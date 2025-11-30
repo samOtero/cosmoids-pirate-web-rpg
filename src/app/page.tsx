@@ -1,13 +1,20 @@
 "use client";
 import { lazy, Suspense } from "react";
 import { useGameStore } from "@/store/gameStore";
-import { Screens } from "@/types/baseGames";
+import { Screens } from "@/types/baseGame";
 
 const StartScreen = lazy(() => import("@/app/components/startScreen"));
 const ProfileScreen = lazy(() => import("@/app/components/profileScreen"));
 
 export default function Home() {
-  const { currentScreen, setScreen } = useGameStore();
+  const {
+    currentScreen,
+    setScreen,
+    profiles,
+    createProfile,
+    deleteProfile,
+    selectProfile,
+  } = useGameStore();
 
   if (currentScreen === Screens.START) {
     return (
@@ -21,10 +28,10 @@ export default function Home() {
     return (
       <Suspense fallback={<div>Loading...</div>}>
         <ProfileScreen
-          profiles={[]}
-          onSelect={() => {}}
-          onCreate={() => {}}
-          onDelete={() => {}}
+          profiles={profiles}
+          onSelect={selectProfile}
+          onCreate={createProfile}
+          onDelete={deleteProfile}
         />
       </Suspense>
     );

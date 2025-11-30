@@ -1,13 +1,13 @@
-import { Profile } from "@/types/baseGames";
+import { Profile } from "@/types/baseGame";
 import { useState } from "react";
 import Panel from "@/app/components/ui/Panel";
 import { Button } from "@/app/components/ui/Button";
 
 interface ProfileScreenProps {
-  profiles: Profile[];
-  onSelect: (profile: Profile) => void;
-  onCreate: (name: string, slotId: number) => void;
-  onDelete: (id: number) => void;
+  profiles: (Profile | null)[];
+  onSelect: (slotId: number) => void;
+  onCreate: (slotId: number, name: string) => void;
+  onDelete: (slotId: number) => void;
 }
 
 export default function ProfileScreen({
@@ -19,11 +19,12 @@ export default function ProfileScreen({
   const [creatingSlot, setCreatingSlot] = useState<number | null>(null);
   const [newName, setNewName] = useState("");
 
-  const handleCreate = (e: React.FormEvent) => {
+  const handleCreate = (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (creatingSlot !== null && newName.trim() !== "") {
       // Logic to create a new profile with the name `newName` in slot `creatingSlot`
       console.log(`Creating profile "${newName}" in slot ${creatingSlot}`);
-      onCreate(newName.trim(), creatingSlot);
+      onCreate(creatingSlot, newName.trim());
       setCreatingSlot(null);
       setNewName("");
     }
@@ -37,7 +38,7 @@ export default function ProfileScreen({
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
         {[0, 1, 2].map((slotId) => {
-          const profile = profiles.find((p) => p.id === slotId);
+          const profile = profiles[slotId];
 
           if (creatingSlot === slotId) {
             return (
@@ -84,7 +85,7 @@ export default function ProfileScreen({
                 className="flex flex-col justify-between h-64 group cursor-pointer hover:border-cyan-500 transition-colors"
               >
                 <div
-                  onClick={() => onSelect(profile)}
+                  onClick={() => onSelect(slotId)}
                   className="flex-1 flex flex-col items-center justify-center space-y-2"
                 >
                   <div className="w-16 h-16 bg-blue-900 rounded-full flex items-center justify-center text-3xl mb-2">
@@ -113,7 +114,7 @@ export default function ProfileScreen({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (confirm("Delete save?")) onDelete(profile.id);
+                      if (confirm("Delete save?")) onDelete(slotId);
                     }}
                     className="text-red-400 hover:text-red-300 text-xs uppercase font-bold"
                   >
