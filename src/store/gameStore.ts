@@ -68,6 +68,9 @@ export const useGameStore = create<GameState>()(
     }),
     {
       name: "cosmoids-game-state",
+      partialize: (state) => ({
+        profiles: state.profiles,
+      }),
     }
   )
 );
