@@ -22,8 +22,6 @@ export default function ProfileScreen({
   const handleCreate = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (creatingSlot !== null && newName.trim() !== "") {
-      // Logic to create a new profile with the name `newName` in slot `creatingSlot`
-      console.log(`Creating profile "${newName}" in slot ${creatingSlot}`);
       onCreate(creatingSlot, newName.trim());
       setCreatingSlot(null);
       setNewName("");

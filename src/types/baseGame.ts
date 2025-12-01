@@ -58,3 +58,9 @@ export interface Island {
   unlocked: boolean;
   cleared: boolean;
 }
+
+export interface DialogLine {
+  speaker: string;
+  text: string;
+  emotion?: "neutral" | "happy" | "angry" | "surprised";
+}

@@ -49,3 +49,11 @@ export const ISLANDS: Island[] = [
     cleared: false,
   },
 ];
+
+export const SPEAKER_IMAGES: Record<string, string> = {
+  Guide: "https://picsum.photos/seed/guide_npc/300/300",
+  Crewmate: "https://picsum.photos/seed/crewmate_npc/300/300",
+  "Old Sailor": "https://picsum.photos/seed/oldsailor/300/300",
+  Narrator: "https://picsum.photos/seed/narrator_book/300/300",
+  default: "https://picsum.photos/seed/unknown_npc/300/300",
+};
