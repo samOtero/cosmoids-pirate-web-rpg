@@ -98,9 +98,8 @@ export default function DialogScreen({
         />
       </div>
 
-      {/* Characters Area */}
-      <div className="flex-1 flex items-end justify-center px-8 pb-32 relative z-10 max-w-6xl mx-auto w-full">
-        {/* Portrait */}
+      {/* Portrait - positioned on left, above dialog */}
+      <div className="absolute bottom-44 md:bottom-52 left-8 md:left-12 z-30">
         <div
           className={`transition-all duration-500 transform ${
             isTyping ? "scale-105 brightness-110" : "scale-100 brightness-100"
