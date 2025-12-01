@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌊 Oceanic Odyssey
 
-## Getting Started
+Pirate-themed creature collection RPG with turn-based battles and island exploration.
 
-First, run the development server:
+## Tech Stack
+Next.js 16 • React 19 • TypeScript • Tailwind CSS 4 • Zustand • Vitest
+
+## Quick Start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install    # Auto-configures git hooks
+pnpm dev        # http://localhost:3000
+pnpm test       # Run tests
+pnpm build      # Production build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Features
+- 3 save profiles with localStorage persistence
+- Island navigation with unlockable areas
+- Creature collection
+- Turn-based battle system
+- Inventory management
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
+```
+src/
+├── app/components/     # UI components
+├── store/gameStore.ts  # Zustand state
+├── types/baseGame.ts   # TypeScript types
+└── __tests__/          # Integration tests
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Testing
+- **Integration tests** cover profile management, state, and persistence
+- **Pre-push hook** runs tests automatically before `git push`
+- Coverage: Profile CRUD, navigation, form validation
 
-## Learn More
+## Scripts
+- `pnpm test run` - Run all tests once
+- `pnpm test:ui` - Visual test runner
+- `pnpm test:coverage` - Coverage report
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Built with [Next.js](https://nextjs.org) • State by [Zustand](https://github.com/pmndrs/zustand) • Tests with [Vitest](https://vitest.dev)
