@@ -47,3 +47,14 @@ export interface Profile {
   unlockedIslands: number; // Max island index unlocked
   currentIslandId: number;
 }
+
+
+export interface Island {
+  id: number;
+  name: string;
+  description: string;
+  difficulty: number;
+  coordinates: { x: number; y: number }; // Percentage 0-100
+  unlocked: boolean;
+  cleared: boolean;
+}
