@@ -34,7 +34,11 @@ export const useGameStore = create<GameState>()(
             unlockedIslands: 0,
             currentIslandId: 0,
           };
-          return { profiles: newProfiles };
+          return {
+            profiles: newProfiles,
+            currentProfileId: slotId,
+            currentScreen: Screens.DIALOG,
+          };
         }),
       deleteProfile: (slotId: number) =>
         set((state) => {
@@ -52,6 +56,7 @@ export const useGameStore = create<GameState>()(
           if (slotId < 0 || slotId >= MAX_PROFILES || !state.profiles[slotId])
             return state;
           const newProfiles = [...state.profiles];
+          const isNewPlayer = newProfiles[slotId]?.isNew;
           if (newProfiles[slotId]) {
             newProfiles[slotId] = {
               ...newProfiles[slotId]!,
@@ -62,7 +67,7 @@ export const useGameStore = create<GameState>()(
           return {
             profiles: newProfiles,
             currentProfileId: slotId,
-            currentScreen: Screens.MAP,
+            currentScreen: isNewPlayer ? Screens.DIALOG : Screens.MAP,
           };
         }),
     }),

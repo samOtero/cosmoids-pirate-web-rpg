@@ -57,3 +57,22 @@ export const SPEAKER_IMAGES: Record<string, string> = {
   Narrator: "https://picsum.photos/seed/narrator_book/300/300",
   default: "https://picsum.photos/seed/unknown_npc/300/300",
 };
+
+export const NEW_PLAYER_WELCOME_DIALOG = [
+  {
+    speaker: "Guide",
+    text: "Ahoy there, sailor! Welcome to the Cosmoid Islands!",
+  },
+  {
+    speaker: "Guide",
+    text: "These waters are filled with mysterious creatures waiting to be discovered. Some will become your loyal companions on this journey.",
+  },
+  {
+    speaker: "Guide",
+    text: "Navigate between islands, collect creatures, and prove yourself as the greatest pirate explorer in these seas!",
+  },
+  {
+    speaker: "Guide",
+    text: "Your adventure begins at Home Shore. Fair winds and following seas, captain!",
+  },
+];

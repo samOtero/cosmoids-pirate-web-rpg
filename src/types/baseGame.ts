@@ -1,6 +1,7 @@
 export enum Screens {
   START = "START",
   PROFILES = "PROFILES",
+  DIALOG = "DIALOG",
   MAP = "MAP",
   BATTLE = "BATTLE",
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { screen, waitFor } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { render, resetStore } from "@/__tests__/utils/test-utils";
 import ProfileScreen from "@/app/components/profileScreen";
