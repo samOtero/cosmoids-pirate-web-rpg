@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Panel from "@/app/components/ui/Panel";
 import { SPEAKER_IMAGES } from "@/constants/game";
 import { DialogLine } from "@/types/baseGame";
@@ -17,6 +17,7 @@ export default function DialogScreen({
   const [lineIndex, setLineIndex] = useState(0);
   const [displayedText, setDisplayedText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const currentLine = sequence[lineIndex];
 
@@ -28,24 +29,30 @@ export default function DialogScreen({
     setIsTyping(true);
     let charIndex = 0;
 
-    const interval = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       charIndex++;
       if (charIndex <= currentLine.text.length) {
         setDisplayedText(currentLine.text.slice(0, charIndex));
       } else {
-        clearInterval(interval);
+        if (intervalRef.current) clearInterval(intervalRef.current);
         setIsTyping(false);
       }
     }, 25); // Speed of typing
 
-    return () => clearInterval(interval);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, [currentLine, lineIndex]); // Re-run when line changes
 
   const handleClick = () => {
     if (isLoading) return;
 
     if (isTyping) {
-      // Complete text immediately
+      // Complete text immediately and stop the interval
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
       setDisplayedText(currentLine.text);
       setIsTyping(false);
     } else {
