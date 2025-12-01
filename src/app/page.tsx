@@ -1,7 +1,7 @@
 "use client";
 import { lazy, Suspense } from "react";
 import { useGameStore } from "@/store/gameStore";
-import { Profile, Screens } from "@/types/baseGame";
+import { Screens } from "@/types/baseGame";
 import { NEW_PLAYER_WELCOME_DIALOG } from "@/constants/game";
 
 const StartScreen = lazy(() => import("@/app/components/startScreen"));
@@ -14,6 +14,7 @@ export default function Home() {
     currentScreen,
     setScreen,
     profiles,
+    currentProfileId,
     createProfile,
     deleteProfile,
     selectProfile,
@@ -52,10 +53,18 @@ export default function Home() {
   }
 
   if (currentScreen === Screens.MAP) {
+    const currentProfile =
+      currentProfileId !== null ? profiles[currentProfileId] : null;
+
+    if (!currentProfile) {
+      setScreen(Screens.PROFILES);
+      return null;
+    }
+
     return (
       <Suspense fallback={<div>Loading...</div>}>
         <MapScreen
-          profile={profiles[0] as Profile}
+          profile={currentProfile}
           onTravel={function (islandId: number): void {
             throw new Error("Function not implemented.");
           }}
