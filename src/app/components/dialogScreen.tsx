@@ -122,11 +122,9 @@ export default function DialogScreen({
         <Panel className="min-h-[160px] flex flex-col justify-start items-start bg-ocean-dark/95 border-wood-light">
           <div className="text-xl md:text-2xl text-sand font-mono leading-relaxed drop-shadow-md">
             {displayedText}
-            <span
-              className={`inline-block w-3 h-6 bg-cyan-400 ml-1 align-middle ${
-                isTyping ? "animate-pulse" : "hidden"
-              }`}
-            ></span>
+            {isTyping && (
+              <span className="inline-block w-3 h-6 bg-cyan-400 ml-1 align-middle animate-pulse"></span>
+            )}
           </div>
 
           {!isTyping && (
