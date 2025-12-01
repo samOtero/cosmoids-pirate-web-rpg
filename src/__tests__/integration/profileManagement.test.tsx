@@ -17,7 +17,7 @@ describe("Profile Management Integration", () => {
   });
 
   describe("Profile Creation", () => {
-    it("should create a profile in an empty slot with valid name", async () => {
+    it("should create a profile in an empty slot", async () => {
       const user = userEvent.setup();
 
       render(
@@ -33,94 +33,8 @@ describe("Profile Management Integration", () => {
       const emptySlots = screen.getAllByText("Empty Slot");
       await user.click(emptySlots[0].closest("div")!);
 
-      // Should show creation form
-      expect(screen.getByPlaceholderText("Enter Name")).toBeInTheDocument();
-
-      // Enter name and create
-      const input = screen.getByPlaceholderText("Enter Name");
-      await user.type(input, "Captain Jack");
-
-      const createButton = screen.getByRole("button", { name: /create/i });
-      await user.click(createButton);
-
       // Verify onCreate was called with correct parameters
-      expect(mockOnCreate).toHaveBeenCalledWith(0, "Captain Jack");
-    });
-
-    it("should not create profile with empty name", async () => {
-      const user = userEvent.setup();
-
-      render(
-        <ProfileScreen
-          profiles={[null, null, null]}
-          onSelect={mockOnSelect}
-          onCreate={mockOnCreate}
-          onDelete={mockOnDelete}
-        />
-      );
-
-      const emptySlots = screen.getAllByText("Empty Slot");
-      await user.click(emptySlots[0].closest("div")!);
-
-      const createButton = screen.getByRole("button", { name: /create/i });
-      await user.click(createButton);
-
-      // onCreate should not be called with empty name
-      expect(mockOnCreate).not.toHaveBeenCalled();
-    });
-
-    it("should clear form when canceling profile creation", async () => {
-      const user = userEvent.setup();
-
-      render(
-        <ProfileScreen
-          profiles={[null, null, null]}
-          onSelect={mockOnSelect}
-          onCreate={mockOnCreate}
-          onDelete={mockOnDelete}
-        />
-      );
-
-      const emptySlots = screen.getAllByText("Empty Slot");
-      await user.click(emptySlots[0].closest("div")!);
-
-      const input = screen.getByPlaceholderText("Enter Name");
-      await user.type(input, "Test Name");
-
-      const cancelButton = screen.getByRole("button", { name: /cancel/i });
-      await user.click(cancelButton);
-
-      // Form should be hidden
-      expect(
-        screen.queryByPlaceholderText("Enter Name")
-      ).not.toBeInTheDocument();
-      expect(screen.getAllByText("Empty Slot")).toHaveLength(3);
-    });
-
-    it("should trim whitespace from profile name", async () => {
-      const user = userEvent.setup();
-
-      render(
-        <ProfileScreen
-          profiles={[null, null, null]}
-          onSelect={mockOnSelect}
-          onCreate={mockOnCreate}
-          onDelete={mockOnDelete}
-        />
-      );
-
-      const emptySlots = screen.getAllByText("Empty Slot");
-      await user.click(emptySlots[1].closest("div")!);
-
-      const input = screen.getByPlaceholderText("Enter Name");
-      // Type the name - note that maxLength=12 in the component will truncate it
-      await user.clear(input);
-      await user.type(input, "Spaced Name");
-
-      const createButton = screen.getByRole("button", { name: /create/i });
-      await user.click(createButton);
-
-      expect(mockOnCreate).toHaveBeenCalledWith(1, "Spaced Name");
+      expect(mockOnCreate).toHaveBeenCalledWith(0);
     });
   });
 
@@ -256,12 +170,12 @@ describe("Profile Management Integration", () => {
     it("should create profile and update store state", () => {
       const { createProfile } = useGameStore.getState();
 
-      createProfile(0, "Store Test");
+      createProfile(0);
 
       const state = useGameStore.getState();
       expect(state.profiles[0]).toMatchObject({
         id: 0,
-        name: "Store Test",
+        name: "Caleb",
         isNew: true,
         creatures: [],
         inventory: [],
@@ -274,8 +188,8 @@ describe("Profile Management Integration", () => {
     it("should not create profile with invalid slot ID", () => {
       const { createProfile } = useGameStore.getState();
 
-      createProfile(-1, "Invalid");
-      createProfile(5, "Invalid");
+      createProfile(-1);
+      createProfile(5);
 
       const state = useGameStore.getState();
       expect(state.profiles.every((p) => p === null)).toBe(true);
@@ -285,7 +199,7 @@ describe("Profile Management Integration", () => {
       const { createProfile, selectProfile, deleteProfile } =
         useGameStore.getState();
 
-      createProfile(1, "To Delete");
+      createProfile(1);
       selectProfile(1);
 
       let state = useGameStore.getState();
@@ -301,7 +215,7 @@ describe("Profile Management Integration", () => {
     it("should select profile and navigate to MAP screen", () => {
       const { createProfile, selectProfile } = useGameStore.getState();
 
-      createProfile(0, "Navigator");
+      createProfile(0);
       selectProfile(0);
 
       const state = useGameStore.getState();
@@ -313,7 +227,7 @@ describe("Profile Management Integration", () => {
     it("should update lastPlayed timestamp on selection", async () => {
       const { createProfile, selectProfile } = useGameStore.getState();
 
-      createProfile(2, "Time Test");
+      createProfile(2);
       const initialTime = useGameStore.getState().profiles[2]?.lastPlayed;
 
       // Wait a bit to ensure time difference
@@ -328,14 +242,16 @@ describe("Profile Management Integration", () => {
     it("should handle multiple profiles independently", () => {
       const { createProfile } = useGameStore.getState();
 
-      createProfile(0, "Profile One");
-      createProfile(1, "Profile Two");
-      createProfile(2, "Profile Three");
+      const defaultName = "Caleb";
+
+      createProfile(0);
+      createProfile(1);
+      createProfile(2);
 
       const state = useGameStore.getState();
-      expect(state.profiles[0]?.name).toBe("Profile One");
-      expect(state.profiles[1]?.name).toBe("Profile Two");
-      expect(state.profiles[2]?.name).toBe("Profile Three");
+      expect(state.profiles[0]?.name).toBe(defaultName);
+      expect(state.profiles[1]?.name).toBe(defaultName);
+      expect(state.profiles[2]?.name).toBe(defaultName);
     });
 
     it("should not select non-existent profile", () => {
@@ -363,12 +279,10 @@ describe("Profile Management Integration", () => {
       );
 
       // Create in slot 0
-      let emptySlots = screen.getAllByText("Empty Slot");
+      const emptySlots = screen.getAllByText("Empty Slot");
       await user.click(emptySlots[0].closest("div")!);
-      await user.type(screen.getByPlaceholderText("Enter Name"), "Profile 1");
-      await user.click(screen.getByRole("button", { name: /create/i }));
 
-      expect(mockOnCreate).toHaveBeenCalledWith(0, "Profile 1");
+      expect(mockOnCreate).toHaveBeenCalledWith(0);
     });
 
     it("should display all three profile slots", () => {
