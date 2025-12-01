@@ -1,12 +1,11 @@
 import { Profile } from "@/types/baseGame";
-import { useState } from "react";
 import Panel from "@/app/components/ui/Panel";
 import { Button } from "@/app/components/ui/Button";
 
 interface ProfileScreenProps {
   profiles: (Profile | null)[];
   onSelect: (slotId: number) => void;
-  onCreate: (slotId: number, name: string) => void;
+  onCreate: (slotId: number) => void;
   onDelete: (slotId: number) => void;
 }
 
@@ -16,18 +15,6 @@ export default function ProfileScreen({
   onCreate,
   onDelete,
 }: ProfileScreenProps) {
-  const [creatingSlot, setCreatingSlot] = useState<number | null>(null);
-  const [newName, setNewName] = useState("");
-
-  const handleCreate = (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (creatingSlot !== null && newName.trim() !== "") {
-      onCreate(creatingSlot, newName.trim());
-      setCreatingSlot(null);
-      setNewName("");
-    }
-  };
-
   return (
     <div className="flex flex-col items-center justify-center h-full p-4">
       <h2 className="text-3xl text-sand font-bold mb-8 uppercase tracking-widest border-b-2 border-wood pb-2">
@@ -37,44 +24,6 @@ export default function ProfileScreen({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
         {[0, 1, 2].map((slotId) => {
           const profile = profiles[slotId];
-
-          if (creatingSlot === slotId) {
-            return (
-              <Panel
-                key={slotId}
-                className="flex flex-col items-center justify-center h-64 space-y-4"
-              >
-                <h3 className="text-sand font-bold">New Adventurer</h3>
-                <form
-                  onSubmit={handleCreate}
-                  className="flex flex-col gap-2 w-full px-4"
-                >
-                  <input
-                    autoFocus
-                    type="text"
-                    maxLength={12}
-                    placeholder="Enter Name"
-                    value={newName}
-                    onChange={(e) => setNewName(e.target.value)}
-                    className="bg-black/30 border border-wood text-sand p-2 rounded text-center focus:outline-none focus:border-cyan-500"
-                  />
-                  <div className="flex gap-2 justify-center mt-2">
-                    <Button type="submit" variant="primary" className="text-sm">
-                      Create
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      className="text-sm"
-                      onClick={() => setCreatingSlot(null)}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </form>
-              </Panel>
-            );
-          }
 
           if (profile) {
             return (
@@ -129,7 +78,7 @@ export default function ProfileScreen({
               className="flex flex-col items-center justify-center h-64 cursor-pointer hover:bg-white/5 transition-colors"
             >
               <div
-                onClick={() => setCreatingSlot(slotId)}
+                onClick={() => onCreate(slotId)}
                 className="text-center space-y-4"
               >
                 <div className="text-4xl text-wood-light opacity-50">+</div>

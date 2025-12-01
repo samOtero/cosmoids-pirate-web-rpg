@@ -8,7 +8,7 @@ interface GameState {
   setScreen: (screen: Screens) => void;
   profiles: (Profile | null)[];
   currentProfileId: number | null;
-  createProfile: (slotId: number, name: string) => void;
+  createProfile: (slotId: number) => void;
   deleteProfile: (slotId: number) => void;
   selectProfile: (slotId: number) => void;
 }
@@ -20,13 +20,13 @@ export const useGameStore = create<GameState>()(
       setScreen: (screen) => set({ currentScreen: screen }),
       profiles: Array(MAX_PROFILES).fill(null),
       currentProfileId: null,
-      createProfile: (slotId: number, name: string) =>
+      createProfile: (slotId: number) =>
         set((state) => {
           if (slotId < 0 || slotId >= MAX_PROFILES) return state;
           const newProfiles = [...state.profiles];
           newProfiles[slotId] = {
             id: slotId,
-            name,
+            name: `Caleb`,
             lastPlayed: Date.now(),
             isNew: true,
             creatures: [],
