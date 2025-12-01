@@ -212,7 +212,7 @@ describe("Profile Management Integration", () => {
       expect(state.currentProfileId).toBe(null);
     });
 
-    it("should select profile and navigate to MAP screen", () => {
+    it("should select NEW profile and navigate to DIALOG screen", () => {
       const { createProfile, selectProfile } = useGameStore.getState();
 
       createProfile(0);
@@ -220,7 +220,7 @@ describe("Profile Management Integration", () => {
 
       const state = useGameStore.getState();
       expect(state.currentProfileId).toBe(0);
-      expect(state.currentScreen).toBe(Screens.MAP);
+      expect(state.currentScreen).toBe(Screens.DIALOG);
       expect(state.profiles[0]?.isNew).toBe(false);
     });
 
