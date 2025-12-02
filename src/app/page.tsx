@@ -46,6 +46,7 @@ export default function Home() {
       <Suspense fallback={<div>Loading...</div>}>
         <DialogScreen
           sequence={NEW_PLAYER_WELCOME_DIALOG}
+          backgroundImageKey="Caleb_House"
           onContinue={() => setScreen(Screens.MAP)}
         />
       </Suspense>

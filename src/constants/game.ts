@@ -62,6 +62,12 @@ export const SPEAKER_IMAGES: Record<string, string> = {
   default: "https://picsum.photos/seed/unknown_npc/300/300",
 };
 
+export const BACKGROUND_IMAGES: Record<string, string> = {
+  Caleb_House: "/bg_caleb_house_1.png",
+  First_Town_Docks: "/bg_first_town_docks.png",
+  default: "/bg_caleb_house_1.png",
+};
+
 export const NEW_PLAYER_WELCOME_DIALOG = [
   {
     portraitKey: "Grandpa_Neutral_Starter_Outfit",
@@ -95,7 +101,7 @@ export const NEW_PLAYER_WELCOME_DIALOG = [
   },
   {
     portraitKey: "Caleb_Happy_Starter_Outfit",
-    text: "I'm on my way! I can't wait to see what new cosmoids they brought back!",
+    text: "I'm on my way! I can't wait to see what new Cosmoids they brought back!",
     displayName: "Caleb",
   },
 ];

@@ -1,19 +1,21 @@
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Panel from "@/app/components/ui/Panel";
-import { SPEAKER_IMAGES } from "@/constants/game";
+import { SPEAKER_IMAGES, BACKGROUND_IMAGES } from "@/constants/game";
 import { DialogLine } from "@/types/baseGame";
 
 interface StoryScreenProps {
   sequence: DialogLine[];
   onContinue: () => void;
   isLoading?: boolean;
+  backgroundImageKey: string;
 }
 
 export default function DialogScreen({
   sequence,
   onContinue,
   isLoading,
+  backgroundImageKey,
 }: StoryScreenProps) {
   const [lineIndex, setLineIndex] = useState(0);
   const [displayedText, setDisplayedText] = useState("");
@@ -76,6 +78,11 @@ export default function DialogScreen({
     return line.displayName;
   };
 
+  const getBackgroundImage = (backgroundImageKey: string) => {
+    if (BACKGROUND_IMAGES[backgroundImageKey]) return BACKGROUND_IMAGES[backgroundImageKey];
+    return BACKGROUND_IMAGES["default"];
+  };
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-8 relative">
@@ -97,7 +104,7 @@ export default function DialogScreen({
       {/* Background */}
       <div className="absolute inset-0 bg-black/60 z-0">
         <Image
-          src="/bg_caleb_house_1.png"
+          src={getBackgroundImage(backgroundImageKey)}
           alt="Story background"
           fill
           className="object-cover opacity-50"
