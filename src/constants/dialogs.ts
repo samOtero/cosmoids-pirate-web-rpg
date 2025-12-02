@@ -75,7 +75,7 @@ export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
       displayName: "Grandpa",
     },
     {
-      portraitKey: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
+      portraitKey: SpeakerImageKey.CALEB_DISAPPOINTED_STARTER_OUTFIT,
       text: "They aren't coming, are they...?",
       displayName: "Caleb",
     },
@@ -85,7 +85,7 @@ export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
       displayName: "Grandpa",
     },
     {
-      portraitKey: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
+      portraitKey: SpeakerImageKey.CALEB_DISAPPOINTED_STARTER_OUTFIT,
       text: 'They said they\'d be here by sunrise. "For sure this time," Dad said in the letter. I guess... I guess finding that Legendary Island was more important than...',
       displayName: "Caleb",
     },
@@ -100,7 +100,7 @@ export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
       displayName: "",
     },
     {
-      portraitKey: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
+      portraitKey: SpeakerImageKey.CALEB_SCARED_SURPRISED_STARTER_OUTFIT,
       text: "Grandpa! Watch out! It's coming straight at you!",
       displayName: "Caleb",
     },

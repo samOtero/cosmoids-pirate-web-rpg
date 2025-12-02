@@ -60,6 +60,10 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
     "/dialog_caleb_yawn_starter_outfit.png",
   [SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT]:
     "/dialog_caleb_happy_starter_outfit.png",
+  [SpeakerImageKey.CALEB_DISAPPOINTED_STARTER_OUTFIT]:
+    "/dialog_caleb_disappointed_starter_outfit.png",
+  [SpeakerImageKey.CALEB_SCARED_SURPRISED_STARTER_OUTFIT]:
+    "/dialog_caleb_scared_surprised_starter_outfit.png",
   [SpeakerImageKey.CREWMATE]: "https://picsum.photos/seed/crewmate_npc/300/300",
   [SpeakerImageKey.OLD_SAILOR]: "https://picsum.photos/seed/oldsailor/300/300",
   [SpeakerImageKey.NARRATOR]:

@@ -20,6 +20,8 @@ export enum SpeakerImageKey {
   CALEB_NEUTRAL_STARTER_OUTFIT = "Caleb_Neutral_Starter_Outfit",
   CALEB_YAWN_STARTER_OUTFIT = "Caleb_Yawn_Starter_Outfit",
   CALEB_HAPPY_STARTER_OUTFIT = "Caleb_Happy_Starter_Outfit",
+  CALEB_DISAPPOINTED_STARTER_OUTFIT = "Caleb_Disappointed_Starter_Outfit",
+  CALEB_SCARED_SURPRISED_STARTER_OUTFIT = "Caleb_Scared_Surprised_Starter_Outfit",
   CREWMATE = "Crewmate",
   OLD_SAILOR = "Old Sailor",
   NARRATOR = "Narrator",
