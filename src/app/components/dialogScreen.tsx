@@ -22,6 +22,17 @@ export default function DialogScreen({
   const [isTyping, setIsTyping] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Reset state when sequence changes to support dialog chaining
+  useEffect(() => {
+    setLineIndex(0);
+    setDisplayedText("");
+    setIsTyping(false);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, [sequence]);
+
   const currentLine = sequence[lineIndex];
 
   // Typewriter effect
@@ -79,7 +90,8 @@ export default function DialogScreen({
   };
 
   const getBackgroundImage = (backgroundImageKey: BackgroundImageKey) => {
-    if (BACKGROUND_IMAGES[backgroundImageKey]) return BACKGROUND_IMAGES[backgroundImageKey];
+    if (BACKGROUND_IMAGES[backgroundImageKey])
+      return BACKGROUND_IMAGES[backgroundImageKey];
     return BACKGROUND_IMAGES[BackgroundImageKey.DEFAULT];
   };
 
@@ -136,7 +148,7 @@ export default function DialogScreen({
 
       {/* Dialog Box */}
       <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8 z-20">
-        <Panel className="min-h-[160px] flex flex-col justify-start items-start bg-ocean-dark/95 border-wood-light">
+        <Panel className="min-h-40 flex flex-col justify-start items-start bg-ocean-dark/95 border-wood-light">
           <div className="text-xl md:text-2xl text-sand font-mono leading-relaxed drop-shadow-md">
             {displayedText}
             {isTyping && (

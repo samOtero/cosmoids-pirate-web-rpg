@@ -24,6 +24,7 @@ export enum SpeakerImageKey {
   OLD_SAILOR = "Old Sailor",
   NARRATOR = "Narrator",
   DEFAULT = "default",
+  EMPTY = "empty",
 }
 
 export enum BackgroundImageKey {
@@ -67,7 +68,6 @@ export interface Profile {
   currentIslandId: number;
 }
 
-
 export interface Island {
   id: number;
   name: string;
@@ -86,6 +86,7 @@ export interface DialogLine {
 
 export enum DialogContext {
   GAME_INTRO = "GAME_INTRO",
+  GAME_INTRO_PART_2 = "GAME_INTRO_PART_2",
   ISLAND_INTRO = "ISLAND_INTRO",
   ISLAND_VICTORY = "ISLAND_VICTORY",
   ISLAND_DEFEAT = "ISLAND_DEFEAT",

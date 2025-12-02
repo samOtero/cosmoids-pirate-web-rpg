@@ -3,6 +3,7 @@ import {
   SpeakerImageKey,
   Screens,
   BackgroundImageKey,
+  DialogContext,
 } from "@/types/baseGame";
 
 export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
@@ -44,6 +45,62 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     },
   ],
   backgroundImageKey: BackgroundImageKey.CALEB_HOUSE,
+  next: {
+    screen: Screens.DIALOG,
+    context: DialogContext.GAME_INTRO_PART_2,
+    contextData: { islandId: 0 },
+  },
+};
+
+export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
+  sequence: [
+    {
+      portraitKey: SpeakerImageKey.EMPTY,
+      text: "A few minutes later, at the docks...",
+      displayName: "",
+    },
+    {
+      portraitKey: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
+      text: "Grandpa! Do you see them?",
+      displayName: "Caleb",
+    },
+    {
+      portraitKey: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+      text: "Hmmph. That's strange. The winds are fair, and your father is never late for a celebration cake...",
+      displayName: "Grandpa",
+    },
+    {
+      portraitKey: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
+      text: "They aren't coming, are they...?",
+      displayName: "Caleb",
+    },
+    {
+      portraitKey: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+      text: "Now, don't say that...",
+      displayName: "Grandpa",
+    },
+    {
+      portraitKey: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
+      text: 'They said they\'d be here by sunrise. "For sure this time," Dad said in the letter. I guess... I guess finding that Legendary Island was more important than...',
+      displayName: "Caleb",
+    },
+    {
+      portraitKey: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+      text: "Don't talk like that, lad. They're probably just chasing a rare Cosmoid. You know how your father gets when he sees something shiny.",
+      displayName: "Grandpa",
+    },
+    {
+      portraitKey: SpeakerImageKey.EMPTY,
+      text: "Suddenly, a high-pitched screech is heard from the sky.",
+      displayName: "",
+    },
+    {
+      portraitKey: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
+      text: "Grandpa! Watch out! It's coming straight at you!",
+      displayName: "Caleb",
+    },
+  ],
+  backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
   next: {
     screen: Screens.MAP,
   },

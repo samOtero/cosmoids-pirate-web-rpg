@@ -9,6 +9,7 @@ import {
   ISLAND_INTRO_DIALOGS,
   ISLAND_VICTORY_DIALOGS,
   ISLAND_DEFEAT_DIALOGS,
+  NEW_PLAYER_WELCOME_DIALOG_PART_2,
 } from "@/constants/dialogs";
 
 export function resolveDialog(
@@ -17,6 +18,10 @@ export function resolveDialog(
 ): DialogConfig {
   if (context === DialogContext.GAME_INTRO) {
     return NEW_PLAYER_WELCOME_DIALOG;
+  }
+
+  if (context === DialogContext.GAME_INTRO_PART_2) {
+    return NEW_PLAYER_WELCOME_DIALOG_PART_2;
   }
 
   if (

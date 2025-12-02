@@ -52,19 +52,25 @@ export const ISLANDS: Island[] = [
 
 export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
   [SpeakerImageKey.GUIDE]: "/dialog_caleb_neutral_starter_outfit.png",
-  [SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT]: "/dialog_grandpa_neutral_starter_outfit.png",
-  [SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT]: "/dialog_caleb_neutral_starter_outfit.png",
-  [SpeakerImageKey.CALEB_YAWN_STARTER_OUTFIT]: "/dialog_caleb_yawn_starter_outfit.png",
-  [SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT]: "/dialog_caleb_happy_starter_outfit.png",
+  [SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT]:
+    "/dialog_grandpa_neutral_starter_outfit.png",
+  [SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT]:
+    "/dialog_caleb_neutral_starter_outfit.png",
+  [SpeakerImageKey.CALEB_YAWN_STARTER_OUTFIT]:
+    "/dialog_caleb_yawn_starter_outfit.png",
+  [SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT]:
+    "/dialog_caleb_happy_starter_outfit.png",
   [SpeakerImageKey.CREWMATE]: "https://picsum.photos/seed/crewmate_npc/300/300",
   [SpeakerImageKey.OLD_SAILOR]: "https://picsum.photos/seed/oldsailor/300/300",
-  [SpeakerImageKey.NARRATOR]: "https://picsum.photos/seed/narrator_book/300/300",
+  [SpeakerImageKey.NARRATOR]:
+    "https://picsum.photos/seed/narrator_book/300/300",
   [SpeakerImageKey.DEFAULT]: "https://picsum.photos/seed/unknown_npc/300/300",
+  [SpeakerImageKey.EMPTY]: "",
 };
 
 export const BACKGROUND_IMAGES: Record<BackgroundImageKey, string> = {
   [BackgroundImageKey.CALEB_HOUSE]: "/bg_caleb_house_1.png",
-  [BackgroundImageKey.FIRST_TOWN_DOCKS]: "/bg_first_town_docks.png",
+  [BackgroundImageKey.FIRST_TOWN_DOCKS]: "/bg_first_town_docks_1.png",
   [BackgroundImageKey.DEFAULT]: "/bg_caleb_house_1.png",
 };
 
