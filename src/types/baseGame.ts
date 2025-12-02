@@ -61,7 +61,8 @@ export interface Island {
 }
 
 export interface DialogLine {
-  speaker: string;
+  portraitKey: string; // Key for looking up portrait in SPEAKER_IMAGES
   text: string;
   emotion?: "neutral" | "happy" | "angry" | "surprised";
+  displayName: string; // The displayed character name
 }

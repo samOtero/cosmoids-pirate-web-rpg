@@ -62,19 +62,23 @@ export const SPEAKER_IMAGES: Record<string, string> = {
 
 export const NEW_PLAYER_WELCOME_DIALOG = [
   {
-    speaker: "Grandpa_Neutral_Starter_Outfit",
+    portraitKey: "Grandpa_Neutral_Starter_Outfit",
     text: "Ahoy there, sailor! Welcome to the Cosmoid Islands!",
+    displayName: "Grandpa",
   },
   {
-    speaker: "Grandpa_Neutral_Starter_Outfit",
+    portraitKey: "Grandpa_Neutral_Starter_Outfit",
     text: "These waters are filled with mysterious creatures waiting to be discovered. Some will become your loyal companions on this journey.",
+    displayName: "Grandpa",
   },
   {
-    speaker: "Caleb_Neutral_Starter_Outfit",
+    portraitKey: "Caleb_Neutral_Starter_Outfit",
     text: "Navigate between islands, collect creatures, and prove yourself as the greatest pirate explorer in these seas!",
+    displayName: "Caleb",
   },
   {
-    speaker: "Grandpa_Neutral_Starter_Outfit",
+    portraitKey: "Grandpa_Neutral_Starter_Outfit",
     text: "Your adventure begins at Home Shore. Fair winds and following seas, captain!",
+    displayName: "Grandpa",
   },
 ];

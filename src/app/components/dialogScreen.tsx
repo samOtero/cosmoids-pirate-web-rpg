@@ -66,11 +66,14 @@ export default function DialogScreen({
     }
   };
 
-  const getPortrait = (speaker: string) => {
-    if (SPEAKER_IMAGES[speaker]) return SPEAKER_IMAGES[speaker];
-    // Try to find if speaker matches player name, if so use a player avatar placeholder
-    // For now, fallback to default
+  const getPortrait = (portraitKey: string) => {
+    if (SPEAKER_IMAGES[portraitKey]) return SPEAKER_IMAGES[portraitKey];
+    // Fallback to default
     return SPEAKER_IMAGES["default"];
+  };
+
+  const getDisplayName = (line: DialogLine) => {
+    return line.displayName;
   };
 
   if (isLoading) {
@@ -111,15 +114,15 @@ export default function DialogScreen({
           }`}
         >
           <Image
-            src={getPortrait(currentLine.speaker)}
-            alt={currentLine.speaker}
+            src={getPortrait(currentLine.portraitKey)}
+            alt={getDisplayName(currentLine)}
             width={256}
             height={256}
             className="w-48 h-48 md:w-64 md:h-64 object-cover border-4 border-wood rounded-lg shadow-2xl bg-black"
             unoptimized
           />
           <div className="bg-wood text-sand font-bold text-center py-1 mt-2 border-2 border-black rounded shadow-lg uppercase tracking-wider">
-            {currentLine.speaker}
+            {getDisplayName(currentLine)}
           </div>
         </div>
       </div>
