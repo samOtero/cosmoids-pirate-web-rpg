@@ -51,7 +51,9 @@ export const ISLANDS: Island[] = [
 ];
 
 export const SPEAKER_IMAGES: Record<string, string> = {
-  Guide: "https://picsum.photos/seed/guide_npc/300/300",
+  Guide: "/dialog_caleb_neutral_starter_outfit.png",
+  Grandpa_Neutral_Starter_Outfit: "/dialog_grandpa_neutral_starter_outfit.png",
+  Caleb_Neutral_Starter_Outfit: "/dialog_caleb_neutral_starter_outfit.png",
   Crewmate: "https://picsum.photos/seed/crewmate_npc/300/300",
   "Old Sailor": "https://picsum.photos/seed/oldsailor/300/300",
   Narrator: "https://picsum.photos/seed/narrator_book/300/300",
@@ -60,19 +62,19 @@ export const SPEAKER_IMAGES: Record<string, string> = {
 
 export const NEW_PLAYER_WELCOME_DIALOG = [
   {
-    speaker: "Guide",
+    speaker: "Grandpa_Neutral_Starter_Outfit",
     text: "Ahoy there, sailor! Welcome to the Cosmoid Islands!",
   },
   {
-    speaker: "Guide",
+    speaker: "Grandpa_Neutral_Starter_Outfit",
     text: "These waters are filled with mysterious creatures waiting to be discovered. Some will become your loyal companions on this journey.",
   },
   {
-    speaker: "Guide",
+    speaker: "Caleb_Neutral_Starter_Outfit",
     text: "Navigate between islands, collect creatures, and prove yourself as the greatest pirate explorer in these seas!",
   },
   {
-    speaker: "Guide",
+    speaker: "Grandpa_Neutral_Starter_Outfit",
     text: "Your adventure begins at Home Shore. Fair winds and following seas, captain!",
   },
 ];

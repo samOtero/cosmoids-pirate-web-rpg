@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
 import Panel from "@/app/components/ui/Panel";
 import { SPEAKER_IMAGES } from "@/constants/game";
 import { DialogLine } from "@/types/baseGame";
@@ -92,9 +93,13 @@ export default function DialogScreen({
     >
       {/* Background */}
       <div className="absolute inset-0 bg-black/60 z-0">
-        <img
+        <Image
           src="https://picsum.photos/seed/ocean_story_bg/1920/1080"
-          className="w-full h-full object-cover opacity-30 grayscale"
+          alt="Story background"
+          fill
+          className="object-cover opacity-30 grayscale"
+          unoptimized
+          priority
         />
       </div>
 
@@ -105,10 +110,13 @@ export default function DialogScreen({
             isTyping ? "scale-105 brightness-110" : "scale-100 brightness-100"
           }`}
         >
-          <img
+          <Image
             src={getPortrait(currentLine.speaker)}
             alt={currentLine.speaker}
+            width={256}
+            height={256}
             className="w-48 h-48 md:w-64 md:h-64 object-cover border-4 border-wood rounded-lg shadow-2xl bg-black"
+            unoptimized
           />
           <div className="bg-wood text-sand font-bold text-center py-1 mt-2 border-2 border-black rounded shadow-lg uppercase tracking-wider">
             {currentLine.speaker}
