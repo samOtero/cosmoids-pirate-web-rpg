@@ -2,13 +2,13 @@ import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Panel from "@/app/components/ui/Panel";
 import { SPEAKER_IMAGES, BACKGROUND_IMAGES } from "@/constants/game";
-import { DialogLine } from "@/types/baseGame";
+import { DialogLine, SpeakerImageKey, BackgroundImageKey } from "@/types/baseGame";
 
 interface StoryScreenProps {
   sequence: DialogLine[];
   onContinue: () => void;
   isLoading?: boolean;
-  backgroundImageKey: string;
+  backgroundImageKey: BackgroundImageKey;
 }
 
 export default function DialogScreen({
@@ -68,19 +68,19 @@ export default function DialogScreen({
     }
   };
 
-  const getPortrait = (portraitKey: string) => {
+  const getPortrait = (portraitKey: SpeakerImageKey) => {
     if (SPEAKER_IMAGES[portraitKey]) return SPEAKER_IMAGES[portraitKey];
     // Fallback to default
-    return SPEAKER_IMAGES["default"];
+    return SPEAKER_IMAGES[SpeakerImageKey.DEFAULT];
   };
 
   const getDisplayName = (line: DialogLine) => {
     return line.displayName;
   };
 
-  const getBackgroundImage = (backgroundImageKey: string) => {
+  const getBackgroundImage = (backgroundImageKey: BackgroundImageKey) => {
     if (BACKGROUND_IMAGES[backgroundImageKey]) return BACKGROUND_IMAGES[backgroundImageKey];
-    return BACKGROUND_IMAGES["default"];
+    return BACKGROUND_IMAGES[BackgroundImageKey.DEFAULT];
   };
 
   if (isLoading) {

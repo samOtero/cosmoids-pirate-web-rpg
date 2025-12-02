@@ -1,4 +1,4 @@
-import { Island } from "@/types/baseGame";
+import { Island, SpeakerImageKey, BackgroundImageKey } from "@/types/baseGame";
 
 export const MAX_PROFILES = 3;
 
@@ -50,57 +50,57 @@ export const ISLANDS: Island[] = [
   },
 ];
 
-export const SPEAKER_IMAGES: Record<string, string> = {
-  Guide: "/dialog_caleb_neutral_starter_outfit.png",
-  Grandpa_Neutral_Starter_Outfit: "/dialog_grandpa_neutral_starter_outfit.png",
-  Caleb_Neutral_Starter_Outfit: "/dialog_caleb_neutral_starter_outfit.png",
-  Caleb_Yawn_Starter_Outfit: "/dialog_caleb_yawn_starter_outfit.png",
-  Caleb_Happy_Starter_Outfit: "/dialog_caleb_happy_starter_outfit.png",
-  Crewmate: "https://picsum.photos/seed/crewmate_npc/300/300",
-  "Old Sailor": "https://picsum.photos/seed/oldsailor/300/300",
-  Narrator: "https://picsum.photos/seed/narrator_book/300/300",
-  default: "https://picsum.photos/seed/unknown_npc/300/300",
+export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
+  [SpeakerImageKey.GUIDE]: "/dialog_caleb_neutral_starter_outfit.png",
+  [SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT]: "/dialog_grandpa_neutral_starter_outfit.png",
+  [SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT]: "/dialog_caleb_neutral_starter_outfit.png",
+  [SpeakerImageKey.CALEB_YAWN_STARTER_OUTFIT]: "/dialog_caleb_yawn_starter_outfit.png",
+  [SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT]: "/dialog_caleb_happy_starter_outfit.png",
+  [SpeakerImageKey.CREWMATE]: "https://picsum.photos/seed/crewmate_npc/300/300",
+  [SpeakerImageKey.OLD_SAILOR]: "https://picsum.photos/seed/oldsailor/300/300",
+  [SpeakerImageKey.NARRATOR]: "https://picsum.photos/seed/narrator_book/300/300",
+  [SpeakerImageKey.DEFAULT]: "https://picsum.photos/seed/unknown_npc/300/300",
 };
 
-export const BACKGROUND_IMAGES: Record<string, string> = {
-  Caleb_House: "/bg_caleb_house_1.png",
-  First_Town_Docks: "/bg_first_town_docks.png",
-  default: "/bg_caleb_house_1.png",
+export const BACKGROUND_IMAGES: Record<BackgroundImageKey, string> = {
+  [BackgroundImageKey.CALEB_HOUSE]: "/bg_caleb_house_1.png",
+  [BackgroundImageKey.FIRST_TOWN_DOCKS]: "/bg_first_town_docks.png",
+  [BackgroundImageKey.DEFAULT]: "/bg_caleb_house_1.png",
 };
 
 export const NEW_PLAYER_WELCOME_DIALOG = [
   {
-    portraitKey: "Grandpa_Neutral_Starter_Outfit",
+    portraitKey: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
     text: "Caleb! Wake up, you sleepy sea-pup!",
     displayName: "Grandpa",
   },
   {
-    portraitKey: "Grandpa_Neutral_Starter_Outfit",
+    portraitKey: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
     text: "You can't sleep through your own birthday. Not when the Horizon Chaser is due in port any minute!",
     displayName: "Grandpa",
   },
   {
-    portraitKey: "Caleb_Yawn_Starter_Outfit",
+    portraitKey: SpeakerImageKey.CALEB_YAWN_STARTER_OUTFIT,
     text: "*Yawn* The Horizon Chaser...?",
     displayName: "Caleb",
   },
   {
-    portraitKey: "Caleb_Happy_Starter_Outfit",
+    portraitKey: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
     text: "Mom! Dad! Did they sound the horn?! Did I miss them docking?!",
     displayName: "Caleb",
   },
   {
-    portraitKey: "Grandpa_Neutral_Starter_Outfit",
+    portraitKey: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
     text: "Easy now! No horn yet. Go wash your face in the basin, then meet me at the docks. I'll keep an eye out for your folks.",
     displayName: "Grandpa",
   },
   {
-    portraitKey: "Grandpa_Neutral_Starter_Outfit",
+    portraitKey: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
     text: "And fix that mop on your head! You look like a castaway.",
     displayName: "Grandpa",
   },
   {
-    portraitKey: "Caleb_Happy_Starter_Outfit",
+    portraitKey: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
     text: "I'm on my way! I can't wait to see what new Cosmoids they brought back!",
     displayName: "Caleb",
   },

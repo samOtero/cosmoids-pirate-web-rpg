@@ -14,6 +14,24 @@ export enum ElementType {
   NORMAL = "Normal",
 }
 
+export enum SpeakerImageKey {
+  GUIDE = "Guide",
+  GRANDPA_NEUTRAL_STARTER_OUTFIT = "Grandpa_Neutral_Starter_Outfit",
+  CALEB_NEUTRAL_STARTER_OUTFIT = "Caleb_Neutral_Starter_Outfit",
+  CALEB_YAWN_STARTER_OUTFIT = "Caleb_Yawn_Starter_Outfit",
+  CALEB_HAPPY_STARTER_OUTFIT = "Caleb_Happy_Starter_Outfit",
+  CREWMATE = "Crewmate",
+  OLD_SAILOR = "Old Sailor",
+  NARRATOR = "Narrator",
+  DEFAULT = "default",
+}
+
+export enum BackgroundImageKey {
+  CALEB_HOUSE = "Caleb_House",
+  FIRST_TOWN_DOCKS = "First_Town_Docks",
+  DEFAULT = "default",
+}
+
 export interface Item {
   id: string;
   name: string;
@@ -61,7 +79,7 @@ export interface Island {
 }
 
 export interface DialogLine {
-  portraitKey: string; // Key for looking up portrait in SPEAKER_IMAGES
+  portraitKey: SpeakerImageKey; // Key for looking up portrait in SPEAKER_IMAGES
   text: string;
   emotion?: "neutral" | "happy" | "angry" | "surprised";
   displayName: string; // The displayed character name

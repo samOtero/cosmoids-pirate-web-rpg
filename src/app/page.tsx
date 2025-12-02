@@ -1,7 +1,7 @@
 "use client";
 import { lazy, Suspense } from "react";
 import { useGameStore } from "@/store/gameStore";
-import { Screens } from "@/types/baseGame";
+import { Screens, BackgroundImageKey } from "@/types/baseGame";
 import { NEW_PLAYER_WELCOME_DIALOG } from "@/constants/game";
 
 const StartScreen = lazy(() => import("@/app/components/startScreen"));
@@ -46,7 +46,7 @@ export default function Home() {
       <Suspense fallback={<div>Loading...</div>}>
         <DialogScreen
           sequence={NEW_PLAYER_WELCOME_DIALOG}
-          backgroundImageKey="Caleb_House"
+          backgroundImageKey={BackgroundImageKey.CALEB_HOUSE}
           onContinue={() => setScreen(Screens.MAP)}
         />
       </Suspense>
