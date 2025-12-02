@@ -1,11 +1,12 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Screens, Profile, DialogContext } from "@/types/baseGame";
+import {
+  Screens,
+  Profile,
+  DialogContext,
+  DialogContextData,
+} from "@/types/baseGame";
 import { MAX_PROFILES } from "@/constants/game";
-
-interface DialogContextData {
-  islandId?: number;
-}
 
 interface GameState {
   currentScreen: Screens;

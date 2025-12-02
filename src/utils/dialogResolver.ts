@@ -1,7 +1,8 @@
 import {
   DialogContext,
-  DialogLine,
   BackgroundImageKey,
+  DialogConfig,
+  Screens,
 } from "@/types/baseGame";
 import {
   NEW_PLAYER_WELCOME_DIALOG,
@@ -13,52 +14,55 @@ import {
 export function resolveDialog(
   context: DialogContext | null,
   contextData: { islandId?: number } | null
-): {
-  sequence: DialogLine[];
-  backgroundImageKey: BackgroundImageKey;
-} {
+): DialogConfig {
   if (context === DialogContext.GAME_INTRO) {
-    return {
-      sequence: NEW_PLAYER_WELCOME_DIALOG,
-      backgroundImageKey: BackgroundImageKey.CALEB_HOUSE,
-    };
+    return NEW_PLAYER_WELCOME_DIALOG;
   }
 
   if (
     context === DialogContext.ISLAND_INTRO &&
     contextData?.islandId !== undefined
   ) {
-    const sequence = ISLAND_INTRO_DIALOGS[contextData.islandId] || [];
-    return {
-      sequence,
-      backgroundImageKey: BackgroundImageKey.DEFAULT,
-    };
+    return (
+      ISLAND_INTRO_DIALOGS[contextData.islandId] || {
+        sequence: [],
+        backgroundImageKey: BackgroundImageKey.DEFAULT,
+        next: { screen: Screens.MAP },
+      }
+    );
   }
 
   if (
     context === DialogContext.ISLAND_VICTORY &&
     contextData?.islandId !== undefined
   ) {
-    const sequence = ISLAND_VICTORY_DIALOGS[contextData.islandId] || [];
-    return {
-      sequence,
-      backgroundImageKey: BackgroundImageKey.DEFAULT,
-    };
+    return (
+      ISLAND_VICTORY_DIALOGS[contextData.islandId] || {
+        sequence: [],
+        backgroundImageKey: BackgroundImageKey.DEFAULT,
+        next: { screen: Screens.MAP },
+      }
+    );
   }
 
   if (
     context === DialogContext.ISLAND_DEFEAT &&
     contextData?.islandId !== undefined
   ) {
-    const sequence = ISLAND_DEFEAT_DIALOGS[contextData.islandId] || [];
-    return {
-      sequence,
-      backgroundImageKey: BackgroundImageKey.DEFAULT,
-    };
+    return (
+      ISLAND_DEFEAT_DIALOGS[contextData.islandId] || {
+        sequence: [],
+        backgroundImageKey: BackgroundImageKey.DEFAULT,
+        next: { screen: Screens.MAP },
+      }
+    );
   }
 
   return {
     sequence: [],
     backgroundImageKey: BackgroundImageKey.DEFAULT,
+    next: {
+      screen: Screens.MAP,
+    },
   };
 }

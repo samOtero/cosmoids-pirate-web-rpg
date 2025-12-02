@@ -90,3 +90,19 @@ export enum DialogContext {
   ISLAND_VICTORY = "ISLAND_VICTORY",
   ISLAND_DEFEAT = "ISLAND_DEFEAT",
 }
+
+export interface DialogContextData {
+  islandId?: number;
+}
+
+export interface DialogTransition {
+  screen: Screens;
+  context?: DialogContext;
+  contextData?: DialogContextData;
+}
+
+export interface DialogConfig {
+  sequence: DialogLine[];
+  backgroundImageKey: BackgroundImageKey;
+  next?: DialogTransition;
+}

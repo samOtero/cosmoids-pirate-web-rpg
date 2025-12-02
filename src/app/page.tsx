@@ -1,7 +1,7 @@
 "use client";
 import { lazy, Suspense } from "react";
 import { useGameStore } from "@/store/gameStore";
-import { Screens, DialogContext } from "@/types/baseGame";
+import { Screens } from "@/types/baseGame";
 import { resolveDialog } from "@/utils/dialogResolver";
 
 const StartScreen = lazy(() => import("@/app/components/startScreen"));
@@ -44,21 +44,14 @@ export default function Home() {
   }
 
   if (currentScreen === Screens.DIALOG) {
-    const { sequence, backgroundImageKey } = resolveDialog(
+    const { sequence, backgroundImageKey, next } = resolveDialog(
       dialogContext,
       dialogContextData
     );
 
     const handleContinue = () => {
-      if (dialogContext === DialogContext.GAME_INTRO) {
-        setScreen(Screens.MAP);
-      } else if (dialogContext === DialogContext.ISLAND_INTRO) {
-        // TODO: Navigate to BATTLE screen
-        console.log("Navigate to BATTLE");
-        setScreen(Screens.MAP);
-      } else if (dialogContext === DialogContext.ISLAND_VICTORY) {
-        // TODO: Unlock next island logic here or in store
-        setScreen(Screens.MAP);
+      if (next) {
+        setScreen(next.screen, next.context, next.contextData);
       } else {
         setScreen(Screens.MAP);
       }
