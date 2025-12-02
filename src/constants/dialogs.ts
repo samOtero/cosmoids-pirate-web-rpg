@@ -9,6 +9,11 @@ import {
 export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
   sequence: [
     {
+      portraitKey: SpeakerImageKey.EMPTY,
+      text: "One sunny morning in the small coastal town of Seabreeze...",
+      displayName: "",
+    },
+    {
       portraitKey: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
       text: "Caleb! Wake up, you sleepy sea-pup!",
       displayName: "Grandpa",
