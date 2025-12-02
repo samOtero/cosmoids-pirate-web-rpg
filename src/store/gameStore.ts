@@ -1,11 +1,21 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Screens, Profile } from "@/types/baseGame";
+import { Screens, Profile, DialogContext } from "@/types/baseGame";
 import { MAX_PROFILES } from "@/constants/game";
+
+interface DialogContextData {
+  islandId?: number;
+}
 
 interface GameState {
   currentScreen: Screens;
-  setScreen: (screen: Screens) => void;
+  dialogContext: DialogContext | null;
+  dialogContextData: DialogContextData | null;
+  setScreen: (
+    screen: Screens,
+    context?: DialogContext,
+    contextData?: DialogContextData
+  ) => void;
   profiles: (Profile | null)[];
   currentProfileId: number | null;
   createProfile: (slotId: number) => void;
@@ -17,7 +27,14 @@ export const useGameStore = create<GameState>()(
   persist(
     (set) => ({
       currentScreen: Screens.START,
-      setScreen: (screen) => set({ currentScreen: screen }),
+      dialogContext: null,
+      dialogContextData: null,
+      setScreen: (screen, context = undefined, contextData = undefined) =>
+        set({
+          currentScreen: screen,
+          dialogContext: context || null,
+          dialogContextData: contextData || null,
+        }),
       profiles: Array(MAX_PROFILES).fill(null),
       currentProfileId: null,
       createProfile: (slotId: number) =>
@@ -38,6 +55,7 @@ export const useGameStore = create<GameState>()(
             profiles: newProfiles,
             currentProfileId: slotId,
             currentScreen: Screens.DIALOG,
+            dialogContext: DialogContext.GAME_INTRO,
           };
         }),
       deleteProfile: (slotId: number) =>
@@ -68,6 +86,7 @@ export const useGameStore = create<GameState>()(
             profiles: newProfiles,
             currentProfileId: slotId,
             currentScreen: isNewPlayer ? Screens.DIALOG : Screens.MAP,
+            dialogContext: isNewPlayer ? DialogContext.GAME_INTRO : null,
           };
         }),
     }),

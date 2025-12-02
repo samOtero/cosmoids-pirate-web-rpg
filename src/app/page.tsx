@@ -1,8 +1,8 @@
 "use client";
 import { lazy, Suspense } from "react";
 import { useGameStore } from "@/store/gameStore";
-import { Screens, BackgroundImageKey } from "@/types/baseGame";
-import { NEW_PLAYER_WELCOME_DIALOG } from "@/constants/game";
+import { Screens, DialogContext } from "@/types/baseGame";
+import { resolveDialog } from "@/utils/dialogResolver";
 
 const StartScreen = lazy(() => import("@/app/components/startScreen"));
 const ProfileScreen = lazy(() => import("@/app/components/profileScreen"));
@@ -18,6 +18,8 @@ export default function Home() {
     createProfile,
     deleteProfile,
     selectProfile,
+    dialogContext,
+    dialogContextData,
   } = useGameStore();
 
   if (currentScreen === Screens.START) {
@@ -42,12 +44,32 @@ export default function Home() {
   }
 
   if (currentScreen === Screens.DIALOG) {
+    const { sequence, backgroundImageKey } = resolveDialog(
+      dialogContext,
+      dialogContextData
+    );
+
+    const handleContinue = () => {
+      if (dialogContext === DialogContext.GAME_INTRO) {
+        setScreen(Screens.MAP);
+      } else if (dialogContext === DialogContext.ISLAND_INTRO) {
+        // TODO: Navigate to BATTLE screen
+        console.log("Navigate to BATTLE");
+        setScreen(Screens.MAP);
+      } else if (dialogContext === DialogContext.ISLAND_VICTORY) {
+        // TODO: Unlock next island logic here or in store
+        setScreen(Screens.MAP);
+      } else {
+        setScreen(Screens.MAP);
+      }
+    };
+
     return (
       <Suspense fallback={<div>Loading...</div>}>
         <DialogScreen
-          sequence={NEW_PLAYER_WELCOME_DIALOG}
-          backgroundImageKey={BackgroundImageKey.CALEB_HOUSE}
-          onContinue={() => setScreen(Screens.MAP)}
+          sequence={sequence}
+          backgroundImageKey={backgroundImageKey}
+          onContinue={handleContinue}
         />
       </Suspense>
     );
@@ -66,7 +88,7 @@ export default function Home() {
       <Suspense fallback={<div>Loading...</div>}>
         <MapScreen
           profile={currentProfile}
-          onTravel={function (islandId: number): void {
+          onTravel={() => {
             throw new Error("Function not implemented.");
           }}
           onOpenMenu={function (): void {

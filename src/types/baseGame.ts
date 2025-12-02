@@ -84,3 +84,10 @@ export interface DialogLine {
   emotion?: "neutral" | "happy" | "angry" | "surprised";
   displayName: string; // The displayed character name
 }
+
+export enum DialogContext {
+  GAME_INTRO = "GAME_INTRO",
+  ISLAND_INTRO = "ISLAND_INTRO",
+  ISLAND_VICTORY = "ISLAND_VICTORY",
+  ISLAND_DEFEAT = "ISLAND_DEFEAT",
+}
