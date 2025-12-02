@@ -94,10 +94,10 @@ export default function DialogScreen({
       {/* Background */}
       <div className="absolute inset-0 bg-black/60 z-0">
         <Image
-          src="https://picsum.photos/seed/ocean_story_bg/1920/1080"
+          src="/bg_caleb_house_1.png"
           alt="Story background"
           fill
-          className="object-cover opacity-30 grayscale"
+          className="object-cover opacity-50"
           unoptimized
           priority
         />
