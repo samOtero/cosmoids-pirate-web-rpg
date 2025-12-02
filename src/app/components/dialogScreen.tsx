@@ -126,25 +126,27 @@ export default function DialogScreen({
       </div>
 
       {/* Portrait - positioned on left, above dialog */}
-      <div className="absolute bottom-44 md:bottom-52 left-8 md:left-12 z-30">
-        <div
-          className={`transition-all duration-500 transform ${
-            isTyping ? "scale-105 brightness-110" : "scale-100 brightness-100"
-          }`}
-        >
-          <Image
-            src={getPortrait(currentLine.portraitKey)}
-            alt={getDisplayName(currentLine)}
-            width={256}
-            height={256}
-            className="w-48 h-48 md:w-64 md:h-64 object-cover border-4 border-wood rounded-lg shadow-2xl bg-black"
-            unoptimized
-          />
-          <div className="bg-wood text-sand font-bold text-center py-1 mt-2 border-2 border-black rounded shadow-lg uppercase tracking-wider">
-            {getDisplayName(currentLine)}
+      {currentLine.portraitKey !== SpeakerImageKey.EMPTY && (
+        <div className="absolute bottom-44 md:bottom-52 left-8 md:left-12 z-30">
+          <div
+            className={`transition-all duration-500 transform ${
+              isTyping ? "scale-105 brightness-110" : "scale-100 brightness-100"
+            }`}
+          >
+            <Image
+              src={getPortrait(currentLine.portraitKey)}
+              alt={getDisplayName(currentLine)}
+              width={256}
+              height={256}
+              className="w-48 h-48 md:w-64 md:h-64 object-cover border-4 border-wood rounded-lg shadow-2xl bg-black"
+              unoptimized
+            />
+            <div className="bg-wood text-sand font-bold text-center py-1 mt-2 border-2 border-black rounded shadow-lg uppercase tracking-wider">
+              {getDisplayName(currentLine)}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Dialog Box */}
       <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8 z-20">
