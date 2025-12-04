@@ -54,6 +54,8 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
   [SpeakerImageKey.GUIDE]: "/dialog_caleb_neutral_starter_outfit.png",
   [SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT]:
     "/dialog_grandpa_neutral_starter_outfit.png",
+  [SpeakerImageKey.GRANDPA_SURPRISED_STARTER_OUTFIT]:
+    "/dialog_grandpa_surprised_starter_outfit.png",
   [SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT]:
     "/dialog_caleb_neutral_starter_outfit.png",
   [SpeakerImageKey.CALEB_YAWN_STARTER_OUTFIT]:
@@ -64,6 +66,11 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
     "/dialog_caleb_disappointed_starter_outfit.png",
   [SpeakerImageKey.CALEB_SCARED_SURPRISED_STARTER_OUTFIT]:
     "/dialog_caleb_scared_surprised_starter_outfit.png",
+  [SpeakerImageKey.HOOKAW_TIRED_BOX_DIVE_SKIN_1]:
+    "/dialog_parrot_tired_box_dive_skin_1.png",
+  [SpeakerImageKey.HOOKAW_TIRED_BOX_SKIN_1]:
+    "/dialog_parrot_tired_box_skin_1.png",
+  [SpeakerImageKey.HOOKAW_TIRED_SKIN_1]: "/dialog_parrot_tired_skin_1-v1.png",
   [SpeakerImageKey.CREWMATE]: "https://picsum.photos/seed/crewmate_npc/300/300",
   [SpeakerImageKey.OLD_SAILOR]: "https://picsum.photos/seed/oldsailor/300/300",
   [SpeakerImageKey.NARRATOR]:
