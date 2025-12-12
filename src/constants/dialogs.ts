@@ -264,10 +264,22 @@ export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
       text: "But first, let's open this birthday box of yours.",
       displayName: "Grandpa",
     },
+    {
+      portraitKey: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
+      text: "I wonder what they sent me!",
+      displayName: "Caleb",
+    },
+    {
+      portraitKey: SpeakerImageKey.EMPTY,
+      text: "*Caleb opens the small chest*",
+      displayName: "",
+    },
   ],
   backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
   next: {
-    screen: Screens.MAP,
+    screen: Screens.DIALOG,
+    context: DialogContext.GAME_INTRO_PART_2,
+    contextData: { islandId: 0 },
   },
 };
 
