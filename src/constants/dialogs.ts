@@ -86,7 +86,7 @@ export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
     },
     {
       portraitKey: SpeakerImageKey.CALEB_DISAPPOINTED_STARTER_OUTFIT,
-      text: 'They said they\'d be here by sunrise. "For sure this time," Dad said in the letter. I guess... I guess finding that Legendary Island was more important than...',
+      text: 'They said they\'d be here by sunrise. "For sure this time", Dad said in the letter. I guess... I guess finding that Legendary Island was more important than...',
       displayName: "Caleb",
     },
     {
