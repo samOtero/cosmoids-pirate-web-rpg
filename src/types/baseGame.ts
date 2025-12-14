@@ -26,6 +26,8 @@ export enum SpeakerImageKey {
   HOOKAW_TIRED_BOX_DIVE_SKIN_1 = "Hookaw_Tired_Box_Dive_Skin_1",
   HOOKAW_TIRED_BOX_SKIN_1 = "Hookaw_Tired_Box_Skin_1",
   HOOKAW_TIRED_SKIN_1 = "Hookaw_Tired_Skin_1",
+  STARTER_CHEST_CLOSED = "Starter_Chest_Closed",
+  STARTER_CHEST_OPEN = "Starter_Chest_Open",
   CREWMATE = "Crewmate",
   OLD_SAILOR = "Old Sailor",
   NARRATOR = "Narrator",

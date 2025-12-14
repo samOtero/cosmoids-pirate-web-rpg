@@ -2,7 +2,11 @@ import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Panel from "@/app/components/ui/Panel";
 import { SPEAKER_IMAGES, BACKGROUND_IMAGES } from "@/constants/game";
-import { DialogLine, SpeakerImageKey, BackgroundImageKey } from "@/types/baseGame";
+import {
+  DialogLine,
+  SpeakerImageKey,
+  BackgroundImageKey,
+} from "@/types/baseGame";
 
 interface StoryScreenProps {
   sequence: DialogLine[];
@@ -124,29 +128,28 @@ export default function DialogScreen({
           priority
         />
       </div>
-
-      {/* Portrait - positioned on left, above dialog */}
-      {currentLine.portraitKey !== SpeakerImageKey.EMPTY && (
-        <div className="absolute bottom-44 md:bottom-52 left-8 md:left-12 z-30">
+      {/* Portrait Container - Flex Centered */}
+      <div className="flex-1 flex flex-col justify-center items-center z-10 pb-32 md:pb-40 w-full">
+        {currentLine.portraitKey !== SpeakerImageKey.EMPTY && (
           <div
-            className={`transition-all duration-500 transform ${
+            className={`transition-all duration-500 transform flex flex-col items-center ${
               isTyping ? "scale-105 brightness-110" : "scale-100 brightness-100"
             }`}
           >
             <Image
               src={getPortrait(currentLine.portraitKey)}
               alt={getDisplayName(currentLine)}
-              width={256}
-              height={256}
-              className="w-48 h-48 md:w-64 md:h-64 object-cover border-4 border-wood rounded-lg shadow-2xl bg-black"
+              width={512}
+              height={512}
+              className="w-80 h-80 md:w-96 md:h-96 object-cover border-4 border-wood rounded-lg shadow-2xl bg-black"
               unoptimized
             />
-            <div className="bg-wood text-sand font-bold text-center py-1 mt-2 border-2 border-black rounded shadow-lg uppercase tracking-wider">
+            <div className="bg-wood text-sand font-bold text-center py-2 px-6 mt-4 border-2 border-black rounded shadow-lg uppercase tracking-wider text-lg">
               {getDisplayName(currentLine)}
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Dialog Box */}
       <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8 z-20">

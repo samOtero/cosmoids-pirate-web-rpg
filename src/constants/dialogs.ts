@@ -270,8 +270,33 @@ export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
       displayName: "Caleb",
     },
     {
+      portraitKey: SpeakerImageKey.STARTER_CHEST_CLOSED,
+      text: "*Caleb grabs the small chest-",
+      displayName: "Birthday Chest",
+    },
+    {
+      portraitKey: SpeakerImageKey.STARTER_CHEST_OPEN,
+      text: "- and opens it*",
+      displayName: "Birthday Chest",
+    },
+    {
+      portraitKey: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
+      text: "Cosmoid doubloons! What kind of Cosmoids do they hold?!",
+      displayName: "Caleb",
+    },
+    {
+      portraitKey: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+      text: "As the tradition goes, you must pick one doubloon out of the three, choose with your heart.",
+      displayName: "Grandpa",
+    },
+    {
+      portraitKey: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
+      text: "Right. With my heart.",
+      displayName: "Caleb",
+    },
+    {
       portraitKey: SpeakerImageKey.EMPTY,
-      text: "*Caleb opens the small chest*",
+      text: "Pick your starter Cosmoid!",
       displayName: "",
     },
   ],
