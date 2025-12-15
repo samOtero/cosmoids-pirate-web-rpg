@@ -86,10 +86,15 @@ export interface Island {
   cleared: boolean;
 }
 
+export interface DialogPortrait {
+  key: SpeakerImageKey;
+  displayName: string;
+}
+
 export interface DialogLine {
-  portraitKey: SpeakerImageKey; // Key for looking up portrait in SPEAKER_IMAGES
+  portraits: DialogPortrait[];
+  speakerIndex: number; // 0-based index into `portraits` for the active speaker
   text: string;
-  displayName: string; // The displayed character name
 }
 
 export enum DialogContext {
