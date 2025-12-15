@@ -131,68 +131,70 @@ export default function DialogScreen({
           priority
         />
       </div>
-      {/* Portrait row (supports up to 3 portraits) */}
-      {currentLine.portraits && currentLine.portraits.length > 0 && (
-        <div className="absolute bottom-36 md:bottom-44 left-0 right-0 z-30 flex justify-center">
-          <div className="flex items-end space-x-6 md:space-x-8">
-            {currentLine.portraits.slice(0, 3).map((p, i) => {
-              const portraitCount = Math.min(currentLine.portraits.length, 3);
-              const activeIndex = Math.max(
-                0,
-                Math.min(
-                  currentLine.speakerIndex || 0,
-                  currentLine.portraits.length - 1
-                )
-              );
-              const isActive = i === activeIndex;
 
-              // Size strategy: single portrait is very large; 2-3 portraits slightly smaller but still prominent
-              let imgClass = "w-40 h-40 md:w-56 md:h-56";
-              let imgWidth = 256;
-              let imgHeight = 256;
-              if (portraitCount === 1) {
-                imgClass = "w-80 h-80 md:w-96 md:h-96";
-                imgWidth = 512;
-                imgHeight = 512;
-              } else if (portraitCount === 2) {
-                imgClass = "w-64 h-64 md:w-80 md:h-80";
-                imgWidth = 384;
-                imgHeight = 384;
-              } else if (portraitCount === 3) {
-                imgClass = "w-64 h-64 md:w-80 md:h-80";
-                imgWidth = 384;
-                imgHeight = 384;
-              }
+      {/* Content Container */}
+      <div className="relative z-10 flex-1 flex flex-col justify-between p-4 md:p-8">
+        {/* Portrait row (supports up to 3 portraits) */}
+        {currentLine.portraits && currentLine.portraits.length > 0 && (
+          <div className="flex justify-center flex-1">
+            <div className="flex items-end space-x-6 md:space-x-8">
+              {currentLine.portraits.slice(0, 3).map((p, i) => {
+                const portraitCount = Math.min(currentLine.portraits.length, 3);
+                const activeIndex = Math.max(
+                  0,
+                  Math.min(
+                    currentLine.speakerIndex || 0,
+                    currentLine.portraits.length - 1
+                  )
+                );
+                const isActive = i === activeIndex;
 
-              return (
-                <div
-                  key={`${p.key}-${i}`}
-                  className={`transition-all duration-500 transform flex flex-col items-center ${
-                    isActive
-                      ? "scale-105 brightness-110"
-                      : "scale-100 opacity-70"
-                  }`}
-                >
-                  <Image
-                    src={getPortrait(p.key)}
-                    alt={p.displayName}
-                    width={imgWidth}
-                    height={imgHeight}
-                    className={`${imgClass} object-cover border-4 border-wood rounded-lg shadow-2xl bg-black`}
-                    unoptimized
-                  />
-                  <div className="bg-wood text-sand font-bold text-center py-1 mt-2 border-2 border-black rounded shadow-lg uppercase tracking-wider text-sm md:text-base">
-                    {p.displayName}
+                // Size strategy: single portrait is very large; 2-3 portraits slightly smaller but still prominent
+                let imgClass = "w-40 h-40 md:w-56 md:h-56";
+                let imgWidth = 256;
+                let imgHeight = 256;
+                if (portraitCount === 1) {
+                  imgClass = "w-80 h-80 md:w-96 md:h-96";
+                  imgWidth = 512;
+                  imgHeight = 512;
+                } else if (portraitCount === 2) {
+                  imgClass = "w-64 h-64 md:w-80 md:h-80";
+                  imgWidth = 384;
+                  imgHeight = 384;
+                } else if (portraitCount === 3) {
+                  imgClass = "w-64 h-64 md:w-80 md:h-80";
+                  imgWidth = 384;
+                  imgHeight = 384;
+                }
+
+                return (
+                  <div
+                    key={`${p.key}-${i}`}
+                    className={`transition-all duration-500 transform flex flex-col items-center ${
+                      isActive
+                        ? "scale-105 brightness-110"
+                        : "scale-100 opacity-70"
+                    }`}
+                  >
+                    <Image
+                      src={getPortrait(p.key)}
+                      alt={p.displayName}
+                      width={imgWidth}
+                      height={imgHeight}
+                      className={`${imgClass} object-cover border-4 border-wood rounded-lg shadow-2xl bg-black`}
+                      unoptimized
+                    />
+                    <div className="bg-wood text-sand font-bold text-center py-1 mt-2 border-2 border-black rounded shadow-lg uppercase tracking-wider text-sm md:text-base">
+                      {p.displayName}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Dialog Box */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8 z-20">
+        {/* Dialog Box */}
         <Panel className="min-h-40 flex flex-col justify-start items-start bg-ocean-dark/95 border-wood-light">
           <div className="text-xl md:text-2xl text-sand font-mono leading-relaxed drop-shadow-md">
             {displayedText}
