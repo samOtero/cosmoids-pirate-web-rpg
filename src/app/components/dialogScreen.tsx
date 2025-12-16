@@ -137,7 +137,7 @@ export default function DialogScreen({
         {/* Portrait row (supports up to 3 portraits) */}
         {currentLine.portraits && currentLine.portraits.length > 0 && (
           <div className="flex justify-center flex-1">
-            <div className="flex items-end space-x-6 md:space-x-8">
+            <div className="flex  items-center space-x-6 md:space-x-8">
               {currentLine.portraits
                 .filter((p) => p.key !== SpeakerImageKey.EMPTY)
                 .slice(0, 3)
