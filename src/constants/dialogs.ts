@@ -528,7 +528,11 @@ export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
       text: "Right. With my heart.",
     },
     {
-      portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
+      portraits: [
+        { key: SpeakerImageKey.STARTER_1_CRAB, displayName: "Crab" },
+        { key: SpeakerImageKey.STARTER_2_IGUANA, displayName: "Iguana" },
+        { key: SpeakerImageKey.STARTER_3_MONKEY, displayName: "Monkey" },
+      ],
       speakerIndex: 0,
       text: "Pick your starter Cosmoid!",
     },

@@ -73,6 +73,10 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
   [SpeakerImageKey.HOOKAW_TIRED_SKIN_1]: "/dialog_parrot_tired_skin_1-v1.png",
   [SpeakerImageKey.STARTER_CHEST_CLOSED]: "/starter_box.png",
   [SpeakerImageKey.STARTER_CHEST_OPEN]: "/starter_box_opened.png",
+  [SpeakerImageKey.STARTER_1_CRAB]: "/crab-starter-grass-neutral-skin-1.png",
+  [SpeakerImageKey.STARTER_2_IGUANA]: "/iguana_starter_fire_neutral_skin_1.png",
+  [SpeakerImageKey.STARTER_3_MONKEY]:
+    "/monkey_starter_water_neutral_skin_1.png",
   [SpeakerImageKey.CREWMATE]: "https://picsum.photos/seed/crewmate_npc/300/300",
   [SpeakerImageKey.OLD_SAILOR]: "https://picsum.photos/seed/oldsailor/300/300",
   [SpeakerImageKey.NARRATOR]:
