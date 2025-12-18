@@ -176,11 +176,7 @@ export default function DialogScreen({
                   return (
                     <div
                       key={`${p.key}-${i}`}
-                      className={`transition-all duration-500 transform flex flex-col items-center ${
-                        isActive
-                          ? "scale-105 brightness-110"
-                          : "scale-100 opacity-70"
-                      }`}
+                      className={`transition-all duration-500 transform flex flex-col items-center scale-105 brightness-110`}
                     >
                       <Image
                         src={getPortrait(p.key)}
