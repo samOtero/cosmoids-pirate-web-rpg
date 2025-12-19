@@ -95,10 +95,16 @@ export interface DialogPortrait {
   onClick?: () => void;
 }
 
+export interface DialogButton {
+  label: string;
+  onClick: () => void;
+}
+
 export interface DialogLine {
   portraits: DialogPortrait[];
   speakerIndex: number; // 0-based index into `portraits` for the active speaker
   text: string;
+  buttons?: DialogButton[]; // Optional buttons for this line
 }
 
 export enum DialogContext {

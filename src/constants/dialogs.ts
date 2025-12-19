@@ -17,6 +17,40 @@ const createStarterDialogHandler = (context: DialogContext) => {
   };
 };
 
+/**
+ * DIALOG BUTTONS FEATURE:
+ * 
+ * You can now add interactive buttons to dialog lines using the `buttons` property.
+ * When buttons are present on a line:
+ * - The player CANNOT advance to the next line by clicking
+ * - Buttons display at the bottom-right of the dialog box
+ * - Each button is clickable and triggers its onClick handler
+ * - Buttons work similarly to portrait onClick handlers - they prevent auto-advancement
+ * 
+ * Example usage in a DialogLine:
+ * {
+ *   portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
+ *   speakerIndex: 0,
+ *   text: "Do you want to continue?",
+ *   buttons: [
+ *     {
+ *       label: "Yes",
+ *       onClick: () => {
+ *         // Handle yes action
+ *         const { setScreen } = useGameStore.getState();
+ *         setScreen(Screens.MAP);
+ *       }
+ *     },
+ *     {
+ *       label: "No",
+ *       onClick: () => {
+ *         // Handle no action
+ *       }
+ *     }
+ *   ]
+ * }
+ */
+
 // Starter Cosmoid Definitions
 export const STARTER_CRAB: Creature = {
   id: "starter_crab",
@@ -307,6 +341,22 @@ export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
       speakerIndex: 0,
       text: "A few minutes later, at the docks...",
+      buttons: [
+        {
+          label: "Yes",
+          onClick: () => {
+            const { setScreen } = useGameStore.getState();
+            setScreen(Screens.MAP);
+          },
+        },
+        {
+          label: "No",
+          onClick: () => {
+            const { setScreen } = useGameStore.getState();
+            setScreen(Screens.MAP);
+          },
+        },
+      ],
     },
     {
       portraits: [
@@ -738,9 +788,21 @@ export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
     },
     {
       portraits: [
-        { key: SpeakerImageKey.STARTER_1_CRAB, displayName: "Crabby", onClick: createStarterDialogHandler(DialogContext.STARTER_CRAB) },
-        { key: SpeakerImageKey.STARTER_2_IGUANA, displayName: "Blazy", onClick: createStarterDialogHandler(DialogContext.STARTER_IGUANA) },
-        { key: SpeakerImageKey.STARTER_3_MONKEY, displayName: "Bubbles", onClick: createStarterDialogHandler(DialogContext.STARTER_MONKEY) },
+        {
+          key: SpeakerImageKey.STARTER_1_CRAB,
+          displayName: "Crabby",
+          onClick: createStarterDialogHandler(DialogContext.STARTER_CRAB),
+        },
+        {
+          key: SpeakerImageKey.STARTER_2_IGUANA,
+          displayName: "Blazy",
+          onClick: createStarterDialogHandler(DialogContext.STARTER_IGUANA),
+        },
+        {
+          key: SpeakerImageKey.STARTER_3_MONKEY,
+          displayName: "Bubbles",
+          onClick: createStarterDialogHandler(DialogContext.STARTER_MONKEY),
+        },
       ],
       speakerIndex: 0,
       text: "Pick your starter Cosmoid!",
@@ -841,3 +903,40 @@ export const ISLAND_DEFEAT_DIALOGS: Record<number, DialogConfig> = {
     },
   },
 };
+
+/**
+ * EXAMPLE: Dialog with buttons
+ * This demonstrates how to use the buttons feature.
+ * When buttons are present, the player cannot click to advance.
+ * Each button can trigger custom actions via its onClick handler.
+ */
+export const EXAMPLE_DIALOG_WITH_BUTTONS: DialogConfig = {
+  sequence: [
+    {
+      portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
+      speakerIndex: 0,
+      text: "Do you want to explore this area?",
+      buttons: [
+        {
+          label: "Yes",
+          onClick: () => {
+            const { setScreen } = useGameStore.getState();
+            setScreen(Screens.MAP);
+          },
+        },
+        {
+          label: "No",
+          onClick: () => {
+            const { setScreen } = useGameStore.getState();
+            setScreen(Screens.MAP);
+          },
+        },
+      ],
+    },
+  ],
+  backgroundImageKey: BackgroundImageKey.DEFAULT,
+  next: {
+    screen: Screens.MAP,
+  },
+};
+

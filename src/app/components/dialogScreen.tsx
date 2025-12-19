@@ -7,6 +7,7 @@ import {
   SpeakerImageKey,
   BackgroundImageKey,
   DialogPortrait,
+  DialogButton,
 } from "@/types/baseGame";
 
 interface StoryScreenProps {
@@ -31,6 +32,11 @@ export default function DialogScreen({
   const hasInteractivePortrait = () => {
     if (!currentLine || !currentLine.portraits) return false;
     return currentLine.portraits.some((p) => p.onClick !== undefined);
+  };
+
+  // Check if current line has buttons
+  const hasButtons = () => {
+    return currentLine && currentLine.buttons && currentLine.buttons.length > 0;
   };
 
   // Reset state when sequence changes to support dialog chaining
@@ -81,8 +87,8 @@ export default function DialogScreen({
       setDisplayedText(currentLine.text);
       setIsTyping(false);
     } else {
-      // Only allow advancing if there's no interactive portrait
-      if (!hasInteractivePortrait()) {
+      // Only allow advancing if there's no interactive portrait and no buttons
+      if (!hasInteractivePortrait() && !hasButtons()) {
         // Next line
         if (lineIndex < sequence.length - 1) {
           setLineIndex((prev) => prev + 1);
@@ -96,6 +102,12 @@ export default function DialogScreen({
   const handlePortraitClick = (portrait: DialogPortrait) => {
     if (portrait.onClick) {
       portrait.onClick();
+    }
+  };
+
+  const handleButtonClick = (button: DialogButton) => {
+    if (button.onClick) {
+      button.onClick();
     }
   };
 
@@ -229,7 +241,24 @@ export default function DialogScreen({
             )}
           </div>
 
-          {!isTyping && !hasInteractivePortrait() && (
+          {!isTyping && hasButtons() && (
+            <div className="self-end mt-auto flex gap-3">
+              {currentLine.buttons?.map((button, idx) => (
+                <button
+                  key={idx}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleButtonClick(button);
+                  }}
+                  className="px-4 py-2 bg-cyan-400 text-ocean-dark font-bold rounded hover:bg-cyan-300 transition-colors uppercase tracking-wider text-sm"
+                >
+                  {button.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {!isTyping && !hasInteractivePortrait() && !hasButtons() && (
             <div className="self-end mt-auto animate-bounce text-cyan-400 text-sm font-bold uppercase tracking-widest">
               {lineIndex < sequence.length - 1
                 ? "Click to Continue ▼"
