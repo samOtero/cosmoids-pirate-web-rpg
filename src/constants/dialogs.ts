@@ -4,7 +4,66 @@ import {
   Screens,
   BackgroundImageKey,
   DialogContext,
+  Creature,
+  ElementType,
 } from "@/types/baseGame";
+import { useGameStore } from "@/store/gameStore";
+
+// Starter Cosmoid Definitions
+export const STARTER_CRAB: Creature = {
+  id: "starter_crab",
+  name: "Crabby",
+  type: ElementType.GRASS,
+  maxHp: 35,
+  currentHp: 35,
+  attack: 40,
+  defense: 45,
+  speed: 35,
+  level: 1,
+  xp: 0,
+  moves: ["Vine Whip", "Scratch"],
+  spriteUrl: "/crab-starter-grass-neutral-skin-1.png",
+};
+
+export const STARTER_IGUANA: Creature = {
+  id: "starter_iguana",
+  name: "Blazy",
+  type: ElementType.FIRE,
+  maxHp: 35,
+  currentHp: 35,
+  attack: 45,
+  defense: 40,
+  speed: 40,
+  level: 1,
+  xp: 0,
+  moves: ["Ember", "Scratch"],
+  spriteUrl: "/iguana_starter_fire_neutral_skin_1.png",
+};
+
+export const STARTER_MONKEY: Creature = {
+  id: "starter_monkey",
+  name: "Bubbles",
+  type: ElementType.WATER,
+  maxHp: 40,
+  currentHp: 40,
+  attack: 40,
+  defense: 40,
+  speed: 45,
+  level: 1,
+  xp: 0,
+  moves: ["Bubble Beam", "Scratch"],
+  spriteUrl: "/monkey_starter_water_neutral_skin_1.png",
+};
+
+// Helper function to create onClick handler for starter selection
+const createStarterSelectionHandler = (creature: Creature) => {
+  return () => {
+    const { currentProfileId, addCreatureToProfile } = useGameStore.getState();
+    if (currentProfileId !== null) {
+      addCreatureToProfile(currentProfileId, { ...creature });
+    }
+  };
+};
 
 export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
   sequence: [
@@ -529,9 +588,9 @@ export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
     },
     {
       portraits: [
-        { key: SpeakerImageKey.STARTER_1_CRAB, displayName: "Crab" },
-        { key: SpeakerImageKey.STARTER_2_IGUANA, displayName: "Iguana" },
-        { key: SpeakerImageKey.STARTER_3_MONKEY, displayName: "Monkey" },
+        { key: SpeakerImageKey.STARTER_1_CRAB, displayName: "Crabby", onClick: createStarterSelectionHandler(STARTER_CRAB) },
+        { key: SpeakerImageKey.STARTER_2_IGUANA, displayName: "Blazy", onClick: createStarterSelectionHandler(STARTER_IGUANA) },
+        { key: SpeakerImageKey.STARTER_3_MONKEY, displayName: "Bubbles", onClick: createStarterSelectionHandler(STARTER_MONKEY) },
       ],
       speakerIndex: 0,
       text: "Pick your starter Cosmoid!",

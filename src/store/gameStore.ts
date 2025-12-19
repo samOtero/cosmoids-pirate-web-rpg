@@ -5,6 +5,7 @@ import {
   Profile,
   DialogContext,
   DialogContextData,
+  Creature,
 } from "@/types/baseGame";
 import { MAX_PROFILES } from "@/constants/game";
 
@@ -22,6 +23,7 @@ interface GameState {
   createProfile: (slotId: number) => void;
   deleteProfile: (slotId: number) => void;
   selectProfile: (slotId: number) => void;
+  addCreatureToProfile: (slotId: number, creature: Creature) => void;
 }
 
 export const useGameStore = create<GameState>()(
@@ -89,6 +91,19 @@ export const useGameStore = create<GameState>()(
             currentScreen: isNewPlayer ? Screens.DIALOG : Screens.MAP,
             dialogContext: isNewPlayer ? DialogContext.GAME_INTRO : null,
           };
+        }),
+      addCreatureToProfile: (slotId: number, creature: Creature) =>
+        set((state) => {
+          if (slotId < 0 || slotId >= MAX_PROFILES || !state.profiles[slotId])
+            return state;
+          const newProfiles = [...state.profiles];
+          if (newProfiles[slotId]) {
+            newProfiles[slotId] = {
+              ...newProfiles[slotId]!,
+              creatures: [...newProfiles[slotId]!.creatures, creature],
+            };
+          }
+          return { profiles: newProfiles };
         }),
     }),
     {

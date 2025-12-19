@@ -27,6 +27,12 @@ export default function DialogScreen({
   const [isTyping, setIsTyping] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Check if current line has an interactive portrait
+  const hasInteractivePortrait = () => {
+    if (!currentLine || !currentLine.portraits) return false;
+    return currentLine.portraits.some((p) => p.onClick !== undefined);
+  };
+
   // Reset state when sequence changes to support dialog chaining
   useEffect(() => {
     setLineIndex(0);
@@ -75,12 +81,21 @@ export default function DialogScreen({
       setDisplayedText(currentLine.text);
       setIsTyping(false);
     } else {
-      // Next line
-      if (lineIndex < sequence.length - 1) {
-        setLineIndex((prev) => prev + 1);
-      } else {
-        onContinue();
+      // Only allow advancing if there's no interactive portrait
+      if (!hasInteractivePortrait()) {
+        // Next line
+        if (lineIndex < sequence.length - 1) {
+          setLineIndex((prev) => prev + 1);
+        } else {
+          onContinue();
+        }
       }
+    }
+  };
+
+  const handlePortraitClick = (portrait: DialogPortrait) => {
+    if (portrait.onClick) {
+      portrait.onClick();
     }
   };
 
@@ -176,14 +191,23 @@ export default function DialogScreen({
                   return (
                     <div
                       key={`${p.key}-${i}`}
-                      className={`transition-all duration-500 transform flex flex-col items-center scale-105 brightness-110`}
+                      className={`transition-all duration-500 transform flex flex-col items-center scale-105 brightness-110 ${
+                        p.onClick ? "cursor-pointer hover:scale-110" : ""
+                      }`}
+                      onClick={(e) => {
+                        if (!p.onClick) return;
+                        e.stopPropagation();
+                        handlePortraitClick(p);
+                      }}
                     >
                       <Image
                         src={getPortrait(p.key)}
                         alt={p.displayName}
                         width={imgWidth}
                         height={imgHeight}
-                        className={`${imgClass} object-cover border-4 border-wood rounded-lg shadow-2xl bg-black`}
+                        className={`${imgClass} object-cover border-4 ${
+                          p.onClick ? "border-cyan-400" : "border-wood"
+                        } rounded-lg shadow-2xl bg-black transition-all duration-300`}
                         unoptimized
                       />
                       <div className="bg-wood text-sand font-bold text-center py-1 mt-2 border-2 border-black rounded shadow-lg uppercase tracking-wider text-sm md:text-base">
@@ -205,7 +229,7 @@ export default function DialogScreen({
             )}
           </div>
 
-          {!isTyping && (
+          {!isTyping && !hasInteractivePortrait() && (
             <div className="self-end mt-auto animate-bounce text-cyan-400 text-sm font-bold uppercase tracking-widest">
               {lineIndex < sequence.length - 1
                 ? "Click to Continue ▼"
