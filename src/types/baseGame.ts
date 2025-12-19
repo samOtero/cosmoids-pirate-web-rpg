@@ -105,6 +105,9 @@ export enum DialogContext {
   GAME_INTRO = "GAME_INTRO",
   GAME_INTRO_PART_2 = "GAME_INTRO_PART_2",
   GAME_INTRO_PART_3 = "GAME_INTRO_PART_3",
+  STARTER_CRAB = "STARTER_CRAB",
+  STARTER_IGUANA = "STARTER_IGUANA",
+  STARTER_MONKEY = "STARTER_MONKEY",
   ISLAND_INTRO = "ISLAND_INTRO",
   ISLAND_VICTORY = "ISLAND_VICTORY",
   ISLAND_DEFEAT = "ISLAND_DEFEAT",
@@ -112,6 +115,7 @@ export enum DialogContext {
 
 export interface DialogContextData {
   islandId?: number;
+  creatureId?: string;
 }
 
 export interface DialogTransition {

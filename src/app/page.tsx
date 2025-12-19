@@ -3,6 +3,11 @@ import { lazy, Suspense } from "react";
 import { useGameStore } from "@/store/gameStore";
 import { Screens } from "@/types/baseGame";
 import { resolveDialog } from "@/utils/dialogResolver";
+import {
+  STARTER_CRAB,
+  STARTER_IGUANA,
+  STARTER_MONKEY,
+} from "@/constants/dialogs";
 
 const StartScreen = lazy(() => import("@/app/components/startScreen"));
 const ProfileScreen = lazy(() => import("@/app/components/profileScreen"));
@@ -20,6 +25,7 @@ export default function Home() {
     selectProfile,
     dialogContext,
     dialogContextData,
+    addCreatureToProfile,
   } = useGameStore();
 
   if (currentScreen === Screens.START) {
@@ -51,6 +57,18 @@ export default function Home() {
 
     const handleContinue = () => {
       if (next) {
+        // Handle creature selection from starter dialogs
+        if (next.contextData?.creatureId && currentProfileId !== null) {
+          const creatureMap: Record<string, typeof STARTER_CRAB> = {
+            starter_crab: STARTER_CRAB,
+            starter_iguana: STARTER_IGUANA,
+            starter_monkey: STARTER_MONKEY,
+          };
+          const creature = creatureMap[next.contextData.creatureId];
+          if (creature) {
+            addCreatureToProfile(currentProfileId, { ...creature });
+          }
+        }
         setScreen(next.screen, next.context, next.contextData);
       } else {
         setScreen(Screens.MAP);

@@ -9,6 +9,14 @@ import {
 } from "@/types/baseGame";
 import { useGameStore } from "@/store/gameStore";
 
+// Helper function to create onClick handler for starter selection that goes to unique dialog
+const createStarterDialogHandler = (context: DialogContext) => {
+  return () => {
+    const { setScreen } = useGameStore.getState();
+    setScreen(Screens.DIALOG, context);
+  };
+};
+
 // Starter Cosmoid Definitions
 export const STARTER_CRAB: Creature = {
   id: "starter_crab",
@@ -55,14 +63,156 @@ export const STARTER_MONKEY: Creature = {
   spriteUrl: "/monkey_starter_water_neutral_skin_1.png",
 };
 
-// Helper function to create onClick handler for starter selection
-const createStarterSelectionHandler = (creature: Creature) => {
-  return () => {
-    const { currentProfileId, addCreatureToProfile } = useGameStore.getState();
-    if (currentProfileId !== null) {
-      addCreatureToProfile(currentProfileId, { ...creature });
-    }
-  };
+// Unique Starter Selection Dialogs
+
+export const STARTER_CRAB_DIALOG: DialogConfig = {
+  sequence: [
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
+          displayName: "Caleb",
+        },
+      ],
+      speakerIndex: 0,
+      text: "Crabby! I choose you as my partner!",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.STARTER_1_CRAB,
+          displayName: "Crabby",
+        },
+      ],
+      speakerIndex: 0,
+      text: "Craaaaab! *clicks claws excitedly*",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
+          displayName: "Caleb",
+        },
+      ],
+      speakerIndex: 0,
+      text: "With your grass powers and strong defense, we'll protect everyone we meet!",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: "Grandpa",
+        },
+      ],
+      speakerIndex: 0,
+      text: "A wise choice, lad. Crabby's roots run deep. Now let's set sail!",
+    },
+  ],
+  backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
+  next: {
+    screen: Screens.MAP,
+    contextData: { creatureId: "starter_crab" },
+  },
+};
+
+export const STARTER_IGUANA_DIALOG: DialogConfig = {
+  sequence: [
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
+          displayName: "Caleb",
+        },
+      ],
+      speakerIndex: 0,
+      text: "Blazy! You're my partner now!",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.STARTER_2_IGUANA,
+          displayName: "Blazy",
+        },
+      ],
+      speakerIndex: 0,
+      text: "*roars with a burst of flame*",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
+          displayName: "Caleb",
+        },
+      ],
+      speakerIndex: 0,
+      text: "With your fiery spirit and speed, we'll blaze our way to victory!",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: "Grandpa",
+        },
+      ],
+      speakerIndex: 0,
+      text: "Hot-headed but brave! Just like your father. You two will make a formidable team!",
+    },
+  ],
+  backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
+  next: {
+    screen: Screens.MAP,
+    contextData: { creatureId: "starter_iguana" },
+  },
+};
+
+export const STARTER_MONKEY_DIALOG: DialogConfig = {
+  sequence: [
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
+          displayName: "Caleb",
+        },
+      ],
+      speakerIndex: 0,
+      text: "Bubbles! Let's go on an adventure together!",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.STARTER_3_MONKEY,
+          displayName: "Bubbles",
+        },
+      ],
+      speakerIndex: 0,
+      text: "*chatters playfully and bounces*",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
+          displayName: "Caleb",
+        },
+      ],
+      speakerIndex: 0,
+      text: "With your water magic and quick reflexes, nothing will stop us!",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: "Grandpa",
+        },
+      ],
+      speakerIndex: 0,
+      text: "Swift as the sea itself! Your mother would be proud of this choice. Now off with you!",
+    },
+  ],
+  backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
+  next: {
+    screen: Screens.MAP,
+    contextData: { creatureId: "starter_monkey" },
+  },
 };
 
 export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
@@ -588,9 +738,9 @@ export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
     },
     {
       portraits: [
-        { key: SpeakerImageKey.STARTER_1_CRAB, displayName: "Crabby", onClick: createStarterSelectionHandler(STARTER_CRAB) },
-        { key: SpeakerImageKey.STARTER_2_IGUANA, displayName: "Blazy", onClick: createStarterSelectionHandler(STARTER_IGUANA) },
-        { key: SpeakerImageKey.STARTER_3_MONKEY, displayName: "Bubbles", onClick: createStarterSelectionHandler(STARTER_MONKEY) },
+        { key: SpeakerImageKey.STARTER_1_CRAB, displayName: "Crabby", onClick: createStarterDialogHandler(DialogContext.STARTER_CRAB) },
+        { key: SpeakerImageKey.STARTER_2_IGUANA, displayName: "Blazy", onClick: createStarterDialogHandler(DialogContext.STARTER_IGUANA) },
+        { key: SpeakerImageKey.STARTER_3_MONKEY, displayName: "Bubbles", onClick: createStarterDialogHandler(DialogContext.STARTER_MONKEY) },
       ],
       speakerIndex: 0,
       text: "Pick your starter Cosmoid!",
