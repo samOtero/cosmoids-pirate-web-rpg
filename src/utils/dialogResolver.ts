@@ -10,9 +10,6 @@ import {
   ISLAND_VICTORY_DIALOGS,
   ISLAND_DEFEAT_DIALOGS,
   NEW_PLAYER_WELCOME_DIALOG_PART_2,
-  STARTER_CRAB_DIALOG,
-  STARTER_IGUANA_DIALOG,
-  STARTER_MONKEY_DIALOG,
 } from "@/constants/dialogs";
 
 export function resolveDialog(
@@ -25,18 +22,6 @@ export function resolveDialog(
 
   if (context === DialogContext.GAME_INTRO_PART_2) {
     return NEW_PLAYER_WELCOME_DIALOG_PART_2;
-  }
-
-  if (context === DialogContext.STARTER_CRAB) {
-    return STARTER_CRAB_DIALOG;
-  }
-
-  if (context === DialogContext.STARTER_IGUANA) {
-    return STARTER_IGUANA_DIALOG;
-  }
-
-  if (context === DialogContext.STARTER_MONKEY) {
-    return STARTER_MONKEY_DIALOG;
   }
 
   if (
