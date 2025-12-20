@@ -5,11 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:check": "pnpm lint && pnpm test && pnpm build",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
+    "validate:dialogs": "node scripts/validate-dialogs.js",
     "prepare": "husky"
   },
   "dependencies": {

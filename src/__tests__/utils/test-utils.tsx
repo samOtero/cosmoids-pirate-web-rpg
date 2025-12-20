@@ -1,6 +1,7 @@
 import { ReactElement, ReactNode } from "react";
 import { render, RenderOptions } from "@testing-library/react";
 import { useGameStore } from "@/store/gameStore";
+import type { AppScreen } from "@/types/baseGame";
 
 // Create a wrapper that can reset the store between tests
 function TestWrapper({ children }: { children: ReactNode }) {
@@ -19,7 +20,7 @@ function customRender(
 export function resetStore() {
   const store = useGameStore.getState();
   useGameStore.setState({
-    currentScreen: "START" as any,
+    currentScreen: "START" as AppScreen,
     profiles: [null, null, null],
     currentProfileId: null,
   });
