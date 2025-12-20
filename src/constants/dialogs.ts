@@ -18,58 +18,38 @@ const createStarterDialogHandler = (context: DialogContext) => {
 };
 
 /**
- * DIALOG BUTTONS FEATURE:
+ * DIALOG LINE JUMPING FEATURE:
  *
- * You can now add interactive buttons to dialog lines using the `buttons` property.
- * When buttons are present on a line:
- * - The player CANNOT advance to the next line by clicking
- * - Buttons display at the bottom-right of the dialog box
- * - Each button is clickable and triggers its onClick handler
- * - Buttons work similarly to portrait onClick handlers - they prevent auto-advancement
+ * You can now add buttons that jump to specific lines within a dialog using the `jumpToLineId` property.
+ * This enables branching dialogs where choices can repeat lines, skip ahead, or loop back.
  *
- * BUTTON TYPES (DialogButtonTypeConfig):
- * DialogButtonTypeConfig is a simple object where each key maps directly to styled classes:
- * - "confirm" - Cyan color (default) for affirmative actions
- * - "cancel" - Orange color for rejection/back actions
- * - "fire" - Dark orange for fire element choices
- * - "grass" - Green for grass element choices
- * - "water" - Blue for water element choices
+ * LINE NAMING:
+ * - Add an optional `id` property to any DialogLine to name that line
+ * - Line IDs must be unique within the same dialog
+ * - IDs are validated when the dialog loads; duplicates throw an error
  *
- * Each button type automatically includes pre-configured styling!
+ * BUTTON JUMPING:
+ * - Add a `jumpToLineId` property to any DialogButton with a target line ID
+ * - Jump executes immediately when the button is clicked (before any onClick handler)
+ * - Supports jumping backwards (for retries), forwards (to skip), or in any direction
+ * - If both `jumpToLineId` and `onClick` are present, jump happens first, then onClick
  *
- * Example usage in a DialogLine:
+ * Example usage:
  * {
+ *   id: "confirm_choice",
  *   portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
  *   speakerIndex: 0,
- *   text: "Which element do you prefer?",
+ *   text: "Are you sure about your choice?",
  *   buttons: [
  *     {
- *       label: "Fire",
- *       type: "fire",
- *       onClick: () => {
- *         // Handle fire selection
- *       }
+ *       label: "Yes, I'm sure",
+ *       type: "confirm",
+ *       jumpToLineId: "choice_confirmed"
  *     },
  *     {
- *       label: "Grass",
- *       type: "grass",
- *       onClick: () => {
- *         // Handle grass selection
- *       }
- *     },
- *     {
- *       label: "Water",
- *       type: "water",
- *       onClick: () => {
- *         // Handle water selection
- *       }
- *     },
- *     {
- *       label: "Cancel",
+ *       label: "No, choose again",
  *       type: "cancel",
- *       onClick: () => {
- *         // Handle cancel
- *       }
+ *       jumpToLineId: "choice_start"
  *     }
  *   ]
  * }
@@ -377,14 +357,12 @@ export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
         {
           label: "No",
           type: "cancel",
-          onClick: () => {
-            const { setScreen } = useGameStore.getState();
-            setScreen(Screens.MAP);
-          },
+          jumpToLineId: "move_on",
         },
       ],
     },
     {
+      id: "move_on",
       portraits: [
         {
           key: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
@@ -931,20 +909,43 @@ export const ISLAND_DEFEAT_DIALOGS: Record<number, DialogConfig> = {
 };
 
 /**
- * EXAMPLE: Dialog with buttons
- * This demonstrates how to use the buttons feature with different button types.
- * When buttons are present, the player cannot click to advance.
- * Each button can trigger custom actions via its onClick handler.
+ * EXAMPLE: Dialog with button line jumping
+ * This demonstrates how to use line IDs and jumping for branching dialogs.
+ * When a button has `jumpToLineId`, clicking it jumps to that line within the same dialog.
  */
-export const EXAMPLE_DIALOG_WITH_BUTTONS: DialogConfig = {
+export const EXAMPLE_DIALOG_WITH_LINE_JUMPING: DialogConfig = {
   sequence: [
     {
+      id: "choice_start",
       portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
       speakerIndex: 0,
-      text: "Choose your path!",
+      text: "Choose your favorite element!",
       buttons: [
         {
-          label: "Confirm",
+          label: "Fire",
+          type: "fire",
+          jumpToLineId: "fire_choice",
+        },
+        {
+          label: "Grass",
+          type: "grass",
+          jumpToLineId: "grass_choice",
+        },
+        {
+          label: "Water",
+          type: "water",
+          jumpToLineId: "water_choice",
+        },
+      ],
+    },
+    {
+      id: "fire_choice",
+      portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
+      speakerIndex: 0,
+      text: "Fire! A passionate choice. Are you sure?",
+      buttons: [
+        {
+          label: "Yes, fire for me",
           type: "confirm",
           onClick: () => {
             const { setScreen } = useGameStore.getState();
@@ -952,40 +953,51 @@ export const EXAMPLE_DIALOG_WITH_BUTTONS: DialogConfig = {
           },
         },
         {
-          label: "Cancel",
+          label: "Choose again",
           type: "cancel",
+          jumpToLineId: "choice_start",
+        },
+      ],
+    },
+    {
+      id: "grass_choice",
+      portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
+      speakerIndex: 0,
+      text: "Grass! Nature's choice. Are you sure?",
+      buttons: [
+        {
+          label: "Yes, grass for me",
+          type: "confirm",
           onClick: () => {
             const { setScreen } = useGameStore.getState();
             setScreen(Screens.MAP);
           },
         },
+        {
+          label: "Choose again",
+          type: "cancel",
+          jumpToLineId: "choice_start",
+        },
       ],
     },
     {
+      id: "water_choice",
       portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
       speakerIndex: 0,
-      text: "Pick an element!",
+      text: "Water! A flowing choice. Are you sure?",
       buttons: [
         {
-          label: "Fire",
-          type: "fire",
+          label: "Yes, water for me",
+          type: "confirm",
           onClick: () => {
-            // Handle fire selection
+            const { setScreen } = useGameStore.getState();
+            setScreen(Screens.MAP);
           },
         },
         {
-          label: "Grass",
-          type: "grass",
-          onClick: () => {
-            // Handle grass selection
-          },
-        },
-        {
-          label: "Water",
-          type: "water",
-          onClick: () => {
-            // Handle water selection
-          },
+          label: "Choose again",
+          type: "cancel",
+          jumpToLineId: "choice_start",
         },
       ],
     },
@@ -995,4 +1007,3 @@ export const EXAMPLE_DIALOG_WITH_BUTTONS: DialogConfig = {
     screen: Screens.MAP,
   },
 };
-

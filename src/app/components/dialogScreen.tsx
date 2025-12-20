@@ -10,12 +10,17 @@ import {
   DialogButton,
   getButtonClasses,
 } from "@/types/baseGame";
+import {
+  validateLineIds,
+  findLineIndexById,
+} from "@/utils/dialogLineValidator";
 
 interface StoryScreenProps {
   sequence: DialogLine[];
   onContinue: () => void;
   isLoading?: boolean;
   backgroundImageKey: BackgroundImageKey;
+  dialogName?: string; // Optional name for error messages
 }
 
 export default function DialogScreen({
@@ -23,11 +28,17 @@ export default function DialogScreen({
   onContinue,
   isLoading,
   backgroundImageKey,
+  dialogName,
 }: StoryScreenProps) {
   const [lineIndex, setLineIndex] = useState(0);
   const [displayedText, setDisplayedText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Validate line IDs on mount and when sequence changes
+  useEffect(() => {
+    validateLineIds(sequence, dialogName);
+  }, [sequence, dialogName]);
 
   // Check if current line has an interactive portrait
   const hasInteractivePortrait = () => {
@@ -106,7 +117,24 @@ export default function DialogScreen({
     }
   };
 
+  const jumpToLine = (lineId: string) => {
+    const targetIndex = findLineIndexById(sequence, lineId, dialogName);
+    setLineIndex(targetIndex);
+    setDisplayedText("");
+    setIsTyping(false);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
+
   const handleButtonClick = (button: DialogButton) => {
+    // Execute jump immediately if specified (for responsiveness)
+    if (button.jumpToLineId) {
+      jumpToLine(button.jumpToLineId);
+    }
+
+    // Then call onClick handler if it exists
     if (button.onClick) {
       button.onClick();
     }

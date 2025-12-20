@@ -115,11 +115,13 @@ export function getButtonClasses(type?: DialogButtonType): string {
 
 export interface DialogButton {
   label: string;
-  onClick: () => void;
+  onClick?: () => void;
   type?: DialogButtonType; // Defaults to CONFIRM if not specified
+  jumpToLineId?: string; // Optional line ID to jump to within the current dialog
 }
 
 export interface DialogLine {
+  id?: string; // Optional unique identifier for jumping to this line
   portraits: DialogPortrait[];
   speakerIndex: number; // 0-based index into `portraits` for the active speaker
   text: string;
