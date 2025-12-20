@@ -95,9 +95,29 @@ export interface DialogPortrait {
   onClick?: () => void;
 }
 
+export const DialogButtonTypeConfig = {
+  confirm:
+    "px-4 py-2 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-sm bg-cyan-400 text-ocean-dark hover:bg-cyan-300",
+  cancel:
+    "px-4 py-2 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-sm bg-orange-500 text-white hover:bg-orange-600",
+  fire: "px-4 py-2 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-sm bg-orange-600 text-white hover:bg-orange-700",
+  grass:
+    "px-4 py-2 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-sm bg-green-600 text-white hover:bg-green-700",
+  water:
+    "px-4 py-2 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-sm bg-blue-600 text-white hover:bg-blue-700",
+} as const;
+
+export type DialogButtonType = keyof typeof DialogButtonTypeConfig;
+
+export function getButtonClasses(type?: DialogButtonType): string {
+  if (!type) return DialogButtonTypeConfig.confirm;
+  return DialogButtonTypeConfig[type] ?? DialogButtonTypeConfig.confirm;
+}
+
 export interface DialogButton {
   label: string;
   onClick: () => void;
+  type?: DialogButtonType; // Defaults to CONFIRM if not specified
 }
 
 export interface DialogLine {

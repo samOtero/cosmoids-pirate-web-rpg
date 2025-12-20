@@ -8,6 +8,7 @@ import {
   BackgroundImageKey,
   DialogPortrait,
   DialogButton,
+  getButtonClasses,
 } from "@/types/baseGame";
 
 interface StoryScreenProps {
@@ -250,7 +251,7 @@ export default function DialogScreen({
                     e.stopPropagation();
                     handleButtonClick(button);
                   }}
-                  className="px-4 py-2 bg-cyan-400 text-ocean-dark font-bold rounded hover:bg-cyan-300 transition-colors uppercase tracking-wider text-sm"
+                  className={getButtonClasses(button.type)}
                 >
                   {button.label}
                 </button>

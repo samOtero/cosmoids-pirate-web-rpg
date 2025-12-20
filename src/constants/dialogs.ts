@@ -19,32 +19,56 @@ const createStarterDialogHandler = (context: DialogContext) => {
 
 /**
  * DIALOG BUTTONS FEATURE:
- * 
+ *
  * You can now add interactive buttons to dialog lines using the `buttons` property.
  * When buttons are present on a line:
  * - The player CANNOT advance to the next line by clicking
  * - Buttons display at the bottom-right of the dialog box
  * - Each button is clickable and triggers its onClick handler
  * - Buttons work similarly to portrait onClick handlers - they prevent auto-advancement
- * 
+ *
+ * BUTTON TYPES (DialogButtonTypeConfig):
+ * DialogButtonTypeConfig is a simple object where each key maps directly to styled classes:
+ * - "confirm" - Cyan color (default) for affirmative actions
+ * - "cancel" - Orange color for rejection/back actions
+ * - "fire" - Dark orange for fire element choices
+ * - "grass" - Green for grass element choices
+ * - "water" - Blue for water element choices
+ *
+ * Each button type automatically includes pre-configured styling!
+ *
  * Example usage in a DialogLine:
  * {
  *   portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
  *   speakerIndex: 0,
- *   text: "Do you want to continue?",
+ *   text: "Which element do you prefer?",
  *   buttons: [
  *     {
- *       label: "Yes",
+ *       label: "Fire",
+ *       type: "fire",
  *       onClick: () => {
- *         // Handle yes action
- *         const { setScreen } = useGameStore.getState();
- *         setScreen(Screens.MAP);
+ *         // Handle fire selection
  *       }
  *     },
  *     {
- *       label: "No",
+ *       label: "Grass",
+ *       type: "grass",
  *       onClick: () => {
- *         // Handle no action
+ *         // Handle grass selection
+ *       }
+ *     },
+ *     {
+ *       label: "Water",
+ *       type: "water",
+ *       onClick: () => {
+ *         // Handle water selection
+ *       }
+ *     },
+ *     {
+ *       label: "Cancel",
+ *       type: "cancel",
+ *       onClick: () => {
+ *         // Handle cancel
  *       }
  *     }
  *   ]
@@ -344,6 +368,7 @@ export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
       buttons: [
         {
           label: "Yes",
+          type: "confirm",
           onClick: () => {
             const { setScreen } = useGameStore.getState();
             setScreen(Screens.MAP);
@@ -351,6 +376,7 @@ export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
         },
         {
           label: "No",
+          type: "cancel",
           onClick: () => {
             const { setScreen } = useGameStore.getState();
             setScreen(Screens.MAP);
@@ -906,7 +932,7 @@ export const ISLAND_DEFEAT_DIALOGS: Record<number, DialogConfig> = {
 
 /**
  * EXAMPLE: Dialog with buttons
- * This demonstrates how to use the buttons feature.
+ * This demonstrates how to use the buttons feature with different button types.
  * When buttons are present, the player cannot click to advance.
  * Each button can trigger custom actions via its onClick handler.
  */
@@ -915,20 +941,50 @@ export const EXAMPLE_DIALOG_WITH_BUTTONS: DialogConfig = {
     {
       portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
       speakerIndex: 0,
-      text: "Do you want to explore this area?",
+      text: "Choose your path!",
       buttons: [
         {
-          label: "Yes",
+          label: "Confirm",
+          type: "confirm",
           onClick: () => {
             const { setScreen } = useGameStore.getState();
             setScreen(Screens.MAP);
           },
         },
         {
-          label: "No",
+          label: "Cancel",
+          type: "cancel",
           onClick: () => {
             const { setScreen } = useGameStore.getState();
             setScreen(Screens.MAP);
+          },
+        },
+      ],
+    },
+    {
+      portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
+      speakerIndex: 0,
+      text: "Pick an element!",
+      buttons: [
+        {
+          label: "Fire",
+          type: "fire",
+          onClick: () => {
+            // Handle fire selection
+          },
+        },
+        {
+          label: "Grass",
+          type: "grass",
+          onClick: () => {
+            // Handle grass selection
+          },
+        },
+        {
+          label: "Water",
+          type: "water",
+          onClick: () => {
+            // Handle water selection
           },
         },
       ],
