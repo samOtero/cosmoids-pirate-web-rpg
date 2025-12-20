@@ -178,24 +178,6 @@ describe("Dialog Configuration Integration Tests", () => {
       expect(lineIds).toContain("choice_start");
       expect(lineIds.some((id) => id.includes("choice"))).toBe(true);
     });
-
-    it("NEW_PLAYER_WELCOME_DIALOG_PART_2 should have valid move_on jump", () => {
-      const result = validateDialogConfig(
-        NEW_PLAYER_WELCOME_DIALOG_PART_2,
-        "NEW_PLAYER_WELCOME_DIALOG_PART_2"
-      );
-
-      if (!result.valid) {
-        console.error(formatValidationErrors(result));
-      }
-      expect(result.valid).toBe(true);
-
-      // Verify move_on line exists
-      const hasMoveonLine = NEW_PLAYER_WELCOME_DIALOG_PART_2.sequence.some(
-        (line) => line.id === "move_on"
-      );
-      expect(hasMoveonLine).toBe(true);
-    });
   });
 
   describe("Error Reporting", () => {

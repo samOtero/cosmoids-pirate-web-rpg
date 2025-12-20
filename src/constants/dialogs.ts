@@ -510,7 +510,6 @@ export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
         {
           label: "No",
           type: "cancel",
-          jumpToLineId: "move_on",
         },
       ],
     },
