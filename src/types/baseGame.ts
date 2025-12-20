@@ -95,16 +95,15 @@ export interface DialogPortrait {
   onClick?: () => void;
 }
 
+const BUTTON_BASE_CLASSES =
+  "px-8 py-3 md:px-12 md:py-4 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-base md:text-lg";
+
 export const DialogButtonTypeConfig = {
-  confirm:
-    "px-8 py-3 md:px-12 md:py-4 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-base md:text-lg bg-cyan-400 text-ocean-dark hover:bg-cyan-300",
-  cancel:
-    "px-8 py-3 md:px-12 md:py-4 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-base md:text-lg bg-orange-500 text-white hover:bg-orange-600",
-  fire: "px-8 py-3 md:px-12 md:py-4 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-base md:text-lg bg-orange-600 text-white hover:bg-orange-700",
-  grass:
-    "px-8 py-3 md:px-12 md:py-4 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-base md:text-lg bg-green-600 text-white hover:bg-green-700",
-  water:
-    "px-8 py-3 md:px-12 md:py-4 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-base md:text-lg bg-blue-600 text-white hover:bg-blue-700",
+  confirm: `${BUTTON_BASE_CLASSES} bg-cyan-400 text-ocean-dark hover:bg-cyan-300`,
+  cancel: `${BUTTON_BASE_CLASSES} bg-orange-500 text-white hover:bg-orange-600`,
+  fire: `${BUTTON_BASE_CLASSES} bg-orange-600 text-white hover:bg-orange-700`,
+  grass: `${BUTTON_BASE_CLASSES} bg-green-600 text-white hover:bg-green-700`,
+  water: `${BUTTON_BASE_CLASSES} bg-blue-600 text-white hover:bg-blue-700`,
 } as const;
 
 export type DialogButtonType = keyof typeof DialogButtonTypeConfig;
