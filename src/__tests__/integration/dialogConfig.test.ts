@@ -4,9 +4,6 @@ import {
   formatValidationErrors,
 } from "@/utils/buildTimeDialogValidator";
 import {
-  STARTER_CRAB_DIALOG,
-  STARTER_IGUANA_DIALOG,
-  STARTER_MONKEY_DIALOG,
   NEW_PLAYER_WELCOME_DIALOG,
   NEW_PLAYER_WELCOME_DIALOG_PART_2,
   ISLAND_INTRO_DIALOGS,
@@ -22,9 +19,6 @@ describe("Dialog Configuration Integration Tests", () => {
   beforeAll(() => {
     // Collect all dialog configs for validation
     allDialogs = {
-      STARTER_CRAB_DIALOG,
-      STARTER_IGUANA_DIALOG,
-      STARTER_MONKEY_DIALOG,
       NEW_PLAYER_WELCOME_DIALOG,
       NEW_PLAYER_WELCOME_DIALOG_PART_2,
       EXAMPLE_DIALOG_WITH_LINE_JUMPING,
@@ -44,39 +38,6 @@ describe("Dialog Configuration Integration Tests", () => {
   });
 
   describe("Individual Dialog Validation", () => {
-    it("should validate STARTER_CRAB_DIALOG", () => {
-      const result = validateDialogConfig(
-        STARTER_CRAB_DIALOG,
-        "STARTER_CRAB_DIALOG"
-      );
-      if (!result.valid) {
-        console.error(formatValidationErrors(result));
-      }
-      expect(result.valid).toBe(true);
-    });
-
-    it("should validate STARTER_IGUANA_DIALOG", () => {
-      const result = validateDialogConfig(
-        STARTER_IGUANA_DIALOG,
-        "STARTER_IGUANA_DIALOG"
-      );
-      if (!result.valid) {
-        console.error(formatValidationErrors(result));
-      }
-      expect(result.valid).toBe(true);
-    });
-
-    it("should validate STARTER_MONKEY_DIALOG", () => {
-      const result = validateDialogConfig(
-        STARTER_MONKEY_DIALOG,
-        "STARTER_MONKEY_DIALOG"
-      );
-      if (!result.valid) {
-        console.error(formatValidationErrors(result));
-      }
-      expect(result.valid).toBe(true);
-    });
-
     it("should validate NEW_PLAYER_WELCOME_DIALOG", () => {
       const result = validateDialogConfig(
         NEW_PLAYER_WELCOME_DIALOG,

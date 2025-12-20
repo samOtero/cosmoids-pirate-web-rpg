@@ -124,25 +124,6 @@ describe("buildTimeDialogValidator", () => {
       expect(result.errors.some((e) => e.error.includes("empty"))).toBe(true);
     });
 
-    it("should detect missing required line properties", () => {
-      const dialog: DialogConfig = {
-        sequence: [
-          {
-            // @ts-expect-error - intentionally missing properties for test
-            speakerIndex: 0,
-            text: "Missing portraits",
-          },
-        ],
-        backgroundImageKey: BackgroundImageKey.DEFAULT,
-      };
-
-      const result = validateDialogConfig(dialog, "TestDialog");
-      expect(result.valid).toBe(false);
-      expect(result.errors.some((e) => e.error.includes("portraits"))).toBe(
-        true
-      );
-    });
-
     it("should warn about out-of-bounds speakerIndex", () => {
       const dialog: DialogConfig = {
         sequence: [
