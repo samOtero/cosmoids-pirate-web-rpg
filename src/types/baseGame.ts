@@ -97,14 +97,14 @@ export interface DialogPortrait {
 
 export const DialogButtonTypeConfig = {
   confirm:
-    "px-4 py-2 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-sm bg-cyan-400 text-ocean-dark hover:bg-cyan-300",
+    "px-8 py-3 md:px-12 md:py-4 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-base md:text-lg bg-cyan-400 text-ocean-dark hover:bg-cyan-300",
   cancel:
-    "px-4 py-2 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-sm bg-orange-500 text-white hover:bg-orange-600",
-  fire: "px-4 py-2 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-sm bg-orange-600 text-white hover:bg-orange-700",
+    "px-8 py-3 md:px-12 md:py-4 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-base md:text-lg bg-orange-500 text-white hover:bg-orange-600",
+  fire: "px-8 py-3 md:px-12 md:py-4 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-base md:text-lg bg-orange-600 text-white hover:bg-orange-700",
   grass:
-    "px-4 py-2 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-sm bg-green-600 text-white hover:bg-green-700",
+    "px-8 py-3 md:px-12 md:py-4 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-base md:text-lg bg-green-600 text-white hover:bg-green-700",
   water:
-    "px-4 py-2 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-sm bg-blue-600 text-white hover:bg-blue-700",
+    "px-8 py-3 md:px-12 md:py-4 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-base md:text-lg bg-blue-600 text-white hover:bg-blue-700",
 } as const;
 
 export type DialogButtonType = keyof typeof DialogButtonTypeConfig;

@@ -243,7 +243,7 @@ export default function DialogScreen({
           </div>
 
           {!isTyping && hasButtons() && (
-            <div className="self-end mt-auto flex gap-3">
+            <div className="w-full mt-6 flex flex-wrap justify-center gap-4">
               {currentLine.buttons?.map((button, idx) => (
                 <button
                   key={idx}
