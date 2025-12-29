@@ -44,7 +44,6 @@ const myDialog: DialogConfig = {
     {
       id: "choice_menu",
       portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
-      speakerIndex: 0,
       text: "Choose your path",
       buttons: [
         {
@@ -62,13 +61,11 @@ const myDialog: DialogConfig = {
     {
       id: "accept_path",
       portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
-      speakerIndex: 0,
       text: "Great! Let's go forward.",
     },
     {
       id: "decline_path",
       portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
-      speakerIndex: 0,
       text: "I understand. You can try again later.",
     },
   ],
@@ -113,8 +110,7 @@ Defensive validation in the dialog component catches any issues that slip throug
 **Build-time errors** include:
 - ❌ **Duplicate line IDs** - Same ID used twice in a dialog
 - ❌ **Invalid jumpToLineId references** - Button jumps to non-existent line
-- ❌ **Missing required properties** - Lines missing portraits, text, speakerIndex
-- ❌ **Out-of-bounds speaker** - speakerIndex exceeds portrait count
+- ❌ **Missing required properties** - Lines missing portraits and text
 - ⚠️ **Unreachable lines** - Lines with IDs that can't be reached
 
 Example error message:

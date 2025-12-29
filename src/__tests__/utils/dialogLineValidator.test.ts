@@ -12,13 +12,11 @@ describe("dialogLineValidator", () => {
         {
           id: "line_1",
           portraits: [],
-          speakerIndex: 0,
           text: "Hello",
         },
         {
           id: "line_2",
           portraits: [],
-          speakerIndex: 0,
           text: "World",
         },
       ];
@@ -30,12 +28,10 @@ describe("dialogLineValidator", () => {
       const sequence: DialogLine[] = [
         {
           portraits: [],
-          speakerIndex: 0,
           text: "Hello",
         },
         {
           portraits: [],
-          speakerIndex: 0,
           text: "World",
         },
       ];
@@ -48,13 +44,11 @@ describe("dialogLineValidator", () => {
         {
           id: "duplicate_id",
           portraits: [],
-          speakerIndex: 0,
           text: "Hello",
         },
         {
           id: "duplicate_id",
           portraits: [],
-          speakerIndex: 0,
           text: "World",
         },
       ];
@@ -69,13 +63,11 @@ describe("dialogLineValidator", () => {
         {
           id: "dup",
           portraits: [],
-          speakerIndex: 0,
           text: "A",
         },
         {
           id: "dup",
           portraits: [],
-          speakerIndex: 0,
           text: "B",
         },
       ];
@@ -90,25 +82,21 @@ describe("dialogLineValidator", () => {
         {
           id: "dup1",
           portraits: [],
-          speakerIndex: 0,
           text: "A",
         },
         {
           id: "dup1",
           portraits: [],
-          speakerIndex: 0,
           text: "B",
         },
         {
           id: "dup2",
           portraits: [],
-          speakerIndex: 0,
           text: "C",
         },
         {
           id: "dup2",
           portraits: [],
-          speakerIndex: 0,
           text: "D",
         },
       ];
@@ -123,19 +111,16 @@ describe("dialogLineValidator", () => {
         {
           id: "first",
           portraits: [],
-          speakerIndex: 0,
           text: "Hello",
         },
         {
           id: "second",
           portraits: [],
-          speakerIndex: 0,
           text: "World",
         },
         {
           id: "third",
           portraits: [],
-          speakerIndex: 0,
           text: "!",
         },
       ];
@@ -150,7 +135,6 @@ describe("dialogLineValidator", () => {
         {
           id: "exists",
           portraits: [],
-          speakerIndex: 0,
           text: "Hello",
         },
       ];
@@ -165,7 +149,6 @@ describe("dialogLineValidator", () => {
         {
           id: "exists",
           portraits: [],
-          speakerIndex: 0,
           text: "Hello",
         },
       ];
@@ -180,13 +163,11 @@ describe("dialogLineValidator", () => {
         {
           id: "line_a",
           portraits: [],
-          speakerIndex: 0,
           text: "A",
         },
         {
           id: "line_b",
           portraits: [],
-          speakerIndex: 0,
           text: "B",
         },
       ];
@@ -200,7 +181,6 @@ describe("dialogLineValidator", () => {
       const sequence: DialogLine[] = [
         {
           portraits: [],
-          speakerIndex: 0,
           text: "No ID",
         },
       ];

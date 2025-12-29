@@ -38,7 +38,6 @@ const createStarterDialogHandler = (context: DialogContext) => {
  * {
  *   id: "confirm_choice",
  *   portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
- *   speakerIndex: 0,
  *   text: "Are you sure about your choice?",
  *   buttons: [
  *     {
@@ -105,7 +104,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
   sequence: [
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
-      speakerIndex: 0,
       text: "On the morning of Caleb's birthday, in the small coastal town of Seabreeze...",
     },
     {
@@ -115,7 +113,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Caleb",
         },
       ],
-      speakerIndex: 0,
       text: "...",
     },
     {
@@ -125,7 +122,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Grandpa",
         },
       ],
-      speakerIndex: 0,
       text: "Up with the sun? Usually I can't get you out of bed at all.",
     },
     {
@@ -135,7 +131,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Caleb",
         },
       ],
-      speakerIndex: 0,
       text: "It's special today, Grandpa. They said they'd be back.",
     },
     {
@@ -145,7 +140,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Grandpa",
         },
       ],
-      speakerIndex: 0,
       text: "The sea is unpredictable, Caleb. But don't worry, they didn't forget.",
     },
     {
@@ -159,12 +153,10 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Birthday Chest",
         },
       ],
-      speakerIndex: 0,
       text: "They sent your gift ahead of time. Just in case.",
     },
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
-      speakerIndex: 0,
       text: "Grandpa hands Caleb a small wooden chest.",
     },
     {
@@ -178,7 +170,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Birthday Chest",
         },
       ],
-      speakerIndex: 0,
       text: "Are these...?",
     },
     {
@@ -188,7 +179,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Grandpa",
         },
       ],
-      speakerIndex: 0,
       text: "Yes, Cosmoid doubloons. As the tradition goes, you must pick one out of the three.",
     },
     {
@@ -206,7 +196,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Monkeg",
         },
       ],
-      speakerIndex: 0,
       text: "Pick your starter Cosmoid!",
       buttons: [
         {
@@ -225,7 +214,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     },
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
-      speakerIndex: 0,
       text: "Suddenly, a high-pitched screech is heard from the sky.",
     },
     {
@@ -235,7 +223,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Caleb",
         },
       ],
-      speakerIndex: 0,
       text: "Grandpa! Watch out! It's coming straight at you!",
     },
     {
@@ -245,12 +232,10 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "???",
         },
       ],
-      speakerIndex: 0,
       text: "HOOOKAWWWWWWW....!",
     },
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
-      speakerIndex: 0,
       text: "The bird crashes onto the wooden planks, sliding to a halt at Caleb's feet.",
     },
     {
@@ -260,7 +245,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Caleb",
         },
       ],
-      speakerIndex: 0,
       text: "Scuttles?!",
     },
     {
@@ -270,7 +254,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Scuttles",
         },
       ],
-      speakerIndex: 0,
       text: "Hookaw.. *panting*",
     },
     {
@@ -280,7 +263,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Caleb",
         },
       ],
-      speakerIndex: 0,
       text: "You look like you flew through a hurricane!",
     },
     {
@@ -290,7 +272,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Scuttles",
         },
       ],
-      speakerIndex: 0,
       text: "*panting*",
     },
     {
@@ -300,7 +281,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Caleb",
         },
       ],
-      speakerIndex: 0,
       text: "Where are my parents?!",
     },
     {
@@ -310,12 +290,10 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Scuttles",
         },
       ],
-      speakerIndex: 0,
       text: "Hookaw.. HOOKAW... *panting*",
     },
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
-      speakerIndex: 0,
       text: "Caleb reaches for the bird, but Scuttles snaps his beak shut and hops back defensively.",
     },
     {
@@ -325,12 +303,10 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Grandpa",
         },
       ],
-      speakerIndex: 0,
       text: "He's guarding a message. He won't talk unless we give it right code words. Your father trained him well.",
     },
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
-      speakerIndex: 0,
       text: "Grandpa leans down and whispers into Scuttles' ear.",
     },
     {
@@ -340,26 +316,22 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Grandpa",
         },
       ],
-      speakerIndex: 0,
       text: '*whispers* "Together we fly, alone we fall"',
     },
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
-      speakerIndex: 0,
       text: "Scuttles opens its beak to speak. What comes out isn't a bird's squawk.. it is Caleb's father’s voice, perfectly mimicked.",
     },
     {
       portraits: [
         { key: SpeakerImageKey.HOOKAW_TIRED_SKIN_1, displayName: "Scuttles" },
       ],
-      speakerIndex: 0,
       text: "(Dad's voice) Caleb... if you're hearing this, it means we didn't make it to your birthday. We are so sorry",
     },
     {
       portraits: [
         { key: SpeakerImageKey.HOOKAW_TIRED_SKIN_1, displayName: "Scuttles" },
       ],
-      speakerIndex: 0,
       text: "(Dad's voice) But listen carefully... We found it! The Isle of Whispers! It's real!",
     },
     {
@@ -369,38 +341,32 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Caleb",
         },
       ],
-      speakerIndex: 0,
       text: "...It's real?",
     },
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
-      speakerIndex: 0,
       text: "Scuttles shifts his stance, instantly switching to the soft, urgent tone of Caleb's mother.",
     },
     {
       portraits: [
         { key: SpeakerImageKey.HOOKAW_TIRED_SKIN_1, displayName: "Scuttles" },
       ],
-      speakerIndex: 0,
       text: "(Mom's voice) We were followed. We have to hide the location. Caleb, do NOT come looking for us. It’s too dangerous.",
     },
     {
       portraits: [
         { key: SpeakerImageKey.HOOKAW_TIRED_SKIN_1, displayName: "Scuttles" },
       ],
-      speakerIndex: 0,
       text: "(Mom's voice) Take this chest. It’s your promised birthday gift. Stay safe with Grandpa. We lo—",
     },
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
-      speakerIndex: 0,
       text: "Suddenly, Scuttles mimics a deafening CRASH—the sound of splintering wood and cannon fire—before letting out a weak, exhausted peep.",
     },
     {
       portraits: [
         { key: SpeakerImageKey.HOOKAW_TIRED_SKIN_1, displayName: "Scuttles" },
       ],
-      speakerIndex: 0,
       text: "Hookaawwwww! Hookawww.. Hook.. *faints*",
     },
     {
@@ -410,7 +376,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Grandpa",
         },
       ],
-      speakerIndex: 0,
       text: "They finally did it... Caleb, you have to-",
     },
     {
@@ -420,7 +385,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Caleb",
         },
       ],
-      speakerIndex: 0,
       text: '"Stay safe"? No way. I\'m going after them.',
     },
     {
@@ -430,7 +394,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Grandpa",
         },
       ],
-      speakerIndex: 0,
       text: "I've seen that look. The same look your mother had when she sailed off.",
     },
     {
@@ -440,7 +403,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Caleb",
         },
       ],
-      speakerIndex: 0,
       text: "They are in danger! The Navy, Pirates or Monsters, I don't care who it is.",
     },
     {
@@ -450,7 +412,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Caleb",
         },
       ],
-      speakerIndex: 0,
       text: "NOBODY STOPS MY PARENTS FROM COMING HOME!",
     },
     {
@@ -460,7 +421,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Grandpa",
         },
       ],
-      speakerIndex: 0,
       text: "You're just a boy! But... ",
     },
     {
@@ -470,12 +430,10 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Grandpa",
         },
       ],
-      speakerIndex: 0,
       text: "...you're a boy with salt in his veins. Alright, lad.",
     },
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
-      speakerIndex: 0,
       text: "Grandpa nudges the chest Scuttles dropped toward Caleb.",
     },
     {
@@ -489,7 +447,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Birthday Chest",
         },
       ],
-      speakerIndex: 0,
       text: "If you're going to survive the ocean, you'll need a partner. Open it.",
     },
   ],
@@ -505,7 +462,6 @@ export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
   sequence: [
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
-      speakerIndex: 0,
       text: "A few minutes later, at the docks...",
       buttons: [
         {
@@ -542,12 +498,10 @@ export const ISLAND_INTRO_DIALOGS: Record<number, DialogConfig> = {
             displayName: "Caleb",
           },
         ],
-        speakerIndex: 0,
         text: "This is it. The beginning of my journey.",
       },
       {
         portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
-        speakerIndex: 0,
         text: "Be careful out there, Caleb. The seas are unpredictable.",
       },
     ],
@@ -566,7 +520,6 @@ export const ISLAND_INTRO_DIALOGS: Record<number, DialogConfig> = {
             displayName: "Caleb",
           },
         ],
-        speakerIndex: 0,
         text: "Wow! Look at the colors!",
       },
     ],
@@ -587,7 +540,6 @@ export const ISLAND_VICTORY_DIALOGS: Record<number, DialogConfig> = {
             displayName: "Caleb",
           },
         ],
-        speakerIndex: 0,
         text: "I did it! I cleared the Home Shore!",
       },
     ],
@@ -608,7 +560,6 @@ export const ISLAND_DEFEAT_DIALOGS: Record<number, DialogConfig> = {
             displayName: "Caleb",
           },
         ],
-        speakerIndex: 0,
         text: "Ouch... that was tough.",
       },
     ],
@@ -629,7 +580,6 @@ export const EXAMPLE_DIALOG_WITH_LINE_JUMPING: DialogConfig = {
     {
       id: "choice_start",
       portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
-      speakerIndex: 0,
       text: "Choose your favorite element!",
       buttons: [
         {
@@ -652,7 +602,6 @@ export const EXAMPLE_DIALOG_WITH_LINE_JUMPING: DialogConfig = {
     {
       id: "fire_choice",
       portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
-      speakerIndex: 0,
       text: "Fire! A passionate choice. Are you sure?",
       buttons: [
         {
@@ -673,7 +622,6 @@ export const EXAMPLE_DIALOG_WITH_LINE_JUMPING: DialogConfig = {
     {
       id: "grass_choice",
       portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
-      speakerIndex: 0,
       text: "Grass! Nature's choice. Are you sure?",
       buttons: [
         {
@@ -694,7 +642,6 @@ export const EXAMPLE_DIALOG_WITH_LINE_JUMPING: DialogConfig = {
     {
       id: "water_choice",
       portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
-      speakerIndex: 0,
       text: "Water! A flowing choice. Are you sure?",
       buttons: [
         {

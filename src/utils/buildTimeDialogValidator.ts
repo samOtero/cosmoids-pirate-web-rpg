@@ -116,17 +116,6 @@ export function validateDialogConfig(
       });
     }
 
-    if (
-      line.speakerIndex === undefined ||
-      typeof line.speakerIndex !== "number"
-    ) {
-      errors.push({
-        dialog: dialogName,
-        error: `Line ${index}: Missing or invalid 'speakerIndex' property`,
-        severity: "error",
-      });
-    }
-
     if (!line.text || typeof line.text !== "string") {
       errors.push({
         dialog: dialogName,
@@ -135,18 +124,7 @@ export function validateDialogConfig(
       });
     }
 
-    // Validate speakerIndex is within bounds
-    if (
-      typeof line.speakerIndex === "number" &&
-      Array.isArray(line.portraits) &&
-      (line.speakerIndex < 0 || line.speakerIndex >= line.portraits.length)
-    ) {
-      errors.push({
-        dialog: dialogName,
-        error: `Line ${index}: speakerIndex ${line.speakerIndex} is out of bounds for ${line.portraits.length} portraits`,
-        severity: "warning",
-      });
-    }
+
   });
 
   // Check for orphaned line IDs (unreachable lines)

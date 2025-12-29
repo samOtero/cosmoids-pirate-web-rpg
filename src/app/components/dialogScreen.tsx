@@ -146,12 +146,6 @@ export default function DialogScreen({
     return SPEAKER_IMAGES[SpeakerImageKey.DEFAULT];
   };
 
-  const getDisplayName = (portraits: DialogPortrait[], idx: number) => {
-    if (!portraits || portraits.length === 0) return "";
-    if (idx < 0 || idx >= portraits.length) return portraits[0].displayName;
-    return portraits[idx].displayName;
-  };
-
   const getBackgroundImage = (backgroundImageKey: BackgroundImageKey) => {
     if (BACKGROUND_IMAGES[backgroundImageKey])
       return BACKGROUND_IMAGES[backgroundImageKey];
@@ -202,14 +196,6 @@ export default function DialogScreen({
                     currentLine.portraits.length,
                     3
                   );
-                  const activeIndex = Math.max(
-                    0,
-                    Math.min(
-                      currentLine.speakerIndex || 0,
-                      currentLine.portraits.length - 1
-                    )
-                  );
-                  const isActive = i === activeIndex;
 
                   // Size strategy: single portrait is very large; 2-3 portraits slightly smaller but still prominent
                   let imgClass = "w-40 h-40 md:w-56 md:h-56";

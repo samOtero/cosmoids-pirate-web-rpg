@@ -123,7 +123,6 @@ export interface DialogButton {
 export interface DialogLine {
   id?: string; // Optional unique identifier for jumping to this line
   portraits: DialogPortrait[];
-  speakerIndex: number; // 0-based index into `portraits` for the active speaker
   text: string;
   buttons?: DialogButton[]; // Optional buttons for this line
 }

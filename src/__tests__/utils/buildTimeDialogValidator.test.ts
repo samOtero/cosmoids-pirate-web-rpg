@@ -19,7 +19,6 @@ describe("buildTimeDialogValidator", () => {
           {
             id: "start",
             portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
-            speakerIndex: 0,
             text: "Hello",
           },
         ],
@@ -38,13 +37,11 @@ describe("buildTimeDialogValidator", () => {
           {
             id: "dup",
             portraits: [],
-            speakerIndex: 0,
             text: "First",
           },
           {
             id: "dup",
             portraits: [],
-            speakerIndex: 0,
             text: "Second",
           },
         ],
@@ -64,7 +61,6 @@ describe("buildTimeDialogValidator", () => {
           {
             id: "start",
             portraits: [],
-            speakerIndex: 0,
             text: "Choose",
             buttons: [
               {
@@ -90,7 +86,6 @@ describe("buildTimeDialogValidator", () => {
           {
             id: "start",
             portraits: [],
-            speakerIndex: 0,
             text: "Choose",
             buttons: [
               {
@@ -102,7 +97,6 @@ describe("buildTimeDialogValidator", () => {
           {
             id: "next_line",
             portraits: [],
-            speakerIndex: 0,
             text: "You went to the next line",
           },
         ],
@@ -124,12 +118,11 @@ describe("buildTimeDialogValidator", () => {
       expect(result.errors.some((e) => e.error.includes("empty"))).toBe(true);
     });
 
-    it("should warn about out-of-bounds speakerIndex", () => {
+    it("should validate a dialog with valid portraits", () => {
       const dialog: DialogConfig = {
         sequence: [
           {
             portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
-            speakerIndex: 5, // Out of bounds
             text: "Hello",
           },
         ],
@@ -137,10 +130,7 @@ describe("buildTimeDialogValidator", () => {
       };
 
       const result = validateDialogConfig(dialog, "TestDialog");
-      expect(result.errors.some((e) => e.severity === "warning")).toBe(true);
-      expect(result.errors.some((e) => e.error.includes("out of bounds"))).toBe(
-        true
-      );
+      expect(result.valid).toBe(true);
     });
 
     it("should warn about unreachable line IDs", () => {
@@ -149,7 +139,6 @@ describe("buildTimeDialogValidator", () => {
           {
             id: "start",
             portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
-            speakerIndex: 0,
             text: "Start",
             buttons: [
               {
@@ -161,13 +150,11 @@ describe("buildTimeDialogValidator", () => {
           {
             id: "dead_end",
             portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
-            speakerIndex: 0,
             text: "Never reached because start jumps over me",
           },
           {
             id: "end",
             portraits: [{ key: SpeakerImageKey.GUIDE, displayName: "Guide" }],
-            speakerIndex: 0,
             text: "End",
           },
         ],
@@ -188,13 +175,11 @@ describe("buildTimeDialogValidator", () => {
           {
             id: "a",
             portraits: [],
-            speakerIndex: 0,
             text: "A",
           },
           {
             id: "a",
             portraits: [],
-            speakerIndex: 0,
             text: "B",
           },
         ],
@@ -216,7 +201,6 @@ describe("buildTimeDialogValidator", () => {
             {
               id: "d1_start",
               portraits: [],
-              speakerIndex: 0,
               text: "Dialog 1",
             },
           ],
@@ -227,7 +211,6 @@ describe("buildTimeDialogValidator", () => {
             {
               id: "d2_start",
               portraits: [],
-              speakerIndex: 0,
               text: "Dialog 2",
             },
           ],
@@ -246,13 +229,11 @@ describe("buildTimeDialogValidator", () => {
             {
               id: "dup",
               portraits: [],
-              speakerIndex: 0,
               text: "A",
             },
             {
               id: "dup",
               portraits: [],
-              speakerIndex: 0,
               text: "B",
             },
           ],
@@ -262,7 +243,6 @@ describe("buildTimeDialogValidator", () => {
           sequence: [
             {
               portraits: [],
-              speakerIndex: 0,
               text: "C",
               buttons: [
                 {
