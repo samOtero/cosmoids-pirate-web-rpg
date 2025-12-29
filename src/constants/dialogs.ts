@@ -111,12 +111,12 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.CALEB_DISAPPOINTED_STARTER_OUTFIT,
+          key: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
           displayName: "Caleb",
         },
       ],
       speakerIndex: 0,
-      text: "They aren't coming, are they...?",
+      text: "...",
     },
     {
       portraits: [
@@ -126,17 +126,17 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         },
       ],
       speakerIndex: 0,
-      text: "Keep looking, lad. Don't give up hope.",
+      text: "Up with the sun? Usually I can't get you out of bed at all.",
     },
     {
       portraits: [
         {
-          key: SpeakerImageKey.CALEB_DISAPPOINTED_STARTER_OUTFIT,
+          key: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
           displayName: "Caleb",
         },
       ],
       speakerIndex: 0,
-      text: "They promised they'd be here by sunrise...",
+      text: "It's special today, Grandpa. They said they'd be back.",
     },
     {
       portraits: [
@@ -146,7 +146,40 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         },
       ],
       speakerIndex: 0,
-      text: "Easy now. Your father is never late for a celebration cake..",
+      text: "The sea is unpredictable, Caleb. But don't worry, they didn't forget.",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: "Grandpa",
+        },
+        {
+          key: SpeakerImageKey.STARTER_CHEST_CLOSED,
+          displayName: "Birthday Chest",
+        },
+      ],
+      speakerIndex: 0,
+      text: "They sent your gift ahead of time. Just in case.",
+    },
+    {
+      portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
+      speakerIndex: 0,
+      text: "Grandpa hands Caleb a small wooden chest.",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
+          displayName: "Caleb",
+        },
+        {
+          key: SpeakerImageKey.STARTER_CHEST_OPEN,
+          displayName: "Birthday Chest",
+        },
+      ],
+      speakerIndex: 0,
+      text: "Are these...?",
     },
     {
       portraits: [
@@ -156,7 +189,39 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         },
       ],
       speakerIndex: 0,
-      text: "But... the winds sure are strange today...",
+      text: "Yes, Cosmoid doubloons. As the tradition goes, you must pick one out of the three.",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.STARTER_1_CRAB,
+          displayName: "Palmit",
+        },
+        {
+          key: SpeakerImageKey.STARTER_2_IGUANA,
+          displayName: "Fueguana",
+        },
+        {
+          key: SpeakerImageKey.STARTER_3_MONKEY,
+          displayName: "Monkeg",
+        },
+      ],
+      speakerIndex: 0,
+      text: "Pick your starter Cosmoid!",
+      buttons: [
+        {
+          label: "Palmit",
+          type: "grass",
+        },
+        {
+          label: "Fueguana",
+          type: "fire",
+        },
+        {
+          label: "Monkeg",
+          type: "water",
+        },
+      ],
     },
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
@@ -426,62 +491,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       ],
       speakerIndex: 0,
       text: "If you're going to survive the ocean, you'll need a partner. Open it.",
-    },
-    {
-      portraits: [
-        {
-          key: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
-          displayName: "Caleb",
-        },
-        {
-          key: SpeakerImageKey.STARTER_CHEST_OPEN,
-          displayName: "Birthday Chest",
-        },
-      ],
-      speakerIndex: 0,
-      text: "Cosmoid doubloons..!",
-    },
-    {
-      portraits: [
-        {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: "Grandpa",
-        },
-      ],
-      speakerIndex: 0,
-      text: "As the tradition goes, you must pick one doubloon out of the three. Choose with your heart.",
-    },
-    {
-      portraits: [
-        {
-          key: SpeakerImageKey.STARTER_1_CRAB,
-          displayName: "Palmit",
-        },
-        {
-          key: SpeakerImageKey.STARTER_2_IGUANA,
-          displayName: "Fueguana",
-        },
-        {
-          key: SpeakerImageKey.STARTER_3_MONKEY,
-          displayName: "Monkeg",
-        },
-      ],
-      speakerIndex: 0,
-      text: "Pick your starter Cosmoid!",
-      buttons: [
-        {
-          label: "Palmit",
-          type: "grass",
-        },
-        {
-          label: "Fueguana",
-          type: "fire",
-        },
-        {
-          label: "Monkeg",
-          type: "water",
-        },
-      ],
     },
   ],
   backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
