@@ -92,7 +92,6 @@ export interface Island {
 export interface DialogPortrait {
   key: SpeakerImageKey;
   displayName: string;
-  onClick?: () => void;
 }
 
 const BUTTON_BASE_CLASSES =
