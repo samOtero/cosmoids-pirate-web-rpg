@@ -9,14 +9,6 @@ import {
 } from "@/types/baseGame";
 import { useGameStore } from "@/store/gameStore";
 
-// Helper function to create onClick handler for starter selection that goes to unique dialog
-const createStarterDialogHandler = (context: DialogContext) => {
-  return () => {
-    const { setScreen } = useGameStore.getState();
-    setScreen(Screens.DIALOG, context);
-  };
-};
-
 /**
  * DIALOG LINE JUMPING FEATURE:
  *
@@ -30,9 +22,9 @@ const createStarterDialogHandler = (context: DialogContext) => {
  *
  * BUTTON JUMPING:
  * - Add a `jumpToLineId` property to any DialogButton with a target line ID
- * - Jump executes immediately when the button is clicked (before any onClick handler)
+ * - Jump executes immediately when the button is clicked (before any action handler)
  * - Supports jumping backwards (for retries), forwards (to skip), or in any direction
- * - If both `jumpToLineId` and `onClick` are present, jump happens first, then onClick
+ * - If both `jumpToLineId` and `action` are present, jump happens first, then action is executed
  *
  * Example usage:
  * {
@@ -467,9 +459,9 @@ export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
         {
           label: "Yes",
           type: "confirm",
-          onClick: () => {
-            const { setScreen } = useGameStore.getState();
-            setScreen(Screens.MAP);
+          action: {
+            type: "CHANGE_SCREEN",
+            payload: { screen: Screens.MAP },
           },
         },
         {
@@ -607,9 +599,9 @@ export const EXAMPLE_DIALOG_WITH_LINE_JUMPING: DialogConfig = {
         {
           label: "Yes, fire for me",
           type: "confirm",
-          onClick: () => {
-            const { setScreen } = useGameStore.getState();
-            setScreen(Screens.MAP);
+          action: {
+            type: "CHANGE_SCREEN",
+            payload: { screen: Screens.MAP },
           },
         },
         {
@@ -627,9 +619,9 @@ export const EXAMPLE_DIALOG_WITH_LINE_JUMPING: DialogConfig = {
         {
           label: "Yes, grass for me",
           type: "confirm",
-          onClick: () => {
-            const { setScreen } = useGameStore.getState();
-            setScreen(Screens.MAP);
+          action: {
+            type: "CHANGE_SCREEN",
+            payload: { screen: Screens.MAP },
           },
         },
         {
@@ -647,9 +639,9 @@ export const EXAMPLE_DIALOG_WITH_LINE_JUMPING: DialogConfig = {
         {
           label: "Yes, water for me",
           type: "confirm",
-          onClick: () => {
-            const { setScreen } = useGameStore.getState();
-            setScreen(Screens.MAP);
+          action: {
+            type: "CHANGE_SCREEN",
+            payload: { screen: Screens.MAP },
           },
         },
         {

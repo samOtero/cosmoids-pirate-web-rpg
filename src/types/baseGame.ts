@@ -104,19 +104,24 @@ export const DialogButtonTypeConfig = {
 
 export type DialogButtonType = keyof typeof DialogButtonTypeConfig;
 
-export function getButtonClasses(type?: DialogButtonType): string {
+export function getButtonClasses(type: DialogButtonType): string {
   const BUTTON_BASE_CLASSES =
     "px-8 py-3 md:px-12 md:py-4 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-base md:text-lg";
-  const typeClasses = type
-    ? DialogButtonTypeConfig[type]
-    : DialogButtonTypeConfig.confirm;
+  const typeClasses = DialogButtonTypeConfig[type];
   return `${BUTTON_BASE_CLASSES} ${typeClasses}`;
+}
+
+export type DialogActionType = "START_BATTLE" | "CHANGE_SCREEN" | "CUSTOM";
+
+export interface DialogAction {
+  type: DialogActionType;
+  payload?: Record<string, string>;
 }
 
 export interface DialogButton {
   label: string;
-  onClick?: () => void;
-  type?: DialogButtonType; // Defaults to CONFIRM if not specified
+  action?: DialogAction;
+  type: DialogButtonType;
   jumpToLineId?: string; // Optional line ID to jump to within the current dialog
 }
 

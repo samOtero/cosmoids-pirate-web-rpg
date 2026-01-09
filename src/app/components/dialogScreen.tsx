@@ -8,11 +8,13 @@ import {
   BackgroundImageKey,
   DialogButton,
   getButtonClasses,
+  DialogAction,
 } from "@/types/baseGame";
 import {
   validateLineIds,
   findLineIndexById,
 } from "@/utils/dialogLineValidator";
+import { useGameStore } from "@/store/gameStore";
 
 interface StoryScreenProps {
   sequence: DialogLine[];
@@ -121,9 +123,31 @@ export default function DialogScreen({
       jumpToLine(button.jumpToLineId);
     }
 
-    // Then call onClick handler if it exists
-    if (button.onClick) {
-      button.onClick();
+    // Then handle action if it exists
+    if (button.action) {
+      handleDialogAction(button.action);
+    }
+  };
+
+  const handleDialogAction = (action: DialogAction) => {
+    const { setScreen } = useGameStore.getState();
+
+    switch (action.type) {
+      case "CHANGE_SCREEN":
+        if (action.payload?.screen) {
+          setScreen(action.payload.screen, action.payload?.context);
+        }
+        break;
+      case "START_BATTLE":
+        // TODO: Implement battle start logic
+        console.log("Starting battle with payload:", action.payload);
+        break;
+      case "CUSTOM":
+        // TODO: Handle custom actions
+        console.log("Custom action:", action.payload);
+        break;
+      default:
+        console.warn("Unknown action type:", action.type);
     }
   };
 
