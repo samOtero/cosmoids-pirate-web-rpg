@@ -94,22 +94,23 @@ export interface DialogPortrait {
   displayName: string;
 }
 
-const BUTTON_BASE_CLASSES =
-  "px-8 py-3 md:px-12 md:py-4 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-base md:text-lg";
-
 export const DialogButtonTypeConfig = {
-  confirm: `${BUTTON_BASE_CLASSES} bg-cyan-400 text-ocean-dark hover:bg-cyan-300`,
-  cancel: `${BUTTON_BASE_CLASSES} bg-orange-500 text-white hover:bg-orange-600`,
-  fire: `${BUTTON_BASE_CLASSES} bg-orange-600 text-white hover:bg-orange-700`,
-  grass: `${BUTTON_BASE_CLASSES} bg-green-600 text-white hover:bg-green-700`,
-  water: `${BUTTON_BASE_CLASSES} bg-blue-600 text-white hover:bg-blue-700`,
+  confirm: "bg-cyan-400 text-ocean-dark hover:bg-cyan-300",
+  cancel: "bg-orange-500 text-white hover:bg-orange-600",
+  fire: "bg-orange-600 text-white hover:bg-orange-700",
+  grass: "bg-green-600 text-white hover:bg-green-700",
+  water: "bg-blue-600 text-white hover:bg-blue-700",
 } as const;
 
 export type DialogButtonType = keyof typeof DialogButtonTypeConfig;
 
 export function getButtonClasses(type?: DialogButtonType): string {
-  if (!type) return DialogButtonTypeConfig.confirm;
-  return DialogButtonTypeConfig[type] ?? DialogButtonTypeConfig.confirm;
+  const BUTTON_BASE_CLASSES =
+    "px-8 py-3 md:px-12 md:py-4 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-base md:text-lg";
+  const typeClasses = type
+    ? DialogButtonTypeConfig[type]
+    : DialogButtonTypeConfig.confirm;
+  return `${BUTTON_BASE_CLASSES} ${typeClasses}`;
 }
 
 export interface DialogButton {
