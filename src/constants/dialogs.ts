@@ -189,19 +189,23 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Monkeg",
         },
       ],
+      id: "starter_choice",
       text: "Pick your starter Cosmoid!",
       buttons: [
         {
           label: "Palmit",
           type: "grass",
+          jumpToLineId: "palmit_choice",
         },
         {
           label: "Fueguana",
           type: "fire",
+          jumpToLineId: "fueguana_choice",
         },
         {
           label: "Monkeg",
           type: "water",
+          jumpToLineId: "monkeg_choice",
         },
       ],
     },
@@ -226,6 +230,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         {
           label: "No",
           type: "cancel",
+          jumpToLineId: "starter_choice",
         },
       ],
     },
@@ -251,6 +256,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         {
           label: "No",
           type: "cancel",
+          jumpToLineId: "starter_choice",
         },
       ],
     },
@@ -275,6 +281,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         {
           label: "No",
           type: "cancel",
+          jumpToLineId: "starter_choice",
         },
       ],
     },
