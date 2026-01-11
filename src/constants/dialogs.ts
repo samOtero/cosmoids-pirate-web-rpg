@@ -379,7 +379,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Caleb",
         },
       ],
-      text: "Where are my parents?!",
+      text: "Where are my parents?! Are they okay?!",
     },
     {
       portraits: [
@@ -418,13 +418,13 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     },
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
-      text: "Scuttles opens its beak to speak. What comes out isn't a bird's squawk.. it is Caleb's father’s voice, perfectly mimicked.",
+      text: "Scuttles opens its beak to speak. What comes out isn't a bird's squawk.. it is Caleb's father's voice, perfectly mimicked.",
     },
     {
       portraits: [
         { key: SpeakerImageKey.HOOKAW_TIRED_SKIN_1, displayName: "Scuttles" },
       ],
-      text: "(Dad's voice) Caleb... if you're hearing this, it means we didn't make it to your birthday. We are so sorry",
+      text: "(Dad's voice) Caleb... if you're hearing this, it means we didn't make it to your birthday. We are so sorry...",
     },
     {
       portraits: [
@@ -455,7 +455,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       portraits: [
         { key: SpeakerImageKey.HOOKAW_TIRED_SKIN_1, displayName: "Scuttles" },
       ],
-      text: "(Mom's voice) Take this chest. It's your promised birthday gift. Stay safe with Grandpa. We lo—",
+      text: "(Mom's voice) I hope you liked your birthday gift. Stay safe with Grandpa. We lo—",
     },
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
@@ -515,11 +515,65 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: "Grandpa",
+          key: SpeakerImageKey.EMPTY,
+          displayName: "",
         },
       ],
-      text: "You're just a boy! But... ",
+      text: "Slow clapping interrupts them. A scruffy man steps from the shadows, eyeing the fainted parrot.",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: "Grunt Pirate Joe",
+        },
+      ],
+      text: "Very touching. But I'll take that bird now. My Captain will pay a great bounty for that message.",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
+          displayName: "Caleb",
+        },
+      ],
+      text: "You're not touching Scuttles!",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.EMPTY,
+          displayName: "",
+        },
+      ],
+      text: "Caleb steps in front of Scuttles.",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: "Grunt Pirate Joe",
+        },
+      ],
+      text: "Have it your way, kid. If you won't hand it over, I'll take it by force!",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.EMPTY,
+          displayName: "",
+        },
+      ],
+      text: "The pirate throws a dark, scratched doubloon onto the dock.",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: "Grunt Pirate Joe",
+        },
+      ],
+      text: "Tear him up, Senticle!",
     },
     {
       portraits: [
@@ -528,24 +582,16 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: "Grandpa",
         },
       ],
-      text: "...you're a boy with salt in his veins. Alright, lad.",
-    },
-    {
-      portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
-      text: "Grandpa nudges the chest Scuttles dropped toward Caleb.",
+      text: "It's a battle, Caleb! Use the gift your parents left you!",
     },
     {
       portraits: [
         {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: "Grandpa",
-        },
-        {
-          key: SpeakerImageKey.STARTER_CHEST_CLOSED,
-          displayName: "Birthday Chest",
+          key: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
+          displayName: "Caleb",
         },
       ],
-      text: "If you're going to survive the ocean, you'll need a partner. Open it.",
+      text: "Right... Let's go, partner! I choose YOU!",
     },
   ],
   backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
