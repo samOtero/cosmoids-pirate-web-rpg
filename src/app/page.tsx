@@ -1,7 +1,7 @@
 "use client";
 import { lazy, Suspense } from "react";
 import { useGameStore } from "@/store/gameStore";
-import { Screens } from "@/types/baseGame";
+import { Screens, DialogAction, DialogContext } from "@/types/baseGame";
 import { resolveDialog } from "@/utils/dialogResolver";
 import {
   STARTER_CRAB,
@@ -55,6 +55,29 @@ export default function Home() {
       dialogContextData
     );
 
+    const handleDialogAction = (action: DialogAction) => {
+      switch (action.type) {
+        case "CHANGE_SCREEN":
+          if (action.payload?.screen) {
+            setScreen(
+              action.payload.screen as Screens,
+              action.payload?.context as DialogContext
+            );
+          }
+          break;
+        case "START_BATTLE":
+          // TODO: Implement battle start logic
+          console.log("Starting battle with payload:", action.payload);
+          break;
+        case "CUSTOM":
+          // TODO: Handle custom actions
+          console.log("Custom action:", action.payload);
+          break;
+        default:
+          console.warn("Unknown action type:", action.type);
+      }
+    };
+
     const handleContinue = () => {
       if (next) {
         // Handle creature selection from starter dialogs
@@ -81,6 +104,7 @@ export default function Home() {
           sequence={sequence}
           backgroundImageKey={backgroundImageKey}
           onContinue={handleContinue}
+          onDialogAction={handleDialogAction}
         />
       </Suspense>
     );
