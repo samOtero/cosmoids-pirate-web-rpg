@@ -326,7 +326,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.HOOKAW_TIRED_BOX_DIVE_SKIN_1,
+          key: SpeakerImageKey.HOOKAW_TIRED_DIVE_SKIN_1,
           displayName: "???",
         },
       ],
@@ -348,7 +348,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.HOOKAW_TIRED_BOX_SKIN_1,
+          key: SpeakerImageKey.HOOKAW_TIRED_SKIN_1,
           displayName: "Scuttles",
         },
       ],
@@ -366,7 +366,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.HOOKAW_TIRED_BOX_SKIN_1,
+          key: SpeakerImageKey.HOOKAW_TIRED_SKIN_1,
           displayName: "Scuttles",
         },
       ],
@@ -384,7 +384,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.HOOKAW_TIRED_BOX_SKIN_1,
+          key: SpeakerImageKey.HOOKAW_TIRED_SKIN_1,
           displayName: "Scuttles",
         },
       ],

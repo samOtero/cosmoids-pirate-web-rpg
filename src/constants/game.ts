@@ -66,10 +66,8 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
     "/dialog_caleb_disappointed_starter_outfit.png",
   [SpeakerImageKey.CALEB_SCARED_SURPRISED_STARTER_OUTFIT]:
     "/dialog_caleb_scared_surprised_starter_outfit.png",
-  [SpeakerImageKey.HOOKAW_TIRED_BOX_DIVE_SKIN_1]:
-    "/dialog_parrot_tired_box_dive_skin_1.png",
-  [SpeakerImageKey.HOOKAW_TIRED_BOX_SKIN_1]:
-    "/dialog_parrot_tired_box_skin_1.png",
+  [SpeakerImageKey.HOOKAW_TIRED_DIVE_SKIN_1]:
+    "/dialog_parrot_tired_dive_skin_1.png",
   [SpeakerImageKey.HOOKAW_TIRED_SKIN_1]: "/dialog_parrot_tired_skin_1-v1.png",
   [SpeakerImageKey.STARTER_CHEST_CLOSED]: "/starter_box.png",
   [SpeakerImageKey.STARTER_CHEST_OPEN]: "/starter_box_opened.png",
