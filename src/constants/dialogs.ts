@@ -206,6 +206,79 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       ],
     },
     {
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: "Grandpa",
+        },
+        {
+          key: SpeakerImageKey.STARTER_1_CRAB,
+          displayName: "Palmit",
+        },
+      ],
+      id: "palmit_choice",
+      text: "A sturdy choice! It has prepared its own coconut raft to brave the salt water. So, are you sure you want to choose Palmit?",
+      buttons: [
+        {
+          label: "Yes",
+          type: "confirm",
+        },
+        {
+          label: "No",
+          type: "cancel",
+        },
+      ],
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: "Grandpa",
+        },
+        {
+          key: SpeakerImageKey.STARTER_2_IGUANA,
+          displayName: "Fueguana",
+          portraitWidth: "wide",
+        },
+      ],
+      id: "fueguana_choice",
+      text: "Oho, a fiery spirit! It has a knack for mischief and gunpowder. So, are you sure you want to choose Fueguana?",
+      buttons: [
+        {
+          label: "Yes",
+          type: "confirm",
+        },
+        {
+          label: "No",
+          type: "cancel",
+        },
+      ],
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: "Grandpa",
+        },
+        {
+          key: SpeakerImageKey.STARTER_3_MONKEY,
+          displayName: "Monkeg",
+        },
+      ],
+      id: "monkeg_choice",
+      text: "Ah, the shy stowaway. It may prefer hiding in its barrel right now, but it's a loyal navigator. So, are you sure you want to choose Monkeg?",
+      buttons: [
+        {
+          label: "Yes",
+          type: "confirm",
+        },
+        {
+          label: "No",
+          type: "cancel",
+        },
+      ],
+    },
+    {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
       text: "Suddenly, a high-pitched screech is heard from the sky.",
     },
@@ -344,13 +417,13 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       portraits: [
         { key: SpeakerImageKey.HOOKAW_TIRED_SKIN_1, displayName: "Scuttles" },
       ],
-      text: "(Mom's voice) We were followed. We have to hide the location. Caleb, do NOT come looking for us. It’s too dangerous.",
+      text: "(Mom's voice) We were followed. We have to hide the location. Caleb, do NOT come looking for us. It's too dangerous.",
     },
     {
       portraits: [
         { key: SpeakerImageKey.HOOKAW_TIRED_SKIN_1, displayName: "Scuttles" },
       ],
-      text: "(Mom's voice) Take this chest. It’s your promised birthday gift. Stay safe with Grandpa. We lo—",
+      text: "(Mom's voice) Take this chest. It's your promised birthday gift. Stay safe with Grandpa. We lo—",
     },
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
