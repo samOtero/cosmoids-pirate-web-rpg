@@ -118,14 +118,13 @@ export default function DialogScreen({
   };
 
   const handleButtonClick = (button: DialogButton) => {
-    // Execute jump immediately if specified (for responsiveness)
-    if (button.jumpToLineId) {
-      jumpToLine(button.jumpToLineId);
-    }
-
     // Then handle action if it exists
     if (button.action) {
       onDialogAction(button.action);
+    }
+    // Execute jump immediately if specified (for responsiveness)
+    if (button.jumpToLineId) {
+      jumpToLine(button.jumpToLineId);
     }
   };
 
