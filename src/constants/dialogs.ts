@@ -226,6 +226,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         {
           label: "Yes",
           type: "confirm",
+          jumpToLineId: "after_starter_choice",
         },
         {
           label: "No",
@@ -252,6 +253,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         {
           label: "Yes",
           type: "confirm",
+          jumpToLineId: "after_starter_choice",
         },
         {
           label: "No",
@@ -277,6 +279,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         {
           label: "Yes",
           type: "confirm",
+          jumpToLineId: "after_starter_choice",
         },
         {
           label: "No",
@@ -284,6 +287,16 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           jumpToLineId: "starter_choice",
         },
       ],
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: "Grandpa",
+        },
+      ],
+      id: "after_starter_choice",
+      text: "A fine choice! I know you two will look out for each other. Now, hold that doubloon tight, Caleb... your journey officially beg-",
     },
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
