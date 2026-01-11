@@ -182,6 +182,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         {
           key: SpeakerImageKey.STARTER_2_IGUANA,
           displayName: "Fueguana",
+          portraitWidth: "wide",
         },
         {
           key: SpeakerImageKey.STARTER_3_MONKEY,

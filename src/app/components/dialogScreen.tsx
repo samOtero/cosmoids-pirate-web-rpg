@@ -187,10 +187,17 @@ export default function DialogScreen({
                   );
 
                   // Size strategy: single portrait is very large; 2-3 portraits slightly smaller but still prominent
+                  // Wide portraits use rectangular dimensions for better fit of wider character art
                   let imgClass = "w-40 h-40 md:w-56 md:h-56";
                   let imgWidth = 256;
                   let imgHeight = 256;
-                  if (portraitCount === 1) {
+
+                  if (p.portraitWidth === "wide") {
+                    // Wide portraits: rectangular aspect ratio (4:3)
+                    imgClass = "w-96 h-72 md:w-[28rem] md:h-80";
+                    imgWidth = 448;
+                    imgHeight = 320;
+                  } else if (portraitCount === 1) {
                     imgClass = "w-80 h-80 md:w-96 md:h-96";
                     imgWidth = 512;
                     imgHeight = 512;

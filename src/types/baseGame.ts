@@ -92,6 +92,7 @@ export interface Island {
 export interface DialogPortrait {
   key: SpeakerImageKey;
   displayName: string;
+  portraitWidth?: "normal" | "wide";
 }
 
 export const DialogButtonTypeConfig = {
