@@ -227,6 +227,10 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           label: "Yes",
           type: "confirm",
           jumpToLineId: "after_starter_choice",
+          action: {
+            type: "PICK_STARTER",
+            payload: { creatureId: "starter_grass" },
+          },
         },
         {
           label: "No",
@@ -254,6 +258,10 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           label: "Yes",
           type: "confirm",
           jumpToLineId: "after_starter_choice",
+          action: {
+            type: "PICK_STARTER",
+            payload: { creatureId: "starter_fire" },
+          },
         },
         {
           label: "No",
@@ -280,6 +288,10 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           label: "Yes",
           type: "confirm",
           jumpToLineId: "after_starter_choice",
+          action: {
+            type: "PICK_STARTER",
+            payload: { creatureId: "starter_water" },
+          },
         },
         {
           label: "No",

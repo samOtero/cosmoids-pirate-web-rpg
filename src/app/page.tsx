@@ -65,6 +65,23 @@ export default function Home() {
             );
           }
           break;
+        case "PICK_STARTER":
+          if (action.payload?.creatureId && currentProfileId !== null) {
+            const creatureMap: Record<string, typeof STARTER_CRAB> = {
+              starter_grass: STARTER_CRAB,
+              starter_fire: STARTER_IGUANA,
+              starter_water: STARTER_MONKEY,
+            };
+            const creature = creatureMap[action.payload?.creatureId];
+            if (creature) {
+              addCreatureToProfile(currentProfileId, { ...creature });
+            }
+          } else {
+            throw new Error(
+              "Invalid starter selection or no profile selected."
+            );
+          }
+          break;
         case "START_BATTLE":
           // TODO: Implement battle start logic
           console.log("Starting battle with payload:", action.payload);
