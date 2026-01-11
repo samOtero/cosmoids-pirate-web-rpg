@@ -75,8 +75,14 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
   [SpeakerImageKey.STARTER_2_IGUANA]: "/iguana_starter_fire_neutral_skin_1.png",
   [SpeakerImageKey.STARTER_3_MONKEY]:
     "/monkey_starter_water_neutral_skin_1.png",
+  [SpeakerImageKey.EEL_SENTICLE]: "/eel-basic-normal-neutral-skin-1.png",
   [SpeakerImageKey.CREWMATE]: "https://picsum.photos/seed/crewmate_npc/300/300",
   [SpeakerImageKey.OLD_SAILOR]: "https://picsum.photos/seed/oldsailor/300/300",
+  [SpeakerImageKey.PIRATE_GRUNT_JOE_SMIRK]: "/dialog_pirate_grunt_smirk.png",
+  [SpeakerImageKey.PIRATE_GRUNT_JOE_ANGRY]:
+    "/dialog_pirate_grunt_aggressive.png",
+  [SpeakerImageKey.PIRATE_GRUNT_JOE_ANGRY_POINTING]:
+    "/dialog_pirate_grunt_aggressive_point.png",
   [SpeakerImageKey.NARRATOR]:
     "https://picsum.photos/seed/narrator_book/300/300",
   [SpeakerImageKey.DEFAULT]: "https://picsum.photos/seed/unknown_npc/300/300",

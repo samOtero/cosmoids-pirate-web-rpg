@@ -7,7 +7,6 @@ import {
   Creature,
   ElementType,
 } from "@/types/baseGame";
-import { useGameStore } from "@/store/gameStore";
 
 /**
  * DIALOG LINE JUMPING FEATURE:
@@ -524,7 +523,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          key: SpeakerImageKey.PIRATE_GRUNT_JOE_SMIRK,
           displayName: "Grunt Pirate Joe",
         },
       ],
@@ -551,7 +550,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          key: SpeakerImageKey.PIRATE_GRUNT_JOE_ANGRY,
           displayName: "Grunt Pirate Joe",
         },
       ],
@@ -569,8 +568,14 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          key: SpeakerImageKey.EEL_SENTICLE,
+          displayName: "Senticle",
+          portraitWidth: "wide",
+        },
+        {
+          key: SpeakerImageKey.PIRATE_GRUNT_JOE_ANGRY_POINTING,
           displayName: "Grunt Pirate Joe",
+          portraitWidth: "wide",
         },
       ],
       text: "Tear him up, Senticle!",
