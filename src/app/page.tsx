@@ -13,6 +13,7 @@ const StartScreen = lazy(() => import("@/app/components/startScreen"));
 const ProfileScreen = lazy(() => import("@/app/components/profileScreen"));
 const DialogScreen = lazy(() => import("@/app/components/dialogScreen"));
 const MapScreen = lazy(() => import("@/app/components/mapScreen"));
+const BattleScreen = lazy(() => import("@/app/components/battleScreen"));
 
 export default function Home() {
   const {
@@ -26,7 +27,49 @@ export default function Home() {
     dialogContext,
     dialogContextData,
     addCreatureToProfile,
+    setCurrentEnemy,
+    currentEnemy,
+    clearCurrentEnemy,
   } = useGameStore();
+
+  if (currentScreen === Screens.BATTLE) {
+    const currentProfile =
+      currentProfileId !== null ? profiles[currentProfileId] : null;
+
+    if (!currentProfile || !currentEnemy) {
+      setScreen(Screens.MAP);
+      return null;
+    }
+
+    // Default to first creature if valid
+    const playerCreature = currentProfile.creatures[0];
+    if (!playerCreature) {
+        // Handle no creatures? Should not happen if game flow is correct
+        setScreen(Screens.MAP);
+        return null;
+    }
+
+    return (
+      <Suspense fallback={<div>Loading Battle...</div>}>
+        <BattleScreen
+          playerCreature={playerCreature}
+          enemyCreature={currentEnemy}
+          inventory={currentProfile.inventory}
+          onBattleEnd={(won) => {
+             // For now just go back to map or dialog depending on context?
+             // Maybe we need a result screen or dialog
+             if (won) {
+                 // Could go to a victory dialog
+                 setScreen(Screens.MAP); 
+             } else {
+                 setScreen(Screens.MAP);
+             }
+             clearCurrentEnemy();
+          }}
+        />
+      </Suspense>
+    );
+  }
 
   if (currentScreen === Screens.START) {
     return (
@@ -83,8 +126,27 @@ export default function Home() {
           }
           break;
         case "START_BATTLE":
-          // TODO: Implement battle start logic
-          console.log("Starting battle with payload:", action.payload);
+          if (action.payload?.creatureId) {
+             // Temporary lookup for enemies until we have a real DB/store for them
+             // Using starter creatures as placeholder enemies for now + maybe some extras
+             const enemyMap: Record<string, any> = {
+                // We'll reuse starters for now or define new ones. 
+                // Let's create a quick "wild" version of them or just use them directly.
+                wild_crab: { ...STARTER_CRAB, id: 'wild_crab_' + Date.now(), currentHp: 15, maxHp: 15, level: 3 },
+                wild_iguana: { ...STARTER_IGUANA, id: 'wild_iguana_' + Date.now(), currentHp: 15, maxHp: 15, level: 3 },
+                wild_monkey: { ...STARTER_MONKEY, id: 'wild_monkey_' + Date.now(), currentHp: 15, maxHp: 15, level: 3 },
+             };
+             
+             const enemyId = action.payload.creatureId;
+             const enemy = enemyMap[enemyId];
+
+             if (enemy) {
+                 setCurrentEnemy(enemy);
+                 setScreen(Screens.BATTLE);
+             } else {
+                 console.warn("Enemy not found:", enemyId);
+             }
+          }
           break;
         case "CUSTOM":
           // TODO: Handle custom actions

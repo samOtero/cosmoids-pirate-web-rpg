@@ -622,8 +622,12 @@ export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
           },
         },
         {
-          label: "No",
-          type: "cancel",
+          label: "[DEBUG] Fight Crab",
+          type: "fire",
+          action: {
+            type: "START_BATTLE",
+            payload: { creatureId: "wild_crab" },
+          },
         },
       ],
     },

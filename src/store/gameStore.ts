@@ -24,6 +24,9 @@ interface GameState {
   deleteProfile: (slotId: number) => void;
   selectProfile: (slotId: number) => void;
   addCreatureToProfile: (slotId: number, creature: Creature) => void;
+  currentEnemy: Creature | null;
+  setCurrentEnemy: (enemy: Creature) => void;
+  clearCurrentEnemy: () => void;
 }
 
 export const useGameStore = create<GameState>()(
@@ -38,6 +41,9 @@ export const useGameStore = create<GameState>()(
           dialogContext: context || null,
           dialogContextData: contextData || null,
         }),
+      currentEnemy: null,
+      setCurrentEnemy: (enemy) => set({ currentEnemy: enemy }),
+      clearCurrentEnemy: () => set({ currentEnemy: null }),
       profiles: Array(MAX_PROFILES).fill(null),
       currentProfileId: null,
       createProfile: (slotId: number) =>
