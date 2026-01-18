@@ -4,6 +4,7 @@ import Panel from '@/app/components/ui/Panel';
 import { Button } from '@/app/components/ui/Button';
 import { HealthBar } from '@/app/components/ui/HealthBar';
 import { TypeBadge } from '@/app/components/ui/TypeBadge';
+import BattleBackground from '@/app/components/BattleBackground';
 
 // --- Presentational Component ---
 interface BattleScreenUIProps {
@@ -30,46 +31,48 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
   }, [battleLog]);
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-blue-900 to-blue-800 relative">
-      {/* Dynamic Background */}
-      <div className="absolute inset-0 opacity-30 bg-[url('https://picsum.photos/seed/battle_sea/1000/600')] bg-cover bg-center pointer-events-none"></div>
-
-      {/* Battle Arena - Scalable and Scrollable if needed */}
-      <div className="flex-1 relative p-2 md:p-4 flex flex-col justify-center md:justify-between max-w-5xl mx-auto w-full z-10 min-h-0 overflow-y-auto custom-scrollbar">
+    <div className="flex flex-col h-full bg-black relative">
+      {/* Battle Arena Wrapper - Restricts background to this area */}
+      <div className="relative flex-1 min-h-0 w-full">
+        <BattleBackground />
         
-        {/* Enemy Group */}
-        <div className="self-end w-full max-w-md flex flex-col items-end mb-4">
-           <Panel className="bg-black/60 border-2 border-red-900/50 w-full mb-2">
-             <div className="flex justify-between items-baseline mb-1">
-                <span className="font-bold text-lg text-sand">{enemyCreature.name}</span>
-                <span className="text-xs text-gray-400">Lvl {enemyCreature.level}</span>
+        {/* Battle Arena Content */}
+        <div className="relative h-full p-2 md:p-4 flex flex-col justify-center md:justify-between max-w-5xl mx-auto w-full z-10 overflow-y-auto custom-scrollbar">
+          
+          {/* Enemy Group */}
+          <div className="self-end w-full max-w-md flex flex-col items-end mb-4">
+             <Panel className="bg-black/60 border-2 border-red-900/50 w-full mb-2">
+               <div className="flex justify-between items-baseline mb-1">
+                  <span className="font-bold text-lg text-sand">{enemyCreature.name}</span>
+                  <span className="text-xs text-gray-400">Lvl {enemyCreature.level}</span>
+               </div>
+               <HealthBar current={enemyCreature.currentHp} max={enemyCreature.maxHp} />
+               <div className="mt-1 flex justify-end">
+                  <TypeBadge type={enemyCreature.type} />
+               </div>
+             </Panel>
+             <div className="pr-4 md:pr-12">
+                <img src={enemyCreature.spriteUrl} alt="Enemy" className="w-28 h-28 md:w-48 md:h-48 animate-pulse object-contain drop-shadow-2xl" />
              </div>
-             <HealthBar current={enemyCreature.currentHp} max={enemyCreature.maxHp} />
-             <div className="mt-1 flex justify-end">
-                <TypeBadge type={enemyCreature.type} />
+          </div>
+  
+          {/* Player Group */}
+          <div className="self-start w-full max-w-md flex flex-col items-start mt-4">
+             <div className="pl-4 md:pl-12 mb-2">
+                <img src={playerCreature.spriteUrl} alt="Player" className="w-28 h-28 md:w-48 md:h-48 object-contain drop-shadow-2xl scale-x-[-1]" />
              </div>
-           </Panel>
-           <div className="pr-4 md:pr-12">
-              <img src={enemyCreature.spriteUrl} alt="Enemy" className="w-28 h-28 md:w-48 md:h-48 animate-pulse object-contain drop-shadow-2xl" />
-           </div>
-        </div>
-
-        {/* Player Group */}
-        <div className="self-start w-full max-w-md flex flex-col items-start mt-4">
-           <div className="pl-4 md:pl-12 mb-2">
-              <img src={playerCreature.spriteUrl} alt="Player" className="w-28 h-28 md:w-48 md:h-48 object-contain drop-shadow-2xl scale-x-[-1]" />
-           </div>
-           <Panel className="bg-black/60 border-2 border-blue-900/50 w-full">
-             <div className="flex justify-between items-baseline mb-1">
-                <span className="font-bold text-lg text-sand">{playerCreature.name}</span>
-                <span className="text-xs text-gray-400">Lvl {playerCreature.level}</span>
-             </div>
-             <HealthBar current={playerCreature.currentHp} max={playerCreature.maxHp} label="HP" />
-             <div className="mt-1 flex justify-between text-xs text-sand/60 font-mono">
-                <span>{playerCreature.currentHp} / {playerCreature.maxHp}</span>
-                <TypeBadge type={playerCreature.type} />
-             </div>
-           </Panel>
+             <Panel className="bg-black/60 border-2 border-blue-900/50 w-full">
+               <div className="flex justify-between items-baseline mb-1">
+                  <span className="font-bold text-lg text-sand">{playerCreature.name}</span>
+                  <span className="text-xs text-gray-400">Lvl {playerCreature.level}</span>
+               </div>
+               <HealthBar current={playerCreature.currentHp} max={playerCreature.maxHp} label="HP" />
+               <div className="mt-1 flex justify-between text-xs text-sand/60 font-mono">
+                  <span>{playerCreature.currentHp} / {playerCreature.maxHp}</span>
+                  <TypeBadge type={playerCreature.type} />
+               </div>
+             </Panel>
+          </div>
         </div>
       </div>
 

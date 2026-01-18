@@ -36,25 +36,25 @@ export default function Home() {
     const currentProfile =
       currentProfileId !== null ? profiles[currentProfileId] : null;
 
-    if (!currentProfile || !currentEnemy) {
+    if (!currentEnemy) {
       setScreen(Screens.MAP);
       return null;
     }
 
     // Default to first creature if valid
-    const playerCreature = currentProfile.creatures[0];
-    if (!playerCreature) {
+    //const playerCreature = currentProfile.creatures[0];
+    //if (!playerCreature) {
         // Handle no creatures? Should not happen if game flow is correct
-        setScreen(Screens.MAP);
-        return null;
-    }
+       // setScreen(Screens.MAP);
+       // return null;
+    //}
 
     return (
       <Suspense fallback={<div>Loading Battle...</div>}>
         <BattleScreen
-          playerCreature={playerCreature}
+          playerCreature={currentEnemy}
           enemyCreature={currentEnemy}
-          inventory={currentProfile.inventory}
+          inventory={[]}
           onBattleEnd={(won) => {
              // For now just go back to map or dialog depending on context?
              // Maybe we need a result screen or dialog
