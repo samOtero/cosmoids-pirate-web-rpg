@@ -51,16 +51,10 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
                   <TypeBadge type={enemyCreature.type} />
                </div>
              </Panel>
-             <div className="pr-4 md:pr-12">
-                <img src={enemyCreature.spriteUrl} alt="Enemy" className="w-28 h-28 md:w-48 md:h-48 animate-pulse object-contain drop-shadow-2xl" />
-             </div>
           </div>
   
           {/* Player Group */}
           <div className="self-start w-full max-w-md flex flex-col items-start mt-4">
-             <div className="pl-4 md:pl-12 mb-2">
-                <img src={playerCreature.spriteUrl} alt="Player" className="w-28 h-28 md:w-48 md:h-48 object-contain drop-shadow-2xl scale-x-[-1]" />
-             </div>
              <Panel className="bg-black/60 border-2 border-blue-900/50 w-full">
                <div className="flex justify-between items-baseline mb-1">
                   <span className="font-bold text-lg text-sand">{playerCreature.name}</span>
