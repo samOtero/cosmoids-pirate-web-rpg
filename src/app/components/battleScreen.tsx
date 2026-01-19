@@ -35,13 +35,13 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
         <BattleBackground />
         
         {/* Battle Arena Content */}
-        <div className="relative h-full p-2 md:p-4 flex flex-col justify-center md:justify-between max-w-5xl mx-auto w-full z-10 overflow-y-auto custom-scrollbar">
+        <div className="relative h-full p-2 md:p-4 flex flex-row items-end justify-between w-full z-10">
           
-          {/* Enemy Group */}
-          <CreatureStatus creature={enemyCreature} variant="enemy" />
-  
-          {/* Player Group */}
+          {/* Player Group - Left */}
           <CreatureStatus creature={playerCreature} variant="friend" showHpValues />
+
+          {/* Enemy Group - Right */}
+          <CreatureStatus creature={enemyCreature} variant="enemy" showHpValues />
         </div>
       </div>
 

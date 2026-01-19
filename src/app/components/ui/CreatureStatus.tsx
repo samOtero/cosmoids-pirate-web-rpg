@@ -8,20 +8,22 @@ interface CreatureStatusProps {
   creature: Creature;
   variant: 'friend' | 'enemy';
   showHpValues?: boolean;
+  className?: string;
 }
 
 export const CreatureStatus: React.FC<CreatureStatusProps> = ({ 
   creature, 
   variant, 
-  showHpValues = false 
+  showHpValues = false,
+  className = ''
 }) => {
   const borderColor = variant === 'enemy' ? 'border-red-900/50' : 'border-blue-900/50';
-  const containerAlignment = variant === 'enemy' ? 'self-end items-end' : 'self-start items-start';
-  const margin = variant === 'enemy' ? 'mb-4' : 'mt-4';
-
+  // Keep internal alignment (text/content alignment) but remove self-* (external positioning)
+  const contentAlignment = variant === 'enemy' ? 'items-end' : 'items-start';
+  
   return (
-    <div className={`${containerAlignment} w-full max-w-md flex flex-col ${margin}`}>
-      <Panel className={`bg-black/60 border-2 ${borderColor} w-full ${variant === 'enemy' ? 'mb-2' : ''}`}>
+    <div className={`w-full max-w-md flex flex-col ${contentAlignment} ${className}`}>
+      <Panel className={`bg-black/60 border-2 ${borderColor} w-full`}>
         <div className="flex justify-between items-baseline mb-1">
           <span className="font-bold text-lg text-sand">{creature.name}</span>
           <span className="text-xs text-gray-400">Lvl {creature.level}</span>
