@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Creature, Item } from '@/types/baseGame';
-import Panel from '@/app/components/ui/Panel';
 import { Button } from '@/app/components/ui/Button';
-import { HealthBar } from '@/app/components/ui/HealthBar';
-import { TypeBadge } from '@/app/components/ui/TypeBadge';
+import { CreatureStatus } from '@/app/components/ui/CreatureStatus';
 import BattleBackground from '@/app/components/BattleBackground';
 
 // --- Presentational Component ---
@@ -40,33 +38,10 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
         <div className="relative h-full p-2 md:p-4 flex flex-col justify-center md:justify-between max-w-5xl mx-auto w-full z-10 overflow-y-auto custom-scrollbar">
           
           {/* Enemy Group */}
-          <div className="self-end w-full max-w-md flex flex-col items-end mb-4">
-             <Panel className="bg-black/60 border-2 border-red-900/50 w-full mb-2">
-               <div className="flex justify-between items-baseline mb-1">
-                  <span className="font-bold text-lg text-sand">{enemyCreature.name}</span>
-                  <span className="text-xs text-gray-400">Lvl {enemyCreature.level}</span>
-               </div>
-               <HealthBar current={enemyCreature.currentHp} max={enemyCreature.maxHp} />
-               <div className="mt-1 flex justify-end">
-                  <TypeBadge type={enemyCreature.type} />
-               </div>
-             </Panel>
-          </div>
+          <CreatureStatus creature={enemyCreature} variant="enemy" />
   
           {/* Player Group */}
-          <div className="self-start w-full max-w-md flex flex-col items-start mt-4">
-             <Panel className="bg-black/60 border-2 border-blue-900/50 w-full">
-               <div className="flex justify-between items-baseline mb-1">
-                  <span className="font-bold text-lg text-sand">{playerCreature.name}</span>
-                  <span className="text-xs text-gray-400">Lvl {playerCreature.level}</span>
-               </div>
-               <HealthBar current={playerCreature.currentHp} max={playerCreature.maxHp} label="HP" />
-               <div className="mt-1 flex justify-between text-xs text-sand/60 font-mono">
-                  <span>{playerCreature.currentHp} / {playerCreature.maxHp}</span>
-                  <TypeBadge type={playerCreature.type} />
-               </div>
-             </Panel>
-          </div>
+          <CreatureStatus creature={playerCreature} variant="friend" showHpValues />
         </div>
       </div>
 
