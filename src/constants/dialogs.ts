@@ -1,12 +1,4 @@
-import {
-  DialogConfig,
-  SpeakerImageKey,
-  Screens,
-  BackgroundImageKey,
-  DialogContext,
-  Creature,
-  ElementType,
-} from "@/types/baseGame";
+import { Creature, ElementType } from "@/types/baseGame";
 
 /**
  * DIALOG LINE JUMPING FEATURE:
@@ -91,27 +83,9 @@ export const STARTER_MONKEY: Creature = {
   spriteUrl: "/monkey_starter_water_neutral_skin_1.png",
 };
 
-import dialogsJson from "./dialogs.json";
-
-export const NEW_PLAYER_WELCOME_DIALOG =
-  dialogsJson.NEW_PLAYER_WELCOME_DIALOG as unknown as DialogConfig;
-
-export const NEW_PLAYER_WELCOME_DIALOG_PART_2 =
-  dialogsJson.NEW_PLAYER_WELCOME_DIALOG_PART_2 as unknown as DialogConfig;
-
-export const ISLAND_INTRO_DIALOGS =
-  dialogsJson.ISLAND_INTRO_DIALOGS as unknown as Record<string, DialogConfig>;
-
-export const ISLAND_VICTORY_DIALOGS =
-  dialogsJson.ISLAND_VICTORY_DIALOGS as unknown as Record<string, DialogConfig>;
-
-export const ISLAND_DEFEAT_DIALOGS =
-  dialogsJson.ISLAND_DEFEAT_DIALOGS as unknown as Record<string, DialogConfig>;
-
-/**
- * EXAMPLE: Dialog with button line jumping
- * This demonstrates how to use line IDs and jumping for branching dialogs.
- * When a button has `jumpToLineId`, clicking it jumps to that line within the same dialog.
- */
-export const EXAMPLE_DIALOG_WITH_LINE_JUMPING =
-  dialogsJson.EXAMPLE_DIALOG_WITH_LINE_JUMPING as unknown as DialogConfig;
+// Export all dialogs from their individual files
+export * from "./dialogs/newPlayerWelcome";
+export * from "./dialogs/islandIntro";
+export * from "./dialogs/islandVictory";
+export * from "./dialogs/islandDefeat";
+export * from "./dialogs/examples";
