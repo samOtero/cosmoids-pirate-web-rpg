@@ -121,6 +121,9 @@ export const useGameStore = create<GameState>()(
             eventQueue: [{
                 type: "SHOW_DIALOG",
                 payload: { context: DialogContext.GAME_INTRO }
+            }, {
+                type: "SHOW_DIALOG",
+                payload: { context: DialogContext.GAME_INTRO_AFTER_STARTER}
             }]
           };
         }); get().processNextEvent();},

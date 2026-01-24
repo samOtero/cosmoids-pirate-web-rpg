@@ -246,15 +246,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     },
   ],
   backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
-  nextEvents: [
-    {
-      type: "SHOW_DIALOG",
-      payload: { 
-          context: DialogContext.GAME_INTRO_AFTER_STARTER,
-          contextData: { islandId: 0 }
-      }
-    }
-  ]
 };
 
 

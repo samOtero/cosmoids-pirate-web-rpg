@@ -177,13 +177,6 @@ export default function Home() {
     };
 
     const handleContinue = () => {
-      if (sequence.length > 0) {
-          // Verify if we are at the end? 
-          // DialogScreen calls onContinue when the sequence is DONE (or skipped).
-          // But wait, DialogScreen handles the inner sequence. 
-          // So onContinue means "This dialog config is finished".
-      }
-
       if (eventQueue.length > 0) {
           processNextEvent();
           return;
