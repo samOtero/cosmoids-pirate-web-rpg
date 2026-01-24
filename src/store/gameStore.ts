@@ -35,12 +35,13 @@ interface GameState {
   enqueueEvent: (event: GameEvent) => void;
   pushEventToFront: (event: GameEvent) => void;
   processNextEvent: () => void;
+  enqueueAndProcessEvents: (events: GameEvent[]) => void;
   clearQueue: () => void;
 }
 
 export const useGameStore = create<GameState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       currentScreen: Screens.START,
       dialogContext: null,
       dialogContextData: null,
@@ -53,6 +54,10 @@ export const useGameStore = create<GameState>()(
       eventQueue: [],
       enqueueEvent: (event) => set((state) => ({ eventQueue: [...state.eventQueue, event] })),
       pushEventToFront: (event) => set((state) => ({ eventQueue: [event, ...state.eventQueue] })),
+      enqueueAndProcessEvents: (events) => {
+        set((state) => ({ eventQueue: [...state.eventQueue, ...events] }));
+        get().processNextEvent();
+      },
       processNextEvent: () =>
         set((state) => {
           if (state.eventQueue.length === 0) return state;

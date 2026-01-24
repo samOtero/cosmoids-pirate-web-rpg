@@ -35,17 +35,8 @@ export default function Home() {
     eventQueue,
     processNextEvent,
     enqueueEvent,
+    enqueueAndProcessEvents,
   } = useGameStore();
-
-  // Auto-process queue if we are in a transition state or just starting
-  useEffect(() => {
-    return; // temp disabled
-    // If we have a profile selected, events in the queue, and we are on the PROFILES screen (just selected),
-    // kick off the event loop.
-    if (currentProfileId !== null && eventQueue.length > 0 && currentScreen === Screens.PROFILES) {
-        processNextEvent();
-    }
-  }, [currentProfileId, eventQueue, currentScreen, processNextEvent]);
 
   // Also handle "WAIT" events or similar if implemented in the store processor, 
   // but for now the store updates state immediately for screen changes.
@@ -99,8 +90,7 @@ export default function Home() {
   if (currentScreen === Screens.START) {
     return (
       <Suspense fallback={<div>Loading...</div>}>
-        <StartScreen onStart={() => { enqueueEvent({ type: "GO_TO_PROFILES" });
-        processNextEvent();}} />
+        <StartScreen onStart={() => enqueueAndProcessEvents([ { type: "GO_TO_PROFILES" }])} />
       </Suspense>
     );
   }
