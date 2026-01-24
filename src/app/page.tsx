@@ -39,6 +39,7 @@ export default function Home() {
 
   // Auto-process queue if we are in a transition state or just starting
   useEffect(() => {
+    return; // temp disabled
     // If we have a profile selected, events in the queue, and we are on the PROFILES screen (just selected),
     // kick off the event loop.
     if (currentProfileId !== null && eventQueue.length > 0 && currentScreen === Screens.PROFILES) {
@@ -98,7 +99,8 @@ export default function Home() {
   if (currentScreen === Screens.START) {
     return (
       <Suspense fallback={<div>Loading...</div>}>
-        <StartScreen onStart={() => setScreen(Screens.PROFILES)} />
+        <StartScreen onStart={() => { enqueueEvent({ type: "GO_TO_PROFILES" });
+        processNextEvent();}} />
       </Suspense>
     );
   }

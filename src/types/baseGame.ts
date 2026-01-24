@@ -171,7 +171,8 @@ export interface DialogConfig {
 export type GameEventType =
   | "SHOW_DIALOG"
   | "START_BATTLE"
-  | "GO_TO_MAP";
+  | "GO_TO_MAP"
+  | "GO_TO_PROFILES";
 
 export interface GameEvent {
   type: GameEventType;

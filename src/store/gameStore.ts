@@ -77,6 +77,14 @@ export const useGameStore = create<GameState>()(
                   // Note: Store might need a way to set the specific battle config from payload
                   break;
               }
+              case "GO_TO_MAP": {
+                  updates = { ...updates, currentScreen: Screens.MAP };
+                  break;
+              }
+              case "GO_TO_PROFILES": {
+                  updates = { ...updates, currentScreen: Screens.PROFILES };
+                  break;
+              }
               // Add other cases as needed
           }
 
