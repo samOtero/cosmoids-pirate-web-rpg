@@ -108,6 +108,34 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
     }
   };
 
+
+
+  const handleDelete = async () => {
+    if (!selectedDialogKey) return;
+    if (!confirm(`Are you sure you want to delete "${selectedDialogKey}"? This action cannot be undone.`)) return;
+
+    try {
+        const res = await fetch("/api/dialogs/delete", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ dialogKey: selectedDialogKey })
+        });
+        
+        if (!res.ok) {
+            const data = await res.json();
+            throw new Error(data.error || "Failed to delete");
+        }
+        
+        alert("Dialog deleted successfully.");
+        setSelectedDialogKey(null);
+        // App should reload or we might need to refresh manually, 
+        // usually HMR picks it up but let's be safe.
+    } catch (error: any) {
+        console.error(error);
+        alert(`Error deleting: ${error.message}`);
+    }
+  };
+
   const handleJumpToLine = (index: number) => {
     setStartLineIndex(index);
     setPlayKey((prev) => prev + 1);
@@ -299,7 +327,17 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                             </button>
                          </div>
                     )}
-                </div>
+                 </div>
+            )}
+            
+            {selectedDialogKey && !isEditing && (
+                 <button
+                    onClick={handleDelete}
+                    className="ml-2 px-3 py-1 bg-red-900/50 text-red-200 text-xs rounded hover:bg-red-800 border border-red-800"
+                    title="Delete this dialog file"
+                >
+                    Delete
+                </button>
             )}
           </div>
 
