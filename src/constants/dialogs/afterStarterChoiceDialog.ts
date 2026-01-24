@@ -9,16 +9,6 @@ import {
 export const AFTER_STARTER_CHOICE_DIALOG: DialogConfig = {
   sequence: [
     {
-      portraits: [
-        {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: "Grandpa",
-        },
-      ],
-      id: "after_starter_choice",
-      text: "A fine choice! I know you two will look out for each other. Now, hold that doubloon tight, Caleb... your journey officially beg-",
-    },
-    {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
       text: "Suddenly, a high-pitched screech is heard from the sky.",
     },

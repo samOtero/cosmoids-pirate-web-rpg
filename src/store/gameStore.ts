@@ -27,6 +27,7 @@ interface GameState {
   currentEnemy: Creature | null;
   setCurrentEnemy: (enemy: Creature) => void;
   clearCurrentEnemy: () => void;
+  completeIntroduction: () => void;
 }
 
 export const useGameStore = create<GameState>()(
@@ -83,20 +84,39 @@ export const useGameStore = create<GameState>()(
           if (slotId < 0 || slotId >= MAX_PROFILES || !state.profiles[slotId])
             return state;
           const newProfiles = [...state.profiles];
-          const isNewPlayer = newProfiles[slotId]?.isNew;
-          if (newProfiles[slotId]) {
-            newProfiles[slotId] = {
-              ...newProfiles[slotId]!,
-              lastPlayed: Date.now(),
-              isNew: false,
-            };
+          const profile = newProfiles[slotId]!;
+          const isNewPlayer = profile.isNew;
+          
+          let nextScreen = Screens.MAP;
+          let nextContext: DialogContext | null = null;
+
+          if (isNewPlayer) {
+              nextScreen = Screens.DIALOG;
+              if (profile.creatures.length === 0) {
+                  nextContext = DialogContext.GAME_INTRO;
+              } else {
+                  nextContext = DialogContext.GAME_INTRO_AFTER_STARTER;
+              }
           }
+
           return {
             profiles: newProfiles,
             currentProfileId: slotId,
-            currentScreen: isNewPlayer ? Screens.DIALOG : Screens.MAP,
-            dialogContext: isNewPlayer ? DialogContext.GAME_INTRO : null,
+            currentScreen: nextScreen,
+            dialogContext: nextContext,
           };
+        }),
+      completeIntroduction: () => 
+        set((state) => {
+            if (state.currentProfileId === null) return state;
+            const newProfiles = [...state.profiles];
+            if (newProfiles[state.currentProfileId]) {
+                 newProfiles[state.currentProfileId] = {
+                    ...newProfiles[state.currentProfileId]!,
+                    isNew: false,
+                 };
+            }
+            return { profiles: newProfiles };
         }),
       addCreatureToProfile: (slotId: number, creature: Creature) =>
         set((state) => {

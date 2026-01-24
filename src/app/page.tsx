@@ -30,6 +30,7 @@ export default function Home() {
     setCurrentEnemy,
     currentEnemy,
     clearCurrentEnemy,
+    completeIntroduction,
   } = useGameStore();
 
   if (currentScreen === Screens.BATTLE) {
@@ -102,6 +103,9 @@ export default function Home() {
       switch (action.type) {
         case "CHANGE_SCREEN":
           if (action.payload?.screen) {
+            if (action.payload.screen === Screens.MAP) {
+                completeIntroduction();
+            }
             setScreen(
               action.payload.screen as Screens,
               action.payload?.context as DialogContext
@@ -171,8 +175,13 @@ export default function Home() {
             addCreatureToProfile(currentProfileId, { ...creature });
           }
         }
+        
+        if (next.screen === Screens.MAP) {
+           completeIntroduction();
+        }
         setScreen(next.screen, next.context, next.contextData);
       } else {
+        completeIntroduction();
         setScreen(Screens.MAP);
       }
     };

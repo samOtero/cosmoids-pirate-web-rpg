@@ -21,7 +21,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         },
       ],
       text: "...",
-      buttons: [
+      /*buttons: [
         {
           label: "Yes",
           type: "confirm",
@@ -39,6 +39,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           },
         },
       ],
+      */
     },
     {
       portraits: [
@@ -159,7 +160,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         {
           label: "Yes",
           type: "confirm",
-          jumpToLineId: undefined,
+          jumpToLineId: "after_starter_choice",
           action: {
             type: "PICK_STARTER",
             payload: { creatureId: "starter_grass" },
@@ -190,7 +191,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         {
           label: "Yes",
           type: "confirm",
-          jumpToLineId: undefined,
+          jumpToLineId: "after_starter_choice",
           action: {
             type: "PICK_STARTER",
             payload: { creatureId: "starter_fire" },
@@ -220,7 +221,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         {
           label: "Yes",
           type: "confirm",
-          jumpToLineId: undefined,
+          jumpToLineId: "after_starter_choice",
           action: {
             type: "PICK_STARTER",
             payload: { creatureId: "starter_water" },
@@ -232,6 +233,16 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           jumpToLineId: "starter_choice",
         },
       ],
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: "Grandpa",
+        },
+      ],
+      id: "after_starter_choice",
+      text: "A fine choice! I know you two will look out for each other. Now, hold that doubloon tight, Caleb... your journey officially beg-",
     },
   ],
   backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
