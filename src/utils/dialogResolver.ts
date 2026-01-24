@@ -10,6 +10,7 @@ import {
   ISLAND_VICTORY_DIALOGS,
   ISLAND_DEFEAT_DIALOGS,
   NEW_PLAYER_WELCOME_DIALOG_PART_2,
+  AFTER_STARTER_CHOICE_DIALOG,
 } from "@/constants/dialogs";
 import { ISLANDS } from "@/constants/game";
 
@@ -29,6 +30,10 @@ export function resolveDialog(
 
   if (context === DialogContext.GAME_INTRO_PART_2) {
     return NEW_PLAYER_WELCOME_DIALOG_PART_2;
+  }
+
+  if (context === DialogContext.GAME_INTRO_AFTER_STARTER) {
+    return AFTER_STARTER_CHOICE_DIALOG;
   }
 
   if (

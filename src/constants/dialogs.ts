@@ -85,6 +85,7 @@ export const STARTER_MONKEY: Creature = {
 
 // Export all dialogs from their individual files
 export * from "./dialogs/newPlayerWelcome";
+export * from "./dialogs/afterStarterChoiceDialog";
 export * from "./dialogs/islandIntro";
 export * from "./dialogs/islandVictory";
 export * from "./dialogs/islandDefeat";
