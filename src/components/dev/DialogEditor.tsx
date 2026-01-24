@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import * as dialogs from "@/constants/dialogs";
-import { DialogConfig, DialogAction, DialogLine, DialogButton, DialogPortrait } from "@/types/baseGame";
+import { DialogConfig, DialogAction, DialogLine, DialogButton, DialogPortrait, SpeakerImageKey, BackgroundImageKey } from "@/types/baseGame";
 import DialogScreen from "@/app/components/dialogScreen";
 
 export default function DialogEditor({ onClose }: { onClose: () => void }) {
@@ -14,6 +14,13 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
   const [isFinished, setIsFinished] = useState(false);
   const [isInspectorOpen, setIsInspectorOpen] = useState(true);
   const [startLineIndex, setStartLineIndex] = useState(0);
+
+  // Editing State
+  const [isEditing, setIsEditing] = useState(false);
+  const [editJson, setEditJson] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [showNewDialogModal, setShowNewDialogModal] = useState(false);
+  const [newDialogData, setNewDialogData] = useState({ fileName: "", varName: "" });
 
   // Filter exports to find valid DialogConfigs
   const availableDialogs = useMemo(() => {
@@ -44,6 +51,61 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
     setStartLineIndex(0);
     setPlayKey(0);
     setIsFinished(false);
+    setIsEditing(false); // Reset edit mode
+    // Pre-populate edit JSON just in case they switch to edit mode
+    // We can't do this here accurately because `availableDialogs` might change, 
+    // better to derive it when entering edit mode or via useEffect if needed.
+  };
+
+  const handleStartEdit = () => {
+    if (!selectedDialog) return;
+    setEditJson(JSON.stringify(selectedDialog, null, 2));
+    setIsEditing(true);
+  };
+
+  const handleSave = async () => {
+    try {
+        const parsed = JSON.parse(editJson);
+        // We need a filename and variable name.
+        // For existing dialogs, we might not know the filename easily without metadata.
+        // For this "Add new dialog" feature, it's most important for NEW ones.
+        // BUT, if we are editing an existing one, we are kind of stuck unless we ask for the filename again
+        // OR we just allow "Save Copy As..." for now.
+        // Let's implement "Save Copy" or if it was just created, we might know.
+        // Simpler for now: "Save to File" button that always asks/confirms details?
+        // Or better: Just "Save" that overwrites if we know the key, but we don't know the file...
+        // Let's rely on the New Dialog flow explicitly for "creating", and maybe an explicit "Save Changes" that asks for filename.
+        setShowNewDialogModal(true);
+        // We'll use the modal to confirm save details
+    } catch (e) {
+        alert("Invalid JSON");
+    }
+  };
+
+  const executeSave = async () => {
+    try {
+        setIsSaving(true);
+        const config = JSON.parse(editJson);
+        const res = await fetch("/api/dialogs/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                fileName: newDialogData.fileName,
+                dialogName: newDialogData.varName,
+                config
+            })
+        });
+        
+        if (!res.ok) throw new Error("Failed to save");
+        
+        alert("Saved successfully! The app may reload.");
+        setShowNewDialogModal(false);
+    } catch (error) {
+        console.error(error);
+        alert("Error saving");
+    } finally {
+        setIsSaving(false);
+    }
   };
 
   const handleJumpToLine = (index: number) => {
@@ -60,7 +122,29 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
           {/* Top: List of Dialogs */}
           <div className={`${isInspectorOpen ? "h-1/2 border-b border-slate-700" : "flex-1"} flex flex-col min-h-0 transition-all duration-300`}>
             <div className="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800 shrink-0">
-               <h2 className="font-bold text-lg">Dialogs</h2>
+               <div className="flex items-center gap-2">
+                 <h2 className="font-bold text-lg">Dialogs</h2>
+                 <button 
+                   onClick={() => {
+                        setEditJson(JSON.stringify({
+                            sequence: [
+                                {
+                                    text: "New dialog text...",
+                                    portraits: [{ key: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT, displayName: "Guide" }]
+                                }
+                            ],
+                            backgroundImageKey: BackgroundImageKey.CALEB_HOUSE
+                        }, null, 2));
+                        setSelectedDialogKey("NEW_DIALOG"); // Placeholder
+                        setIsEditing(true);
+                        setStartLineIndex(0);
+                        setShowNewDialogModal(true);
+                   }}
+                   className="text-xs bg-cyan-600 px-2 py-1 rounded hover:bg-cyan-500"
+                 >
+                    + New
+                 </button>
+               </div>
                <button
                  onClick={onClose}
                  className="text-slate-400 hover:text-white px-2 py-1"
@@ -188,10 +272,51 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                 Select a dialog to view
               </span>
             )}
+            
+            {selectedDialogKey && (
+                <div className="flex gap-2">
+                    {!isEditing && (
+                        <button
+                            onClick={handleStartEdit}
+                            className="px-3 py-1 bg-purple-600 text-xs rounded hover:bg-purple-500"
+                        >
+                            Edit JSON
+                        </button>
+                    )}
+                    {isEditing && (
+                         <div className="flex gap-2">
+                            <button
+                                onClick={() => setShowNewDialogModal(true)}
+                                className="px-3 py-1 bg-green-600 text-xs rounded hover:bg-green-500"
+                            >
+                                Save to File...
+                            </button>
+                             <button
+                                onClick={() => setIsEditing(false)}
+                                className="px-3 py-1 bg-slate-700 text-xs rounded hover:bg-slate-600"
+                            >
+                                Cancel
+                            </button>
+                         </div>
+                    )}
+                </div>
+            )}
           </div>
 
           <div className="flex-1 relative overflow-hidden bg-black">
-            {selectedDialog ? (
+            {isEditing ? (
+                 <div className="h-full w-full flex flex-col">
+                    <div className="bg-slate-900 p-2 text-xs text-slate-400 border-b border-slate-800">
+                        Edit raw JSON. <span className="text-cyan-400">Tip:</span> Use string values (e.g. "Guide"). They will be automatically converted to Enums on save.
+                    </div>
+                    <textarea 
+                        className="flex-1 bg-slate-950 text-slate-300 font-mono text-sm p-4 focus:outline-none resize-none"
+                        value={editJson}
+                        onChange={(e) => setEditJson(e.target.value)}
+                        spellCheck={false}
+                    />
+                 </div>
+            ) : selectedDialog ? (
               <div
                 key={`${selectedDialogKey}-${playKey}`}
                 className="h-full w-full"
@@ -227,6 +352,66 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
           </div>
         </div>
       </div>
+      {/* New/Save Dialog Modal */}
+      {showNewDialogModal && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <div className="bg-slate-800 p-6 rounded-lg border border-slate-600 w-96 shadow-xl">
+                <h3 className="font-bold text-lg mb-4">Save Dialog</h3>
+                
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-xs uppercase text-slate-400 font-bold mb-1">
+                            Current Key (display only)
+                        </label>
+                         <input 
+                            disabled
+                            value={selectedDialogKey || "NEW"}
+                            className="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded text-slate-500"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-xs uppercase text-slate-400 font-bold mb-1">
+                            Filename (no extension)
+                        </label>
+                        <input 
+                            value={newDialogData.fileName}
+                            onChange={e => setNewDialogData(prev => ({...prev, fileName: e.target.value}))}
+                            placeholder="e.g. myNewDialog"
+                            className="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded focus:border-cyan-500 focus:outline-none"
+                        />
+                    </div>
+                     <div>
+                        <label className="block text-xs uppercase text-slate-400 font-bold mb-1">
+                            Variable Name (Export)
+                        </label>
+                        <input 
+                            value={newDialogData.varName}
+                             onChange={e => setNewDialogData(prev => ({...prev, varName: e.target.value}))}
+                            placeholder="e.g. MY_NEW_DIALOG"
+                            className="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded focus:border-cyan-500 focus:outline-none"
+                        />
+                         <p className="text-xs text-slate-500 mt-1">This will be the exported constant name.</p>
+                    </div>
+                </div>
+
+                <div className="flex justify-end gap-2 mt-6">
+                    <button 
+                        onClick={() => setShowNewDialogModal(false)}
+                        className="px-4 py-2 text-slate-300 hover:text-white"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        onClick={executeSave}
+                        disabled={isSaving || !newDialogData.fileName || !newDialogData.varName}
+                        className="px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isSaving ? "Saving..." : "Save File"}
+                    </button>
+                </div>
+            </div>
+        </div>
+      )}
     </div>
   );
 }
