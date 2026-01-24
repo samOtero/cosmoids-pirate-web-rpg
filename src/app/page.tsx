@@ -1,5 +1,6 @@
 "use client";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
+
 import { useGameStore } from "@/store/gameStore";
 import { Screens, DialogAction, DialogContext } from "@/types/baseGame";
 import { resolveDialog } from "@/utils/dialogResolver";
@@ -31,7 +32,22 @@ export default function Home() {
     currentEnemy,
     clearCurrentEnemy,
     completeIntroduction,
+    eventQueue,
+    processNextEvent,
+    enqueueEvent,
   } = useGameStore();
+
+  // Auto-process queue if we are in a transition state or just starting
+  useEffect(() => {
+    // If we have a profile selected, events in the queue, and we are on the PROFILES screen (just selected),
+    // kick off the event loop.
+    if (currentProfileId !== null && eventQueue.length > 0 && currentScreen === Screens.PROFILES) {
+        processNextEvent();
+    }
+  }, [currentProfileId, eventQueue, currentScreen, processNextEvent]);
+
+  // Also handle "WAIT" events or similar if implemented in the store processor, 
+  // but for now the store updates state immediately for screen changes.
 
   if (currentScreen === Screens.BATTLE) {
     const currentProfile =
@@ -59,6 +75,13 @@ export default function Home() {
           onBattleEnd={(won) => {
              // For now just go back to map or dialog depending on context?
              // Maybe we need a result screen or dialog
+             
+             if (eventQueue.length > 0) {
+                 processNextEvent();
+                 clearCurrentEnemy();
+                 return;
+             }
+
              if (won) {
                  // Could go to a victory dialog
                  setScreen(Screens.MAP); 
@@ -94,7 +117,7 @@ export default function Home() {
   }
 
   if (currentScreen === Screens.DIALOG) {
-    const { sequence, backgroundImageKey, next } = resolveDialog(
+    const { sequence, backgroundImageKey, next, nextEvents } = resolveDialog(
       dialogContext,
       dialogContextData
     );
@@ -162,6 +185,29 @@ export default function Home() {
     };
 
     const handleContinue = () => {
+      if (sequence.length > 0) {
+          // Verify if we are at the end? 
+          // DialogScreen calls onContinue when the sequence is DONE (or skipped).
+          // But wait, DialogScreen handles the inner sequence. 
+          // So onContinue means "This dialog config is finished".
+      }
+
+      if (eventQueue.length > 0) {
+          processNextEvent();
+          return;
+      }
+
+      // Check for nextEvents from the DialogConfig
+      if (nextEvents && nextEvents.length > 0) {
+          // Add them to the queue
+          nextEvents.forEach(e => enqueueEvent(e));
+          // Process the first one immediately? 
+          // Or just wait for the next render? 
+          // We should probably process immediately to avoid a dead frame.
+          processNextEvent();
+          return;
+      }
+
       if (next) {
         // Handle creature selection from starter dialogs
         if (next.contextData?.creatureId && currentProfileId !== null) {

@@ -165,4 +165,30 @@ export interface DialogConfig {
   sequence: DialogLine[];
   backgroundImageKey: BackgroundImageKey;
   next?: DialogTransition;
+  nextEvents?: GameEvent[];
+}
+
+export type GameEventType =
+  | "SHOW_DIALOG"
+  | "START_BATTLE"
+  | "GO_TO_MAP";
+
+export interface GameEvent {
+  type: GameEventType;
+  payload?: any;
+}
+
+export interface ShowDialogEventPayload {
+  dialogId?: string;
+  context?: DialogContext;
+  contextData?: DialogContextData;
+}
+
+export interface StartBattleEventPayload {
+  enemyId: string;
+  backgroundKey?: BackgroundImageKey;
+}
+
+export interface GoToMapEventPayload {
+  islandId: number;
 }

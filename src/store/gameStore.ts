@@ -8,6 +8,8 @@ import {
   Creature,
 } from "@/types/baseGame";
 import { MAX_PROFILES } from "@/constants/game";
+import { GameEvent, GameEventType, ShowDialogEventPayload } from "@/types/baseGame";
+
 
 interface GameState {
   currentScreen: Screens;
@@ -28,6 +30,12 @@ interface GameState {
   setCurrentEnemy: (enemy: Creature) => void;
   clearCurrentEnemy: () => void;
   completeIntroduction: () => void;
+  // Event Queue
+  eventQueue: GameEvent[];
+  enqueueEvent: (event: GameEvent) => void;
+  pushEventToFront: (event: GameEvent) => void;
+  processNextEvent: () => void;
+  clearQueue: () => void;
 }
 
 export const useGameStore = create<GameState>()(
@@ -42,6 +50,39 @@ export const useGameStore = create<GameState>()(
           dialogContext: context || null,
           dialogContextData: contextData || null,
         }),
+      eventQueue: [],
+      enqueueEvent: (event) => set((state) => ({ eventQueue: [...state.eventQueue, event] })),
+      pushEventToFront: (event) => set((state) => ({ eventQueue: [event, ...state.eventQueue] })),
+      processNextEvent: () =>
+        set((state) => {
+          if (state.eventQueue.length === 0) return state;
+          const [nextEvent, ...remainingEvents] = state.eventQueue;
+            
+          // Handle the event
+          let updates: Partial<GameState> = { eventQueue: remainingEvents };
+          
+          switch (nextEvent.type) {
+              case "SHOW_DIALOG": {
+                  const payload = nextEvent.payload as ShowDialogEventPayload;
+                  updates = { 
+                      ...updates, 
+                      currentScreen: Screens.DIALOG, 
+                      dialogContext: payload.context || null,
+                      dialogContextData: payload.contextData || null
+                  };
+                  break;
+              }
+              case "START_BATTLE": {
+                  updates = { ...updates, currentScreen: Screens.BATTLE };
+                  // Note: Store might need a way to set the specific battle config from payload
+                  break;
+              }
+              // Add other cases as needed
+          }
+
+          return updates;
+        }),
+      clearQueue: () => set({ eventQueue: [] }),
       currentEnemy: null,
       setCurrentEnemy: (enemy) => set({ currentEnemy: enemy }),
       clearCurrentEnemy: () => set({ currentEnemy: null }),
@@ -64,8 +105,10 @@ export const useGameStore = create<GameState>()(
           return {
             profiles: newProfiles,
             currentProfileId: slotId,
-            currentScreen: Screens.DIALOG,
-            dialogContext: DialogContext.GAME_INTRO,
+            eventQueue: [{
+                type: "SHOW_DIALOG",
+                payload: { context: DialogContext.GAME_INTRO }
+            }]
           };
         }),
       deleteProfile: (slotId: number) =>
@@ -93,23 +136,31 @@ export const useGameStore = create<GameState>()(
           
           const isNewPlayer = profile.isNew;
           
-          let nextScreen = Screens.MAP;
-          let nextContext: DialogContext | null = null;
+          let initialEvents: GameEvent[] = [];
 
           if (isNewPlayer) {
-              nextScreen = Screens.DIALOG;
               if (profile.creatures.length === 0) {
-                  nextContext = DialogContext.GAME_INTRO;
+                   initialEvents.push({
+                       type: "SHOW_DIALOG",
+                       payload: { context: DialogContext.GAME_INTRO }
+                   });
               } else {
-                  nextContext = DialogContext.GAME_INTRO_AFTER_STARTER;
+                   initialEvents.push({
+                       type: "SHOW_DIALOG",
+                       payload: { context: DialogContext.GAME_INTRO_AFTER_STARTER }
+                   });
               }
+          } else {
+              initialEvents.push({
+                  type: "GO_TO_MAP",
+                  payload: { screen: Screens.MAP }
+              });
           }
 
           return {
             profiles: newProfiles,
             currentProfileId: slotId,
-            currentScreen: nextScreen,
-            dialogContext: nextContext,
+            eventQueue: initialEvents,
           };
         }),
       completeIntroduction: () => 
