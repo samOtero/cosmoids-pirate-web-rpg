@@ -4,14 +4,7 @@ import {
   DialogConfig,
   Screens,
 } from "@/types/baseGame";
-import {
-  NEW_PLAYER_WELCOME_DIALOG,
-  ISLAND_INTRO_DIALOGS,
-  ISLAND_VICTORY_DIALOGS,
-  ISLAND_DEFEAT_DIALOGS,
-  NEW_PLAYER_WELCOME_DIALOG_PART_2,
-  AFTER_STARTER_CHOICE_DIALOG,
-} from "@/constants/dialogs";
+import * as AllDialogs from "@/constants/dialogs";
 import { ISLANDS } from "@/constants/game";
 
 function getIslandKey(islandId: number): string {
@@ -20,64 +13,7 @@ function getIslandKey(islandId: number): string {
   return island.name.toLowerCase().replace(/ /g, "_");
 }
 
-export function resolveDialog(
-  context: DialogContext | null,
-  contextData: { islandId?: number } | null
-): DialogConfig {
-  if (context === DialogContext.GAME_INTRO) {
-    return NEW_PLAYER_WELCOME_DIALOG;
-  }
-
-  if (context === DialogContext.GAME_INTRO_PART_2) {
-    return NEW_PLAYER_WELCOME_DIALOG_PART_2;
-  }
-
-  if (context === DialogContext.GAME_INTRO_AFTER_STARTER) {
-    return AFTER_STARTER_CHOICE_DIALOG;
-  }
-
-  if (
-    context === DialogContext.ISLAND_INTRO &&
-    contextData?.islandId !== undefined
-  ) {
-    const key = getIslandKey(contextData.islandId);
-    return (
-      (ISLAND_INTRO_DIALOGS as Record<string, DialogConfig>)[key] || {
-        sequence: [],
-        backgroundImageKey: BackgroundImageKey.DEFAULT,
-        next: { screen: Screens.MAP },
-      }
-    );
-  }
-
-  if (
-    context === DialogContext.ISLAND_VICTORY &&
-    contextData?.islandId !== undefined
-  ) {
-    const key = getIslandKey(contextData.islandId);
-    return (
-      (ISLAND_VICTORY_DIALOGS as Record<string, DialogConfig>)[key] || {
-        sequence: [],
-        backgroundImageKey: BackgroundImageKey.DEFAULT,
-        next: { screen: Screens.MAP },
-      }
-    );
-  }
-
-  if (
-    context === DialogContext.ISLAND_DEFEAT &&
-    contextData?.islandId !== undefined
-  ) {
-    const key = getIslandKey(contextData.islandId);
-    return (
-      (ISLAND_DEFEAT_DIALOGS as Record<string, DialogConfig>)[key] || {
-        sequence: [],
-        backgroundImageKey: BackgroundImageKey.DEFAULT,
-        next: { screen: Screens.MAP },
-      }
-    );
-  }
-
+function getDefaultDialog(): DialogConfig {
   return {
     sequence: [],
     backgroundImageKey: BackgroundImageKey.DEFAULT,
@@ -85,4 +21,32 @@ export function resolveDialog(
       screen: Screens.MAP,
     },
   };
+}
+
+export function resolveDialog(
+  context: DialogContext | null,
+  contextData: { islandId?: number } | null
+): DialogConfig {
+  // 1. Explicit Mappings for Legacy Dialogs
+  if (context === DialogContext.GAME_INTRO) {
+    return AllDialogs.NEW_PLAYER_WELCOME_DIALOG;
+  }
+
+  if (context === DialogContext.GAME_INTRO_PART_2) {
+    return AllDialogs.NEW_PLAYER_WELCOME_DIALOG_PART_2;
+  }
+
+  if (context === DialogContext.GAME_INTRO_AFTER_STARTER) {
+    return AllDialogs.AFTER_STARTER_CHOICE_DIALOG;
+  }
+
+
+  // 3. Dynamic Lookup
+  // Attempts to find a dialog export matching the Context key
+  // This supports new dialogs added via the editor where ContextKey matches ExportName
+  if (context && context in AllDialogs) {
+    return (AllDialogs as any)[context] as DialogConfig;
+  }
+
+  return getDefaultDialog();
 }
