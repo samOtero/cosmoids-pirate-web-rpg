@@ -1,31 +1,96 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import * as dialogs from "@/constants/dialogs";
-import { DialogConfig, DialogAction, DialogLine, DialogButton, DialogPortrait, SpeakerImageKey, BackgroundImageKey } from "@/types/baseGame";
+import {
+  DialogConfig,
+  DialogAction,
+  DialogLine,
+  DialogButton,
+  DialogPortrait,
+  SpeakerImageKey,
+  BackgroundImageKey,
+  DialogButtonType,
+  DialogButtonTypeConfig,
+  DialogActionType,
+} from "@/types/baseGame";
 import DialogScreen from "@/app/components/dialogScreen";
 
-export default function DialogEditor({ onClose }: { onClose: () => void }) {
-  const [selectedDialogKey, setSelectedDialogKey] = useState<string | null>(
-    null
-  );
-  // Key to force re-mounting of DialogScreen to reset state
-  const [playKey, setPlayKey] = useState(0); 
-  const [isFinished, setIsFinished] = useState(false);
-  const [isInspectorOpen, setIsInspectorOpen] = useState(true);
-  const [startLineIndex, setStartLineIndex] = useState(0);
+// --- Helpers ---
 
-  // Editing State
-  const [isEditing, setIsEditing] = useState(false);
-  const [editJson, setEditJson] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
+const SPEAKER_OPTIONS = Object.values(SpeakerImageKey);
+const BACKGROUND_OPTIONS = Object.values(BackgroundImageKey);
+const BUTTON_TYPE_OPTIONS = Object.keys(DialogButtonTypeConfig) as DialogButtonType[];
+const ACTION_TYPE_OPTIONS: DialogActionType[] = ["START_BATTLE", "CHANGE_SCREEN", "PICK_STARTER", "CUSTOM"];
+
+const DEFAULT_LINE: DialogLine = {
+  text: "New line...",
+  portraits: [],
+};
+
+const DEFAULT_PORTRAIT: DialogPortrait = {
+  key: SpeakerImageKey.GUIDE,
+  displayName: "Guide",
+};
+
+// --- Components ---
+
+function JsonEditor({ value, onChange }: { value: any; onChange: (val: any) => void }) {
+  const [text, setText] = useState(JSON.stringify(value, null, 2));
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setText(JSON.stringify(value, null, 2));
+  }, [value]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newText = e.target.value;
+    setText(newText);
+    try {
+      const parsed = JSON.parse(newText);
+      setError(null);
+      onChange(parsed);
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full">
+      <textarea
+        className={`flex-1 bg-slate-950 font-mono text-xs p-2 focus:outline-none resize-none ${error ? "border-red-500 border" : ""}`}
+        value={text}
+        onChange={handleChange}
+        spellCheck={false}
+      />
+      {error && <div className="text-red-400 text-xs p-1">{error}</div>}
+    </div>
+  );
+}
+
+// --- Main Editor Component ---
+
+export default function DialogEditor({ onClose }: { onClose: () => void }) {
+  // Global State
+  const [selectedDialogKey, setSelectedDialogKey] = useState<string | null>(null);
+  
+  // Working State (In-Memory Edit)
+  // We initialize this when a dialog is selected
+  const [workingConfig, setWorkingConfig] = useState<DialogConfig | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
+
+  // UI State
+  const [selectedLineIndex, setSelectedLineIndex] = useState<number>(0);
+  const [showJsonMode, setShowJsonMode] = useState(false);
   const [showNewDialogModal, setShowNewDialogModal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  
+  // New Dialog Form State
   const [newDialogData, setNewDialogData] = useState({ fileName: "", varName: "" });
 
-  // Filter exports to find valid DialogConfigs
+  // Load Dialogs from Constant Exports
   const availableDialogs = useMemo(() => {
     return Object.entries(dialogs).filter(([_, value]) => {
-      // Basic duck typing to check if it looks like a DialogConfig
       const val = value as any;
       return (
         val &&
@@ -36,48 +101,111 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
     }) as [string, DialogConfig][];
   }, []);
 
-  const selectedDialog = selectedDialogKey
-    ? ((dialogs as any)[selectedDialogKey] as DialogConfig)
-    : null;
+  // --- Handlers ---
 
-  const handleRestart = () => {
-    setStartLineIndex(0);
-    setPlayKey((prev) => prev + 1);
-    setIsFinished(false);
-  };
-
-  const handleSelect = (key: string) => {
+  const handleSelectDialog = (key: string) => {
+    if (isDirty && !confirm("You have unsaved changes. Discard them?")) return;
+    
+    const originalConfig = (dialogs as any)[key] as DialogConfig;
+    // Deep copy to break reference
+    setWorkingConfig(JSON.parse(JSON.stringify(originalConfig)));
     setSelectedDialogKey(key);
-    setStartLineIndex(0);
-    setPlayKey(0);
-    setIsFinished(false);
-    setIsEditing(false); // Reset edit mode
-    // Pre-populate edit JSON just in case they switch to edit mode
-    // We can't do this here accurately because `availableDialogs` might change, 
-    // better to derive it when entering edit mode or via useEffect if needed.
+    setSelectedLineIndex(0);
+    setIsDirty(false);
+    setShowJsonMode(false);
   };
 
-  const handleStartEdit = () => {
-    if (!selectedDialog) return;
-    setEditJson(JSON.stringify(selectedDialog, null, 2));
-    setIsEditing(true);
+  const handleCreateNew = () => {
+    setWorkingConfig({
+      sequence: [{ ...DEFAULT_LINE }],
+      backgroundImageKey: BackgroundImageKey.DEFAULT,
+    });
+    setSelectedDialogKey("NEW_DIALOG");
+    setNewDialogData({ fileName: "", varName: "" });
+    setShowNewDialogModal(true);
+    setSelectedLineIndex(0);
+    setIsDirty(true);
   };
+
+  const updateWorkingConfig = (newConfig: DialogConfig) => {
+    setWorkingConfig(newConfig);
+    setIsDirty(true);
+  };
+
+  const updateLine = (index: number, newLine: DialogLine) => {
+    if (!workingConfig) return;
+    const newSequence = [...workingConfig.sequence];
+    newSequence[index] = newLine;
+    updateWorkingConfig({ ...workingConfig, sequence: newSequence });
+  };
+
+  const addLine = () => {
+    if (!workingConfig) return;
+    const newSequence = [...workingConfig.sequence, { ...DEFAULT_LINE }];
+    updateWorkingConfig({ ...workingConfig, sequence: newSequence });
+    setSelectedLineIndex(newSequence.length - 1);
+  };
+
+  const deleteLine = (index: number) => {
+    if (!workingConfig) return;
+    if (workingConfig.sequence.length <= 1) {
+        alert("Cannot delete the last line.");
+        return;
+    }
+    const newSequence = workingConfig.sequence.filter((_, i) => i !== index);
+    updateWorkingConfig({ ...workingConfig, sequence: newSequence });
+    if (selectedLineIndex >= newSequence.length) {
+      setSelectedLineIndex(newSequence.length - 1);
+    }
+  };
+
+  const moveLine = (index: number, direction: -1 | 1) => {
+    if (!workingConfig) return;
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= workingConfig.sequence.length) return;
+    
+    const newSequence = [...workingConfig.sequence];
+    const temp = newSequence[index];
+    newSequence[index] = newSequence[newIndex];
+    newSequence[newIndex] = temp;
+    
+    updateWorkingConfig({ ...workingConfig, sequence: newSequence });
+    setSelectedLineIndex(newIndex);
+  };
+
+  // --- API Actions ---
 
   const executeSave = async (overrideData?: { fileName?: string, varName?: string }) => {
+    if (!workingConfig) return;
+    
     try {
         setIsSaving(true);
-        const config = JSON.parse(editJson);
         const fileName = overrideData?.fileName || newDialogData.fileName;
         const dialogName = overrideData?.varName || newDialogData.varName;
         
+        // Validation for new dialogs
+        if (selectedDialogKey === "NEW_DIALOG" && (!fileName || !dialogName)) {
+            alert("Please provide a Filename and Variable Name.");
+            setIsSaving(false);
+            return;
+        }
+
+        // If saving an existing dialog, we need its original filename if possible, 
+        // but our API currently relies on the user providing it or us inferring it.
+        // The current API contract seems to assume we pass everything.
+        // Wait, existing usage passed `varName: selectedDialogKey`. The API likely looks up the file or overwrites.
+        // Let's stick to the previous pattern: 
+        
+        const payload = {
+            fileName: fileName,
+            dialogName: dialogName || selectedDialogKey,
+            config: workingConfig
+        };
+
         const res = await fetch("/api/dialogs/save", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                fileName,
-                dialogName,
-                config
-            })
+            body: JSON.stringify(payload)
         });
         
         if (!res.ok) {
@@ -86,6 +214,10 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
         }
         
         alert("Saved successfully! The app may reload.");
+        setIsDirty(false);
+        if (selectedDialogKey === "NEW_DIALOG" && dialogName) {
+            setSelectedDialogKey(dialogName); // Switch to the new key
+        }
         setShowNewDialogModal(false);
     } catch (error: any) {
         console.error(error);
@@ -95,22 +227,21 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
     }
   };
 
-  const handleQuickSave = async () => {
-    if (!selectedDialogKey || selectedDialogKey === "NEW_DIALOG") {
+  const handleSave = () => {
+    if (selectedDialogKey === "NEW_DIALOG") {
         setShowNewDialogModal(true);
-        return;
+    } else {
+        // We don't have the original filename easily available in the list 
+        // unless we parse it out or the API handles lookup by Export Name.
+        // Assuming the previous implementation `executeSave({ varName: selectedDialogKey })` worked,
+        // we'll do the same. The API likely finds the file containing the varName.
+        executeSave({ varName: selectedDialogKey || "" });
     }
-    
-    // Quick save: try to save to existing file
-    await executeSave({ varName: selectedDialogKey });
   };
 
-
-
-
   const handleDelete = async () => {
-    if (!selectedDialogKey) return;
-    if (!confirm(`Are you sure you want to delete "${selectedDialogKey}"? This action cannot be undone.`)) return;
+    if (!selectedDialogKey || selectedDialogKey === "NEW_DIALOG") return;
+    if (!confirm(`Delete "${selectedDialogKey}"?`)) return;
 
     try {
         const res = await fetch("/api/dialogs/delete", {
@@ -124,336 +255,437 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
             throw new Error(data.error || "Failed to delete");
         }
         
-        alert("Dialog deleted successfully.");
+        alert("Deleted.");
         setSelectedDialogKey(null);
-        // App should reload or we might need to refresh manually, 
-        // usually HMR picks it up but let's be safe.
+        setWorkingConfig(null);
     } catch (error: any) {
         console.error(error);
-        alert(`Error deleting: ${error.message}`);
+        alert(`Error: ${error.message}`);
     }
   };
 
-  const handleJumpToLine = (index: number) => {
-    setStartLineIndex(index);
-    setPlayKey((prev) => prev + 1);
-    setIsFinished(false);
+  // --- Render Helpers ---
+
+  const renderVisualEditor = () => {
+    if (!workingConfig) return null;
+    const line = workingConfig.sequence[selectedLineIndex];
+    if (!line) return <div>No line selected</div>;
+
+    return (
+      <div className="flex flex-col gap-4 p-4 overflow-y-auto h-full pb-20">
+        {/* Core Line Info */}
+        <div className="bg-slate-800 p-4 rounded border border-slate-700">
+            <h4 className="text-cyan-400 text-xs font-bold uppercase mb-2">Text Content</h4>
+            <textarea
+                value={line.text}
+                onChange={(e) => updateLine(selectedLineIndex, { ...line, text: e.target.value })}
+                className="w-full h-24 bg-slate-900 border border-slate-600 rounded p-2 text-sm text-slate-200 focus:border-cyan-500 focus:outline-none"
+            />
+            <div className="mt-2">
+                <label className="text-xs text-slate-400 mr-2">Line ID (Optional):</label>
+                <input 
+                    value={line.id || ""}
+                    onChange={(e) => updateLine(selectedLineIndex, { ...line, id: e.target.value })}
+                    className="bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs text-slate-200 w-40"
+                    placeholder="unique-id"
+                />
+            </div>
+        </div>
+
+        {/* Portraits */}
+        <div className="bg-slate-800 p-4 rounded border border-slate-700">
+            <div className="flex justify-between items-center mb-2">
+                 <h4 className="text-cyan-400 text-xs font-bold uppercase">Portraits</h4>
+                 <button 
+                    onClick={() => updateLine(selectedLineIndex, { ...line, portraits: [...line.portraits, { ...DEFAULT_PORTRAIT }] })}
+                    className="text-xs bg-cyan-700 px-2 py-1 rounded text-white hover:bg-cyan-600"
+                 >
+                    + Add Portrait
+                 </button>
+            </div>
+            
+            <div className="space-y-3">
+                {line.portraits.map((portrait, pIdx) => (
+                    <div key={pIdx} className="bg-slate-900 p-2 rounded flex flex-col gap-2 relative border border-slate-700/50">
+                        <button 
+                            onClick={() => {
+                                const newPortraits = line.portraits.filter((_, i) => i !== pIdx);
+                                updateLine(selectedLineIndex, { ...line, portraits: newPortraits });
+                            }}
+                            className="absolute top-1 right-1 text-red-500 hover:text-red-400 text-xs px-1"
+                        >
+                            ✕
+                        </button>
+                        
+                        <div className="grid grid-cols-2 gap-2">
+                            <div>
+                                <label className="block text-xs text-slate-500 mb-1">Character</label>
+                                <select 
+                                    value={portrait.key}
+                                    onChange={(e) => {
+                                        const newPortraits = [...line.portraits];
+                                        newPortraits[pIdx] = { ...portrait, key: e.target.value as SpeakerImageKey };
+                                        updateLine(selectedLineIndex, { ...line, portraits: newPortraits });
+                                    }}
+                                    className="w-full bg-slate-950 border border-slate-700 rounded p-1 text-xs"
+                                >
+                                    {SPEAKER_OPTIONS.map(opt => (
+                                        <option key={opt} value={opt}>{opt}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-xs text-slate-500 mb-1">Display Name</label>
+                                <input 
+                                    value={portrait.displayName}
+                                    onChange={(e) => {
+                                        const newPortraits = [...line.portraits];
+                                        newPortraits[pIdx] = { ...portrait, displayName: e.target.value };
+                                        updateLine(selectedLineIndex, { ...line, portraits: newPortraits });
+                                    }}
+                                    className="w-full bg-slate-950 border border-slate-700 rounded p-1 text-xs"
+                                />
+                            </div>
+                             <div>
+                                <label className="block text-xs text-slate-500 mb-1">Size</label>
+                                <select 
+                                    value={portrait.portraitWidth || "normal"}
+                                    onChange={(e) => {
+                                        const newPortraits = [...line.portraits];
+                                        newPortraits[pIdx] = { ...portrait, portraitWidth: e.target.value as "normal" | "wide" };
+                                        updateLine(selectedLineIndex, { ...line, portraits: newPortraits });
+                                    }}
+                                    className="w-full bg-slate-950 border border-slate-700 rounded p-1 text-xs"
+                                >
+                                    <option value="normal">Normal</option>
+                                    <option value="wide">Wide</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+                {line.portraits.length === 0 && <p className="text-xs text-slate-500 italic">No portraits (Narrator mode)</p>}
+            </div>
+        </div>
+
+        {/* Buttons */}
+        <div className="bg-slate-800 p-4 rounded border border-slate-700">
+             <div className="flex justify-between items-center mb-2">
+                 <h4 className="text-cyan-400 text-xs font-bold uppercase">Response Buttons</h4>
+                 <button 
+                    onClick={() => updateLine(selectedLineIndex, { ...line, buttons: [...(line.buttons || []), { label: "Continue", type: "confirm" }] })}
+                    className="text-xs bg-cyan-700 px-2 py-1 rounded text-white hover:bg-cyan-600"
+                 >
+                    + Add Button
+                 </button>
+            </div>
+            
+             <div className="space-y-3">
+                {line.buttons?.map((btn, bIdx) => (
+                    <div key={bIdx} className="bg-slate-900 p-2 rounded flex flex-col gap-2 relative border border-slate-700/50">
+                         <button 
+                            onClick={() => {
+                                const newButtons = line.buttons?.filter((_, i) => i !== bIdx);
+                                updateLine(selectedLineIndex, { ...line, buttons: newButtons });
+                            }}
+                             className="absolute top-1 right-1 text-red-500 hover:text-red-400 text-xs px-1"
+                        >
+                            ✕
+                        </button>
+
+                        <div className="grid grid-cols-2 gap-2">
+                            <div>
+                                <label className="block text-xs text-slate-500 mb-1">Label</label>
+                                <input 
+                                    value={btn.label}
+                                    onChange={(e) => {
+                                        const newButtons = [...(line.buttons || [])];
+                                        newButtons[bIdx] = { ...btn, label: e.target.value };
+                                        updateLine(selectedLineIndex, { ...line, buttons: newButtons });
+                                    }}
+                                    className="w-full bg-slate-950 border border-slate-700 rounded p-1 text-xs"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs text-slate-500 mb-1">Type (Color)</label>
+                                <select 
+                                    value={btn.type}
+                                    onChange={(e) => {
+                                        const newButtons = [...(line.buttons || [])];
+                                        newButtons[bIdx] = { ...btn, type: e.target.value as DialogButtonType };
+                                        updateLine(selectedLineIndex, { ...line, buttons: newButtons });
+                                    }}
+                                    className="w-full bg-slate-950 border border-slate-700 rounded p-1 text-xs"
+                                >
+                                    {BUTTON_TYPE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                </select>
+                            </div>
+                             <div>
+                                <label className="block text-xs text-slate-500 mb-1">Jump to Line ID</label>
+                                <input 
+                                    value={btn.jumpToLineId || ""}
+                                    onChange={(e) => {
+                                        const newButtons = [...(line.buttons || [])];
+                                        newButtons[bIdx] = { ...btn, jumpToLineId: e.target.value };
+                                        updateLine(selectedLineIndex, { ...line, buttons: newButtons });
+                                    }}
+                                    className="w-full bg-slate-950 border border-slate-700 rounded p-1 text-xs"
+                                    placeholder="Optional ID"
+                                />
+                            </div>
+                             <div>
+                                <label className="block text-xs text-slate-500 mb-1">Action Type</label>
+                                <select 
+                                    value={btn.action?.type || ""}
+                                    onChange={(e) => {
+                                        const newButtons = [...(line.buttons || [])];
+                                        if (!e.target.value) {
+                                            delete newButtons[bIdx].action;
+                                        } else {
+                                            newButtons[bIdx].action = { 
+                                                type: e.target.value as DialogActionType,
+                                                payload: newButtons[bIdx].action?.payload 
+                                            };
+                                        }
+                                        updateLine(selectedLineIndex, { ...line, buttons: newButtons });
+                                    }}
+                                    className="w-full bg-slate-950 border border-slate-700 rounded p-1 text-xs"
+                                >
+                                    <option value="">(None)</option>
+                                    {ACTION_TYPE_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+                {(!line.buttons || line.buttons.length === 0) && <p className="text-xs text-slate-500 italic">No buttons (Standard click-to-continue)</p>}
+             </div>
+        </div>
+      </div>
+    );
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-8 text-white">
-      <div className="bg-slate-900 border border-slate-700 w-full h-full flex shadow-2xl rounded-lg overflow-hidden">
-        {/* Sidebar: List + Inspector */}
-        <div className="w-1/3 border-r border-slate-700 flex flex-col min-h-0 bg-slate-900">
-          {/* Top: List of Dialogs */}
-          <div className={`${isInspectorOpen ? "h-1/2 border-b border-slate-700" : "flex-1"} flex flex-col min-h-0 transition-all duration-300`}>
-            <div className="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800 shrink-0">
-               <div className="flex items-center gap-2">
-                 <h2 className="font-bold text-lg">Dialogs</h2>
-                 <button 
-                   onClick={() => {
-                        setEditJson(JSON.stringify({
-                            sequence: [
-                                {
-                                    text: "New dialog text...",
-                                    portraits: [{ key: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT, displayName: "Guide" }]
-                                }
-                            ],
-                            backgroundImageKey: BackgroundImageKey.CALEB_HOUSE
-                        }, null, 2));
-                        setSelectedDialogKey("NEW_DIALOG"); // Placeholder
-                        setIsEditing(true);
-                        setStartLineIndex(0);
-                        setShowNewDialogModal(true);
-                   }}
-                   className="text-xs bg-cyan-600 px-2 py-1 rounded hover:bg-cyan-500"
-                 >
-                    + New
-                 </button>
-               </div>
-               <button
-                 onClick={onClose}
-                 className="text-slate-400 hover:text-white px-2 py-1"
-               >
-                 ✕
-               </button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-2 space-y-1">
-              {availableDialogs.map(([key]) => (
-                <button
-                  key={key}
-                  onClick={() => handleSelect(key)}
-                  className={`w-full text-left px-4 py-2 rounded text-sm font-mono transition-colors ${
-                    selectedDialogKey === key
-                      ? "bg-cyan-600 text-white"
-                      : "hover:bg-slate-800 text-slate-300"
-                  }`}
-                >
-                  {key}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Bottom: Sequence Inspector */}
-          <div className={`${isInspectorOpen ? "h-1/2" : "h-10"} flex flex-col min-h-0 transition-all duration-300 bg-slate-900 border-t border-slate-700`}>
-             <button 
-               onClick={() => setIsInspectorOpen(!isInspectorOpen)}
-               className="p-2 border-b border-slate-700 bg-slate-800 text-sm font-bold text-slate-300 flex justify-between items-center shrink-0 hover:bg-slate-700 transition-colors"
-             >
-                <div className="flex items-center gap-2">
-                   <span>{isInspectorOpen ? "▼" : "▲"} Sequence Inspector</span>
-                </div>
-                <span className="text-xs text-slate-500">
-                  {selectedDialog ? `${selectedDialog.sequence.length} lines` : ""}
-                </span>
-             </button>
-             
-             {isInspectorOpen && (
-               <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                 {selectedDialog ? (
-                   selectedDialog.sequence.map((line, idx) => (
-                     <div
-                       key={idx}
-                       onClick={() => handleJumpToLine(idx)}
-                       className="bg-slate-800 border border-slate-700 rounded p-3 text-sm relative cursor-pointer hover:bg-slate-700 transition-colors"
-                     >
-                       <div className="absolute top-2 right-2 text-slate-500 text-xs font-mono">
-                         #{idx}
-                       </div>
-                       {line.id && (
-                         <div className="mb-1">
-                           <span className="bg-purple-900 text-purple-200 text-xs px-2 py-0.5 rounded font-mono">
-                             ID: {line.id}
-                           </span>
-                         </div>
-                       )}
-                       <div className="flex gap-2 mb-2">
-                         {line.portraits.map((p, pIdx) => (
-                           <span
-                             key={pIdx}
-                             className="text-cyan-400 font-bold text-xs uppercase tracking-wider bg-slate-900 px-2 py-0.5 rounded"
-                           >
-                             {p.displayName}
-                           </span>
-                         ))}
-                       </div>
-                       <div className="text-slate-300 mb-2 leading-relaxed">
-                         {line.text}
-                       </div>
-                       {line.buttons && line.buttons.length > 0 && (
-                         <div className="mt-2 pt-2 border-t border-slate-700">
-                           <p className="text-xs text-slate-500 mb-1">Buttons:</p>
-                           <div className="flex flex-wrap gap-2">
-                             {line.buttons.map((btn, bIdx) => (
-                               <div
-                                 key={bIdx}
-                                 className="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs"
-                               >
-                                 <span className="text-white font-bold mr-2">
-                                   [{btn.label}]
-                                 </span>
-                                 {btn.jumpToLineId && (
-                                   <span className="text-orange-400 mr-2">
-                                     → Jump: {btn.jumpToLineId}
-                                   </span>
-                                 )}
-                                 {btn.action && (
-                                   <span className="text-green-400">
-                                     → Action: {btn.action.type}
-                                   </span>
-                                 )}
-                               </div>
-                             ))}
-                           </div>
-                         </div>
-                       )}
-                     </div>
-                   ))
-                 ) : (
-                   <div className="text-center text-slate-600 mt-10">
-                     Select a dialog to inspect its sequence
-                   </div>
-                 )}
-               </div>
-             )}
-          </div>
-        </div>
-
-        {/* Main Area: Logic/Preview */}
-        <div className="w-2/3 flex flex-col bg-slate-950 relative">
-          <div className="p-4 border-b border-slate-700 bg-slate-900 h-14 flex items-center justify-between z-20">
-            {selectedDialogKey ? (
-              <>
-                <h3 className="font-mono text-cyan-400">{selectedDialogKey}</h3>
-                <button
-                  onClick={handleRestart}
-                  className="px-3 py-1 bg-slate-700 text-xs rounded hover:bg-slate-600"
-                >
-                  Restart
-                </button>
-              </>
-            ) : (
-              <span className="text-slate-500 italic">
-                Select a dialog to view
-              </span>
-            )}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur text-white font-sans">
+        <div className="w-full h-full flex overflow-hidden">
             
-            {selectedDialogKey && (
-                <div className="flex gap-2">
-                    {!isEditing && (
-                        <button
-                            onClick={handleStartEdit}
-                            className="px-3 py-1 bg-purple-600 text-xs rounded hover:bg-purple-500"
-                        >
-                            Edit JSON
+            {/* PANEL 1: Dialog List (Left) */}
+            <div className="w-64 border-r border-slate-800 bg-slate-900 flex flex-col">
+                <div className="p-3 border-b border-slate-800 flex justify-between items-center bg-slate-950">
+                    <h2 className="font-bold text-sm text-slate-300">Dialogs</h2>
+                    <div className="flex gap-1">
+                        <button onClick={handleCreateNew} className="text-xs bg-cyan-700 hover:bg-cyan-600 px-2 py-1 rounded text-white">
+                            + New
                         </button>
-                    )}
-            {isEditing && (
-                 <div className="flex gap-2">
-                    <button
-                        onClick={handleQuickSave}
-                        className="px-3 py-1 bg-cyan-600 text-xs rounded hover:bg-cyan-500 font-bold"
-                    >
-                        Save
-                    </button>
-                     <button
-                        onClick={() => setShowNewDialogModal(true)}
-                        className="px-3 py-1 bg-slate-700 text-xs rounded hover:bg-slate-600"
-                    >
-                        Save As...
-                    </button>
-                     <button
-                        onClick={() => setIsEditing(false)}
-                        className="px-3 py-1 bg-slate-700 text-xs rounded hover:bg-slate-600"
-                    >
-                        Cancel
-                    </button>
-                 </div>
-            )}
-                 </div>
-            )}
-            
-            {selectedDialogKey && !isEditing && (
-                 <button
-                    onClick={handleDelete}
-                    className="ml-2 px-3 py-1 bg-red-900/50 text-red-200 text-xs rounded hover:bg-red-800 border border-red-800"
-                    title="Delete this dialog file"
-                >
-                    Delete
-                </button>
-            )}
-          </div>
-
-          <div className="flex-1 relative overflow-hidden bg-black">
-            {isEditing ? (
-                 <div className="h-full w-full flex flex-col">
-                    <div className="bg-slate-900 p-2 text-xs text-slate-400 border-b border-slate-800">
-                        Edit raw JSON. <span className="text-cyan-400">Tip:</span> Use string values (e.g. "Guide"). They will be automatically converted to Enums on save.
-                    </div>
-                    <textarea 
-                        className="flex-1 bg-slate-950 text-slate-300 font-mono text-sm p-4 focus:outline-none resize-none"
-                        value={editJson}
-                        onChange={(e) => setEditJson(e.target.value)}
-                        spellCheck={false}
-                    />
-                 </div>
-            ) : selectedDialog ? (
-              <div
-                key={`${selectedDialogKey}-${playKey}`}
-                className="h-full w-full"
-              >
-                {isFinished ? (
-                  <div className="h-full w-full flex flex-col items-center justify-center text-slate-400 gap-4">
-                    <p>Dialog Sequence Completed</p>
-                    <button
-                      onClick={handleRestart}
-                      className="px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-500 font-bold"
-                    >
-                      Replay
-                    </button>
-                  </div>
-                ) : (
-                  <DialogScreen
-                    sequence={selectedDialog.sequence}
-                    backgroundImageKey={selectedDialog.backgroundImageKey}
-                    initialLineIndex={startLineIndex}
-                    onContinue={() => setIsFinished(true)}
-                    onDialogAction={(action) => {
-                      console.log("[DialogEditor] Action triggered:", action);
-                      alert(`Action triggered: ${action.type}`);
-                    }}
-                  />
-                )}
-              </div>
-            ) : (
-              <div className="h-full flex items-center justify-center text-slate-600">
-                <p>No dialog selected</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-      {/* New/Save Dialog Modal */}
-      {showNewDialogModal && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div className="bg-slate-800 p-6 rounded-lg border border-slate-600 w-96 shadow-xl">
-                <h3 className="font-bold text-lg mb-4">Save Dialog</h3>
-                
-                <div className="space-y-4">
-                    <div>
-                        <label className="block text-xs uppercase text-slate-400 font-bold mb-1">
-                            Current Key (display only)
-                        </label>
-                         <input 
-                            disabled
-                            value={selectedDialogKey || "NEW"}
-                            className="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded text-slate-500"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-xs uppercase text-slate-400 font-bold mb-1">
-                            Filename (no extension)
-                        </label>
-                        <input 
-                            value={newDialogData.fileName}
-                            onChange={e => setNewDialogData(prev => ({...prev, fileName: e.target.value}))}
-                            placeholder="e.g. myNewDialog"
-                            className="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded focus:border-cyan-500 focus:outline-none"
-                        />
-                    </div>
-                     <div>
-                        <label className="block text-xs uppercase text-slate-400 font-bold mb-1">
-                            Variable Name (Export)
-                        </label>
-                        <input 
-                            value={newDialogData.varName}
-                             onChange={e => setNewDialogData(prev => ({...prev, varName: e.target.value}))}
-                            placeholder="e.g. MY_NEW_DIALOG"
-                            className="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded focus:border-cyan-500 focus:outline-none"
-                        />
-                         <p className="text-xs text-slate-500 mt-1">This will be the exported constant name.</p>
+                        <button onClick={onClose} className="text-slate-500 hover:text-white px-2">✕</button>
                     </div>
                 </div>
-
-                <div className="flex justify-end gap-2 mt-6">
-                    <button 
-                        onClick={() => setShowNewDialogModal(false)}
-                        className="px-4 py-2 text-slate-300 hover:text-white"
-                    >
-                        Cancel
-                    </button>
-                    <button 
-                        onClick={() => executeSave()}
-                        disabled={isSaving || !newDialogData.fileName || !newDialogData.varName}
-                        className="px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {isSaving ? "Saving..." : "Save File"}
-                    </button>
+                <div className="flex-1 overflow-y-auto p-2">
+                    {availableDialogs.map(([key]) => (
+                        <button
+                            key={key}
+                            onClick={() => handleSelectDialog(key)}
+                            className={`w-full text-left px-3 py-2 rounded text-xs font-mono mb-1 truncate transition-colors ${
+                                selectedDialogKey === key ? "bg-cyan-900 text-cyan-100" : "text-slate-400 hover:bg-slate-800"
+                            }`}
+                        >
+                            {key}
+                        </button>
+                    ))}
                 </div>
             </div>
+
+            {/* PANEL 2: Sequence Inspector (Middle) */}
+            <div className="w-80 border-r border-slate-800 bg-slate-900 flex flex-col">
+                <div className="p-3 border-b border-slate-800 bg-slate-950">
+                     <h3 className="font-bold text-xs text-slate-400 uppercase tracking-wider mb-2">Sequence Inspector</h3>
+                     {/* Global Settings for Dialog */}
+                     {workingConfig && (
+                        <div className="mb-2">
+                            <label className="text-xs text-slate-500">Background</label>
+                            <select 
+                                value={workingConfig.backgroundImageKey}
+                                onChange={(e) => updateWorkingConfig({ ...workingConfig, backgroundImageKey: e.target.value as BackgroundImageKey })}
+                                className="w-full bg-slate-800 border border-slate-700 rounded text-xs p-1 mt-1 text-slate-300"
+                            >
+                                {BACKGROUND_OPTIONS.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                            </select>
+                        </div>
+                     )}
+                </div>
+                
+                <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                    {workingConfig ? (
+                        workingConfig.sequence.map((line, idx) => (
+                            <div 
+                                key={idx}
+                                onClick={() => setSelectedLineIndex(idx)}
+                                className={`p-2 rounded border cursor-pointer relative group ${
+                                    selectedLineIndex === idx 
+                                    ? "bg-slate-800 border-cyan-600/50" 
+                                    : "bg-slate-900 border-slate-800 hover:bg-slate-800"
+                                }`}
+                            >
+                                <div className="flex justify-between items-start mb-1">
+                                    <span className="text-[10px] text-slate-500 font-mono">#{idx}</span>
+                                    {line.id && <span className="text-[10px] bg-purple-900/50 text-purple-200 px-1 rounded">{line.id}</span>}
+                                </div>
+                                <p className="text-xs text-slate-300 line-clamp-2">{line.text}</p>
+                                
+                                <div className="absolute right-1 top-1 hidden group-hover:flex gap-1">
+                                    <button onClick={(e) => { e.stopPropagation(); moveLine(idx, -1); }} className="p-1 hover:text-cyan-400 text-slate-600">▲</button>
+                                    <button onClick={(e) => { e.stopPropagation(); moveLine(idx, 1); }} className="p-1 hover:text-cyan-400 text-slate-600">▼</button>
+                                    <button onClick={(e) => { e.stopPropagation(); deleteLine(idx); }} className="p-1 hover:text-red-400 text-slate-600">✕</button>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-center text-slate-600 text-xs mt-10">Select a dialog</div>
+                    )}
+                </div>
+                 
+                 {workingConfig && (
+                     <div className="p-2 border-t border-slate-800">
+                         <button onClick={addLine} className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 rounded border border-slate-700 flex justify-center items-center gap-2">
+                             <span>+ Add Line</span>
+                         </button>
+                     </div>
+                 )}
+            </div>
+
+            {/* PANEL 3: Workspace (Right) */}
+            <div className="flex-1 flex flex-col bg-black min-w-0">
+                {/* Visual Preview (Top) */}
+                <div className="h-1/2 relative border-b border-slate-800 overflow-hidden bg-gray-900">
+                     <div className="absolute top-2 left-2 z-20 bg-black/50 px-2 py-1 rounded text-[10px] text-slate-400 font-mono uppercase">
+                         Preview Mode
+                     </div>
+                     {workingConfig && (
+                         <div className="w-full h-full transform scale-90 origin-center"> {/* Slight scale down to fit ui comfortably */}
+                             <DialogScreen 
+                                sequence={workingConfig.sequence}
+                                backgroundImageKey={workingConfig.backgroundImageKey}
+                                initialLineIndex={selectedLineIndex}
+                                isLoading={false}
+                                onContinue={() => {}} // No-op in preview
+                                onDialogAction={() => {}}
+                                // We use key to force re-mounting if sequence length changes drastically, 
+                                // but for simple updates passing props is enough.
+                                // Actually, DialogScreen is stateful for typewriter.
+                                // If we want to preview specific line without typing every char change, we might need a "Preview Toggle" or just accept it.
+                                // Let's try key={selectedLineIndex} to snap to that line fresh.
+                                key={`${selectedDialogKey}-${selectedLineIndex}-${workingConfig.sequence.length}`} 
+                             />
+                         </div>
+                     )}
+                     {!workingConfig && <div className="w-full h-full flex items-center justify-center text-slate-600">No Preview</div>}
+                </div>
+
+                {/* Editor (Bottom) */}
+                <div className="h-1/2 flex flex-col min-h-0 bg-slate-900">
+                     {/* Toolbar */}
+                     <div className="h-10 border-b border-slate-800 flex items-center justify-between px-4 bg-slate-950">
+                         <div className="flex items-center gap-4">
+                             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Line Editor</h3>
+                             <div className="flex bg-slate-900 rounded p-0.5 border border-slate-800">
+                                 <button 
+                                    onClick={() => setShowJsonMode(false)}
+                                    className={`px-3 py-1 text-[10px] rounded ${!showJsonMode ? "bg-cyan-700 text-white" : "text-slate-500 hover:text-slate-300"}`}
+                                 >
+                                     Visual
+                                 </button>
+                                 <button 
+                                    onClick={() => setShowJsonMode(true)}
+                                    className={`px-3 py-1 text-[10px] rounded ${showJsonMode ? "bg-cyan-700 text-white" : "text-slate-500 hover:text-slate-300"}`}
+                                 >
+                                     JSON
+                                 </button>
+                             </div>
+                         </div>
+
+                         <div className="flex items-center gap-2">
+                             {isDirty && <span className="text-xs text-orange-400 italic mr-2">Unsaved Changes</span>}
+                             <button 
+                                onClick={handleSave}
+                                disabled={isSaving || !workingConfig}
+                                className="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded flex items-center gap-2 disabled:opacity-50"
+                             >
+                                 {isSaving ? "Saving..." : "Save Dialog"}
+                             </button>
+                             {selectedDialogKey && selectedDialogKey !== "NEW_DIALOG" && (
+                                 <button 
+                                    onClick={handleDelete}
+                                    className="px-3 py-1.5 bg-red-900/30 hover:bg-red-900/50 text-red-400 text-xs rounded border border-red-900/50"
+                                 >
+                                     Delete
+                                 </button>
+                             )}
+                         </div>
+                     </div>
+
+                     {/* Edit Content */}
+                     <div className="flex-1 min-h-0">
+                         {showJsonMode ? (
+                             <div className="h-full p-4">
+                                <JsonEditor 
+                                    value={workingConfig} 
+                                    onChange={(val) => {
+                                        setWorkingConfig(val);
+                                        setIsDirty(true);
+                                    }} 
+                                />
+                             </div>
+                         ) : (
+                             renderVisualEditor()
+                         )}
+                     </div>
+                </div>
+            </div>
+
         </div>
-      )}
+
+        {/* Save As Modal */}
+        {showNewDialogModal && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80">
+                <div className="bg-slate-800 p-6 rounded border border-slate-600 w-96 shadow-2xl">
+                    <h3 className="font-bold text-lg mb-4 text-white">Save New Dialog</h3>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-xs uppercase text-slate-400 font-bold mb-1">Filename</label>
+                            <input 
+                                value={newDialogData.fileName}
+                                onChange={e => setNewDialogData(prev => ({...prev, fileName: e.target.value}))}
+                                placeholder="e.g. introSequence"
+                                className="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded text-slate-200 focus:border-cyan-500 focus:outline-none"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs uppercase text-slate-400 font-bold mb-1">Variable Name (Export)</label>
+                            <input 
+                                value={newDialogData.varName}
+                                onChange={e => setNewDialogData(prev => ({...prev, varName: e.target.value}))}
+                                placeholder="e.g. INTRO_SEQUENCE"
+                                className="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded text-slate-200 focus:border-cyan-500 focus:outline-none"
+                            />
+                        </div>
+                    </div>
+                    <div className="flex justify-end gap-2 mt-6">
+                        <button 
+                             onClick={() => setShowNewDialogModal(false)}
+                             className="px-4 py-2 text-slate-400 hover:text-white text-sm"
+                        >
+                            Cancel
+                        </button>
+                        <button 
+                             onClick={() => executeSave()}
+                             className="px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-500 font-bold text-sm"
+                        >
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
     </div>
   );
 }

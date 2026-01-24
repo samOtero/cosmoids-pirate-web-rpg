@@ -255,8 +255,12 @@ export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
     {
       "portraits": [
         {
-          "key": SpeakerImageKey.EMPTY,
+          "key": SpeakerImageKey.STARTER_3_MONKEY,
           "displayName": ""
+        },
+        {
+          "key": SpeakerImageKey.HOOKAW_TIRED_DIVE_SKIN_1,
+          "displayName": "Guide"
         }
       ],
       "text": "A few minutes later, at the docks...",
