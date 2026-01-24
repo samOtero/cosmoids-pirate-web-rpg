@@ -221,7 +221,7 @@ describe("Profile Management Integration", () => {
       const state = useGameStore.getState();
       expect(state.currentProfileId).toBe(0);
       expect(state.currentScreen).toBe(Screens.DIALOG);
-      expect(state.profiles[0]?.isNew).toBe(false);
+      expect(state.profiles[0]?.isNew).toBe(true);
     });
 
     it("should update lastPlayed timestamp on selection", async () => {

@@ -85,6 +85,12 @@ export const useGameStore = create<GameState>()(
             return state;
           const newProfiles = [...state.profiles];
           const profile = newProfiles[slotId]!;
+          // Update last played time
+          newProfiles[slotId] = {
+              ...profile,
+              lastPlayed: Date.now(),
+          };
+          
           const isNewPlayer = profile.isNew;
           
           let nextScreen = Screens.MAP;
