@@ -242,14 +242,14 @@ describe("Profile Management Integration", () => {
       expect(state.profiles[2]?.name).toBe(defaultName);
     });
 
-    it("should not select non-existent profile", () => {
+    it("selecting empty slot should take you to new player dialog", () => {
       const { selectProfile } = useGameStore.getState();
 
       selectProfile(0); // Slot is empty
 
       const state = useGameStore.getState();
       expect(state.currentProfileId).toBe(null);
-      expect(state.currentScreen).toBe(Screens.START);
+      expect(state.currentScreen).toBe(Screens.DIALOG);
     });
   });
 
