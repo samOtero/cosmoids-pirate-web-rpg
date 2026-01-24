@@ -13,6 +13,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
   const [playKey, setPlayKey] = useState(0); 
   const [isFinished, setIsFinished] = useState(false);
   const [isInspectorOpen, setIsInspectorOpen] = useState(true);
+  const [startLineIndex, setStartLineIndex] = useState(0);
 
   // Filter exports to find valid DialogConfigs
   const availableDialogs = useMemo(() => {
@@ -33,13 +34,21 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
     : null;
 
   const handleRestart = () => {
+    setStartLineIndex(0);
     setPlayKey((prev) => prev + 1);
     setIsFinished(false);
   };
 
   const handleSelect = (key: string) => {
     setSelectedDialogKey(key);
+    setStartLineIndex(0);
     setPlayKey(0);
+    setIsFinished(false);
+  };
+
+  const handleJumpToLine = (index: number) => {
+    setStartLineIndex(index);
+    setPlayKey((prev) => prev + 1);
     setIsFinished(false);
   };
 
@@ -96,7 +105,8 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                    selectedDialog.sequence.map((line, idx) => (
                      <div
                        key={idx}
-                       className="bg-slate-800 border border-slate-700 rounded p-3 text-sm relative"
+                       onClick={() => handleJumpToLine(idx)}
+                       className="bg-slate-800 border border-slate-700 rounded p-3 text-sm relative cursor-pointer hover:bg-slate-700 transition-colors"
                      >
                        <div className="absolute top-2 right-2 text-slate-500 text-xs font-mono">
                          #{idx}
@@ -200,6 +210,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                   <DialogScreen
                     sequence={selectedDialog.sequence}
                     backgroundImageKey={selectedDialog.backgroundImageKey}
+                    initialLineIndex={startLineIndex}
                     onContinue={() => setIsFinished(true)}
                     onDialogAction={(action) => {
                       console.log("[DialogEditor] Action triggered:", action);

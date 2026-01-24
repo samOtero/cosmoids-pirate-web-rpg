@@ -21,6 +21,7 @@ interface StoryScreenProps {
   isLoading?: boolean;
   backgroundImageKey: BackgroundImageKey;
   dialogName?: string; // Optional name for error messages
+  initialLineIndex?: number;
 }
 
 export default function DialogScreen({
@@ -30,8 +31,9 @@ export default function DialogScreen({
   isLoading,
   backgroundImageKey,
   dialogName,
+  initialLineIndex = 0,
 }: StoryScreenProps) {
-  const [lineIndex, setLineIndex] = useState(0);
+  const [lineIndex, setLineIndex] = useState(initialLineIndex);
   const [displayedText, setDisplayedText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -48,14 +50,14 @@ export default function DialogScreen({
 
   // Reset state when sequence changes to support dialog chaining
   useEffect(() => {
-    setLineIndex(0);
+    setLineIndex(initialLineIndex);
     setDisplayedText("");
     setIsTyping(false);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-  }, [sequence]);
+  }, [sequence, initialLineIndex]);
 
   const currentLine = sequence[lineIndex];
 
