@@ -84,6 +84,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
   const [showJsonMode, setShowJsonMode] = useState(false);
   const [showNewDialogModal, setShowNewDialogModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isEditorCollapsed, setIsEditorCollapsed] = useState(false);
   
   // New Dialog Form State
   const [newDialogData, setNewDialogData] = useState({ fileName: "", varName: "" });
@@ -554,9 +555,9 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
             </div>
 
             {/* PANEL 3: Workspace (Right) */}
-            <div className="flex-1 flex flex-col bg-black min-w-0">
+            <div className="flex-1 flex flex-col bg-black min-w-0 transition-all duration-300">
                 {/* Visual Preview (Top) */}
-                <div className="h-1/2 relative border-b border-slate-800 overflow-hidden bg-gray-900">
+                <div className={`${isEditorCollapsed ? "flex-1" : "h-1/2"} relative border-b border-slate-800 overflow-hidden bg-gray-900 transition-all duration-300`}>
                      <div className="absolute top-2 left-2 z-20 bg-black/50 px-2 py-1 rounded text-[10px] text-slate-400 font-mono uppercase">
                          Preview Mode
                      </div>
@@ -582,25 +583,34 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                 </div>
 
                 {/* Editor (Bottom) */}
-                <div className="h-1/2 flex flex-col min-h-0 bg-slate-900">
+                <div className={`${isEditorCollapsed ? "h-10" : "h-1/2"} flex flex-col min-h-0 bg-slate-900 transition-all duration-300`}>
                      {/* Toolbar */}
-                     <div className="h-10 border-b border-slate-800 flex items-center justify-between px-4 bg-slate-950">
+                     <div className="h-10 border-b border-slate-800 flex items-center justify-between px-4 bg-slate-950 shrink-0">
                          <div className="flex items-center gap-4">
+                             <button
+                                onClick={() => setIsEditorCollapsed(!isEditorCollapsed)}
+                                className="text-slate-500 hover:text-white mr-2"
+                                title={isEditorCollapsed ? "Expand Editor" : "Minimize Editor"}
+                             >
+                                 {isEditorCollapsed ? "▲" : "▼"}
+                             </button>
                              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Line Editor</h3>
-                             <div className="flex bg-slate-900 rounded p-0.5 border border-slate-800">
-                                 <button 
-                                    onClick={() => setShowJsonMode(false)}
-                                    className={`px-3 py-1 text-[10px] rounded ${!showJsonMode ? "bg-cyan-700 text-white" : "text-slate-500 hover:text-slate-300"}`}
-                                 >
-                                     Visual
-                                 </button>
-                                 <button 
-                                    onClick={() => setShowJsonMode(true)}
-                                    className={`px-3 py-1 text-[10px] rounded ${showJsonMode ? "bg-cyan-700 text-white" : "text-slate-500 hover:text-slate-300"}`}
-                                 >
-                                     JSON
-                                 </button>
-                             </div>
+                             {!isEditorCollapsed && (
+                                <div className="flex bg-slate-900 rounded p-0.5 border border-slate-800">
+                                    <button 
+                                        onClick={() => setShowJsonMode(false)}
+                                        className={`px-3 py-1 text-[10px] rounded ${!showJsonMode ? "bg-cyan-700 text-white" : "text-slate-500 hover:text-slate-300"}`}
+                                    >
+                                        Visual
+                                    </button>
+                                    <button 
+                                        onClick={() => setShowJsonMode(true)}
+                                        className={`px-3 py-1 text-[10px] rounded ${showJsonMode ? "bg-cyan-700 text-white" : "text-slate-500 hover:text-slate-300"}`}
+                                    >
+                                        JSON
+                                    </button>
+                                </div>
+                             )}
                          </div>
 
                          <div className="flex items-center gap-2">
@@ -624,21 +634,23 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                      </div>
 
                      {/* Edit Content */}
-                     <div className="flex-1 min-h-0">
-                         {showJsonMode ? (
-                             <div className="h-full p-4">
-                                <JsonEditor 
-                                    value={workingConfig} 
-                                    onChange={(val) => {
-                                        setWorkingConfig(val);
-                                        setIsDirty(true);
-                                    }} 
-                                />
-                             </div>
-                         ) : (
-                             renderVisualEditor()
-                         )}
-                     </div>
+                     {!isEditorCollapsed && (
+                        <div className="flex-1 min-h-0">
+                            {showJsonMode ? (
+                                <div className="h-full p-4">
+                                    <JsonEditor 
+                                        value={workingConfig} 
+                                        onChange={(val) => {
+                                            setWorkingConfig(val);
+                                            setIsDirty(true);
+                                        }} 
+                                    />
+                                </div>
+                            ) : (
+                                renderVisualEditor()
+                            )}
+                        </div>
+                     )}
                 </div>
             </div>
 

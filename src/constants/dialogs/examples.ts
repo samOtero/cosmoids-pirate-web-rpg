@@ -13,6 +13,16 @@ import {
 export const EXAMPLE_DIALOG_WITH_LINE_JUMPING: DialogConfig = {
   "sequence": [
     {
+      "text": "New line...",
+      "portraits": [
+        {
+          "key": SpeakerImageKey.EEL_SENTICLE,
+          "displayName": "Guide",
+          "portraitWidth": "wide"
+        }
+      ]
+    },
+    {
       "id": "choice_start",
       "portraits": [
         {
@@ -31,33 +41,6 @@ export const EXAMPLE_DIALOG_WITH_LINE_JUMPING: DialogConfig = {
         {
           "label": "Continue",
           "type": "confirm"
-        }
-      ]
-    },
-    {
-      "id": "fire_choice",
-      "portraits": [
-        {
-          "key": SpeakerImageKey.GUIDE,
-          "displayName": "Guide"
-        }
-      ],
-      "text": "Fire! A passionate choice. Are you sure?",
-      "buttons": [
-        {
-          "label": "Yes, fire for me",
-          "type": "confirm",
-          "action": {
-            "type": "CHANGE_SCREEN",
-            "payload": {
-              "screen": "MAP"
-            }
-          }
-        },
-        {
-          "label": "Choose again",
-          "type": "cancel",
-          "jumpToLineId": "choice_start"
         }
       ]
     },
