@@ -44,7 +44,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-8 text-white">
-      <div className="bg-slate-900 border border-slate-700 w-full h-full max-w-6xl flex shadow-2xl rounded-lg overflow-hidden">
+      <div className="bg-slate-900 border border-slate-700 w-full h-full flex shadow-2xl rounded-lg overflow-hidden">
         {/* Sidebar: List of Dialogs */}
         <div className="w-1/3 border-r border-slate-700 flex flex-col">
           <div className="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800">
@@ -125,13 +125,6 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
             )}
           </div>
           
-          {/* Debug Info Overlay */}
-          {selectedDialog && (
-            <div className="absolute bottom-0 left-0 right-0 bg-black/80 p-2 text-xs font-mono text-slate-400 border-t border-slate-800 z-10 max-h-32 overflow-auto">
-                <p>Background: {selectedDialog.backgroundImageKey}</p>
-                <p>Next Screen: {selectedDialog.next?.screen}</p>
-            </div>
-          )}
         </div>
       </div>
     </div>
