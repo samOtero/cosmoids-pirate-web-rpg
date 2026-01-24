@@ -36,7 +36,7 @@ export const EXAMPLE_DIALOG_WITH_LINE_JUMPING: DialogConfig = {
         {
           "label": "Fire",
           "type": "fire",
-          "jumpToLineId": "fire_choice"
+          "jumpToLineId": "grass_choice"
         },
         {
           "label": "Continue",
