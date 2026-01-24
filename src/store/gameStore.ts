@@ -8,7 +8,7 @@ import {
   Creature,
 } from "@/types/baseGame";
 import { MAX_PROFILES } from "@/constants/game";
-import { GameEvent, GameEventType, ShowDialogEventPayload } from "@/types/baseGame";
+import { GameEvent, ShowDialogEventPayload } from "@/types/baseGame";
 
 
 interface GameState {
@@ -101,7 +101,7 @@ export const useGameStore = create<GameState>()(
       clearCurrentEnemy: () => set({ currentEnemy: null }),
       profiles: Array(MAX_PROFILES).fill(null),
       currentProfileId: null,
-      createProfile: (slotId: number) =>
+      createProfile: (slotId: number) => {
         set((state) => {
           if (slotId < 0 || slotId >= MAX_PROFILES) return state;
           const newProfiles = [...state.profiles];
@@ -123,7 +123,7 @@ export const useGameStore = create<GameState>()(
                 payload: { context: DialogContext.GAME_INTRO }
             }]
           };
-        }),
+        }); get().processNextEvent();},
       deleteProfile: (slotId: number) =>
         set((state) => {
           if (slotId < 0 || slotId >= MAX_PROFILES) return state;
@@ -135,7 +135,7 @@ export const useGameStore = create<GameState>()(
               state.currentProfileId === slotId ? null : state.currentProfileId,
           };
         }),
-      selectProfile: (slotId: number) =>
+      selectProfile: (slotId: number) => {
         set((state) => {
           if (slotId < 0 || slotId >= MAX_PROFILES || !state.profiles[slotId])
             return state;
@@ -175,7 +175,9 @@ export const useGameStore = create<GameState>()(
             currentProfileId: slotId,
             eventQueue: initialEvents,
           };
-        }),
+        });
+        get().processNextEvent();
+      },
       completeIntroduction: () => 
         set((state) => {
             if (state.currentProfileId === null) return state;
