@@ -257,39 +257,52 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
   ]
 };
 
+
+
 export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
-  sequence: [
+  "sequence": [
     {
-      portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
-      text: "A few minutes later, at the docks...",
-      buttons: [
+      "portraits": [
         {
-          label: "Yes",
-          type: "confirm",
-          action: {
-            type: "CHANGE_SCREEN",
-            payload: { screen: "MAP" },
-          },
-        },
-        {
-          label: "[DEBUG] Fight Crab",
-          type: "fire",
-          action: {
-            type: "START_BATTLE",
-            payload: { creatureId: "wild_crab" },
-          },
-        },
-      ],
-    },
-  ],
-  backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
-  nextEvents: [
-    {
-        type: "SHOW_DIALOG",
-        payload: {
-            context: DialogContext.GAME_INTRO_PART_2,
-            contextData: { islandId: 0 }
+          "key": SpeakerImageKey.EMPTY,
+          "displayName": ""
         }
+      ],
+      "text": "A few minutes later, at the docks...",
+      "buttons": [
+        {
+          "label": "Yes",
+          "type": "confirm",
+          "action": {
+            "type": "CHANGE_SCREEN",
+            "payload": {
+              "screen": "MAP"
+            }
+          }
+        },
+        {
+          "label": "Fight Crab",
+          "type": "fire",
+          "action": {
+            "type": "START_BATTLE",
+            "payload": {
+              "creatureId": "wild_crab"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "backgroundImageKey": BackgroundImageKey.FIRST_TOWN_DOCKS,
+  "nextEvents": [
+    {
+      "type": "SHOW_DIALOG",
+      "payload": {
+        "context": "GAME_INTRO_PART_2",
+        "contextData": {
+          "islandId": 0
+        }
+      }
     }
   ]
 };

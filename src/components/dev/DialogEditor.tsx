@@ -63,50 +63,48 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
     setIsEditing(true);
   };
 
-  const handleSave = async () => {
-    try {
-        const parsed = JSON.parse(editJson);
-        // We need a filename and variable name.
-        // For existing dialogs, we might not know the filename easily without metadata.
-        // For this "Add new dialog" feature, it's most important for NEW ones.
-        // BUT, if we are editing an existing one, we are kind of stuck unless we ask for the filename again
-        // OR we just allow "Save Copy As..." for now.
-        // Let's implement "Save Copy" or if it was just created, we might know.
-        // Simpler for now: "Save to File" button that always asks/confirms details?
-        // Or better: Just "Save" that overwrites if we know the key, but we don't know the file...
-        // Let's rely on the New Dialog flow explicitly for "creating", and maybe an explicit "Save Changes" that asks for filename.
-        setShowNewDialogModal(true);
-        // We'll use the modal to confirm save details
-    } catch (e) {
-        alert("Invalid JSON");
-    }
-  };
-
-  const executeSave = async () => {
+  const executeSave = async (overrideData?: { fileName?: string, varName?: string }) => {
     try {
         setIsSaving(true);
         const config = JSON.parse(editJson);
+        const fileName = overrideData?.fileName || newDialogData.fileName;
+        const dialogName = overrideData?.varName || newDialogData.varName;
+        
         const res = await fetch("/api/dialogs/save", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                fileName: newDialogData.fileName,
-                dialogName: newDialogData.varName,
+                fileName,
+                dialogName,
                 config
             })
         });
         
-        if (!res.ok) throw new Error("Failed to save");
+        if (!res.ok) {
+            const data = await res.json();
+            throw new Error(data.error || "Failed to save");
+        }
         
         alert("Saved successfully! The app may reload.");
         setShowNewDialogModal(false);
-    } catch (error) {
+    } catch (error: any) {
         console.error(error);
-        alert("Error saving");
+        alert(`Error saving: ${error.message}`);
     } finally {
         setIsSaving(false);
     }
   };
+
+  const handleQuickSave = async () => {
+    if (!selectedDialogKey || selectedDialogKey === "NEW_DIALOG") {
+        setShowNewDialogModal(true);
+        return;
+    }
+    
+    // Quick save: try to save to existing file
+    await executeSave({ varName: selectedDialogKey });
+  };
+
 
 
 
@@ -311,22 +309,28 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                             Edit JSON
                         </button>
                     )}
-                    {isEditing && (
-                         <div className="flex gap-2">
-                            <button
-                                onClick={() => setShowNewDialogModal(true)}
-                                className="px-3 py-1 bg-green-600 text-xs rounded hover:bg-green-500"
-                            >
-                                Save to File...
-                            </button>
-                             <button
-                                onClick={() => setIsEditing(false)}
-                                className="px-3 py-1 bg-slate-700 text-xs rounded hover:bg-slate-600"
-                            >
-                                Cancel
-                            </button>
-                         </div>
-                    )}
+            {isEditing && (
+                 <div className="flex gap-2">
+                    <button
+                        onClick={handleQuickSave}
+                        className="px-3 py-1 bg-cyan-600 text-xs rounded hover:bg-cyan-500 font-bold"
+                    >
+                        Save
+                    </button>
+                     <button
+                        onClick={() => setShowNewDialogModal(true)}
+                        className="px-3 py-1 bg-slate-700 text-xs rounded hover:bg-slate-600"
+                    >
+                        Save As...
+                    </button>
+                     <button
+                        onClick={() => setIsEditing(false)}
+                        className="px-3 py-1 bg-slate-700 text-xs rounded hover:bg-slate-600"
+                    >
+                        Cancel
+                    </button>
+                 </div>
+            )}
                  </div>
             )}
             
@@ -440,7 +444,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                         Cancel
                     </button>
                     <button 
-                        onClick={executeSave}
+                        onClick={() => executeSave()}
                         disabled={isSaving || !newDialogData.fileName || !newDialogData.varName}
                         className="px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
