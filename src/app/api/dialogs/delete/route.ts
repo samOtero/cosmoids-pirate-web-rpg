@@ -52,6 +52,24 @@ export async function POST(req: NextRequest) {
     
     await fs.writeFile(indexPath, newLines.join("\n"), "utf-8");
 
+    // 4. Remove from DialogContext Enum in baseGame.ts
+    // We need to know the *exported variable name* to remove it from the enum.
+    // However, the delete API receives `dialogKey` which IS the variable name.
+    
+    const baseGamePath = path.join(process.cwd(), "src", "types", "baseGame.ts");
+    let baseGameContent = await fs.readFile(baseGamePath, "utf-8");
+    
+    // We search for:   KEY = "KEY",
+    // and remove that line.
+    
+    const enumLineRegex = new RegExp(`\\s*${dialogKey}\\s*=\\s*"${dialogKey}",?`);
+    if (enumLineRegex.test(baseGameContent)) {
+        baseGameContent = baseGameContent.replace(enumLineRegex, "");
+        // Cleanup empty lines if necessary, but messy regex is risky. 
+        // Simple replace is usually enough.
+        await fs.writeFile(baseGamePath, baseGameContent, "utf-8");
+    }
+
     return NextResponse.json({ success: true, deletedFile: foundFile });
 
   } catch (error) {

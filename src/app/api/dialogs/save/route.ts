@@ -185,6 +185,29 @@ export async function POST(req: NextRequest) {
       await fs.appendFile(indexPath, `\n${exportStatement}`);
     }
 
+    // 6. Update DialogContext Enum in baseGame.ts
+    const baseGamePath = path.join(process.cwd(), "src", "types", "baseGame.ts");
+    let baseGameContent = await fs.readFile(baseGamePath, "utf-8");
+    
+    // Check if the key already exists in the enum
+    // Regex matches: GAME_INTRO = "GAME_INTRO", or similar
+    // We assume the key name is the dialogName (variable name)
+    const contextKey = dialogName; 
+    
+    if (!baseGameContent.includes(`${contextKey} = "${contextKey}"`)) {
+        // Insert it into the enum
+        // Look for "export enum DialogContext {"
+        const enumStart = "export enum DialogContext {";
+        const parts = baseGameContent.split(enumStart);
+        
+        if (parts.length >= 2) {
+            // parts[1] starts with the enum content.
+            // We just insert at the beginning of the enum block for simplicity
+            baseGameContent = parts[0] + enumStart + `\n  ${contextKey} = "${contextKey}",` + parts[1];
+            await fs.writeFile(baseGamePath, baseGameContent, "utf-8");
+        }
+    }
+
     return NextResponse.json({ success: true, path: filePath });
   } catch (error) {
     console.error("Error saving dialog:", error);

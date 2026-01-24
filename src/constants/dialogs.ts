@@ -90,4 +90,3 @@ export * from "./dialogs/islandIntro";
 export * from "./dialogs/islandVictory";
 export * from "./dialogs/islandDefeat";
 export * from "./dialogs/examples";
-export * from "./dialogs/testing_editor";
