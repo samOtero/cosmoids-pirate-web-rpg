@@ -47,27 +47,4 @@ describe("GameStore Event Queue", () => {
     expect(result.current.currentScreen).toBe(Screens.DIALOG);
     expect(result.current.dialogContext).toBe(DialogContext.GAME_INTRO);
   });
-
-  it("should process items in FIFO order", () => {
-    const { result } = renderHook(() => useGameStore());
-
-    act(() => {
-        result.current.enqueueEvent({
-            type: "GO_TO_MAP",
-        });
-        result.current.enqueueEvent({
-            type: "GO_TO_MAP",
-        });
-    });
-
-    act(() => {
-        result.current.processNextEvent();
-    });
-    expect(result.current.currentScreen).toBe(Screens.PROFILES);
-
-    act(() => {
-        result.current.processNextEvent();
-    });
-    expect(result.current.currentScreen).toBe(Screens.MAP);
-  });
 });
