@@ -18,25 +18,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         },
       ],
       text: "...",
-      /*buttons: [
-        {
-          label: "Yes",
-          type: "confirm",
-          action: {
-            type: "CHANGE_SCREEN",
-            payload: { screen: "MAP" },
-          },
-        },
-        {
-          label: "[DEBUG] Fight Crab",
-          type: "fire",
-          action: {
-            type: "START_BATTLE",
-            payload: { creatureId: "wild_crab" },
-          },
-        },
-      ],
-      */
     },
     {
       portraits: [

@@ -152,10 +152,10 @@ export const useGameStore = create<GameState>()(
             currentProfileId: slotId,
             eventQueue: [{
                 type: "SHOW_DIALOG",
-                payload: { context: DialogContext.GAME_INTRO, contextData: {dialogStartIndex: 0} }
+                payload: { context: DialogContext.GAME_INTRO }
             }, {
                 type: "SHOW_DIALOG",
-                payload: { context: DialogContext.LEVEL_1_THE_MESSAGE}
+                payload: { context: DialogContext.LEVEL_1_THE_MESSAGE, contextData: {dialogStartIndex: 1}}
             }, { type: "START_BATTLE", payload: { context: BattleContext.FIRST_BATTLE } }]
           };
         }); get().processNextEvent();},
@@ -200,8 +200,7 @@ export const useGameStore = create<GameState>()(
               }
           } else {
               initialEvents.push({
-                  type: "GO_TO_MAP",
-                  payload: { screen: Screens.MAP }
+                  type: "GO_TO_MAP"
               });
           }
 

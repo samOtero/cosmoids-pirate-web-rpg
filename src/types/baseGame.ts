@@ -181,12 +181,11 @@ export type GameEventType =
 
 export interface GameEvent {
   type: GameEventType;
-  payload?: any;
+  payload?: ShowDialogEventPayload | StartBattleEventPayload | GoToMapEventPayload;
 }
 
 export interface ShowDialogEventPayload {
-  dialogId?: string;
-  context?: DialogContext;
+  context: DialogContext;
   contextData?: DialogContextData;
 }
 
@@ -202,7 +201,7 @@ export interface BattleConfig {
 }
 
 export interface StartBattleEventPayload {
-  context?: BattleContext;
+  context: BattleContext;
   enemyId?: string;
   backgroundKey?: BackgroundImageKey;
 }

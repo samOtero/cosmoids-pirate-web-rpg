@@ -3,6 +3,15 @@ import { DialogConfig, BackgroundImageKey, SpeakerImageKey } from "@/types/baseG
 export const LEVEL_1_THE_MESSAGE: DialogConfig = {
   "sequence": [
     {
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: "Grandpa",
+        },
+      ],
+      text: "A fine choice! I know you two will look out for each other. Now, hold that doubloon tight, Caleb... your journey officially beg-",
+    },
+    {
       "portraits": [
         {
           "key": SpeakerImageKey.EMPTY,
