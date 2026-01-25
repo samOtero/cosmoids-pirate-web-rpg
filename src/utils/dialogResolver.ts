@@ -32,9 +32,7 @@ export function resolveDialog(
     return AllDialogs.NEW_PLAYER_WELCOME_DIALOG;
   }
 
-  if (context === DialogContext.GAME_INTRO_PART_2) {
-    return AllDialogs.NEW_PLAYER_WELCOME_DIALOG_PART_2;
-  }
+
 
   if (context === DialogContext.GAME_INTRO_AFTER_STARTER) {
     return AllDialogs.AFTER_STARTER_CHOICE_DIALOG;

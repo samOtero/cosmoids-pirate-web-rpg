@@ -1,10 +1,7 @@
 import {
   DialogConfig,
   SpeakerImageKey,
-  Screens,
   BackgroundImageKey,
-  DialogContext,
-  DialogButtonTypeConfig,
 } from "@/types/baseGame";
 
 export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
@@ -250,54 +247,4 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
 
 
 
-export const NEW_PLAYER_WELCOME_DIALOG_PART_2: DialogConfig = {
-  "sequence": [
-    {
-      "portraits": [
-        {
-          "key": SpeakerImageKey.STARTER_3_MONKEY,
-          "displayName": ""
-        },
-        {
-          "key": SpeakerImageKey.HOOKAW_TIRED_DIVE_SKIN_1,
-          "displayName": "Guide"
-        }
-      ],
-      "text": "A few minutes later, at the docks...",
-      "buttons": [
-        {
-          "label": "Yes",
-          "type": "confirm",
-          "action": {
-            "type": "CHANGE_SCREEN",
-            "payload": {
-              "screen": "MAP"
-            }
-          }
-        },
-        {
-          "label": "Fight Crab",
-          "type": "fire",
-          "action": {
-            "type": "START_BATTLE",
-            "payload": {
-              "creatureId": "wild_crab"
-            }
-          }
-        }
-      ]
-    }
-  ],
-  "backgroundImageKey": BackgroundImageKey.FIRST_TOWN_DOCKS,
-  "nextEvents": [
-    {
-      "type": "SHOW_DIALOG",
-      "payload": {
-        "context": "GAME_INTRO_PART_2",
-        "contextData": {
-          "islandId": 0
-        }
-      }
-    }
-  ]
-};
+

@@ -300,8 +300,6 @@ export const AFTER_STARTER_CHOICE_DIALOG: DialogConfig = {
   ],
   backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
   next: {
-    screen: Screens.DIALOG,
-    context: DialogContext.GAME_INTRO_PART_2,
-    contextData: { islandId: 0 },
+    screen: Screens.MAP,
   },
 };

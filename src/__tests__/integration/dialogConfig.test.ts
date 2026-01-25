@@ -5,7 +5,6 @@ import {
 } from "@/utils/buildTimeDialogValidator";
 import {
   NEW_PLAYER_WELCOME_DIALOG,
-  NEW_PLAYER_WELCOME_DIALOG_PART_2,
   ISLAND_INTRO_DIALOGS,
   ISLAND_VICTORY_DIALOGS,
   ISLAND_DEFEAT_DIALOGS,
@@ -20,7 +19,6 @@ describe("Dialog Configuration Integration Tests", () => {
     // Collect all dialog configs for validation
     allDialogs = {
       NEW_PLAYER_WELCOME_DIALOG,
-      NEW_PLAYER_WELCOME_DIALOG_PART_2,
       EXAMPLE_DIALOG_WITH_LINE_JUMPING,
       ...Object.entries(ISLAND_INTRO_DIALOGS).reduce((acc, [key, dialog]) => {
         acc[`ISLAND_INTRO_DIALOGS[${key}]`] = dialog;
@@ -42,17 +40,6 @@ describe("Dialog Configuration Integration Tests", () => {
       const result = validateDialogConfig(
         NEW_PLAYER_WELCOME_DIALOG,
         "NEW_PLAYER_WELCOME_DIALOG"
-      );
-      if (!result.valid) {
-        console.error(formatValidationErrors(result));
-      }
-      expect(result.valid).toBe(true);
-    });
-
-    it("should validate NEW_PLAYER_WELCOME_DIALOG_PART_2", () => {
-      const result = validateDialogConfig(
-        NEW_PLAYER_WELCOME_DIALOG_PART_2,
-        "NEW_PLAYER_WELCOME_DIALOG_PART_2"
       );
       if (!result.valid) {
         console.error(formatValidationErrors(result));
