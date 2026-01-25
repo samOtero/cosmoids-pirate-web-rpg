@@ -115,11 +115,7 @@ export function getButtonClasses(type: DialogButtonType): string {
   return `${BUTTON_BASE_CLASSES} ${typeClasses}`;
 }
 
-export type DialogActionType =
-  | "START_BATTLE"
-  | "CHANGE_SCREEN"
-  | "PICK_STARTER"
-  | "CUSTOM";
+export type DialogActionType = "PICK_STARTER";
 
 export interface DialogAction {
   type: DialogActionType;

@@ -21,7 +21,7 @@ import DialogScreen from "@/app/components/dialogScreen";
 const SPEAKER_OPTIONS = Object.values(SpeakerImageKey);
 const BACKGROUND_OPTIONS = Object.values(BackgroundImageKey);
 const BUTTON_TYPE_OPTIONS = Object.keys(DialogButtonTypeConfig) as DialogButtonType[];
-const ACTION_TYPE_OPTIONS: DialogActionType[] = ["START_BATTLE", "CHANGE_SCREEN", "PICK_STARTER", "CUSTOM"];
+const ACTION_TYPE_OPTIONS: DialogActionType[] = ["PICK_STARTER"];
 
 const DEFAULT_LINE: DialogLine = {
   text: "New line...",

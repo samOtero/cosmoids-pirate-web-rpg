@@ -28,7 +28,6 @@ export default function Home() {
     dialogContext,
     dialogContextData,
     addCreatureToProfile,
-    setCurrentEnemy,
     currentEnemy,
     clearCurrentEnemy,
     completeIntroduction,
@@ -118,17 +117,6 @@ export default function Home() {
 
     const handleDialogAction = (action: DialogAction) => {
       switch (action.type) {
-        case "CHANGE_SCREEN":
-          if (action.payload?.screen) {
-            if (action.payload.screen === Screens.MAP) {
-                completeIntroduction();
-            }
-            setScreen(
-              action.payload.screen as Screens,
-              action.payload?.context as DialogContext
-            );
-          }
-          break;
         case "PICK_STARTER":
           if (action.payload?.creatureId && currentProfileId !== null) {
             const creatureMap: Record<string, typeof STARTER_CRAB> = {
@@ -145,33 +133,6 @@ export default function Home() {
               "Invalid starter selection or no profile selected."
             );
           }
-          break;
-        case "START_BATTLE":
-          if (action.payload?.creatureId) {
-             // Temporary lookup for enemies until we have a real DB/store for them
-             // Using starter creatures as placeholder enemies for now + maybe some extras
-             const enemyMap: Record<string, any> = {
-                // We'll reuse starters for now or define new ones. 
-                // Let's create a quick "wild" version of them or just use them directly.
-                wild_crab: { ...STARTER_CRAB, id: 'wild_crab_' + Date.now(), currentHp: 15, maxHp: 15, level: 3 },
-                wild_iguana: { ...STARTER_IGUANA, id: 'wild_iguana_' + Date.now(), currentHp: 15, maxHp: 15, level: 3 },
-                wild_monkey: { ...STARTER_MONKEY, id: 'wild_monkey_' + Date.now(), currentHp: 15, maxHp: 15, level: 3 },
-             };
-             
-             const enemyId = action.payload.creatureId;
-             const enemy = enemyMap[enemyId];
-
-             if (enemy) {
-                 setCurrentEnemy(enemy);
-                 setScreen(Screens.BATTLE);
-             } else {
-                 console.warn("Enemy not found:", enemyId);
-             }
-          }
-          break;
-        case "CUSTOM":
-          // TODO: Handle custom actions
-          console.log("Custom action:", action.payload);
           break;
         default:
           console.warn("Unknown action type:", action.type);
