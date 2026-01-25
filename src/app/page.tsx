@@ -2,7 +2,7 @@
 import { lazy, Suspense, useEffect } from "react";
 
 import { useGameStore } from "@/store/gameStore";
-import { Screens, DialogAction, DialogContext } from "@/types/baseGame";
+import { Screens, DialogAction, DialogContext, BattleContext } from "@/types/baseGame";
 import { resolveDialog } from "@/utils/dialogResolver";
 import {
   STARTER_CRAB,
@@ -246,7 +246,7 @@ export default function Home() {
         <MapScreen
           profile={currentProfile}
           onTravel={() => {
-            throw new Error("Function not implemented.");
+            enqueueAndProcessEvents([{ type: "SHOW_DIALOG", payload: { context: DialogContext.LEVEL_1_THE_MESSAGE } }, { type: "START_BATTLE", payload: { context: BattleContext.FIRST_BATTLE } }])
           }}
           onOpenMenu={function (): void {
             throw new Error("Function not implemented.");
