@@ -157,7 +157,7 @@ export const useGameStore = create<GameState>()(
                 payload: { context: DialogContext.GAME_INTRO }
             }, {
                 type: "SHOW_DIALOG",
-                payload: { context: DialogContext.GAME_INTRO_AFTER_STARTER}
+                payload: { context: DialogContext.LEVEL_1_THE_MESSAGE}
             }]
           };
         }); get().processNextEvent();},
@@ -197,7 +197,7 @@ export const useGameStore = create<GameState>()(
               } else {
                    initialEvents.push({
                        type: "SHOW_DIALOG",
-                       payload: { context: DialogContext.GAME_INTRO_AFTER_STARTER }
+                       payload: { context: DialogContext.LEVEL_1_THE_MESSAGE }
                    });
               }
           } else {
