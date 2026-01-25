@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, devtools } from "zustand/middleware";
 import {
   Screens,
   Profile,
@@ -11,8 +11,9 @@ import {
   BattleContext,
 } from "@/types/baseGame";
 import { MAX_PROFILES } from "@/constants/game";
-import { GameEvent, ShowDialogEventPayload } from "@/types/baseGame";
+import { GameEvent, ShowDialogEventPayload, PickStarterEventPayload } from "@/types/baseGame";
 import { BATTLES } from "@/constants/battles";
+import { STARTER_CRAB, STARTER_IGUANA, STARTER_MONKEY } from "@/constants/dialogs";
 
 
 interface GameState {
@@ -48,7 +49,8 @@ interface GameState {
 }
 
 export const useGameStore = create<GameState>()(
-  persist(
+  devtools(
+    persist(
     (set, get) => ({
       currentScreen: Screens.START,
       dialogContext: null,
@@ -107,7 +109,36 @@ export const useGameStore = create<GameState>()(
                   updates = { ...updates, currentScreen: Screens.PROFILES };
                   break;
               }
-              // Add other cases as needed
+              case "PICK_STARTER": {
+                  const payload = nextEvent.payload as PickStarterEventPayload;
+                  const state = get();
+                  if (state.currentProfileId !== null && payload.creatureId) {
+                      const creatureMap: Record<string, Creature> = {
+                        starter_grass: STARTER_CRAB,
+                        starter_fire: STARTER_IGUANA,
+                        starter_water: STARTER_MONKEY,
+                      };
+                      const creature = creatureMap[payload.creatureId];
+                      if (creature) {
+                          // We can't use `addCreatureToProfile` directly because we are inside `set` via `processNextEvent`.
+                          // `addCreatureToProfile` calls `set` itself.
+                          // So we must manually update the profile here or queue another action?
+                          // Actually `processNextEvent` is returning `updates` to `set`.
+                          // So we should update `profiles` in `updates`.
+                          
+                          const newProfiles = [...state.profiles];
+                          const profile = newProfiles[state.currentProfileId];
+                          if (profile) {
+                              newProfiles[state.currentProfileId] = {
+                                  ...profile,
+                                  creatures: [...profile.creatures, { ...creature }]
+                              };
+                              updates = { ...updates, profiles: newProfiles };
+                          }
+                      }
+                  }
+                  break;
+              }
           }
 
           return updates;
@@ -244,6 +275,7 @@ export const useGameStore = create<GameState>()(
         profiles: state.profiles,
       }),
     }
+    )
   )
 );
 

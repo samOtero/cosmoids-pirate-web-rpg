@@ -118,20 +118,11 @@ export default function Home() {
     const handleDialogAction = (action: DialogAction) => {
       switch (action.type) {
         case "PICK_STARTER":
-          if (action.payload?.creatureId && currentProfileId !== null) {
-            const creatureMap: Record<string, typeof STARTER_CRAB> = {
-              starter_grass: STARTER_CRAB,
-              starter_fire: STARTER_IGUANA,
-              starter_water: STARTER_MONKEY,
-            };
-            const creature = creatureMap[action.payload?.creatureId];
-            if (creature) {
-              addCreatureToProfile(currentProfileId, { ...creature });
-            }
-          } else {
-            throw new Error(
-              "Invalid starter selection or no profile selected."
-            );
+          if (action.payload?.creatureId) {
+             enqueueAndProcessEvents([{ 
+                 type: "PICK_STARTER", 
+                 payload: { creatureId: action.payload.creatureId } 
+             }]);
           }
           break;
         default:

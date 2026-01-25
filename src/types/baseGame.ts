@@ -173,16 +173,21 @@ export type GameEventType =
   | "SHOW_DIALOG"
   | "START_BATTLE"
   | "GO_TO_MAP"
-  | "GO_TO_PROFILES";
+  | "GO_TO_PROFILES"
+  | "PICK_STARTER";
 
 export interface GameEvent {
   type: GameEventType;
-  payload?: ShowDialogEventPayload | StartBattleEventPayload | GoToMapEventPayload;
+  payload?: ShowDialogEventPayload | StartBattleEventPayload | GoToMapEventPayload | PickStarterEventPayload;
 }
 
 export interface ShowDialogEventPayload {
   context: DialogContext;
   contextData?: DialogContextData;
+}
+
+export interface PickStarterEventPayload {
+  creatureId: string;
 }
 
 export enum BattleContext {
