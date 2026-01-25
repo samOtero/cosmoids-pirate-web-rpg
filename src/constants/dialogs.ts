@@ -92,3 +92,4 @@ export * from "./dialogs/islandDefeat";
 export * from "./dialogs/examples";
 export * from "./dialogs/starterBattleLose";
 export * from "./dialogs/level1TheMessage";
+export * from "./dialogs/level1Win";
