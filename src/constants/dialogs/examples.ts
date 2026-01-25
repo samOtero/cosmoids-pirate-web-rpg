@@ -101,6 +101,6 @@ export const EXAMPLE_DIALOG_WITH_LINE_JUMPING: DialogConfig = {
   ],
   "backgroundImageKey": BackgroundImageKey.FIRST_TOWN_DOCKS,
   "next": {
-    "screen": "MAP"
+    "screen": Screens.MAP
   }
 };

@@ -186,8 +186,20 @@ export interface ShowDialogEventPayload {
   contextData?: DialogContextData;
 }
 
+export enum BattleContext {
+  FIRST_BATTLE = "FIRST_BATTLE",
+}
+
+export interface BattleConfig {
+  enemy: Creature;
+  backgroundImageKey: BackgroundImageKey;
+  winEvents: GameEvent[];
+  loseEvents: GameEvent[];
+}
+
 export interface StartBattleEventPayload {
-  enemyId: string;
+  context?: BattleContext;
+  enemyId?: string;
   backgroundKey?: BackgroundImageKey;
 }
 

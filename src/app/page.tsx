@@ -36,6 +36,8 @@ export default function Home() {
     processNextEvent,
     enqueueEvent,
     enqueueAndProcessEvents,
+    handleBattleWin,
+    handleBattleLose,
   } = useGameStore();
 
   // Also handle "WAIT" events or similar if implemented in the store processor, 
@@ -75,12 +77,10 @@ export default function Home() {
              }
 
              if (won) {
-                 // Could go to a victory dialog
-                 setScreen(Screens.MAP); 
+                 handleBattleWin();
              } else {
-                 setScreen(Screens.MAP);
+                 handleBattleLose();
              }
-             clearCurrentEnemy();
           }}
         />
       </Suspense>

@@ -4,6 +4,7 @@ import {
   Screens,
   BackgroundImageKey,
   DialogContext,
+  BattleContext
 } from "@/types/baseGame";
 
 export const AFTER_STARTER_CHOICE_DIALOG: DialogConfig = {
@@ -299,7 +300,4 @@ export const AFTER_STARTER_CHOICE_DIALOG: DialogConfig = {
     },
   ],
   backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
-  next: {
-    screen: Screens.MAP,
-  },
 };

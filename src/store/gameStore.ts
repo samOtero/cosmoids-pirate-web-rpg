@@ -6,9 +6,12 @@ import {
   DialogContext,
   DialogContextData,
   Creature,
+  BattleConfig,
+  StartBattleEventPayload,
 } from "@/types/baseGame";
 import { MAX_PROFILES } from "@/constants/game";
 import { GameEvent, ShowDialogEventPayload } from "@/types/baseGame";
+import { BATTLES } from "@/constants/battles";
 
 
 interface GameState {
@@ -30,6 +33,10 @@ interface GameState {
   setCurrentEnemy: (enemy: Creature) => void;
   clearCurrentEnemy: () => void;
   completeIntroduction: () => void;
+  // Battle Config
+  currentBattle: BattleConfig | null;
+  handleBattleWin: () => void;
+  handleBattleLose: () => void;
   // Event Queue
   eventQueue: GameEvent[];
   enqueueEvent: (event: GameEvent) => void;
@@ -78,8 +85,20 @@ export const useGameStore = create<GameState>()(
                   break;
               }
               case "START_BATTLE": {
+                  const payload = nextEvent.payload as StartBattleEventPayload;
                   updates = { ...updates, currentScreen: Screens.BATTLE };
-                  // Note: Store might need a way to set the specific battle config from payload
+                  
+                  if (payload.context && BATTLES[payload.context]) {
+                      const battleConfig = BATTLES[payload.context];
+                      updates = {
+                          ...updates,
+                          currentBattle: battleConfig,
+                          currentEnemy: battleConfig.enemy
+                      };
+                  } else if (payload.enemyId) {
+                      // Legacy/Manual enemy capability could be handled here if needed
+                      // For now we rely on explicit BattleContext
+                  }
                   break;
               }
               case "GO_TO_MAP": {
@@ -99,6 +118,21 @@ export const useGameStore = create<GameState>()(
       currentEnemy: null,
       setCurrentEnemy: (enemy) => set({ currentEnemy: enemy }),
       clearCurrentEnemy: () => set({ currentEnemy: null }),
+      currentBattle: null,
+      handleBattleWin: () => {
+          const state = get();
+          if (state.currentBattle) {
+              get().enqueueAndProcessEvents(state.currentBattle.winEvents);
+          }
+           set({ currentBattle: null, currentEnemy: null });
+      },
+      handleBattleLose: () => {
+          const state = get();
+          if (state.currentBattle) {
+              get().enqueueAndProcessEvents(state.currentBattle.loseEvents);
+          }
+          set({ currentBattle: null, currentEnemy: null });
+      },
       profiles: Array(MAX_PROFILES).fill(null),
       currentProfileId: null,
       createProfile: (slotId: number) => {
@@ -189,7 +223,7 @@ export const useGameStore = create<GameState>()(
                  newProfiles[state.currentProfileId] = {
                     ...newProfiles[state.currentProfileId]!,
                     isNew: false,
-                 };
+                  };
             }
             return { profiles: newProfiles };
         }),
@@ -215,3 +249,4 @@ export const useGameStore = create<GameState>()(
     }
   )
 );
+
