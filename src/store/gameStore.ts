@@ -8,6 +8,7 @@ import {
   Creature,
   BattleConfig,
   StartBattleEventPayload,
+  BattleContext,
 } from "@/types/baseGame";
 import { MAX_PROFILES } from "@/constants/game";
 import { GameEvent, ShowDialogEventPayload } from "@/types/baseGame";
@@ -95,9 +96,6 @@ export const useGameStore = create<GameState>()(
                           currentBattle: battleConfig,
                           currentEnemy: battleConfig.enemy
                       };
-                  } else if (payload.enemyId) {
-                      // Legacy/Manual enemy capability could be handled here if needed
-                      // For now we rely on explicit BattleContext
                   }
                   break;
               }
@@ -158,7 +156,7 @@ export const useGameStore = create<GameState>()(
             }, {
                 type: "SHOW_DIALOG",
                 payload: { context: DialogContext.LEVEL_1_THE_MESSAGE}
-            }]
+            }, { type: "START_BATTLE", payload: { context: BattleContext.FIRST_BATTLE } }]
           };
         }); get().processNextEvent();},
       deleteProfile: (slotId: number) =>
