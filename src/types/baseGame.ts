@@ -157,6 +157,7 @@ export enum DialogContext {
 export interface DialogContextData {
   islandId?: number;
   creatureId?: string;
+  dialogStartIndex?: number;
 }
 
 export interface DialogTransition {

@@ -114,6 +114,8 @@ export default function Home() {
       dialogContextData
     );
 
+    const {dialogStartIndex = 0 } = dialogContextData || {};
+
     const handleDialogAction = (action: DialogAction) => {
       switch (action.type) {
         case "CHANGE_SCREEN":
@@ -224,6 +226,7 @@ export default function Home() {
           backgroundImageKey={backgroundImageKey}
           onContinue={handleContinue}
           onDialogAction={handleDialogAction}
+          initialLineIndex={dialogStartIndex}
         />
       </Suspense>
     );

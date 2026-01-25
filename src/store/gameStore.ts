@@ -152,7 +152,7 @@ export const useGameStore = create<GameState>()(
             currentProfileId: slotId,
             eventQueue: [{
                 type: "SHOW_DIALOG",
-                payload: { context: DialogContext.GAME_INTRO }
+                payload: { context: DialogContext.GAME_INTRO, contextData: {dialogStartIndex: 0} }
             }, {
                 type: "SHOW_DIALOG",
                 payload: { context: DialogContext.LEVEL_1_THE_MESSAGE}
@@ -190,7 +190,7 @@ export const useGameStore = create<GameState>()(
               if (profile.creatures.length === 0) {
                    initialEvents.push({
                        type: "SHOW_DIALOG",
-                       payload: { context: DialogContext.GAME_INTRO }
+                       payload: { context: DialogContext.GAME_INTRO, contextData: {dialogStartIndex: 0} }
                    });
               } else {
                    initialEvents.push({
