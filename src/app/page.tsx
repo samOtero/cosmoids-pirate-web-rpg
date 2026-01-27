@@ -35,6 +35,7 @@ export default function Home() {
     processNextEvent,
     enqueueEvent,
     enqueueAndProcessEvents,
+    pushEventToFront,
     handleBattleWin,
     handleBattleLose,
   } = useGameStore();
@@ -117,12 +118,10 @@ export default function Home() {
 
     const handleDialogAction = (action: DialogAction) => {
       switch (action.type) {
-        case "PICK_STARTER":
-          if (action.payload?.creatureId) {
-             enqueueAndProcessEvents([{ 
-                 type: "PICK_STARTER", 
-                 payload: { creatureId: action.payload.creatureId } 
-             }]);
+        case "PROCESS_EVENT":
+          if (action.payload?.event) {
+             pushEventToFront(action.payload.event);
+             processNextEvent();
           }
           break;
         default:

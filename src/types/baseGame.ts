@@ -115,11 +115,13 @@ export function getButtonClasses(type: DialogButtonType): string {
   return `${BUTTON_BASE_CLASSES} ${typeClasses}`;
 }
 
-export type DialogActionType = "PICK_STARTER";
+export type DialogActionType = "PROCESS_EVENT";
 
 export interface DialogAction {
   type: DialogActionType;
-  payload?: Record<string, string>;
+  payload: {
+    event: GameEvent;
+  };
 }
 
 export interface DialogButton {

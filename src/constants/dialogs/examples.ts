@@ -58,9 +58,14 @@ export const EXAMPLE_DIALOG_WITH_LINE_JUMPING: DialogConfig = {
           "label": "Yes, grass for me",
           "type": "confirm",
           "action": {
-            "type": "CHANGE_SCREEN",
+            "type": "PROCESS_EVENT",
             "payload": {
-              "screen": "MAP"
+              "event": {
+                "type": "GO_TO_MAP",
+                "payload": {
+                  "islandId": 0
+                }
+              }
             }
           }
         },
@@ -85,9 +90,14 @@ export const EXAMPLE_DIALOG_WITH_LINE_JUMPING: DialogConfig = {
           "label": "Yes, water for me",
           "type": "confirm",
           "action": {
-            "type": "CHANGE_SCREEN",
+            "type": "PROCESS_EVENT",
             "payload": {
-              "screen": "MAP"
+              "event": {
+                "type": "GO_TO_MAP",
+                "payload": {
+                  "islandId": 0
+                }
+              }
             }
           }
         },

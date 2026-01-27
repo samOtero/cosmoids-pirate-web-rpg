@@ -21,7 +21,7 @@ import DialogScreen from "@/app/components/dialogScreen";
 const SPEAKER_OPTIONS = Object.values(SpeakerImageKey);
 const BACKGROUND_OPTIONS = Object.values(BackgroundImageKey);
 const BUTTON_TYPE_OPTIONS = Object.keys(DialogButtonTypeConfig) as DialogButtonType[];
-const ACTION_TYPE_OPTIONS: DialogActionType[] = ["PICK_STARTER"];
+const ACTION_TYPE_OPTIONS: DialogActionType[] = ["PROCESS_EVENT"];
 
 const DEFAULT_LINE: DialogLine = {
   text: "New line...",
@@ -445,7 +445,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                                         } else {
                                             newButtons[bIdx].action = { 
                                                 type: e.target.value as DialogActionType,
-                                                payload: newButtons[bIdx].action?.payload 
+                                                payload: newButtons[bIdx].action?.payload || { event: { type: "SHOW_DIALOG", payload: { context: "GAME_INTRO" as any } } }
                                             };
                                         }
                                         updateLine(selectedLineIndex, { ...line, buttons: newButtons });

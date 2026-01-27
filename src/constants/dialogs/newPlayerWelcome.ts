@@ -140,8 +140,13 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           type: "confirm",
           jumpToLineId: "after_starter_choice",
           action: {
-            type: "PICK_STARTER",
-            payload: { creatureId: "starter_grass" },
+            type: "PROCESS_EVENT",
+            payload: {
+              event: {
+                type: "PICK_STARTER",
+                payload: { creatureId: "starter_grass" },
+              },
+            },
           },
         },
         {
@@ -171,8 +176,13 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           type: "confirm",
           jumpToLineId: "after_starter_choice",
           action: {
-            type: "PICK_STARTER",
-            payload: { creatureId: "starter_fire" },
+            type: "PROCESS_EVENT",
+            payload: {
+              event: {
+                type: "PICK_STARTER",
+                payload: { creatureId: "starter_fire" },
+              },
+            },
           },
         },
         {
@@ -201,8 +211,13 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           type: "confirm",
           jumpToLineId: "after_starter_choice",
           action: {
-            type: "PICK_STARTER",
-            payload: { creatureId: "starter_water" },
+            type: "PROCESS_EVENT",
+            payload: {
+              event: {
+                type: "PICK_STARTER",
+                payload: { creatureId: "starter_water" },
+              },
+            },
           },
         },
         {
