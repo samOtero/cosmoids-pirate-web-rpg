@@ -2,28 +2,28 @@ import {
   DialogConfig,
   SpeakerImageKey,
   BackgroundImageKey,
-} from "@/types/baseGame";
+} from '@/types/baseGame';
 
 export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
   sequence: [
     {
-      portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
+      portraits: [{ key: SpeakerImageKey.EMPTY, displayName: '' }],
       text: "On the morning of Caleb's birthday, in the small coastal town of Seabreeze...",
     },
     {
       portraits: [
         {
           key: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
-          displayName: "Caleb",
+          displayName: 'Caleb',
         },
       ],
-      text: "...",
+      text: '...',
     },
     {
       portraits: [
         {
           key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: "Grandpa",
+          displayName: 'Grandpa',
         },
       ],
       text: "Up with the sun? Usually I can't get you out of bed at all.",
@@ -32,7 +32,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       portraits: [
         {
           key: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
-          displayName: "Caleb",
+          displayName: 'Caleb',
         },
       ],
       text: "It's special today, Grandpa. They said they'd be back.",
@@ -41,7 +41,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       portraits: [
         {
           key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: "Grandpa",
+          displayName: 'Grandpa',
         },
       ],
       text: "The sea is unpredictable, Caleb. But don't worry, they didn't forget.",
@@ -50,74 +50,74 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       portraits: [
         {
           key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: "Grandpa",
+          displayName: 'Grandpa',
         },
         {
           key: SpeakerImageKey.STARTER_CHEST_CLOSED,
-          displayName: "Birthday Chest",
+          displayName: 'Birthday Chest',
         },
       ],
-      text: "They sent your gift ahead of time. Just in case.",
+      text: 'They sent your gift ahead of time. Just in case.',
     },
     {
-      portraits: [{ key: SpeakerImageKey.EMPTY, displayName: "" }],
-      text: "Grandpa hands Caleb a small wooden chest.",
+      portraits: [{ key: SpeakerImageKey.EMPTY, displayName: '' }],
+      text: 'Grandpa hands Caleb a small wooden chest.',
     },
     {
       portraits: [
         {
           key: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
-          displayName: "Caleb",
+          displayName: 'Caleb',
         },
         {
           key: SpeakerImageKey.STARTER_CHEST_OPEN,
-          displayName: "Birthday Chest",
+          displayName: 'Birthday Chest',
         },
       ],
-      text: "Are these...?",
+      text: 'Are these...?',
     },
     {
       portraits: [
         {
           key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: "Grandpa",
+          displayName: 'Grandpa',
         },
       ],
-      text: "Yes, Cosmoid doubloons. As the tradition goes, you must pick one out of the three.",
+      text: 'Yes, Cosmoid doubloons. As the tradition goes, you must pick one out of the three.',
     },
     {
       portraits: [
         {
           key: SpeakerImageKey.STARTER_1_CRAB,
-          displayName: "Palmit",
+          displayName: 'Palmit',
         },
         {
           key: SpeakerImageKey.STARTER_2_IGUANA,
-          displayName: "Fueguana",
-          portraitWidth: "wide",
+          displayName: 'Fueguana',
+          portraitWidth: 'wide',
         },
         {
           key: SpeakerImageKey.STARTER_3_MONKEY,
-          displayName: "Monkeg",
+          displayName: 'Monkeg',
         },
       ],
-      id: "starter_choice",
-      text: "Pick your starter Cosmoid!",
+      id: 'starter_choice',
+      text: 'Pick your starter Cosmoid!',
       buttons: [
         {
-          label: "Palmit",
-          type: "grass",
-          jumpToLineId: "palmit_choice",
+          label: 'Palmit',
+          type: 'grass',
+          jumpToLineId: 'palmit_choice',
         },
         {
-          label: "Fueguana",
-          type: "fire",
-          jumpToLineId: "fueguana_choice",
+          label: 'Fueguana',
+          type: 'fire',
+          jumpToLineId: 'fueguana_choice',
         },
         {
-          label: "Monkeg",
-          type: "water",
-          jumpToLineId: "monkeg_choice",
+          label: 'Monkeg',
+          type: 'water',
+          jumpToLineId: 'monkeg_choice',
         },
       ],
     },
@@ -125,34 +125,34 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       portraits: [
         {
           key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: "Grandpa",
+          displayName: 'Grandpa',
         },
         {
           key: SpeakerImageKey.STARTER_1_CRAB,
-          displayName: "Palmit",
+          displayName: 'Palmit',
         },
       ],
-      id: "palmit_choice",
-      text: "A sturdy choice! It has prepared its own coconut raft to brave the salt water. So, are you sure you want to choose Palmit?",
+      id: 'palmit_choice',
+      text: 'A sturdy choice! It has prepared its own coconut raft to brave the salt water. So, are you sure you want to choose Palmit?',
       buttons: [
         {
-          label: "Yes",
-          type: "confirm",
-          jumpToLineId: "after_starter_choice",
+          label: 'Yes',
+          type: 'confirm',
+          jumpToLineId: 'after_starter_choice',
           action: {
-            type: "PROCESS_EVENT",
+            type: 'PROCESS_EVENT',
             payload: {
               event: {
-                type: "PICK_STARTER",
-                payload: { creatureId: "starter_grass" },
+                type: 'PICK_STARTER',
+                payload: { creatureId: 'starter_grass' },
               },
             },
           },
         },
         {
-          label: "No",
-          type: "cancel",
-          jumpToLineId: "starter_choice",
+          label: 'No',
+          type: 'cancel',
+          jumpToLineId: 'starter_choice',
         },
       ],
     },
@@ -160,35 +160,35 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       portraits: [
         {
           key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: "Grandpa",
+          displayName: 'Grandpa',
         },
         {
           key: SpeakerImageKey.STARTER_2_IGUANA,
-          displayName: "Fueguana",
-          portraitWidth: "wide",
+          displayName: 'Fueguana',
+          portraitWidth: 'wide',
         },
       ],
-      id: "fueguana_choice",
-      text: "Oho, a fiery spirit! It has a knack for mischief and gunpowder. So, are you sure you want to choose Fueguana?",
+      id: 'fueguana_choice',
+      text: 'Oho, a fiery spirit! It has a knack for mischief and gunpowder. So, are you sure you want to choose Fueguana?',
       buttons: [
         {
-          label: "Yes",
-          type: "confirm",
-          jumpToLineId: "after_starter_choice",
+          label: 'Yes',
+          type: 'confirm',
+          jumpToLineId: 'after_starter_choice',
           action: {
-            type: "PROCESS_EVENT",
+            type: 'PROCESS_EVENT',
             payload: {
               event: {
-                type: "PICK_STARTER",
-                payload: { creatureId: "starter_fire" },
+                type: 'PICK_STARTER',
+                payload: { creatureId: 'starter_fire' },
               },
             },
           },
         },
         {
-          label: "No",
-          type: "cancel",
-          jumpToLineId: "starter_choice",
+          label: 'No',
+          type: 'cancel',
+          jumpToLineId: 'starter_choice',
         },
       ],
     },
@@ -196,34 +196,34 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       portraits: [
         {
           key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: "Grandpa",
+          displayName: 'Grandpa',
         },
         {
           key: SpeakerImageKey.STARTER_3_MONKEY,
-          displayName: "Monkeg",
+          displayName: 'Monkeg',
         },
       ],
-      id: "monkeg_choice",
+      id: 'monkeg_choice',
       text: "Ah, the shy stowaway. It may prefer hiding in its barrel right now, but it's a loyal navigator. So, are you sure you want to choose Monkeg?",
       buttons: [
         {
-          label: "Yes",
-          type: "confirm",
-          jumpToLineId: "after_starter_choice",
+          label: 'Yes',
+          type: 'confirm',
+          jumpToLineId: 'after_starter_choice',
           action: {
-            type: "PROCESS_EVENT",
+            type: 'PROCESS_EVENT',
             payload: {
               event: {
-                type: "PICK_STARTER",
-                payload: { creatureId: "starter_water" },
+                type: 'PICK_STARTER',
+                payload: { creatureId: 'starter_water' },
               },
             },
           },
         },
         {
-          label: "No",
-          type: "cancel",
-          jumpToLineId: "starter_choice",
+          label: 'No',
+          type: 'cancel',
+          jumpToLineId: 'starter_choice',
         },
       ],
     },
@@ -231,16 +231,12 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       portraits: [
         {
           key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: "Grandpa",
+          displayName: 'Grandpa',
         },
       ],
-      id: "after_starter_choice",
-      text: "A fine choice! I know you two will look out for each other. Now, hold that doubloon tight, Caleb... your journey officially beg-",
+      id: 'after_starter_choice',
+      text: 'A fine choice! I know you two will look out for each other. Now, hold that doubloon tight, Caleb... your journey officially beg-',
     },
   ],
   backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
 };
-
-
-
-

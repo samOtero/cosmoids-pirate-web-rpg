@@ -1,0 +1,24 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.nuxt/
+
+# Logs and system files
+*.log
+.DS_Store
+.eslintcache
+.stylelintcache
+
+# Version control
+.git/
+.svn/
+.hg/
+
+# Coverage reports
+coverage/

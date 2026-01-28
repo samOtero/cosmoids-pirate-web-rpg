@@ -17,10 +17,18 @@ interface BattleScreenUIProps {
   inventory: Item[];
 }
 
-const BattleScreenUI: React.FC<BattleScreenUIProps> = ({ 
-  playerCreature, enemyCreature, onAttack, onHeal, onRun, battleLog, isPlayerTurn, battleOver, inventory 
+const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
+  playerCreature,
+  enemyCreature,
+  onAttack,
+  onHeal,
+  onRun,
+  battleLog,
+  isPlayerTurn,
+  battleOver,
+  inventory,
 }) => {
-  const potion = inventory.find(i => i.id === 'potion');
+  const potion = inventory.find((i) => i.id === 'potion');
   const potionCount = potion ? potion.count : 0;
   const logEndRef = useRef<HTMLDivElement>(null);
 
@@ -33,66 +41,81 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
       {/* Battle Arena Wrapper - Restricts background to this area */}
       <div className="relative flex-1 min-h-0 w-full">
         <BattleBackground />
-        
+
         {/* Battle Arena Content */}
         <div className="relative h-full p-2 md:p-4 flex flex-row items-end justify-between w-full z-10">
-          
           {/* Player Group - Left */}
-          <CreatureStatus creature={playerCreature} variant="friend" showHpValues />
+          <CreatureStatus
+            creature={playerCreature}
+            variant="friend"
+            showHpValues
+          />
 
           {/* Enemy Group - Right */}
-          <CreatureStatus creature={enemyCreature} variant="enemy" showHpValues />
+          <CreatureStatus
+            creature={enemyCreature}
+            variant="enemy"
+            showHpValues
+          />
         </div>
       </div>
 
       {/* Log & Controls Area - Fixed Height / No Shrink */}
       <div className="bg-ocean-dark border-t-4 border-wood p-2 md:p-4 z-20 shadow-2xl shrink-0">
-         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
-            
-            {/* Battle Log */}
-            <div className="bg-black/40 border-2 border-wood-light/30 rounded p-2 h-24 md:h-32 overflow-y-auto font-mono text-xs md:text-sm text-sand leading-relaxed">
-              {battleLog.length === 0 ? <p className="opacity-50">Battle started...</p> : 
-                battleLog.map((log, i) => (
-                  <p key={i} className="mb-1 border-b border-white/5 pb-1 last:border-0">{log}</p>
-                ))
-              }
-              <div ref={logEndRef}></div>
-            </div>
+        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4">
+          {/* Battle Log */}
+          <div className="bg-black/40 border-2 border-wood-light/30 rounded p-2 h-24 md:h-32 overflow-y-auto font-mono text-xs md:text-sm text-sand leading-relaxed">
+            {battleLog.length === 0 ? (
+              <p className="opacity-50">Battle started...</p>
+            ) : (
+              battleLog.map((log, i) => (
+                <p
+                  key={i}
+                  className="mb-1 border-b border-white/5 pb-1 last:border-0"
+                >
+                  {log}
+                </p>
+              ))
+            )}
+            <div ref={logEndRef}></div>
+          </div>
 
-            {/* Controls */}
-            <div className="grid grid-cols-2 gap-2 h-24 md:h-32">
-               {playerCreature.moves.map((move, idx) => (
-                 <Button 
-                    key={move} 
-                    variant="wood" 
-                    disabled={!isPlayerTurn || battleOver}
-                    onClick={() => onAttack(idx)}
-                    className="text-xs md:text-sm h-full flex items-center justify-center"
-                 >
-                   {move}
-                 </Button>
-               ))}
-               
-               <Button 
-                 variant="secondary" 
-                 disabled={!isPlayerTurn || battleOver || potionCount === 0}
-                 onClick={onHeal}
-                 className="flex flex-col items-center justify-center h-full text-xs md:text-sm"
-               >
-                 <span>Bag</span>
-                 <span className="text-[10px] opacity-70">Potions: {potionCount}</span>
-               </Button>
-               
-               <Button 
-                 variant="danger" 
-                 onClick={onRun}
-                 disabled={!isPlayerTurn || battleOver}
-                 className="h-full flex items-center justify-center text-xs md:text-sm"
-               >
-                 Run
-               </Button>
-            </div>
-         </div>
+          {/* Controls */}
+          <div className="grid grid-cols-2 gap-2 h-24 md:h-32">
+            {playerCreature.moves.map((move, idx) => (
+              <Button
+                key={move}
+                variant="wood"
+                disabled={!isPlayerTurn || battleOver}
+                onClick={() => onAttack(idx)}
+                className="text-xs md:text-sm h-full flex items-center justify-center"
+              >
+                {move}
+              </Button>
+            ))}
+
+            <Button
+              variant="secondary"
+              disabled={!isPlayerTurn || battleOver || potionCount === 0}
+              onClick={onHeal}
+              className="flex flex-col items-center justify-center h-full text-xs md:text-sm"
+            >
+              <span>Bag</span>
+              <span className="text-[10px] opacity-70">
+                Potions: {potionCount}
+              </span>
+            </Button>
+
+            <Button
+              variant="danger"
+              onClick={onRun}
+              disabled={!isPlayerTurn || battleOver}
+              className="h-full flex items-center justify-center text-xs md:text-sm"
+            >
+              Run
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -100,13 +123,18 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
 
 // --- Logic Wrapper ---
 interface BattleScreenLogicProps {
-  playerCreature: Creature; 
+  playerCreature: Creature;
   enemyCreature: Creature;
   inventory: Item[];
   onBattleEnd: (won: boolean) => void;
 }
 
-export default function BattleScreen({ playerCreature, enemyCreature, inventory, onBattleEnd }: BattleScreenLogicProps) {
+export default function BattleScreen({
+  playerCreature,
+  enemyCreature,
+  inventory,
+  onBattleEnd,
+}: BattleScreenLogicProps) {
   // Local state for the battle loop so we don't mutate global store directly until the end
   const [playerHp, setPlayerHp] = useState(playerCreature.currentHp);
   const [enemyHp, setEnemyHp] = useState(enemyCreature.currentHp);
@@ -116,7 +144,7 @@ export default function BattleScreen({ playerCreature, enemyCreature, inventory,
 
   // Simple logging helper
   const addLog = (msg: string) => {
-    setBattleLog(prev => [...prev, msg]);
+    setBattleLog((prev) => [...prev, msg]);
   };
 
   useEffect(() => {
@@ -138,40 +166,45 @@ export default function BattleScreen({ playerCreature, enemyCreature, inventory,
   // Enemy turn logic
   useEffect(() => {
     if (!isPlayerTurn && !battleOver) {
-        const timer = setTimeout(() => {
-            // Enemy attacks
-            const damage = Math.max(1, Math.floor(enemyCreature.attack - (playerCreature.defense / 2)));
-            setPlayerHp(prev => prev - damage);
-            addLog(`${enemyCreature.name} attacked doing ${damage} damage!`);
-            setIsPlayerTurn(true);
-        }, 1000);
-        return () => clearTimeout(timer);
+      const timer = setTimeout(() => {
+        // Enemy attacks
+        const damage = Math.max(
+          1,
+          Math.floor(enemyCreature.attack - playerCreature.defense / 2)
+        );
+        setPlayerHp((prev) => prev - damage);
+        addLog(`${enemyCreature.name} attacked doing ${damage} damage!`);
+        setIsPlayerTurn(true);
+      }, 1000);
+      return () => clearTimeout(timer);
     }
   }, [isPlayerTurn, battleOver]);
-
 
   const handleAttack = (moveIndex: number) => {
     if (!isPlayerTurn || battleOver) return;
 
     // Calc damage
     const moveName = playerCreature.moves[moveIndex];
-    const damage = Math.max(1, Math.floor(playerCreature.attack - (enemyCreature.defense / 2)));
-    setEnemyHp(prev => prev - damage);
+    const damage = Math.max(
+      1,
+      Math.floor(playerCreature.attack - enemyCreature.defense / 2)
+    );
+    setEnemyHp((prev) => prev - damage);
     addLog(`${playerCreature.name} used ${moveName} doing ${damage} damage!`);
-    
+
     setIsPlayerTurn(false);
   };
 
   const handleHeal = () => {
     if (!isPlayerTurn || battleOver) return;
     // Logic to use potion would go here - for now just skip turn effectively or implement heal if we updated inventory
-    addLog("You used a potion! (Not implemented fully yet)");
+    addLog('You used a potion! (Not implemented fully yet)');
     setIsPlayerTurn(false);
   };
 
   const handleRun = () => {
     if (!isPlayerTurn || battleOver) return;
-    addLog("You ran away safely!");
+    addLog('You ran away safely!');
     setBattleOver(true);
     setTimeout(() => onBattleEnd(false), 1000);
   };
