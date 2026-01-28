@@ -80,6 +80,7 @@ export interface Profile {
   inventory: Item[];
   unlockedIslands: number; // Max island index unlocked
   currentIslandId: number;
+  starterCreatureId: string | null;
 }
 
 export interface Island {

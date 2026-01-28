@@ -141,7 +141,8 @@ export const useGameStore = create<GameState>()(
                                 const profile = newProfiles[currentProfileId]!;
                                 newProfiles[currentProfileId] = {
                                     ...profile,
-                                    creatures: [...profile.creatures, { ...creature }]
+                                    creatures: [...profile.creatures, { ...creature }],
+                                    starterCreatureId: payload.creatureId
                                 };
                                 updates = { ...updates, profiles: newProfiles };
                              }
@@ -199,6 +200,7 @@ export const useGameStore = create<GameState>()(
             inventory: [],
             unlockedIslands: 0,
             currentIslandId: 0,
+            starterCreatureId: null,
           };
           return {
             profiles: newProfiles,

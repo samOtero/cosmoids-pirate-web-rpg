@@ -1,7 +1,6 @@
 import { renderHook, act } from "@testing-library/react";
 import { useGameStore } from "../../store/gameStore";
-import { BattleContext, DialogContext, GameEvent, Screens, ShowDialogEventPayload } from "../../types/baseGame";
-import { BATTLES } from "../../constants/battles";
+import { BattleContext, DialogContext, GameEvent, Screens } from "../../types/baseGame";
 
 // Mock localStorage to avoid persist errors
 const localStorageMock = (function () {
