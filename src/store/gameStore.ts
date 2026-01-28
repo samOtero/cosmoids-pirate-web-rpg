@@ -84,13 +84,8 @@ export const useGameStore = create<GameState>()(
           while (shouldContinue) {
              switch (currentEvent.type) {
                 case "SHOW_DIALOG": {
-                    const payload = currentEvent.payload as ShowDialogEventPayload;
-                    updates = { 
-                        ...updates, 
-                        currentScreen: Screens.DIALOG, 
-                        dialogContext: payload.context || null,
-                        dialogContextData: payload.contextData || null
-                    };
+                    const dialogPayload = currentEvent.payload as ShowDialogEventPayload;
+                    state.setScreen(Screens.DIALOG, dialogPayload.context || null, dialogPayload.contextData || undefined);
                     break;
                 }
                 case "START_BATTLE": {
@@ -108,11 +103,11 @@ export const useGameStore = create<GameState>()(
                     break;
                 }
                 case "GO_TO_MAP": {
-                    updates = { ...updates, currentScreen: Screens.MAP };
+                    state.setScreen(Screens.MAP);
                     break;
                 }
                 case "GO_TO_PROFILES": {
-                    updates = { ...updates, currentScreen: Screens.PROFILES };
+                    state.setScreen(Screens.PROFILES);
                     break;
                 }
                 case "PICK_STARTER": {
@@ -174,14 +169,14 @@ export const useGameStore = create<GameState>()(
       handleBattleWin: () => {
           const state = get();
           if (state.currentBattle) {
-              get().enqueueAndProcessEvents(state.currentBattle.winEvents);
+              state.enqueueAndProcessEvents(state.currentBattle.winEvents);
           }
            set({ currentBattle: null, currentEnemy: null }, false, "handleBattleWin");
       },
       handleBattleLose: () => {
           const state = get();
           if (state.currentBattle) {
-              get().enqueueAndProcessEvents(state.currentBattle.loseEvents);
+              state.enqueueAndProcessEvents(state.currentBattle.loseEvents);
           }
           set({ currentBattle: null, currentEnemy: null }, false, "handleBattleLose");
       },
