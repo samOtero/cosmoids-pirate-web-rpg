@@ -60,12 +60,12 @@ export const useGameStore = create<GameState>()(
           currentScreen: screen,
           dialogContext: context || null,
           dialogContextData: contextData || null,
-        }),
+        }, false, "setScreen"),
       eventQueue: [],
-      enqueueEvent: (event) => set((state) => ({ eventQueue: [...state.eventQueue, event] })),
-      pushEventToFront: (event) => set((state) => ({ eventQueue: [event, ...state.eventQueue] })),
+      enqueueEvent: (event) => set((state) => ({ eventQueue: [...state.eventQueue, event] }), false, "enqueueEvent"),
+      pushEventToFront: (event) => set((state) => ({ eventQueue: [event, ...state.eventQueue] }), false, "pushEventToFront"),
       enqueueAndProcessEvents: (events) => {
-        set((state) => ({ eventQueue: [...state.eventQueue, ...events] }));
+        set((state) => ({ eventQueue: [...state.eventQueue, ...events] }), false, "enqueueAndProcessEvents");
         get().processNextEvent();
       },
       processNextEvent: () =>
@@ -165,25 +165,25 @@ export const useGameStore = create<GameState>()(
            
           updates = { ...updates, eventQueue: currentQueue };
           return updates;
-        }),
-      clearQueue: () => set({ eventQueue: [] }),
+        }, false, "processNextEvent"),
+      clearQueue: () => set({ eventQueue: [] }, false, "clearQueue"),
       currentEnemy: null,
-      setCurrentEnemy: (enemy) => set({ currentEnemy: enemy }),
-      clearCurrentEnemy: () => set({ currentEnemy: null }),
+      setCurrentEnemy: (enemy) => set({ currentEnemy: enemy }, false, "setCurrentEnemy"),
+      clearCurrentEnemy: () => set({ currentEnemy: null }, false, "clearCurrentEnemy"),
       currentBattle: null,
       handleBattleWin: () => {
           const state = get();
           if (state.currentBattle) {
               get().enqueueAndProcessEvents(state.currentBattle.winEvents);
           }
-           set({ currentBattle: null, currentEnemy: null });
+           set({ currentBattle: null, currentEnemy: null }, false, "handleBattleWin");
       },
       handleBattleLose: () => {
           const state = get();
           if (state.currentBattle) {
               get().enqueueAndProcessEvents(state.currentBattle.loseEvents);
           }
-          set({ currentBattle: null, currentEnemy: null });
+          set({ currentBattle: null, currentEnemy: null }, false, "handleBattleLose");
       },
       profiles: Array(MAX_PROFILES).fill(null),
       currentProfileId: null,
@@ -213,7 +213,7 @@ export const useGameStore = create<GameState>()(
                 payload: { context: DialogContext.LEVEL_1_THE_MESSAGE, contextData: {dialogStartIndex: 1}}
             }, { type: "START_BATTLE", payload: { context: BattleContext.FIRST_BATTLE } }]
           };
-        }); get().processNextEvent();},
+        }, false, "createProfile"); get().processNextEvent();},
       deleteProfile: (slotId: number) =>
         set((state) => {
           if (slotId < 0 || slotId >= MAX_PROFILES) return state;
@@ -224,7 +224,7 @@ export const useGameStore = create<GameState>()(
             currentProfileId:
               state.currentProfileId === slotId ? null : state.currentProfileId,
           };
-        }),
+        }, false, "deleteProfile"),
       selectProfile: (slotId: number) => {
         set((state) => {
           if (slotId < 0 || slotId >= MAX_PROFILES || !state.profiles[slotId])
@@ -264,7 +264,7 @@ export const useGameStore = create<GameState>()(
             currentProfileId: slotId,
             eventQueue: initialEvents,
           };
-        });
+        }, false, "selectProfile");
         get().processNextEvent();
       },
       completeIntroduction: () => 
@@ -278,7 +278,7 @@ export const useGameStore = create<GameState>()(
                   };
             }
             return { profiles: newProfiles };
-        }),
+        }, false, "completeIntroduction"),
       addCreatureToProfile: (slotId: number, creature: Creature) =>
         set((state) => {
           if (slotId < 0 || slotId >= MAX_PROFILES || !state.profiles[slotId])
@@ -291,7 +291,7 @@ export const useGameStore = create<GameState>()(
             };
           }
           return { profiles: newProfiles };
-        }),
+        }, false, "addCreatureToProfile"),
     }),
     {
       name: "cosmoids-game-state",
