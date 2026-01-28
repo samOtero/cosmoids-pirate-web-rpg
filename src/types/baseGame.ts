@@ -177,11 +177,12 @@ export type GameEventType =
   | "START_BATTLE"
   | "GO_TO_MAP"
   | "GO_TO_PROFILES"
-  | "PICK_STARTER";
+  | "PICK_STARTER"
+  | "ADD_CREATURE_TO_PROFILE";
 
 export interface GameEvent {
   type: GameEventType;
-  payload?: ShowDialogEventPayload | StartBattleEventPayload | GoToMapEventPayload | PickStarterEventPayload;
+  payload?: ShowDialogEventPayload | StartBattleEventPayload | GoToMapEventPayload | PickStarterEventPayload | AddCreatureToProfileEventPayload;
   autoProceed?: boolean;
 }
 
@@ -192,6 +193,11 @@ export interface ShowDialogEventPayload {
 
 export interface PickStarterEventPayload {
   creatureId: string;
+}
+
+export interface AddCreatureToProfileEventPayload {
+  creature: Creature;
+  profileId: number;
 }
 
 export enum BattleContext {

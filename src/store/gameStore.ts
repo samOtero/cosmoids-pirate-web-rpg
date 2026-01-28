@@ -9,6 +9,7 @@ import {
   BattleConfig,
   StartBattleEventPayload,
   BattleContext,
+  AddCreatureToProfileEventPayload,
 } from "@/types/baseGame";
 import { MAX_PROFILES } from "@/constants/game";
 import { GameEvent, ShowDialogEventPayload, PickStarterEventPayload } from "@/types/baseGame";
@@ -31,14 +32,16 @@ interface GameState {
   deleteProfile: (slotId: number) => void;
   selectProfile: (slotId: number) => void;
   addCreatureToProfile: (slotId: number, creature: Creature) => void;
-  currentEnemy: Creature | null;
-  setCurrentEnemy: (enemy: Creature) => void;
-  clearCurrentEnemy: () => void;
+  setStarterCreature: (slotId: number, creatureId: string) => void;
   completeIntroduction: () => void;
   // Battle Config
   currentBattle: BattleConfig | null;
   handleBattleWin: () => void;
   handleBattleLose: () => void;
+  currentEnemy: Creature | null;
+  setBattleConfig: (battleConfig: BattleConfig | null, enemy: Creature | null) => void;
+  setCurrentEnemy: (enemy: Creature) => void;
+  clearCurrentEnemy: () => void;
   // Event Queue
   eventQueue: GameEvent[];
   enqueueEvent: (event: GameEvent) => void;
@@ -55,13 +58,17 @@ export const useGameStore = create<GameState>()(
       currentScreen: Screens.START,
       dialogContext: null,
       dialogContextData: null,
+      eventQueue: [],
+      profiles: Array(MAX_PROFILES).fill(null),
+      currentProfileId: null,
+      currentEnemy: null,
+      currentBattle: null,
       setScreen: (screen, context = undefined, contextData = undefined) =>
         set({
           currentScreen: screen,
           dialogContext: context || null,
           dialogContextData: contextData || null,
         }, false, "setScreen"),
-      eventQueue: [],
       enqueueEvent: (event) => set((state) => ({ eventQueue: [...state.eventQueue, event] }), false, "enqueueEvent"),
       pushEventToFront: (event) => set((state) => ({ eventQueue: [event, ...state.eventQueue] }), false, "pushEventToFront"),
       enqueueAndProcessEvents: (events) => {
@@ -90,15 +97,10 @@ export const useGameStore = create<GameState>()(
                 }
                 case "START_BATTLE": {
                     const payload = currentEvent.payload as StartBattleEventPayload;
-                    updates = { ...updates, currentScreen: Screens.BATTLE };
-                    
                     if (payload.context && BATTLES[payload.context]) {
                         const battleConfig = BATTLES[payload.context];
-                        updates = {
-                            ...updates,
-                            currentBattle: battleConfig,
-                            currentEnemy: battleConfig.enemy
-                        };
+                        state.setBattleConfig(battleConfig, battleConfig.enemy);
+                        state.setScreen(Screens.BATTLE);
                     }
                     break;
                 }
@@ -112,13 +114,6 @@ export const useGameStore = create<GameState>()(
                 }
                 case "PICK_STARTER": {
                     const payload = currentEvent.payload as PickStarterEventPayload;
-                    const state = get();
-                    // NOTE: This logic assumes state.profiles is fresh from the store state, 
-                    // BUT inside this loop `updates.profiles` might be newer if modified by a previous event in the same chain.
-                    // To support multiple profile updates in one autoProceed chain, we should check `updates.profiles` first.
-                    // However, `updates` is Partial<GameState>, and `state` is the full `GameState`.
-                    // A safe way is to merge them for the check.
-                    
                     const currentProfiles = updates.profiles || state.profiles;
                     const currentProfileId = updates.currentProfileId ?? state.currentProfileId; // Use ?? because id can be 0 or null
 
@@ -130,19 +125,15 @@ export const useGameStore = create<GameState>()(
                         };
                         const creature = creatureMap[payload.creatureId];
                         if (creature) {
-                            const newProfiles = [...currentProfiles];
-                            // Must verify profile exists before spreading
-                             if (newProfiles[currentProfileId]) {
-                                const profile = newProfiles[currentProfileId]!;
-                                newProfiles[currentProfileId] = {
-                                    ...profile,
-                                    creatures: [...profile.creatures, { ...creature }],
-                                    starterCreatureId: payload.creatureId
-                                };
-                                updates = { ...updates, profiles: newProfiles };
-                             }
+                            state.setStarterCreature(currentProfileId, creature.id);
+                            state.addCreatureToProfile(currentProfileId, creature);
                         }
                     }
+                    break;
+                }
+                case "ADD_CREATURE_TO_PROFILE": {
+                    const payload = currentEvent.payload as AddCreatureToProfileEventPayload;
+                    state.addCreatureToProfile(payload.profileId, payload.creature);
                     break;
                 }
             }
@@ -162,10 +153,8 @@ export const useGameStore = create<GameState>()(
           return updates;
         }, false, "processNextEvent"),
       clearQueue: () => set({ eventQueue: [] }, false, "clearQueue"),
-      currentEnemy: null,
       setCurrentEnemy: (enemy) => set({ currentEnemy: enemy }, false, "setCurrentEnemy"),
       clearCurrentEnemy: () => set({ currentEnemy: null }, false, "clearCurrentEnemy"),
-      currentBattle: null,
       handleBattleWin: () => {
           const state = get();
           if (state.currentBattle) {
@@ -180,8 +169,9 @@ export const useGameStore = create<GameState>()(
           }
           set({ currentBattle: null, currentEnemy: null }, false, "handleBattleLose");
       },
-      profiles: Array(MAX_PROFILES).fill(null),
-      currentProfileId: null,
+      setBattleConfig(battleConfig, enemy) {
+        set({ currentBattle: battleConfig, currentEnemy: enemy }, false, "setBattleConfig");
+      },
       createProfile: (slotId: number) => {
         set((state) => {
           if (slotId < 0 || slotId >= MAX_PROFILES) return state;
@@ -287,6 +277,19 @@ export const useGameStore = create<GameState>()(
           }
           return { profiles: newProfiles };
         }, false, "addCreatureToProfile"),
+      setStarterCreature: (slotId: number, creatureId: string) =>
+        set((state) => {
+          if (slotId < 0 || slotId >= MAX_PROFILES || !state.profiles[slotId])
+            return state;
+          const newProfiles = [...state.profiles];
+          if (newProfiles[slotId]) {
+            newProfiles[slotId] = {
+              ...newProfiles[slotId]!,
+              starterCreatureId: creatureId,
+            };
+          }
+          return { profiles: newProfiles };
+        }, false, "setStarterCreature"),
     }),
     {
       name: "cosmoids-game-state",
