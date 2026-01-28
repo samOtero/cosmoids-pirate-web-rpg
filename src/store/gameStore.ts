@@ -114,7 +114,6 @@ export const useGameStore = create<GameState>()(
                 }
                 case "PICK_STARTER": {
                     const payload = currentEvent.payload as PickStarterEventPayload;
-                    const currentProfiles = updates.profiles || state.profiles;
                     const currentProfileId = updates.currentProfileId ?? state.currentProfileId; // Use ?? because id can be 0 or null
 
                     if (currentProfileId !== null && payload.creatureId) {
