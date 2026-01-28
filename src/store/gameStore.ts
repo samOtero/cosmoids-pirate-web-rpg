@@ -76,71 +76,93 @@ export const useGameStore = create<GameState>()(
           // Handle the event
           let updates: Partial<GameState> = { eventQueue: remainingEvents };
           
-          switch (nextEvent.type) {
-              case "SHOW_DIALOG": {
-                  const payload = nextEvent.payload as ShowDialogEventPayload;
-                  updates = { 
-                      ...updates, 
-                      currentScreen: Screens.DIALOG, 
-                      dialogContext: payload.context || null,
-                      dialogContextData: payload.contextData || null
-                  };
-                  break;
-              }
-              case "START_BATTLE": {
-                  const payload = nextEvent.payload as StartBattleEventPayload;
-                  updates = { ...updates, currentScreen: Screens.BATTLE };
-                  
-                  if (payload.context && BATTLES[payload.context]) {
-                      const battleConfig = BATTLES[payload.context];
-                      updates = {
-                          ...updates,
-                          currentBattle: battleConfig,
-                          currentEnemy: battleConfig.enemy
-                      };
-                  }
-                  break;
-              }
-              case "GO_TO_MAP": {
-                  updates = { ...updates, currentScreen: Screens.MAP };
-                  break;
-              }
-              case "GO_TO_PROFILES": {
-                  updates = { ...updates, currentScreen: Screens.PROFILES };
-                  break;
-              }
-              case "PICK_STARTER": {
-                  const payload = nextEvent.payload as PickStarterEventPayload;
-                  const state = get();
-                  if (state.currentProfileId !== null && payload.creatureId) {
-                      const creatureMap: Record<string, Creature> = {
-                        starter_grass: STARTER_CRAB,
-                        starter_fire: STARTER_IGUANA,
-                        starter_water: STARTER_MONKEY,
-                      };
-                      const creature = creatureMap[payload.creatureId];
-                      if (creature) {
-                          // We can't use `addCreatureToProfile` directly because we are inside `set` via `processNextEvent`.
-                          // `addCreatureToProfile` calls `set` itself.
-                          // So we must manually update the profile here or queue another action?
-                          // Actually `processNextEvent` is returning `updates` to `set`.
-                          // So we should update `profiles` in `updates`.
-                          
-                          const newProfiles = [...state.profiles];
-                          const profile = newProfiles[state.currentProfileId];
-                          if (profile) {
-                              newProfiles[state.currentProfileId] = {
-                                  ...profile,
-                                  creatures: [...profile.creatures, { ...creature }]
-                              };
-                              updates = { ...updates, profiles: newProfiles };
-                          }
-                      }
-                  }
-                  break;
-              }
-          }
+          // Loop to process events as long as autoProceed is true and there are events
+          let currentEvent = nextEvent;
+          let currentQueue = remainingEvents;
+          let shouldContinue = true;
 
+          while (shouldContinue) {
+             switch (currentEvent.type) {
+                case "SHOW_DIALOG": {
+                    const payload = currentEvent.payload as ShowDialogEventPayload;
+                    updates = { 
+                        ...updates, 
+                        currentScreen: Screens.DIALOG, 
+                        dialogContext: payload.context || null,
+                        dialogContextData: payload.contextData || null
+                    };
+                    break;
+                }
+                case "START_BATTLE": {
+                    const payload = currentEvent.payload as StartBattleEventPayload;
+                    updates = { ...updates, currentScreen: Screens.BATTLE };
+                    
+                    if (payload.context && BATTLES[payload.context]) {
+                        const battleConfig = BATTLES[payload.context];
+                        updates = {
+                            ...updates,
+                            currentBattle: battleConfig,
+                            currentEnemy: battleConfig.enemy
+                        };
+                    }
+                    break;
+                }
+                case "GO_TO_MAP": {
+                    updates = { ...updates, currentScreen: Screens.MAP };
+                    break;
+                }
+                case "GO_TO_PROFILES": {
+                    updates = { ...updates, currentScreen: Screens.PROFILES };
+                    break;
+                }
+                case "PICK_STARTER": {
+                    const payload = currentEvent.payload as PickStarterEventPayload;
+                    const state = get();
+                    // NOTE: This logic assumes state.profiles is fresh from the store state, 
+                    // BUT inside this loop `updates.profiles` might be newer if modified by a previous event in the same chain.
+                    // To support multiple profile updates in one autoProceed chain, we should check `updates.profiles` first.
+                    // However, `updates` is Partial<GameState>, and `state` is the full `GameState`.
+                    // A safe way is to merge them for the check.
+                    
+                    const currentProfiles = updates.profiles || state.profiles;
+                    const currentProfileId = updates.currentProfileId ?? state.currentProfileId; // Use ?? because id can be 0 or null
+
+                    if (currentProfileId !== null && payload.creatureId) {
+                        const creatureMap: Record<string, Creature> = {
+                          starter_grass: STARTER_CRAB,
+                          starter_fire: STARTER_IGUANA,
+                          starter_water: STARTER_MONKEY,
+                        };
+                        const creature = creatureMap[payload.creatureId];
+                        if (creature) {
+                            const newProfiles = [...currentProfiles];
+                            // Must verify profile exists before spreading
+                             if (newProfiles[currentProfileId]) {
+                                const profile = newProfiles[currentProfileId]!;
+                                newProfiles[currentProfileId] = {
+                                    ...profile,
+                                    creatures: [...profile.creatures, { ...creature }]
+                                };
+                                updates = { ...updates, profiles: newProfiles };
+                             }
+                        }
+                    }
+                    break;
+                }
+            }
+
+            if (currentEvent.autoProceed && currentQueue.length > 0) {
+                // Prepare for next iteration
+                const [next, ...rest] = currentQueue;
+                currentEvent = next;
+                currentQueue = rest;
+                shouldContinue = true;
+            } else {
+                shouldContinue = false;
+            }
+          }
+           
+          updates = { ...updates, eventQueue: currentQueue };
           return updates;
         }),
       clearQueue: () => set({ eventQueue: [] }),

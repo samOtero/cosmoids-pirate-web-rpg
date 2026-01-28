@@ -181,6 +181,7 @@ export type GameEventType =
 export interface GameEvent {
   type: GameEventType;
   payload?: ShowDialogEventPayload | StartBattleEventPayload | GoToMapEventPayload | PickStarterEventPayload;
+  autoProceed?: boolean;
 }
 
 export interface ShowDialogEventPayload {
