@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Creature, Item } from '@/types/baseGame';
 import { Button } from '@/app/components/ui/Button';
-import { CreatureStatus } from '@/app/components/ui/CreatureStatus';
+import { CreaturePortrait } from '@/app/components/ui/CreaturePortrait';
 import BattleBackground from '@/app/components/BattleBackground';
 
 // --- Presentational Component ---
@@ -52,17 +52,17 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
         {/* Battle Arena Content */}
         <div className="relative h-full p-2 md:p-4 flex flex-row items-end justify-between w-full z-10">
           {/* Player Group - Left */}
-          <CreatureStatus
+          <CreaturePortrait
             creature={playerCreature}
             variant="friend"
-            showHpValues
+            className="mb-8 md:mb-12"
           />
 
           {/* Enemy Group - Right */}
-          <CreatureStatus
+          <CreaturePortrait
             creature={enemyCreature}
             variant="enemy"
-            showHpValues
+            className="mb-20 md:mb-32 translate-y-[-20%] md:translate-y-[-10%]"
           />
         </div>
       </div>
