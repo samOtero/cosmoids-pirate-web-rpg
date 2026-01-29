@@ -1,4 +1,4 @@
-import { Creature, ElementType } from "@/types/baseGame";
+import { Creature, ElementType } from '@/types/baseGame';
 
 /**
  * DIALOG LINE JUMPING FEATURE:
@@ -39,8 +39,8 @@ import { Creature, ElementType } from "@/types/baseGame";
 
 // Starter Cosmoid Definitions
 export const STARTER_CRAB: Creature = {
-  id: "starter_crab",
-  name: "Crabby",
+  id: 'starter_crab',
+  name: 'Crabby',
   type: ElementType.GRASS,
   maxHp: 35,
   currentHp: 35,
@@ -49,13 +49,14 @@ export const STARTER_CRAB: Creature = {
   speed: 35,
   level: 1,
   xp: 0,
-  moves: ["Vine Whip", "Scratch"],
-  spriteUrl: "/crab-starter-grass-neutral-skin-1.png",
+  moves: ['Vine Whip', 'Scratch'],
+  spriteUrl: '/crab-starter-grass-neutral-skin-1.png',
+  battleSpriteUrl: '/crab-starter-grass-neutral-skin-1.png',
 };
 
 export const STARTER_IGUANA: Creature = {
-  id: "starter_iguana",
-  name: "Blazy",
+  id: 'starter_iguana',
+  name: 'Blazy',
   type: ElementType.FIRE,
   maxHp: 35,
   currentHp: 35,
@@ -64,13 +65,14 @@ export const STARTER_IGUANA: Creature = {
   speed: 40,
   level: 1,
   xp: 0,
-  moves: ["Ember", "Scratch"],
-  spriteUrl: "/iguana_starter_fire_neutral_skin_1.png",
+  moves: ['Ember', 'Scratch'],
+  spriteUrl: '/iguana_starter_fire_neutral_skin_1.png',
+  battleSpriteUrl: '/iguana_starter_fire_battle_skin_2_actual.png',
 };
 
 export const STARTER_MONKEY: Creature = {
-  id: "starter_monkey",
-  name: "Bubbles",
+  id: 'starter_monkey',
+  name: 'Bubbles',
   type: ElementType.WATER,
   maxHp: 40,
   currentHp: 40,
@@ -79,17 +81,18 @@ export const STARTER_MONKEY: Creature = {
   speed: 45,
   level: 1,
   xp: 0,
-  moves: ["Bubble Beam", "Scratch"],
-  spriteUrl: "/monkey_starter_water_neutral_skin_1.png",
+  moves: ['Bubble Beam', 'Scratch'],
+  spriteUrl: '/monkey_starter_water_neutral_skin_1.png',
+  battleSpriteUrl: '/monkey_starter_water_battle_skin_1_actual.png',
 };
 
 // Export all dialogs from their individual files
-export * from "./dialogs/newPlayerWelcome";
-export * from "./dialogs/afterStarterChoiceDialog";
-export * from "./dialogs/islandIntro";
-export * from "./dialogs/islandVictory";
-export * from "./dialogs/islandDefeat";
-export * from "./dialogs/examples";
-export * from "./dialogs/starterBattleLose";
-export * from "./dialogs/level1TheMessage";
-export * from "./dialogs/level1Win";
+export * from './dialogs/newPlayerWelcome';
+export * from './dialogs/afterStarterChoiceDialog';
+export * from './dialogs/islandIntro';
+export * from './dialogs/islandVictory';
+export * from './dialogs/islandDefeat';
+export * from './dialogs/examples';
+export * from './dialogs/starterBattleLose';
+export * from './dialogs/level1TheMessage';
+export * from './dialogs/level1Win';

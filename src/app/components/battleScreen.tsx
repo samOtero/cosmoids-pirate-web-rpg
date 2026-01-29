@@ -40,7 +40,14 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
     <div className="flex flex-col h-full bg-black relative">
       {/* Battle Arena Wrapper - Restricts background to this area */}
       <div className="relative flex-1 min-h-0 w-full">
-        <BattleBackground />
+        <BattleBackground
+          playerCreatureUrl={
+            playerCreature.battleSpriteUrl || playerCreature.spriteUrl
+          }
+          enemyCreatureUrl={
+            enemyCreature.battleSpriteUrl || enemyCreature.spriteUrl
+          }
+        />
 
         {/* Battle Arena Content */}
         <div className="relative h-full p-2 md:p-4 flex flex-row items-end justify-between w-full z-10">

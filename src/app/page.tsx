@@ -52,23 +52,23 @@ export default function Home() {
     const currentProfile =
       currentProfileId !== null ? profiles[currentProfileId] : null;
 
-    if (!currentEnemy) {
+    if (!currentProfile || !currentEnemy) {
       setScreen(Screens.MAP);
       return null;
     }
 
     // Default to first creature if valid
-    //const playerCreature = currentProfile.creatures[0];
-    //if (!playerCreature) {
-    // Handle no creatures? Should not happen if game flow is correct
-    // setScreen(Screens.MAP);
-    // return null;
-    //}
+    const playerCreature = currentProfile.creatures[0];
+    if (!playerCreature) {
+      // Handle no creatures? Should not happen if game flow is correct
+      setScreen(Screens.MAP);
+      return null;
+    }
 
     return (
       <Suspense fallback={<div>Loading Battle...</div>}>
         <BattleScreen
-          playerCreature={currentEnemy}
+          playerCreature={playerCreature}
           enemyCreature={currentEnemy}
           inventory={[]}
           onBattleEnd={(won) => {
