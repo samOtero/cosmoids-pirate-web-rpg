@@ -1,36 +1,28 @@
 import React from 'react';
+import Image from 'next/image';
 
 interface BattleBackgroundProps {
   className?: string;
-  playerCreatureUrl?: string;
-  enemyCreatureUrl?: string;
+  backgroundImageUrl: string;
 }
 
 const BattleBackground: React.FC<BattleBackgroundProps> = ({
   className = '',
-  playerCreatureUrl,
-  enemyCreatureUrl,
+  backgroundImageUrl,
 }) => {
   return (
     <div
       className={`absolute inset-0 flex overflow-hidden pointer-events-none ${className}`}
     >
-      {/* Background Image 2: Player (Front layer, clipped) */}
-      <div className="flex items-center justify-center w-1/2">
-        {playerCreatureUrl && (
-          <img src={playerCreatureUrl} alt="Battle Player" />
-        )}
-      </div>
-
-      {/* Background Image 1: Enemy (Back layer, visible where Player is clipped) */}
-      <div className="flex items-center justify-center w-1/2">
-        {enemyCreatureUrl && (
-          <img
-            src={enemyCreatureUrl}
-            alt="Battle Enemy"
-            className="scale-x-[-1]"
-          />
-        )}
+      <div className="absolute inset-0 bg-black/60 z-0">
+        <Image
+          src={backgroundImageUrl}
+          alt="Battle background"
+          fill
+          className="object-cover"
+          unoptimized
+          priority
+        />
       </div>
 
       {/* Overlay for consistency/darkening if needed */}

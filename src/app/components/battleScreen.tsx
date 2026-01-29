@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Creature, Item } from '@/types/baseGame';
+
+import { Creature, Item, BackgroundImageKey } from '@/types/baseGame';
+import { BACKGROUND_IMAGES } from '@/constants/game';
 import { Button } from '@/app/components/ui/Button';
 import { CreaturePortrait } from '@/app/components/ui/CreaturePortrait';
 import BattleBackground from '@/app/components/BattleBackground';
@@ -14,7 +16,9 @@ interface BattleScreenUIProps {
   battleLog: string[];
   isPlayerTurn: boolean;
   battleOver: boolean;
+
   inventory: Item[];
+  backgroundImageUrl: string;
 }
 
 const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
@@ -27,6 +31,7 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
   isPlayerTurn,
   battleOver,
   inventory,
+  backgroundImageUrl,
 }) => {
   const potion = inventory.find((i) => i.id === 'potion');
   const potionCount = potion ? potion.count : 0;
@@ -40,14 +45,7 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
     <div className="flex flex-col h-full bg-black relative">
       {/* Battle Arena Wrapper - Restricts background to this area */}
       <div className="relative flex-1 min-h-0 w-full">
-        <BattleBackground
-          playerCreatureUrl={
-            playerCreature.battleSpriteUrl || playerCreature.spriteUrl
-          }
-          enemyCreatureUrl={
-            enemyCreature.battleSpriteUrl || enemyCreature.spriteUrl
-          }
-        />
+        <BattleBackground backgroundImageUrl={backgroundImageUrl} />
 
         {/* Battle Arena Content */}
         <div className="relative h-full p-2 md:p-4 flex flex-row items-end justify-between w-full z-10">
@@ -133,14 +131,18 @@ interface BattleScreenLogicProps {
   playerCreature: Creature;
   enemyCreature: Creature;
   inventory: Item[];
+
   onBattleEnd: (won: boolean) => void;
+  backgroundImageKey: BackgroundImageKey;
 }
 
 export default function BattleScreen({
   playerCreature,
   enemyCreature,
   inventory,
+
   onBattleEnd,
+  backgroundImageKey,
 }: BattleScreenLogicProps) {
   // Local state for the battle loop so we don't mutate global store directly until the end
   const [playerHp, setPlayerHp] = useState(playerCreature.currentHp);
@@ -220,6 +222,10 @@ export default function BattleScreen({
   const currentPlayer = { ...playerCreature, currentHp: Math.max(0, playerHp) };
   const currentEnemy = { ...enemyCreature, currentHp: Math.max(0, enemyHp) };
 
+  const backgroundImageUrl =
+    BACKGROUND_IMAGES[backgroundImageKey] ||
+    BACKGROUND_IMAGES[BackgroundImageKey.DEFAULT];
+
   return (
     <BattleScreenUI
       playerCreature={currentPlayer}
@@ -231,6 +237,7 @@ export default function BattleScreen({
       isPlayerTurn={isPlayerTurn}
       battleOver={battleOver}
       inventory={inventory}
+      backgroundImageUrl={backgroundImageUrl}
     />
   );
 }

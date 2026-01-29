@@ -7,6 +7,7 @@ import {
   DialogAction,
   DialogContext,
   BattleContext,
+  BackgroundImageKey,
 } from '@/types/baseGame';
 import { resolveDialog } from '@/utils/dialogResolver';
 import {
@@ -33,6 +34,7 @@ export default function Home() {
     dialogContext,
     dialogContextData,
     addCreatureToProfile,
+    currentBattle,
     currentEnemy,
     clearCurrentEnemy,
     completeIntroduction,
@@ -87,6 +89,9 @@ export default function Home() {
               handleBattleLose();
             }
           }}
+          backgroundImageKey={
+            currentBattle?.backgroundImageKey || BackgroundImageKey.DEFAULT
+          }
         />
       </Suspense>
     );
