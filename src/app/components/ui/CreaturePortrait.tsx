@@ -14,10 +14,6 @@ export const CreaturePortrait: React.FC<CreaturePortraitProps> = ({
   variant,
   className = '',
 }) => {
-  // Card container styling
-  const cardClasses =
-    'relative border-[3px] border-[#8B4513] rounded-lg bg-[#2a2a2a] w-32 md:w-40 flex flex-col shadow-lg overflow-hidden shrink-0';
-
   // Specific adjustments for friend vs enemy if needed (e.g. facing)
   // Provide a fallback if battleSpriteUrl is missing
   const spriteUrl =
@@ -26,16 +22,18 @@ export const CreaturePortrait: React.FC<CreaturePortraitProps> = ({
     '/iguana_starter_fire_battle_skin_2_actual.png';
 
   return (
-    <div className={`${cardClasses} ${className}`}>
+    <div
+      className={`relative border-[10px] border-[#8B4513] rounded-lg bg-[#2a2a2a] flex flex-col shadow-lg overflow-hidden ${className}`}
+    >
       {/* Portrait Section */}
-      <div className="bg-[#87CEEB] h-24 md:h-32 w-full relative overflow-hidden flex items-center justify-center border-b-[3px] border-[#8B4513]">
+      <div className="bg-[#87CEEB] relative overflow-hidden flex items-center justify-center border-b-[3px] border-[#8B4513]">
         {/* Background clouds or simple gradient could go here */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#87CEEB] to-[#E0F7FA] opacity-50"></div>
 
         <img
           src={spriteUrl}
           alt={creature.name}
-          className="relative z-10 h-[90%] w-auto object-contain drop-shadow-md"
+          className="relative z-10 w-auto object-contain drop-shadow-md"
         />
       </div>
 

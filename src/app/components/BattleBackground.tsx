@@ -19,14 +19,11 @@ const BattleBackground: React.FC<BattleBackgroundProps> = ({
           src={backgroundImageUrl}
           alt="Battle background"
           fill
-          className="object-cover"
+          className="object-cover opacity-50"
           unoptimized
           priority
         />
       </div>
-
-      {/* Overlay for consistency/darkening if needed */}
-      <div className="absolute inset-0 bg-black/10 mix-blend-overlay"></div>
     </div>
   );
 };

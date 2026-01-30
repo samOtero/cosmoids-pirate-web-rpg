@@ -48,19 +48,19 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
         <BattleBackground backgroundImageUrl={backgroundImageUrl} />
 
         {/* Battle Arena Content */}
-        <div className="relative h-full p-2 md:p-4 flex flex-row items-end justify-between w-full z-10">
+        <div className="relative h-full p-2 md:p-4 flex flex-row justify-evenly w-full z-10 items-center">
           {/* Player Group - Left */}
           <CreaturePortrait
             creature={playerCreature}
             variant="friend"
-            className="mb-8 md:mb-12"
+            className="w-fit max-w-md"
           />
 
           {/* Enemy Group - Right */}
           <CreaturePortrait
             creature={enemyCreature}
             variant="enemy"
-            className="mb-20 md:mb-32 translate-y-[-20%] md:translate-y-[-10%]"
+            className="w-fit max-w-md"
           />
         </div>
       </div>
