@@ -1,7 +1,7 @@
-import { useEffect, useState, useRef } from "react";
-import Image from "next/image";
-import Panel from "@/app/components/ui/Panel";
-import { SPEAKER_IMAGES, BACKGROUND_IMAGES } from "@/constants/game";
+import { useEffect, useState, useRef } from 'react';
+import Image from 'next/image';
+import Panel from '@/app/components/ui/Panel';
+import { SPEAKER_IMAGES, BACKGROUND_IMAGES } from '@/constants/game';
 import {
   DialogLine,
   SpeakerImageKey,
@@ -9,11 +9,11 @@ import {
   DialogButton,
   getButtonClasses,
   DialogAction,
-} from "@/types/baseGame";
+} from '@/types/baseGame';
 import {
   validateLineIds,
   findLineIndexById,
-} from "@/utils/dialogLineValidator";
+} from '@/utils/dialogLineValidator';
 interface StoryScreenProps {
   sequence: DialogLine[];
   onContinue: () => void;
@@ -34,7 +34,7 @@ export default function DialogScreen({
   initialLineIndex = 0,
 }: StoryScreenProps) {
   const [lineIndex, setLineIndex] = useState(initialLineIndex);
-  const [displayedText, setDisplayedText] = useState("");
+  const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -51,7 +51,7 @@ export default function DialogScreen({
   // Reset state when sequence changes to support dialog chaining
   useEffect(() => {
     setLineIndex(initialLineIndex);
-    setDisplayedText("");
+    setDisplayedText('');
     setIsTyping(false);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -65,7 +65,7 @@ export default function DialogScreen({
   useEffect(() => {
     if (!currentLine) return;
 
-    setDisplayedText("");
+    setDisplayedText('');
     setIsTyping(true);
     let charIndex = 0;
 
@@ -111,7 +111,7 @@ export default function DialogScreen({
   const jumpToLine = (lineId: string) => {
     const targetIndex = findLineIndexById(sequence, lineId, dialogName);
     setLineIndex(targetIndex);
-    setDisplayedText("");
+    setDisplayedText('');
     setIsTyping(false);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -157,7 +157,7 @@ export default function DialogScreen({
 
   return (
     <div
-      className="flex flex-col h-full relative cursor-pointer"
+      className="flex flex-col h-full relative cursor-pointer select-none"
       onClick={handleClick}
     >
       {/* Background */}
@@ -169,6 +169,7 @@ export default function DialogScreen({
           className="object-cover opacity-50"
           unoptimized
           priority
+          draggable={false}
         />
       </div>
 
@@ -189,25 +190,25 @@ export default function DialogScreen({
 
                   // Size strategy: single portrait is very large; 2-3 portraits slightly smaller but still prominent
                   // Wide portraits use rectangular dimensions for better fit of wider character art
-                  let imgClass = "w-40 h-40 md:w-56 md:h-56";
+                  let imgClass = 'w-40 h-40 md:w-56 md:h-56';
                   let imgWidth = 256;
                   let imgHeight = 256;
 
-                  if (p.portraitWidth === "wide") {
+                  if (p.portraitWidth === 'wide') {
                     // Wide portraits: rectangular aspect ratio (4:3)
-                    imgClass = "w-96 h-72 md:w-[28rem] md:h-80";
+                    imgClass = 'w-96 h-72 md:w-[28rem] md:h-80';
                     imgWidth = 448;
                     imgHeight = 320;
                   } else if (portraitCount === 1) {
-                    imgClass = "w-80 h-80 md:w-96 md:h-96";
+                    imgClass = 'w-80 h-80 md:w-96 md:h-96';
                     imgWidth = 512;
                     imgHeight = 512;
                   } else if (portraitCount === 2) {
-                    imgClass = "w-64 h-64 md:w-80 md:h-80";
+                    imgClass = 'w-64 h-64 md:w-80 md:h-80';
                     imgWidth = 384;
                     imgHeight = 384;
                   } else if (portraitCount === 3) {
-                    imgClass = "w-64 h-64 md:w-80 md:h-80";
+                    imgClass = 'w-64 h-64 md:w-80 md:h-80';
                     imgWidth = 384;
                     imgHeight = 384;
                   }
@@ -224,6 +225,7 @@ export default function DialogScreen({
                         height={imgHeight}
                         className={`${imgClass} object-cover border-4 border-wood rounded-lg shadow-2xl bg-black transition-all duration-300`}
                         unoptimized
+                        draggable={false}
                       />
                       <div className="bg-wood text-sand font-bold text-center py-1 mt-2 border-2 border-black rounded shadow-lg uppercase tracking-wider text-sm md:text-base">
                         {p.displayName}
@@ -264,8 +266,8 @@ export default function DialogScreen({
           {!isTyping && !hasButtons() && (
             <div className="self-end mt-auto animate-bounce text-cyan-400 text-sm font-bold uppercase tracking-widest">
               {lineIndex < sequence.length - 1
-                ? "Click to Continue ▼"
-                : "Click to Proceed ►"}
+                ? 'Click to Continue ▼'
+                : 'Click to Proceed ►'}
             </div>
           )}
         </Panel>
