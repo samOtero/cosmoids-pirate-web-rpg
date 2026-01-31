@@ -212,7 +212,7 @@ export default function Home() {
             enqueueAndProcessEvents([
               {
                 type: 'SHOW_DIALOG',
-                payload: { context: DialogContext.LEVEL_1_THE_MESSAGE },
+                payload: { context: DialogContext.LEVEL_1_INTRO },
               },
               {
                 type: 'START_BATTLE',

@@ -251,12 +251,14 @@ export const useGameStore = create<GameState>()(
                 eventQueue: [
                   {
                     type: 'SHOW_DIALOG',
-                    payload: { context: DialogContext.GAME_INTRO },
+                    payload: {
+                      context: DialogContext.NEW_PLAYER_WELCOME_DIALOG,
+                    },
                   },
                   {
                     type: 'SHOW_DIALOG',
                     payload: {
-                      context: DialogContext.LEVEL_1_THE_MESSAGE,
+                      context: DialogContext.LEVEL_1_INTRO,
                       contextData: { dialogStartIndex: 1 },
                     },
                   },
@@ -315,14 +317,14 @@ export const useGameStore = create<GameState>()(
                   initialEvents.push({
                     type: 'SHOW_DIALOG',
                     payload: {
-                      context: DialogContext.GAME_INTRO,
+                      context: DialogContext.NEW_PLAYER_WELCOME_DIALOG,
                       contextData: { dialogStartIndex: 0 },
                     },
                   });
                 } else {
                   initialEvents.push({
                     type: 'SHOW_DIALOG',
-                    payload: { context: DialogContext.LEVEL_1_THE_MESSAGE },
+                    payload: { context: DialogContext.LEVEL_1_INTRO },
                   });
                 }
               } else {

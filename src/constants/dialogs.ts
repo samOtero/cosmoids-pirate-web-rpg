@@ -96,3 +96,5 @@ export * from './dialogs/examples';
 export * from './dialogs/starterBattleLose';
 export * from './dialogs/level1TheMessage';
 export * from './dialogs/level1Win';
+
+export * from './dialogs/level1Intro';

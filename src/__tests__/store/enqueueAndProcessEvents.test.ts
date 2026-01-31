@@ -1,6 +1,11 @@
-import { renderHook, act } from "@testing-library/react";
-import { useGameStore } from "../../store/gameStore";
-import { BattleContext, DialogContext, GameEvent, Screens } from "../../types/baseGame";
+import { renderHook, act } from '@testing-library/react';
+import { useGameStore } from '../../store/gameStore';
+import {
+  BattleContext,
+  DialogContext,
+  GameEvent,
+  Screens,
+} from '../../types/baseGame';
 
 // Mock localStorage to avoid persist errors
 const localStorageMock = (function () {
@@ -21,11 +26,11 @@ const localStorageMock = (function () {
   };
 })();
 
-Object.defineProperty(window, "localStorage", {
+Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
 });
 
-describe("useGameStore - enqueueAndProcessEvents", () => {
+describe('useGameStore - enqueueAndProcessEvents', () => {
   beforeEach(() => {
     // Reset store before each test
     const { result } = renderHook(() => useGameStore());
@@ -37,21 +42,21 @@ describe("useGameStore - enqueueAndProcessEvents", () => {
     localStorageMock.clear();
   });
 
-  it("should append events to the queue and process the first one immediately", () => {
+  it('should append events to the queue and process the first one immediately', () => {
     const { result } = renderHook(() => useGameStore());
 
     const event1: GameEvent = {
-        type: "START_BATTLE",
-        payload: { context: BattleContext.FIRST_BATTLE, enemyId: "101" }
+      type: 'START_BATTLE',
+      payload: { context: BattleContext.FIRST_BATTLE, enemyId: '101' },
     };
 
     const event2: GameEvent = {
-        type: "SHOW_DIALOG",
-        payload: { context: DialogContext.GAME_INTRO }
+      type: 'SHOW_DIALOG',
+      payload: { context: DialogContext.NEW_PLAYER_WELCOME_DIALOG },
     };
 
     act(() => {
-        result.current.enqueueAndProcessEvents([event1, event2]);
+      result.current.enqueueAndProcessEvents([event1, event2]);
     });
 
     // Expect queue to have the second event (first one processed)
@@ -62,40 +67,39 @@ describe("useGameStore - enqueueAndProcessEvents", () => {
     expect(result.current.currentScreen).toBe(Screens.BATTLE);
   });
 
-  it("should handle empty array gracefully", () => {
+  it('should handle empty array gracefully', () => {
     const { result } = renderHook(() => useGameStore());
 
     act(() => {
-        result.current.enqueueAndProcessEvents([]);
+      result.current.enqueueAndProcessEvents([]);
     });
 
     expect(result.current.eventQueue).toHaveLength(0);
   });
 
-
-  it("should automatically process the next event if autoProceed is true", () => {
+  it('should automatically process the next event if autoProceed is true', () => {
     const { result } = renderHook(() => useGameStore());
 
     // Event 1: Go to MAP, autoProceed = true
     const event1: GameEvent = {
-        type: "GO_TO_MAP",
-        payload: { islandId: 1 },
-        autoProceed: true
+      type: 'GO_TO_MAP',
+      payload: { islandId: 1 },
+      autoProceed: true,
     };
 
     // Event 2: Start Battle (should be processed immediately after Event 1)
     const event2: GameEvent = {
-        type: "START_BATTLE",
-        payload: { context: BattleContext.FIRST_BATTLE }
+      type: 'START_BATTLE',
+      payload: { context: BattleContext.FIRST_BATTLE },
     };
 
     act(() => {
-        result.current.enqueueAndProcessEvents([event1, event2]);
+      result.current.enqueueAndProcessEvents([event1, event2]);
     });
 
     // Final state should be BATTLE, because Event 1 auto-proceeded to Event 2
     expect(result.current.currentScreen).toBe(Screens.BATTLE);
-    
+
     // Queue should be empty because both were processed
     expect(result.current.eventQueue).toHaveLength(0);
   });

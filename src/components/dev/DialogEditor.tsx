@@ -562,7 +562,9 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                             payload: newButtons[bIdx].action?.payload || {
                               event: {
                                 type: 'SHOW_DIALOG',
-                                payload: { context: 'GAME_INTRO' as any },
+                                payload: {
+                                  context: 'NEW_PLAYER_WELCOME_DIALOG' as any,
+                                },
                               },
                             },
                           };

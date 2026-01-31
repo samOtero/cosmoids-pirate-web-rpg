@@ -5,7 +5,7 @@ import { DialogConfig, BackgroundImageKey, SpeakerImageKey } from "@/types/baseG
 export const STARTER_BATTLE_LOSE: DialogConfig = {
   "sequence": [
     {
-      "text": "Hah! Like I said... child's play.",
+      "text": "Told you, kid… I’m not losing my life over some brat. That bird is coming with me!",
       "portraits": [
         {
           "key": SpeakerImageKey.PIRATE_GRUNT_JOE_SMIRK,
