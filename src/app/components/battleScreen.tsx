@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 import { Creature, Item, BackgroundImageKey } from '@/types/baseGame';
-import { BACKGROUND_IMAGES } from '@/constants/game';
+import { BATTLE_BACKGROUND_IMAGES } from '@/constants/game';
 import { Button } from '@/app/components/ui/Button';
 import { CreaturePortrait } from '@/app/components/ui/CreaturePortrait';
 import BattleBackground from '@/app/components/BattleBackground';
@@ -223,8 +223,8 @@ export default function BattleScreen({
   const currentEnemy = { ...enemyCreature, currentHp: Math.max(0, enemyHp) };
 
   const backgroundImageUrl =
-    BACKGROUND_IMAGES[backgroundImageKey] ||
-    BACKGROUND_IMAGES[BackgroundImageKey.DEFAULT];
+    BATTLE_BACKGROUND_IMAGES[backgroundImageKey] ||
+    BATTLE_BACKGROUND_IMAGES[BackgroundImageKey.DEFAULT];
 
   return (
     <BattleScreenUI
