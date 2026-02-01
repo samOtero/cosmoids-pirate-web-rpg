@@ -1,21 +1,22 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import DevTools from "@/components/dev/DevTools";
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
+import './globals.css';
+import DevTools from '@/components/dev/DevTools';
+import AnimationProvider from '@/app/components/AnimationProvider';
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
-  title: "Cosmoids Pirate RPG",
-  description: "A creature collection RPG set in the Pirate era!",
+  title: 'Cosmoids Pirate RPG',
+  description: 'A creature collection RPG set in the Pirate era!',
 };
 
 export default function RootLayout({
@@ -29,6 +30,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased w-screen h-screen bg-[#0d2b45] text-[#f4e4b]`}
       >
         {children}
+        <AnimationProvider />
         <DevTools />
       </body>
     </html>

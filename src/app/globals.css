@@ -30,6 +30,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/*
 @keyframes lizard-move {
   0% {
     transform: translateY(0) scale(1);
@@ -51,3 +52,4 @@ body {
 .animate-lizard {
   animation: lizard-move 2.5s infinite ease-in-out;
 }
+  */

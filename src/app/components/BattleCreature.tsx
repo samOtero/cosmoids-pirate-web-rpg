@@ -13,12 +13,7 @@ export const BattleCreature: React.FC<BattleCreatureProps> = ({
   className = '',
 }) => {
   const getAnimationClass = (movementId?: string) => {
-    switch (movementId) {
-      case 'lizard':
-        return 'animate-lizard';
-      default:
-        return '';
-    }
+    return movementId ? `animate-${movementId}` : '';
   };
 
   const animClass = getAnimationClass(creature.movementId);
