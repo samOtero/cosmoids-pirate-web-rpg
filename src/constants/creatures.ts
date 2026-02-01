@@ -15,4 +15,5 @@ export const SENTICLE: Creature = {
   spriteUrl: '/eel-basic-normal-neutral-skin-1.png',
   battleSpriteUrl:
     '/battles/cosmoids/eel-basic-normal-neutral-skin-battle-ground-2.png',
+  movementId: 'lizard',
 };

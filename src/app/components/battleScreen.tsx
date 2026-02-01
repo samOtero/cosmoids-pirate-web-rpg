@@ -5,6 +5,7 @@ import { BATTLE_BACKGROUND_IMAGES } from '@/constants/game';
 import { Button } from '@/app/components/ui/Button';
 import { CreatureBattleStats } from '@/app/components/ui/CreatureBattleStats';
 import BattleBackground from '@/app/components/BattleBackground';
+import { BattleCreature } from '@/app/components/BattleCreature';
 
 // --- Presentational Component ---
 interface BattleScreenUIProps {
@@ -56,27 +57,18 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
 
           {/* Enemy Sprite (Bottom Right/Center) */}
           <div className="absolute bottom-[5%] right-[10%] md:right-[20%] z-10">
-            <img
-              src={
-                enemyCreature.battleSpriteUrl ||
-                enemyCreature.spriteUrl ||
-                '/iguana_starter_fire_battle_skin_2_actual.png'
-              }
-              alt={enemyCreature.name}
-              className="h-40 md:h-56 lg:h-64 w-auto object-contain drop-shadow-xl scale-x-[-1]"
+            <BattleCreature
+              creature={enemyCreature}
+              isEnemy={true}
+              className="h-40 md:h-56 lg:h-64 w-auto"
             />
           </div>
 
           {/* Player Sprite (Bottom Left/Center) */}
           <div className="absolute bottom-[2%] left-[10%] md:left-[20%] z-30">
-            <img
-              src={
-                playerCreature.battleSpriteUrl ||
-                playerCreature.spriteUrl ||
-                '/iguana_starter_fire_battle_skin_2_actual.png'
-              }
-              alt={playerCreature.name}
-              className="h-40 md:h-56 lg:h-60 w-auto object-contain drop-shadow-xl"
+            <BattleCreature
+              creature={playerCreature}
+              className="h-40 md:h-56 lg:h-60 w-auto"
             />
           </div>
 

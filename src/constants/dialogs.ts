@@ -69,6 +69,7 @@ export const STARTER_IGUANA: Creature = {
   spriteUrl: '/iguana_starter_fire_neutral_skin_1.png',
   battleSpriteUrl:
     '/battles/cosmoids/iguana_starter_fire_neutral_skin_1_transparent_actual.png',
+  movementId: 'lizard',
 };
 
 export const STARTER_MONKEY: Creature = {

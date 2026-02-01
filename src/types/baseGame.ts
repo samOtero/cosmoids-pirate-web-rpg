@@ -70,6 +70,7 @@ export interface Creature {
   moves: string[];
   spriteUrl: string; // Placeholder URL
   battleSpriteUrl?: string;
+  movementId?: string;
 }
 
 export interface Profile {
