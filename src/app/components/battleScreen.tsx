@@ -49,13 +49,13 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
 
         {/* Battle Arena Content */}
         <div className="relative h-full w-full z-10">
-          {/* Enemy HUD (Top Left) */}
-          <div className="absolute top-4 left-4 md:top-8 md:left-8 z-20">
+          {/* Enemy HUD (Top right) */}
+          <div className="absolute top-[5%] md:top-[10%] right-4 md:right-8 z-20">
             <CreatureBattleStats creature={enemyCreature} variant="enemy" />
           </div>
 
-          {/* Enemy Sprite (Top Right/Center) */}
-          <div className="absolute top-[15%] right-[10%] md:right-[20%] z-10">
+          {/* Enemy Sprite (Bottom Right/Center) */}
+          <div className="absolute bottom-[5%] right-[10%] md:right-[20%] z-10">
             <img
               src={
                 enemyCreature.battleSpriteUrl ||
@@ -63,7 +63,7 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
                 '/iguana_starter_fire_battle_skin_2_actual.png'
               }
               alt={enemyCreature.name}
-              className="h-32 md:h-48 lg:h-56 w-auto object-contain drop-shadow-xl"
+              className="h-32 md:h-48 lg:h-56 w-auto object-contain drop-shadow-xl scale-x-[-1]"
             />
           </div>
 
@@ -80,8 +80,8 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
             />
           </div>
 
-          {/* Player HUD (Bottom Right) */}
-          <div className="absolute bottom-[5%] right-4 md:bottom-[10%] md:right-8 z-20">
+          {/* Player HUD (Top left) */}
+          <div className="absolute top-[5%] md:top-[10%] left-4 md:left-8 z-20">
             <CreatureBattleStats creature={playerCreature} variant="friend" />
           </div>
         </div>
