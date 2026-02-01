@@ -198,16 +198,28 @@ export default function BattleScreen({
   useEffect(() => {
     if (!isPlayerTurn && !battleOver) {
       const timer = setTimeout(() => {
-        // Enemy attacks
-        const damage = Math.max(
-          1,
-          Math.floor(enemyCreature.attack - playerCreature.defense / 2)
-        );
-        setPlayerHp((prev) => prev - damage);
-        addLog(`${enemyCreature.name} attacked doing ${damage} damage!`);
-        setPlayerHit('hit');
-        setTimeout(() => setPlayerHit(undefined), 500);
-        setIsPlayerTurn(true);
+        // 1. Enemy Tackle Animation
+        setEnemyHit('tackle_enemy');
+
+        setTimeout(() => {
+          // 2. Play Tackle Sound (Optional, future)
+          // 3. Player Hit Animation + Damage
+          setPlayerHit('hit');
+
+          const damage = Math.max(
+            1,
+            Math.floor(enemyCreature.attack - playerCreature.defense / 2)
+          );
+          setPlayerHp((prev) => prev - damage);
+          addLog(`${enemyCreature.name} attacked doing ${damage} damage!`);
+
+          // Clear animations
+          setTimeout(() => {
+            setEnemyHit(undefined);
+            setPlayerHit(undefined);
+            setIsPlayerTurn(true);
+          }, 500);
+        }, 250); // Impact time (mid-tackle)
       }, 1000);
       return () => clearTimeout(timer);
     }
@@ -216,18 +228,29 @@ export default function BattleScreen({
   const handleAttack = (moveIndex: number) => {
     if (!isPlayerTurn || battleOver) return;
 
-    // Calc damage
     const moveName = playerCreature.moves[moveIndex];
-    const damage = 1; //Math.max(
-    // 1,
-    //  Math.floor(playerCreature.attack - enemyCreature.defense / 2)
-    //);
-    setEnemyHp((prev) => prev - damage);
-    addLog(`${playerCreature.name} used ${moveName} doing ${damage} damage!`);
-    setEnemyHit('hit');
-    setTimeout(() => setEnemyHit(undefined), 500);
-
     setIsPlayerTurn(false);
+
+    // 1. Player Tackle Animation
+    setPlayerHit('tackle_player');
+
+    setTimeout(() => {
+      // 2. Enemy Hit Animation + Damage
+      setEnemyHit('hit');
+
+      const damage = 1; //Math.max(
+      // 1,
+      // Math.floor(playerCreature.attack - enemyCreature.defense / 2)
+      // );
+      setEnemyHp((prev) => prev - damage);
+      addLog(`${playerCreature.name} used ${moveName} doing ${damage} damage!`);
+
+      // Clear animations
+      setTimeout(() => {
+        setPlayerHit(undefined);
+        setEnemyHit(undefined);
+      }, 500);
+    }, 250); // Impact time
   };
 
   const handleHeal = () => {

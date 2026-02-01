@@ -74,16 +74,64 @@ export const ANIMATIONS: AnimationMap = {
         transform: { x: -5 },
       },
       {
-        percent: 80,
+        percent: 75,
         transform: { x: 5 },
       },
       {
-        percent: 90,
+        percent: 80,
         transform: { x: 0 },
       },
       {
         percent: 100,
         transform: { x: 0 },
+      },
+    ],
+  },
+  tackle_player: {
+    id: 'tackle_player',
+    name: 'Tackle (Right)',
+    duration: 0.5,
+    easing: 'ease-in-out',
+    keyframes: [
+      {
+        percent: 0,
+        transform: { x: 0 },
+      },
+      {
+        percent: 20,
+        transform: { x: -10 }, // Wind up
+      },
+      {
+        percent: 50,
+        transform: { x: 60 }, // Strike
+      },
+      {
+        percent: 100,
+        transform: { x: 0 }, // Return
+      },
+    ],
+  },
+  tackle_enemy: {
+    id: 'tackle_enemy',
+    name: 'Tackle (Left)',
+    duration: 0.5,
+    easing: 'ease-in-out',
+    keyframes: [
+      {
+        percent: 0,
+        transform: { x: 0 },
+      },
+      {
+        percent: 20,
+        transform: { x: 10 }, // Wind up
+      },
+      {
+        percent: 50,
+        transform: { x: -60 }, // Strike
+      },
+      {
+        percent: 100,
+        transform: { x: 0 }, // Return
       },
     ],
   },
