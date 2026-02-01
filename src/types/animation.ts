@@ -7,6 +7,8 @@ export interface AnimationKeyframe {
     scaleY?: number; // multiplier
     rotate?: number; // degrees
   };
+  opacity?: number;
+  filter?: string;
 }
 
 export interface AnimationDefinition {

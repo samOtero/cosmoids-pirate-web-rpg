@@ -22,9 +22,20 @@ export const generateKeyframesCss = (anim: AnimationDefinition): string => {
         transforms.push(`rotate(${kf.transform.rotate}deg)`);
       }
 
+      const styles: string[] = [];
+      if (transforms.length > 0) {
+        styles.push(`transform: ${transforms.join(' ')}`);
+      }
+      if (kf.opacity !== undefined) {
+        styles.push(`opacity: ${kf.opacity}`);
+      }
+      if (kf.filter !== undefined) {
+        styles.push(`filter: ${kf.filter}`);
+      }
+
       return `
     ${kf.percent}% {
-      transform: ${transforms.join(' ') || 'none'};
+      ${styles.join(';\n      ')}
     }`;
     })
     .join('\n');

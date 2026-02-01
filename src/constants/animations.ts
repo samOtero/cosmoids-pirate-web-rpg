@@ -29,4 +29,62 @@ export const ANIMATIONS: AnimationMap = {
       },
     ],
   },
+  hit: {
+    id: 'hit',
+    name: 'Hit Reaction',
+    duration: 0.5,
+    easing: 'linear',
+    keyframes: [
+      {
+        percent: 0,
+        transform: { x: 0 },
+        opacity: 1,
+        filter: 'brightness(1)',
+      },
+      {
+        percent: 10,
+        transform: { x: -10 },
+        opacity: 0.8,
+        filter: 'brightness(2) sepia(1) hue-rotate(-50deg) saturate(5)', // Flash reddish/bright
+      },
+      {
+        percent: 20,
+        transform: { x: 10 },
+        opacity: 1,
+        filter: 'brightness(1)',
+      },
+      {
+        percent: 30,
+        transform: { x: -10 },
+      },
+      {
+        percent: 40,
+        transform: { x: 10 },
+      },
+      {
+        percent: 50,
+        transform: { x: -5 },
+      },
+      {
+        percent: 60,
+        transform: { x: 5 },
+      },
+      {
+        percent: 70,
+        transform: { x: -5 },
+      },
+      {
+        percent: 80,
+        transform: { x: 5 },
+      },
+      {
+        percent: 90,
+        transform: { x: 0 },
+      },
+      {
+        percent: 100,
+        transform: { x: 0 },
+      },
+    ],
+  },
 };
