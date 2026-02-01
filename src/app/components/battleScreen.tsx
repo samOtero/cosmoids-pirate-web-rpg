@@ -20,6 +20,8 @@ interface BattleScreenUIProps {
 
   inventory: Item[];
   backgroundImageUrl: string;
+  playerHit?: string;
+  enemyHit?: string;
 }
 
 const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
@@ -33,6 +35,8 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
   battleOver,
   inventory,
   backgroundImageUrl,
+  playerHit,
+  enemyHit,
 }) => {
   const potion = inventory.find((i) => i.id === 'potion');
   const potionCount = potion ? potion.count : 0;
@@ -61,6 +65,7 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
               creature={enemyCreature}
               isEnemy={true}
               className="h-40 md:h-56 lg:h-64 w-auto"
+              animationOverride={enemyHit}
             />
           </div>
 
@@ -69,6 +74,7 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
             <BattleCreature
               creature={playerCreature}
               className="h-40 md:h-56 lg:h-60 w-auto"
+              animationOverride={playerHit}
             />
           </div>
 
@@ -164,6 +170,8 @@ export default function BattleScreen({
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [battleLog, setBattleLog] = useState<string[]>([]);
   const [battleOver, setBattleOver] = useState(false);
+  const [playerHit, setPlayerHit] = useState<string | undefined>();
+  const [enemyHit, setEnemyHit] = useState<string | undefined>();
 
   // Simple logging helper
   const addLog = (msg: string) => {
@@ -197,6 +205,8 @@ export default function BattleScreen({
         );
         setPlayerHp((prev) => prev - damage);
         addLog(`${enemyCreature.name} attacked doing ${damage} damage!`);
+        setPlayerHit('hit');
+        setTimeout(() => setPlayerHit(undefined), 500);
         setIsPlayerTurn(true);
       }, 1000);
       return () => clearTimeout(timer);
@@ -208,12 +218,14 @@ export default function BattleScreen({
 
     // Calc damage
     const moveName = playerCreature.moves[moveIndex];
-    const damage = Math.max(
-      1,
-      Math.floor(playerCreature.attack - enemyCreature.defense / 2)
-    );
+    const damage = 1; //Math.max(
+    // 1,
+    //  Math.floor(playerCreature.attack - enemyCreature.defense / 2)
+    //);
     setEnemyHp((prev) => prev - damage);
     addLog(`${playerCreature.name} used ${moveName} doing ${damage} damage!`);
+    setEnemyHit('hit');
+    setTimeout(() => setEnemyHit(undefined), 500);
 
     setIsPlayerTurn(false);
   };
@@ -252,6 +264,8 @@ export default function BattleScreen({
       battleOver={battleOver}
       inventory={inventory}
       backgroundImageUrl={backgroundImageUrl}
+      playerHit={playerHit}
+      enemyHit={enemyHit}
     />
   );
 }
