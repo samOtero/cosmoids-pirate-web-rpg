@@ -44,9 +44,23 @@ export const CreatureBattleStats: React.FC<CreatureBattleStatsProps> = ({
           <span className="text-[10px] font-mono opacity-80">
             {creature.currentHp} / {creature.maxHp}
           </span>
-          <div className="scale-75 origin-right">
-            <TypeBadge type={creature.type} />
-          </div>
+        </div>
+      </div>
+
+      {/* Energy Section - Visual Only */}
+      <div className="flex flex-col gap-0.5 mt-2">
+        <div className="flex justify-between items-end mb-0.5">
+          <span className="text-[10px] uppercase font-bold text-[#D7CCC8]">
+            Energy
+          </span>
+        </div>
+        <div className="w-full h-2 bg-gray-800 rounded-full border border-[#5D4037] overflow-hidden relative">
+          <div className="h-full bg-yellow-400" style={{ width: '100%' }} />
+          {/* Shine effect */}
+          <div className="absolute top-0 left-0 w-full h-1/3 bg-white opacity-20"></div>
+        </div>
+        <div className="flex justify-between items-center mt-1">
+          <span className="text-[10px] font-mono opacity-80">100 / 100</span>
         </div>
       </div>
     </div>
