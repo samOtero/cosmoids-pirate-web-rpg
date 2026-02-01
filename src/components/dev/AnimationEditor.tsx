@@ -87,6 +87,7 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
     SENTICLE.id
   );
   const [selectedPercent, setSelectedPercent] = useState<number | null>(0);
+  const [renderVersion, setRenderVersion] = useState(0);
   const [isDirty, setIsDirty] = useState(false);
 
   // Derived
@@ -101,7 +102,12 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
   // Live CSS Injection for Preview
   useEffect(() => {
     if (!activeAnim) return;
-    const css = generateKeyframesCss(activeAnim);
+    // Hack to force browser to pick up new keyframes: version the name
+    const versionedId = `anim-${activeAnim.id}-${renderVersion}`;
+    const rawCss = generateKeyframesCss(activeAnim);
+    // Replace the standard name with versioned name in the CSS string
+    const css = rawCss.replaceAll(`anim-${activeAnim.id}`, versionedId);
+
     const styleId = 'preview-animation-style';
     let styleEl = document.getElementById(styleId);
     if (!styleEl) {
@@ -110,11 +116,7 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
       document.head.appendChild(styleEl);
     }
     styleEl.innerHTML = css;
-
-    return () => {
-      // Cleanup? Maybe keep it so it doesn't flicker, but on unmount remove
-    };
-  }, [activeAnim]);
+  }, [activeAnim, renderVersion]);
 
   // Handlers
   const ensureUniqueId = (baseId: string) => {
@@ -133,6 +135,7 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
     setAnimations({ ...animations, [id]: newAnim });
     setSelectedAnimId(id);
     setIsDirty(true);
+    setRenderVersion(0);
   };
 
   const updateAnim = (updates: Partial<AnimationDefinition>) => {
@@ -140,6 +143,7 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
     const updated = { ...activeAnim, ...updates };
     setAnimations({ ...animations, [activeAnim.id]: updated });
     setIsDirty(true);
+    setRenderVersion((v) => v + 1);
   };
 
   const updateKeyframe = (updates: Partial<AnimationKeyframe['transform']>) => {
@@ -297,9 +301,10 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
                     type="number"
                     step="0.1"
                     value={activeAnim.duration}
-                    onChange={(e) =>
-                      updateAnim({ duration: parseFloat(e.target.value) })
-                    }
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value);
+                      updateAnim({ duration: isNaN(val) ? 0 : val });
+                    }}
                     className="w-full bg-slate-950 border border-slate-600 rounded px-2 py-1 text-xs"
                   />
                 </div>
@@ -356,9 +361,10 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
                         type="number"
                         step="0.01"
                         value={activeKeyframe.transform.scaleX ?? 1}
-                        onChange={(e) =>
-                          updateKeyframe({ scaleX: parseFloat(e.target.value) })
-                        }
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value);
+                          updateKeyframe({ scaleX: isNaN(val) ? 1 : val });
+                        }}
                         className="w-full bg-slate-950 border border-slate-600 rounded px-1 py-1 text-xs"
                       />
                     </div>
@@ -370,9 +376,10 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
                         type="number"
                         step="0.01"
                         value={activeKeyframe.transform.scaleY ?? 1}
-                        onChange={(e) =>
-                          updateKeyframe({ scaleY: parseFloat(e.target.value) })
-                        }
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value);
+                          updateKeyframe({ scaleY: isNaN(val) ? 1 : val });
+                        }}
                         className="w-full bg-slate-950 border border-slate-600 rounded px-1 py-1 text-xs"
                       />
                     </div>
@@ -384,9 +391,10 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
                         type="number"
                         step="1"
                         value={activeKeyframe.transform.y ?? 0}
-                        onChange={(e) =>
-                          updateKeyframe({ y: parseFloat(e.target.value) })
-                        }
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value);
+                          updateKeyframe({ y: isNaN(val) ? 0 : val });
+                        }}
                         className="w-full bg-slate-950 border border-slate-600 rounded px-1 py-1 text-xs"
                       />
                     </div>
@@ -398,9 +406,10 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
                         type="number"
                         step="1"
                         value={activeKeyframe.transform.x ?? 0}
-                        onChange={(e) =>
-                          updateKeyframe({ x: parseFloat(e.target.value) })
-                        }
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value);
+                          updateKeyframe({ x: isNaN(val) ? 0 : val });
+                        }}
                         className="w-full bg-slate-950 border border-slate-600 rounded px-1 py-1 text-xs"
                       />
                     </div>
@@ -412,9 +421,10 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
                         type="number"
                         step="1"
                         value={activeKeyframe.transform.rotate ?? 0}
-                        onChange={(e) =>
-                          updateKeyframe({ rotate: parseFloat(e.target.value) })
-                        }
+                        onChange={(e) => {
+                          const val = parseFloat(e.target.value);
+                          updateKeyframe({ rotate: isNaN(val) ? 0 : val });
+                        }}
                         className="w-full bg-slate-950 border border-slate-600 rounded px-1 py-1 text-xs"
                       />
                     </div>
@@ -432,6 +442,7 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
                           // Change percent logic is tricky because of ID
                           // simpler to just update value, but need to check collision
                           const p = parseInt(e.target.value);
+                          if (isNaN(p)) return; // Don't allow clearing percent to empty/NaN as it breaks ID
                           if (activeAnim.keyframes.some((k) => k.percent === p))
                             return; // collision
                           // update
@@ -476,6 +487,11 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
                 {activeCreature && (
                   <div
                     className={`transform transition-all animate-${activeAnim.id}`}
+                    style={{
+                      animationDuration: `${activeAnim.duration}s`,
+                      animationTimingFunction: activeAnim.easing,
+                      animationName: `anim-${activeAnim.id}-${renderVersion}`,
+                    }}
                   >
                     <img
                       src={
