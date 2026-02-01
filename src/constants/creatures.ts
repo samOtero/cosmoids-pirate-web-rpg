@@ -14,5 +14,5 @@ export const SENTICLE: Creature = {
   moves: ['T Tackle', 'Leer'], // Placeholder moves
   spriteUrl: '/eel-basic-normal-neutral-skin-1.png',
   battleSpriteUrl:
-    '/battles/cosmoids/eel-basic-normal-neutral-skin-1_transparent_actual.png',
+    '/battles/cosmoids/eel-basic-normal-neutral-skin-battle-ground-2.png',
 };

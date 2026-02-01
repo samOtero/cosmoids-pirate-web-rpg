@@ -63,7 +63,7 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
                 '/iguana_starter_fire_battle_skin_2_actual.png'
               }
               alt={enemyCreature.name}
-              className="h-32 md:h-48 lg:h-56 w-auto object-contain drop-shadow-xl scale-x-[-1]"
+              className="h-40 md:h-56 lg:h-64 w-auto object-contain drop-shadow-xl scale-x-[-1]"
             />
           </div>
 
