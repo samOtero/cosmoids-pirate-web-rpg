@@ -67,7 +67,8 @@ export const STARTER_IGUANA: Creature = {
   xp: 0,
   moves: ['Ember', 'Scratch'],
   spriteUrl: '/iguana_starter_fire_neutral_skin_1.png',
-  battleSpriteUrl: '/iguana_starter_fire_battle_skin_2_actual.png',
+  battleSpriteUrl:
+    '/battles/cosmoids/iguana_starter_fire_neutral_skin_1_transparent_actual.png',
 };
 
 export const STARTER_MONKEY: Creature = {

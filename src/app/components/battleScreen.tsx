@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Creature, Item, BackgroundImageKey } from '@/types/baseGame';
 import { BATTLE_BACKGROUND_IMAGES } from '@/constants/game';
 import { Button } from '@/app/components/ui/Button';
-import { CreaturePortrait } from '@/app/components/ui/CreaturePortrait';
+import { CreatureBattleStats } from '@/app/components/ui/CreatureBattleStats';
 import BattleBackground from '@/app/components/BattleBackground';
 
 // --- Presentational Component ---
@@ -48,20 +48,42 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
         <BattleBackground backgroundImageUrl={backgroundImageUrl} />
 
         {/* Battle Arena Content */}
-        <div className="relative h-full p-2 md:p-4 flex flex-row justify-evenly w-full z-10 items-center">
-          {/* Player Group - Left */}
-          <CreaturePortrait
-            creature={playerCreature}
-            variant="friend"
-            className="w-fit max-w-md"
-          />
+        <div className="relative h-full w-full z-10">
+          {/* Enemy HUD (Top Left) */}
+          <div className="absolute top-4 left-4 md:top-8 md:left-8 z-20">
+            <CreatureBattleStats creature={enemyCreature} variant="enemy" />
+          </div>
 
-          {/* Enemy Group - Right */}
-          <CreaturePortrait
-            creature={enemyCreature}
-            variant="enemy"
-            className="w-fit max-w-md"
-          />
+          {/* Enemy Sprite (Top Right/Center) */}
+          <div className="absolute top-[15%] right-[10%] md:right-[20%] z-10">
+            <img
+              src={
+                enemyCreature.battleSpriteUrl ||
+                enemyCreature.spriteUrl ||
+                '/iguana_starter_fire_battle_skin_2_actual.png'
+              }
+              alt={enemyCreature.name}
+              className="h-32 md:h-48 lg:h-56 w-auto object-contain drop-shadow-xl"
+            />
+          </div>
+
+          {/* Player Sprite (Bottom Left/Center) */}
+          <div className="absolute bottom-[2%] left-[10%] md:left-[20%] z-30">
+            <img
+              src={
+                playerCreature.battleSpriteUrl ||
+                playerCreature.spriteUrl ||
+                '/iguana_starter_fire_battle_skin_2_actual.png'
+              }
+              alt={playerCreature.name}
+              className="h-40 md:h-56 lg:h-64 w-auto object-contain drop-shadow-xl"
+            />
+          </div>
+
+          {/* Player HUD (Bottom Right) */}
+          <div className="absolute bottom-[5%] right-4 md:bottom-[10%] md:right-8 z-20">
+            <CreatureBattleStats creature={playerCreature} variant="friend" />
+          </div>
         </div>
       </div>
 
