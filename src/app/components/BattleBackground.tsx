@@ -19,7 +19,7 @@ const BattleBackground: React.FC<BattleBackgroundProps> = ({
           src={backgroundImageUrl}
           alt="Battle background"
           fill
-          className="object-cover opacity-50"
+          className="object-cover opacity-50 blur-xs"
           unoptimized
           priority
         />
