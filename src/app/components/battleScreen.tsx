@@ -147,6 +147,15 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
 };
 
 // --- Logic Wrapper ---
+import { resolveDialog } from '@/utils/dialogResolver';
+import DialogContent from '@/app/components/ui/DialogContent';
+import {
+  DialogContext,
+  DialogContextData,
+  DialogAction,
+} from '@/types/baseGame';
+
+// --- Logic Wrapper ---
 interface BattleScreenLogicProps {
   playerCreature: Creature;
   enemyCreature: Creature;
@@ -154,6 +163,12 @@ interface BattleScreenLogicProps {
 
   onBattleEnd: (won: boolean) => void;
   backgroundImageKey: BackgroundImageKey;
+
+  // Dialog Support
+  dialogContext?: DialogContext | null;
+  dialogContextData?: DialogContextData | null;
+  onDialogContinue?: () => void;
+  onDialogAction?: (action: DialogAction) => void;
 }
 
 export default function BattleScreen({
@@ -163,6 +178,11 @@ export default function BattleScreen({
 
   onBattleEnd,
   backgroundImageKey,
+
+  dialogContext,
+  dialogContextData,
+  onDialogContinue,
+  onDialogAction,
 }: BattleScreenLogicProps) {
   // Local state for the battle loop so we don't mutate global store directly until the end
   const [playerHp, setPlayerHp] = useState(playerCreature.currentHp);
@@ -238,7 +258,7 @@ export default function BattleScreen({
       // 2. Enemy Hit Animation + Damage
       setEnemyHit('hit');
 
-      const damage = 1; //Math.max(
+      const damage = 5; //Math.max(
       // 1,
       // Math.floor(playerCreature.attack - enemyCreature.defense / 2)
       // );
@@ -275,20 +295,41 @@ export default function BattleScreen({
     BATTLE_BACKGROUND_IMAGES[backgroundImageKey] ||
     BATTLE_BACKGROUND_IMAGES[BackgroundImageKey.DEFAULT];
 
+  // Resolve dialog if active
+  const resolvedDialog = dialogContext
+    ? resolveDialog(dialogContext, dialogContextData || null)
+    : null;
+  const sequence = resolvedDialog?.sequence || null;
+  const dialogStartIndex = dialogContextData?.dialogStartIndex || 0;
+
   return (
-    <BattleScreenUI
-      playerCreature={currentPlayer}
-      enemyCreature={currentEnemy}
-      onAttack={handleAttack}
-      onHeal={handleHeal}
-      onRun={handleRun}
-      battleLog={battleLog}
-      isPlayerTurn={isPlayerTurn}
-      battleOver={battleOver}
-      inventory={inventory}
-      backgroundImageUrl={backgroundImageUrl}
-      playerHit={playerHit}
-      enemyHit={enemyHit}
-    />
+    <>
+      <BattleScreenUI
+        playerCreature={currentPlayer}
+        enemyCreature={currentEnemy}
+        onAttack={handleAttack}
+        onHeal={handleHeal}
+        onRun={handleRun}
+        battleLog={battleLog}
+        isPlayerTurn={isPlayerTurn}
+        battleOver={battleOver}
+        inventory={inventory}
+        backgroundImageUrl={backgroundImageUrl}
+        playerHit={playerHit}
+        enemyHit={enemyHit}
+      />
+
+      {/* Dialog Overlay */}
+      {sequence && onDialogContinue && (
+        <div className="absolute inset-0 z-50 pointer-events-auto">
+          <DialogContent
+            sequence={sequence}
+            onContinue={onDialogContinue}
+            onDialogAction={onDialogAction || (() => {})}
+            initialLineIndex={dialogStartIndex || 0}
+          />
+        </div>
+      )}
+    </>
   );
 }

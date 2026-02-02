@@ -3,6 +3,7 @@ import {
   BackgroundImageKey,
   DialogConfig,
   Screens,
+  DialogContextData,
 } from '@/types/baseGame';
 import * as AllDialogs from '@/constants/dialogs';
 import { ISLANDS } from '@/constants/game';
@@ -25,7 +26,7 @@ function getDefaultDialog(): DialogConfig {
 
 export function resolveDialog(
   context: DialogContext | null,
-  contextData: { islandId?: number } | null
+  contextData: DialogContextData | null
 ): DialogConfig {
   // 3. Dynamic Lookup
   // Attempts to find a dialog export matching the Context key

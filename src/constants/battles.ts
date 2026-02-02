@@ -1,5 +1,10 @@
-import { BattleConfig, BattleContext, BackgroundImageKey, DialogContext } from "@/types/baseGame";
-import { SENTICLE } from "./creatures";
+import {
+  BattleConfig,
+  BattleContext,
+  BackgroundImageKey,
+  DialogContext,
+} from '@/types/baseGame';
+import { SENTICLE } from './creatures';
 
 export const BATTLES: Record<BattleContext, BattleConfig> = {
   [BattleContext.FIRST_BATTLE]: {
@@ -7,20 +12,20 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
     backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
     winEvents: [
       {
-        type: "SHOW_DIALOG",
+        type: 'SHOW_DIALOG',
         payload: {
-           context: DialogContext.LEVEL_1_WIN, 
-           contextData: { creatureId: "senticle" }
-        }
-      }
+          context: DialogContext.LEVEL_1_WIN,
+          contextData: { creatureId: 'senticle' },
+        },
+      },
     ],
     loseEvents: [
-       {
-        type: "SHOW_DIALOG",
+      {
+        type: 'SHOW_DIALOG',
         payload: {
-           context: DialogContext.STARTER_BATTLE_LOSE, 
-        }
-      }
-    ]
+          context: DialogContext.STARTER_BATTLE_LOSE,
+        },
+      },
+    ],
   },
 };

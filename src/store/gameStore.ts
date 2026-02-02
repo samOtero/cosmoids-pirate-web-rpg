@@ -15,6 +15,7 @@ import { MAX_PROFILES } from '@/constants/game';
 import {
   GameEvent,
   ShowDialogEventPayload,
+  ShowBattleDialogEventPayload,
   PickStarterEventPayload,
 } from '@/types/baseGame';
 import { BATTLES } from '@/constants/battles';
@@ -124,6 +125,16 @@ export const useGameStore = create<GameState>()(
                       currentEvent.payload as ShowDialogEventPayload;
                     state.setScreen(
                       Screens.DIALOG,
+                      dialogPayload.context || null,
+                      dialogPayload.contextData || undefined
+                    );
+                    break;
+                  }
+                  case 'SHOW_BATTLE_DIALOG': {
+                    const dialogPayload =
+                      currentEvent.payload as ShowBattleDialogEventPayload;
+                    state.setScreen(
+                      Screens.BATTLE,
                       dialogPayload.context || null,
                       dialogPayload.contextData || undefined
                     );

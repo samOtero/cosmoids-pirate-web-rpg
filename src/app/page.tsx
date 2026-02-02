@@ -50,20 +50,33 @@ export default function Home() {
   // Also handle "WAIT" events or similar if implemented in the store processor,
   // but for now the store updates state immediately for screen changes.
 
-  if (currentScreen === Screens.BATTLE) {
-    const currentProfile =
-      currentProfileId !== null ? profiles[currentProfileId] : null;
+  // Deduced state
+  const currentProfile =
+    currentProfileId !== null ? profiles[currentProfileId] : null;
 
+  useEffect(() => {
+    // Handle redirects based on state validity
+    if (currentScreen === Screens.BATTLE) {
+      if (!currentProfile || !currentEnemy) {
+        setScreen(Screens.MAP);
+      } else if (!currentProfile.creatures[0]) {
+        setScreen(Screens.MAP);
+      }
+    } else if (currentScreen === Screens.MAP) {
+      if (!currentProfile) {
+        setScreen(Screens.PROFILES);
+      }
+    }
+  }, [currentScreen, currentProfile, currentEnemy, setScreen, profiles]);
+
+  if (currentScreen === Screens.BATTLE) {
     if (!currentProfile || !currentEnemy) {
-      setScreen(Screens.MAP);
       return null;
     }
 
     // Default to first creature if valid
     const playerCreature = currentProfile.creatures[0];
     if (!playerCreature) {
-      // Handle no creatures? Should not happen if game flow is correct
-      setScreen(Screens.MAP);
       return null;
     }
 
@@ -92,6 +105,32 @@ export default function Home() {
           backgroundImageKey={
             currentBattle?.backgroundImageKey || BackgroundImageKey.DEFAULT
           }
+          dialogContext={dialogContext}
+          dialogContextData={dialogContextData}
+          onDialogContinue={() => {
+            const { nextEvents } = resolveDialog(
+              dialogContext,
+              dialogContextData
+            );
+
+            if (nextEvents && nextEvents.length > 0) {
+              enqueueAndProcessEvents(nextEvents);
+              return;
+            }
+
+            if (eventQueue.length > 0) {
+              processNextEvent();
+            } else {
+              // Close dialog
+              setScreen(Screens.BATTLE);
+            }
+          }}
+          onDialogAction={(action) => {
+            if (action.type === 'PROCESS_EVENT' && action.payload?.event) {
+              pushEventToFront(action.payload.event);
+              processNextEvent();
+            }
+          }}
         />
       </Suspense>
     );
@@ -196,11 +235,7 @@ export default function Home() {
   }
 
   if (currentScreen === Screens.MAP) {
-    const currentProfile =
-      currentProfileId !== null ? profiles[currentProfileId] : null;
-
     if (!currentProfile) {
-      setScreen(Screens.PROFILES);
       return null;
     }
 

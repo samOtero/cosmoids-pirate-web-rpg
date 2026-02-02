@@ -103,4 +103,37 @@ describe('useGameStore - enqueueAndProcessEvents', () => {
     // Queue should be empty because both were processed
     expect(result.current.eventQueue).toHaveLength(0);
   });
+
+  it('should not switch screen when SHOW_BATTLE_DIALOG is triggered during BATTLE', () => {
+    const { result } = renderHook(() => useGameStore());
+
+    // 1. Start Battle
+    act(() => {
+      result.current.enqueueAndProcessEvents([
+        {
+          type: 'START_BATTLE',
+          payload: { context: BattleContext.FIRST_BATTLE },
+        },
+      ]);
+    });
+
+    expect(result.current.currentScreen).toBe(Screens.BATTLE);
+
+    // 2. Trigger Battle Dialog
+    act(() => {
+      result.current.enqueueAndProcessEvents([
+        {
+          type: 'SHOW_BATTLE_DIALOG',
+          payload: { context: DialogContext.NEW_PLAYER_WELCOME_DIALOG },
+        },
+      ]);
+    });
+
+    // 3. Verify screen is STILL Battle
+    expect(result.current.currentScreen).toBe(Screens.BATTLE);
+    // 4. Verify context is set
+    expect(result.current.dialogContext).toBe(
+      DialogContext.NEW_PLAYER_WELCOME_DIALOG
+    );
+  });
 });
