@@ -222,6 +222,7 @@ export enum BattleContext {
 export interface BattleConfig {
   enemy: Creature;
   backgroundImageKey: BackgroundImageKey;
+  afterStartEvents?: GameEvent[];
   winEvents: GameEvent[];
   loseEvents: GameEvent[];
 }

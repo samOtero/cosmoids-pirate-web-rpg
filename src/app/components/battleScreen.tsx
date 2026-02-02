@@ -169,6 +169,7 @@ interface BattleScreenLogicProps {
   dialogContextData?: DialogContextData | null;
   onDialogContinue?: () => void;
   onDialogAction?: (action: DialogAction) => void;
+  onStartEvents?: () => void;
 }
 
 export default function BattleScreen({
@@ -183,6 +184,7 @@ export default function BattleScreen({
   dialogContextData,
   onDialogContinue,
   onDialogAction,
+  onStartEvents,
 }: BattleScreenLogicProps) {
   // Local state for the battle loop so we don't mutate global store directly until the end
   const [playerHp, setPlayerHp] = useState(playerCreature.currentHp);
@@ -200,6 +202,7 @@ export default function BattleScreen({
 
   useEffect(() => {
     addLog(`A wild ${enemyCreature.name} appeared!`);
+    if (onStartEvents) onStartEvents();
   }, []);
 
   useEffect(() => {
