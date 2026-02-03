@@ -52,6 +52,8 @@ export const STARTER_CRAB: Creature = {
   moves: ['Vine Whip', 'Scratch'],
   spriteUrl: '/crab-starter-grass-neutral-skin-1.png',
   battleSpriteUrl: '/crab-starter-grass-neutral-skin-1.png',
+  startingEnergy: 100,
+  currentEnergy: 100,
 };
 
 export const STARTER_IGUANA: Creature = {
@@ -70,6 +72,8 @@ export const STARTER_IGUANA: Creature = {
   battleSpriteUrl:
     '/battles/cosmoids/iguana_starter_fire_neutral_skin_1_transparent_actual.png',
   movementId: 'lizard',
+  startingEnergy: 100,
+  currentEnergy: 100,
 };
 
 export const STARTER_MONKEY: Creature = {
@@ -86,6 +90,8 @@ export const STARTER_MONKEY: Creature = {
   moves: ['Bubble Beam', 'Scratch'],
   spriteUrl: '/monkey_starter_water_neutral_skin_1.png',
   battleSpriteUrl: '/monkey_starter_water_battle_skin_1_actual.png',
+  startingEnergy: 100,
+  currentEnergy: 100,
 };
 
 // Export all dialogs from their individual files

@@ -71,6 +71,8 @@ export interface Creature {
   spriteUrl: string; // Placeholder URL
   battleSpriteUrl?: string;
   movementId?: string;
+  startingEnergy: number;
+  currentEnergy: number;
 }
 
 export interface Profile {
