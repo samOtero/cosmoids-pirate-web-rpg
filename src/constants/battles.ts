@@ -14,8 +14,7 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
       {
         type: 'SHOW_BATTLE_DIALOG',
         payload: {
-          context: DialogContext.LEVEL_1_WIN,
-          contextData: { creatureId: 'senticle' },
+          context: DialogContext.LEVEL_1_INSTRUCTION_1,
         },
       },
     ],
@@ -24,7 +23,6 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
         type: 'SHOW_DIALOG',
         payload: {
           context: DialogContext.LEVEL_1_WIN,
-          contextData: { creatureId: 'senticle' },
         },
       },
     ],

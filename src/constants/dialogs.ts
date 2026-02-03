@@ -106,3 +106,5 @@ export * from './dialogs/level1TheMessage';
 export * from './dialogs/level1Win';
 
 export * from './dialogs/level1Intro';
+
+export * from './dialogs/level1Instruction1';

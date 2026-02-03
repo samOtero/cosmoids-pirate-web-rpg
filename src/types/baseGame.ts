@@ -144,6 +144,7 @@ export interface DialogLine {
 }
 
 export enum DialogContext {
+  LEVEL_1_INSTRUCTION_1 = 'LEVEL_1_INSTRUCTION_1',
   NEW_PLAYER_WELCOME_DIALOG = 'NEW_PLAYER_WELCOME_DIALOG',
   LEVEL_1_INTRO = 'LEVEL_1_INTRO',
   LEVEL_1_WIN = 'LEVEL_1_WIN',
