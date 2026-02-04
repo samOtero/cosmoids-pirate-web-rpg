@@ -222,10 +222,18 @@ export enum BattleContext {
   FIRST_BATTLE = 'FIRST_BATTLE',
 }
 
+export type BattleTurnPhase = 'before' | 'attack' | 'after' | 'end';
+export type BattleTriggerPhase = 'beforeEnemyAttack' | 'afterEnemyAttack';
+
 export interface BattleConfig {
   enemy: Creature;
   backgroundImageKey: BackgroundImageKey;
   afterStartEvents?: GameEvent[];
+  turnEvents?: {
+    [turn: number]: {
+      [key in BattleTriggerPhase]?: GameEvent[];
+    };
+  };
   winEvents: GameEvent[];
   loseEvents: GameEvent[];
 }

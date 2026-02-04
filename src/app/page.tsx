@@ -135,6 +135,14 @@ export default function Home() {
             if (!currentBattle?.afterStartEvents?.length) return;
             enqueueAndProcessEvents(currentBattle.afterStartEvents);
           }}
+          onTriggerTurnEvent={(turn, phase) => {
+            const events = currentBattle?.turnEvents?.[turn]?.[phase];
+            if (events && events.length > 0) {
+              enqueueAndProcessEvents(events);
+              return true;
+            }
+            return false;
+          }}
         />
       </Suspense>
     );

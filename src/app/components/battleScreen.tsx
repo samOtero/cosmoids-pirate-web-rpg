@@ -1,6 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-import { Creature, Item, BackgroundImageKey } from '@/types/baseGame';
+import {
+  Creature,
+  Item,
+  BattleConfig,
+  BattleContext,
+  BackgroundImageKey,
+  DialogContext,
+  BattleTurnPhase,
+  BattleTriggerPhase,
+} from '@/types/baseGame';
 import { BATTLE_BACKGROUND_IMAGES } from '@/constants/game';
 import { Button } from '@/app/components/ui/Button';
 import { CreatureBattleStats } from '@/app/components/ui/CreatureBattleStats';
@@ -149,11 +158,7 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
 // --- Logic Wrapper ---
 import { resolveDialog } from '@/utils/dialogResolver';
 import DialogContent from '@/app/components/ui/DialogContent';
-import {
-  DialogContext,
-  DialogContextData,
-  DialogAction,
-} from '@/types/baseGame';
+import { DialogContextData, DialogAction } from '@/types/baseGame';
 
 // --- Logic Wrapper ---
 interface BattleScreenLogicProps {
@@ -170,6 +175,7 @@ interface BattleScreenLogicProps {
   onDialogContinue?: () => void;
   onDialogAction?: (action: DialogAction) => void;
   onStartEvents?: () => void;
+  onTriggerTurnEvent?: (turn: number, phase: BattleTriggerPhase) => boolean;
 }
 
 export default function BattleScreen({
@@ -185,6 +191,7 @@ export default function BattleScreen({
   onDialogContinue,
   onDialogAction,
   onStartEvents,
+  onTriggerTurnEvent,
 }: BattleScreenLogicProps) {
   // Local state for the battle loop so we don't mutate global store directly until the end
   const [playerHp, setPlayerHp] = useState(playerCreature.currentHp);
@@ -195,6 +202,9 @@ export default function BattleScreen({
   const [playerHit, setPlayerHit] = useState<string | undefined>();
   const [enemyHit, setEnemyHit] = useState<string | undefined>();
 
+  // Turn Management
+  const [turnCount, setTurnCount] = useState(1);
+  const [turnPhase, setTurnPhase] = useState<BattleTurnPhase>('before');
   // Simple logging helper
   const addLog = (msg: string) => {
     setBattleLog((prev) => [...prev, msg]);
@@ -219,7 +229,31 @@ export default function BattleScreen({
 
   // Enemy turn logic
   useEffect(() => {
-    if (!isPlayerTurn && !battleOver) {
+    // 1. Basic checks: Must be enemy turn, battle active, and NO active dialog
+    if (isPlayerTurn || battleOver || !!dialogContext) return;
+
+    // 2. Phase: Before Attack
+    if (turnPhase === 'before') {
+      const triggered = onTriggerTurnEvent?.(turnCount, 'beforeEnemyAttack');
+      // If triggered, we stay in 'before' phase but wait for dialog to clear.
+      // Once dialog clears, this effect runs again. We need to advance phase ONLY if NOT triggered or trigger handled?
+      // actually, if triggered is true, we should probably mark that we attempted it?
+      // No, if triggered is true, it means an event was queued. The dialogContext will become true shortly.
+      // But for this render cycle, we need to STOP.
+      // And we need to advance to 'attack' phase for the NEXT check.
+      // But if we advance to 'attack' now, we might skip the wait.
+      // Better: If triggered, we wait. The TRIGGER function should probably return true if it did something.
+      // If it returned true, we set phase to 'attack' BUT return early so we don't run attack immediately.
+      // Next time we come here (after dialog), phase is 'attack', so we proceed.
+
+      setTurnPhase('attack');
+      if (triggered) {
+        return;
+      }
+    }
+
+    // 3. Phase: Attack
+    if (turnPhase === 'attack') {
       const timer = setTimeout(() => {
         // 1. Enemy Tackle Animation
         setEnemyHit('tackle_enemy');
@@ -240,13 +274,39 @@ export default function BattleScreen({
           setTimeout(() => {
             setEnemyHit(undefined);
             setPlayerHit(undefined);
-            setIsPlayerTurn(true);
+            // Move to After phase
+            setTurnPhase('after');
           }, 500);
         }, 250); // Impact time (mid-tackle)
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [isPlayerTurn, battleOver]);
+
+    // 4. Phase: After Attack
+    if (turnPhase === 'after') {
+      const triggered = onTriggerTurnEvent?.(turnCount, 'afterEnemyAttack');
+      setTurnPhase('end');
+      if (triggered) {
+        return;
+      }
+    }
+
+    // 5. Phase: End
+    if (turnPhase === 'end') {
+      setIsPlayerTurn(true);
+      setTurnPhase('before'); // Reset for next enemy turn
+      setTurnCount((prev) => prev + 1);
+    }
+  }, [
+    isPlayerTurn,
+    battleOver,
+    turnPhase,
+    dialogContext,
+    onTriggerTurnEvent,
+    turnCount,
+    enemyCreature,
+    playerCreature,
+  ]);
 
   const handleAttack = (moveIndex: number) => {
     if (!isPlayerTurn || battleOver) return;

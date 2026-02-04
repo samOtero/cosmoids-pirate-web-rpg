@@ -18,6 +18,26 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
         },
       },
     ],
+    turnEvents: {
+      1: {
+        beforeEnemyAttack: [
+          {
+            type: 'SHOW_BATTLE_DIALOG',
+            payload: {
+              context: DialogContext.LEVEL_1_INSTRUCTION_1,
+            },
+          },
+        ],
+        afterEnemyAttack: [
+          {
+            type: 'SHOW_BATTLE_DIALOG',
+            payload: {
+              context: DialogContext.LEVEL_1_INSTRUCTION_1,
+            },
+          },
+        ],
+      },
+    },
     winEvents: [
       {
         type: 'SHOW_DIALOG',
