@@ -174,7 +174,6 @@ interface BattleScreenLogicProps {
   dialogContextData?: DialogContextData | null;
   onDialogContinue?: () => void;
   onDialogAction?: (action: DialogAction) => void;
-  onStartEvents?: () => void;
   onTriggerTurnEvent?: (turn: number, phase: BattleTriggerPhase) => boolean;
 }
 
@@ -190,7 +189,6 @@ export default function BattleScreen({
   dialogContextData,
   onDialogContinue,
   onDialogAction,
-  onStartEvents,
   onTriggerTurnEvent,
 }: BattleScreenLogicProps) {
   // Local state for the battle loop so we don't mutate global store directly until the end
@@ -212,7 +210,7 @@ export default function BattleScreen({
 
   useEffect(() => {
     addLog(`A wild ${enemyCreature.name} appeared!`);
-    if (onStartEvents) onStartEvents();
+    onTriggerTurnEvent?.(1, 'start');
   }, []);
 
   useEffect(() => {
@@ -310,6 +308,9 @@ export default function BattleScreen({
 
   const handleAttack = (moveIndex: number) => {
     if (!isPlayerTurn || battleOver) return;
+
+    const triggered = onTriggerTurnEvent?.(turnCount, 'beforePlayerAttack');
+    if (triggered) return;
 
     const moveName = playerCreature.moves[moveIndex];
     setIsPlayerTurn(false);

@@ -223,12 +223,15 @@ export enum BattleContext {
 }
 
 export type BattleTurnPhase = 'before' | 'attack' | 'after' | 'end';
-export type BattleTriggerPhase = 'beforeEnemyAttack' | 'afterEnemyAttack';
+export type BattleTriggerPhase =
+  | 'start'
+  | 'beforePlayerAttack'
+  | 'beforeEnemyAttack'
+  | 'afterEnemyAttack';
 
 export interface BattleConfig {
   enemy: Creature;
   backgroundImageKey: BackgroundImageKey;
-  afterStartEvents?: GameEvent[];
   turnEvents?: {
     [turn: number]: {
       [key in BattleTriggerPhase]?: GameEvent[];

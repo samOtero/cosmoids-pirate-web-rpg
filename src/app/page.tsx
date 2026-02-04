@@ -131,10 +131,6 @@ export default function Home() {
               processNextEvent();
             }
           }}
-          onStartEvents={() => {
-            if (!currentBattle?.afterStartEvents?.length) return;
-            enqueueAndProcessEvents(currentBattle.afterStartEvents);
-          }}
           onTriggerTurnEvent={(turn, phase) => {
             const events = currentBattle?.turnEvents?.[turn]?.[phase];
             if (events && events.length > 0) {
