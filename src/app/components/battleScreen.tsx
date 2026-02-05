@@ -272,8 +272,11 @@ export default function BattleScreen({
           setTimeout(() => {
             setEnemyHit(undefined);
             setPlayerHit(undefined);
-            // Move to After phase
-            setTurnPhase('after');
+
+            // Add delay before moving to After phase
+            setTimeout(() => {
+              setTurnPhase('after');
+            }, 1000);
           }, 500);
         }, 250); // Impact time (mid-tackle)
       }, 1000);
