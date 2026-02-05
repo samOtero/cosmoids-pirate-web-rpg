@@ -24,7 +24,7 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
           {
             type: 'SHOW_BATTLE_DIALOG',
             payload: {
-              context: DialogContext.LEVEL_1_INSTRUCTION_1,
+              context: DialogContext.LEVEL_1_INSTRUCTION_2,
             },
           },
         ],
@@ -32,7 +32,7 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
           {
             type: 'SHOW_BATTLE_DIALOG',
             payload: {
-              context: DialogContext.LEVEL_1_INSTRUCTION_1,
+              context: DialogContext.LEVEL_1_INSTRUCTION_3,
             },
           },
         ],
