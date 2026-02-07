@@ -80,7 +80,7 @@ export default function DialogContent({
     };
   }, [currentLine, lineIndex]); // Re-run when line changes
 
-  const handleClick = () => {
+  const handleGlobalClick = () => {
     if (isTyping) {
       // Complete text immediately and stop the interval
       if (intervalRef.current) {
@@ -89,15 +89,17 @@ export default function DialogContent({
       }
       setDisplayedText(currentLine.text);
       setIsTyping(false);
-    } else {
-      // Only allow advancing if there are no buttons
-      if (!hasButtons()) {
-        // Next line
-        if (lineIndex < sequence.length - 1) {
-          setLineIndex((prev) => prev + 1);
-        } else {
-          onContinue();
-        }
+    }
+  };
+
+  const handleAdvance = () => {
+    // Only allow advancing if there are no buttons
+    if (!hasButtons()) {
+      // Next line
+      if (lineIndex < sequence.length - 1) {
+        setLineIndex((prev) => prev + 1);
+      } else {
+        onContinue();
       }
     }
   };
@@ -160,7 +162,7 @@ export default function DialogContent({
   }
 
   return (
-    <div className={containerClasses} onClick={handleClick}>
+    <div className={containerClasses} onClick={handleGlobalClick}>
       {/* Content Container */}
       <div className={contentWrapperClasses}>
         {/* Portrait row (supports up to 3 portraits) */}
@@ -264,10 +266,18 @@ export default function DialogContent({
           )}
 
           {!isTyping && !hasButtons() && (
-            <div className="self-end mt-auto animate-bounce text-cyan-400 text-sm font-bold uppercase tracking-widest">
-              {lineIndex < sequence.length - 1
-                ? 'Click to Continue ▼'
-                : 'Click to Proceed ►'}
+            <div
+              className="self-end mt-auto cursor-pointer p-6 -mr-4 -mb-4 hover:bg-white/5 rounded-lg transition-colors group"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAdvance();
+              }}
+            >
+              <div className="animate-bounce text-cyan-400 text-sm font-bold uppercase tracking-widest group-hover:text-cyan-300">
+                {lineIndex < sequence.length - 1
+                  ? 'Click to Continue ▼'
+                  : 'Click to Proceed ►'}
+              </div>
             </div>
           )}
         </Panel>
