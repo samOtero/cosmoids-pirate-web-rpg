@@ -4,8 +4,9 @@ import React, { useEffect, useState, lazy, Suspense } from 'react';
 
 const DialogEditor = lazy(() => import('./DialogEditor'));
 const AnimationEditor = lazy(() => import('./AnimationEditor'));
+const BattleDebug = lazy(() => import('./BattleDebug'));
 
-type ToolType = 'DIALOG' | 'ANIMATION' | null;
+type ToolType = 'DIALOG' | 'ANIMATION' | 'BATTLE' | null;
 
 export default function DevTools() {
   const [activeTool, setActiveTool] = useState<ToolType>(null);
@@ -53,6 +54,15 @@ export default function DevTools() {
               >
                 Animation Editor
               </button>
+              <button
+                onClick={() => {
+                  setActiveTool('BATTLE');
+                  setShowMenu(false);
+                }}
+                className="text-sm bg-slate-800 hover:bg-cyan-700 px-3 py-2 rounded text-left"
+              >
+                Battle Debug
+              </button>
             </div>
           </div>
         </div>
@@ -71,6 +81,9 @@ export default function DevTools() {
           )}
           {activeTool === 'ANIMATION' && (
             <AnimationEditor onClose={() => setActiveTool(null)} />
+          )}
+          {activeTool === 'BATTLE' && (
+            <BattleDebug onClose={() => setActiveTool(null)} />
           )}
         </Suspense>
       )}
