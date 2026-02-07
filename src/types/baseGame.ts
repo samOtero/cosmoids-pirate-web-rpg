@@ -136,11 +136,14 @@ export interface DialogButton {
   jumpToLineId?: string; // Optional line ID to jump to within the current dialog
 }
 
+export type DialogLayout = 'default' | 'battle-left' | 'battle-right';
+
 export interface DialogLine {
   id?: string; // Optional unique identifier for jumping to this line
   portraits: DialogPortrait[];
   text: string;
   buttons?: DialogButton[]; // Optional buttons for this line
+  layout?: DialogLayout;
 }
 
 export enum DialogContext {

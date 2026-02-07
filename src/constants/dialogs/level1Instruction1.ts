@@ -14,6 +14,7 @@ export const LEVEL_1_INSTRUCTION_1: DialogConfig = {
           displayName: 'Grandpa',
         },
       ],
+      layout: 'battle-left',
     },
   ],
   backgroundImageKey: BackgroundImageKey.DEFAULT,

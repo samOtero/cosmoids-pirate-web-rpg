@@ -132,17 +132,41 @@ export default function DialogContent({
 
   if (!currentLine) return null;
 
+  const layout = currentLine.layout || 'default';
+
+  // Base container classes
+  let containerClasses =
+    'flex flex-col h-full relative cursor-pointer select-none';
+  let contentWrapperClasses =
+    'relative z-10 flex-1 flex flex-col justify-between p-4 md:p-8';
+  let portraitContainerClasses = 'flex justify-center flex-1';
+  let dialogPanelContainerClasses =
+    'min-h-40 flex flex-col justify-start items-start bg-ocean-dark/95 border-wood-light';
+
+  if (layout === 'battle-left') {
+    // Position fixed bottom-left
+    containerClasses =
+      'absolute bottom-4 left-4 w-[45%] h-auto cursor-pointer select-none';
+    contentWrapperClasses = 'relative z-10 flex flex-col p-2';
+    // Portrait aligned left-ish or centered within the smaller box
+    portraitContainerClasses = 'flex justify-start mb-2 pl-4';
+    // Remove flex-1 from portrait so it doesn't take up empty space
+  } else if (layout === 'battle-right') {
+    // Position fixed bottom-right
+    containerClasses =
+      'absolute bottom-4 right-4 w-[45%] h-auto cursor-pointer select-none';
+    contentWrapperClasses = 'relative z-10 flex flex-col p-2';
+    portraitContainerClasses = 'flex justify-end mb-2 pr-4';
+  }
+
   return (
-    <div
-      className="flex flex-col h-full relative cursor-pointer select-none"
-      onClick={handleClick}
-    >
+    <div className={containerClasses} onClick={handleClick}>
       {/* Content Container */}
-      <div className="relative z-10 flex-1 flex flex-col justify-between p-4 md:p-8">
+      <div className={contentWrapperClasses}>
         {/* Portrait row (supports up to 3 portraits) */}
         {currentLine.portraits && currentLine.portraits.length > 0 && (
-          <div className="flex justify-center flex-1">
-            <div className="flex  items-center space-x-6 md:space-x-8">
+          <div className={portraitContainerClasses}>
+            <div className="flex items-center space-x-4 md:space-x-6">
               {currentLine.portraits
                 .filter((p) => p.key !== SpeakerImageKey.EMPTY)
                 .slice(0, 3)
@@ -152,29 +176,41 @@ export default function DialogContent({
                     3
                   );
 
-                  // Size strategy: single portrait is very large; 2-3 portraits slightly smaller but still prominent
-                  // Wide portraits use rectangular dimensions for better fit of wider character art
+                  // Size strategy: Determine based on layout
+                  // In battle layouts, we want smaller portraits usually
                   let imgClass = 'w-40 h-40 md:w-56 md:h-56';
+                  if (layout !== 'default') {
+                    imgClass = 'w-24 h-24 md:w-32 md:h-32';
+                  }
+
                   let imgWidth = 256;
                   let imgHeight = 256;
 
-                  if (p.portraitWidth === 'wide') {
-                    // Wide portraits: rectangular aspect ratio (4:3)
-                    imgClass = 'w-96 h-72 md:w-[28rem] md:h-80';
-                    imgWidth = 448;
-                    imgHeight = 320;
-                  } else if (portraitCount === 1) {
-                    imgClass = 'w-80 h-80 md:w-96 md:h-96';
-                    imgWidth = 512;
-                    imgHeight = 512;
-                  } else if (portraitCount === 2) {
-                    imgClass = 'w-64 h-64 md:w-80 md:h-80';
-                    imgWidth = 384;
-                    imgHeight = 384;
-                  } else if (portraitCount === 3) {
-                    imgClass = 'w-64 h-64 md:w-80 md:h-80';
-                    imgWidth = 384;
-                    imgHeight = 384;
+                  if (layout === 'default') {
+                    if (p.portraitWidth === 'wide') {
+                      // Wide portraits: rectangular aspect ratio (4:3)
+                      imgClass = 'w-96 h-72 md:w-[28rem] md:h-80';
+                      imgWidth = 448;
+                      imgHeight = 320;
+                    } else if (portraitCount === 1) {
+                      imgClass = 'w-80 h-80 md:w-96 md:h-96';
+                      imgWidth = 512;
+                      imgHeight = 512;
+                    } else if (portraitCount === 2) {
+                      imgClass = 'w-64 h-64 md:w-80 md:h-80';
+                      imgWidth = 384;
+                      imgHeight = 384;
+                    } else if (portraitCount === 3) {
+                      imgClass = 'w-64 h-64 md:w-80 md:h-80';
+                      imgWidth = 384;
+                      imgHeight = 384;
+                    }
+                  } else {
+                    // Battle modes - keep it compact
+                    // If wide, just make it a bit wider
+                    if (p.portraitWidth === 'wide') {
+                      imgClass = 'w-48 h-36 md:w-64 md:h-48';
+                    }
                   }
 
                   return (
@@ -202,7 +238,7 @@ export default function DialogContent({
         )}
 
         {/* Dialog Box */}
-        <Panel className="min-h-40 flex flex-col justify-start items-start bg-ocean-dark/95 border-wood-light">
+        <Panel className={dialogPanelContainerClasses}>
           <div className="text-xl md:text-2xl text-sand font-mono leading-relaxed drop-shadow-md">
             {displayedText}
             {isTyping && (
