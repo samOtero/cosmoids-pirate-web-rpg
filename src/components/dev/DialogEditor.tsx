@@ -13,6 +13,7 @@ import {
   DialogButtonType,
   DialogButtonTypeConfig,
   DialogActionType,
+  DialogLayout,
 } from '@/types/baseGame';
 import DialogScreen from '@/app/components/dialogScreen';
 
@@ -20,6 +21,11 @@ import DialogScreen from '@/app/components/dialogScreen';
 
 const SPEAKER_OPTIONS = Object.values(SpeakerImageKey);
 const BACKGROUND_OPTIONS = Object.values(BackgroundImageKey);
+const LAYOUT_OPTIONS: DialogLayout[] = [
+  'default',
+  'battle-left',
+  'battle-right',
+];
 const BUTTON_TYPE_OPTIONS = Object.keys(
   DialogButtonTypeConfig
 ) as DialogButtonType[];
@@ -314,6 +320,25 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
               className="bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs text-slate-200 w-40"
               placeholder="unique-id"
             />
+          </div>
+          <div className="mt-2">
+            <label className="text-xs text-slate-400 mr-2">Layout:</label>
+            <select
+              value={line.layout || 'default'}
+              onChange={(e) =>
+                updateLine(selectedLineIndex, {
+                  ...line,
+                  layout: e.target.value as DialogLayout,
+                })
+              }
+              className="bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs text-slate-200"
+            >
+              {LAYOUT_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
