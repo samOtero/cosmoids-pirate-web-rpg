@@ -28,3 +28,6 @@ description: Verify battle mechanics by entering a specific battle via DevTools.
 
 7.  **Verify Mechanics**:
     - Verify any mechanics that you are currently interested in based on the task at hand.
+
+8.  **Only take a single screenshot**:
+    - Only take a SINGLE screenshot, DO NOT keep taking multiple screenshots when verifying a feature.
