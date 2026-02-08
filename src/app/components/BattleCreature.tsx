@@ -35,6 +35,7 @@ export const BattleCreature: React.FC<BattleCreatureProps> = ({
         }
         alt={creature.name}
         className={`object-contain drop-shadow-xl ${flipClass} ${className}`}
+        draggable={false}
       />
     </div>
   );

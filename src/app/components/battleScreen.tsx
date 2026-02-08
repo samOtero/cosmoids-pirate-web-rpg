@@ -56,7 +56,7 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
   }, [battleLog]);
 
   return (
-    <div className="flex flex-col h-full bg-black relative">
+    <div className="flex flex-col h-full bg-black relative select-none">
       {/* Battle Arena Wrapper - Restricts background to this area */}
       <div className="relative flex-1 min-h-0 w-full">
         <BattleBackground backgroundImageUrl={backgroundImageUrl} />
