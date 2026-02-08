@@ -2,7 +2,7 @@ import {
   Island,
   SpeakerImageKey,
   BackgroundImageKey,
-  DialogContext,
+  BattleContext,
 } from '@/types/baseGame';
 
 export const MAX_PROFILES = 3;
@@ -24,10 +24,9 @@ export const ISLANDS: Island[] = [
         coordinates: { x: 10, y: 80 },
         events: [
           {
-            type: 'SHOW_DIALOG',
+            type: 'START_BATTLE',
             payload: {
-              context: DialogContext.ISLAND_INTRO,
-              contextData: { islandId: 0 },
+              context: BattleContext.FIRST_BATTLE,
             },
           },
         ],
