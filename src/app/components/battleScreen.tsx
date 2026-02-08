@@ -292,6 +292,11 @@ export default function BattleScreen({
             damage = Math.max(1, Math.floor(damage * 0.2));
           }
 
+          // VULNERABLE DEFENSE PENALTY
+          if (playerEnergy <= 0) {
+            damage = Math.floor(damage * 1.5);
+          }
+
           setPlayerHp((prev) => prev - damage);
           addLog(`${enemyCreature.name} attacked doing ${damage} damage!`);
 
@@ -376,6 +381,11 @@ export default function BattleScreen({
       // WEAK ATTACK PENALTY
       if (playerEnergy <= 0) {
         damage = Math.max(1, Math.floor(damage * 0.2));
+      }
+
+      // VULNERABLE DEFENSE PENALTY
+      if (enemyEnergy <= 0) {
+        damage = Math.floor(damage * 1.5);
       }
 
       setEnemyHp((prev) => prev - damage);
