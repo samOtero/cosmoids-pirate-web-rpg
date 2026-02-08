@@ -20,6 +20,7 @@ interface DialogContentProps {
   onDialogAction: (action: DialogAction) => void;
   dialogName?: string;
   initialLineIndex?: number;
+  allowSkip?: boolean;
 }
 
 export default function DialogContent({
@@ -28,6 +29,7 @@ export default function DialogContent({
   onDialogAction,
   dialogName,
   initialLineIndex = 0,
+  allowSkip = true,
 }: DialogContentProps) {
   const [lineIndex, setLineIndex] = useState(initialLineIndex);
   const [displayedText, setDisplayedText] = useState('');
@@ -115,6 +117,29 @@ export default function DialogContent({
     }
   };
 
+  const handleSkip = () => {
+    // Find next line with an ID
+    let nextIdIndex = -1;
+    for (let i = lineIndex + 1; i < sequence.length; i++) {
+      if (sequence[i].id) {
+        nextIdIndex = i;
+        break;
+      }
+    }
+
+    if (nextIdIndex !== -1) {
+      setLineIndex(nextIdIndex);
+      setDisplayedText('');
+      setIsTyping(false);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    } else {
+      onContinue();
+    }
+  };
+
   const handleButtonClick = (button: DialogButton) => {
     // Then handle action if it exists
     if (button.action) {
@@ -143,7 +168,7 @@ export default function DialogContent({
     'relative z-10 flex-1 flex flex-col justify-between p-4 md:p-8';
   let portraitContainerClasses = 'flex justify-center flex-1';
   let dialogPanelContainerClasses =
-    'min-h-40 flex flex-col justify-start items-start bg-ocean-dark/95 border-wood-light';
+    'min-h-40 flex flex-col justify-start items-start bg-ocean-dark/95 border-wood-light relative';
 
   if (layout === 'battle-left') {
     // Position fixed bottom-left
@@ -241,6 +266,19 @@ export default function DialogContent({
 
         {/* Dialog Box */}
         <Panel className={dialogPanelContainerClasses}>
+          {allowSkip && !hasButtons() && (
+            <div
+              className="absolute top-2 right-2 cursor-pointer p-2 hover:bg-white/10 rounded transition-colors group z-50"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSkip();
+              }}
+            >
+              <span className="text-sand/50 text-xs font-bold uppercase tracking-widest group-hover:text-sand">
+                Skip
+              </span>
+            </div>
+          )}
           <div className="text-xl md:text-2xl text-sand font-mono leading-relaxed drop-shadow-md">
             {displayedText}
             {isTyping && (

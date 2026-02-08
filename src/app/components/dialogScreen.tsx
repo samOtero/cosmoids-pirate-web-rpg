@@ -60,6 +60,7 @@ export default function DialogScreen({
         onDialogAction={onDialogAction}
         dialogName={dialogName}
         initialLineIndex={initialLineIndex}
+        allowSkip={true}
       />
     </div>
   );

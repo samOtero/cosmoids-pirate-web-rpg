@@ -461,6 +461,7 @@ export default function BattleScreen({
             onContinue={onDialogContinue}
             onDialogAction={onDialogAction || (() => {})}
             initialLineIndex={dialogStartIndex || 0}
+            allowSkip={false}
           />
         </div>
       )}
