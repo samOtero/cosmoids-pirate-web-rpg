@@ -154,6 +154,10 @@ export const useGameStore = create<GameState>()(
                     state.setScreen(Screens.MAP);
                     break;
                   }
+                  case 'GO_TO_ISLAND_MAP': {
+                    state.setScreen(Screens.ISLAND_MAP);
+                    break;
+                  }
                   case 'GO_TO_PROFILES': {
                     state.setScreen(Screens.PROFILES);
                     break;
@@ -254,6 +258,7 @@ export const useGameStore = create<GameState>()(
                 inventory: [],
                 unlockedIslands: 0,
                 currentIslandId: 0,
+                islandNodeProgress: { 0: 0 },
                 starterCreatureId: null,
               };
               return {

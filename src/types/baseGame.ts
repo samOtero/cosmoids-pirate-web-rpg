@@ -3,6 +3,8 @@ export enum Screens {
   PROFILES = 'PROFILES',
   DIALOG = 'DIALOG',
   MAP = 'MAP',
+  ISLAND_MAP = 'ISLAND_MAP',
+  ISLAND_INSIDE = 'ISLAND_INSIDE',
   BATTLE = 'BATTLE',
 }
 
@@ -75,6 +77,14 @@ export interface Creature {
   currentEnergy: number;
 }
 
+export interface IslandNode {
+  id: number;
+  name: string;
+  description: string;
+  coordinates: { x: number; y: number }; // Percentage 0-100
+  events: GameEvent[];
+}
+
 export interface Profile {
   id: number;
   name: string;
@@ -84,6 +94,7 @@ export interface Profile {
   inventory: Item[];
   unlockedIslands: number; // Max island index unlocked
   currentIslandId: number;
+  islandNodeProgress: Record<number, number>; // IslandID -> MaxUnlockedNodeIndex
   starterCreatureId: string | null;
 }
 
@@ -95,6 +106,7 @@ export interface Island {
   coordinates: { x: number; y: number }; // Percentage 0-100
   unlocked: boolean;
   cleared: boolean;
+  nodes: IslandNode[];
 }
 
 export interface DialogPortrait {
@@ -189,6 +201,7 @@ export type GameEventType =
   | 'SHOW_BATTLE_DIALOG'
   | 'START_BATTLE'
   | 'GO_TO_MAP'
+  | 'GO_TO_ISLAND_MAP'
   | 'GO_TO_PROFILES'
   | 'PICK_STARTER'
   | 'ADD_CREATURE_TO_PROFILE';
@@ -200,6 +213,7 @@ export interface GameEvent {
     | ShowBattleDialogEventPayload
     | StartBattleEventPayload
     | GoToMapEventPayload
+    | GoToIslandMapEventPayload
     | PickStarterEventPayload
     | AddCreatureToProfileEventPayload;
   autoProceed?: boolean;
@@ -254,5 +268,9 @@ export interface StartBattleEventPayload {
 }
 
 export interface GoToMapEventPayload {
+  islandId: number;
+}
+
+export interface GoToIslandMapEventPayload {
   islandId: number;
 }

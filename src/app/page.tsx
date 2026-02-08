@@ -15,12 +15,14 @@ import {
   STARTER_IGUANA,
   STARTER_MONKEY,
 } from '@/constants/dialogs';
+import { ISLANDS } from '@/constants/game';
 
 const StartScreen = lazy(() => import('@/app/components/startScreen'));
 const ProfileScreen = lazy(() => import('@/app/components/profileScreen'));
 const DialogScreen = lazy(() => import('@/app/components/dialogScreen'));
 const MapScreen = lazy(() => import('@/app/components/mapScreen'));
 const BattleScreen = lazy(() => import('@/app/components/battleScreen'));
+const IslandMapScreen = lazy(() => import('@/app/components/IslandMapScreen'));
 
 export default function Home() {
   const {
@@ -251,7 +253,9 @@ export default function Home() {
       <Suspense fallback={<div>Loading...</div>}>
         <MapScreen
           profile={currentProfile}
-          onTravel={() => {
+          onTravel={(islandId) => {
+            // For now, traveling just starts the level 1 intro sequence
+            // In a real game, this would update currentIslandId
             enqueueAndProcessEvents([
               {
                 type: 'SHOW_DIALOG',
@@ -263,9 +267,43 @@ export default function Home() {
               },
             ]);
           }}
-          onOpenMenu={function (): void {
-            throw new Error('Function not implemented.');
+          onEnterIsland={(islandId) => {
+            enqueueAndProcessEvents([
+              {
+                type: 'GO_TO_ISLAND_MAP',
+                payload: { islandId },
+              },
+            ]);
           }}
+          onOpenMenu={() => {}}
+        />
+      </Suspense>
+    );
+  }
+
+  if (currentScreen === Screens.ISLAND_MAP) {
+    if (!currentProfile) return null;
+    const island = ISLANDS.find((i) => i.id === currentProfile.currentIslandId);
+
+    // Fallback if island not found or logic error
+    if (!island) {
+      setScreen(Screens.MAP);
+      return null;
+    }
+
+    return (
+      <Suspense fallback={<div>Loading Island...</div>}>
+        <IslandMapScreen
+          profile={currentProfile}
+          island={island}
+          onNodeClick={(nodeId) => {
+            const node = island.nodes?.find((n) => n.id === nodeId);
+            if (node && node.events) {
+              enqueueAndProcessEvents(node.events);
+            }
+          }}
+          onBack={() => setScreen(Screens.MAP)}
+          onOpenMenu={() => {}}
         />
       </Suspense>
     );

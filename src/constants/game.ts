@@ -1,4 +1,9 @@
-import { Island, SpeakerImageKey, BackgroundImageKey } from '@/types/baseGame';
+import {
+  Island,
+  SpeakerImageKey,
+  BackgroundImageKey,
+  DialogContext,
+} from '@/types/baseGame';
 
 export const MAX_PROFILES = 3;
 
@@ -11,6 +16,37 @@ export const ISLANDS: Island[] = [
     coordinates: { x: 10, y: 80 },
     unlocked: true,
     cleared: false,
+    nodes: [
+      {
+        id: 0,
+        name: 'Landing Point',
+        description: 'Where your journey begins.',
+        coordinates: { x: 10, y: 80 },
+        events: [
+          {
+            type: 'SHOW_DIALOG',
+            payload: {
+              context: DialogContext.ISLAND_INTRO,
+              contextData: { islandId: 0 },
+            },
+          },
+        ],
+      },
+      {
+        id: 1,
+        name: 'Coconut Grove',
+        description: 'A grove with fresh coconuts.',
+        coordinates: { x: 30, y: 60 },
+        events: [],
+      },
+      {
+        id: 2,
+        name: 'Mysterious Cave',
+        description: 'Dark and echoey.',
+        coordinates: { x: 60, y: 40 },
+        events: [],
+      },
+    ],
   },
   {
     id: 1,
@@ -20,6 +56,7 @@ export const ISLANDS: Island[] = [
     coordinates: { x: 30, y: 60 },
     unlocked: false,
     cleared: false,
+    nodes: [],
   },
   {
     id: 2,
@@ -29,6 +66,7 @@ export const ISLANDS: Island[] = [
     coordinates: { x: 50, y: 40 },
     unlocked: false,
     cleared: false,
+    nodes: [],
   },
   {
     id: 3,
@@ -38,6 +76,7 @@ export const ISLANDS: Island[] = [
     coordinates: { x: 70, y: 20 },
     unlocked: false,
     cleared: false,
+    nodes: [],
   },
   {
     id: 4,
@@ -47,6 +86,7 @@ export const ISLANDS: Island[] = [
     coordinates: { x: 90, y: 50 },
     unlocked: false,
     cleared: false,
+    nodes: [],
   },
 ];
 

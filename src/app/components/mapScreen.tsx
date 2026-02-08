@@ -1,32 +1,34 @@
-import { Profile } from "@/types/baseGame";
-import Panel from "@/app/components/ui/Panel";
-import { useState } from "react";
-import { Button } from "@/app/components/ui/Button";
-import { ISLANDS } from "@/constants/game";
+import { Profile } from '@/types/baseGame';
+import Panel from '@/app/components/ui/Panel';
+import { useState } from 'react';
+import { Button } from '@/app/components/ui/Button';
+import { ISLANDS } from '@/constants/game';
 
 interface MapScreenProps {
   profile: Profile;
   onTravel: (islandId: number) => void;
+  onEnterIsland: (islandId: number) => void;
   onOpenMenu: () => void;
 }
 export default function MapScreen({
   profile,
   onTravel,
+  onEnterIsland,
   onOpenMenu,
 }: MapScreenProps) {
   const [hoverIsland, setHoverIsland] = useState<number | null>(null);
   const potionCount =
-    profile.inventory.find((i) => i.id === "potion")?.count || 0;
+    profile.inventory.find((i) => i.id === 'potion')?.count || 0;
 
   return (
-    <div className="relative w-full h-full bg-[#1a4f7c] overflow-hidden">
+    <div className="relative w-full h-full bg-ocean overflow-hidden">
       {/* Background Grid */}
       <div
         className="absolute inset-0 opacity-10"
         style={{
           backgroundImage:
-            "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
+            'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
+          backgroundSize: '40px 40px',
         }}
       ></div>
 
@@ -101,9 +103,9 @@ export default function MapScreen({
                 y1={`${prev.coordinates.y}%`}
                 x2={`${island.coordinates.x}%`}
                 y2={`${island.coordinates.y}%`}
-                stroke={isUnlocked ? "#f4e4bc" : "#334"}
+                stroke={isUnlocked ? '#f4e4bc' : '#334'}
                 strokeWidth="2"
-                strokeDasharray={isUnlocked ? "0" : "5,5"}
+                strokeDasharray={isUnlocked ? '0' : '5,5'}
               />
             );
           })}
@@ -124,17 +126,23 @@ export default function MapScreen({
               }}
               onMouseEnter={() => setHoverIsland(island.id)}
               onMouseLeave={() => setHoverIsland(null)}
-              onClick={() => isUnlocked && onTravel(island.id)}
+              onClick={() => {
+                if (isCurrent) {
+                  onEnterIsland(island.id);
+                } else if (isUnlocked) {
+                  onTravel(island.id);
+                }
+              }}
             >
               {/* Island Node */}
               <div
                 className={`w-12 h-12 md:w-16 md:h-16 rounded-full border-4 flex items-center justify-center shadow-xl relative
                    ${
                      isCurrent
-                       ? "bg-cyan-600 border-white scale-110"
+                       ? 'bg-cyan-600 border-white scale-110'
                        : isUnlocked
-                       ? "bg-wood hover:bg-wood-light border-sand"
-                       : "bg-gray-800 border-gray-600 cursor-not-allowed"
+                         ? 'bg-wood hover:bg-wood-light border-sand'
+                         : 'bg-gray-800 border-gray-600 cursor-not-allowed'
                    }
                 `}
               >
@@ -152,7 +160,7 @@ export default function MapScreen({
               {(isHover || isCurrent) && (
                 <div
                   className={`mt-2 bg-black/80 text-sand p-2 rounded text-center whitespace-nowrap z-10 pointer-events-none ${
-                    isCurrent ? "border border-cyan-500" : ""
+                    isCurrent ? 'border border-cyan-500' : ''
                   }`}
                 >
                   <div className="font-bold">{island.name}</div>
@@ -166,7 +174,7 @@ export default function MapScreen({
                   )}
                   {isCurrent && (
                     <div className="text-[10px] text-cyan-300 mt-1">
-                      Click to Explore
+                      Click to Enter
                     </div>
                   )}
                 </div>
