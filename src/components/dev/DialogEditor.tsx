@@ -41,6 +41,21 @@ const DEFAULT_PORTRAIT: DialogPortrait = {
   displayName: 'Guide',
 };
 
+const getDisplayNameForKey = (key: string): string => {
+  if (key.startsWith('Grandpa')) return 'Grandpa';
+  if (key.startsWith('Caleb')) return 'Caleb';
+  if (key.startsWith('Hookaw')) return 'Scuttles';
+  if (key.startsWith('Pirate_Grunt_Joe')) return 'Grunt Pirate Joe';
+  if (key.startsWith('Eel_Senticle')) return 'Senticle';
+  if (key === 'Old Sailor') return 'Old Sailor';
+  if (key.startsWith('Starter_Chest')) return 'Chest';
+  if (key === 'Guide') return 'Guide';
+  if (key === 'Crewmate') return 'Crewmate';
+  if (key === 'Narrator') return 'Narrator';
+  if (key === 'default' || key === 'empty') return '';
+  return key;
+};
+
 // --- Components ---
 
 function JsonEditor({
@@ -390,10 +405,12 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                     <select
                       value={portrait.key}
                       onChange={(e) => {
+                        const newKey = e.target.value as SpeakerImageKey;
                         const newPortraits = [...line.portraits];
                         newPortraits[pIdx] = {
                           ...portrait,
-                          key: e.target.value as SpeakerImageKey,
+                          key: newKey,
+                          displayName: getDisplayNameForKey(newKey),
                         };
                         updateLine(selectedLineIndex, {
                           ...line,
