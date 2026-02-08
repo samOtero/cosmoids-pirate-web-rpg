@@ -5,272 +5,290 @@ import {
 } from '@/types/baseGame';
 
 export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
-  "sequence": [
+  sequence: [
     {
-      "portraits": [
+      portraits: [
         {
-          "key": SpeakerImageKey.EMPTY,
-          "displayName": ""
-        }
+          key: SpeakerImageKey.EMPTY,
+          displayName: '',
+        },
       ],
-      "text": "On the morning of Caleb's birthday, in the small coastal town of Seabreeze..."
+      text: "On the morning of Caleb's birthday, in the small coastal town of Seabreeze...",
     },
     {
-      "portraits": [
+      portraits: [
         {
-          "key": SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
-          "displayName": "Caleb"
-        }
+          key: SpeakerImageKey.CALEB_DISAPPOINTED_STARTER_OUTFIT,
+          displayName: 'Caleb',
+        },
       ],
-      "text": "..."
+      text: "They aren't coming... are they?",
     },
     {
-      "portraits": [
+      portraits: [
         {
-          "key": SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          "displayName": "Grandpa"
-        }
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: 'Grandpa',
+        },
       ],
-      "text": "Scanning the horizon already? Usually I can't get you out of bed at all."
+      text: "The sea is unpredictable, lad. It doesn't mean they forgot you.",
     },
     {
-      "portraits": [
+      portraits: [
         {
-          "key": SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
-          "displayName": "Caleb"
-        }
+          key: SpeakerImageKey.CALEB_DISAPPOINTED_STARTER_OUTFIT,
+          displayName: 'Caleb',
+        },
       ],
-      "text": "It’s today, Grandpa. They promised. They’re coming."
+      text: "It's because I'm not good enough...",
     },
     {
-      "portraits": [
+      portraits: [
         {
-          "key": SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          "displayName": "Grandpa"
-        }
+          key: SpeakerImageKey.CALEB_DISAPPOINTED_STARTER_OUTFIT,
+          displayName: 'Caleb',
+        },
       ],
-      "text": "The sea keeps its own schedule, Caleb. Tides turn when they want to."
+      text: "If I was a real Captain, they wouldn't leave me behind...",
     },
     {
-      "portraits": [
+      portraits: [
         {
-          "key": SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          "displayName": "Grandpa"
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: 'Grandpa',
+        },
+      ],
+      text: "Look at me, Caleb. I've seen you grow up into a smart, capable, hard-working young man.",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: 'Grandpa',
+        },
+      ],
+      text: 'Believe me when I say your parents see it too.',
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: 'Grandpa',
         },
         {
-          "key": SpeakerImageKey.STARTER_CHEST_CLOSED,
-          "displayName": "Birthday Chest"
-        }
+          key: SpeakerImageKey.STARTER_CHEST_CLOSED,
+          displayName: 'Birthday Chest',
+        },
       ],
-      "text": "But... they knew you’d be waiting. They sent a package ahead. Just in case."
+      text: "That's why they sent you this.",
     },
     {
-      "portraits": [
+      portraits: [
         {
-          "key": SpeakerImageKey.EMPTY,
-          "displayName": ""
-        }
+          key: SpeakerImageKey.EMPTY,
+          displayName: '',
+        },
       ],
-      "text": "Grandpa hands Caleb a small wooden chest."
+      text: 'Grandpa hands Caleb a small wooden chest.',
     },
     {
-      "portraits": [
+      portraits: [
         {
-          "key": SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
-          "displayName": "Caleb"
+          key: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
+          displayName: 'Caleb',
         },
         {
-          "key": SpeakerImageKey.STARTER_CHEST_OPEN,
-          "displayName": "Birthday Chest"
-        }
+          key: SpeakerImageKey.STARTER_CHEST_OPEN,
+          displayName: 'Birthday Chest',
+        },
       ],
-      "text": "No way.. Are these real Cosmoid Doubloons?!"
+      text: 'No way.. Are these real Cosmoid Doubloons?!',
     },
     {
-      "portraits": [
+      portraits: [
         {
-          "key": SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          "displayName": "Grandpa"
-        }
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: 'Grandpa',
+        },
       ],
-      "text": "Aye. The first rule of a Captain is choosing the right crew."
+      text: 'Aye, your parents wanted to ensure you had a crew worthy of a Captain.',
     },
     {
-      "text": "Tradition says you must pick one. Choose wisely, lad.",
-      "portraits": [
+      text: 'Tradition dictates you must choose your first partner, so choose wisely.',
+      portraits: [
         {
-          "key": SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          "displayName": "Grandpa"
-        }
-      ]
-    },
-    {
-      "portraits": [
-        {
-          "key": SpeakerImageKey.STARTER_1_CRAB,
-          "displayName": "Palmit"
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: 'Grandpa',
         },
-        {
-          "key": SpeakerImageKey.STARTER_2_IGUANA,
-          "displayName": "Fueguana",
-          "portraitWidth": "wide"
-        },
-        {
-          "key": SpeakerImageKey.STARTER_3_MONKEY,
-          "displayName": "Monkeg"
-        }
       ],
-      "id": "starter_choice",
-      "text": "Pick your starter Cosmoid!",
-      "buttons": [
-        {
-          "label": "Palmit",
-          "type": "grass",
-          "jumpToLineId": "palmit_choice"
-        },
-        {
-          "label": "Fueguana",
-          "type": "fire",
-          "jumpToLineId": "fueguana_choice"
-        },
-        {
-          "label": "Monkeg",
-          "type": "water",
-          "jumpToLineId": "monkeg_choice"
-        }
-      ]
     },
     {
-      "portraits": [
+      portraits: [
         {
-          "key": SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          "displayName": "Grandpa"
+          key: SpeakerImageKey.STARTER_1_CRAB,
+          displayName: 'Palmit',
         },
         {
-          "key": SpeakerImageKey.STARTER_1_CRAB,
-          "displayName": "Palmit"
-        }
+          key: SpeakerImageKey.STARTER_2_IGUANA,
+          displayName: 'Fueguana',
+          portraitWidth: 'wide',
+        },
+        {
+          key: SpeakerImageKey.STARTER_3_MONKEY,
+          displayName: 'Monkeg',
+        },
       ],
-      "id": "palmit_choice",
-      "text": "A sturdy choice! It builds its own coconut raft to brave the salt water. So, are you sure you want to choose Palmit?",
-      "buttons": [
+      id: 'starter_choice',
+      text: 'Pick your starter Cosmoid!',
+      buttons: [
         {
-          "label": "Yes",
-          "type": "confirm",
-          "jumpToLineId": "after_starter_choice",
-          "action": {
-            "type": "PROCESS_EVENT",
-            "payload": {
-              "event": {
-                "type": "PICK_STARTER",
-                "payload": {
-                  "creatureId": "starter_grass"
-                }
-              }
-            }
-          }
+          label: 'Palmit',
+          type: 'grass',
+          jumpToLineId: 'palmit_choice',
         },
         {
-          "label": "No",
-          "type": "cancel",
-          "jumpToLineId": "starter_choice"
-        }
-      ]
-    },
-    {
-      "portraits": [
-        {
-          "key": SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          "displayName": "Grandpa"
+          label: 'Fueguana',
+          type: 'fire',
+          jumpToLineId: 'fueguana_choice',
         },
         {
-          "key": SpeakerImageKey.STARTER_2_IGUANA,
-          "displayName": "Fueguana",
-          "portraitWidth": "wide"
-        }
+          label: 'Monkeg',
+          type: 'water',
+          jumpToLineId: 'monkeg_choice',
+        },
       ],
-      "id": "fueguana_choice",
-      "text": "Oho, a fiery spirit! It has a knack for mischief and gunpowder. So, are you sure you want to choose Fueguana?",
-      "buttons": [
-        {
-          "label": "Yes",
-          "type": "confirm",
-          "jumpToLineId": "after_starter_choice",
-          "action": {
-            "type": "PROCESS_EVENT",
-            "payload": {
-              "event": {
-                "type": "PICK_STARTER",
-                "payload": {
-                  "creatureId": "starter_fire"
-                }
-              }
-            }
-          }
-        },
-        {
-          "label": "No",
-          "type": "cancel",
-          "jumpToLineId": "starter_choice"
-        }
-      ]
     },
     {
-      "portraits": [
+      portraits: [
         {
-          "key": SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          "displayName": "Grandpa"
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: 'Grandpa',
         },
         {
-          "key": SpeakerImageKey.STARTER_3_MONKEY,
-          "displayName": "Monkeg"
-        }
+          key: SpeakerImageKey.STARTER_1_CRAB,
+          displayName: 'Palmit',
+        },
       ],
-      "id": "monkeg_choice",
-      "text": "Ah, the shy stowaway. It may prefer hiding in its barrel right now, but it's a natural navigator. So, are you sure you want to choose Monkeg?",
-      "buttons": [
+      id: 'palmit_choice',
+      text: 'A sturdy choice! It builds its own coconut raft to brave the salt water. So, are you sure you want to choose Palmit?',
+      buttons: [
         {
-          "label": "Yes",
-          "type": "confirm",
-          "jumpToLineId": "after_starter_choice",
-          "action": {
-            "type": "PROCESS_EVENT",
-            "payload": {
-              "event": {
-                "type": "PICK_STARTER",
-                "payload": {
-                  "creatureId": "starter_water"
-                }
-              }
-            }
-          }
+          label: 'Yes',
+          type: 'confirm',
+          jumpToLineId: 'after_starter_choice',
+          action: {
+            type: 'PROCESS_EVENT',
+            payload: {
+              event: {
+                type: 'PICK_STARTER',
+                payload: {
+                  creatureId: 'starter_grass',
+                },
+              },
+            },
+          },
         },
         {
-          "label": "No",
-          "type": "cancel",
-          "jumpToLineId": "starter_choice"
-        }
-      ]
-    },
-    {
-      "portraits": [
-        {
-          "key": SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          "displayName": "Grandpa"
-        }
+          label: 'No',
+          type: 'cancel',
+          jumpToLineId: 'starter_choice',
+        },
       ],
-      "id": "after_starter_choice",
-      "text": "A fine heading! I know you two will look out for each other."
     },
     {
-      "text": "Hold that doubloon tight, Caleb. your journey officially beg-",
-      "portraits": [
+      portraits: [
         {
-          "key": SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          "displayName": "Grandpa"
-        }
-      ]
-    }
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: 'Grandpa',
+        },
+        {
+          key: SpeakerImageKey.STARTER_2_IGUANA,
+          displayName: 'Fueguana',
+          portraitWidth: 'wide',
+        },
+      ],
+      id: 'fueguana_choice',
+      text: 'Oho, a fiery spirit! It has a knack for mischief and gunpowder. So, are you sure you want to choose Fueguana?',
+      buttons: [
+        {
+          label: 'Yes',
+          type: 'confirm',
+          jumpToLineId: 'after_starter_choice',
+          action: {
+            type: 'PROCESS_EVENT',
+            payload: {
+              event: {
+                type: 'PICK_STARTER',
+                payload: {
+                  creatureId: 'starter_fire',
+                },
+              },
+            },
+          },
+        },
+        {
+          label: 'No',
+          type: 'cancel',
+          jumpToLineId: 'starter_choice',
+        },
+      ],
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: 'Grandpa',
+        },
+        {
+          key: SpeakerImageKey.STARTER_3_MONKEY,
+          displayName: 'Monkeg',
+        },
+      ],
+      id: 'monkeg_choice',
+      text: "Ah, the shy stowaway. It may prefer hiding in its barrel right now, but it's a natural navigator. So, are you sure you want to choose Monkeg?",
+      buttons: [
+        {
+          label: 'Yes',
+          type: 'confirm',
+          jumpToLineId: 'after_starter_choice',
+          action: {
+            type: 'PROCESS_EVENT',
+            payload: {
+              event: {
+                type: 'PICK_STARTER',
+                payload: {
+                  creatureId: 'starter_water',
+                },
+              },
+            },
+          },
+        },
+        {
+          label: 'No',
+          type: 'cancel',
+          jumpToLineId: 'starter_choice',
+        },
+      ],
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: 'Grandpa',
+        },
+      ],
+      id: 'after_starter_choice',
+      text: "A fine choice. A Captain is nothing without a loyal First Mate, and you've picked a good one.",
+    },
+    {
+      text: 'Your journey officially beg-',
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: 'Grandpa',
+        },
+      ],
+    },
   ],
-  "backgroundImageKey": BackgroundImageKey.FIRST_TOWN_DOCKS
+  backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
 };

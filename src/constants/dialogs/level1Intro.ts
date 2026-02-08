@@ -13,7 +13,7 @@ export const LEVEL_1_INTRO: DialogConfig = {
           displayName: 'Grandpa',
         },
       ],
-      text: 'Hold that doubloon tight, Caleb. your journey officially beg-',
+      text: 'Your journey officially beg-',
     },
     {
       portraits: [
@@ -76,7 +76,7 @@ export const LEVEL_1_INTRO: DialogConfig = {
           displayName: 'Grandpa',
         },
       ],
-      text: 'Careful! Someone followed him here.',
+      text: 'Caleb! Careful! Someone followed him here.',
     },
     {
       portraits: [
@@ -90,20 +90,29 @@ export const LEVEL_1_INTRO: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
+          key: SpeakerImageKey.CALEB_SCARED_SURPRISED_STARTER_OUTFIT,
           displayName: 'Caleb',
         },
       ],
-      text: 'Who are you? Stay away from Scuttles!',
+      text: 'Grandpa! Who is that?! Why does he want Scuttles?!',
     },
     {
       portraits: [
         {
-          key: SpeakerImageKey.PIRATE_GRUNT_JOE_ANGRY,
+          key: SpeakerImageKey.PIRATE_GRUNT_JOE_SMIRK,
           displayName: 'Grunt Pirate Joe',
         },
       ],
-      text: "Give me that bird, kid. The Captain's gonna have my head if I lose it!",
+      text: "Hand over... the bird, kid. Huff... The Captain's gonna have my head... if I lose it!",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.CALEB_SCARED_SURPRISED_STARTER_OUTFIT,
+          displayName: 'Caleb',
+        },
+      ],
+      text: "I- I don't want any trouble! Just leave us alone!",
     },
     {
       portraits: [
@@ -127,7 +136,25 @@ export const LEVEL_1_INTRO: DialogConfig = {
           displayName: 'Grandpa',
         },
       ],
-      text: 'He leaves us no choice! Caleb, use the gift your parents sent you. Defend your crew!',
+      text: 'Caleb, stand fast! Use the gift your parents sent you. Defend your crew!',
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.CALEB_DISAPPOINTED_STARTER_OUTFIT,
+          displayName: 'Caleb',
+        },
+      ],
+      text: 'My parents... they sent me this partner for a reason...',
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.CALEB_DISAPPOINTED_STARTER_OUTFIT,
+          displayName: 'Caleb',
+        },
+      ],
+      text: "...even if I feel like I'm not enough...",
     },
     {
       portraits: [
@@ -136,7 +163,7 @@ export const LEVEL_1_INTRO: DialogConfig = {
           displayName: 'Caleb',
         },
       ],
-      text: "Nobody touches my family! Let's go, partner! I choose YOU!",
+      text: "I won't let you touch Scuttles!!",
     },
   ],
   backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
