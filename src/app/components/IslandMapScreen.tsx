@@ -1,4 +1,5 @@
-import { Profile, Island } from '@/types/baseGame';
+import { Profile, Island, BackgroundImageKey } from '@/types/baseGame';
+import { BACKGROUND_IMAGES } from '@/constants/game';
 import Panel from '@/app/components/ui/Panel';
 import { useState } from 'react';
 import { Button } from '@/app/components/ui/Button';
@@ -27,8 +28,20 @@ export default function IslandMapScreen({
   return (
     <div className="relative w-full h-full bg-[#2c3e50] overflow-hidden">
       {/* Background Grid - slightly different color/style than world map */}
+      {island.backgroundImageKey && (
+        <div
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: `url(${BACKGROUND_IMAGES[island.backgroundImageKey]})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+      )}
+
+      {/* Background Grid - slightly different color/style than world map */}
       <div
-        className="absolute inset-0 opacity-10"
+        className="absolute inset-0 opacity-10 z-0"
         style={{
           backgroundImage:
             'linear-gradient(#f4e4bc 1px, transparent 1px), linear-gradient(90deg, #f4e4bc 1px, transparent 1px)',

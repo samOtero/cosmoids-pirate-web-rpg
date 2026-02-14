@@ -46,6 +46,7 @@ export enum SpeakerImageKey {
 export enum BackgroundImageKey {
   CALEB_HOUSE = 'Caleb_House',
   FIRST_TOWN_DOCKS = 'First_Town_Docks',
+  ISLAND_1 = 'Island_1',
   DEFAULT = 'default',
 }
 
@@ -104,6 +105,7 @@ export interface Island {
   description: string;
   difficulty: number;
   coordinates: { x: number; y: number }; // Percentage 0-100
+  backgroundImageKey?: BackgroundImageKey;
   unlocked: boolean;
   cleared: boolean;
   nodes: IslandNode[];

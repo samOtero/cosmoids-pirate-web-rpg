@@ -14,6 +14,7 @@ export const ISLANDS: Island[] = [
     description: 'A peaceful starting beach.',
     difficulty: 1,
     coordinates: { x: 10, y: 80 },
+    backgroundImageKey: BackgroundImageKey.ISLAND_1,
     unlocked: true,
     cleared: false,
     nodes: [
@@ -131,6 +132,7 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
 export const BACKGROUND_IMAGES: Record<BackgroundImageKey, string> = {
   [BackgroundImageKey.CALEB_HOUSE]: '/bg_caleb_house_1.png',
   [BackgroundImageKey.FIRST_TOWN_DOCKS]: '/bg_first_town_docks_1.png',
+  [BackgroundImageKey.ISLAND_1]: '/island_1_wip.png',
   [BackgroundImageKey.DEFAULT]: '/bg_caleb_house_1.png',
 };
 
