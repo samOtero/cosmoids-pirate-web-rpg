@@ -143,6 +143,22 @@ export default function MapEditor({ onClose }: { onClose: () => void }) {
     setSelectedNodeId(null);
   };
 
+  const handleSave = async () => {
+    try {
+      const res = await fetch('/api/map/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ islands }),
+      });
+      if (!res.ok) throw new Error('Failed to save');
+      setIsDirty(false);
+      alert('Saved successfully!');
+    } catch (e) {
+      console.error(e);
+      alert('Error saving: ' + (e as Error).message);
+    }
+  };
+
   const handleCopyJson = () => {
     if (!activeIsland) return;
     // create a clean copy without react internal keys if any
@@ -188,6 +204,17 @@ export default function MapEditor({ onClose }: { onClose: () => void }) {
               {activeIsland ? activeIsland.name : 'Select an Island'}
             </div>
             <div className="flex gap-2">
+              <button
+                onClick={handleSave}
+                className={`text-xs px-3 py-1 rounded font-bold ${
+                  isDirty
+                    ? 'bg-green-600 text-white hover:bg-green-500'
+                    : 'bg-slate-800 text-slate-500'
+                }`}
+                disabled={!isDirty}
+              >
+                {isDirty ? 'Save' : 'Saved'}
+              </button>
               <button
                 onClick={handleCopyJson}
                 className="bg-cyan-700 hover:bg-cyan-600 text-white text-xs px-3 py-1 rounded"
