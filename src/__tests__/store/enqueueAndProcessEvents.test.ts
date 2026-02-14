@@ -136,4 +136,35 @@ describe('useGameStore - enqueueAndProcessEvents', () => {
       DialogContext.NEW_PLAYER_WELCOME_DIALOG
     );
   });
+
+  it('should not switch screen when SHOW_ISLAND_MAP_DIALOG is triggered during ISLAND_MAP', () => {
+    const { result } = renderHook(() => useGameStore());
+
+    // 1. Go to Island Map
+    act(() => {
+      result.current.enqueueAndProcessEvents([
+        {
+          type: 'GO_TO_ISLAND_MAP',
+          payload: { islandId: 0 },
+        },
+      ]);
+    });
+
+    expect(result.current.currentScreen).toBe(Screens.ISLAND_MAP);
+
+    // 2. Trigger Island Map Dialog
+    act(() => {
+      result.current.enqueueAndProcessEvents([
+        {
+          type: 'SHOW_ISLAND_MAP_DIALOG',
+          payload: { context: DialogContext.ISLAND_INTRO },
+        },
+      ]);
+    });
+
+    // 3. Verify screen is STILL Island Map
+    expect(result.current.currentScreen).toBe(Screens.ISLAND_MAP);
+    // 4. Verify dialog context is set
+    expect(result.current.dialogContext).toBe(DialogContext.ISLAND_INTRO);
+  });
 });

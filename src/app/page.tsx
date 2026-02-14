@@ -280,6 +280,32 @@ export default function Home() {
           }}
           onBack={() => setScreen(Screens.MAP)}
           onOpenMenu={() => {}}
+          dialogContext={dialogContext}
+          dialogContextData={dialogContextData}
+          onDialogContinue={() => {
+            const { nextEvents } = resolveDialog(
+              dialogContext,
+              dialogContextData
+            );
+
+            if (nextEvents && nextEvents.length > 0) {
+              enqueueAndProcessEvents(nextEvents);
+              return;
+            }
+
+            if (eventQueue.length > 0) {
+              processNextEvent();
+            } else {
+              // Close dialog
+              setScreen(Screens.ISLAND_MAP);
+            }
+          }}
+          onDialogAction={(action) => {
+            if (action.type === 'PROCESS_EVENT' && action.payload?.event) {
+              pushEventToFront(action.payload.event);
+              processNextEvent();
+            }
+          }}
         />
       </Suspense>
     );

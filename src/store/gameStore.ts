@@ -17,6 +17,7 @@ import {
   GameEvent,
   ShowDialogEventPayload,
   ShowBattleDialogEventPayload,
+  ShowIslandMapDialogEventPayload,
   SetFlagEventPayload,
   RemoveFlagEventPayload,
   UnlockIslandEventPayload,
@@ -148,6 +149,16 @@ export const useGameStore = create<GameState>()(
                       currentEvent.payload as ShowBattleDialogEventPayload;
                     state.setScreen(
                       Screens.BATTLE,
+                      dialogPayload.context || null,
+                      dialogPayload.contextData || undefined
+                    );
+                    break;
+                  }
+                  case 'SHOW_ISLAND_MAP_DIALOG': {
+                    const dialogPayload =
+                      currentEvent.payload as ShowIslandMapDialogEventPayload;
+                    state.setScreen(
+                      Screens.ISLAND_MAP,
                       dialogPayload.context || null,
                       dialogPayload.contextData || undefined
                     );

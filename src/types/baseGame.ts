@@ -211,6 +211,7 @@ export interface DialogConfig {
 export type GameEventType =
   | 'SHOW_DIALOG'
   | 'SHOW_BATTLE_DIALOG'
+  | 'SHOW_ISLAND_MAP_DIALOG'
   | 'START_BATTLE'
   | 'GO_TO_MAP'
   | 'GO_TO_ISLAND_MAP'
@@ -227,6 +228,7 @@ export interface GameEvent {
   payload?:
     | ShowDialogEventPayload
     | ShowBattleDialogEventPayload
+    | ShowIslandMapDialogEventPayload
     | StartBattleEventPayload
     | GoToMapEventPayload
     | GoToIslandMapEventPayload
@@ -244,6 +246,11 @@ export interface ShowDialogEventPayload {
 }
 
 export interface ShowBattleDialogEventPayload {
+  context: DialogContext;
+  contextData?: DialogContextData;
+}
+
+export interface ShowIslandMapDialogEventPayload {
   context: DialogContext;
   contextData?: DialogContextData;
 }
