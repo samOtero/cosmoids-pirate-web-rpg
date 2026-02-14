@@ -5,8 +5,9 @@ import React, { useEffect, useState, lazy, Suspense } from 'react';
 const DialogEditor = lazy(() => import('./DialogEditor'));
 const AnimationEditor = lazy(() => import('./AnimationEditor'));
 const BattleDebug = lazy(() => import('./BattleDebug'));
+const MapEditor = lazy(() => import('./MapEditor'));
 
-type ToolType = 'DIALOG' | 'ANIMATION' | 'BATTLE' | null;
+type ToolType = 'DIALOG' | 'ANIMATION' | 'BATTLE' | 'MAP' | null;
 
 export default function DevTools() {
   const [activeTool, setActiveTool] = useState<ToolType>(null);
@@ -63,6 +64,15 @@ export default function DevTools() {
               >
                 Battle Debug
               </button>
+              <button
+                onClick={() => {
+                  setActiveTool('MAP');
+                  setShowMenu(false);
+                }}
+                className="text-sm bg-slate-800 hover:bg-cyan-700 px-3 py-2 rounded text-left"
+              >
+                Map Editor
+              </button>
             </div>
           </div>
         </div>
@@ -84,6 +94,9 @@ export default function DevTools() {
           )}
           {activeTool === 'BATTLE' && (
             <BattleDebug onClose={() => setActiveTool(null)} />
+          )}
+          {activeTool === 'MAP' && (
+            <MapEditor onClose={() => setActiveTool(null)} />
           )}
         </Suspense>
       )}
