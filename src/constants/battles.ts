@@ -63,7 +63,7 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
       {
         type: 'SHOW_ISLAND_MAP_DIALOG',
         payload: {
-          context: DialogContext.LEVEL_1_INSTRUCTION_2,
+          context: DialogContext.LEVEL_2_ISLAND_MAP_INTRO,
         },
       },
     ],
