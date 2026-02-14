@@ -55,6 +55,7 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
       },
       {
         type: 'GO_TO_ISLAND_MAP',
+        autoProceed: true,
         payload: {
           islandId: 0,
         },
