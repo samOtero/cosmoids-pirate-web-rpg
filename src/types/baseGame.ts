@@ -84,6 +84,8 @@ export interface IslandNode {
   description: string;
   coordinates: { x: number; y: number }; // Percentage 0-100
   events: GameEvent[];
+  requiresFlag?: string; // Node only accessible if this flag is SET
+  blockedByFlag?: string; // Node inaccessible while this flag is SET
 }
 
 export interface Profile {
@@ -97,6 +99,7 @@ export interface Profile {
   currentIslandId: number;
   islandNodeProgress: Record<number, number>; // IslandID -> MaxUnlockedNodeIndex
   starterCreatureId: string | null;
+  gameFlags: string[]; // Persistent flags set by events (e.g. "BEAT_FIRST_BOSS")
 }
 
 export interface Island {
@@ -206,7 +209,11 @@ export type GameEventType =
   | 'GO_TO_ISLAND_MAP'
   | 'GO_TO_PROFILES'
   | 'PICK_STARTER'
-  | 'ADD_CREATURE_TO_PROFILE';
+  | 'ADD_CREATURE_TO_PROFILE'
+  | 'SET_FLAG'
+  | 'REMOVE_FLAG'
+  | 'UNLOCK_ISLAND'
+  | 'ADVANCE_NODE';
 
 export interface GameEvent {
   type: GameEventType;
@@ -217,7 +224,11 @@ export interface GameEvent {
     | GoToMapEventPayload
     | GoToIslandMapEventPayload
     | PickStarterEventPayload
-    | AddCreatureToProfileEventPayload;
+    | AddCreatureToProfileEventPayload
+    | SetFlagEventPayload
+    | RemoveFlagEventPayload
+    | UnlockIslandEventPayload
+    | AdvanceNodeEventPayload;
   autoProceed?: boolean;
 }
 
@@ -275,4 +286,21 @@ export interface GoToMapEventPayload {
 
 export interface GoToIslandMapEventPayload {
   islandId: number;
+}
+
+export interface SetFlagEventPayload {
+  flag: string;
+}
+
+export interface RemoveFlagEventPayload {
+  flag: string;
+}
+
+export interface UnlockIslandEventPayload {
+  islandId: number;
+}
+
+export interface AdvanceNodeEventPayload {
+  islandId: number;
+  nodeIndex: number;
 }

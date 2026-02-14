@@ -1,4 +1,9 @@
-import { Profile, Island, BackgroundImageKey } from '@/types/baseGame';
+import {
+  Profile,
+  Island,
+  IslandNode,
+  BackgroundImageKey,
+} from '@/types/baseGame';
 import { BACKGROUND_IMAGES } from '@/constants/game';
 import Panel from '@/app/components/ui/Panel';
 import { useState } from 'react';
@@ -24,6 +29,17 @@ export default function IslandMapScreen({
   // Nodes are stored in island.nodes
   // Progress is stored in profile.islandNodeProgress[island.id]
   const maxUnlockedNode = profile.islandNodeProgress[island.id] ?? 0;
+  const flags = profile.gameFlags ?? [];
+
+  // Check if a node is accessible based on progress index + flag conditions
+  const isNodeUnlocked = (node: IslandNode, idx: number) => {
+    const withinProgress = idx <= maxUnlockedNode;
+    const meetsRequirement =
+      !node.requiresFlag || flags.includes(node.requiresFlag);
+    const notBlocked =
+      !node.blockedByFlag || !flags.includes(node.blockedByFlag);
+    return withinProgress && meetsRequirement && notBlocked;
+  };
 
   return (
     <div className="relative w-full h-full bg-[#2c3e50] overflow-hidden">
@@ -77,7 +93,7 @@ export default function IslandMapScreen({
           {island.nodes?.map((node, idx) => {
             if (idx === 0) return null;
             const prev = island.nodes![idx - 1];
-            const isUnlocked = idx <= maxUnlockedNode;
+            const isUnlocked = isNodeUnlocked(island.nodes![idx], idx);
 
             // Only draw line if previous node exists
             if (!prev) return null;
@@ -98,7 +114,7 @@ export default function IslandMapScreen({
         </svg>
 
         {island.nodes?.map((node, idx) => {
-          const isUnlocked = idx <= maxUnlockedNode;
+          const isUnlocked = isNodeUnlocked(node, idx);
           const isNext = idx === maxUnlockedNode + 1; // The next node to unlock
           const isHover = hoverNode === node.id;
 

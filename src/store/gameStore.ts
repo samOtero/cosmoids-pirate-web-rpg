@@ -17,6 +17,10 @@ import {
   ShowDialogEventPayload,
   ShowBattleDialogEventPayload,
   PickStarterEventPayload,
+  SetFlagEventPayload,
+  RemoveFlagEventPayload,
+  UnlockIslandEventPayload,
+  AdvanceNodeEventPayload,
 } from '@/types/baseGame';
 import { BATTLES } from '@/constants/battles';
 import {
@@ -42,6 +46,11 @@ interface GameState {
   addCreatureToProfile: (slotId: number, creature: Creature) => void;
   setStarterCreature: (slotId: number, creatureId: string) => void;
   completeIntroduction: () => void;
+  // Progression
+  setGameFlag: (flag: string) => void;
+  removeGameFlag: (flag: string) => void;
+  unlockIsland: (islandId: number) => void;
+  advanceNode: (islandId: number, nodeIndex: number) => void;
   // Battle Config
   currentBattle: BattleConfig | null;
   handleBattleWin: () => void;
@@ -191,6 +200,29 @@ export const useGameStore = create<GameState>()(
                     );
                     break;
                   }
+                  case 'SET_FLAG': {
+                    const payload = currentEvent.payload as SetFlagEventPayload;
+                    state.setGameFlag(payload.flag);
+                    break;
+                  }
+                  case 'REMOVE_FLAG': {
+                    const payload =
+                      currentEvent.payload as RemoveFlagEventPayload;
+                    state.removeGameFlag(payload.flag);
+                    break;
+                  }
+                  case 'UNLOCK_ISLAND': {
+                    const payload =
+                      currentEvent.payload as UnlockIslandEventPayload;
+                    state.unlockIsland(payload.islandId);
+                    break;
+                  }
+                  case 'ADVANCE_NODE': {
+                    const payload =
+                      currentEvent.payload as AdvanceNodeEventPayload;
+                    state.advanceNode(payload.islandId, payload.nodeIndex);
+                    break;
+                  }
                 }
 
                 if (currentEvent.autoProceed && currentQueue.length > 0) {
@@ -260,6 +292,7 @@ export const useGameStore = create<GameState>()(
                 currentIslandId: 0,
                 islandNodeProgress: { 0: 0 },
                 starterCreatureId: null,
+                gameFlags: [],
               };
               return {
                 profiles: newProfiles,
@@ -417,6 +450,84 @@ export const useGameStore = create<GameState>()(
             },
             false,
             'setStarterCreature'
+          ),
+        setGameFlag: (flag: string) =>
+          set(
+            (state) => {
+              const profileId = state.currentProfileId;
+              if (profileId === null || !state.profiles[profileId])
+                return state;
+              const profile = state.profiles[profileId]!;
+              const flags = profile.gameFlags ?? [];
+              if (flags.includes(flag)) return state;
+              const newProfiles = [...state.profiles];
+              newProfiles[profileId] = {
+                ...profile,
+                gameFlags: [...flags, flag],
+              };
+              return { profiles: newProfiles };
+            },
+            false,
+            'setGameFlag'
+          ),
+        removeGameFlag: (flag: string) =>
+          set(
+            (state) => {
+              const profileId = state.currentProfileId;
+              if (profileId === null || !state.profiles[profileId])
+                return state;
+              const profile = state.profiles[profileId]!;
+              const flags = profile.gameFlags ?? [];
+              if (!flags.includes(flag)) return state;
+              const newProfiles = [...state.profiles];
+              newProfiles[profileId] = {
+                ...profile,
+                gameFlags: flags.filter((f) => f !== flag),
+              };
+              return { profiles: newProfiles };
+            },
+            false,
+            'removeGameFlag'
+          ),
+        unlockIsland: (islandId: number) =>
+          set(
+            (state) => {
+              const profileId = state.currentProfileId;
+              if (profileId === null || !state.profiles[profileId])
+                return state;
+              const profile = state.profiles[profileId]!;
+              if (islandId <= profile.unlockedIslands) return state;
+              const newProfiles = [...state.profiles];
+              newProfiles[profileId] = {
+                ...profile,
+                unlockedIslands: islandId,
+              };
+              return { profiles: newProfiles };
+            },
+            false,
+            'unlockIsland'
+          ),
+        advanceNode: (islandId: number, nodeIndex: number) =>
+          set(
+            (state) => {
+              const profileId = state.currentProfileId;
+              if (profileId === null || !state.profiles[profileId])
+                return state;
+              const profile = state.profiles[profileId]!;
+              const currentProgress = profile.islandNodeProgress[islandId] ?? 0;
+              if (nodeIndex <= currentProgress) return state;
+              const newProfiles = [...state.profiles];
+              newProfiles[profileId] = {
+                ...profile,
+                islandNodeProgress: {
+                  ...profile.islandNodeProgress,
+                  [islandId]: nodeIndex,
+                },
+              };
+              return { profiles: newProfiles };
+            },
+            false,
+            'advanceNode'
           ),
       }),
       {
