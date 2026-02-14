@@ -46,6 +46,14 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
         },
       },
       {
+        type: 'ADVANCE_NODE',
+        autoProceed: true,
+        payload: {
+          islandId: 0,
+          nodeIndex: 1,
+        },
+      },
+      {
         type: 'GO_TO_ISLAND_MAP',
         payload: {
           islandId: 0,
