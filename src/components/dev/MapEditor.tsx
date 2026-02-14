@@ -225,90 +225,99 @@ export default function MapEditor({ onClose }: { onClose: () => void }) {
           </div>
 
           <div className="flex-1 flex overflow-hidden">
-            {/* MAP PREVIEW */}
-            <div
-              className="flex-1 relative bg-black overflow-hidden select-none"
-              ref={mapRef}
-              onMouseMove={handleMouseMove}
-              onClick={() => setSelectedNodeId(null)} // Deselect node on map click
-            >
-              {activeIsland && (
-                <>
-                  {/* Background Key Check */}
-                  {activeIsland.backgroundImageKey &&
-                  BACKGROUND_IMAGES[activeIsland.backgroundImageKey] ? (
+            <div className="flex-1 flex items-center justify-center overflow-hidden bg-slate-950 p-4">
+              {/* MAP PREVIEW - ASPECT RATIO CONTAINER */}
+              <div
+                className="relative bg-black shadow-2xl"
+                style={{
+                  aspectRatio: '16/9',
+                  width: '100%',
+                  maxWidth: '100%',
+                  height: 'auto',
+                  maxHeight: '100%',
+                }}
+                ref={mapRef}
+                onMouseMove={handleMouseMove}
+                onClick={() => setSelectedNodeId(null)} // Deselect node on map click
+              >
+                {activeIsland && (
+                  <>
+                    {/* Background Key Check */}
+                    {activeIsland.backgroundImageKey &&
+                    BACKGROUND_IMAGES[activeIsland.backgroundImageKey] ? (
+                      <div
+                        className="absolute inset-0 z-0 pointer-events-none"
+                        style={{
+                          backgroundImage: `url(${BACKGROUND_IMAGES[activeIsland.backgroundImageKey]})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                          opacity: 0.8, // Slightly brighter for better visibility
+                        }}
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-slate-600 border border-slate-700">
+                        No Background Image
+                      </div>
+                    )}
+
+                    {/* Grid Overlay */}
                     <div
-                      className="absolute inset-0 z-0 pointer-events-none"
+                      className="absolute inset-0 opacity-20 pointer-events-none"
                       style={{
-                        backgroundImage: `url(${BACKGROUND_IMAGES[activeIsland.backgroundImageKey]})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        opacity: 0.5, // Dimmed for editing
+                        backgroundImage:
+                          'linear-gradient(#444 1px, transparent 1px), linear-gradient(90deg, #444 1px, transparent 1px)',
+                        backgroundSize: '4%', // Relative to container width approx
                       }}
                     />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-slate-600">
-                      No Background Image
-                    </div>
-                  )}
 
-                  {/* Grid Overlay */}
-                  <div
-                    className="absolute inset-0 opacity-20 pointer-events-none"
-                    style={{
-                      backgroundImage:
-                        'linear-gradient(#444 1px, transparent 1px), linear-gradient(90deg, #444 1px, transparent 1px)',
-                      backgroundSize: '20px 20px',
-                    }}
-                  />
+                    {/* Connections */}
+                    <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
+                      {activeIsland.nodes?.map((node, idx) => {
+                        if (idx === 0) return null;
+                        const prev = activeIsland.nodes[idx - 1];
+                        return (
+                          <line
+                            key={`path-${node.id}`}
+                            x1={`${prev.coordinates.x}%`}
+                            y1={`${prev.coordinates.y}%`}
+                            x2={`${node.coordinates.x}%`}
+                            y2={`${node.coordinates.y}%`}
+                            stroke={'#f4e4bc'}
+                            strokeWidth="2"
+                            strokeDasharray={'5,5'}
+                            opacity={0.6}
+                          />
+                        );
+                      })}
+                    </svg>
 
-                  {/* Connections */}
-                  <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
-                    {activeIsland.nodes?.map((node, idx) => {
-                      if (idx === 0) return null;
-                      const prev = activeIsland.nodes[idx - 1];
-                      return (
-                        <line
-                          key={`path-${node.id}`}
-                          x1={`${prev.coordinates.x}%`}
-                          y1={`${prev.coordinates.y}%`}
-                          x2={`${node.coordinates.x}%`}
-                          y2={`${node.coordinates.y}%`}
-                          stroke={'#f4e4bc'}
-                          strokeWidth="2"
-                          strokeDasharray={'5,5'}
-                          opacity={0.6}
-                        />
-                      );
-                    })}
-                  </svg>
-
-                  {/* Nodes */}
-                  {activeIsland.nodes?.map((node) => (
-                    <div
-                      key={node.id}
-                      className={`absolute w-8 h-8 rounded-full border-2 flex items-center justify-center transform -translate-x-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing z-20 
+                    {/* Nodes */}
+                    {activeIsland.nodes?.map((node) => (
+                      <div
+                        key={node.id}
+                        className={`absolute w-6 h-6 md:w-8 md:h-8 rounded-full border-2 flex items-center justify-center transform -translate-x-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing z-20 
                                         ${selectedNodeId === node.id ? 'bg-cyan-600 border-white scale-125 shadow-[0_0_10px_rgba(34,211,238,0.8)]' : 'bg-slate-700 border-slate-500 hover:bg-slate-600'}
                                     `}
-                      style={{
-                        left: `${node.coordinates.x}%`,
-                        top: `${node.coordinates.y}%`,
-                      }}
-                      onMouseDown={(e) => handleDragStart(e, node.id)}
-                      // onClick handled by mousedown mostly, but for selection without drag:
-                      onClick={(e) => handleNodeSelect(e, node.id)}
-                    >
-                      <span className="text-[10px] pointer-events-none select-none text-white font-bold">
-                        {node.id}
-                      </span>
-                      {/* Tooltip on hover */}
-                      <div className="absolute top-full mt-1 bg-black/80 px-2 py-1 rounded text-[10px] whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
-                        {node.name}
+                        style={{
+                          left: `${node.coordinates.x}%`,
+                          top: `${node.coordinates.y}%`,
+                        }}
+                        onMouseDown={(e) => handleDragStart(e, node.id)}
+                        // onClick handled by mousedown mostly, but for selection without drag:
+                        onClick={(e) => handleNodeSelect(e, node.id)}
+                      >
+                        <span className="text-[10px] pointer-events-none select-none text-white font-bold">
+                          {node.id}
+                        </span>
+                        {/* Tooltip on hover */}
+                        <div className="absolute top-full mt-1 bg-black/80 px-2 py-1 rounded text-[10px] whitespace-nowrap pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+                          {node.name}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </>
-              )}
+                    ))}
+                  </>
+                )}
+              </div>
             </div>
 
             {/* PROPERTIES PANEL */}

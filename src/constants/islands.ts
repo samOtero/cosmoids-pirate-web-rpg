@@ -23,8 +23,8 @@ export const ISLANDS: Island[] = [
         "name": "Landing Point",
         "description": "Where your journey begins.",
         "coordinates": {
-          "x": 27.604166666666668,
-          "y": 71.78073864749251
+          "x": 30.926724137931032,
+          "y": 68.04597642686632
         },
         "events": [
           {
@@ -40,8 +40,8 @@ export const ISLANDS: Island[] = [
         "name": "Coconut Grove",
         "description": "A grove with fresh coconuts.",
         "coordinates": {
-          "x": 46.25,
-          "y": 50.17401125663113
+          "x": 46.875,
+          "y": 47.931033898130686
         },
         "events": []
       },
@@ -50,8 +50,8 @@ export const ISLANDS: Island[] = [
         "name": "Mysterious Cave",
         "description": "Dark and echoey.",
         "coordinates": {
-          "x": 69.27083333333334,
-          "y": 36.10788671358714
+          "x": 64.22413793103449,
+          "y": 37.011493668245635
         },
         "events": []
       }
