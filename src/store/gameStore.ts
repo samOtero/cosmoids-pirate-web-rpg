@@ -10,17 +10,18 @@ import {
   StartBattleEventPayload,
   BattleContext,
   AddCreatureToProfileEventPayload,
+  GameFlagValue,
 } from '@/types/baseGame';
 import { MAX_PROFILES } from '@/constants/game';
 import {
   GameEvent,
   ShowDialogEventPayload,
   ShowBattleDialogEventPayload,
-  PickStarterEventPayload,
   SetFlagEventPayload,
   RemoveFlagEventPayload,
   UnlockIslandEventPayload,
   AdvanceNodeEventPayload,
+  GameFlag,
 } from '@/types/baseGame';
 import { BATTLES } from '@/constants/battles';
 import {
@@ -44,11 +45,10 @@ interface GameState {
   deleteProfile: (slotId: number) => void;
   selectProfile: (slotId: number) => void;
   addCreatureToProfile: (slotId: number, creature: Creature) => void;
-  setStarterCreature: (slotId: number, creatureId: string) => void;
   completeIntroduction: () => void;
   // Progression
-  setGameFlag: (flag: string) => void;
-  removeGameFlag: (flag: string) => void;
+  setGameFlag: (flag: GameFlagValue) => void;
+  removeGameFlag: (flag: GameFlagValue) => void;
   unlockIsland: (islandId: number) => void;
   advanceNode: (islandId: number, nodeIndex: number) => void;
   // Battle Config
@@ -172,20 +172,19 @@ export const useGameStore = create<GameState>()(
                     break;
                   }
                   case 'PICK_STARTER': {
-                    const payload =
-                      currentEvent.payload as PickStarterEventPayload;
+                    const payload = currentEvent.payload as SetFlagEventPayload;
                     const currentProfileId =
                       updates.currentProfileId ?? state.currentProfileId; // Use ?? because id can be 0 or null
 
-                    if (currentProfileId !== null && payload.creatureId) {
+                    if (currentProfileId !== null && payload.flag) {
                       const creatureMap: Record<string, Creature> = {
-                        starter_grass: STARTER_CRAB,
-                        starter_fire: STARTER_IGUANA,
-                        starter_water: STARTER_MONKEY,
+                        [GameFlag.STARTER_PALMIT]: STARTER_CRAB,
+                        [GameFlag.STARTER_FUEGUANA]: STARTER_IGUANA,
+                        [GameFlag.STARTER_MONKEG]: STARTER_MONKEY,
                       };
-                      const creature = creatureMap[payload.creatureId];
+                      const creature = creatureMap[payload.flag];
                       if (creature) {
-                        state.setStarterCreature(currentProfileId, creature.id);
+                        state.setGameFlag(payload.flag);
                         state.addCreatureToProfile(currentProfileId, creature);
                       }
                     }
@@ -291,7 +290,6 @@ export const useGameStore = create<GameState>()(
                 unlockedIslands: 0,
                 currentIslandId: 0,
                 islandNodeProgress: { 0: 0 },
-                starterCreatureId: null,
                 gameFlags: [],
               };
               return {
@@ -430,28 +428,7 @@ export const useGameStore = create<GameState>()(
             false,
             'addCreatureToProfile'
           ),
-        setStarterCreature: (slotId: number, creatureId: string) =>
-          set(
-            (state) => {
-              if (
-                slotId < 0 ||
-                slotId >= MAX_PROFILES ||
-                !state.profiles[slotId]
-              )
-                return state;
-              const newProfiles = [...state.profiles];
-              if (newProfiles[slotId]) {
-                newProfiles[slotId] = {
-                  ...newProfiles[slotId]!,
-                  starterCreatureId: creatureId,
-                };
-              }
-              return { profiles: newProfiles };
-            },
-            false,
-            'setStarterCreature'
-          ),
-        setGameFlag: (flag: string) =>
+        setGameFlag: (flag: GameFlagValue) =>
           set(
             (state) => {
               const profileId = state.currentProfileId;
@@ -470,7 +447,7 @@ export const useGameStore = create<GameState>()(
             false,
             'setGameFlag'
           ),
-        removeGameFlag: (flag: string) =>
+        removeGameFlag: (flag: GameFlagValue) =>
           set(
             (state) => {
               const profileId = state.currentProfileId;

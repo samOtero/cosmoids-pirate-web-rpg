@@ -2,6 +2,7 @@ import {
   DialogConfig,
   SpeakerImageKey,
   BackgroundImageKey,
+  GameFlag,
 } from '@/types/baseGame';
 
 export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
@@ -182,7 +183,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
               event: {
                 type: 'PICK_STARTER',
                 payload: {
-                  creatureId: 'starter_grass',
+                  flag: GameFlag.STARTER_PALMIT,
                 },
               },
             },
@@ -220,7 +221,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
               event: {
                 type: 'PICK_STARTER',
                 payload: {
-                  creatureId: 'starter_fire',
+                  flag: GameFlag.STARTER_FUEGUANA,
                 },
               },
             },
@@ -257,7 +258,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
               event: {
                 type: 'PICK_STARTER',
                 payload: {
-                  creatureId: 'starter_water',
+                  flag: GameFlag.STARTER_MONKEG,
                 },
               },
             },

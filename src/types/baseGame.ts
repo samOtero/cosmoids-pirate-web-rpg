@@ -50,6 +50,15 @@ export enum BackgroundImageKey {
   DEFAULT = 'default',
 }
 
+/** Minimal game flags. Key = human-readable name, value = compact flag ID. */
+export const GameFlag = {
+  STARTER_PALMIT: '0_1',
+  STARTER_FUEGUANA: '0_2',
+  STARTER_MONKEG: '0_3',
+} as const;
+
+export type GameFlagValue = (typeof GameFlag)[keyof typeof GameFlag];
+
 export interface Item {
   id: string;
   name: string;
@@ -98,8 +107,7 @@ export interface Profile {
   unlockedIslands: number; // Max island index unlocked
   currentIslandId: number;
   islandNodeProgress: Record<number, number>; // IslandID -> MaxUnlockedNodeIndex
-  starterCreatureId: string | null;
-  gameFlags: string[]; // Persistent flags set by events (e.g. "BEAT_FIRST_BOSS")
+  gameFlags: GameFlagValue[]; // Persistent flags set by events (e.g. GameFlag.STARTER_PALMIT)
 }
 
 export interface Island {
@@ -223,7 +231,6 @@ export interface GameEvent {
     | StartBattleEventPayload
     | GoToMapEventPayload
     | GoToIslandMapEventPayload
-    | PickStarterEventPayload
     | AddCreatureToProfileEventPayload
     | SetFlagEventPayload
     | RemoveFlagEventPayload
@@ -240,10 +247,6 @@ export interface ShowDialogEventPayload {
 export interface ShowBattleDialogEventPayload {
   context: DialogContext;
   contextData?: DialogContextData;
-}
-
-export interface PickStarterEventPayload {
-  creatureId: string;
 }
 
 export interface AddCreatureToProfileEventPayload {
@@ -289,11 +292,11 @@ export interface GoToIslandMapEventPayload {
 }
 
 export interface SetFlagEventPayload {
-  flag: string;
+  flag: GameFlagValue;
 }
 
 export interface RemoveFlagEventPayload {
-  flag: string;
+  flag: GameFlagValue;
 }
 
 export interface UnlockIslandEventPayload {
