@@ -45,6 +45,12 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
           context: DialogContext.LEVEL_1_WIN,
         },
       },
+      {
+        type: 'GO_TO_ISLAND_MAP',
+        payload: {
+          islandId: 0,
+        },
+      },
     ],
     loseEvents: [
       {
