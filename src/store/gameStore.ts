@@ -49,7 +49,7 @@ interface GameState {
   deleteProfile: (slotId: number) => void;
   selectProfile: (slotId: number) => void;
   addCreatureToProfile: (slotId: number, creature: Creature) => void;
-  completeIntroduction: () => void;
+
   // Progression
   setGameFlag: (flag: GameFlagValue) => void;
   removeGameFlag: (flag: GameFlagValue) => void;
@@ -288,7 +288,6 @@ export const useGameStore = create<GameState>()(
                 id: slotId,
                 name: `Caleb`,
                 lastPlayed: Date.now(),
-                isNew: true,
                 creatures: [],
                 inventory: [],
                 unlockedIslands: 0,
@@ -341,7 +340,7 @@ export const useGameStore = create<GameState>()(
                 lastPlayed: Date.now(),
               };
 
-              const isNewPlayer = profile.isNew;
+              const isNewPlayer = (profile.islandNodeProgress[0] ?? 0) === 0;
 
               let initialEvents: GameEvent[] = [];
 
@@ -368,22 +367,7 @@ export const useGameStore = create<GameState>()(
           );
           get().processNextEvent();
         },
-        completeIntroduction: () =>
-          set(
-            (state) => {
-              if (state.currentProfileId === null) return state;
-              const newProfiles = [...state.profiles];
-              if (newProfiles[state.currentProfileId]) {
-                newProfiles[state.currentProfileId] = {
-                  ...newProfiles[state.currentProfileId]!,
-                  isNew: false,
-                };
-              }
-              return { profiles: newProfiles };
-            },
-            false,
-            'completeIntroduction'
-          ),
+
         addCreatureToProfile: (slotId: number, creature: Creature) =>
           set(
             (state) => {

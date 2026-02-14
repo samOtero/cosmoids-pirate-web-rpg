@@ -10,11 +10,6 @@ import {
   BackgroundImageKey,
 } from '@/types/baseGame';
 import { resolveDialog } from '@/utils/dialogResolver';
-import {
-  STARTER_CRAB,
-  STARTER_IGUANA,
-  STARTER_MONKEY,
-} from '@/constants/dialogs';
 import { ISLANDS } from '@/constants/game';
 
 const StartScreen = lazy(() => import('@/app/components/startScreen'));
@@ -35,11 +30,9 @@ export default function Home() {
     selectProfile,
     dialogContext,
     dialogContextData,
-    addCreatureToProfile,
     currentBattle,
     currentEnemy,
     clearCurrentEnemy,
-    completeIntroduction,
     eventQueue,
     processNextEvent,
     enqueueEvent,
@@ -208,25 +201,8 @@ export default function Home() {
       }
 
       if (next) {
-        // Handle creature selection from starter dialogs
-        if (next.contextData?.creatureId && currentProfileId !== null) {
-          const creatureMap: Record<string, typeof STARTER_CRAB> = {
-            starter_crab: STARTER_CRAB,
-            starter_iguana: STARTER_IGUANA,
-            starter_monkey: STARTER_MONKEY,
-          };
-          const creature = creatureMap[next.contextData.creatureId];
-          if (creature) {
-            addCreatureToProfile(currentProfileId, { ...creature });
-          }
-        }
-
-        if (next.screen === Screens.MAP) {
-          completeIntroduction();
-        }
         setScreen(next.screen, next.context, next.contextData);
       } else {
-        completeIntroduction();
         setScreen(Screens.MAP);
       }
     };

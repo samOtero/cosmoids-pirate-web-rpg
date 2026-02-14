@@ -1,12 +1,12 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import { screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { render, resetStore } from "@/__tests__/utils/test-utils";
-import ProfileScreen from "@/app/components/profileScreen";
-import { useGameStore } from "@/store/gameStore";
-import { Screens } from "@/types/baseGame";
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { render, resetStore } from '@/__tests__/utils/test-utils';
+import ProfileScreen from '@/app/components/profileScreen';
+import { useGameStore } from '@/store/gameStore';
+import { Screens } from '@/types/baseGame';
 
-describe("Profile Management Integration", () => {
+describe('Profile Management Integration', () => {
   const mockOnSelect = vi.fn();
   const mockOnCreate = vi.fn();
   const mockOnDelete = vi.fn();
@@ -16,8 +16,8 @@ describe("Profile Management Integration", () => {
     vi.clearAllMocks();
   });
 
-  describe("Profile Creation", () => {
-    it("should create a profile in an empty slot", async () => {
+  describe('Profile Creation', () => {
+    it('should create a profile in an empty slot', async () => {
       const user = userEvent.setup();
 
       render(
@@ -30,26 +30,27 @@ describe("Profile Management Integration", () => {
       );
 
       // Click on empty slot to start creation
-      const emptySlots = screen.getAllByText("Empty Slot");
-      await user.click(emptySlots[0].closest("div")!);
+      const emptySlots = screen.getAllByText('Empty Slot');
+      await user.click(emptySlots[0].closest('div')!);
 
       // Verify onCreate was called with correct parameters
       expect(mockOnCreate).toHaveBeenCalledWith(0);
     });
   });
 
-  describe("Profile Selection", () => {
-    it("should select an existing profile and call onSelect", async () => {
+  describe('Profile Selection', () => {
+    it('should select an existing profile and call onSelect', async () => {
       const user = userEvent.setup();
       const existingProfile = {
         id: 0,
-        name: "Pirate Pete",
+        name: 'Pirate Pete',
         lastPlayed: Date.now(),
-        isNew: false,
         creatures: [],
         inventory: [],
         unlockedIslands: 2,
         currentIslandId: 1,
+        islandNodeProgress: { 0: 1 },
+        gameFlags: [],
       };
 
       render(
@@ -62,23 +63,24 @@ describe("Profile Management Integration", () => {
       );
 
       // Click on the profile
-      const profileCard = screen.getByText("Pirate Pete").closest("div")!;
+      const profileCard = screen.getByText('Pirate Pete').closest('div')!;
       await user.click(profileCard);
 
       expect(mockOnSelect).toHaveBeenCalledWith(0);
     });
 
-    it("should display profile information correctly", () => {
-      const testDate = new Date("2025-11-15").getTime();
+    it('should display profile information correctly', () => {
+      const testDate = new Date('2025-11-15').getTime();
       const existingProfile = {
         id: 1,
-        name: "Sea Captain",
+        name: 'Sea Captain',
         lastPlayed: testDate,
-        isNew: false,
         creatures: [],
         inventory: [],
         unlockedIslands: 3,
         currentIslandId: 2,
+        islandNodeProgress: { 0: 1 },
+        gameFlags: [],
       };
 
       render(
@@ -90,28 +92,29 @@ describe("Profile Management Integration", () => {
         />
       );
 
-      expect(screen.getByText("Sea Captain")).toBeInTheDocument();
-      expect(screen.getByText("Island 4")).toBeInTheDocument(); // unlockedIslands + 1
+      expect(screen.getByText('Sea Captain')).toBeInTheDocument();
+      expect(screen.getByText('Island 4')).toBeInTheDocument(); // unlockedIslands + 1
       // Use text matcher that works with the actual rendered date format
       expect(screen.getByText(/Last Played:/)).toBeInTheDocument();
       expect(screen.getByText(/11\/\d{1,2}\/2025/)).toBeInTheDocument();
     });
   });
 
-  describe("Profile Deletion", () => {
-    it("should delete a profile after confirmation", async () => {
+  describe('Profile Deletion', () => {
+    it('should delete a profile after confirmation', async () => {
       const user = userEvent.setup();
-      const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
 
       const existingProfile = {
         id: 0,
-        name: "To Delete",
+        name: 'To Delete',
         lastPlayed: Date.now(),
-        isNew: false,
         creatures: [],
         inventory: [],
         unlockedIslands: 0,
         currentIslandId: 0,
+        islandNodeProgress: { 0: 0 },
+        gameFlags: [],
       };
 
       render(
@@ -123,28 +126,29 @@ describe("Profile Management Integration", () => {
         />
       );
 
-      const deleteButton = screen.getByRole("button", { name: /delete data/i });
+      const deleteButton = screen.getByRole('button', { name: /delete data/i });
       await user.click(deleteButton);
 
-      expect(confirmSpy).toHaveBeenCalledWith("Delete save?");
+      expect(confirmSpy).toHaveBeenCalledWith('Delete save?');
       expect(mockOnDelete).toHaveBeenCalledWith(0);
 
       confirmSpy.mockRestore();
     });
 
-    it("should not delete profile when confirmation is canceled", async () => {
+    it('should not delete profile when confirmation is canceled', async () => {
       const user = userEvent.setup();
-      const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
+      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
 
       const existingProfile = {
         id: 1,
-        name: "Keep Me",
+        name: 'Keep Me',
         lastPlayed: Date.now(),
-        isNew: false,
         creatures: [],
         inventory: [],
         unlockedIslands: 0,
         currentIslandId: 0,
+        islandNodeProgress: { 0: 0 },
+        gameFlags: [],
       };
 
       render(
@@ -156,18 +160,18 @@ describe("Profile Management Integration", () => {
         />
       );
 
-      const deleteButton = screen.getByRole("button", { name: /delete data/i });
+      const deleteButton = screen.getByRole('button', { name: /delete data/i });
       await user.click(deleteButton);
 
-      expect(confirmSpy).toHaveBeenCalledWith("Delete save?");
+      expect(confirmSpy).toHaveBeenCalledWith('Delete save?');
       expect(mockOnDelete).not.toHaveBeenCalled();
 
       confirmSpy.mockRestore();
     });
   });
 
-  describe("Zustand Store Integration", () => {
-    it("should create profile and update store state", () => {
+  describe('Zustand Store Integration', () => {
+    it('should create profile and update store state', () => {
       const { createProfile } = useGameStore.getState();
 
       createProfile(0);
@@ -175,8 +179,7 @@ describe("Profile Management Integration", () => {
       const state = useGameStore.getState();
       expect(state.profiles[0]).toMatchObject({
         id: 0,
-        name: "Caleb",
-        isNew: true,
+        name: 'Caleb',
         creatures: [],
         inventory: [],
         unlockedIslands: 0,
@@ -185,7 +188,7 @@ describe("Profile Management Integration", () => {
       expect(state.profiles[0]?.lastPlayed).toBeDefined();
     });
 
-    it("should not create profile with invalid slot ID", () => {
+    it('should not create profile with invalid slot ID', () => {
       const { createProfile } = useGameStore.getState();
 
       createProfile(-1);
@@ -195,7 +198,7 @@ describe("Profile Management Integration", () => {
       expect(state.profiles.every((p) => p === null)).toBe(true);
     });
 
-    it("should delete profile and clear currentProfileId if active", () => {
+    it('should delete profile and clear currentProfileId if active', () => {
       const { createProfile, selectProfile, deleteProfile } =
         useGameStore.getState();
 
@@ -212,7 +215,7 @@ describe("Profile Management Integration", () => {
       expect(state.currentProfileId).toBe(null);
     });
 
-    it("should update lastPlayed timestamp on selection", async () => {
+    it('should update lastPlayed timestamp on selection', async () => {
       const { createProfile, selectProfile } = useGameStore.getState();
 
       createProfile(2);
@@ -227,10 +230,10 @@ describe("Profile Management Integration", () => {
       expect(updatedTime).toBeGreaterThan(initialTime!);
     });
 
-    it("should handle multiple profiles independently", () => {
+    it('should handle multiple profiles independently', () => {
       const { createProfile } = useGameStore.getState();
 
-      const defaultName = "Caleb";
+      const defaultName = 'Caleb';
 
       createProfile(0);
       createProfile(1);
@@ -242,7 +245,7 @@ describe("Profile Management Integration", () => {
       expect(state.profiles[2]?.name).toBe(defaultName);
     });
 
-    it("selecting empty slot should take you to new player dialog", () => {
+    it('selecting empty slot should take you to new player dialog', () => {
       const { selectProfile } = useGameStore.getState();
 
       selectProfile(0); // Slot is empty
@@ -253,8 +256,8 @@ describe("Profile Management Integration", () => {
     });
   });
 
-  describe("Multiple Profiles", () => {
-    it("should allow creating profiles in all 3 slots", async () => {
+  describe('Multiple Profiles', () => {
+    it('should allow creating profiles in all 3 slots', async () => {
       const user = userEvent.setup();
 
       const { rerender } = render(
@@ -267,13 +270,13 @@ describe("Profile Management Integration", () => {
       );
 
       // Create in slot 0
-      const emptySlots = screen.getAllByText("Empty Slot");
-      await user.click(emptySlots[0].closest("div")!);
+      const emptySlots = screen.getAllByText('Empty Slot');
+      await user.click(emptySlots[0].closest('div')!);
 
       expect(mockOnCreate).toHaveBeenCalledWith(0);
     });
 
-    it("should display all three profile slots", () => {
+    it('should display all three profile slots', () => {
       render(
         <ProfileScreen
           profiles={[null, null, null]}
@@ -283,7 +286,7 @@ describe("Profile Management Integration", () => {
         />
       );
 
-      const emptySlots = screen.getAllByText("Empty Slot");
+      const emptySlots = screen.getAllByText('Empty Slot');
       expect(emptySlots).toHaveLength(3);
     });
   });

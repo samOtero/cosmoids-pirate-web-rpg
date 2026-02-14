@@ -101,7 +101,6 @@ export interface Profile {
   id: number;
   name: string;
   lastPlayed: number; // Timestamp
-  isNew: boolean;
   creatures: Creature[];
   inventory: Item[];
   unlockedIslands: number; // Max island index unlocked
