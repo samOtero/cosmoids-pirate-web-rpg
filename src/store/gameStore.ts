@@ -24,6 +24,7 @@ import {
   GameFlag,
 } from '@/types/baseGame';
 import { BATTLES } from '@/constants/battles';
+import { NEW_PLAYER_EVENTS } from '@/constants/events';
 import {
   STARTER_CRAB,
   STARTER_IGUANA,
@@ -295,25 +296,7 @@ export const useGameStore = create<GameState>()(
               return {
                 profiles: newProfiles,
                 currentProfileId: slotId,
-                eventQueue: [
-                  {
-                    type: 'SHOW_DIALOG',
-                    payload: {
-                      context: DialogContext.NEW_PLAYER_WELCOME_DIALOG,
-                    },
-                  },
-                  {
-                    type: 'SHOW_DIALOG',
-                    payload: {
-                      context: DialogContext.LEVEL_1_INTRO,
-                      contextData: { dialogStartIndex: 1 },
-                    },
-                  },
-                  {
-                    type: 'START_BATTLE',
-                    payload: { context: BattleContext.FIRST_BATTLE },
-                  },
-                ],
+                eventQueue: [...NEW_PLAYER_EVENTS],
               };
             },
             false,
@@ -361,13 +344,7 @@ export const useGameStore = create<GameState>()(
 
               if (isNewPlayer) {
                 if (profile.creatures.length === 0) {
-                  initialEvents.push({
-                    type: 'SHOW_DIALOG',
-                    payload: {
-                      context: DialogContext.NEW_PLAYER_WELCOME_DIALOG,
-                      contextData: { dialogStartIndex: 0 },
-                    },
-                  });
+                  initialEvents = [...NEW_PLAYER_EVENTS];
                 } else {
                   initialEvents.push({
                     type: 'SHOW_DIALOG',
