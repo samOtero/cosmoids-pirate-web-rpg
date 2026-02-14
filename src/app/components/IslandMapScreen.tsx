@@ -31,6 +31,9 @@ export default function IslandMapScreen({
   const maxUnlockedNode = profile.islandNodeProgress[island.id] ?? 0;
   const flags = profile.gameFlags ?? [];
 
+  const isWorldMapUnlocked =
+    profile.islandNodeProgress[1] && profile.islandNodeProgress[1] > 0;
+
   // Check if a node is accessible based on progress index + flag conditions
   const isNodeUnlocked = (node: IslandNode, idx: number) => {
     const withinProgress = idx <= maxUnlockedNode;
@@ -78,9 +81,11 @@ export default function IslandMapScreen({
       </div>
 
       <div className="absolute bottom-4 right-4 z-20 flex gap-2">
-        <Button variant="wood" onClick={onBack}>
-          World Map
-        </Button>
+        {isWorldMapUnlocked && (
+          <Button variant="wood" onClick={onBack}>
+            World Map
+          </Button>
+        )}
         <Button variant="wood" onClick={onOpenMenu}>
           Menu
         </Button>

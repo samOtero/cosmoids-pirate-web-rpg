@@ -93,8 +93,8 @@ export interface IslandNode {
   description: string;
   coordinates: { x: number; y: number }; // Percentage 0-100
   events: GameEvent[];
-  requiresFlag?: string; // Node only accessible if this flag is SET
-  blockedByFlag?: string; // Node inaccessible while this flag is SET
+  requiresFlag?: GameFlagValue; // Node only accessible if this flag is SET
+  blockedByFlag?: GameFlagValue; // Node inaccessible while this flag is SET
 }
 
 export interface Profile {
