@@ -127,7 +127,7 @@ export const LEVEL_1_INTRO: DialogConfig = {
           portraitWidth: 'wide',
         },
       ],
-      text: "I'm not going back empty-handed. Tear him up, Senticle!",
+      text: "The Captain's runnin' out of time... he needs what's in that bird's head, and he needs it now! Tear him up, Senticle!",
     },
     {
       portraits: [
