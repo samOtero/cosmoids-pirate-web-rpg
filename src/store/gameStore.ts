@@ -24,7 +24,10 @@ import {
   GameFlag,
 } from '@/types/baseGame';
 import { BATTLES } from '@/constants/battles';
-import { NEW_PLAYER_EVENTS } from '@/constants/events';
+import {
+  NEW_PLAYER_EVENTS,
+  FIRST_BATTLE_AFTER_GETTING_STARTER,
+} from '@/constants/events';
 import {
   STARTER_CRAB,
   STARTER_IGUANA,
@@ -346,10 +349,7 @@ export const useGameStore = create<GameState>()(
                 if (profile.creatures.length === 0) {
                   initialEvents = [...NEW_PLAYER_EVENTS];
                 } else {
-                  initialEvents.push({
-                    type: 'SHOW_DIALOG',
-                    payload: { context: DialogContext.LEVEL_1_INTRO },
-                  });
+                  initialEvents = [...FIRST_BATTLE_AFTER_GETTING_STARTER];
                 }
               } else {
                 initialEvents.push({
