@@ -39,7 +39,14 @@ export const ISLANDS: Island[] = [
           x: 39.6551724137931,
           y: 42.18390746134908,
         },
-        events: [],
+        events: [
+          {
+            type: 'START_BATTLE',
+            payload: {
+              context: BattleContext.FOREST_BUG_BATTLE,
+            },
+          },
+        ],
       },
       {
         id: 2,

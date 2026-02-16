@@ -4,7 +4,7 @@ import {
   BackgroundImageKey,
   DialogContext,
 } from '@/types/baseGame';
-import { SENTICLE } from './creatures';
+import { SENTICLE, BUG_STAGE_1 } from './creatures';
 
 export const BATTLES: Record<BattleContext, BattleConfig> = {
   [BattleContext.FIRST_BATTLE]: {
@@ -72,6 +72,35 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
         type: 'SHOW_DIALOG',
         payload: {
           context: DialogContext.STARTER_BATTLE_LOSE,
+        },
+      },
+    ],
+  },
+  [BattleContext.FOREST_BUG_BATTLE]: {
+    enemy: BUG_STAGE_1,
+    backgroundImageKey: BackgroundImageKey.FOREST,
+    turnEvents: {},
+    winEvents: [
+      {
+        type: 'ADVANCE_NODE',
+        autoProceed: true,
+        payload: {
+          islandId: 0,
+          nodeIndex: 2,
+        },
+      },
+      {
+        type: 'GO_TO_ISLAND_MAP',
+        payload: {
+          islandId: 0,
+        },
+      },
+    ],
+    loseEvents: [
+      {
+        type: 'GO_TO_ISLAND_MAP',
+        payload: {
+          islandId: 0,
         },
       },
     ],
