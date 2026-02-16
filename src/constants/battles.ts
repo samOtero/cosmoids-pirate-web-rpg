@@ -4,7 +4,7 @@ import {
   BackgroundImageKey,
   DialogContext,
 } from '@/types/baseGame';
-import { SENTICLE, BUG_STAGE_1 } from './creatures';
+import { SENTICLE, BUG_STAGE_1, BUG_STAGE_2, BUG_STAGE_3 } from './creatures';
 
 export const BATTLES: Record<BattleContext, BattleConfig> = {
   [BattleContext.FIRST_BATTLE]: {
@@ -89,6 +89,56 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
           nodeIndex: 2,
         },
       },
+      {
+        type: 'GO_TO_ISLAND_MAP',
+        payload: {
+          islandId: 0,
+        },
+      },
+    ],
+    loseEvents: [
+      {
+        type: 'GO_TO_ISLAND_MAP',
+        payload: {
+          islandId: 0,
+        },
+      },
+    ],
+  },
+  [BattleContext.FOREST_BUG_STAGE_2_BATTLE]: {
+    enemy: BUG_STAGE_2,
+    backgroundImageKey: BackgroundImageKey.FOREST,
+    turnEvents: {},
+    winEvents: [
+      {
+        type: 'ADVANCE_NODE',
+        autoProceed: true,
+        payload: {
+          islandId: 0,
+          nodeIndex: 3,
+        },
+      },
+      {
+        type: 'GO_TO_ISLAND_MAP',
+        payload: {
+          islandId: 0,
+        },
+      },
+    ],
+    loseEvents: [
+      {
+        type: 'GO_TO_ISLAND_MAP',
+        payload: {
+          islandId: 0,
+        },
+      },
+    ],
+  },
+  [BattleContext.FOREST_MOTH_BATTLE]: {
+    enemy: BUG_STAGE_3,
+    backgroundImageKey: BackgroundImageKey.FOREST_2,
+    turnEvents: {},
+    winEvents: [
       {
         type: 'GO_TO_ISLAND_MAP',
         payload: {

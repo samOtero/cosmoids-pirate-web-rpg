@@ -56,7 +56,14 @@ export const ISLANDS: Island[] = [
           x: 54.633620689655174,
           y: 53.10344769123414,
         },
-        events: [],
+        events: [
+          {
+            type: 'START_BATTLE',
+            payload: {
+              context: BattleContext.FOREST_BUG_STAGE_2_BATTLE,
+            },
+          },
+        ],
       },
       {
         id: 3,
@@ -66,7 +73,14 @@ export const ISLANDS: Island[] = [
           x: 63.254310344827594,
           y: 37.58620631192379,
         },
-        events: [],
+        events: [
+          {
+            type: 'START_BATTLE',
+            payload: {
+              context: BattleContext.FOREST_MOTH_BATTLE,
+            },
+          },
+        ],
       },
     ],
   },

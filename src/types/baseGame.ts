@@ -264,6 +264,8 @@ export interface AddCreatureToProfileEventPayload {
 export enum BattleContext {
   FIRST_BATTLE = 'FIRST_BATTLE',
   FOREST_BUG_BATTLE = 'FOREST_BUG_BATTLE',
+  FOREST_BUG_STAGE_2_BATTLE = 'FOREST_BUG_STAGE_2_BATTLE',
+  FOREST_MOTH_BATTLE = 'FOREST_MOTH_BATTLE',
 }
 
 export type BattleTurnPhase =
