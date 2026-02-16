@@ -260,6 +260,7 @@ export default function BattleScreen({
     // 3. Phase: Attack
     if (turnPhase === 'attack') {
       const timer = setTimeout(() => {
+        setTurnPhase('animating'); // Advance phase first to prevent re-entry on state changes
         // ENERGY CHECK FOR ENEMY
         if (enemyEnergy <= 0) {
           const refuse = Math.random() > 0.5;

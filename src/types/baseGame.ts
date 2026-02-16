@@ -266,7 +266,12 @@ export enum BattleContext {
   FOREST_BUG_BATTLE = 'FOREST_BUG_BATTLE',
 }
 
-export type BattleTurnPhase = 'before' | 'attack' | 'after' | 'end';
+export type BattleTurnPhase =
+  | 'before'
+  | 'attack'
+  | 'animating'
+  | 'after'
+  | 'end';
 export type BattleTriggerPhase =
   | 'start'
   | 'beforePlayerAttack'
