@@ -351,7 +351,10 @@ export const useGameStore = create<GameState>()(
                 lastPlayed: Date.now(),
               };
 
-              const isNewPlayer = (profile.islandNodeProgress[0] ?? 0) === 0;
+              const isNewPlayer =
+                ((profile.islandNodeProgress &&
+                  profile.islandNodeProgress[0]) ??
+                  0) === 0;
 
               let initialEvents: GameEvent[] = [];
 
