@@ -47,6 +47,8 @@ export enum BackgroundImageKey {
   CALEB_HOUSE = 'Caleb_House',
   FIRST_TOWN_DOCKS = 'First_Town_Docks',
   ISLAND_1 = 'Island_1',
+  FOREST = 'Forest',
+  FOREST_2 = 'Forest_2',
   DEFAULT = 'default',
 }
 

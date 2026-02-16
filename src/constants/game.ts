@@ -47,6 +47,9 @@ export const BACKGROUND_IMAGES: Record<BackgroundImageKey, string> = {
   [BackgroundImageKey.CALEB_HOUSE]: '/bg_caleb_house_1.png',
   [BackgroundImageKey.FIRST_TOWN_DOCKS]: '/bg_first_town_docks_1.png',
   [BackgroundImageKey.ISLAND_1]: '/island_1_wip.png',
+  [BackgroundImageKey.FOREST]: '/battles/bg/bg_first_island_forest_battle.png',
+  [BackgroundImageKey.FOREST_2]:
+    '/battles/bg/bg_first_island_forest_battle_2.png',
   [BackgroundImageKey.DEFAULT]: '/bg_caleb_house_1.png',
 };
 
@@ -54,4 +57,7 @@ export const BATTLE_BACKGROUND_IMAGES: Record<BackgroundImageKey, string> = {
   ...BACKGROUND_IMAGES,
   [BackgroundImageKey.FIRST_TOWN_DOCKS]:
     '/battles/bg/bg_first_town_docks_1_battle_2.png',
+  [BackgroundImageKey.FOREST]: '/battles/bg/bg_first_island_forest_battle.png',
+  [BackgroundImageKey.FOREST_2]:
+    '/battles/bg/bg_first_island_forest_battle_2.png',
 };
