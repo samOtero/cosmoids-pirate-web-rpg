@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
   SENTICLE,
   BUG_STAGE_1,
@@ -12,8 +12,7 @@ import {
 } from '@/constants/creatures';
 import { BATTLE_BACKGROUND_IMAGES } from '@/constants/game';
 import { BackgroundImageKey, Creature } from '@/types/baseGame';
-import BattleBackground from '@/app/components/BattleBackground';
-import { BattleCreature } from '@/app/components/BattleCreature';
+import { BattleScreenUI } from '@/app/components/battleScreen';
 
 // Map variable names to creatures for both display and saving
 const ALL_CREATURES: { varName: string; creature: Creature }[] = [
@@ -35,6 +34,7 @@ export default function CreaturePositionEditor({
 }) {
   const [side, setSide] = useState<Side>('left');
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [oppositeIndex, setOppositeIndex] = useState(1);
   const [bgKey, setBgKey] = useState<BackgroundImageKey>(
     BackgroundImageKey.DEFAULT
   );
@@ -103,6 +103,20 @@ export default function CreaturePositionEditor({
     BATTLE_BACKGROUND_IMAGES[bgKey] ||
     BATTLE_BACKGROUND_IMAGES[BackgroundImageKey.DEFAULT];
 
+  // Build a creature with the editor's live position/scale values
+  const previewCreature: Creature = {
+    ...creature,
+    battlePosition: { bottom, left },
+    battleScale: scale,
+  };
+
+  // The opposite creature uses its own saved position/scale (read-only)
+  const oppositeCreature = ALL_CREATURES[oppositeIndex].creature;
+
+  // Build player + enemy creatures for the BattleScreenUI
+  const playerCreature = side === 'left' ? previewCreature : oppositeCreature;
+  const enemyCreature = side === 'right' ? previewCreature : oppositeCreature;
+
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col bg-black/95 text-white font-sans">
       {/* Header */}
@@ -158,6 +172,24 @@ export default function CreaturePositionEditor({
             <select
               value={selectedIndex}
               onChange={(e) => handleCreatureChange(Number(e.target.value))}
+              className="w-full bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-cyan-500"
+            >
+              {ALL_CREATURES.map((entry, i) => (
+                <option key={entry.varName} value={i}>
+                  {entry.creature.name} ({entry.varName})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Opposite Creature Picker */}
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">
+              Opposite Creature
+            </label>
+            <select
+              value={oppositeIndex}
+              onChange={(e) => setOppositeIndex(Number(e.target.value))}
               className="w-full bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-cyan-500"
             >
               {ALL_CREATURES.map((entry, i) => (
@@ -278,28 +310,20 @@ export default function CreaturePositionEditor({
           </div>
         </div>
 
-        {/* Preview Area */}
+        {/* Preview Area — renders the real BattleScreenUI */}
         <div className="flex-1 relative overflow-hidden">
-          <BattleBackground backgroundImageUrl={bgUrl} />
-
-          {/* Creature Preview */}
-          <div className="absolute inset-0 z-10">
-            <div
-              className="absolute"
-              style={
-                side === 'left'
-                  ? { bottom: `${bottom}%`, left: `${left}%` }
-                  : { bottom: `${bottom}%`, right: `${left}%` }
-              }
-            >
-              <BattleCreature
-                creature={creature}
-                isEnemy={side === 'right'}
-                className="h-40 md:h-56 lg:h-64 w-auto"
-                scale={scale}
-              />
-            </div>
-          </div>
+          <BattleScreenUI
+            playerCreature={playerCreature}
+            enemyCreature={enemyCreature}
+            onAttack={() => {}}
+            onHeal={() => {}}
+            onRun={() => {}}
+            battleLog={[]}
+            isPlayerTurn={false}
+            battleOver={true}
+            inventory={[]}
+            backgroundImageUrl={bgUrl}
+          />
 
           {/* Crosshair Guide */}
           <div className="absolute inset-0 z-20 pointer-events-none">
@@ -310,7 +334,8 @@ export default function CreaturePositionEditor({
           {/* Info Overlay */}
           <div className="absolute top-3 left-3 z-30 bg-black/60 backdrop-blur-sm rounded px-2 py-1">
             <p className="text-[10px] text-slate-400">
-              {creature.name} • {side === 'left' ? 'Player' : 'Enemy'} side
+              {creature.name} • {side === 'left' ? 'Player' : 'Enemy'} side •
+              Uses real BattleScreenUI
             </p>
           </div>
         </div>

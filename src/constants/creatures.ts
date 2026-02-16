@@ -37,8 +37,8 @@ export const BUG_STAGE_1: Creature = {
   startingEnergy: 50,
   currentEnergy: 50,
   movementId: 'lizard',
-  battlePosition: { bottom: -10, left: 14.5 },
-  battleScale: 2.65,
+  battlePosition: { bottom: -0.5, left: 17 },
+  battleScale: 0.75,
 };
 
 export const BUG_STAGE_2: Creature = {

@@ -33,7 +33,7 @@ interface BattleScreenUIProps {
   enemyHit?: string;
 }
 
-const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
+export const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
   playerCreature,
   enemyCreature,
   onAttack,
