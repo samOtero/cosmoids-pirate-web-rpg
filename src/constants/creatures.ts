@@ -36,6 +36,7 @@ export const BUG_STAGE_1: Creature = {
   battleSpriteUrl: '/battles/cosmoids/bug-1-basic-normal-neutral-skin-1.png',
   startingEnergy: 50,
   currentEnergy: 50,
+  movementId: 'lizard',
 };
 
 export const BUG_STAGE_2: Creature = {
@@ -54,6 +55,7 @@ export const BUG_STAGE_2: Creature = {
   battleSpriteUrl: '/battles/cosmoids/bug-2-basic-normal-neutral-skin-1.png',
   startingEnergy: 75,
   currentEnergy: 75,
+  movementId: 'lizard',
 };
 
 export const BUG_STAGE_3: Creature = {
@@ -72,4 +74,5 @@ export const BUG_STAGE_3: Creature = {
   battleSpriteUrl: '/battles/cosmoids/moth-basic-normal-neutral-skin-1.png',
   startingEnergy: 75,
   currentEnergy: 75,
+  movementId: 'lizard',
 };
