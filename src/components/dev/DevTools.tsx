@@ -6,8 +6,15 @@ const DialogEditor = lazy(() => import('./DialogEditor'));
 const AnimationEditor = lazy(() => import('./AnimationEditor'));
 const BattleDebug = lazy(() => import('./BattleDebug'));
 const MapEditor = lazy(() => import('./MapEditor'));
+const CreaturePositionEditor = lazy(() => import('./CreaturePositionEditor'));
 
-type ToolType = 'DIALOG' | 'ANIMATION' | 'BATTLE' | 'MAP' | null;
+type ToolType =
+  | 'DIALOG'
+  | 'ANIMATION'
+  | 'BATTLE'
+  | 'MAP'
+  | 'CREATURE_POSITION'
+  | null;
 
 export default function DevTools() {
   const [activeTool, setActiveTool] = useState<ToolType>(null);
@@ -73,6 +80,15 @@ export default function DevTools() {
               >
                 Map Editor
               </button>
+              <button
+                onClick={() => {
+                  setActiveTool('CREATURE_POSITION');
+                  setShowMenu(false);
+                }}
+                className="text-sm bg-slate-800 hover:bg-cyan-700 px-3 py-2 rounded text-left"
+              >
+                Creature Position Editor
+              </button>
             </div>
           </div>
         </div>
@@ -97,6 +113,9 @@ export default function DevTools() {
           )}
           {activeTool === 'MAP' && (
             <MapEditor onClose={() => setActiveTool(null)} />
+          )}
+          {activeTool === 'CREATURE_POSITION' && (
+            <CreaturePositionEditor onClose={() => setActiveTool(null)} />
           )}
         </Suspense>
       )}

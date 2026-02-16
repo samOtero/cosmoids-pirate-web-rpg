@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useGameStore } from '@/store/gameStore';
-import { SENTICLE } from '@/constants/creatures';
 import {
+  SENTICLE,
   STARTER_CRAB,
   STARTER_IGUANA,
   STARTER_MONKEY,
-} from '@/constants/dialogs';
+} from '@/constants/creatures';
 import { BattleContext, BackgroundImageKey, Screens } from '@/types/baseGame';
 
 export default function BattleDebug({ onClose }: { onClose: () => void }) {

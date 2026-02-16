@@ -37,6 +37,8 @@ export const BUG_STAGE_1: Creature = {
   startingEnergy: 50,
   currentEnergy: 50,
   movementId: 'lizard',
+  battlePosition: { bottom: 4.5, left: 14.5 },
+  battleScale: 2.65,
 };
 
 export const BUG_STAGE_2: Creature = {
@@ -75,4 +77,61 @@ export const BUG_STAGE_3: Creature = {
   startingEnergy: 75,
   currentEnergy: 75,
   movementId: 'lizard',
+};
+
+// Starter Cosmoid Definitions
+export const STARTER_CRAB: Creature = {
+  id: 'starter_crab',
+  name: 'Crabby',
+  type: ElementType.GRASS,
+  maxHp: 35,
+  currentHp: 35,
+  attack: 40,
+  defense: 45,
+  speed: 35,
+  level: 1,
+  xp: 0,
+  moves: ['Vine Whip', 'Scratch'],
+  spriteUrl: '/crab-starter-grass-neutral-skin-1.png',
+  battleSpriteUrl: '/crab-starter-grass-neutral-skin-1.png',
+  startingEnergy: 100,
+  currentEnergy: 100,
+};
+
+export const STARTER_IGUANA: Creature = {
+  id: 'starter_iguana',
+  name: 'Blazy',
+  type: ElementType.FIRE,
+  maxHp: 35,
+  currentHp: 35,
+  attack: 45,
+  defense: 40,
+  speed: 40,
+  level: 1,
+  xp: 0,
+  moves: ['Ember', 'Scratch'],
+  spriteUrl: '/iguana_starter_fire_neutral_skin_1.png',
+  battleSpriteUrl:
+    '/battles/cosmoids/iguana_starter_fire_neutral_skin_1_transparent_actual.png',
+  movementId: 'lizard',
+  startingEnergy: 100,
+  currentEnergy: 100,
+};
+
+export const STARTER_MONKEY: Creature = {
+  id: 'starter_monkey',
+  name: 'Bubbles',
+  type: ElementType.WATER,
+  maxHp: 40,
+  currentHp: 40,
+  attack: 40,
+  defense: 40,
+  speed: 45,
+  level: 1,
+  xp: 0,
+  moves: ['Bubble Beam', 'Scratch'],
+  spriteUrl: '/monkey_starter_water_neutral_skin_1.png',
+  battleSpriteUrl: '/monkey_starter_water_battle_skin_1_actual.png',
+  startingEnergy: 100,
+  currentEnergy: 100,
 };

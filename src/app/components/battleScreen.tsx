@@ -69,21 +69,43 @@ const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
           </div>
 
           {/* Enemy Sprite (Bottom Right/Center) */}
-          <div className="absolute bottom-[5%] right-[10%] md:right-[20%] z-10">
+          <div
+            className={`absolute z-10 ${!enemyCreature.battlePosition ? 'bottom-[5%] right-[10%] md:right-[20%]' : ''}`}
+            style={
+              enemyCreature.battlePosition
+                ? {
+                    bottom: `${enemyCreature.battlePosition.bottom}%`,
+                    right: `${enemyCreature.battlePosition.left}%`,
+                  }
+                : undefined
+            }
+          >
             <BattleCreature
               creature={enemyCreature}
               isEnemy={true}
               className="h-40 md:h-56 lg:h-64 w-auto"
               animationOverride={enemyHit}
+              scale={enemyCreature.battleScale}
             />
           </div>
 
           {/* Player Sprite (Bottom Left/Center) */}
-          <div className="absolute bottom-[2%] left-[10%] md:left-[20%] z-30">
+          <div
+            className={`absolute z-30 ${!playerCreature.battlePosition ? 'bottom-[2%] left-[10%] md:left-[20%]' : ''}`}
+            style={
+              playerCreature.battlePosition
+                ? {
+                    bottom: `${playerCreature.battlePosition.bottom}%`,
+                    left: `${playerCreature.battlePosition.left}%`,
+                  }
+                : undefined
+            }
+          >
             <BattleCreature
               creature={playerCreature}
               className="h-40 md:h-56 lg:h-60 w-auto"
               animationOverride={playerHit}
+              scale={playerCreature.battleScale}
             />
           </div>
 

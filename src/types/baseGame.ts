@@ -84,6 +84,8 @@ export interface Creature {
   moves: string[];
   spriteUrl: string; // Placeholder URL
   battleSpriteUrl?: string;
+  battlePosition?: { bottom: number; left: number }; // percentage 0-100
+  battleScale?: number; // multiplier, 1 = default
   movementId?: string;
   startingEnergy: number;
   currentEnergy: number;

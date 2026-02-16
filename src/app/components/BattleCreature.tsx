@@ -6,6 +6,7 @@ interface BattleCreatureProps {
   isEnemy?: boolean;
   className?: string;
   animationOverride?: string;
+  scale?: number;
 }
 
 export const BattleCreature: React.FC<BattleCreatureProps> = ({
@@ -13,6 +14,7 @@ export const BattleCreature: React.FC<BattleCreatureProps> = ({
   isEnemy,
   className = '',
   animationOverride,
+  scale,
 }) => {
   const getAnimationClass = (movementId?: string) => {
     return movementId ? `animate-${movementId}` : '';
@@ -23,10 +25,19 @@ export const BattleCreature: React.FC<BattleCreatureProps> = ({
   const flipClass = isEnemy ? 'scale-x-[-1]' : '';
 
   // If overriding, assume we want to play once (like a hit reaction)
-  const style = animationOverride ? { animationIterationCount: 1 } : undefined;
+  const animStyle: React.CSSProperties = animationOverride
+    ? { animationIterationCount: 1 }
+    : {};
+
+  const scaleStyle: React.CSSProperties = scale
+    ? { transform: `scale(${scale})`, transformOrigin: 'bottom center' }
+    : {};
 
   return (
-    <div className={`${animClass} inline-block`} style={style}>
+    <div
+      className={`${animClass} inline-block`}
+      style={{ ...animStyle, ...scaleStyle }}
+    >
       <img
         src={
           creature.battleSpriteUrl ||

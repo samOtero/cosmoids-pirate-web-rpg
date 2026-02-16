@@ -33,7 +33,7 @@ import {
   STARTER_CRAB,
   STARTER_IGUANA,
   STARTER_MONKEY,
-} from '@/constants/dialogs';
+} from '@/constants/creatures';
 
 interface GameState {
   currentScreen: Screens;
