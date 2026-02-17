@@ -18,6 +18,8 @@ export const SENTICLE: Creature = {
   movementId: 'lizard',
   startingEnergy: 0,
   currentEnergy: 0,
+  battlePosition: { bottom: 8, left: 15 },
+  battleScale: 0.85,
 };
 
 export const BUG_STAGE_1: Creature = {
@@ -58,6 +60,8 @@ export const BUG_STAGE_2: Creature = {
   startingEnergy: 75,
   currentEnergy: 75,
   movementId: 'lizard',
+  battlePosition: { bottom: 21.5, left: 23.5 },
+  battleScale: 1.25,
 };
 
 export const BUG_STAGE_3: Creature = {
@@ -77,6 +81,8 @@ export const BUG_STAGE_3: Creature = {
   startingEnergy: 75,
   currentEnergy: 75,
   movementId: 'lizard',
+  battlePosition: { bottom: 19, left: 12 },
+  battleScale: 0.85,
 };
 
 // Starter Cosmoid Definitions
@@ -116,6 +122,8 @@ export const STARTER_IGUANA: Creature = {
   movementId: 'lizard',
   startingEnergy: 100,
   currentEnergy: 100,
+  battlePosition: { bottom: 2.5, left: 14.5 },
+  battleScale: 0.85,
 };
 
 export const STARTER_MONKEY: Creature = {
