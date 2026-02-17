@@ -491,3 +491,9 @@ export const useGameStore = create<GameState>()(
     )
   )
 );
+
+if (process.env.NODE_ENV === 'development') {
+  if (typeof window !== 'undefined') {
+    (window as any).__GAME_STORE__ = useGameStore;
+  }
+}
