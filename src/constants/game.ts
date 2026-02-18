@@ -1,6 +1,7 @@
 import { SpeakerImageKey, BackgroundImageKey } from '@/types/baseGame';
 
 export const MAX_PROFILES = 3;
+export const CURRENT_PROFILE_VERSION = 1;
 
 export { ISLANDS } from './islands';
 

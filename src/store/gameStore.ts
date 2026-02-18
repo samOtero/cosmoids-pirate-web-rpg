@@ -12,7 +12,7 @@ import {
   AddCreatureToProfileEventPayload,
   GameFlagValue,
 } from '@/types/baseGame';
-import { MAX_PROFILES } from '@/constants/game';
+import { MAX_PROFILES, CURRENT_PROFILE_VERSION } from '@/constants/game';
 import {
   GameEvent,
   ShowDialogEventPayload,
@@ -305,6 +305,7 @@ export const useGameStore = create<GameState>()(
                 currentIslandId: 0,
                 islandNodeProgress: { 0: 0 },
                 gameFlags: [],
+                version: CURRENT_PROFILE_VERSION,
               };
               return {
                 profiles: newProfiles,
