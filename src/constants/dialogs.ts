@@ -14,3 +14,4 @@ export * from './dialogs/level1Instruction1';
 export * from './dialogs/level1Instruction2';
 export * from './dialogs/level1Instruction3';
 export * from './dialogs/level2IslandMapIntro';
+export * from './dialogs/foundBerry';

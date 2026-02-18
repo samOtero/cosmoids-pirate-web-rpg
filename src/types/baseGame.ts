@@ -191,6 +191,7 @@ export enum DialogContext {
   ISLAND_INTRO = 'ISLAND_INTRO',
   ISLAND_VICTORY = 'ISLAND_VICTORY',
   ISLAND_DEFEAT = 'ISLAND_DEFEAT',
+  FOUND_ITEM = 'FOUND_ITEM',
 }
 
 export interface DialogContextData {
@@ -225,7 +226,8 @@ export type GameEventType =
   | 'SET_FLAG'
   | 'REMOVE_FLAG'
   | 'UNLOCK_ISLAND'
-  | 'ADVANCE_NODE';
+  | 'ADVANCE_NODE'
+  | 'GAIN_ITEM';
 
 export interface GameEvent {
   type: GameEventType;
@@ -240,7 +242,8 @@ export interface GameEvent {
     | SetFlagEventPayload
     | RemoveFlagEventPayload
     | UnlockIslandEventPayload
-    | AdvanceNodeEventPayload;
+    | AdvanceNodeEventPayload
+    | GainItemEventPayload;
   autoProceed?: boolean;
 }
 
@@ -283,6 +286,13 @@ export type BattleTriggerPhase =
   | 'beforeEnemyAttack'
   | 'afterEnemyAttack';
 
+export interface BattleDrop {
+  itemId: string;
+  chance: number; // 0-1
+  min: number;
+  max: number;
+}
+
 export interface BattleConfig {
   enemy: Creature;
   backgroundImageKey: BackgroundImageKey;
@@ -293,6 +303,7 @@ export interface BattleConfig {
   };
   winEvents: GameEvent[];
   loseEvents: GameEvent[];
+  drops?: BattleDrop[];
 }
 
 export interface StartBattleEventPayload {
@@ -324,4 +335,9 @@ export interface UnlockIslandEventPayload {
 export interface AdvanceNodeEventPayload {
   islandId: number;
   nodeIndex: number;
+}
+
+export interface GainItemEventPayload {
+  itemId: string;
+  count: number;
 }

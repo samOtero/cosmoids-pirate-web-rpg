@@ -13,6 +13,7 @@ import {
   GameFlagValue,
 } from '@/types/baseGame';
 import { MAX_PROFILES, CURRENT_PROFILE_VERSION } from '@/constants/game';
+import { ITEMS } from '@/constants/items';
 import {
   GameEvent,
   ShowDialogEventPayload,
@@ -23,6 +24,7 @@ import {
   UnlockIslandEventPayload,
   AdvanceNodeEventPayload,
   GameFlag,
+  GainItemEventPayload,
 } from '@/types/baseGame';
 import { BATTLES } from '@/constants/battles';
 import {
@@ -237,6 +239,39 @@ export const useGameStore = create<GameState>()(
                     state.advanceNode(payload.islandId, payload.nodeIndex);
                     break;
                   }
+                  case 'GAIN_ITEM': {
+                    const payload =
+                      currentEvent.payload as GainItemEventPayload;
+                    const profileId = state.currentProfileId;
+                    if (profileId !== null && state.profiles[profileId]) {
+                      const profile = state.profiles[profileId]!;
+                      const inventory = [...profile.inventory];
+                      const existingItemIndex = inventory.findIndex(
+                        (i) => i.id === payload.itemId
+                      );
+
+                      if (existingItemIndex >= 0) {
+                        inventory[existingItemIndex] = {
+                          ...inventory[existingItemIndex],
+                          count:
+                            inventory[existingItemIndex].count + payload.count,
+                        };
+                      } else {
+                        const itemDef = ITEMS[payload.itemId];
+                        if (itemDef) {
+                          inventory.push({ ...itemDef, count: payload.count });
+                        }
+                      }
+
+                      const newProfiles = [...state.profiles];
+                      newProfiles[profileId] = {
+                        ...profile,
+                        inventory,
+                      };
+                      updates = { ...updates, profiles: newProfiles };
+                    }
+                    break;
+                  }
                 }
 
                 if (currentEvent.autoProceed && currentQueue.length > 0) {
@@ -264,7 +299,36 @@ export const useGameStore = create<GameState>()(
         handleBattleWin: () => {
           const state = get();
           if (state.currentBattle) {
-            state.enqueueAndProcessEvents(state.currentBattle.winEvents);
+            const extraEvents: GameEvent[] = [];
+            // Handle Drops
+            if (state.currentBattle.drops) {
+              state.currentBattle.drops.forEach((drop) => {
+                if (Math.random() <= drop.chance) {
+                  const count =
+                    Math.floor(Math.random() * (drop.max - drop.min + 1)) +
+                    drop.min;
+                  extraEvents.push({
+                    type: 'SHOW_DIALOG',
+                    payload: {
+                      context: DialogContext.FOUND_ITEM,
+                    },
+                  });
+                  extraEvents.push({
+                    type: 'GAIN_ITEM',
+                    payload: {
+                      itemId: drop.itemId,
+                      count,
+                    },
+                    autoProceed: true,
+                  });
+                }
+              });
+            }
+
+            state.enqueueAndProcessEvents([
+              ...extraEvents,
+              ...state.currentBattle.winEvents,
+            ]);
           }
           set(
             { currentBattle: null, currentEnemy: null },

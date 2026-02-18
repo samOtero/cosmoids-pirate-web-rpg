@@ -80,6 +80,14 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
     enemy: BUG_STAGE_1,
     backgroundImageKey: BackgroundImageKey.FOREST,
     turnEvents: {},
+    drops: [
+      {
+        itemId: 'BERRY',
+        chance: 0.5,
+        min: 1,
+        max: 1,
+      },
+    ],
     winEvents: [
       {
         type: 'ADVANCE_NODE',
