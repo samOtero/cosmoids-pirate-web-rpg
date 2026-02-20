@@ -15,13 +15,15 @@ import { Button } from '@/app/components/ui/Button';
 import { CreatureBattleStats } from '@/app/components/ui/CreatureBattleStats';
 import BattleBackground from '@/app/components/BattleBackground';
 import { BattleCreature } from '@/app/components/BattleCreature';
+import InventoryModal from '@/app/components/inventory/InventoryModal';
 
 // --- Presentational Component ---
 interface BattleScreenUIProps {
   playerCreature: Creature;
   enemyCreature: Creature;
   onAttack: (moveIndex: number) => void;
-  onHeal: () => void;
+  onHeal: () => void; // Keep for compatibility if needed, but we used onOpenBag
+  onOpenBag: () => void;
   onRun: () => void;
   battleLog: string[];
   isPlayerTurn: boolean;
@@ -46,9 +48,8 @@ export const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
   backgroundImageUrl,
   playerHit,
   enemyHit,
+  onOpenBag,
 }) => {
-  const potion = inventory.find((i) => i.id === 'potion');
-  const potionCount = potion ? potion.count : 0;
   const logEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -152,14 +153,11 @@ export const BattleScreenUI: React.FC<BattleScreenUIProps> = ({
 
             <Button
               variant="secondary"
-              disabled={!isPlayerTurn || battleOver || potionCount === 0}
-              onClick={onHeal}
+              disabled={!isPlayerTurn || battleOver}
+              onClick={onOpenBag}
               className="flex flex-col items-center justify-center h-full text-xs md:text-sm"
             >
               <span>Bag</span>
-              <span className="text-[10px] opacity-70">
-                Potions: {potionCount}
-              </span>
             </Button>
 
             <Button
@@ -197,6 +195,8 @@ interface BattleScreenLogicProps {
   onDialogContinue?: () => void;
   onDialogAction?: (action: DialogAction) => void;
   onTriggerTurnEvent?: (turn: number, phase: BattleTriggerPhase) => boolean;
+  party: Creature[];
+  onUseItem?: (itemId: string, targetCreatureId?: string) => void;
 }
 
 const ENERGY_COST_ATTACK = 10;
@@ -214,6 +214,8 @@ export default function BattleScreen({
   onDialogContinue,
   onDialogAction,
   onTriggerTurnEvent,
+  party,
+  onUseItem,
 }: BattleScreenLogicProps) {
   // Local state for the battle loop so we don't mutate global store directly until the end
   const [playerHp, setPlayerHp] = useState(playerCreature.currentHp);
@@ -228,6 +230,7 @@ export default function BattleScreen({
   const [battleOver, setBattleOver] = useState(false);
   const [playerHit, setPlayerHit] = useState<string | undefined>();
   const [enemyHit, setEnemyHit] = useState<string | undefined>();
+  const [showInventory, setShowInventory] = useState(false);
 
   // Turn Management
   const [turnCount, setTurnCount] = useState(1);
@@ -423,9 +426,32 @@ export default function BattleScreen({
   };
 
   const handleHeal = () => {
-    if (!isPlayerTurn || battleOver) return;
-    // Logic to use potion would go here - for now just skip turn effectively or implement heal if we updated inventory
-    addLog('You used a potion! (Not implemented fully yet)');
+    // Deprecated in favor of Bag, but kept to satisfy UI prop if needed
+    setShowInventory(true);
+  };
+
+  const handleUseItem = (itemId: string, targetCreatureId?: string) => {
+    const item = inventory.find((i) => i.id === itemId);
+    if (!item) return;
+
+    if (onUseItem) {
+      onUseItem(itemId, targetCreatureId);
+    }
+
+    const targetName =
+      targetCreatureId === playerCreature.id
+        ? playerCreature.name
+        : party.find((c) => c.id === targetCreatureId)?.name || 'Creature';
+
+    addLog(`You used ${item.name} on ${targetName}!`);
+
+    // If used on active creature, update local state
+    if (targetCreatureId === playerCreature.id && item.effect === 'HEAL') {
+      const newHp = Math.min(playerHp + item.value, playerCreature.maxHp);
+      setPlayerHp(newHp);
+    }
+
+    setShowInventory(false);
     setIsPlayerTurn(false);
   };
 
@@ -474,7 +500,17 @@ export default function BattleScreen({
         backgroundImageUrl={backgroundImageUrl}
         playerHit={playerHit}
         enemyHit={enemyHit}
+        onOpenBag={() => setShowInventory(true)}
       />
+
+      {showInventory && (
+        <InventoryModal
+          inventory={inventory}
+          creatures={party}
+          onClose={() => setShowInventory(false)}
+          onUseItem={handleUseItem}
+        />
+      )}
 
       {/* Dialog Overlay */}
       {sequence && onDialogContinue && (

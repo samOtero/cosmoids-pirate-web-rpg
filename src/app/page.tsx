@@ -80,8 +80,10 @@ export default function Home() {
       <Suspense fallback={<div>Loading Battle...</div>}>
         <BattleScreen
           playerCreature={playerCreature}
+          party={currentProfile.creatures}
           enemyCreature={currentEnemy}
-          inventory={[]}
+          inventory={currentProfile.inventory}
+          onUseItem={useItem}
           onBattleEnd={(won) => {
             // For now just go back to map or dialog depending on context?
             // Maybe we need a result screen or dialog
