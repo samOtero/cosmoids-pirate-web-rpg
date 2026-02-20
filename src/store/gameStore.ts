@@ -52,6 +52,7 @@ interface GameState {
   deleteProfile: (slotId: number) => void;
   selectProfile: (slotId: number) => void;
   addCreatureToProfile: (slotId: number, creature: Creature) => void;
+  useItem: (itemId: string, targetCreatureId?: string) => void;
 
   // Progression
   setGameFlag: (flag: GameFlagValue) => void;
@@ -467,6 +468,74 @@ export const useGameStore = create<GameState>()(
             },
             false,
             'addCreatureToProfile'
+          ),
+        useItem: (itemId: string, targetCreatureId?: string) =>
+          set(
+            (state) => {
+              const profileId = state.currentProfileId;
+              if (profileId === null || !state.profiles[profileId])
+                return state;
+              const profile = state.profiles[profileId]!;
+              const inventory = [...profile.inventory];
+              const itemIndex = inventory.findIndex((i) => i.id === itemId);
+              if (itemIndex === -1) {
+                return state;
+              }
+              const item = inventory[itemIndex];
+
+              if (item.count <= 0) return state;
+
+              // Apply Effect
+              let newCreatures = [...profile.creatures];
+
+              if (item.effect === 'HEAL' && targetCreatureId) {
+                const creatureIndex = newCreatures.findIndex(
+                  (c) => c.id === targetCreatureId
+                );
+                if (creatureIndex === -1) return state;
+                const creature = newCreatures[creatureIndex];
+
+                // Don't use if full health
+                if (creature.currentHp >= creature.maxHp) return state;
+
+                const healAmount = item.value;
+                const newHp = Math.min(
+                  creature.currentHp + healAmount,
+                  creature.maxHp
+                );
+
+                newCreatures[creatureIndex] = {
+                  ...creature,
+                  currentHp: newHp,
+                };
+              } else if (item.effect === 'CATCH') {
+                // Catch logic is typically battle-only, so maybe we don't allow it here?
+                // Or we handle it differently. For now, let's assume this action is only for "Menu" usage.
+                // So we might return if it's not a valid menu item.
+                // But for now, let's just decrement if valid?
+                // Actually, let's block non-HEAL items for now in this function if deemed "menu only"
+                return state;
+              }
+
+              // Decrement count
+              const newItem = { ...item, count: item.count - 1 };
+              if (newItem.count <= 0) {
+                inventory.splice(itemIndex, 1);
+              } else {
+                inventory[itemIndex] = newItem;
+              }
+
+              const newProfiles = [...state.profiles];
+              newProfiles[profileId] = {
+                ...profile,
+                creatures: newCreatures,
+                inventory,
+              };
+
+              return { profiles: newProfiles };
+            },
+            false,
+            'useItem'
           ),
         setGameFlag: (flag: GameFlagValue) =>
           set(

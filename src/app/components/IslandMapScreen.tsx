@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { Button } from '@/app/components/ui/Button';
 import { resolveDialog } from '@/utils/dialogResolver';
 import DialogContent from '@/app/components/ui/DialogContent';
+import InventoryModal from '@/app/components/inventory/InventoryModal';
 
 interface IslandMapScreenProps {
   profile: Profile;
@@ -19,6 +20,7 @@ interface IslandMapScreenProps {
   onNodeClick: (nodeId: number) => void;
   onBack: () => void;
   onOpenMenu: () => void;
+  onUseItem: (itemId: string, targetCreatureId?: string) => void;
   // Dialog Support
   dialogContext?: DialogContext | null;
   dialogContextData?: DialogContextData | null;
@@ -36,8 +38,10 @@ export default function IslandMapScreen({
   dialogContextData,
   onDialogContinue,
   onDialogAction,
+  onUseItem,
 }: IslandMapScreenProps) {
   const [hoverNode, setHoverNode] = useState<number | null>(null);
+  const [showInventory, setShowInventory] = useState(false);
 
   // Nodes are stored in island.nodes
   // Progress is stored in profile.islandNodeProgress[island.id]
@@ -109,6 +113,9 @@ export default function IslandMapScreen({
           )}
           <Button variant="wood" onClick={onOpenMenu}>
             Menu
+          </Button>
+          <Button variant="wood" onClick={() => setShowInventory(true)}>
+            Bag
           </Button>
         </div>
 
@@ -213,6 +220,15 @@ export default function IslandMapScreen({
             initialLineIndex={dialogStartIndex || 0}
           />
         </div>
+      )}
+
+      {showInventory && (
+        <InventoryModal
+          inventory={profile.inventory}
+          creatures={profile.creatures}
+          onClose={() => setShowInventory(false)}
+          onUseItem={onUseItem}
+        />
       )}
     </>
   );

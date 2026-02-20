@@ -40,6 +40,7 @@ export default function Home() {
     pushEventToFront,
     handleBattleWin,
     handleBattleLose,
+    useItem,
   } = useGameStore();
 
   // Also handle "WAIT" events or similar if implemented in the store processor,
@@ -306,6 +307,7 @@ export default function Home() {
               processNextEvent();
             }
           }}
+          onUseItem={useItem}
         />
       </Suspense>
     );
