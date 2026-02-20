@@ -253,6 +253,7 @@ export default function Home() {
             ]);
           }}
           onOpenMenu={() => {}}
+          onUseItem={useItem}
         />
       </Suspense>
     );
