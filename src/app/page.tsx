@@ -41,6 +41,7 @@ export default function Home() {
     handleBattleWin,
     handleBattleLose,
     useItem,
+    updateCreatures,
   } = useGameStore();
 
   // Also handle "WAIT" events or similar if implemented in the store processor,
@@ -84,7 +85,12 @@ export default function Home() {
           enemyCreature={currentEnemy}
           inventory={currentProfile.inventory}
           onUseItem={useItem}
-          onBattleEnd={(won) => {
+          onBattleEnd={(won, modifiedCreatures) => {
+            // Update creatures if modified
+            if (modifiedCreatures && modifiedCreatures.length > 0) {
+              updateCreatures(modifiedCreatures);
+            }
+
             // For now just go back to map or dialog depending on context?
             // Maybe we need a result screen or dialog
 

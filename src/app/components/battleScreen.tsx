@@ -186,7 +186,7 @@ interface BattleScreenLogicProps {
   enemyCreature: Creature;
   inventory: Item[];
 
-  onBattleEnd: (won: boolean) => void;
+  onBattleEnd: (won: boolean, modifiedCreatures?: Creature[]) => void;
   backgroundImageKey: BackgroundImageKey;
 
   // Dialog Support
@@ -249,11 +249,11 @@ export default function BattleScreen({
     if (enemyHp <= 0) {
       addLog(`${enemyCreature.name} fainted! You won!`);
       setBattleOver(true);
-      setTimeout(() => onBattleEnd(true), 2000);
+      setTimeout(() => onBattleEnd(true, [currentPlayer]), 2000);
     } else if (playerHp <= 0) {
       addLog(`${playerCreature.name} fainted! You lost...`);
       setBattleOver(true);
-      setTimeout(() => onBattleEnd(false), 2000);
+      setTimeout(() => onBattleEnd(false, [currentPlayer]), 2000);
     }
   }, [enemyHp, playerHp]);
 
@@ -459,7 +459,8 @@ export default function BattleScreen({
     if (!isPlayerTurn || battleOver) return;
     addLog('You ran away safely!');
     setBattleOver(true);
-    setTimeout(() => onBattleEnd(false), 1000);
+    setBattleOver(true);
+    setTimeout(() => onBattleEnd(false, [currentPlayer]), 1000);
   };
 
   // Create temporary creature objects with current HP for the UI

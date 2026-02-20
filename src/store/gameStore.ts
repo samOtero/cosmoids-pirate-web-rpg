@@ -52,6 +52,7 @@ interface GameState {
   deleteProfile: (slotId: number) => void;
   selectProfile: (slotId: number) => void;
   addCreatureToProfile: (slotId: number, creature: Creature) => void;
+  updateCreatures: (creatures: Creature[]) => void;
   useItem: (itemId: string, targetCreatureId?: string) => void;
 
   // Progression
@@ -468,6 +469,38 @@ export const useGameStore = create<GameState>()(
             },
             false,
             'addCreatureToProfile'
+          ),
+        updateCreatures: (creatures: Creature[]) =>
+          set(
+            (state) => {
+              const profileId = state.currentProfileId;
+              if (profileId === null || !state.profiles[profileId])
+                return state;
+              const profile = state.profiles[profileId]!;
+              const newCreatures = [...profile.creatures];
+
+              let hasUpdates = false;
+              creatures.forEach((updatedCreature) => {
+                const index = newCreatures.findIndex(
+                  (c) => c.id === updatedCreature.id
+                );
+                if (index !== -1) {
+                  newCreatures[index] = updatedCreature;
+                  hasUpdates = true;
+                }
+              });
+
+              if (!hasUpdates) return state;
+
+              const newProfiles = [...state.profiles];
+              newProfiles[profileId] = {
+                ...profile,
+                creatures: newCreatures,
+              };
+              return { profiles: newProfiles };
+            },
+            false,
+            'updateCreatures'
           ),
         useItem: (itemId: string, targetCreatureId?: string) =>
           set(
