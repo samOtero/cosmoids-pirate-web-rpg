@@ -53,7 +53,7 @@ interface GameState {
   selectProfile: (slotId: number) => void;
   addCreatureToProfile: (slotId: number, creature: Creature) => void;
   updateCreatures: (creatures: Creature[]) => void;
-  useItem: (itemId: string, targetCreatureId?: string) => void;
+  useItem: (itemId: string, targetCreatureId?: string) => boolean | void;
 
   // Progression
   setGameFlag: (flag: GameFlagValue) => void;
@@ -502,7 +502,8 @@ export const useGameStore = create<GameState>()(
             false,
             'updateCreatures'
           ),
-        useItem: (itemId: string, targetCreatureId?: string) =>
+        useItem: (itemId: string, targetCreatureId?: string) => {
+          let catchSuccess = false;
           set(
             (state) => {
               const profileId = state.currentProfileId;
@@ -542,12 +543,14 @@ export const useGameStore = create<GameState>()(
                   currentHp: newHp,
                 };
               } else if (item.effect === 'CATCH') {
-                // Catch logic is typically battle-only, so maybe we don't allow it here?
-                // Or we handle it differently. For now, let's assume this action is only for "Menu" usage.
-                // So we might return if it's not a valid menu item.
-                // But for now, let's just decrement if valid?
-                // Actually, let's block non-HEAL items for now in this function if deemed "menu only"
-                return state;
+                const enemy = state.currentEnemy;
+                if (!enemy) return state; // Only works in battle with enemy
+
+                catchSuccess = Math.random() <= item.value;
+
+                if (catchSuccess) {
+                  newCreatures = [...newCreatures, enemy];
+                }
               }
 
               // Decrement count
@@ -569,7 +572,9 @@ export const useGameStore = create<GameState>()(
             },
             false,
             'useItem'
-          ),
+          );
+          return catchSuccess;
+        },
         setGameFlag: (flag: GameFlagValue) =>
           set(
             (state) => {

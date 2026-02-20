@@ -40,10 +40,10 @@ export default function InventoryModal({
     if (item.effect === 'HEAL') {
       setSelectedItem(item);
       setShowCreatureSelect(true);
+    } else if (item.effect === 'CATCH') {
+      onUseItem(item.id, 'ENEMY');
     } else {
       // For now, maybe just log or show message that it can't be used here?
-      // Or if we want to allow using CATCH items (like releasing them? no that doesnt make sense)
-      // We'll stick to HEAL for now as per plan.
       alert('This item cannot be used here.');
     }
   };
@@ -178,7 +178,7 @@ export default function InventoryModal({
                     <span className="font-mono text-sand font-bold">
                       x{item.count}
                     </span>
-                    {item.effect === 'HEAL' && (
+                    {(item.effect === 'HEAL' || item.effect === 'CATCH') && (
                       <button
                         onClick={() => handleUseClick(item)}
                         className="px-3 py-1 bg-green-600 text-white text-xs font-bold rounded hover:bg-green-500 transition-colors uppercase"

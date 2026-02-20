@@ -87,6 +87,12 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
         min: 1,
         max: 1,
       },
+      {
+        itemId: 'CATCH_DEVICE',
+        chance: 1.0,
+        min: 1,
+        max: 1,
+      },
     ],
     winEvents: [
       {

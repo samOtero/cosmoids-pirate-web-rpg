@@ -196,7 +196,7 @@ interface BattleScreenLogicProps {
   onDialogAction?: (action: DialogAction) => void;
   onTriggerTurnEvent?: (turn: number, phase: BattleTriggerPhase) => boolean;
   party: Creature[];
-  onUseItem?: (itemId: string, targetCreatureId?: string) => void;
+  onUseItem?: (itemId: string, targetCreatureId?: string) => boolean | void;
 }
 
 const ENERGY_COST_ATTACK = 10;
@@ -434,8 +434,26 @@ export default function BattleScreen({
     const item = inventory.find((i) => i.id === itemId);
     if (!item) return;
 
+    let catchSuccess = false;
     if (onUseItem) {
-      onUseItem(itemId, targetCreatureId);
+      catchSuccess = onUseItem(itemId, targetCreatureId) as boolean;
+    }
+
+    if (item.effect === 'CATCH') {
+      addLog(`You threw the ${item.name}...`);
+      setShowInventory(false);
+
+      setTimeout(() => {
+        if (catchSuccess) {
+          addLog(`Gotcha! ${enemyCreature.name} was caught!`);
+          setBattleOver(true);
+          setTimeout(() => onBattleEnd(true, [currentPlayer]), 2000);
+        } else {
+          addLog(`Oh no! The cosmoid broke free!`);
+          setIsPlayerTurn(false);
+        }
+      }, 1000);
+      return;
     }
 
     const targetName =
