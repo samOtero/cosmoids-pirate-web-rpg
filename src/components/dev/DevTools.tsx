@@ -7,6 +7,7 @@ const AnimationEditor = lazy(() => import('./AnimationEditor'));
 const BattleDebug = lazy(() => import('./BattleDebug'));
 const MapEditor = lazy(() => import('./MapEditor'));
 const CreaturePositionEditor = lazy(() => import('./CreaturePositionEditor'));
+const TowerDefenseMap = lazy(() => import('./TowerDefenseMap'));
 
 type ToolType =
   | 'DIALOG'
@@ -14,6 +15,7 @@ type ToolType =
   | 'BATTLE'
   | 'MAP'
   | 'CREATURE_POSITION'
+  | 'TOWER_DEFENSE'
   | null;
 
 export default function DevTools() {
@@ -89,6 +91,15 @@ export default function DevTools() {
               >
                 Creature Position Editor
               </button>
+              <button
+                onClick={() => {
+                  setActiveTool('TOWER_DEFENSE');
+                  setShowMenu(false);
+                }}
+                className="text-sm bg-slate-800 hover:bg-cyan-700 px-3 py-2 rounded text-left"
+              >
+                Tower Defense Map
+              </button>
             </div>
           </div>
         </div>
@@ -116,6 +127,9 @@ export default function DevTools() {
           )}
           {activeTool === 'CREATURE_POSITION' && (
             <CreaturePositionEditor onClose={() => setActiveTool(null)} />
+          )}
+          {activeTool === 'TOWER_DEFENSE' && (
+            <TowerDefenseMap onClose={() => setActiveTool(null)} />
           )}
         </Suspense>
       )}
