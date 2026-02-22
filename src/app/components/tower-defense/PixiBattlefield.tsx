@@ -27,6 +27,7 @@ export default function PixiBattlefield({
   const containerRef = useRef<HTMLDivElement>(null);
   const fpsRef = useRef<HTMLDivElement>(null);
   const onMapDropRef = useRef(onMapDrop);
+  const dragPosRef = useRef<{ x: number; y: number } | null>(null);
 
   // Keep the latest callback without triggering re-runs of the PIXI initializer
   useEffect(() => {
@@ -80,6 +81,8 @@ export default function PixiBattlefield({
       const towerSprites = new Map<string, PIXI.Container>();
       const enemySprites = new Map<string, PIXI.Container>();
       const projectileSprites = new Map<string, PIXI.Graphics>();
+      const spotGraphics = new PIXI.Graphics();
+      const invalidSpotGraphics = new PIXI.Graphics();
 
       // PIXI's internal ticker, synced to monitor refresh rate.
       // This DOES NOT run game logic, it ONLY draws current state.
@@ -133,6 +136,70 @@ export default function PixiBattlefield({
           }
           container.x = (tower.position.x / 100) * screenW;
           container.y = (tower.position.y / 100) * screenH;
+        }
+
+        // --- Render Placement Spots ---
+        spotGraphics.clear();
+        invalidSpotGraphics.clear();
+
+        app.stage.addChild(spotGraphics); // Ensure it's on the stage
+        app.stage.addChild(invalidSpotGraphics);
+        app.stage.setChildIndex(spotGraphics, 1); // Draw above background but below units
+        app.stage.setChildIndex(invalidSpotGraphics, 2);
+
+        let isHoveringValidSpot = false;
+
+        engine.placementSpots.forEach((spot) => {
+          if (!engine.isSpotOccupied(spot.x, spot.y)) {
+            const pxX = (spot.x / 100) * screenW;
+            const pxY = (spot.y / 100) * screenH;
+
+            let isHovered = false;
+
+            if (dragPosRef.current) {
+              const dx = dragPosRef.current.x - spot.x;
+              const dy = dragPosRef.current.y - spot.y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist <= 10) {
+                // Hover/Snap threshold is 10vw/vh approx
+                isHovered = true;
+                isHoveringValidSpot = true;
+              }
+            }
+
+            if (isHovered) {
+              spotGraphics.circle(pxX, pxY, screenW * 0.05); // 5vw radius
+              spotGraphics.fill({ color: 0xf97316, alpha: 0.3 }); // Transparent orange
+              spotGraphics.stroke({ color: 0xf97316, alpha: 1, width: 4 }); // Solid thicker border
+            } else {
+              spotGraphics.circle(pxX, pxY, screenW * 0.05);
+              spotGraphics.stroke({ color: 0xf97316, alpha: 0.8, width: 2 }); // Standard outline
+            }
+          }
+        });
+
+        // If dragging but not hovering a valid open spot, show error indicator
+        if (dragPosRef.current && !isHoveringValidSpot) {
+          const pxX = (dragPosRef.current.x / 100) * screenW;
+          const pxY = (dragPosRef.current.y / 100) * screenH;
+          const radius = screenW * 0.05;
+
+          invalidSpotGraphics.circle(pxX, pxY, radius);
+          invalidSpotGraphics.fill({ color: 0xef4444, alpha: 0.2 }); // Transparent red
+          invalidSpotGraphics.stroke({ color: 0xef4444, alpha: 0.8, width: 3 }); // Solid red border
+
+          // Draw an X
+          const crossSize = radius * 0.5;
+          invalidSpotGraphics.moveTo(pxX - crossSize, pxY - crossSize);
+          invalidSpotGraphics.lineTo(pxX + crossSize, pxY + crossSize);
+          invalidSpotGraphics.moveTo(pxX + crossSize, pxY - crossSize);
+          invalidSpotGraphics.lineTo(pxX - crossSize, pxY + crossSize);
+          invalidSpotGraphics.stroke({
+            color: 0xef4444,
+            width: 4,
+            join: 'round',
+            cap: 'round',
+          });
         }
 
         // --- Render Enemies ---
@@ -238,15 +305,47 @@ export default function PixiBattlefield({
       onDragOver={(e) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'copy';
+
+        // Track hover position
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        dragPosRef.current = { x, y };
+      }}
+      onDragLeave={() => {
+        dragPosRef.current = null;
       }}
       onDrop={(e) => {
         e.preventDefault();
+        dragPosRef.current = null;
         const towerIdStr = e.dataTransfer.getData('application/tower-id');
         if (towerIdStr) {
           const rect = e.currentTarget.getBoundingClientRect();
           const x = ((e.clientX - rect.left) / rect.width) * 100;
           const y = ((e.clientY - rect.top) / rect.height) * 100;
-          onMapDropRef.current(towerIdStr, x, y);
+
+          if (engine) {
+            let closestSpot: { x: number; y: number } | null = null;
+            let minSqDist = Infinity;
+            const SNAP_DIST_SQ = 100; // 10 units squared
+
+            for (const spot of engine.placementSpots) {
+              if (engine.isSpotOccupied(spot.x, spot.y)) continue;
+
+              const dx = x - spot.x;
+              const dy = y - spot.y;
+              const distSq = dx * dx + dy * dy;
+
+              if (distSq <= SNAP_DIST_SQ && distSq < minSqDist) {
+                minSqDist = distSq;
+                closestSpot = spot;
+              }
+            }
+
+            if (closestSpot) {
+              onMapDropRef.current(towerIdStr, closestSpot.x, closestSpot.y);
+            }
+          }
         }
       }}
     >

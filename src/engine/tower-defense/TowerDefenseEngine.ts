@@ -59,6 +59,25 @@ export class TowerDefenseEngine {
 
   private lastSpawnTime: number = 0;
 
+  // Predefined coordinates (x, y percentages) where towers can be placed
+  public placementSpots: { x: number; y: number }[] = [
+    { x: 15, y: 15 },
+    { x: 30, y: 15 },
+    { x: 45, y: 15 },
+    { x: 60, y: 15 },
+    { x: 75, y: 15 },
+    { x: 15, y: 85 },
+    { x: 30, y: 85 },
+    { x: 45, y: 85 },
+    { x: 60, y: 85 },
+    { x: 75, y: 85 },
+  ];
+
+  public isSpotOccupied(x: number, y: number): boolean {
+    // Check if any tower is at these exact coordinates
+    return this.towers.some((t) => t.position.x === x && t.position.y === y);
+  }
+
   public destroy() {
     this.progression.destroy();
   }
@@ -217,7 +236,7 @@ export class TowerDefenseEngine {
   }
 
   public addTower(definitionId: string, x: number, y: number) {
-    if (this.money >= 50) {
+    if (this.money >= 50 && !this.isSpotOccupied(x, y)) {
       const defMeta = TD_CREATURE_DEFS[definitionId];
       if (!defMeta) return false;
 
