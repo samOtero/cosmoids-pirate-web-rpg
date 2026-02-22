@@ -36,7 +36,8 @@ describe('Inventory Logic', () => {
     expect(profile.creatures[0].currentHp).toBe(10);
 
     // Act: Use Item
-    store.useItem('BERRY', creature.id);
+    const storedCreatureId = profile.creatures[0].id;
+    store.useItem('BERRY', storedCreatureId);
 
     // Assert
     profile = useGameStore.getState().profiles[0]!;
@@ -62,7 +63,9 @@ describe('Inventory Logic', () => {
     ]);
 
     // Act: Use Item
-    store.useItem('BERRY', creature.id);
+    const profileBefore = useGameStore.getState().profiles[0]!;
+    const storedCreatureId = profileBefore.creatures[0].id;
+    store.useItem('BERRY', storedCreatureId);
 
     // Assert
     const profile = useGameStore.getState().profiles[0]!;
@@ -89,7 +92,9 @@ describe('Inventory Logic', () => {
     ]);
 
     // Act: Use Item
-    store.useItem('BERRY', creature.id);
+    const profileBefore = useGameStore.getState().profiles[0]!;
+    const storedCreatureId = profileBefore.creatures[0].id;
+    store.useItem('BERRY', storedCreatureId);
 
     // Assert
     const profile = useGameStore.getState().profiles[0]!;
