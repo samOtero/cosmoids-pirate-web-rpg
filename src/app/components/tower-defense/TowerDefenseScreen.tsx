@@ -21,9 +21,6 @@ export default function TowerDefenseScreen({
   const [uiMoney, setUiMoney] = useState(engineRef.current.money);
   const [uiLives, setUiLives] = useState(engineRef.current.lives);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [selectedCreatureIndex, setSelectedCreatureIndex] = useState<
-    number | null
-  >(null);
 
   const requestRef = useRef<number | null>(null);
   const previousTimeRef = useRef<number | null>(null);
@@ -67,15 +64,10 @@ export default function TowerDefenseScreen({
     };
   }, [isPlaying, uiLives, uiMoney]); // Dependencies for state sync closure
 
-  const handleMapClick = (x: number, y: number) => {
-    if (selectedCreatureIndex === null) return;
-
-    const defId = PLAYER_CREATURES[selectedCreatureIndex].id;
-
+  const handleMapDrop = (defId: string, x: number, y: number) => {
     const success = engineRef.current.addTower(defId, x, y);
     if (success) {
       setUiMoney(engineRef.current.money);
-      setSelectedCreatureIndex(null);
     }
   };
 
@@ -101,30 +93,36 @@ export default function TowerDefenseScreen({
         </div>
       </div>
 
-      <PixiBattlefield engine={engineRef.current} onMapClick={handleMapClick} />
+      <PixiBattlefield engine={engineRef.current} onMapDrop={handleMapDrop} />
 
       <div className="bg-slate-800 p-4 shrink-0 flex items-center justify-center gap-4 overflow-x-auto border-t border-cyan-800">
         <div className="text-slate-400 mr-4 font-bold uppercase text-sm">
-          Select Creature to Place ($50):
+          Drag Creature to Place ($50):
         </div>
-        {PLAYER_CREATURES.map((creature, i) => (
+        {PLAYER_CREATURES.map((creature) => (
           <button
             key={creature.id}
-            onClick={() =>
-              setSelectedCreatureIndex(i === selectedCreatureIndex ? null : i)
-            }
-            className={`w-24 h-24 p-2 rounded flex flex-col items-center justify-center transition-all ${
-              selectedCreatureIndex === i
-                ? 'bg-cyan-700 ring-2 ring-cyan-300 scale-110'
-                : 'bg-slate-700 hover:bg-slate-600'
-            }`}
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData(
+                'application/tower-id',
+                creature.id.toString()
+              );
+              e.dataTransfer.effectAllowed = 'copy';
+              const imgEl = e.currentTarget.querySelector('img');
+              if (imgEl) {
+                // Approximate center of a 48x48 element
+                e.dataTransfer.setDragImage(imgEl, 24, 24);
+              }
+            }}
+            className="w-24 h-24 p-2 rounded flex flex-col items-center justify-center transition-all bg-slate-700 hover:bg-slate-500 cursor-grab active:cursor-grabbing hover:scale-105"
           >
             <img
               src={creature.spriteUrl}
               alt={creature.name}
-              className="w-12 h-12 object-contain"
+              className="w-12 h-12 object-contain pointer-events-none"
             />
-            <span className="text-[10px] text-white mt-1 uppercase text-center leading-tight">
+            <span className="text-[10px] text-white mt-1 uppercase text-center leading-tight pointer-events-none">
               {creature.name}
             </span>
           </button>

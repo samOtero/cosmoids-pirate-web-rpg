@@ -17,21 +17,21 @@ const TYPE_COLORS: Record<ElementType, number> = {
 
 interface PixiBattlefieldProps {
   engine: TowerDefenseEngine;
-  onMapClick: (x: number, y: number) => void;
+  onMapDrop: (defId: string, x: number, y: number) => void;
 }
 
 export default function PixiBattlefield({
   engine,
-  onMapClick,
+  onMapDrop,
 }: PixiBattlefieldProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const fpsRef = useRef<HTMLDivElement>(null);
-  const onMapClickRef = useRef(onMapClick);
+  const onMapDropRef = useRef(onMapDrop);
 
   // Keep the latest callback without triggering re-runs of the PIXI initializer
   useEffect(() => {
-    onMapClickRef.current = onMapClick;
-  }, [onMapClick]);
+    onMapDropRef.current = onMapDrop;
+  }, [onMapDrop]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -73,13 +73,8 @@ export default function PixiBattlefield({
         bgSprite.height = app.screen.height;
       });
 
-      // Interactive background for clicks
+      // Interactive background
       bgSprite.eventMode = 'static';
-      bgSprite.on('pointerdown', (e) => {
-        const x = (e.global.x / app.screen.width) * 100;
-        const y = (e.global.y / app.screen.height) * 100;
-        onMapClickRef.current(x, y);
-      });
 
       // Sprite caching structure
       const towerSprites = new Map<string, PIXI.Container>();
@@ -238,8 +233,24 @@ export default function PixiBattlefield({
   }, [engine]);
 
   return (
-    <div className="flex-1 relative overflow-hidden">
-      <div ref={containerRef} className="absolute inset-0 cursor-crosshair" />
+    <div
+      className="flex-1 relative overflow-hidden"
+      onDragOver={(e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+      }}
+      onDrop={(e) => {
+        e.preventDefault();
+        const towerIdStr = e.dataTransfer.getData('application/tower-id');
+        if (towerIdStr) {
+          const rect = e.currentTarget.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width) * 100;
+          const y = ((e.clientY - rect.top) / rect.height) * 100;
+          onMapDropRef.current(towerIdStr, x, y);
+        }
+      }}
+    >
+      <div ref={containerRef} className="absolute inset-0" />
       <div
         ref={fpsRef}
         className="absolute top-2 left-2 bg-black/60 text-green-400 font-mono font-bold px-2 py-1 text-sm rounded shadow select-none pointer-events-none z-10"
