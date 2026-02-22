@@ -70,7 +70,13 @@ export class TowerDefenseEngine {
     let newTowers = [...this.towers];
 
     // Spawn enemies
-    if (time - this.lastSpawnTime > 50) {
+    // we use > 500ms as a simple interval for MVP.
+    // Ensure if time jumps massive (tab suspension), we don't spawn 100 enemies.
+    if (time - this.lastSpawnTime > 500) {
+      if (time - this.lastSpawnTime > 5000) {
+        this.lastSpawnTime = time - 500; // soft clamp if tab was backgrounded
+      }
+
       const randomEnemyDef =
         ENEMY_TYPES[Math.floor(Math.random() * ENEMY_TYPES.length)];
       newEnemies.push({

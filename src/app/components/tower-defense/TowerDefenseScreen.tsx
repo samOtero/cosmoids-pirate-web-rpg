@@ -31,7 +31,8 @@ export default function TowerDefenseScreen({
   // The Game Loop
   const animate = (time: number) => {
     if (previousTimeRef.current != null && isPlaying) {
-      const deltaTime = time - previousTimeRef.current;
+      // Clamp delta time to 50ms max to prevent huge jumps when tab is in background
+      const deltaTime = Math.min(time - previousTimeRef.current, 50);
 
       // 1. Tick the engine simulation
       engineRef.current.tick(time, deltaTime);
