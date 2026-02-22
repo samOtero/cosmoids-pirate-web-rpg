@@ -18,7 +18,6 @@ export default function TowerDefenseScreen({
 }) {
   const engineRef = useRef(new TowerDefenseEngine());
 
-  const [uiMoney, setUiMoney] = useState(engineRef.current.money);
   const [uiLives, setUiLives] = useState(engineRef.current.lives);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -42,9 +41,6 @@ export default function TowerDefenseScreen({
           alert('Game Over!');
         }
       }
-      if (engineRef.current.money !== uiMoney) {
-        setUiMoney(engineRef.current.money);
-      }
     }
     previousTimeRef.current = time;
     if (isPlaying) {
@@ -62,13 +58,14 @@ export default function TowerDefenseScreen({
       }
       previousTimeRef.current = null;
     };
-  }, [isPlaying, uiLives, uiMoney]); // Dependencies for state sync closure
+  }, [isPlaying, uiLives]); // Dependencies for state sync closure
 
   const handleMapDrop = (defId: string, x: number, y: number) => {
-    const success = engineRef.current.addTower(defId, x, y);
-    if (success) {
-      setUiMoney(engineRef.current.money);
-    }
+    engineRef.current.placeTower(defId, x, y);
+  };
+
+  const handleMapRemove = (defId: string) => {
+    engineRef.current.removeTower(defId);
   };
 
   return (
@@ -76,7 +73,6 @@ export default function TowerDefenseScreen({
       <div className="bg-slate-800 p-4 shrink-0 flex items-center justify-between border-b border-cyan-800">
         <h2 className="text-xl font-bold text-cyan-400">Tower Defense</h2>
         <div className="flex items-center gap-4 text-white">
-          <span>Money: ${uiMoney}</span>
           <span>Lives: {uiLives}</span>
           <button
             onClick={() => setIsPlaying(!isPlaying)}
@@ -93,11 +89,15 @@ export default function TowerDefenseScreen({
         </div>
       </div>
 
-      <PixiBattlefield engine={engineRef.current} onMapDrop={handleMapDrop} />
+      <PixiBattlefield
+        engine={engineRef.current}
+        onMapDrop={handleMapDrop}
+        onMapRemove={handleMapRemove}
+      />
 
       <div className="bg-slate-800 p-4 shrink-0 flex items-center justify-center gap-4 overflow-x-auto border-t border-cyan-800">
         <div className="text-slate-400 mr-4 font-bold uppercase text-sm">
-          Drag Creature to Place ($50):
+          Drag Creature to Place:
         </div>
         {PLAYER_CREATURES.map((creature) => (
           <button

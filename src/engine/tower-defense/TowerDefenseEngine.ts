@@ -235,37 +235,69 @@ export class TowerDefenseEngine {
     this.towers = newTowers;
   }
 
-  public addTower(definitionId: string, x: number, y: number) {
-    if (this.money >= 50 && !this.isSpotOccupied(x, y)) {
-      const defMeta = TD_CREATURE_DEFS[definitionId];
-      if (!defMeta) return false;
+  public removeTower(definitionId: string) {
+    this.towers = this.towers.filter((t) => t.definitionId !== definitionId);
+  }
 
-      // Assign default attacks based on definition (hardcoded mapping for MVP)
-      const defaultAttacks: string[] = [];
-      if (definitionId === 'starter_crab')
-        defaultAttacks.push('VINE_WHIP', 'SCRATCH');
-      else if (definitionId === 'starter_iguana')
-        defaultAttacks.push('EMBER', 'SCRATCH');
-      else if (definitionId === 'starter_monkey')
-        defaultAttacks.push('BUBBLE_BEAM', 'SCRATCH');
-      else defaultAttacks.push('TACKLE'); // Fallback
+  public placeTower(definitionId: string, x: number, y: number) {
+    const existingTower = this.towers.find(
+      (t) => t.definitionId === definitionId
+    );
+    const targetTower = this.towers.find(
+      (t) => t.position.x === x && t.position.y === y
+    );
 
-      this.towers.push({
-        id: `tower_${Date.now()}`,
-        definitionId,
-        position: { x, y },
-        lastAttackTime: 0,
-        level: 1,
-        xp: 0,
-        currentAttack: defMeta.baseCreature.attack,
-        equippedAttacks: defaultAttacks.map((atkId) => ({
-          definitionId: atkId,
-          lastFiredTime: 0,
-        })),
-      });
-      this.money -= 50;
+    if (existingTower) {
+      if (existingTower.position.x === x && existingTower.position.y === y) {
+        return true; // Dropped on itself
+      }
+
+      if (targetTower) {
+        // Swap positions
+        targetTower.position = {
+          x: existingTower.position.x,
+          y: existingTower.position.y,
+        };
+        existingTower.position = { x, y };
+      } else {
+        // Move
+        existingTower.position = { x, y };
+      }
       return true;
     }
-    return false;
+
+    // New tower from the deck
+    if (targetTower) {
+      // Remove whatever tower was there previously, taking its spot
+      this.towers = this.towers.filter((t) => t.id !== targetTower.id);
+    }
+
+    const defMeta = TD_CREATURE_DEFS[definitionId];
+    if (!defMeta) return false;
+
+    // Assign default attacks based on definition (hardcoded mapping for MVP)
+    const defaultAttacks: string[] = [];
+    if (definitionId === 'starter_crab')
+      defaultAttacks.push('VINE_WHIP', 'SCRATCH');
+    else if (definitionId === 'starter_iguana')
+      defaultAttacks.push('EMBER', 'SCRATCH');
+    else if (definitionId === 'starter_monkey')
+      defaultAttacks.push('BUBBLE_BEAM', 'SCRATCH');
+    else defaultAttacks.push('TACKLE'); // Fallback
+
+    this.towers.push({
+      id: `tower_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+      definitionId,
+      position: { x, y },
+      lastAttackTime: 0,
+      level: 1,
+      xp: 0,
+      currentAttack: defMeta.baseCreature.attack,
+      equippedAttacks: defaultAttacks.map((atkId) => ({
+        definitionId: atkId,
+        lastFiredTime: 0,
+      })),
+    });
+    return true;
   }
 }
