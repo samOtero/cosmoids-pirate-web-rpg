@@ -19,6 +19,7 @@ export default function TowerDefenseScreen({
   const engineRef = useRef(new TowerDefenseEngine());
 
   const [uiLives, setUiLives] = useState(engineRef.current.lives);
+  const [activeTowerIds, setActiveTowerIds] = useState<string[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const requestRef = useRef<number | null>(null);
@@ -62,10 +63,12 @@ export default function TowerDefenseScreen({
 
   const handleMapDrop = (defId: string, x: number, y: number) => {
     engineRef.current.placeTower(defId, x, y);
+    setActiveTowerIds(engineRef.current.towers.map((t) => t.definitionId));
   };
 
   const handleMapRemove = (defId: string) => {
     engineRef.current.removeTower(defId);
+    setActiveTowerIds(engineRef.current.towers.map((t) => t.definitionId));
   };
 
   return (
@@ -99,34 +102,43 @@ export default function TowerDefenseScreen({
         <div className="text-slate-400 mr-4 font-bold uppercase text-sm">
           Drag Creature to Place:
         </div>
-        {PLAYER_CREATURES.map((creature) => (
-          <button
-            key={creature.id}
-            draggable
-            onDragStart={(e) => {
-              e.dataTransfer.setData(
-                'application/tower-id',
-                creature.id.toString()
-              );
-              e.dataTransfer.effectAllowed = 'copy';
-              const imgEl = e.currentTarget.querySelector('img');
-              if (imgEl) {
-                // Approximate center of a 48x48 element
-                e.dataTransfer.setDragImage(imgEl, 24, 24);
-              }
-            }}
-            className="w-24 h-24 p-2 rounded flex flex-col items-center justify-center transition-all bg-slate-700 hover:bg-slate-500 cursor-grab active:cursor-grabbing hover:scale-105"
-          >
-            <img
-              src={creature.spriteUrl}
-              alt={creature.name}
-              className="w-12 h-12 object-contain pointer-events-none"
-            />
-            <span className="text-[10px] text-white mt-1 uppercase text-center leading-tight pointer-events-none">
-              {creature.name}
-            </span>
-          </button>
-        ))}
+        {PLAYER_CREATURES.map((creature) => {
+          const isActive = activeTowerIds.includes(creature.id);
+          return (
+            <button
+              key={creature.id}
+              draggable={true}
+              onDragStart={(e) => {
+                e.dataTransfer.setData(
+                  'application/tower-id',
+                  creature.id.toString()
+                );
+                e.dataTransfer.effectAllowed = 'copy';
+                const imgEl = e.currentTarget.querySelector('img');
+                if (imgEl) {
+                  // Approximate center of a 48x48 element
+                  e.dataTransfer.setDragImage(imgEl, 24, 24);
+                }
+              }}
+              className={`w-24 h-24 p-2 rounded flex flex-col items-center justify-center transition-all cursor-grab active:cursor-grabbing hover:scale-105 ${
+                isActive
+                  ? 'bg-cyan-900 border-2 border-cyan-400 hover:bg-cyan-800'
+                  : 'bg-slate-700 hover:bg-slate-500'
+              }`}
+            >
+              <img
+                src={creature.spriteUrl}
+                alt={creature.name}
+                className="w-12 h-12 object-contain pointer-events-none"
+              />
+              <span
+                className={`text-[10px] mt-1 uppercase text-center leading-tight pointer-events-none ${isActive ? 'text-cyan-300 font-bold' : 'text-white'}`}
+              >
+                {isActive ? 'Deployed' : creature.name}
+              </span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
