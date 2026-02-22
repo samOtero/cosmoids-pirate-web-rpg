@@ -21,6 +21,7 @@ interface PixiBattlefieldProps {
   onMapRemove: (defId: string) => void;
   onEnemyCaptured?: (enemyId: string) => void;
   onDragStateChange?: (isDragging: boolean) => void;
+  getDragState?: () => 'tower' | 'capture' | false;
 }
 
 export default function PixiBattlefield({
@@ -29,6 +30,7 @@ export default function PixiBattlefield({
   onMapRemove,
   onEnemyCaptured,
   onDragStateChange,
+  getDragState,
 }: PixiBattlefieldProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const fpsRef = useRef<HTMLDivElement>(null);
@@ -36,6 +38,7 @@ export default function PixiBattlefield({
   const onMapRemoveRef = useRef(onMapRemove);
   const onEnemyCapturedRef = useRef(onEnemyCaptured);
   const onDragStateChangeRef = useRef(onDragStateChange);
+  const getDragStateRef = useRef(getDragState);
   const dragPosRef = useRef<{ x: number; y: number } | null>(null);
   const draggingCaptureDeviceRef = useRef<boolean>(false);
 
@@ -43,6 +46,10 @@ export default function PixiBattlefield({
   useEffect(() => {
     onMapDropRef.current = onMapDrop;
   }, [onMapDrop]);
+
+  useEffect(() => {
+    getDragStateRef.current = getDragState;
+  }, [getDragState]);
 
   useEffect(() => {
     onMapRemoveRef.current = onMapRemove;
@@ -189,6 +196,16 @@ export default function PixiBattlefield({
         const screenW = app.screen.width;
         const screenH = app.screen.height;
 
+        const externalDragState = getDragStateRef.current
+          ? getDragStateRef.current()
+          : false;
+        const isDraggingCapture =
+          draggingCaptureDeviceRef.current || externalDragState === 'capture';
+        const isDraggingTower =
+          externalDragState === 'tower' ||
+          (!isDraggingCapture && dragPosRef.current !== null) ||
+          draggingTowerCreatureId !== null;
+
         // --- Render Towers ---
         const currentTowerKeys = new Set(
           engine.towers.map((t) => `${t.id}_${t.creatureId}`)
@@ -250,10 +267,6 @@ export default function PixiBattlefield({
             container.y = (tower.position.y / 100) * screenH;
           }
 
-          const isDraggingTower =
-            (dragPosRef.current !== null &&
-              !draggingCaptureDeviceRef.current) ||
-            draggingTowerCreatureId !== null;
           const rCircle = container.getChildByLabel('rangeCircle');
           if (rCircle) {
             rCircle.visible = isDraggingTower;
@@ -272,7 +285,6 @@ export default function PixiBattlefield({
           app.stage.children.length - 1
         );
 
-        const isDraggingCapture = draggingCaptureDeviceRef.current;
         let isHoveringValidSpot = false;
 
         if (isDraggingCapture) {
@@ -339,7 +351,7 @@ export default function PixiBattlefield({
               }
             }
           }
-        } else {
+        } else if (isDraggingTower) {
           // Normal Tower Placement Logic
           engine.placementSpots.forEach((spot) => {
             const pxX = (spot.x / 100) * screenW;

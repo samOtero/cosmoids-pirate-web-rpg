@@ -25,7 +25,7 @@ export default function TowerDefenseScreen({
   const [activeTowerIds, setActiveTowerIds] = useState<string[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [uiUpdateToggle, setUiUpdateToggle] = useState(false);
-  const isDraggingRef = useRef(false);
+  const dragStateRef = useRef<'tower' | 'capture' | false>(false);
 
   const requestRef = useRef<number | null>(null);
   const previousTimeRef = useRef<number | null>(null);
@@ -46,11 +46,7 @@ export default function TowerDefenseScreen({
 
   // The Game Loop
   const animate = (time: number) => {
-    if (
-      previousTimeRef.current != null &&
-      isPlaying &&
-      !isDraggingRef.current
-    ) {
+    if (previousTimeRef.current != null && isPlaying && !dragStateRef.current) {
       // Clamp delta time to 50ms max to prevent huge jumps when tab is in background
       const deltaTime = Math.min(time - previousTimeRef.current, 50);
 
@@ -131,8 +127,9 @@ export default function TowerDefenseScreen({
         onMapRemove={handleMapRemove}
         onEnemyCaptured={handleEnemyCaptured}
         onDragStateChange={(isDragging) => {
-          isDraggingRef.current = isDragging;
+          dragStateRef.current = isDragging ? 'tower' : false;
         }}
+        getDragState={() => dragStateRef.current}
       />
 
       <div className="bg-slate-800 p-4 shrink-0 flex items-center justify-center gap-4 overflow-x-auto border-t border-cyan-800">
@@ -160,7 +157,7 @@ export default function TowerDefenseScreen({
               key={creature.id}
               draggable={true}
               onDragStart={(e) => {
-                isDraggingRef.current = true;
+                dragStateRef.current = 'tower';
                 e.dataTransfer.setData(
                   'application/tower-id',
                   creature.id.toString()
@@ -173,7 +170,7 @@ export default function TowerDefenseScreen({
                 }
               }}
               onDragEnd={() => {
-                isDraggingRef.current = false;
+                dragStateRef.current = false;
               }}
               className={`relative w-24 h-24 p-1 rounded flex flex-col items-center justify-center transition-all cursor-grab active:cursor-grabbing hover:scale-105 shrink-0 ${
                 isActive
@@ -219,7 +216,7 @@ export default function TowerDefenseScreen({
         <button
           draggable={true}
           onDragStart={(e) => {
-            isDraggingRef.current = true;
+            dragStateRef.current = 'capture';
             e.dataTransfer.setData('application/capture-device', 'true');
             e.dataTransfer.effectAllowed = 'copy';
             const imgEl = e.currentTarget.querySelector('img');
@@ -228,7 +225,7 @@ export default function TowerDefenseScreen({
             }
           }}
           onDragEnd={() => {
-            isDraggingRef.current = false;
+            dragStateRef.current = false;
           }}
           className="w-24 h-24 p-2 rounded flex flex-col items-center justify-center transition-all cursor-grab active:cursor-grabbing hover:scale-105 bg-purple-900 border-2 border-purple-500 hover:bg-purple-800 shrink-0"
         >
