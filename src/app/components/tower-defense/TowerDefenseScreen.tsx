@@ -69,14 +69,9 @@ export default function TowerDefenseScreen({
   const handleMapClick = (x: number, y: number) => {
     if (selectedCreatureIndex === null) return;
 
-    const newTower = {
-      id: `tower_${Date.now()}`,
-      creature: PLAYER_CREATURES[selectedCreatureIndex],
-      position: { x, y },
-      lastAttackTime: 0,
-    };
+    const defId = PLAYER_CREATURES[selectedCreatureIndex].id;
 
-    const success = engineRef.current.addTower(newTower);
+    const success = engineRef.current.addTower(defId, x, y);
     if (success) {
       setUiMoney(engineRef.current.money);
       setSelectedCreatureIndex(null);

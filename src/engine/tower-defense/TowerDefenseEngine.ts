@@ -1,5 +1,22 @@
-import { BUG_STAGE_1, BUG_STAGE_2, BUG_STAGE_3 } from '@/constants/creatures';
+import {
+  BUG_STAGE_1,
+  BUG_STAGE_2,
+  BUG_STAGE_3,
+  STARTER_CRAB,
+  STARTER_IGUANA,
+  STARTER_MONKEY,
+} from '@/constants/creatures';
+import { Creature } from '@/types/baseGame';
 import { Tower, Enemy, Projectile } from './types';
+
+export const TD_CREATURE_DEFS: Record<string, Creature> = {
+  [BUG_STAGE_1.id]: BUG_STAGE_1,
+  [BUG_STAGE_2.id]: BUG_STAGE_2,
+  [BUG_STAGE_3.id]: BUG_STAGE_3,
+  [STARTER_CRAB.id]: STARTER_CRAB,
+  [STARTER_IGUANA.id]: STARTER_IGUANA,
+  [STARTER_MONKEY.id]: STARTER_MONKEY,
+};
 
 const ENEMY_TYPES = [BUG_STAGE_1, BUG_STAGE_2, BUG_STAGE_3];
 
@@ -20,15 +37,16 @@ export class TowerDefenseEngine {
 
     // Spawn enemies
     if (time - this.lastSpawnTime > 50) {
-      const randomEnemy =
+      const randomEnemyDef =
         ENEMY_TYPES[Math.floor(Math.random() * ENEMY_TYPES.length)];
       newEnemies.push({
         id: `enemy_${time}`,
-        creature: randomEnemy,
+        definitionId: randomEnemyDef.id,
         position: { x: 100, y: 20 + Math.random() * 60 },
-        hp: randomEnemy.maxHp,
-        maxHp: randomEnemy.maxHp,
+        hp: randomEnemyDef.maxHp,
+        maxHp: randomEnemyDef.maxHp,
         speed: 0.1 + Math.random() * 0.1,
+        currentAttack: randomEnemyDef.attack,
       });
       this.lastSpawnTime = time;
     }
@@ -77,7 +95,7 @@ export class TowerDefenseEngine {
             targetId: enemyTarget.id,
             position: { ...tower.position },
             speed: 1, // Will apply timescale to this as well
-            damage: tower.creature.attack,
+            damage: tower.currentAttack,
             target: { ...enemyTarget.position },
           });
           tower.lastAttackTime = time;
@@ -124,9 +142,20 @@ export class TowerDefenseEngine {
     this.towers = newTowers;
   }
 
-  public addTower(tower: Tower) {
+  public addTower(definitionId: string, x: number, y: number) {
     if (this.money >= 50) {
-      this.towers.push(tower);
+      const def = TD_CREATURE_DEFS[definitionId];
+      if (!def) return false;
+
+      this.towers.push({
+        id: `tower_${Date.now()}`,
+        definitionId,
+        position: { x, y },
+        lastAttackTime: 0,
+        level: 1,
+        xp: 0,
+        currentAttack: def.attack,
+      });
       this.money -= 50;
       return true;
     }

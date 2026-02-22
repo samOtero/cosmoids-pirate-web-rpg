@@ -7,18 +7,22 @@ export interface Point {
 
 export interface Tower {
   id: string;
-  creature: Creature;
+  definitionId: string;
   position: Point;
   lastAttackTime: number;
+  level: number;
+  xp: number;
+  currentAttack: number;
 }
 
 export interface Enemy {
   id: string;
-  creature: Creature;
+  definitionId: string;
   position: Point;
   hp: number;
   maxHp: number;
   speed: number;
+  currentAttack: number;
 }
 
 export interface Projectile {

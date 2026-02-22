@@ -1,6 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import * as PIXI from 'pixi.js';
-import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
+import {
+  TowerDefenseEngine,
+  TD_CREATURE_DEFS,
+} from '@/engine/tower-defense/TowerDefenseEngine';
 
 interface PixiBattlefieldProps {
   engine: TowerDefenseEngine;
@@ -98,8 +101,8 @@ export default function PixiBattlefield({
           let container = towerSprites.get(tower.id);
           if (!container) {
             container = new PIXI.Container();
-            // Load and add sprite
-            PIXI.Assets.load(tower.creature.spriteUrl).then((texture) => {
+            const spriteUrl = TD_CREATURE_DEFS[tower.definitionId].spriteUrl;
+            PIXI.Assets.load(spriteUrl).then((texture) => {
               if (isDestroyed || !towerSprites.has(tower.id)) return;
               const tsprite = new PIXI.Sprite(texture);
               tsprite.anchor.set(0.5);
@@ -137,7 +140,8 @@ export default function PixiBattlefield({
           if (!container) {
             container = new PIXI.Container();
 
-            PIXI.Assets.load(enemy.creature.spriteUrl).then((texture) => {
+            const spriteUrl = TD_CREATURE_DEFS[enemy.definitionId].spriteUrl;
+            PIXI.Assets.load(spriteUrl).then((texture) => {
               if (isDestroyed || !enemySprites.has(enemy.id)) return;
               const esprite = new PIXI.Sprite(texture);
               esprite.anchor.set(0.5);
