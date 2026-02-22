@@ -28,8 +28,9 @@ export interface TDLevelData {
 }
 
 export interface Tower {
-  id: string;
-  definitionId: string;
+  id: string; // Unique tower map instance ID
+  creatureId: string; // Reference to the Creature instance ID in the player's party
+  speciesId: string; // The base species ID for rendering
   position: Point;
   lastAttackTime: number; // Deprecate or keep for generic attacks
   level: number;

@@ -30,7 +30,7 @@ export class TDProgressionManager {
           killer.level += 1;
 
           // Scale Stats
-          const metadata = TD_CREATURE_DEFS[killer.definitionId];
+          const metadata = TD_CREATURE_DEFS[killer.speciesId];
           const statGrowth = 2; // Flat +2 attack per level as simple example
           killer.currentAttack =
             metadata.baseCreature.attack + killer.level * statGrowth;
@@ -46,7 +46,7 @@ export class TDProgressionManager {
     } else if (event.type === 'TOWER_LEVELED_UP') {
       const tower = this.engine.towers.find((t) => t.id === event.towerId);
       if (tower) {
-        const metadata = TD_CREATURE_DEFS[tower.definitionId];
+        const metadata = TD_CREATURE_DEFS[tower.speciesId];
 
         if (metadata.attackUnlocks) {
           metadata.attackUnlocks.forEach((node) => {
@@ -74,10 +74,10 @@ export class TDProgressionManager {
         if (metadata.evolutionNodes) {
           metadata.evolutionNodes.forEach((node) => {
             if (node.level === event.newLevel) {
-              const oldDef = tower.definitionId;
-              tower.definitionId = node.evolutionDefId;
+              const oldDef = tower.speciesId;
+              tower.speciesId = node.evolutionDefId;
 
-              const newMetadata = TD_CREATURE_DEFS[tower.definitionId];
+              const newMetadata = TD_CREATURE_DEFS[tower.speciesId];
               tower.currentAttack =
                 newMetadata.baseCreature.attack + tower.level * 2;
 
@@ -85,7 +85,7 @@ export class TDProgressionManager {
                 type: 'TOWER_EVOLVED',
                 towerId: tower.id,
                 oldDefinitionId: oldDef,
-                newDefinitionId: tower.definitionId,
+                newDefinitionId: tower.speciesId,
               });
             }
           });

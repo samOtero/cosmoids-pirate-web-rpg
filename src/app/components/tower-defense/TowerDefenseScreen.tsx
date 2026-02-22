@@ -1,16 +1,10 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import {
-  STARTER_CRAB,
-  STARTER_IGUANA,
-  STARTER_MONKEY,
-} from '@/constants/creatures';
+import { useGameStore } from '@/store/gameStore';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import PixiBattlefield from './PixiBattlefield';
 import { FIRST_LEVEL } from '@/constants/tdLevels';
-
-const PLAYER_CREATURES = [STARTER_CRAB, STARTER_IGUANA, STARTER_MONKEY];
 
 export default function TowerDefenseScreen({
   onClose,
@@ -18,6 +12,11 @@ export default function TowerDefenseScreen({
   onClose: () => void;
 }) {
   const engineRef = useRef(new TowerDefenseEngine(FIRST_LEVEL));
+
+  const profiles = useGameStore((state) => state.profiles);
+  const currentProfileId = useGameStore((state) => state.currentProfileId);
+  const profile = currentProfileId !== null ? profiles[currentProfileId] : null;
+  const playerCreatures = profile?.creatures || [];
 
   const [uiLives, setUiLives] = useState(engineRef.current.lives);
   const [activeTowerIds, setActiveTowerIds] = useState<string[]>([]);
@@ -62,14 +61,16 @@ export default function TowerDefenseScreen({
     };
   }, [isPlaying, uiLives]); // Dependencies for state sync closure
 
-  const handleMapDrop = (defId: string, x: number, y: number) => {
-    engineRef.current.placeTower(defId, x, y);
-    setActiveTowerIds(engineRef.current.towers.map((t) => t.definitionId));
+  const handleMapDrop = (creatureId: string, x: number, y: number) => {
+    const creature = playerCreatures.find((c) => c.id === creatureId);
+    if (!creature) return;
+    engineRef.current.placeTower(creature, x, y);
+    setActiveTowerIds(engineRef.current.towers.map((t: any) => t.creatureId));
   };
 
-  const handleMapRemove = (defId: string) => {
-    engineRef.current.removeTower(defId);
-    setActiveTowerIds(engineRef.current.towers.map((t) => t.definitionId));
+  const handleMapRemove = (creatureId: string) => {
+    engineRef.current.removeTower(creatureId);
+    setActiveTowerIds(engineRef.current.towers.map((t: any) => t.creatureId));
   };
 
   return (
@@ -103,7 +104,7 @@ export default function TowerDefenseScreen({
         <div className="text-slate-400 mr-4 font-bold uppercase text-sm">
           Drag Creature to Place:
         </div>
-        {PLAYER_CREATURES.map((creature) => {
+        {playerCreatures.map((creature) => {
           const isActive = activeTowerIds.includes(creature.id);
           return (
             <button

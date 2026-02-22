@@ -214,7 +214,7 @@ export const useGameStore = create<GameState>()(
                       currentEvent.payload as AddCreatureToProfileEventPayload;
                     state.addCreatureToProfile(
                       payload.profileId,
-                      payload.creature
+                      { ...payload.creature } // Clone to avoid mutating static def
                     );
                     break;
                   }
@@ -460,9 +460,18 @@ export const useGameStore = create<GameState>()(
                 return state;
               const newProfiles = [...state.profiles];
               if (newProfiles[slotId]) {
+                const instanceId = crypto.randomUUID();
+                const newCreatureInstance: Creature = {
+                  ...creature,
+                  speciesId: creature.id,
+                  id: instanceId,
+                };
                 newProfiles[slotId] = {
                   ...newProfiles[slotId]!,
-                  creatures: [...newProfiles[slotId]!.creatures, creature],
+                  creatures: [
+                    ...newProfiles[slotId]!.creatures,
+                    newCreatureInstance,
+                  ],
                 };
               }
               return { profiles: newProfiles };

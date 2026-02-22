@@ -71,7 +71,8 @@ export interface Item {
 }
 
 export interface Creature {
-  id: string;
+  id: string; // Unique instance ID
+  speciesId: string; // Base definition ID (e.g., 'starter_crab')
   name: string;
   type: ElementType;
   maxHp: number;

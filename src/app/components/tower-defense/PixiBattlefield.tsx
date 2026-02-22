@@ -97,13 +97,13 @@ export default function PixiBattlefield({
       const invalidSpotGraphics = new PIXI.Graphics();
 
       let draggingNode: PIXI.Container | null = null;
-      let draggingTowerDefinitionId: string | null = null;
+      let draggingTowerCreatureId: string | null = null;
 
       app.stage.eventMode = 'static';
       app.stage.hitArea = new PIXI.Rectangle(0, 0, 10000, 10000);
 
       const onDragEnd = (e: PIXI.FederatedPointerEvent) => {
-        if (draggingTowerDefinitionId) {
+        if (draggingTowerCreatureId) {
           const screenW = app.screen.width;
           const screenH = app.screen.height;
           const x = (e.global.x / screenW) * 100;
@@ -126,20 +126,20 @@ export default function PixiBattlefield({
 
           if (closestSpot) {
             onMapDropRef.current(
-              draggingTowerDefinitionId,
+              draggingTowerCreatureId,
               closestSpot.x,
               closestSpot.y
             );
           } else {
             if (onMapRemoveRef.current) {
-              onMapRemoveRef.current(draggingTowerDefinitionId);
+              onMapRemoveRef.current(draggingTowerCreatureId);
             }
           }
 
           dragPosRef.current = null;
           if (draggingNode) draggingNode.cursor = 'grab';
           draggingNode = null;
-          draggingTowerDefinitionId = null;
+          draggingTowerCreatureId = null;
         }
       };
 
@@ -173,7 +173,7 @@ export default function PixiBattlefield({
 
         // --- Render Towers ---
         const currentTowerKeys = new Set(
-          engine.towers.map((t) => `${t.id}_${t.definitionId}`)
+          engine.towers.map((t) => `${t.id}_${t.creatureId}`)
         );
         for (const [key, sprite] of towerSprites.entries()) {
           if (!currentTowerKeys.has(key)) {
@@ -183,7 +183,7 @@ export default function PixiBattlefield({
           }
         }
         for (const tower of engine.towers) {
-          const cacheKey = `${tower.id}_${tower.definitionId}`;
+          const cacheKey = `${tower.id}_${tower.creatureId}`;
           let container = towerSprites.get(cacheKey);
           if (!container) {
             const newContainer = new PIXI.Container();
@@ -193,7 +193,7 @@ export default function PixiBattlefield({
             newContainer.cursor = 'grab';
             newContainer.on('pointerdown', (e) => {
               draggingNode = newContainer;
-              draggingTowerDefinitionId = tower.definitionId;
+              draggingTowerCreatureId = tower.creatureId;
               newContainer.cursor = 'grabbing';
               app.stage.setChildIndex(
                 newContainer,
@@ -202,7 +202,7 @@ export default function PixiBattlefield({
             });
 
             const spriteUrl =
-              TD_CREATURE_DEFS[tower.definitionId].baseCreature.spriteUrl;
+              TD_CREATURE_DEFS[tower.speciesId].baseCreature.spriteUrl;
             PIXI.Assets.load(spriteUrl).then((texture) => {
               if (isDestroyed || !towerSprites.has(cacheKey)) return;
               const tsprite = new PIXI.Sprite(texture);
@@ -223,7 +223,7 @@ export default function PixiBattlefield({
             app.stage.addChild(container);
             towerSprites.set(cacheKey, container);
           }
-          if (draggingTowerDefinitionId !== tower.definitionId) {
+          if (draggingTowerCreatureId !== tower.creatureId) {
             container.x = (tower.position.x / 100) * screenW;
             container.y = (tower.position.y / 100) * screenH;
           }

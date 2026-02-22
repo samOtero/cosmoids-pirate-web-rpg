@@ -263,14 +263,16 @@ export class TowerDefenseEngine {
     this.towers = newTowers;
   }
 
-  public removeTower(definitionId: string) {
-    this.towers = this.towers.filter((t) => t.definitionId !== definitionId);
+  public removeTower(creatureId: string) {
+    this.towers = this.towers.filter((t) => t.creatureId !== creatureId);
   }
 
-  public placeTower(definitionId: string, x: number, y: number) {
-    const existingTower = this.towers.find(
-      (t) => t.definitionId === definitionId
-    );
+  public placeTower(
+    creature: import('@/types/baseGame').Creature,
+    x: number,
+    y: number
+  ) {
+    const existingTower = this.towers.find((t) => t.creatureId === creature.id);
     const targetTower = this.towers.find(
       (t) => t.position.x === x && t.position.y === y
     );
@@ -300,27 +302,28 @@ export class TowerDefenseEngine {
       this.towers = this.towers.filter((t) => t.id !== targetTower.id);
     }
 
-    const defMeta = TD_CREATURE_DEFS[definitionId];
+    const defMeta = TD_CREATURE_DEFS[creature.speciesId];
     if (!defMeta) return false;
 
     // Assign default attacks based on definition (hardcoded mapping for MVP)
     const defaultAttacks: string[] = [];
-    if (definitionId === 'starter_crab')
+    if (creature.speciesId === 'starter_crab')
       defaultAttacks.push('VINE_WHIP', 'SCRATCH');
-    else if (definitionId === 'starter_iguana')
+    else if (creature.speciesId === 'starter_iguana')
       defaultAttacks.push('EMBER', 'SCRATCH');
-    else if (definitionId === 'starter_monkey')
+    else if (creature.speciesId === 'starter_monkey')
       defaultAttacks.push('BUBBLE_BEAM', 'SCRATCH');
     else defaultAttacks.push('TACKLE'); // Fallback
 
     this.towers.push({
       id: `tower_${Date.now()}_${Math.random().toString(36).substring(7)}`,
-      definitionId,
+      creatureId: creature.id,
+      speciesId: creature.speciesId,
       position: { x, y },
       lastAttackTime: 0,
-      level: 1,
-      xp: 0,
-      currentAttack: defMeta.baseCreature.attack,
+      level: creature.level,
+      xp: creature.xp,
+      currentAttack: creature.attack,
       equippedAttacks: defaultAttacks.map((atkId) => ({
         definitionId: atkId,
         lastFiredTime: 0,
