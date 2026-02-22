@@ -322,6 +322,7 @@ export default function CreaturePositionEditor({
             isPlayerTurn={false}
             battleOver={true}
             inventory={[]}
+            onOpenBag={() => {}}
             backgroundImageUrl={bgUrl}
           />
 

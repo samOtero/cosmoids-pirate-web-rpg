@@ -7,7 +7,9 @@ const AnimationEditor = lazy(() => import('./AnimationEditor'));
 const BattleDebug = lazy(() => import('./BattleDebug'));
 const MapEditor = lazy(() => import('./MapEditor'));
 const CreaturePositionEditor = lazy(() => import('./CreaturePositionEditor'));
-const TowerDefenseMap = lazy(() => import('./TowerDefenseMap'));
+const TowerDefenseScreen = lazy(
+  () => import('@/app/components/tower-defense/TowerDefenseScreen')
+);
 
 type ToolType =
   | 'DIALOG'
@@ -129,7 +131,7 @@ export default function DevTools() {
             <CreaturePositionEditor onClose={() => setActiveTool(null)} />
           )}
           {activeTool === 'TOWER_DEFENSE' && (
-            <TowerDefenseMap onClose={() => setActiveTool(null)} />
+            <TowerDefenseScreen onClose={() => setActiveTool(null)} />
           )}
         </Suspense>
       )}
