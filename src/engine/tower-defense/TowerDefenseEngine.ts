@@ -56,8 +56,13 @@ export class TowerDefenseEngine {
 
   public events = new TDEventBus();
   private progression = new TDProgressionManager(this, this.events);
-
   private lastSpawnTime: number = 0;
+
+  public aspectRatio: number = 1;
+
+  public setAspectRatio(ratio: number) {
+    this.aspectRatio = ratio;
+  }
 
   // Predefined waypoints for enemies
   public path: { x: number; y: number }[] = [
@@ -156,7 +161,10 @@ export class TowerDefenseEngine {
         const targetPoint = this.path[enemy.currentWaypointIndex];
         const dx = targetPoint.x - enemy.position.x;
         const dy = targetPoint.y - enemy.position.y;
-        const distSq = dx * dx + dy * dy;
+
+        // Normalize distance by aspect ratio to make vertical movement feel proportional
+        const effectiveDy = dy * this.aspectRatio;
+        const distSq = dx * dx + effectiveDy * effectiveDy;
 
         const frameDistance = moveSpeed * timeScale;
 
@@ -169,7 +177,8 @@ export class TowerDefenseEngine {
           // Move towards waypoint
           const dist = Math.sqrt(distSq);
           enemy.position.x += (dx / dist) * frameDistance;
-          enemy.position.y += (dy / dist) * frameDistance;
+          // Apply inverse normalization to the actual movement
+          enemy.position.y += (dy / dist) * frameDistance * this.aspectRatio;
         }
       }
     });

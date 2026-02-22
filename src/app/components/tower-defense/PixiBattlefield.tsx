@@ -76,10 +76,15 @@ export default function PixiBattlefield({
       app.stage.addChild(bgSprite);
 
       // Handle resize
-      app.renderer.on('resize', () => {
+      const updateAspectRatio = () => {
         bgSprite.width = app.screen.width;
         bgSprite.height = app.screen.height;
-      });
+        if (engine && app.screen.height > 0) {
+          engine.setAspectRatio(app.screen.width / app.screen.height);
+        }
+      };
+      app.renderer.on('resize', updateAspectRatio);
+      updateAspectRatio(); // Initial setting
 
       // Interactive background
       bgSprite.eventMode = 'static';
