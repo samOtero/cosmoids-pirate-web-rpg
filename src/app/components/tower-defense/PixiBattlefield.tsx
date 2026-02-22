@@ -269,7 +269,7 @@ export default function PixiBattlefield({
 
           const rCircle = container.getChildByLabel('rangeCircle');
           if (rCircle) {
-            rCircle.visible = isDraggingTower;
+            rCircle.visible = draggingTowerCreatureId === tower.creatureId;
           }
         }
 
@@ -353,6 +353,15 @@ export default function PixiBattlefield({
           }
         } else if (isDraggingTower) {
           // Normal Tower Placement Logic
+          if (draggingTowerCreatureId === null && dragPosRef.current) {
+            const pxX = (dragPosRef.current.x / 100) * screenW;
+            const pxY = (dragPosRef.current.y / 100) * screenH;
+            const radius = screenW * 0.15;
+            spotGraphics.circle(pxX, pxY, radius);
+            spotGraphics.fill({ color: 0x22d3ee, alpha: 0.05 });
+            spotGraphics.stroke({ color: 0x22d3ee, alpha: 0.3, width: 1 });
+          }
+
           engine.placementSpots.forEach((spot) => {
             const pxX = (spot.x / 100) * screenW;
             const pxY = (spot.y / 100) * screenH;
