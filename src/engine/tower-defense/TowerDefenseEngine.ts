@@ -267,6 +267,29 @@ export class TowerDefenseEngine {
     this.towers = this.towers.filter((t) => t.creatureId !== creatureId);
   }
 
+  public captureEnemy(
+    enemyId: string
+  ): import('@/types/baseGame').Creature | null {
+    const enemyIndex = this.enemies.findIndex((e) => e.id === enemyId);
+    if (enemyIndex === -1) return null;
+
+    const enemy = this.enemies[enemyIndex];
+
+    // Remove the enemy without triggering 'ENEMY_DIED' drops or lives reduction
+    this.enemies.splice(enemyIndex, 1);
+
+    const baseCreature = TD_CREATURE_DEFS[enemy.definitionId]?.baseCreature;
+    if (!baseCreature) return null;
+
+    // Return a base Creature object suitable for adding to the profile
+    return {
+      ...baseCreature,
+      currentHp: baseCreature.maxHp, // Heal them upon capture
+      level: 1, // Base level for captured creatures
+      xp: 0,
+    };
+  }
+
   public placeTower(
     creature: import('@/types/baseGame').Creature,
     x: number,

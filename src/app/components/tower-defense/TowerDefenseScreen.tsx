@@ -15,6 +15,9 @@ export default function TowerDefenseScreen({
 
   const profiles = useGameStore((state) => state.profiles);
   const currentProfileId = useGameStore((state) => state.currentProfileId);
+  const addCreatureToProfile = useGameStore(
+    (state) => state.addCreatureToProfile
+  );
   const profile = currentProfileId !== null ? profiles[currentProfileId] : null;
   const playerCreatures = profile?.creatures || [];
 
@@ -78,6 +81,14 @@ export default function TowerDefenseScreen({
     setActiveTowerIds(engineRef.current.towers.map((t: any) => t.creatureId));
   };
 
+  const handleEnemyCaptured = (enemyId: string) => {
+    const capturedCreature = engineRef.current.captureEnemy(enemyId);
+    if (capturedCreature && currentProfileId !== null) {
+      addCreatureToProfile(currentProfileId, capturedCreature);
+      // Optional: Show some success feedback
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-9998 bg-slate-900 flex flex-col">
       <div className="bg-slate-800 p-4 shrink-0 flex items-center justify-between border-b border-cyan-800">
@@ -103,6 +114,7 @@ export default function TowerDefenseScreen({
         engine={engineRef.current}
         onMapDrop={handleMapDrop}
         onMapRemove={handleMapRemove}
+        onEnemyCaptured={handleEnemyCaptured}
         onDragStateChange={(isDragging) => {
           isDraggingRef.current = isDragging;
         }}
@@ -153,6 +165,34 @@ export default function TowerDefenseScreen({
             </button>
           );
         })}
+
+        {/* Permanent Capture Device Tool */}
+        <div className="w-px h-16 bg-cyan-800 mx-2 flex-shrink-0" />
+        <button
+          draggable={true}
+          onDragStart={(e) => {
+            isDraggingRef.current = true;
+            e.dataTransfer.setData('application/capture-device', 'true');
+            e.dataTransfer.effectAllowed = 'copy';
+            const imgEl = e.currentTarget.querySelector('img');
+            if (imgEl) {
+              e.dataTransfer.setDragImage(imgEl, 24, 24);
+            }
+          }}
+          onDragEnd={() => {
+            isDraggingRef.current = false;
+          }}
+          className="w-24 h-24 p-2 rounded flex flex-col items-center justify-center transition-all cursor-grab active:cursor-grabbing hover:scale-105 bg-purple-900 border-2 border-purple-500 hover:bg-purple-800 flex-shrink-0"
+        >
+          {/* We'll use a placeholder icon or color for the capture device */}
+          <div className="relative w-12 h-12 rounded-full border-4 border-white bg-red-500 flex items-center justify-center shadow-lg pointer-events-none mb-1 overflow-hidden">
+            <div className="w-full h-1 bg-black absolute top-1/2 -mt-[2px] left-0" />
+            <div className="w-4 h-4 bg-white rounded-full border-2 border-black z-10" />
+          </div>
+          <span className="text-[10px] mt-1 uppercase text-center leading-tight pointer-events-none text-purple-200 font-bold">
+            Capture
+          </span>
+        </button>
       </div>
     </div>
   );

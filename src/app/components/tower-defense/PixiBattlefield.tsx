@@ -19,6 +19,7 @@ interface PixiBattlefieldProps {
   engine: TowerDefenseEngine;
   onMapDrop: (defId: string, x: number, y: number) => void;
   onMapRemove: (defId: string) => void;
+  onEnemyCaptured?: (enemyId: string) => void;
   onDragStateChange?: (isDragging: boolean) => void;
 }
 
@@ -26,14 +27,17 @@ export default function PixiBattlefield({
   engine,
   onMapDrop,
   onMapRemove,
+  onEnemyCaptured,
   onDragStateChange,
 }: PixiBattlefieldProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const fpsRef = useRef<HTMLDivElement>(null);
   const onMapDropRef = useRef(onMapDrop);
   const onMapRemoveRef = useRef(onMapRemove);
+  const onEnemyCapturedRef = useRef(onEnemyCaptured);
   const onDragStateChangeRef = useRef(onDragStateChange);
   const dragPosRef = useRef<{ x: number; y: number } | null>(null);
+  const draggingCaptureDeviceRef = useRef<boolean>(false);
 
   // Keep the latest callback without triggering re-runs of the PIXI initializer
   useEffect(() => {
@@ -47,6 +51,10 @@ export default function PixiBattlefield({
   useEffect(() => {
     onDragStateChangeRef.current = onDragStateChange;
   }, [onDragStateChange]);
+
+  useEffect(() => {
+    onEnemyCapturedRef.current = onEnemyCaptured;
+  }, [onEnemyCaptured]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -242,7 +250,7 @@ export default function PixiBattlefield({
           }
         }
 
-        // --- Render Placement Spots ---
+        // --- Render Placement Spots & Capture Hover ---
         spotGraphics.clear();
         invalidSpotGraphics.clear();
 
@@ -254,75 +262,151 @@ export default function PixiBattlefield({
           app.stage.children.length - 1
         );
 
+        const isDraggingCapture = draggingCaptureDeviceRef.current;
         let isHoveringValidSpot = false;
 
-        engine.placementSpots.forEach((spot) => {
-          const pxX = (spot.x / 100) * screenW;
-          const pxY = (spot.y / 100) * screenH;
-
-          let isHovered = false;
+        if (isDraggingCapture) {
+          // Capture Device Logic
+          let targetedEnemyId: string | null = null;
+          let isWeakened = false;
 
           if (dragPosRef.current) {
-            const dx = dragPosRef.current.x - spot.x;
-            const dy = dragPosRef.current.y - spot.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist <= 10) {
-              // Hover/Snap threshold is 10vw/vh approx
-              isHovered = true;
-              isHoveringValidSpot = true;
+            let minSqDist = Infinity;
+            const CAPTURE_DIST_SQ = 64; // distance squared for hovering enemy
+
+            // Find closest enemy
+            engine.enemies.forEach((enemy) => {
+              const dx = dragPosRef.current!.x - enemy.position.x;
+              const dy = dragPosRef.current!.y - enemy.position.y;
+              const distSq = dx * dx + dy * dy;
+
+              if (distSq <= CAPTURE_DIST_SQ && distSq < minSqDist) {
+                minSqDist = distSq;
+                targetedEnemyId = enemy.id;
+                isWeakened = enemy.hp / enemy.maxHp <= 0.3;
+              }
+            });
+
+            if (targetedEnemyId) {
+              isHoveringValidSpot = isWeakened;
+              const enemy = engine.enemies.find(
+                (e) => e.id === targetedEnemyId
+              )!;
+              const pxX = (enemy.position.x / 100) * screenW;
+              const pxY = (enemy.position.y / 100) * screenH;
+              const radius = screenW * 0.05;
+
+              if (isWeakened) {
+                // Green circle for valid capture
+                spotGraphics.circle(pxX, pxY, radius);
+                spotGraphics.fill({ color: 0x22c55e, alpha: 0.3 }); // Transparent green
+                spotGraphics.stroke({
+                  color: 0x22c55e,
+                  alpha: 1,
+                  width: 4,
+                });
+              } else {
+                // Red X for invalid capture (not weakened enough)
+                invalidSpotGraphics.circle(pxX, pxY, radius);
+                invalidSpotGraphics.fill({ color: 0xef4444, alpha: 0.2 });
+                invalidSpotGraphics.stroke({
+                  color: 0xef4444,
+                  alpha: 0.8,
+                  width: 3,
+                });
+
+                const crossSize = radius * 0.5;
+                invalidSpotGraphics.moveTo(pxX - crossSize, pxY - crossSize);
+                invalidSpotGraphics.lineTo(pxX + crossSize, pxY + crossSize);
+                invalidSpotGraphics.moveTo(pxX + crossSize, pxY - crossSize);
+                invalidSpotGraphics.lineTo(pxX - crossSize, pxY + crossSize);
+                invalidSpotGraphics.stroke({
+                  color: 0xef4444,
+                  width: 4,
+                  join: 'round',
+                  cap: 'round',
+                });
+              }
             }
           }
+        } else {
+          // Normal Tower Placement Logic
+          engine.placementSpots.forEach((spot) => {
+            const pxX = (spot.x / 100) * screenW;
+            const pxY = (spot.y / 100) * screenH;
 
-          const strokeWidth = isHovered ? 4 : 2;
-          const alpha = isHovered ? 1 : 0.8;
-          let baseColor = 0xf97316; // Orange
+            let isHovered = false;
 
-          if (engine.isSpotOccupied(spot.x, spot.y)) {
-            // Let's color occupied spots differently while dragging to indicate swap!
-            // blue-ish if occupied! Wait, let's keep it orange to stay consistent but it proves it works.
-            baseColor = 0xf97316;
-          }
+            if (dragPosRef.current) {
+              const dx = dragPosRef.current.x - spot.x;
+              const dy = dragPosRef.current.y - spot.y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist <= 10) {
+                // Hover/Snap threshold is 10vw/vh approx
+                isHovered = true;
+                isHoveringValidSpot = true;
+              }
+            }
 
-          if (isHovered) {
-            spotGraphics.circle(pxX, pxY, screenW * 0.05); // 5vw radius
-            spotGraphics.fill({ color: baseColor, alpha: 0.3 }); // Transparent
-            spotGraphics.stroke({
-              color: baseColor,
-              alpha: alpha,
-              width: strokeWidth,
-            }); // Solid thicker border
-          } else {
-            spotGraphics.circle(pxX, pxY, screenW * 0.05);
-            spotGraphics.stroke({
-              color: baseColor,
-              alpha: alpha,
-              width: strokeWidth,
-            }); // Standard outline
-          }
-        });
+            const strokeWidth = isHovered ? 4 : 2;
+            const alpha = isHovered ? 1 : 0.8;
+            let baseColor = 0xf97316; // Orange
 
-        // If dragging but not hovering a valid open spot, show error indicator
-        if (dragPosRef.current && !isHoveringValidSpot) {
-          const pxX = (dragPosRef.current.x / 100) * screenW;
-          const pxY = (dragPosRef.current.y / 100) * screenH;
-          const radius = screenW * 0.05;
+            if (engine.isSpotOccupied(spot.x, spot.y)) {
+              // Let's color occupied spots differently while dragging to indicate swap!
+              // blue-ish if occupied! Wait, let's keep it orange to stay consistent but it proves it works.
+              baseColor = 0xf97316;
+            }
 
-          invalidSpotGraphics.circle(pxX, pxY, radius);
-          invalidSpotGraphics.fill({ color: 0xef4444, alpha: 0.2 }); // Transparent red
-          invalidSpotGraphics.stroke({ color: 0xef4444, alpha: 0.8, width: 3 }); // Solid red border
-
-          // Draw an X
-          const crossSize = radius * 0.5;
-          invalidSpotGraphics.moveTo(pxX - crossSize, pxY - crossSize);
-          invalidSpotGraphics.lineTo(pxX + crossSize, pxY + crossSize);
-          invalidSpotGraphics.moveTo(pxX + crossSize, pxY - crossSize);
-          invalidSpotGraphics.lineTo(pxX - crossSize, pxY + crossSize);
-          invalidSpotGraphics.stroke({
-            color: 0xef4444,
-            width: 4,
-            join: 'round',
-            cap: 'round',
+            if (isHovered) {
+              spotGraphics.circle(pxX, pxY, screenW * 0.05); // 5vw radius
+              spotGraphics.fill({ color: baseColor, alpha: 0.3 }); // Transparent
+              spotGraphics.stroke({
+                color: baseColor,
+                alpha: alpha,
+                width: strokeWidth,
+              }); // Solid thicker border
+            } else {
+              spotGraphics.circle(pxX, pxY, screenW * 0.05);
+              spotGraphics.stroke({
+                color: baseColor,
+                alpha: alpha,
+                width: strokeWidth,
+              }); // Standard outline
+            }
           });
+
+          // If dragging tower but not hovering a valid open spot, show error indicator
+          if (
+            dragPosRef.current &&
+            !isHoveringValidSpot &&
+            dragPosRef.current
+          ) {
+            const pxX = (dragPosRef.current.x / 100) * screenW;
+            const pxY = (dragPosRef.current.y / 100) * screenH;
+            const radius = screenW * 0.05;
+
+            invalidSpotGraphics.circle(pxX, pxY, radius);
+            invalidSpotGraphics.fill({ color: 0xef4444, alpha: 0.2 }); // Transparent red
+            invalidSpotGraphics.stroke({
+              color: 0xef4444,
+              alpha: 0.8,
+              width: 3,
+            }); // Solid red border
+
+            // Draw an X
+            const crossSize = radius * 0.5;
+            invalidSpotGraphics.moveTo(pxX - crossSize, pxY - crossSize);
+            invalidSpotGraphics.lineTo(pxX + crossSize, pxY + crossSize);
+            invalidSpotGraphics.moveTo(pxX + crossSize, pxY - crossSize);
+            invalidSpotGraphics.lineTo(pxX - crossSize, pxY + crossSize);
+            invalidSpotGraphics.stroke({
+              color: 0xef4444,
+              width: 4,
+              join: 'round',
+              cap: 'round',
+            });
+          }
         }
 
         // --- Render Enemies ---
@@ -429,6 +513,13 @@ export default function PixiBattlefield({
         e.preventDefault();
         e.dataTransfer.dropEffect = 'copy';
 
+        // Set dragging capture device ref based on items (types in modern browsers)
+        if (e.dataTransfer.types.includes('application/capture-device')) {
+          draggingCaptureDeviceRef.current = true;
+        } else {
+          draggingCaptureDeviceRef.current = false;
+        }
+
         // Track hover position
         const rect = e.currentTarget.getBoundingClientRect();
         const x = ((e.clientX - rect.left) / rect.width) * 100;
@@ -437,11 +528,48 @@ export default function PixiBattlefield({
       }}
       onDragLeave={() => {
         dragPosRef.current = null;
+        draggingCaptureDeviceRef.current = false;
       }}
       onDrop={(e) => {
         e.preventDefault();
         dragPosRef.current = null;
+        draggingCaptureDeviceRef.current = false;
+
         const towerIdStr = e.dataTransfer.getData('application/tower-id');
+        const isCaptureDevice = e.dataTransfer.getData(
+          'application/capture-device'
+        );
+
+        if (isCaptureDevice && engine) {
+          const rect = e.currentTarget.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width) * 100;
+          const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+          let targetedEnemyId: string | null = null;
+          let isWeakened = false;
+          let minSqDist = Infinity;
+          const CAPTURE_DIST_SQ = 64; // distance squared for hovering enemy
+
+          engine.enemies.forEach((enemy) => {
+            const dx = x - enemy.position.x;
+            const dy = y - enemy.position.y;
+            const distSq = dx * dx + dy * dy;
+
+            if (distSq <= CAPTURE_DIST_SQ && distSq < minSqDist) {
+              minSqDist = distSq;
+              targetedEnemyId = enemy.id;
+              isWeakened = enemy.hp / enemy.maxHp <= 0.9;
+            }
+          });
+
+          if (targetedEnemyId && isWeakened) {
+            if (onEnemyCapturedRef.current) {
+              onEnemyCapturedRef.current(targetedEnemyId);
+            }
+          }
+          return;
+        }
+
         if (towerIdStr) {
           const rect = e.currentTarget.getBoundingClientRect();
           const x = ((e.clientX - rect.left) / rect.width) * 100;
