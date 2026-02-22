@@ -5,6 +5,12 @@ export type TDEvent =
       killerTowerId: string;
       xpValue: number;
     }
+  | {
+      type: 'TOWER_XP_GAINED';
+      towerId: string;
+      xpGained: number;
+      totalXp: number;
+    }
   | { type: 'TOWER_LEVELED_UP'; towerId: string; newLevel: number }
   | {
       type: 'TOWER_EVOLVED';

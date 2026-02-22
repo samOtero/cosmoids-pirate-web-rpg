@@ -22,6 +22,13 @@ export class TDProgressionManager {
       if (killer) {
         killer.xp += event.xpValue;
 
+        this.engine.events.emit({
+          type: 'TOWER_XP_GAINED',
+          towerId: killer.id,
+          xpGained: event.xpValue,
+          totalXp: killer.xp,
+        });
+
         // Simple RPG curve: Level 1->2 is 100xp, 2->3 is 200xp, etc.
         const requiredXp = killer.level * 100;
 

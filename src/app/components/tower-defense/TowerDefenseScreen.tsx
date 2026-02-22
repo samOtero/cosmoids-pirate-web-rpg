@@ -24,10 +24,25 @@ export default function TowerDefenseScreen({
   const [uiLives, setUiLives] = useState(engineRef.current.lives);
   const [activeTowerIds, setActiveTowerIds] = useState<string[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [uiUpdateToggle, setUiUpdateToggle] = useState(false);
   const isDraggingRef = useRef(false);
 
   const requestRef = useRef<number | null>(null);
   const previousTimeRef = useRef<number | null>(null);
+
+  // Subscribe to engine events that require a UI re-render
+  useEffect(() => {
+    const unsub = engineRef.current.events.subscribe((event) => {
+      switch (event.type) {
+        case 'TOWER_XP_GAINED':
+        case 'TOWER_LEVELED_UP':
+        case 'TOWER_EVOLVED':
+          setUiUpdateToggle((prev) => !prev);
+          break;
+      }
+    });
+    return unsub;
+  }, []);
 
   // The Game Loop
   const animate = (time: number) => {
@@ -126,6 +141,20 @@ export default function TowerDefenseScreen({
         </div>
         {playerCreatures.map((creature) => {
           const isActive = activeTowerIds.includes(creature.id);
+
+          let displayLevel = creature.level;
+          let displayXp = creature.xp;
+
+          if (isActive) {
+            const activeTower = engineRef.current.towers.find(
+              (t) => t.creatureId === creature.id
+            );
+            if (activeTower) {
+              displayLevel = activeTower.level;
+              displayXp = activeTower.xp;
+            }
+          }
+
           return (
             <button
               key={creature.id}
@@ -146,22 +175,41 @@ export default function TowerDefenseScreen({
               onDragEnd={() => {
                 isDraggingRef.current = false;
               }}
-              className={`w-24 h-24 p-2 rounded flex flex-col items-center justify-center transition-all cursor-grab active:cursor-grabbing hover:scale-105 ${
+              className={`relative w-24 h-24 p-1 rounded flex flex-col items-center justify-center transition-all cursor-grab active:cursor-grabbing hover:scale-105 shrink-0 ${
                 isActive
-                  ? 'bg-cyan-900 border-2 border-cyan-400 hover:bg-cyan-800'
-                  : 'bg-slate-700 hover:bg-slate-500'
+                  ? 'bg-cyan-800 border-2 border-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.6)] hover:bg-cyan-700'
+                  : 'bg-slate-700 border-2 border-transparent hover:bg-slate-500'
               }`}
             >
               <img
                 src={creature.spriteUrl}
                 alt={creature.name}
-                className="w-12 h-12 object-contain pointer-events-none"
+                className="w-10 h-10 object-contain pointer-events-none"
               />
-              <span
-                className={`text-[10px] mt-1 uppercase text-center leading-tight pointer-events-none ${isActive ? 'text-cyan-300 font-bold' : 'text-white'}`}
-              >
-                {isActive ? 'Deployed' : creature.name}
-              </span>
+              <div className="flex flex-col items-center w-full mt-1 pointer-events-none">
+                <span
+                  className={`text-[9px] uppercase font-bold truncate w-full text-center leading-tight ${isActive ? 'text-cyan-100' : 'text-white'}`}
+                >
+                  {creature.name}
+                </span>
+
+                <div className="w-full flex items-center justify-between px-1 mt-0.5">
+                  <span className="text-[8px] text-gray-300 leading-none">
+                    Lv.{displayLevel}
+                  </span>
+                </div>
+
+                <div className="w-full px-1 mt-0.5">
+                  <div className="w-full h-1.5 bg-gray-900 rounded-full overflow-hidden border border-gray-600">
+                    <div
+                      className="h-full bg-cyan-400 transition-all duration-300"
+                      style={{
+                        width: `${Math.min(100, Math.max(0, (displayXp / (displayLevel * 100)) * 100))}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
             </button>
           );
         })}
@@ -182,7 +230,7 @@ export default function TowerDefenseScreen({
           onDragEnd={() => {
             isDraggingRef.current = false;
           }}
-          className="w-24 h-24 p-2 rounded flex flex-col items-center justify-center transition-all cursor-grab active:cursor-grabbing hover:scale-105 bg-purple-900 border-2 border-purple-500 hover:bg-purple-800 flex-shrink-0"
+          className="w-24 h-24 p-2 rounded flex flex-col items-center justify-center transition-all cursor-grab active:cursor-grabbing hover:scale-105 bg-purple-900 border-2 border-purple-500 hover:bg-purple-800 shrink-0"
         >
           {/* We'll use a placeholder icon or color for the capture device */}
           <div className="relative w-12 h-12 rounded-full border-4 border-white bg-red-500 flex items-center justify-center shadow-lg pointer-events-none mb-1 overflow-hidden">
