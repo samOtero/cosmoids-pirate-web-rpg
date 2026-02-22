@@ -59,6 +59,18 @@ export class TowerDefenseEngine {
 
   private lastSpawnTime: number = 0;
 
+  // Predefined waypoints for enemies
+  public path: { x: number; y: number }[] = [
+    { x: 100, y: 20 },
+    { x: 70, y: 20 },
+    { x: 70, y: 80 },
+    { x: 40, y: 80 },
+    { x: 40, y: 20 },
+    { x: 10, y: 20 },
+    { x: 10, y: 80 },
+    { x: -10, y: 80 },
+  ];
+
   // Predefined coordinates (x, y percentages) where towers can be placed
   public placementSpots: { x: number; y: number }[] = [
     { x: 15, y: 15 },
@@ -101,12 +113,13 @@ export class TowerDefenseEngine {
       newEnemies.push({
         id: `enemy_${time}`,
         definitionId: randomEnemyDef.id,
-        position: { x: 100, y: 20 + Math.random() * 60 },
+        position: { x: this.path[0].x, y: this.path[0].y },
         hp: randomEnemyDef.maxHp,
         maxHp: randomEnemyDef.maxHp,
         speed: 0.1 + Math.random() * 0.1,
         currentAttack: randomEnemyDef.attack,
         statusConditions: [],
+        currentWaypointIndex: 1,
       });
       this.lastSpawnTime = time;
     }
@@ -139,11 +152,32 @@ export class TowerDefenseEngine {
         );
       }
 
-      enemy.position.x -= moveSpeed * timeScale;
+      if (enemy.currentWaypointIndex < this.path.length) {
+        const targetPoint = this.path[enemy.currentWaypointIndex];
+        const dx = targetPoint.x - enemy.position.x;
+        const dy = targetPoint.y - enemy.position.y;
+        const distSq = dx * dx + dy * dy;
+
+        const frameDistance = moveSpeed * timeScale;
+
+        if (distSq <= frameDistance * frameDistance) {
+          // Reached waypoint, move to target and increment
+          enemy.position.x = targetPoint.x;
+          enemy.position.y = targetPoint.y;
+          enemy.currentWaypointIndex++;
+        } else {
+          // Move towards waypoint
+          const dist = Math.sqrt(distSq);
+          enemy.position.x += (dx / dist) * frameDistance;
+          enemy.position.y += (dy / dist) * frameDistance;
+        }
+      }
     });
 
     // Enemy reached end
-    const reachedEnd = newEnemies.filter((e) => e.position.x <= 0);
+    const reachedEnd = newEnemies.filter(
+      (e) => e.currentWaypointIndex >= this.path.length
+    );
     if (reachedEnd.length > 0) {
       this.lives -= reachedEnd.length;
       if (this.lives <= 0) {
@@ -151,7 +185,9 @@ export class TowerDefenseEngine {
         this.lives = 0;
       }
     }
-    newEnemies = newEnemies.filter((e) => e.position.x > 0);
+    newEnemies = newEnemies.filter(
+      (e) => e.currentWaypointIndex < this.path.length
+    );
 
     // Towers attack
     newTowers.forEach((tower) => {

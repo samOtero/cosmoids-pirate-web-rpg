@@ -49,6 +49,7 @@ export interface Enemy {
   speed: number;
   currentAttack: number;
   statusConditions: StatusCondition[];
+  currentWaypointIndex: number;
 }
 
 export interface Projectile {
