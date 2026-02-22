@@ -15,6 +15,8 @@ const TYPE_COLORS: Record<ElementType, number> = {
   [ElementType.NORMAL]: 0xa3a3a3,
 };
 
+export const WEAKENED_THRESHOLD = 0.9;
+
 interface PixiBattlefieldProps {
   engine: TowerDefenseEngine;
   onMapDrop: (defId: string, x: number, y: number) => void;
@@ -305,7 +307,7 @@ export default function PixiBattlefield({
               if (distSq <= CAPTURE_DIST_SQ && distSq < minSqDist) {
                 minSqDist = distSq;
                 targetedEnemyId = enemy.id;
-                isWeakened = enemy.hp / enemy.maxHp <= 0.3;
+                isWeakened = enemy.hp / enemy.maxHp <= WEAKENED_THRESHOLD;
               }
             });
 
@@ -474,7 +476,7 @@ export default function PixiBattlefield({
             // Health bar foreground
             const hpFg = new PIXI.Graphics();
             hpFg.rect(-32, 32, 64, 4);
-            hpFg.fill({ color: 0xff0000 });
+            hpFg.fill({ color: 0x22c55e });
 
             container.addChild(hpBg);
             container.addChild(hpFg);
@@ -486,12 +488,15 @@ export default function PixiBattlefield({
           container.y = (enemy.position.y / 100) * screenH;
 
           // Update health bar (it is always the last child added)
+          const hpRatio = enemy.hp / enemy.maxHp;
           const hpFg = container.children[
             container.children.length - 1
           ] as PIXI.Graphics;
           hpFg.clear();
-          hpFg.rect(-32, 32, 64 * Math.max(0, enemy.hp / enemy.maxHp), 4);
-          hpFg.fill({ color: 0xff0000 });
+          hpFg.rect(-32, 32, 64 * Math.max(0, hpRatio), 4);
+
+          const isEnemyWeakened = hpRatio <= WEAKENED_THRESHOLD;
+          hpFg.fill({ color: isEnemyWeakened ? 0xff0000 : 0x22c55e });
         }
 
         // --- Render Projectiles ---
@@ -589,7 +594,7 @@ export default function PixiBattlefield({
             if (distSq <= CAPTURE_DIST_SQ && distSq < minSqDist) {
               minSqDist = distSq;
               targetedEnemyId = enemy.id;
-              isWeakened = enemy.hp / enemy.maxHp <= 0.9;
+              isWeakened = enemy.hp / enemy.maxHp <= WEAKENED_THRESHOLD;
             }
           });
 
