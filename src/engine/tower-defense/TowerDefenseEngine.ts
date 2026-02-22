@@ -64,31 +64,14 @@ export class TowerDefenseEngine {
     this.aspectRatio = ratio;
   }
 
-  // Predefined waypoints for enemies
-  public path: { x: number; y: number }[] = [
-    { x: 100, y: 20 },
-    { x: 70, y: 20 },
-    { x: 70, y: 80 },
-    { x: 40, y: 80 },
-    { x: 40, y: 20 },
-    { x: 10, y: 20 },
-    { x: 10, y: 80 },
-    { x: -10, y: 80 },
-  ];
+  // Loaded at initialization
+  public path: { x: number; y: number }[] = [];
+  public placementSpots: { x: number; y: number }[] = [];
 
-  // Predefined coordinates (x, y percentages) where towers can be placed
-  public placementSpots: { x: number; y: number }[] = [
-    { x: 15, y: 15 },
-    { x: 30, y: 15 },
-    { x: 45, y: 15 },
-    { x: 60, y: 15 },
-    { x: 75, y: 15 },
-    { x: 15, y: 85 },
-    { x: 30, y: 85 },
-    { x: 45, y: 85 },
-    { x: 60, y: 85 },
-    { x: 75, y: 85 },
-  ];
+  constructor(levelData: import('./types').TDLevelData) {
+    this.path = levelData.path;
+    this.placementSpots = levelData.placementSpots;
+  }
 
   public isSpotOccupied(x: number, y: number): boolean {
     // Check if any tower is at these exact coordinates

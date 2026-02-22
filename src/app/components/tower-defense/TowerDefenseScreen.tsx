@@ -8,6 +8,7 @@ import {
 } from '@/constants/creatures';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import PixiBattlefield from './PixiBattlefield';
+import { FIRST_LEVEL } from '@/constants/tdLevels';
 
 const PLAYER_CREATURES = [STARTER_CRAB, STARTER_IGUANA, STARTER_MONKEY];
 
@@ -16,7 +17,7 @@ export default function TowerDefenseScreen({
 }: {
   onClose: () => void;
 }) {
-  const engineRef = useRef(new TowerDefenseEngine());
+  const engineRef = useRef(new TowerDefenseEngine(FIRST_LEVEL));
 
   const [uiLives, setUiLives] = useState(engineRef.current.lives);
   const [activeTowerIds, setActiveTowerIds] = useState<string[]>([]);

@@ -22,6 +22,11 @@ export interface Point {
   y: number;
 }
 
+export interface TDLevelData {
+  path: Point[];
+  placementSpots: Point[];
+}
+
 export interface Tower {
   id: string;
   definitionId: string;

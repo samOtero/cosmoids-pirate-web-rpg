@@ -10,6 +10,7 @@ const CreaturePositionEditor = lazy(() => import('./CreaturePositionEditor'));
 const TowerDefenseScreen = lazy(
   () => import('@/app/components/tower-defense/TowerDefenseScreen')
 );
+const TDLevelEditor = lazy(() => import('./TDLevelEditor'));
 
 type ToolType =
   | 'DIALOG'
@@ -18,6 +19,7 @@ type ToolType =
   | 'MAP'
   | 'CREATURE_POSITION'
   | 'TOWER_DEFENSE'
+  | 'TD_LEVEL_EDITOR'
   | null;
 
 export default function DevTools() {
@@ -102,6 +104,15 @@ export default function DevTools() {
               >
                 Tower Defense Map
               </button>
+              <button
+                onClick={() => {
+                  setActiveTool('TD_LEVEL_EDITOR');
+                  setShowMenu(false);
+                }}
+                className="text-sm bg-slate-800 hover:bg-cyan-700 px-3 py-2 rounded text-left"
+              >
+                TD Level Editor
+              </button>
             </div>
           </div>
         </div>
@@ -132,6 +143,9 @@ export default function DevTools() {
           )}
           {activeTool === 'TOWER_DEFENSE' && (
             <TowerDefenseScreen onClose={() => setActiveTool(null)} />
+          )}
+          {activeTool === 'TD_LEVEL_EDITOR' && (
+            <TDLevelEditor onClose={() => setActiveTool(null)} />
           )}
         </Suspense>
       )}
