@@ -19,17 +19,20 @@ interface PixiBattlefieldProps {
   engine: TowerDefenseEngine;
   onMapDrop: (defId: string, x: number, y: number) => void;
   onMapRemove: (defId: string) => void;
+  onDragStateChange?: (isDragging: boolean) => void;
 }
 
 export default function PixiBattlefield({
   engine,
   onMapDrop,
   onMapRemove,
+  onDragStateChange,
 }: PixiBattlefieldProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const fpsRef = useRef<HTMLDivElement>(null);
   const onMapDropRef = useRef(onMapDrop);
   const onMapRemoveRef = useRef(onMapRemove);
+  const onDragStateChangeRef = useRef(onDragStateChange);
   const dragPosRef = useRef<{ x: number; y: number } | null>(null);
 
   // Keep the latest callback without triggering re-runs of the PIXI initializer
@@ -40,6 +43,10 @@ export default function PixiBattlefield({
   useEffect(() => {
     onMapRemoveRef.current = onMapRemove;
   }, [onMapRemove]);
+
+  useEffect(() => {
+    onDragStateChangeRef.current = onDragStateChange;
+  }, [onDragStateChange]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -140,6 +147,9 @@ export default function PixiBattlefield({
           if (draggingNode) draggingNode.cursor = 'grab';
           draggingNode = null;
           draggingTowerCreatureId = null;
+          if (onDragStateChangeRef.current) {
+            onDragStateChangeRef.current(false);
+          }
         }
       };
 
@@ -199,6 +209,9 @@ export default function PixiBattlefield({
                 newContainer,
                 app.stage.children.length - 1
               );
+              if (onDragStateChangeRef.current) {
+                onDragStateChangeRef.current(true);
+              }
             });
 
             const spriteUrl =

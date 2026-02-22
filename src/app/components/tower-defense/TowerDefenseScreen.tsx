@@ -21,13 +21,18 @@ export default function TowerDefenseScreen({
   const [uiLives, setUiLives] = useState(engineRef.current.lives);
   const [activeTowerIds, setActiveTowerIds] = useState<string[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
+  const isDraggingRef = useRef(false);
 
   const requestRef = useRef<number | null>(null);
   const previousTimeRef = useRef<number | null>(null);
 
   // The Game Loop
   const animate = (time: number) => {
-    if (previousTimeRef.current != null && isPlaying) {
+    if (
+      previousTimeRef.current != null &&
+      isPlaying &&
+      !isDraggingRef.current
+    ) {
       // Clamp delta time to 50ms max to prevent huge jumps when tab is in background
       const deltaTime = Math.min(time - previousTimeRef.current, 50);
 
@@ -98,6 +103,9 @@ export default function TowerDefenseScreen({
         engine={engineRef.current}
         onMapDrop={handleMapDrop}
         onMapRemove={handleMapRemove}
+        onDragStateChange={(isDragging) => {
+          isDraggingRef.current = isDragging;
+        }}
       />
 
       <div className="bg-slate-800 p-4 shrink-0 flex items-center justify-center gap-4 overflow-x-auto border-t border-cyan-800">
@@ -111,6 +119,7 @@ export default function TowerDefenseScreen({
               key={creature.id}
               draggable={true}
               onDragStart={(e) => {
+                isDraggingRef.current = true;
                 e.dataTransfer.setData(
                   'application/tower-id',
                   creature.id.toString()
@@ -121,6 +130,9 @@ export default function TowerDefenseScreen({
                   // Approximate center of a 48x48 element
                   e.dataTransfer.setDragImage(imgEl, 24, 24);
                 }
+              }}
+              onDragEnd={() => {
+                isDraggingRef.current = false;
               }}
               className={`w-24 h-24 p-2 rounded flex flex-col items-center justify-center transition-all cursor-grab active:cursor-grabbing hover:scale-105 ${
                 isActive
