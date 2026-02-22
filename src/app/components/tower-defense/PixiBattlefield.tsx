@@ -234,6 +234,7 @@ export default function PixiBattlefield({
             });
 
             const rangeCircle = new PIXI.Graphics();
+            rangeCircle.label = 'rangeCircle';
             const radius = screenW * 0.15; // 30vw approx diameter -> 15vw radius
             rangeCircle.circle(0, 0, radius);
             rangeCircle.fill({ color: 0x22d3ee, alpha: 0.05 });
@@ -247,6 +248,15 @@ export default function PixiBattlefield({
           if (draggingTowerCreatureId !== tower.creatureId) {
             container.x = (tower.position.x / 100) * screenW;
             container.y = (tower.position.y / 100) * screenH;
+          }
+
+          const isDraggingTower =
+            (dragPosRef.current !== null &&
+              !draggingCaptureDeviceRef.current) ||
+            draggingTowerCreatureId !== null;
+          const rCircle = container.getChildByLabel('rangeCircle');
+          if (rCircle) {
+            rCircle.visible = isDraggingTower;
           }
         }
 
