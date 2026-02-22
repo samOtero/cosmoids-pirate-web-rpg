@@ -11,14 +11,37 @@ import { Tower, Enemy, Projectile } from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
 import { AttackBehaviorRegistry } from './attacks/behaviors';
 import { EffectProcessor } from './attacks/EffectProcessor';
+import { TDCreatureMetadata } from './types';
+import { TDEventBus } from './events/TDEventBus';
+import { TDProgressionManager } from './progression/TDProgressionManager';
 
-export const TD_CREATURE_DEFS: Record<string, Creature> = {
-  [BUG_STAGE_1.id]: BUG_STAGE_1,
-  [BUG_STAGE_2.id]: BUG_STAGE_2,
-  [BUG_STAGE_3.id]: BUG_STAGE_3,
-  [STARTER_CRAB.id]: STARTER_CRAB,
-  [STARTER_IGUANA.id]: STARTER_IGUANA,
-  [STARTER_MONKEY.id]: STARTER_MONKEY,
+export const TD_CREATURE_DEFS: Record<string, TDCreatureMetadata> = {
+  [BUG_STAGE_1.id]: {
+    baseCreature: BUG_STAGE_1,
+    xpYield: 15,
+  },
+  [BUG_STAGE_2.id]: {
+    baseCreature: BUG_STAGE_2,
+    xpYield: 30,
+  },
+  [BUG_STAGE_3.id]: {
+    baseCreature: BUG_STAGE_3,
+    xpYield: 50,
+  },
+  [STARTER_CRAB.id]: {
+    baseCreature: STARTER_CRAB,
+    xpYield: 0,
+    evolutionNodes: [{ level: 5, evolutionDefId: BUG_STAGE_2.id }], // example evolution
+    attackUnlocks: [{ level: 3, attackDefId: 'BUBBLE_BEAM' }], // example attack unlock
+  },
+  [STARTER_IGUANA.id]: {
+    baseCreature: STARTER_IGUANA,
+    xpYield: 0,
+  },
+  [STARTER_MONKEY.id]: {
+    baseCreature: STARTER_MONKEY,
+    xpYield: 0,
+  },
 };
 
 const ENEMY_TYPES = [BUG_STAGE_1, BUG_STAGE_2, BUG_STAGE_3];
@@ -31,7 +54,14 @@ export class TowerDefenseEngine {
   public money: number = 100;
   public lives: number = 2000;
 
+  public events = new TDEventBus();
+  private progression = new TDProgressionManager(this, this.events);
+
   private lastSpawnTime: number = 0;
+
+  public destroy() {
+    this.progression.destroy();
+  }
 
   public tick(time: number, deltaMs: number) {
     let newEnemies = [...this.enemies];
@@ -147,6 +177,16 @@ export class TowerDefenseEngine {
           } else {
             target.hp -= p.damage;
           }
+
+          if (target.hp <= 0 && sourceTower) {
+            const meta = TD_CREATURE_DEFS[target.definitionId];
+            this.events.emit({
+              type: 'ENEMY_DIED',
+              enemyId: target.id,
+              killerTowerId: sourceTower.id,
+              xpValue: meta ? meta.xpYield : 10,
+            });
+          }
         }
         p.speed = 0; // mark for deletion
       } else {
@@ -172,8 +212,8 @@ export class TowerDefenseEngine {
 
   public addTower(definitionId: string, x: number, y: number) {
     if (this.money >= 50) {
-      const def = TD_CREATURE_DEFS[definitionId];
-      if (!def) return false;
+      const defMeta = TD_CREATURE_DEFS[definitionId];
+      if (!defMeta) return false;
 
       // Assign default attacks based on definition (hardcoded mapping for MVP)
       const defaultAttacks: string[] = [];
@@ -192,7 +232,7 @@ export class TowerDefenseEngine {
         lastAttackTime: 0,
         level: 1,
         xp: 0,
-        currentAttack: def.attack,
+        currentAttack: defMeta.baseCreature.attack,
         equippedAttacks: defaultAttacks.map((atkId) => ({
           definitionId: atkId,
           lastFiredTime: 0,

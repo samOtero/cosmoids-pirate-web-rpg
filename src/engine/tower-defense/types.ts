@@ -1,5 +1,22 @@
 import { Creature } from '@/types/baseGame';
 
+export interface TDEvolutionNode {
+  level: number;
+  evolutionDefId: string;
+}
+
+export interface TDAttackUnlockNode {
+  level: number;
+  attackDefId: string;
+}
+
+export interface TDCreatureMetadata {
+  baseCreature: Creature;
+  evolutionNodes?: TDEvolutionNode[];
+  attackUnlocks?: TDAttackUnlockNode[];
+  xpYield: number;
+}
+
 export interface Point {
   x: number;
   y: number;

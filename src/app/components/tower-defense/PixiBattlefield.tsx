@@ -99,21 +99,25 @@ export default function PixiBattlefield({
         const screenH = app.screen.height;
 
         // --- Render Towers ---
-        const currentTowerIds = new Set(engine.towers.map((t) => t.id));
-        for (const [id, sprite] of towerSprites.entries()) {
-          if (!currentTowerIds.has(id)) {
+        const currentTowerKeys = new Set(
+          engine.towers.map((t) => `${t.id}_${t.definitionId}`)
+        );
+        for (const [key, sprite] of towerSprites.entries()) {
+          if (!currentTowerKeys.has(key)) {
             app.stage.removeChild(sprite);
             sprite.destroy({ children: true });
-            towerSprites.delete(id);
+            towerSprites.delete(key);
           }
         }
         for (const tower of engine.towers) {
-          let container = towerSprites.get(tower.id);
+          const cacheKey = `${tower.id}_${tower.definitionId}`;
+          let container = towerSprites.get(cacheKey);
           if (!container) {
             container = new PIXI.Container();
-            const spriteUrl = TD_CREATURE_DEFS[tower.definitionId].spriteUrl;
+            const spriteUrl =
+              TD_CREATURE_DEFS[tower.definitionId].baseCreature.spriteUrl;
             PIXI.Assets.load(spriteUrl).then((texture) => {
-              if (isDestroyed || !towerSprites.has(tower.id)) return;
+              if (isDestroyed || !towerSprites.has(cacheKey)) return;
               const tsprite = new PIXI.Sprite(texture);
               tsprite.anchor.set(0.5);
               tsprite.width = 80;
@@ -130,7 +134,7 @@ export default function PixiBattlefield({
             container.addChild(rangeCircle);
 
             app.stage.addChild(container);
-            towerSprites.set(tower.id, container);
+            towerSprites.set(cacheKey, container);
           }
           container.x = (tower.position.x / 100) * screenW;
           container.y = (tower.position.y / 100) * screenH;
@@ -150,7 +154,8 @@ export default function PixiBattlefield({
           if (!container) {
             container = new PIXI.Container();
 
-            const spriteUrl = TD_CREATURE_DEFS[enemy.definitionId].spriteUrl;
+            const spriteUrl =
+              TD_CREATURE_DEFS[enemy.definitionId].baseCreature.spriteUrl;
             PIXI.Assets.load(spriteUrl).then((texture) => {
               if (isDestroyed || !enemySprites.has(enemy.id)) return;
               const esprite = new PIXI.Sprite(texture);
