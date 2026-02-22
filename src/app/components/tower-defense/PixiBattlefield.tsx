@@ -4,6 +4,16 @@ import {
   TowerDefenseEngine,
   TD_CREATURE_DEFS,
 } from '@/engine/tower-defense/TowerDefenseEngine';
+import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import { ElementType } from '@/types/baseGame';
+
+const TYPE_COLORS: Record<ElementType, number> = {
+  [ElementType.WATER]: 0x3b82f6,
+  [ElementType.FIRE]: 0xef4444,
+  [ElementType.GRASS]: 0x22c55e,
+  [ElementType.ELECTRIC]: 0xeab308,
+  [ElementType.NORMAL]: 0xa3a3a3,
+};
 
 interface PixiBattlefieldProps {
   engine: TowerDefenseEngine;
@@ -193,7 +203,16 @@ export default function PixiBattlefield({
           if (!sprite) {
             sprite = new PIXI.Graphics();
             sprite.circle(0, 0, 8);
-            sprite.fill({ color: 0x22d3ee });
+
+            let projColor = 0x22d3ee; // Default cyan
+            if (proj.attackDefinitionId) {
+              const def = ATTACK_DEFS[proj.attackDefinitionId];
+              if (def) {
+                projColor = TYPE_COLORS[def.type] || projColor;
+              }
+            }
+
+            sprite.fill({ color: projColor });
             app.stage.addChild(sprite);
             projectileSprites.set(proj.id, sprite);
           }
