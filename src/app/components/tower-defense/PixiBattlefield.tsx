@@ -470,12 +470,13 @@ export default function PixiBattlefield({
 
             // Health bar background
             const hpBg = new PIXI.Graphics();
-            hpBg.rect(-32, 32, 64, 4);
+            hpBg.rect(-33, -41, 66, 6);
             hpBg.fill({ color: 0x000000 });
+            hpBg.stroke({ color: 0x111111, width: 1 });
 
             // Health bar foreground
             const hpFg = new PIXI.Graphics();
-            hpFg.rect(-32, 32, 64, 4);
+            hpFg.rect(-32, -40, 64, 4);
             hpFg.fill({ color: 0x22c55e });
 
             container.addChild(hpBg);
@@ -493,7 +494,7 @@ export default function PixiBattlefield({
             container.children.length - 1
           ] as PIXI.Graphics;
           hpFg.clear();
-          hpFg.rect(-32, 32, 64 * Math.max(0, hpRatio), 4);
+          hpFg.rect(-32, -40, 64 * Math.max(0, hpRatio), 4);
 
           const isEnemyWeakened = hpRatio <= WEAKENED_THRESHOLD;
           hpFg.fill({ color: isEnemyWeakened ? 0xff0000 : 0x22c55e });
