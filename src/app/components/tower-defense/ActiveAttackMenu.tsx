@@ -24,17 +24,7 @@ export function ActiveAttackMenu({
 }) {
   return (
     <div className="absolute inset-0 bg-slate-900/95 z-50 flex flex-col items-center justify-center p-2 backdrop-blur-sm">
-      <div className="flex items-center justify-between w-full max-w-2xl text-cyan-400 mb-2 px-4 pb-2 border-b border-cyan-900/50">
-        <span className="font-bold text-lg">Select Active Attack</span>
-        <button
-          onClick={onClose}
-          className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded px-3 py-1 text-sm font-bold transition-colors"
-        >
-          Close
-        </button>
-      </div>
-
-      <div className="flex items-center justify-center gap-6 w-full px-4 pb-2 mt-4 overflow-x-auto">
+      <div className="flex items-center justify-center gap-6 w-full px-4 pb-2 overflow-x-auto">
         {/* Tower Identity Side */}
         <div className="flex flex-col items-center shrink-0">
           <TowerButton
@@ -87,6 +77,19 @@ export function ActiveAttackMenu({
               </button>
             );
           })}
+        </div>
+
+        {/* Close Button Side */}
+        <div className="w-px h-24 bg-cyan-900/50 shrink-0"></div>
+        <div className="flex flex-col items-center justify-center shrink-0 h-24">
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg px-6 py-2 text-sm font-bold transition-colors h-full flex items-center justify-center border-2 border-slate-600 hover:border-red-500/50 group"
+          >
+            <span className="group-hover:text-red-400 transition-colors uppercase tracking-wider">
+              Close
+            </span>
+          </button>
         </div>
       </div>
     </div>
