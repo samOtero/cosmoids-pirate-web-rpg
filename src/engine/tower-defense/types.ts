@@ -22,9 +22,22 @@ export interface Point {
   y: number;
 }
 
+export interface TDWaveGroup {
+  definitionId: string; // The enemy ID to spawn
+  count: number; // How many to spawn
+  spawnIntervalMs: number; // Time between each spawn in this group
+  delayBeforeGroupMs: number; // Delay before this group starts (after wave start or previous group ends)
+}
+
+export interface TDWave {
+  id: string; // e.g. "wave_1"
+  groups: TDWaveGroup[];
+}
+
 export interface TDLevelData {
   path: Point[];
   placementSpots: Point[];
+  waves?: TDWave[]; // Optional for backwards compatibility
 }
 
 export interface Tower {

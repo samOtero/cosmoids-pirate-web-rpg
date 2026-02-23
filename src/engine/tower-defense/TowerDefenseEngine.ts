@@ -11,7 +11,7 @@ import { Tower, Enemy, Projectile } from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
 import { AttackBehaviorRegistry } from './attacks/behaviors';
 import { EffectProcessor } from './attacks/EffectProcessor';
-import { TDCreatureMetadata } from './types';
+import { TDWave, TDWaveGroup, TDCreatureMetadata } from './types';
 import { TDEventBus } from './events/TDEventBus';
 import { TDProgressionManager } from './progression/TDProgressionManager';
 
@@ -56,7 +56,16 @@ export class TowerDefenseEngine {
 
   public events = new TDEventBus();
   private progression = new TDProgressionManager(this, this.events);
+
+  // Wave Management State
+  public waves: TDWave[] = [];
+  public currentWaveIndex: number = 0;
+  public currentGroupIndex: number = 0;
+  public spawnsRemainingInGroup: number = 0;
   private lastSpawnTime: number = 0;
+  private waveDelayTimer: number = 0;
+  private isWaitingForDelay: boolean = false;
+  private hasFinishedAllWaves: boolean = false;
 
   public aspectRatio: number = 1;
 
@@ -71,6 +80,18 @@ export class TowerDefenseEngine {
   constructor(levelData: import('./types').TDLevelData) {
     this.path = levelData.path;
     this.placementSpots = levelData.placementSpots;
+    this.waves = levelData.waves || [];
+
+    // Initialize first wave group if available
+    if (this.waves.length > 0 && this.waves[0].groups.length > 0) {
+      this.currentWaveIndex = 0;
+      this.currentGroupIndex = 0;
+      this.spawnsRemainingInGroup = this.waves[0].groups[0].count;
+      this.isWaitingForDelay = true;
+      this.waveDelayTimer = this.waves[0].groups[0].delayBeforeGroupMs || 0;
+    } else {
+      this.hasFinishedAllWaves = true; // Fallback to random or nothing
+    }
   }
 
   public isSpotOccupied(x: number, y: number): boolean {
@@ -89,27 +110,32 @@ export class TowerDefenseEngine {
     let newTowers = [...this.towers];
 
     // Spawn enemies
-    // we use > 500ms as a simple interval for MVP.
-    // Ensure if time jumps massive (tab suspension), we don't spawn 100 enemies.
-    if (time - this.lastSpawnTime > 500) {
-      if (time - this.lastSpawnTime > 5000) {
-        this.lastSpawnTime = time - 500; // soft clamp if tab was backgrounded
+    if (this.waves.length > 0) {
+      if (!this.hasFinishedAllWaves) {
+        this.processWaveSpawns(time, deltaMs, newEnemies);
       }
+    } else {
+      // Fallback: MVP random spawning if no waves defined
+      if (time - this.lastSpawnTime > 500) {
+        if (time - this.lastSpawnTime > 5000) {
+          this.lastSpawnTime = time - 500; // soft clamp if tab was backgrounded
+        }
 
-      const randomEnemyDef =
-        ENEMY_TYPES[Math.floor(Math.random() * ENEMY_TYPES.length)];
-      newEnemies.push({
-        id: `enemy_${time}`,
-        definitionId: randomEnemyDef.id,
-        position: { x: this.path[0].x, y: this.path[0].y },
-        hp: randomEnemyDef.maxHp,
-        maxHp: randomEnemyDef.maxHp,
-        speed: 0.1 + Math.random() * 0.1,
-        currentAttack: randomEnemyDef.attack,
-        statusConditions: [],
-        currentWaypointIndex: 1,
-      });
-      this.lastSpawnTime = time;
+        const randomEnemyDef =
+          ENEMY_TYPES[Math.floor(Math.random() * ENEMY_TYPES.length)];
+        newEnemies.push({
+          id: `enemy_${time}`,
+          definitionId: randomEnemyDef.id,
+          position: { x: this.path[0].x, y: this.path[0].y },
+          hp: randomEnemyDef.maxHp,
+          maxHp: randomEnemyDef.maxHp,
+          speed: randomEnemyDef.speed / 100,
+          currentAttack: randomEnemyDef.attack,
+          statusConditions: [],
+          currentWaypointIndex: 1,
+        });
+        this.lastSpawnTime = time;
+      }
     }
 
     // Update enemies
@@ -261,6 +287,112 @@ export class TowerDefenseEngine {
     this.enemies = newEnemies;
     this.projectiles = activeProjectiles;
     this.towers = newTowers;
+  }
+
+  private processWaveSpawns(
+    time: number,
+    deltaMs: number,
+    newEnemies: Enemy[]
+  ) {
+    if (this.hasFinishedAllWaves) return;
+
+    const currentWave = this.waves[this.currentWaveIndex];
+    if (!currentWave || currentWave.groups.length === 0) {
+      this.hasFinishedAllWaves = true;
+      return;
+    }
+
+    const currentGroup = currentWave.groups[this.currentGroupIndex];
+    if (!currentGroup) {
+      // Move to next wave
+      this.advanceToNextWave();
+      return;
+    }
+
+    if (this.isWaitingForDelay) {
+      this.waveDelayTimer -= deltaMs;
+      if (this.waveDelayTimer <= 0) {
+        this.isWaitingForDelay = false;
+        this.lastSpawnTime = time - currentGroup.spawnIntervalMs; // Force immediate spawn
+      } else {
+        return; // Still waiting on delay
+      }
+    }
+
+    // Checking if it's time to spawn
+    const timeSinceLastSpawn = time - this.lastSpawnTime;
+    if (timeSinceLastSpawn >= currentGroup.spawnIntervalMs) {
+      this.spawnEnemyFromDef(currentGroup.definitionId, time, newEnemies);
+      this.spawnsRemainingInGroup--;
+      this.lastSpawnTime = time;
+
+      if (this.spawnsRemainingInGroup <= 0) {
+        this.advanceToNextGroup();
+      }
+    }
+  }
+
+  private advanceToNextGroup() {
+    this.currentGroupIndex++;
+    const currentWave = this.waves[this.currentWaveIndex];
+
+    if (this.currentGroupIndex >= currentWave.groups.length) {
+      this.advanceToNextWave();
+    } else {
+      // Setup next group in current wave
+      const nextGroup = currentWave.groups[this.currentGroupIndex];
+      this.spawnsRemainingInGroup = nextGroup.count;
+      if (nextGroup.delayBeforeGroupMs > 0) {
+        this.isWaitingForDelay = true;
+        this.waveDelayTimer = nextGroup.delayBeforeGroupMs;
+      }
+    }
+  }
+
+  private advanceToNextWave() {
+    this.currentWaveIndex++;
+    this.currentGroupIndex = 0;
+
+    if (this.currentWaveIndex >= this.waves.length) {
+      this.hasFinishedAllWaves = true;
+    } else {
+      const nextWave = this.waves[this.currentWaveIndex];
+      // Skip empty waves
+      if (nextWave.groups.length === 0) {
+        this.advanceToNextWave();
+        return;
+      }
+
+      const firstGroup = nextWave.groups[0];
+      this.spawnsRemainingInGroup = firstGroup.count;
+      if (firstGroup.delayBeforeGroupMs > 0) {
+        this.isWaitingForDelay = true;
+        this.waveDelayTimer = firstGroup.delayBeforeGroupMs;
+      } else {
+        this.isWaitingForDelay = false;
+      }
+    }
+  }
+
+  private spawnEnemyFromDef(
+    definitionId: string,
+    time: number,
+    newEnemies: Enemy[]
+  ) {
+    const meta = TD_CREATURE_DEFS[definitionId];
+    if (!meta) return;
+
+    newEnemies.push({
+      id: `enemy_${time}_${Math.random().toString(36).substring(7)}`,
+      definitionId: definitionId,
+      position: { x: this.path[0].x, y: this.path[0].y },
+      hp: meta.baseCreature.maxHp,
+      maxHp: meta.baseCreature.maxHp,
+      speed: meta.baseCreature.speed / 100,
+      currentAttack: meta.baseCreature.attack,
+      statusConditions: [],
+      currentWaypointIndex: 1,
+    });
   }
 
   public removeTower(creatureId: string) {

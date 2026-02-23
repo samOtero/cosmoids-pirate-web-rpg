@@ -76,6 +76,37 @@ export const FIRST_LEVEL: TDLevelData = {
       "x": 77.03,
       "y": 33.35
     }
+  ],
+  "waves": [
+    {
+      "id": "wave_1771807082096",
+      "groups": [
+        {
+          "definitionId": "bug_stage_1",
+          "count": 1,
+          "spawnIntervalMs": 1500,
+          "delayBeforeGroupMs": 100
+        },
+        {
+          "definitionId": "bug_stage_1",
+          "count": 2,
+          "spawnIntervalMs": 1500,
+          "delayBeforeGroupMs": 3000
+        },
+        {
+          "definitionId": "bug_stage_1",
+          "count": 3,
+          "spawnIntervalMs": 1500,
+          "delayBeforeGroupMs": 3000
+        },
+        {
+          "definitionId": "bug_stage_2",
+          "count": 5,
+          "spawnIntervalMs": 1500,
+          "delayBeforeGroupMs": 3000
+        }
+      ]
+    }
   ]
 };
 

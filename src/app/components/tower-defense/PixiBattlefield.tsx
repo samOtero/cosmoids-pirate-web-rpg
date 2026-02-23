@@ -241,8 +241,9 @@ export default function PixiBattlefield({
               }
             });
 
+            const baseCreature = TD_CREATURE_DEFS[tower.speciesId].baseCreature;
             const spriteUrl =
-              TD_CREATURE_DEFS[tower.speciesId].baseCreature.spriteUrl;
+              baseCreature.battleSpriteUrl || baseCreature.spriteUrl;
             PIXI.Assets.load(spriteUrl).then((texture) => {
               if (isDestroyed || !towerSprites.has(cacheKey)) return;
               const tsprite = new PIXI.Sprite(texture);
@@ -456,8 +457,10 @@ export default function PixiBattlefield({
           if (!container) {
             container = new PIXI.Container();
 
+            const baseCreature =
+              TD_CREATURE_DEFS[enemy.definitionId].baseCreature;
             const spriteUrl =
-              TD_CREATURE_DEFS[enemy.definitionId].baseCreature.spriteUrl;
+              baseCreature.battleSpriteUrl || baseCreature.spriteUrl;
             PIXI.Assets.load(spriteUrl).then((texture) => {
               if (isDestroyed || !enemySprites.has(enemy.id)) return;
               const esprite = new PIXI.Sprite(texture);

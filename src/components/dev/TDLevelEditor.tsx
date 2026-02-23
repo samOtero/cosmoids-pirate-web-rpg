@@ -3,7 +3,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import PixiTDLevelEditor, { PointType } from './PixiTDLevelEditor';
 import * as tdLevels from '@/constants/tdLevels';
-import { TDLevelData } from '@/engine/tower-defense/types';
+import { TDLevelData, TDWave, TDWaveGroup } from '@/engine/tower-defense/types';
+import { TD_CREATURE_DEFS } from '@/engine/tower-defense/TowerDefenseEngine';
 
 export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
   const [selectedLevelKey, setSelectedLevelKey] = useState<string | null>(null);
@@ -12,6 +13,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
   const [placementSpots, setPlacementSpots] = useState<
     { x: number; y: number }[]
   >([]);
+  const [waves, setWaves] = useState<TDWave[]>([]);
   const [deleteMode, setDeleteMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showNewModal, setShowNewModal] = useState(false);
@@ -38,9 +40,13 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
       // Deep copy
       setPathPoints(JSON.parse(JSON.stringify(levelData.path)));
       setPlacementSpots(JSON.parse(JSON.stringify(levelData.placementSpots)));
+      setWaves(
+        levelData.waves ? JSON.parse(JSON.stringify(levelData.waves)) : []
+      );
     } else {
       setPathPoints([]);
       setPlacementSpots([]);
+      setWaves([]);
     }
     setSelectedLevelKey(key);
   };
@@ -48,6 +54,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
   const handleCreateNew = () => {
     setPathPoints([]);
     setPlacementSpots([]);
+    setWaves([]);
     setSelectedLevelKey('NEW_LEVEL');
     setNewLevelName('');
     setShowNewModal(true);
@@ -113,6 +120,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
           x: Number(s.x.toFixed(2)),
           y: Number(s.y.toFixed(2)),
         })),
+        waves: waves,
       };
 
       const res = await fetch('/api/dev/td-levels/save', {
@@ -140,6 +148,54 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const addWave = () => {
+    setWaves((prev) => [
+      ...prev,
+      {
+        id: `wave_${Date.now()}`,
+        groups: [],
+      },
+    ]);
+  };
+
+  const addGroupToWave = (waveIndex: number) => {
+    setWaves((prev) => {
+      const next = [...prev];
+      next[waveIndex].groups.push({
+        definitionId: Object.keys(TD_CREATURE_DEFS)[0] || '',
+        count: 5,
+        spawnIntervalMs: 1000,
+        delayBeforeGroupMs: 0,
+      });
+      return next;
+    });
+  };
+
+  const updateGroup = (
+    waveIndex: number,
+    groupIndex: number,
+    field: keyof TDWaveGroup,
+    value: any
+  ) => {
+    setWaves((prev) => {
+      const next = JSON.parse(JSON.stringify(prev)); // deep copy to ensure re-render
+      next[waveIndex].groups[groupIndex][field] = value;
+      return next;
+    });
+  };
+
+  const deleteWave = (waveIndex: number) => {
+    setWaves((prev) => prev.filter((_, i) => i !== waveIndex));
+  };
+
+  const deleteGroup = (waveIndex: number, groupIndex: number) => {
+    setWaves((prev) => {
+      const next = JSON.parse(JSON.stringify(prev));
+      next[waveIndex].groups.splice(groupIndex, 1);
+      return next;
+    });
   };
 
   return (
@@ -252,13 +308,172 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
         </div>
       </div>
 
-      <PixiTDLevelEditor
-        pathPoints={pathPoints}
-        placementSpots={placementSpots}
-        deleteMode={deleteMode}
-        onPointMove={handlePointMove}
-        onPointDelete={handlePointDelete}
-      />
+      <div className="flex-1 relative flex">
+        <PixiTDLevelEditor
+          pathPoints={pathPoints}
+          placementSpots={placementSpots}
+          deleteMode={deleteMode}
+          onPointMove={handlePointMove}
+          onPointDelete={handlePointDelete}
+        />
+
+        {/* Waves Editor Sidebar */}
+        <div className="absolute right-0 top-0 bottom-0 w-80 bg-slate-800 border-l border-cyan-800 overflow-y-auto p-4 opacity-95">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-cyan-400">
+              Waves ({waves.length})
+            </h3>
+            <button
+              onClick={addWave}
+              className="px-2 py-1 bg-cyan-700 hover:bg-cyan-600 rounded text-white text-xs font-bold"
+            >
+              + Add Wave
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {waves.map((wave, wIdx) => (
+              <div
+                key={wave.id}
+                className="bg-slate-900 p-3 rounded border border-slate-700"
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <h4 className="font-bold text-white text-sm">
+                    Wave {wIdx + 1}
+                  </h4>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => addGroupToWave(wIdx)}
+                      className="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-white"
+                    >
+                      + Group
+                    </button>
+                    <button
+                      onClick={() => deleteWave(wIdx)}
+                      className="text-xs bg-red-900 hover:bg-red-800 px-2 py-1 rounded text-white"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  {wave.groups.map((group, gIdx) => (
+                    <div
+                      key={gIdx}
+                      className="bg-slate-800 p-2 rounded relative border border-slate-600 text-xs"
+                    >
+                      <button
+                        onClick={() => deleteGroup(wIdx, gIdx)}
+                        className="absolute top-1 right-1 text-red-500 hover:text-red-400 font-bold"
+                      >
+                        X
+                      </button>
+
+                      <div className="grid grid-cols-2 gap-2 mt-2">
+                        <div>
+                          <label className="block text-slate-400 mb-1">
+                            Enemy Type
+                          </label>
+                          <select
+                            value={group.definitionId}
+                            onChange={(e) =>
+                              updateGroup(
+                                wIdx,
+                                gIdx,
+                                'definitionId',
+                                e.target.value
+                              )
+                            }
+                            className="w-full bg-slate-950 text-white rounded p-1 border border-slate-700"
+                          >
+                            {Object.keys(TD_CREATURE_DEFS).map((defId) => (
+                              <option key={defId} value={defId}>
+                                {defId}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-slate-400 mb-1">
+                            Count
+                          </label>
+                          <input
+                            type="number"
+                            min="1"
+                            value={group.count}
+                            onChange={(e) =>
+                              updateGroup(
+                                wIdx,
+                                gIdx,
+                                'count',
+                                parseInt(e.target.value) || 1
+                              )
+                            }
+                            className="w-full bg-slate-950 text-white rounded p-1 border border-slate-700"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-slate-400 mb-1">
+                            Interval (ms)
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            step="100"
+                            value={group.spawnIntervalMs}
+                            onChange={(e) =>
+                              updateGroup(
+                                wIdx,
+                                gIdx,
+                                'spawnIntervalMs',
+                                parseInt(e.target.value) || 0
+                              )
+                            }
+                            className="w-full bg-slate-950 text-white rounded p-1 border border-slate-700"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-slate-400 mb-1">
+                            Delay Before (ms)
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            step="100"
+                            value={group.delayBeforeGroupMs}
+                            onChange={(e) =>
+                              updateGroup(
+                                wIdx,
+                                gIdx,
+                                'delayBeforeGroupMs',
+                                parseInt(e.target.value) || 0
+                              )
+                            }
+                            className="w-full bg-slate-950 text-white rounded p-1 border border-slate-700"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {wave.groups.length === 0 && (
+                    <p className="text-slate-500 text-xs italic text-center py-2">
+                      No enemy groups in this wave yet.
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {waves.length === 0 && (
+              <p className="text-slate-500 text-sm italic text-center py-8">
+                No waves defined. Enemies will not spawn using the new wave
+                system.
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
