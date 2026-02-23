@@ -5,6 +5,7 @@ import { useGameStore } from '@/store/gameStore';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import PixiBattlefield from './PixiBattlefield';
 import { FIRST_LEVEL } from '@/constants/tdLevels';
+import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 
 export default function TowerDefenseScreen({
   onClose,
@@ -25,6 +26,10 @@ export default function TowerDefenseScreen({
   const [activeTowerIds, setActiveTowerIds] = useState<string[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [uiUpdateToggle, setUiUpdateToggle] = useState(false);
+  const [selectedCreatureId, setSelectedCreatureId] = useState<string | null>(
+    null
+  );
+  const [wasPlayingBeforeMenu, setWasPlayingBeforeMenu] = useState(false);
   const dragStateRef = useRef<'tower' | 'capture' | false>(false);
 
   const requestRef = useRef<number | null>(null);
@@ -132,7 +137,91 @@ export default function TowerDefenseScreen({
         getDragState={() => dragStateRef.current}
       />
 
-      <div className="bg-slate-800 p-4 shrink-0 flex items-center justify-center gap-4 overflow-x-auto border-t border-cyan-800">
+      <div className="bg-slate-800 p-4 shrink-0 flex items-center justify-center gap-4 overflow-x-auto border-t border-cyan-800 relative min-h-[140px]">
+        {selectedCreatureId ? (
+          <div className="absolute inset-0 bg-slate-900/95 z-50 flex flex-col items-center justify-center p-2 backdrop-blur-sm">
+            <div className="flex items-center justify-between w-full max-w-2xl text-cyan-400 mb-2 px-4">
+              <span className="font-bold text-lg">Select Active Attack</span>
+              <button
+                onClick={() => {
+                  setSelectedCreatureId(null);
+                  if (wasPlayingBeforeMenu) setIsPlaying(true);
+                }}
+                className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded px-3 py-1 text-sm font-bold"
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="flex items-center justify-center gap-4 w-full overflow-x-auto px-4 pb-2">
+              {(() => {
+                const tower = engineRef.current.towers.find(
+                  (t) => t.creatureId === selectedCreatureId
+                );
+                const creature = playerCreatures.find(
+                  (c) => c.id === selectedCreatureId
+                );
+                if (!creature)
+                  return (
+                    <span className="text-slate-500 italic">
+                      Creature not found.
+                    </span>
+                  );
+
+                const equippedAttacks = tower
+                  ? tower.equippedAttacks.map((a) => a.definitionId)
+                  : TowerDefenseEngine.getDefaultAttacks(creature.speciesId);
+
+                const activeAttackIndex = tower
+                  ? tower.selectedAttackIndex
+                  : engineRef.current.playerSelectedAttacks[creature.id] || 0;
+
+                return equippedAttacks.map((attackId, index) => {
+                  const def = ATTACK_DEFS[attackId];
+                  if (!def) return null;
+
+                  const isSelected = activeAttackIndex === index;
+
+                  return (
+                    <button
+                      key={`${attackId}-${index}`}
+                      onClick={() => {
+                        engineRef.current.setTowerAttack(
+                          selectedCreatureId,
+                          index
+                        );
+                        setUiUpdateToggle((prev) => !prev);
+                      }}
+                      className={`flex flex-col items-center p-3 rounded border-2 transition-all min-w-[120px] ${
+                        isSelected
+                          ? 'bg-cyan-900/50 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.4)]'
+                          : 'bg-slate-800 border-slate-600 hover:border-cyan-600 hover:bg-slate-700'
+                      }`}
+                    >
+                      <span
+                        className={`font-bold mb-1 ${isSelected ? 'text-cyan-300' : 'text-slate-200'}`}
+                      >
+                        {def.name}
+                      </span>
+                      <div className="flex gap-2 text-xs">
+                        <span className="text-red-400">Pwr: {def.power}</span>
+                        <span className="text-blue-400">
+                          CD: {def.cooldownMs / 1000}s
+                        </span>
+                      </div>
+                      {isSelected && (
+                        <span className="mt-2 text-[10px] font-bold text-black bg-cyan-400 px-2 py-0.5 rounded-full uppercase">
+                          Active
+                        </span>
+                      )}
+                    </button>
+                  );
+                });
+              })()}
+            </div>
+          </div>
+        ) : null}
+
         <div className="text-slate-400 mr-4 font-bold uppercase text-sm">
           Drag Creature to Place:
         </div>
@@ -156,6 +245,14 @@ export default function TowerDefenseScreen({
             <button
               key={creature.id}
               draggable={true}
+              onClick={() => {
+                // If we aren't dragging, open the menu (whether active or not)
+                if (!dragStateRef.current) {
+                  setSelectedCreatureId(creature.id);
+                  setWasPlayingBeforeMenu(isPlaying);
+                  setIsPlaying(false); // Pause game
+                }
+              }}
               onDragStart={(e) => {
                 dragStateRef.current = 'tower';
                 e.dataTransfer.setData(
@@ -227,7 +324,7 @@ export default function TowerDefenseScreen({
           onDragEnd={() => {
             dragStateRef.current = false;
           }}
-          className="w-24 h-24 p-2 rounded flex flex-col items-center justify-center transition-all cursor-grab active:cursor-grabbing hover:scale-105 bg-purple-900 border-2 border-purple-500 hover:bg-purple-800 shrink-0"
+          className="relative z-0 w-24 h-24 p-2 rounded flex flex-col items-center justify-center transition-all cursor-grab active:cursor-grabbing hover:scale-105 bg-purple-900 border-2 border-purple-500 hover:bg-purple-800 shrink-0"
         >
           {/* We'll use a placeholder icon or color for the capture device */}
           <div className="relative w-12 h-12 rounded-full border-4 border-white bg-red-500 flex items-center justify-center shadow-lg pointer-events-none mb-1 overflow-hidden">

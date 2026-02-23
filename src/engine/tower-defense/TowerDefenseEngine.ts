@@ -67,6 +67,8 @@ export class TowerDefenseEngine {
   private isWaitingForDelay: boolean = false;
   private hasFinishedAllWaves: boolean = false;
 
+  public playerSelectedAttacks: Record<string, number> = {};
+
   public aspectRatio: number = 1;
 
   public setAspectRatio(ratio: number) {
@@ -461,15 +463,9 @@ export class TowerDefenseEngine {
     const defMeta = TD_CREATURE_DEFS[creature.speciesId];
     if (!defMeta) return false;
 
-    // Assign default attacks based on definition (hardcoded mapping for MVP)
-    const defaultAttacks: string[] = [];
-    if (creature.speciesId === 'starter_crab')
-      defaultAttacks.push('VINE_WHIP', 'SCRATCH');
-    else if (creature.speciesId === 'starter_iguana')
-      defaultAttacks.push('EMBER', 'SCRATCH');
-    else if (creature.speciesId === 'starter_monkey')
-      defaultAttacks.push('BUBBLE_BEAM', 'SCRATCH');
-    else defaultAttacks.push('TACKLE'); // Fallback
+    const defaultAttacks = TowerDefenseEngine.getDefaultAttacks(
+      creature.speciesId
+    );
 
     this.towers.push({
       id: `tower_${Date.now()}_${Math.random().toString(36).substring(7)}`,
@@ -484,8 +480,32 @@ export class TowerDefenseEngine {
         definitionId: atkId,
         lastFiredTime: 0,
       })),
-      selectedAttackIndex: 0,
+      selectedAttackIndex: this.playerSelectedAttacks[creature.id] || 0,
     });
     return true;
+  }
+
+  public static getDefaultAttacks(speciesId: string): string[] {
+    const defaultAttacks: string[] = [];
+    if (speciesId === 'starter_crab')
+      defaultAttacks.push('VINE_WHIP', 'SCRATCH');
+    else if (speciesId === 'starter_iguana')
+      defaultAttacks.push('EMBER', 'SCRATCH');
+    else if (speciesId === 'starter_monkey')
+      defaultAttacks.push('BUBBLE_BEAM', 'SCRATCH');
+    else defaultAttacks.push('TACKLE'); // Fallback
+    return defaultAttacks;
+  }
+
+  public setTowerAttack(creatureId: string, attackIndex: number) {
+    this.playerSelectedAttacks[creatureId] = attackIndex;
+    const tower = this.towers.find((t) => t.creatureId === creatureId);
+    if (
+      tower &&
+      attackIndex >= 0 &&
+      attackIndex < tower.equippedAttacks.length
+    ) {
+      tower.selectedAttackIndex = attackIndex;
+    }
   }
 }
