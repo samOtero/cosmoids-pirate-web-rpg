@@ -50,6 +50,7 @@ export interface Tower {
   xp: number;
   currentAttack: number;
   equippedAttacks: Array<{ definitionId: string; lastFiredTime: number }>;
+  selectedAttackIndex: number;
 }
 
 export interface StatusCondition {

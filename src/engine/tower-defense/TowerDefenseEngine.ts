@@ -209,19 +209,20 @@ export class TowerDefenseEngine {
 
     // Towers attack
     newTowers.forEach((tower) => {
-      tower.equippedAttacks.forEach((attackInstance) => {
-        const attackDef = ATTACK_DEFS[attackInstance.definitionId];
-        if (!attackDef) return;
+      const attackInstance = tower.equippedAttacks[tower.selectedAttackIndex];
+      if (!attackInstance) return;
 
-        if (time - attackInstance.lastFiredTime > attackDef.cooldownMs) {
-          const behavior = AttackBehaviorRegistry[attackDef.behaviorType];
+      const attackDef = ATTACK_DEFS[attackInstance.definitionId];
+      if (!attackDef) return;
 
-          if (behavior && behavior.canExecute(this, tower, attackDef)) {
-            behavior.execute(this, tower, attackDef);
-            attackInstance.lastFiredTime = time;
-          }
+      if (time - attackInstance.lastFiredTime > attackDef.cooldownMs) {
+        const behavior = AttackBehaviorRegistry[attackDef.behaviorType];
+
+        if (behavior && behavior.canExecute(this, tower, attackDef)) {
+          behavior.execute(this, tower, attackDef);
+          attackInstance.lastFiredTime = time;
         }
-      });
+      }
     });
 
     // Update projectiles
@@ -483,6 +484,7 @@ export class TowerDefenseEngine {
         definitionId: atkId,
         lastFiredTime: 0,
       })),
+      selectedAttackIndex: 0,
     });
     return true;
   }
