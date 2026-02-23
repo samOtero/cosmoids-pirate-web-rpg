@@ -5,7 +5,8 @@ import { useGameStore } from '@/store/gameStore';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import PixiBattlefield from './PixiBattlefield';
 import { FIRST_LEVEL } from '@/constants/tdLevels';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import { ActiveAttackMenu } from './ActiveAttackMenu';
+import { TowerButton } from './TowerButton';
 
 export default function TowerDefenseScreen({
   onClose,
@@ -138,89 +139,48 @@ export default function TowerDefenseScreen({
       />
 
       <div className="bg-slate-800 p-4 shrink-0 flex items-center justify-center gap-4 overflow-x-auto border-t border-cyan-800 relative min-h-[140px]">
-        {selectedCreatureId ? (
-          <div className="absolute inset-0 bg-slate-900/95 z-50 flex flex-col items-center justify-center p-2 backdrop-blur-sm">
-            <div className="flex items-center justify-between w-full max-w-2xl text-cyan-400 mb-2 px-4">
-              <span className="font-bold text-lg">Select Active Attack</span>
-              <button
-                onClick={() => {
-                  setSelectedCreatureId(null);
-                  if (wasPlayingBeforeMenu) setIsPlaying(true);
-                }}
-                className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded px-3 py-1 text-sm font-bold"
-              >
-                Close
-              </button>
-            </div>
+        {selectedCreatureId
+          ? (() => {
+              const creature = playerCreatures.find(
+                (c) => c.id === selectedCreatureId
+              );
+              if (!creature) return null;
 
-            <div className="flex items-center justify-center gap-4 w-full overflow-x-auto px-4 pb-2">
-              {(() => {
-                const tower = engineRef.current.towers.find(
-                  (t) => t.creatureId === selectedCreatureId
-                );
-                const creature = playerCreatures.find(
-                  (c) => c.id === selectedCreatureId
-                );
-                if (!creature)
-                  return (
-                    <span className="text-slate-500 italic">
-                      Creature not found.
-                    </span>
-                  );
+              const tower = engineRef.current.towers.find(
+                (t) => t.creatureId === selectedCreatureId
+              );
+              const isActive = activeTowerIds.includes(creature.id);
+              const displayLevel = tower ? tower.level : creature.level;
+              const displayXp = tower ? tower.xp : creature.xp;
 
-                const equippedAttacks = tower
-                  ? tower.equippedAttacks.map((a) => a.definitionId)
-                  : TowerDefenseEngine.getDefaultAttacks(creature.speciesId);
+              const equippedAttacks = tower
+                ? tower.equippedAttacks.map((a: any) => a.definitionId)
+                : TowerDefenseEngine.getDefaultAttacks(creature.speciesId);
 
-                const activeAttackIndex = tower
-                  ? tower.selectedAttackIndex
-                  : engineRef.current.playerSelectedAttacks[creature.id] || 0;
+              const activeAttackIndex = tower
+                ? tower.selectedAttackIndex
+                : engineRef.current.playerSelectedAttacks[creature.id] || 0;
 
-                return equippedAttacks.map((attackId, index) => {
-                  const def = ATTACK_DEFS[attackId];
-                  if (!def) return null;
-
-                  const isSelected = activeAttackIndex === index;
-
-                  return (
-                    <button
-                      key={`${attackId}-${index}`}
-                      onClick={() => {
-                        engineRef.current.setTowerAttack(
-                          selectedCreatureId,
-                          index
-                        );
-                        setUiUpdateToggle((prev) => !prev);
-                      }}
-                      className={`flex flex-col items-center p-3 rounded border-2 transition-all min-w-[120px] ${
-                        isSelected
-                          ? 'bg-cyan-900/50 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.4)]'
-                          : 'bg-slate-800 border-slate-600 hover:border-cyan-600 hover:bg-slate-700'
-                      }`}
-                    >
-                      <span
-                        className={`font-bold mb-1 ${isSelected ? 'text-cyan-300' : 'text-slate-200'}`}
-                      >
-                        {def.name}
-                      </span>
-                      <div className="flex gap-2 text-xs">
-                        <span className="text-red-400">Pwr: {def.power}</span>
-                        <span className="text-blue-400">
-                          CD: {def.cooldownMs / 1000}s
-                        </span>
-                      </div>
-                      {isSelected && (
-                        <span className="mt-2 text-[10px] font-bold text-black bg-cyan-400 px-2 py-0.5 rounded-full uppercase">
-                          Active
-                        </span>
-                      )}
-                    </button>
-                  );
-                });
-              })()}
-            </div>
-          </div>
-        ) : null}
+              return (
+                <ActiveAttackMenu
+                  creature={creature}
+                  isActive={isActive}
+                  displayLevel={displayLevel}
+                  displayXp={displayXp}
+                  equippedAttacks={equippedAttacks}
+                  activeAttackIndex={activeAttackIndex}
+                  onSelectAttack={(index) => {
+                    engineRef.current.setTowerAttack(selectedCreatureId, index);
+                    setUiUpdateToggle((prev) => !prev);
+                  }}
+                  onClose={() => {
+                    setSelectedCreatureId(null);
+                    if (wasPlayingBeforeMenu) setIsPlaying(true);
+                  }}
+                />
+              );
+            })()
+          : null}
 
         <div className="text-slate-400 mr-4 font-bold uppercase text-sm">
           Drag Creature to Place:
@@ -242,15 +202,18 @@ export default function TowerDefenseScreen({
           }
 
           return (
-            <button
+            <TowerButton
               key={creature.id}
+              creature={creature}
+              isActive={isActive}
+              displayLevel={displayLevel}
+              displayXp={displayXp}
               draggable={true}
               onClick={() => {
-                // If we aren't dragging, open the menu (whether active or not)
                 if (!dragStateRef.current) {
                   setSelectedCreatureId(creature.id);
                   setWasPlayingBeforeMenu(isPlaying);
-                  setIsPlaying(false); // Pause game
+                  setIsPlaying(false);
                 }
               }}
               onDragStart={(e) => {
@@ -262,49 +225,13 @@ export default function TowerDefenseScreen({
                 e.dataTransfer.effectAllowed = 'copy';
                 const imgEl = e.currentTarget.querySelector('img');
                 if (imgEl) {
-                  // Approximate center of a 48x48 element
                   e.dataTransfer.setDragImage(imgEl, 24, 24);
                 }
               }}
               onDragEnd={() => {
                 dragStateRef.current = false;
               }}
-              className={`relative w-24 h-24 p-1 rounded flex flex-col items-center justify-center transition-all cursor-grab active:cursor-grabbing hover:scale-105 shrink-0 ${
-                isActive
-                  ? 'bg-cyan-800 border-2 border-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.6)] hover:bg-cyan-700'
-                  : 'bg-slate-700 border-2 border-transparent hover:bg-slate-500'
-              }`}
-            >
-              <img
-                src={creature.spriteUrl}
-                alt={creature.name}
-                className="w-10 h-10 object-contain pointer-events-none"
-              />
-              <div className="flex flex-col items-center w-full mt-1 pointer-events-none">
-                <span
-                  className={`text-[9px] uppercase font-bold truncate w-full text-center leading-tight ${isActive ? 'text-cyan-100' : 'text-white'}`}
-                >
-                  {creature.name}
-                </span>
-
-                <div className="w-full flex items-center justify-between px-1 mt-0.5">
-                  <span className="text-[8px] text-gray-300 leading-none">
-                    Lv.{displayLevel}
-                  </span>
-                </div>
-
-                <div className="w-full px-1 mt-0.5">
-                  <div className="w-full h-1.5 bg-gray-900 rounded-full overflow-hidden border border-gray-600">
-                    <div
-                      className="h-full bg-cyan-400 transition-all duration-300"
-                      style={{
-                        width: `${Math.min(100, Math.max(0, (displayXp / (displayLevel * 100)) * 100))}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </button>
+            />
           );
         })}
 
