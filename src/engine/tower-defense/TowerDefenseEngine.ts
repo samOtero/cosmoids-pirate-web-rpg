@@ -18,7 +18,7 @@ import { TDProgressionManager } from './progression/TDProgressionManager';
 export const TD_CREATURE_DEFS: Record<string, TDCreatureMetadata> = {
   [BUG_STAGE_1.id]: {
     baseCreature: BUG_STAGE_1,
-    xpYield: 15,
+    xpYield: 100, // TEMPORARY for testing: faster leveling
   },
   [BUG_STAGE_2.id]: {
     baseCreature: BUG_STAGE_2,
@@ -31,8 +31,12 @@ export const TD_CREATURE_DEFS: Record<string, TDCreatureMetadata> = {
   [STARTER_CRAB.id]: {
     baseCreature: STARTER_CRAB,
     xpYield: 0,
-    evolutionNodes: [{ level: 5, evolutionDefId: BUG_STAGE_2.id }], // example evolution
-    attackUnlocks: [{ level: 3, attackDefId: 'BUBBLE_BEAM' }], // example attack unlock
+    evolutionNodes: [{ level: 10, evolutionDefId: BUG_STAGE_2.id }], // pushed back for testing
+    attackUnlocks: [
+      { level: 2, attackDefId: 'EMBER' },
+      { level: 3, attackDefId: 'BUBBLE_BEAM' },
+      { level: 4, attackDefId: 'STRING_SHOT' },
+    ], // temporary testing progression
   },
   [STARTER_IGUANA.id]: {
     baseCreature: STARTER_IGUANA,
@@ -506,6 +510,28 @@ export class TowerDefenseEngine {
       attackIndex < tower.equippedAttacks.length
     ) {
       tower.selectedAttackIndex = attackIndex;
+    }
+  }
+
+  public replaceTowerAttack(
+    towerId: string,
+    replaceIndex: number,
+    newAttackDefId: string
+  ) {
+    const tower = this.towers.find((t) => t.id === towerId);
+    if (!tower) return;
+    if (replaceIndex >= 0 && replaceIndex < tower.equippedAttacks.length) {
+      tower.equippedAttacks[replaceIndex] = {
+        definitionId: newAttackDefId,
+        lastFiredTime: 0,
+      };
+
+      // Emit event so the UI can show the success modal if desired, or just to update state
+      this.events.emit({
+        type: 'TOWER_LEARNED_ATTACK',
+        towerId: tower.id,
+        attackDefId: newAttackDefId,
+      });
     }
   }
 }

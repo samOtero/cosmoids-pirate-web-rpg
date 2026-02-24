@@ -64,15 +64,23 @@ export class TDProgressionManager {
                   (a) => a.definitionId === node.attackDefId
                 )
               ) {
-                tower.equippedAttacks.push({
-                  definitionId: node.attackDefId,
-                  lastFiredTime: 0,
-                });
-                this.engine.events.emit({
-                  type: 'TOWER_LEARNED_ATTACK',
-                  towerId: tower.id,
-                  attackDefId: node.attackDefId,
-                });
+                if (tower.equippedAttacks.length < 4) {
+                  tower.equippedAttacks.push({
+                    definitionId: node.attackDefId,
+                    lastFiredTime: 0,
+                  });
+                  this.engine.events.emit({
+                    type: 'TOWER_LEARNED_ATTACK',
+                    towerId: tower.id,
+                    attackDefId: node.attackDefId,
+                  });
+                } else {
+                  this.engine.events.emit({
+                    type: 'TOWER_ASK_REPLACE_ATTACK',
+                    towerId: tower.id,
+                    newAttackDefId: node.attackDefId,
+                  });
+                }
               }
             }
           });

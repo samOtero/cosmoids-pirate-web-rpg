@@ -7,6 +7,7 @@ import PixiBattlefield from './PixiBattlefield';
 import { FIRST_LEVEL } from '@/constants/tdLevels';
 import { ActiveAttackMenu } from './ActiveAttackMenu';
 import { TowerButton } from './TowerButton';
+import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 
 export default function TowerDefenseScreen({
   onClose,
@@ -36,6 +37,14 @@ export default function TowerDefenseScreen({
     null
   );
   const [wasPlayingBeforeMenu, setWasPlayingBeforeMenu] = useState(false);
+  const [learningAttack, setLearningAttack] = useState<{
+    towerId: string;
+    attackDefId: string;
+  } | null>(null);
+  const [replaceAttackPrompt, setReplaceAttackPrompt] = useState<{
+    towerId: string;
+    newAttackDefId: string;
+  } | null>(null);
   const dragStateRef = useRef<'tower' | 'capture' | false>(false);
 
   const requestRef = useRef<number | null>(null);
@@ -48,6 +57,22 @@ export default function TowerDefenseScreen({
         case 'TOWER_XP_GAINED':
         case 'TOWER_LEVELED_UP':
         case 'TOWER_EVOLVED':
+          setUiUpdateToggle((prev) => !prev);
+          break;
+        case 'TOWER_LEARNED_ATTACK':
+          setIsPlaying(false);
+          setLearningAttack({
+            towerId: event.towerId,
+            attackDefId: event.attackDefId,
+          });
+          setUiUpdateToggle((prev) => !prev);
+          break;
+        case 'TOWER_ASK_REPLACE_ATTACK':
+          setIsPlaying(false);
+          setReplaceAttackPrompt({
+            towerId: event.towerId,
+            newAttackDefId: event.newAttackDefId,
+          });
           setUiUpdateToggle((prev) => !prev);
           break;
       }
@@ -282,6 +307,118 @@ export default function TowerDefenseScreen({
           </span>
         </button>
       </div>
+
+      {/* Learning Attack Modal */}
+      {learningAttack && (
+        <div className="fixed inset-0 z-9999 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-slate-800 p-6 rounded-lg text-center border-2 border-cyan-500 max-w-sm w-full">
+            <h3 className="text-2xl font-bold text-cyan-400 mb-4">
+              Learned a New Attack!
+            </h3>
+            <div className="bg-slate-900 p-4 rounded mb-6">
+              <span className="font-bold text-xl text-yellow-400">
+                {ATTACK_DEFS[learningAttack.attackDefId]?.name ||
+                  learningAttack.attackDefId}
+              </span>
+              <p className="text-sm text-slate-300 mt-2">
+                Power: {ATTACK_DEFS[learningAttack.attackDefId]?.power} |
+                Cooldown:{' '}
+                {(ATTACK_DEFS[learningAttack.attackDefId]?.cooldownMs || 1000) /
+                  1000}
+                s
+              </p>
+            </div>
+            <button
+              className="px-6 py-2 bg-cyan-600 hover:bg-cyan-500 rounded font-bold text-white w-full"
+              onClick={() => {
+                setLearningAttack(null);
+                setIsPlaying(true);
+              }}
+            >
+              Awesome!
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Replace Attack Modal */}
+      {replaceAttackPrompt &&
+        (() => {
+          const tower = engineRef.current.towers.find(
+            (t: any) => t.id === replaceAttackPrompt.towerId
+          );
+          if (!tower) return null;
+          const newDef = ATTACK_DEFS[replaceAttackPrompt.newAttackDefId];
+
+          return (
+            <div className="fixed inset-0 z-9999 bg-black/80 flex items-center justify-center p-4">
+              <div className="bg-slate-800 p-6 rounded-lg border-2 border-purple-500 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <h3 className="text-2xl font-bold text-purple-400 mb-2">
+                  Maximum Attacks Reached!
+                </h3>
+                <p className="text-slate-300 mb-6">
+                  This creature wants to learn{' '}
+                  <span className="font-bold text-yellow-400">
+                    {newDef?.name}
+                  </span>
+                  , but already knows 4 attacks. Choose an attack to forget, or
+                  cancel.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                  {/* Current Attacks */}
+                  {tower.equippedAttacks.map((atk: any, idx: number) => {
+                    const def = ATTACK_DEFS[atk.definitionId];
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          engineRef.current.replaceTowerAttack(
+                            tower.id,
+                            idx,
+                            replaceAttackPrompt.newAttackDefId
+                          );
+                          setReplaceAttackPrompt(null);
+                          // The engine will emit TOWER_LEARNED_ATTACK, which will show the other modal.
+                        }}
+                        className="p-3 bg-slate-700 hover:bg-red-900/50 border border-slate-600 hover:border-red-500 rounded text-left transition-colors flex flex-col group"
+                      >
+                        <span className="font-bold text-slate-200 group-hover:text-red-400">
+                          Forget {def?.name}
+                        </span>
+                        <span className="text-xs text-slate-400 mt-1 line-clamp-2">
+                          Power: {def?.power}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* New Attack Info & Cancel */}
+                <div className="flex flex-col sm:flex-row gap-4 items-center justify-between border-t border-slate-700 pt-4">
+                  <div className="flex-1">
+                    <div className="font-bold text-yellow-400">
+                      New: {newDef?.name}
+                    </div>
+                    <div className="text-sm text-slate-300">
+                      Power: {newDef?.power} | Cooldown:{' '}
+                      {(newDef?.cooldownMs || 1000) / 1000}s
+                    </div>
+                  </div>
+                  <button
+                    className="px-6 py-2 bg-slate-600 hover:bg-slate-500 rounded font-bold text-white whitespace-nowrap"
+                    onClick={() => {
+                      setReplaceAttackPrompt(null);
+                      setIsPlaying(true);
+                    }}
+                  >
+                    Do Not Learn
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
     </div>
   );
 }
