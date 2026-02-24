@@ -142,7 +142,11 @@ export default function DevTools() {
             <CreaturePositionEditor onClose={() => setActiveTool(null)} />
           )}
           {activeTool === 'TOWER_DEFENSE' && (
-            <TowerDefenseScreen onClose={() => setActiveTool(null)} />
+            <TowerDefenseScreen
+              onClose={() => setActiveTool(null)}
+              onWin={() => alert('You win!')}
+              onLose={() => alert('You lose!?')}
+            />
           )}
           {activeTool === 'TD_LEVEL_EDITOR' && (
             <TDLevelEditor onClose={() => setActiveTool(null)} />

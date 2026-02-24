@@ -65,7 +65,7 @@ export class TowerDefenseEngine {
   private lastSpawnTime: number = 0;
   private waveDelayTimer: number = 0;
   private isWaitingForDelay: boolean = false;
-  private hasFinishedAllWaves: boolean = false;
+  public hasFinishedAllWaves: boolean = false;
 
   public playerSelectedAttacks: Record<string, number> = {};
 

@@ -10,10 +10,15 @@ import { TowerButton } from './TowerButton';
 
 export default function TowerDefenseScreen({
   onClose,
+  onWin,
+  onLose,
 }: {
   onClose: () => void;
+  onWin?: () => void;
+  onLose?: () => void;
 }) {
   const engineRef = useRef(new TowerDefenseEngine(FIRST_LEVEL));
+  const hasEndedRef = useRef(false);
 
   const profiles = useGameStore((state) => state.profiles);
   const currentProfileId = useGameStore((state) => state.currentProfileId);
@@ -62,14 +67,28 @@ export default function TowerDefenseScreen({
       // 2. Sync essential UI state (could throttle this for more perf)
       if (engineRef.current.lives !== uiLives) {
         setUiLives(engineRef.current.lives);
-        if (engineRef.current.lives <= 0) {
+        if (engineRef.current.lives <= 0 && !hasEndedRef.current) {
+          hasEndedRef.current = true;
           setIsPlaying(false);
-          alert('Game Over!');
+          if (onLose) onLose();
+          else alert('Game Over!');
         }
+      }
+
+      // 3. Check win condition
+      if (
+        engineRef.current.hasFinishedAllWaves &&
+        engineRef.current.enemies.length === 0 &&
+        engineRef.current.lives > 0 &&
+        !hasEndedRef.current
+      ) {
+        hasEndedRef.current = true;
+        setIsPlaying(false);
+        if (onWin) onWin();
       }
     }
     previousTimeRef.current = time;
-    if (isPlaying) {
+    if (isPlaying && !hasEndedRef.current) {
       requestRef.current = requestAnimationFrame(animate);
     }
   };
