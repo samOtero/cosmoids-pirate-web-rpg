@@ -26,7 +26,7 @@ export default function TowerDefenseScreen({
     (state) => state.addCreatureToProfile
   );
   const profile = currentProfileId !== null ? profiles[currentProfileId] : null;
-  const playerCreatures = profile?.creatures || [];
+  const playerCreatures = (profile?.creatures || []).slice(0, 6);
 
   const [uiLives, setUiLives] = useState(engineRef.current.lives);
   const [activeTowerIds, setActiveTowerIds] = useState<string[]>([]);

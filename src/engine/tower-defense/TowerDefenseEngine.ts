@@ -52,7 +52,7 @@ export class TowerDefenseEngine {
   public projectiles: Projectile[] = [];
 
   public money: number = 100;
-  public lives: number = 2000;
+  public lives: number = 2;
 
   public events = new TDEventBus();
   private progression = new TDProgressionManager(this, this.events);
