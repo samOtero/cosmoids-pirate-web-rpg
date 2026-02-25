@@ -93,14 +93,21 @@ export default function PixiBattlefield({
       if (isDestroyed) return;
 
       const bgSprite = PIXI.Sprite.from('/battles/bg/bg_dock_battle_pixel.png');
-      bgSprite.width = app.screen.width;
-      bgSprite.height = app.screen.height;
       app.stage.addChild(bgSprite);
 
       // Handle resize
       const updateAspectRatio = () => {
-        bgSprite.width = app.screen.width;
-        bgSprite.height = app.screen.height;
+        if (
+          bgSprite.texture.width > 0 &&
+          bgSprite.texture.height > 0 &&
+          app.screen.height > 0
+        ) {
+          const ratio = bgSprite.texture.width / bgSprite.texture.height;
+          bgSprite.height = app.screen.height;
+          bgSprite.width = app.screen.height * ratio;
+          bgSprite.x = (app.screen.width - bgSprite.width) / 2;
+        }
+
         if (engine && app.screen.height > 0) {
           engine.setAspectRatio(app.screen.width / app.screen.height);
         }
