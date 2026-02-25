@@ -55,6 +55,8 @@ export default function PixiTDLevelEditor({
     const pathNodes = new Map<number, PIXI.Container>();
     const placementNodes = new Map<number, PIXI.Container>();
 
+    let bgBounds = { x: 0, y: 0, width: 0, height: 0 };
+
     // Track dragging state
     let draggingNode: PIXI.Container | null = null;
     let draggingInfo: { type: PointType; index: number } | null = null;
@@ -102,6 +104,13 @@ export default function PixiTDLevelEditor({
           bgSprite.height = app.screen.height;
           bgSprite.width = app.screen.height * ratio;
           bgSprite.x = (app.screen.width - bgSprite.width) / 2;
+
+          bgBounds = {
+            x: bgSprite.x,
+            y: bgSprite.y,
+            width: bgSprite.width,
+            height: bgSprite.height,
+          };
         }
       };
       app.renderer.on('resize', updateAspectRatio);
@@ -116,11 +125,14 @@ export default function PixiTDLevelEditor({
       app.stage.on('pointerup', onDragEnd);
       app.stage.on('pointerupoutside', onDragEnd);
       app.stage.on('pointermove', (e) => {
-        if (draggingNode && draggingInfo && !deleteModeRef.current) {
-          const screenW = app.screen.width;
-          const screenH = app.screen.height;
-          let newX = (e.global.x / screenW) * 100;
-          let newY = (e.global.y / screenH) * 100;
+        if (
+          draggingNode &&
+          draggingInfo &&
+          !deleteModeRef.current &&
+          bgBounds.width > 0
+        ) {
+          let newX = ((e.global.x - bgBounds.x) / bgBounds.width) * 100;
+          let newY = ((e.global.y - bgBounds.y) / bgBounds.height) * 100;
 
           // Clamp to 0-100
           newX = Math.max(0, Math.min(100, newX));
@@ -202,8 +214,8 @@ export default function PixiTDLevelEditor({
       };
 
       app.ticker.add(() => {
-        const screenW = app.screen.width;
-        const screenH = app.screen.height;
+        if (bgBounds.width === 0) return;
+
         const currentPathPoints = pathPointsRef.current;
         const currentPlacementSpots = placementSpotsRef.current;
 
@@ -212,13 +224,13 @@ export default function PixiTDLevelEditor({
         app.stage.setChildIndex(pathGraphics, 1); // just above background
         if (currentPathPoints.length > 0) {
           pathGraphics.moveTo(
-            (currentPathPoints[0].x / 100) * screenW,
-            (currentPathPoints[0].y / 100) * screenH
+            bgBounds.x + (currentPathPoints[0].x / 100) * bgBounds.width,
+            bgBounds.y + (currentPathPoints[0].y / 100) * bgBounds.height
           );
           for (let i = 1; i < currentPathPoints.length; i++) {
             pathGraphics.lineTo(
-              (currentPathPoints[i].x / 100) * screenW,
-              (currentPathPoints[i].y / 100) * screenH
+              bgBounds.x + (currentPathPoints[i].x / 100) * bgBounds.width,
+              bgBounds.y + (currentPathPoints[i].y / 100) * bgBounds.height
             );
           }
           pathGraphics.stroke({ color: 0xff0000, width: 4, alpha: 0.6 });
@@ -238,8 +250,8 @@ export default function PixiTDLevelEditor({
             node = createDraggablePoint('PATH', i, 0xff0000, 15);
             pathNodes.set(i, node);
           }
-          node.x = (pt.x / 100) * screenW;
-          node.y = (pt.y / 100) * screenH;
+          node.x = bgBounds.x + (pt.x / 100) * bgBounds.width;
+          node.y = bgBounds.y + (pt.y / 100) * bgBounds.height;
           node.cursor = deleteModeRef.current
             ? 'pointer'
             : draggingNode === node
@@ -261,7 +273,7 @@ export default function PixiTDLevelEditor({
         }
         currentPlacementSpots.forEach((spot, i) => {
           let node = placementNodes.get(i);
-          const radius = screenW * 0.05; // 5vw approx
+          const radius = bgBounds.width * 0.05; // 5% of bg width approx
           if (!node) {
             node = createDraggablePoint(
               'PLACEMENT',
@@ -273,8 +285,8 @@ export default function PixiTDLevelEditor({
             );
             placementNodes.set(i, node);
           }
-          node.x = (spot.x / 100) * screenW;
-          node.y = (spot.y / 100) * screenH;
+          node.x = bgBounds.x + (spot.x / 100) * bgBounds.width;
+          node.y = bgBounds.y + (spot.y / 100) * bgBounds.height;
           node.cursor = deleteModeRef.current
             ? 'pointer'
             : draggingNode === node

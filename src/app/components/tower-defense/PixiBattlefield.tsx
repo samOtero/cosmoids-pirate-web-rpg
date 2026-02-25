@@ -43,6 +43,12 @@ export default function PixiBattlefield({
   const getDragStateRef = useRef(getDragState);
   const dragPosRef = useRef<{ x: number; y: number } | null>(null);
   const draggingCaptureDeviceRef = useRef<boolean>(false);
+  const bgBoundsRef = useRef<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  }>({ x: 0, y: 0, width: 0, height: 0 });
 
   // Keep the latest callback without triggering re-runs of the PIXI initializer
   useEffect(() => {
@@ -72,6 +78,7 @@ export default function PixiBattlefield({
 
     let isDestroyed = false;
     let isInitialized = false;
+    let bgBounds = { x: 0, y: 0, width: 0, height: 0 };
 
     const initPixi = async () => {
       await app.init({
@@ -106,6 +113,14 @@ export default function PixiBattlefield({
           bgSprite.height = app.screen.height;
           bgSprite.width = app.screen.height * ratio;
           bgSprite.x = (app.screen.width - bgSprite.width) / 2;
+
+          bgBounds = {
+            x: bgSprite.x,
+            y: bgSprite.y,
+            width: bgSprite.width,
+            height: bgSprite.height,
+          };
+          bgBoundsRef.current = bgBounds;
         }
 
         if (engine && app.screen.height > 0) {
@@ -132,11 +147,9 @@ export default function PixiBattlefield({
       app.stage.hitArea = new PIXI.Rectangle(0, 0, 10000, 10000);
 
       const onDragEnd = (e: PIXI.FederatedPointerEvent) => {
-        if (draggingTowerCreatureId) {
-          const screenW = app.screen.width;
-          const screenH = app.screen.height;
-          const x = (e.global.x / screenW) * 100;
-          const y = (e.global.y / screenH) * 100;
+        if (draggingTowerCreatureId && bgBounds.width > 0) {
+          const x = ((e.global.x - bgBounds.x) / bgBounds.width) * 100;
+          const y = ((e.global.y - bgBounds.y) / bgBounds.height) * 100;
 
           let closestSpot: { x: number; y: number } | null = null;
           let minSqDist = Infinity;
@@ -178,15 +191,13 @@ export default function PixiBattlefield({
       app.stage.on('pointerup', onDragEnd);
       app.stage.on('pointerupoutside', onDragEnd);
       app.stage.on('pointermove', (e) => {
-        if (draggingNode) {
+        if (draggingNode && bgBounds.width > 0) {
           draggingNode.x = e.global.x;
           draggingNode.y = e.global.y;
 
-          const screenW = app.screen.width;
-          const screenH = app.screen.height;
           dragPosRef.current = {
-            x: (e.global.x / screenW) * 100,
-            y: (e.global.y / screenH) * 100,
+            x: ((e.global.x - bgBounds.x) / bgBounds.width) * 100,
+            y: ((e.global.y - bgBounds.y) / bgBounds.height) * 100,
           };
         }
       });
@@ -198,10 +209,12 @@ export default function PixiBattlefield({
           fpsRef.current.innerText = `FPS: ${Math.round(app.ticker.FPS)}`;
         }
 
-        if (!engine) return;
+        if (!engine || bgBounds.width === 0) return;
 
-        const screenW = app.screen.width;
-        const screenH = app.screen.height;
+        const screenW = bgBounds.width;
+        const screenH = bgBounds.height;
+        const offsetX = bgBounds.x;
+        const offsetY = bgBounds.y;
 
         const externalDragState = getDragStateRef.current
           ? getDragStateRef.current()
@@ -271,8 +284,8 @@ export default function PixiBattlefield({
             towerSprites.set(cacheKey, container);
           }
           if (draggingTowerCreatureId !== tower.creatureId) {
-            container.x = (tower.position.x / 100) * screenW;
-            container.y = (tower.position.y / 100) * screenH;
+            container.x = offsetX + (tower.position.x / 100) * screenW;
+            container.y = offsetY + (tower.position.y / 100) * screenH;
           }
 
           const rCircle = container.getChildByLabel('rangeCircle');
@@ -322,8 +335,8 @@ export default function PixiBattlefield({
               const enemy = engine.enemies.find(
                 (e) => e.id === targetedEnemyId
               )!;
-              const pxX = (enemy.position.x / 100) * screenW;
-              const pxY = (enemy.position.y / 100) * screenH;
+              const pxX = offsetX + (enemy.position.x / 100) * screenW;
+              const pxY = offsetY + (enemy.position.y / 100) * screenH;
               const radius = screenW * 0.05;
 
               if (isWeakened) {
@@ -362,8 +375,8 @@ export default function PixiBattlefield({
         } else if (isDraggingTower) {
           // Normal Tower Placement Logic
           if (draggingTowerCreatureId === null && dragPosRef.current) {
-            const pxX = (dragPosRef.current.x / 100) * screenW;
-            const pxY = (dragPosRef.current.y / 100) * screenH;
+            const pxX = offsetX + (dragPosRef.current.x / 100) * screenW;
+            const pxY = offsetY + (dragPosRef.current.y / 100) * screenH;
             const radius = screenW * 0.15;
             spotGraphics.circle(pxX, pxY, radius);
             spotGraphics.fill({ color: 0x22d3ee, alpha: 0.05 });
@@ -371,8 +384,8 @@ export default function PixiBattlefield({
           }
 
           engine.placementSpots.forEach((spot) => {
-            const pxX = (spot.x / 100) * screenW;
-            const pxY = (spot.y / 100) * screenH;
+            const pxX = offsetX + (spot.x / 100) * screenW;
+            const pxY = offsetY + (spot.y / 100) * screenH;
 
             let isHovered = false;
 
@@ -421,8 +434,8 @@ export default function PixiBattlefield({
             !isHoveringValidSpot &&
             dragPosRef.current
           ) {
-            const pxX = (dragPosRef.current.x / 100) * screenW;
-            const pxY = (dragPosRef.current.y / 100) * screenH;
+            const pxX = offsetX + (dragPosRef.current.x / 100) * screenW;
+            const pxY = offsetY + (dragPosRef.current.y / 100) * screenH;
             const radius = screenW * 0.05;
 
             invalidSpotGraphics.circle(pxX, pxY, radius);
@@ -493,8 +506,8 @@ export default function PixiBattlefield({
             app.stage.addChild(container);
             enemySprites.set(enemy.id, container);
           }
-          container.x = (enemy.position.x / 100) * screenW;
-          container.y = (enemy.position.y / 100) * screenH;
+          container.x = offsetX + (enemy.position.x / 100) * screenW;
+          container.y = offsetY + (enemy.position.y / 100) * screenH;
 
           // Update health bar (it is always the last child added)
           const hpRatio = enemy.hp / enemy.maxHp;
@@ -535,8 +548,8 @@ export default function PixiBattlefield({
             app.stage.addChild(sprite);
             projectileSprites.set(proj.id, sprite);
           }
-          sprite.x = (proj.position.x / 100) * screenW;
-          sprite.y = (proj.position.y / 100) * screenH;
+          sprite.x = offsetX + (proj.position.x / 100) * screenW;
+          sprite.y = offsetY + (proj.position.y / 100) * screenH;
         }
       });
     };
@@ -566,10 +579,15 @@ export default function PixiBattlefield({
         }
 
         // Track hover position
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-        dragPosRef.current = { x, y };
+        const bgBounds = bgBoundsRef.current;
+        if (bgBounds && bgBounds.width > 0) {
+          const rect = e.currentTarget.getBoundingClientRect();
+          const localX = e.clientX - rect.left - bgBounds.x;
+          const localY = e.clientY - rect.top - bgBounds.y;
+          const x = (localX / bgBounds.width) * 100;
+          const y = (localY / bgBounds.height) * 100;
+          dragPosRef.current = { x, y };
+        }
       }}
       onDragLeave={() => {
         dragPosRef.current = null;
@@ -580,16 +598,21 @@ export default function PixiBattlefield({
         dragPosRef.current = null;
         draggingCaptureDeviceRef.current = false;
 
+        const bgBounds = bgBoundsRef.current;
+        if (!bgBounds || bgBounds.width === 0) return;
+
+        const rect = e.currentTarget.getBoundingClientRect();
+        const localX = e.clientX - rect.left - bgBounds.x;
+        const localY = e.clientY - rect.top - bgBounds.y;
+        const x = (localX / bgBounds.width) * 100;
+        const y = (localY / bgBounds.height) * 100;
+
         const towerIdStr = e.dataTransfer.getData('application/tower-id');
         const isCaptureDevice = e.dataTransfer.getData(
           'application/capture-device'
         );
 
         if (isCaptureDevice && engine) {
-          const rect = e.currentTarget.getBoundingClientRect();
-          const x = ((e.clientX - rect.left) / rect.width) * 100;
-          const y = ((e.clientY - rect.top) / rect.height) * 100;
-
           let targetedEnemyId: string | null = null;
           let isWeakened = false;
           let minSqDist = Infinity;
@@ -616,10 +639,6 @@ export default function PixiBattlefield({
         }
 
         if (towerIdStr) {
-          const rect = e.currentTarget.getBoundingClientRect();
-          const x = ((e.clientX - rect.left) / rect.width) * 100;
-          const y = ((e.clientY - rect.top) / rect.height) * 100;
-
           if (engine) {
             let closestSpot: { x: number; y: number } | null = null;
             let minSqDist = Infinity;
