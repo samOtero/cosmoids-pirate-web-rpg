@@ -13,6 +13,7 @@ import { Button } from '@/app/components/ui/Button';
 import { resolveDialog } from '@/utils/dialogResolver';
 import DialogContent from '@/app/components/ui/DialogContent';
 import InventoryModal from '@/app/components/inventory/InventoryModal';
+import { useGameStore } from '@/store/gameStore';
 
 interface IslandMapScreenProps {
   profile: Profile;
@@ -42,6 +43,9 @@ export default function IslandMapScreen({
 }: IslandMapScreenProps) {
   const [hoverNode, setHoverNode] = useState<number | null>(null);
   const [showInventory, setShowInventory] = useState(false);
+  const enqueueAndProcessEvents = useGameStore(
+    (state) => state.enqueueAndProcessEvents
+  );
 
   // Nodes are stored in island.nodes
   // Progress is stored in profile.islandNodeProgress[island.id]
@@ -113,6 +117,12 @@ export default function IslandMapScreen({
           )}
           <Button variant="wood" onClick={onOpenMenu}>
             Menu
+          </Button>
+          <Button
+            variant="wood"
+            onClick={() => enqueueAndProcessEvents([{ type: 'GO_TO_PARTY' }])}
+          >
+            Team
           </Button>
           <Button variant="wood" onClick={() => setShowInventory(true)}>
             Bag

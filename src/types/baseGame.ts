@@ -6,6 +6,7 @@ export enum Screens {
   ISLAND_MAP = 'ISLAND_MAP',
   ISLAND_INSIDE = 'ISLAND_INSIDE',
   BATTLE = 'BATTLE',
+  PARTY = 'PARTY',
 }
 
 export enum ElementType {
@@ -228,7 +229,9 @@ export type GameEventType =
   | 'REMOVE_FLAG'
   | 'UNLOCK_ISLAND'
   | 'ADVANCE_NODE'
-  | 'GAIN_ITEM';
+  | 'GAIN_ITEM'
+  | 'GO_TO_PARTY'
+  | 'REORDER_CREATURES';
 
 export interface GameEvent {
   type: GameEventType;
@@ -244,7 +247,8 @@ export interface GameEvent {
     | RemoveFlagEventPayload
     | UnlockIslandEventPayload
     | AdvanceNodeEventPayload
-    | GainItemEventPayload;
+    | GainItemEventPayload
+    | ReorderCreaturesEventPayload;
   autoProceed?: boolean;
 }
 
@@ -341,4 +345,9 @@ export interface AdvanceNodeEventPayload {
 export interface GainItemEventPayload {
   itemId: string;
   count: number;
+}
+
+export interface ReorderCreaturesEventPayload {
+  startIndex: number;
+  endIndex: number;
 }

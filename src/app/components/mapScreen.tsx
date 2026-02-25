@@ -3,7 +3,8 @@ import Panel from '@/app/components/ui/Panel';
 import { useState } from 'react';
 import { Button } from '@/app/components/ui/Button';
 import { ISLANDS } from '@/constants/game';
-import InventoryModal from '@/app/components/inventory/InventoryModal'; // Added import
+import InventoryModal from '@/app/components/inventory/InventoryModal';
+import { useGameStore } from '@/store/gameStore';
 
 interface MapScreenProps {
   profile: Profile;
@@ -21,6 +22,9 @@ export default function MapScreen({
 }: MapScreenProps) {
   const [hoverIsland, setHoverIsland] = useState<number | null>(null);
   const [showInventory, setShowInventory] = useState(false);
+  const enqueueAndProcessEvents = useGameStore(
+    (state) => state.enqueueAndProcessEvents
+  );
   const potionCount =
     profile.inventory.find((i) => i.id === 'potion')?.count || 0;
 
@@ -89,6 +93,12 @@ export default function MapScreen({
       <div className="absolute bottom-4 right-4 z-20 flex gap-2">
         <Button variant="wood" onClick={onOpenMenu}>
           Full Menu
+        </Button>
+        <Button
+          variant="wood"
+          onClick={() => enqueueAndProcessEvents([{ type: 'GO_TO_PARTY' }])}
+        >
+          Team
         </Button>
         <Button variant="wood" onClick={() => setShowInventory(true)}>
           Bag

@@ -18,6 +18,7 @@ const DialogScreen = lazy(() => import('@/app/components/dialogScreen'));
 const MapScreen = lazy(() => import('@/app/components/mapScreen'));
 const BattleScreen = lazy(() => import('@/app/components/battleScreen'));
 const IslandMapScreen = lazy(() => import('@/app/components/IslandMapScreen'));
+const PartyScreen = lazy(() => import('@/app/components/PartyScreen'));
 
 export default function Home() {
   const {
@@ -42,6 +43,7 @@ export default function Home() {
     handleBattleLose,
     useItem,
     updateCreatures,
+    reorderCreatures,
   } = useGameStore();
 
   // Also handle "WAIT" events or similar if implemented in the store processor,
@@ -171,6 +173,22 @@ export default function Home() {
     );
   }
 
+  if (currentScreen === Screens.PARTY) {
+    if (!currentProfile) {
+      return null;
+    }
+
+    return (
+      <Suspense fallback={<div>Loading Team...</div>}>
+        <PartyScreen
+          creatures={currentProfile.creatures}
+          onBack={() => setScreen(Screens.MAP)}
+          onReorder={reorderCreatures}
+        />
+      </Suspense>
+    );
+  }
+
   if (currentScreen === Screens.DIALOG) {
     const { sequence, backgroundImageKey, next, nextEvents } = resolveDialog(
       dialogContext,
@@ -238,7 +256,7 @@ export default function Home() {
       <Suspense fallback={<div>Loading...</div>}>
         <MapScreen
           profile={currentProfile}
-          onTravel={(islandId) => {
+          onTravel={(islandId: number) => {
             // For now, traveling just starts the level 1 intro sequence
             // In a real game, this would update currentIslandId
             enqueueAndProcessEvents([
@@ -252,7 +270,7 @@ export default function Home() {
               },
             ]);
           }}
-          onEnterIsland={(islandId) => {
+          onEnterIsland={(islandId: number) => {
             enqueueAndProcessEvents([
               {
                 type: 'GO_TO_ISLAND_MAP',

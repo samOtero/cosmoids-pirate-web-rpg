@@ -25,6 +25,7 @@ import {
   AdvanceNodeEventPayload,
   GameFlag,
   GainItemEventPayload,
+  ReorderCreaturesEventPayload,
 } from '@/types/baseGame';
 import { BATTLES } from '@/constants/battles';
 import {
@@ -54,6 +55,7 @@ interface GameState {
   addCreatureToProfile: (slotId: number, creature: Creature) => void;
   updateCreatures: (creatures: Creature[]) => void;
   overwriteProfileCreatures: (creatures: Creature[]) => void;
+  reorderCreatures: (startIndex: number, endIndex: number) => void;
   useItem: (itemId: string, targetCreatureId?: string) => boolean | void;
 
   // Progression
@@ -189,6 +191,19 @@ export const useGameStore = create<GameState>()(
                   }
                   case 'GO_TO_PROFILES': {
                     state.setScreen(Screens.PROFILES);
+                    break;
+                  }
+                  case 'GO_TO_PARTY': {
+                    state.setScreen(Screens.PARTY);
+                    break;
+                  }
+                  case 'REORDER_CREATURES': {
+                    const payload =
+                      currentEvent.payload as ReorderCreaturesEventPayload;
+                    state.reorderCreatures(
+                      payload.startIndex,
+                      payload.endIndex
+                    );
                     break;
                   }
                   case 'PICK_STARTER': {
@@ -532,6 +547,38 @@ export const useGameStore = create<GameState>()(
             },
             false,
             'overwriteProfileCreatures'
+          ),
+        reorderCreatures: (startIndex: number, endIndex: number) =>
+          set(
+            (state) => {
+              const profileId = state.currentProfileId;
+              if (profileId === null || !state.profiles[profileId])
+                return state;
+
+              const profile = state.profiles[profileId]!;
+              const newCreatures = [...profile.creatures];
+
+              if (
+                startIndex < 0 ||
+                startIndex >= newCreatures.length ||
+                endIndex < 0 ||
+                endIndex >= newCreatures.length
+              ) {
+                return state;
+              }
+
+              const [removed] = newCreatures.splice(startIndex, 1);
+              newCreatures.splice(endIndex, 0, removed);
+
+              const newProfiles = [...state.profiles];
+              newProfiles[profileId] = {
+                ...profile,
+                creatures: newCreatures,
+              };
+              return { profiles: newProfiles };
+            },
+            false,
+            'reorderCreatures'
           ),
         useItem: (itemId: string, targetCreatureId?: string) => {
           let catchSuccess = false;

@@ -143,6 +143,26 @@ export default function DevTools() {
               >
                 Set LVL 1 Starters + Bug
               </button>
+              <button
+                onClick={() => {
+                  const thirtyCreatures = Array.from({ length: 30 }).map(
+                    (_, i) => ({
+                      ...STARTER_CRAB,
+                      id: crypto.randomUUID(),
+                      speciesId: STARTER_CRAB.id,
+                      level: 10,
+                      currentHp: STARTER_CRAB.maxHp,
+                      xp: 0,
+                      name: `Crab ${i + 1}`,
+                    })
+                  );
+                  overwriteProfileCreatures(thirtyCreatures);
+                  setShowMenu(false);
+                }}
+                className="text-sm bg-purple-900 border border-purple-500 hover:bg-purple-700 px-3 py-2 rounded text-left font-bold"
+              >
+                Populate 30 Creatures
+              </button>
             </div>
           </div>
         </div>
