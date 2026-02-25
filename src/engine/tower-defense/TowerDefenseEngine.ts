@@ -80,12 +80,12 @@ export class TowerDefenseEngine {
   }
 
   // Loaded at initialization
-  public path: { x: number; y: number }[] = [];
+  public paths: { x: number; y: number }[][] = [];
   public placementSpots: { x: number; y: number }[] = [];
 
-  constructor(levelData: import('./types').TDLevelData) {
-    this.path = levelData.path;
-    this.placementSpots = levelData.placementSpots;
+  constructor(levelData: import('./types').TDLevelData | any) {
+    this.paths = levelData.paths || [];
+    this.placementSpots = levelData.placementSpots || [];
     this.waves = levelData.waves || [];
 
     // Initialize first wave group if available
@@ -113,7 +113,7 @@ export class TowerDefenseEngine {
     let newEnemies = [...this.enemies];
     // Notice: we do NOT clone projectiles here anymore, we filter them at the end.
     // Behaviors push directly to engine.projectiles during the tick.
-    let newTowers = [...this.towers];
+    const newTowers = [...this.towers];
 
     // Spawn enemies
     if (this.waves.length > 0) {
@@ -129,16 +129,22 @@ export class TowerDefenseEngine {
 
         const randomEnemyDef =
           ENEMY_TYPES[Math.floor(Math.random() * ENEMY_TYPES.length)];
+        const pathIndex =
+          this.paths.length > 0
+            ? Math.floor(Math.random() * this.paths.length)
+            : 0;
+        const startPath = this.paths[pathIndex] || [{ x: 0, y: 0 }];
         newEnemies.push({
           id: `enemy_${time}`,
           definitionId: randomEnemyDef.id,
-          position: { x: this.path[0].x, y: this.path[0].y },
+          position: { x: startPath[0].x, y: startPath[0].y },
           hp: randomEnemyDef.maxHp,
           maxHp: randomEnemyDef.maxHp,
           speed: randomEnemyDef.speed / 100,
           currentAttack: randomEnemyDef.attack,
           statusConditions: [],
           currentWaypointIndex: 1,
+          pathIndex: pathIndex,
         });
         this.lastSpawnTime = time;
       }
@@ -172,8 +178,9 @@ export class TowerDefenseEngine {
         );
       }
 
-      if (enemy.currentWaypointIndex < this.path.length) {
-        const targetPoint = this.path[enemy.currentWaypointIndex];
+      const activePath = this.paths[enemy.pathIndex] || [];
+      if (enemy.currentWaypointIndex < activePath.length) {
+        const targetPoint = activePath[enemy.currentWaypointIndex];
         const dx = targetPoint.x - enemy.position.x;
         const dy = targetPoint.y - enemy.position.y;
 
@@ -199,9 +206,10 @@ export class TowerDefenseEngine {
     });
 
     // Enemy reached end
-    const reachedEnd = newEnemies.filter(
-      (e) => e.currentWaypointIndex >= this.path.length
-    );
+    const reachedEnd = newEnemies.filter((e) => {
+      const activePath = this.paths[e.pathIndex] || [];
+      return e.currentWaypointIndex >= activePath.length;
+    });
     if (reachedEnd.length > 0) {
       this.lives -= reachedEnd.length;
       if (this.lives <= 0) {
@@ -209,9 +217,10 @@ export class TowerDefenseEngine {
         this.lives = 0;
       }
     }
-    newEnemies = newEnemies.filter(
-      (e) => e.currentWaypointIndex < this.path.length
-    );
+    newEnemies = newEnemies.filter((e) => {
+      const activePath = this.paths[e.pathIndex] || [];
+      return e.currentWaypointIndex < activePath.length;
+    });
 
     // Towers attack
     newTowers.forEach((tower) => {
@@ -289,7 +298,7 @@ export class TowerDefenseEngine {
     newEnemies = newEnemies.filter((e) => e.hp > 0);
 
     // Keep projectiles that haven't hit yet (speed > 0)
-    let activeProjectiles = this.projectiles.filter((p) => p.speed > 0);
+    const activeProjectiles = this.projectiles.filter((p) => p.speed > 0);
 
     this.enemies = newEnemies;
     this.projectiles = activeProjectiles;
@@ -329,7 +338,12 @@ export class TowerDefenseEngine {
     // Checking if it's time to spawn
     const timeSinceLastSpawn = time - this.lastSpawnTime;
     if (timeSinceLastSpawn >= currentGroup.spawnIntervalMs) {
-      this.spawnEnemyFromDef(currentGroup.definitionId, time, newEnemies);
+      this.spawnEnemyFromDef(
+        currentGroup.definitionId,
+        time,
+        newEnemies,
+        currentGroup.pathIndex
+      );
       this.spawnsRemainingInGroup--;
       this.lastSpawnTime = time;
 
@@ -384,21 +398,26 @@ export class TowerDefenseEngine {
   private spawnEnemyFromDef(
     definitionId: string,
     time: number,
-    newEnemies: Enemy[]
+    newEnemies: Enemy[],
+    groupPathIndex: number
   ) {
     const meta = TD_CREATURE_DEFS[definitionId];
     if (!meta) return;
 
+    const pathIndex = groupPathIndex;
+    const startPath = this.paths[pathIndex] || [{ x: 0, y: 0 }];
+
     newEnemies.push({
       id: `enemy_${time}_${Math.random().toString(36).substring(7)}`,
       definitionId: definitionId,
-      position: { x: this.path[0].x, y: this.path[0].y },
+      position: { x: startPath[0].x, y: startPath[0].y },
       hp: meta.baseCreature.maxHp,
       maxHp: meta.baseCreature.maxHp,
       speed: meta.baseCreature.speed / 100,
       currentAttack: meta.baseCreature.attack,
       statusConditions: [],
       currentWaypointIndex: 1,
+      pathIndex: pathIndex,
     });
   }
 

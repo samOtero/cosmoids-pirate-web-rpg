@@ -9,7 +9,8 @@ import { TD_CREATURE_DEFS } from '@/engine/tower-defense/TowerDefenseEngine';
 export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
   const [selectedLevelKey, setSelectedLevelKey] = useState<string | null>(null);
 
-  const [pathPoints, setPathPoints] = useState<{ x: number; y: number }[]>([]);
+  const [paths, setPaths] = useState<{ x: number; y: number }[][]>([[]]);
+  const [activePathIndex, setActivePathIndex] = useState(0);
   const [placementSpots, setPlacementSpots] = useState<
     { x: number; y: number }[]
   >([]);
@@ -23,7 +24,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
     return Object.entries(tdLevels).filter(([key, value]) => {
       const val = value as any;
       return (
-        val && Array.isArray(val.path) && Array.isArray(val.placementSpots)
+        val && Array.isArray(val.paths) && Array.isArray(val.placementSpots)
       );
     }) as [string, TDLevelData][];
   }, []);
@@ -38,13 +39,19 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
     const levelData = (tdLevels as any)[key] as TDLevelData;
     if (levelData) {
       // Deep copy
-      setPathPoints(JSON.parse(JSON.stringify(levelData.path)));
+      if (levelData.paths) {
+        setPaths(JSON.parse(JSON.stringify(levelData.paths)));
+      } else {
+        setPaths([[]]);
+      }
+      setActivePathIndex(0);
       setPlacementSpots(JSON.parse(JSON.stringify(levelData.placementSpots)));
       setWaves(
         levelData.waves ? JSON.parse(JSON.stringify(levelData.waves)) : []
       );
     } else {
-      setPathPoints([]);
+      setPaths([[]]);
+      setActivePathIndex(0);
       setPlacementSpots([]);
       setWaves([]);
     }
@@ -52,7 +59,8 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
   };
 
   const handleCreateNew = () => {
-    setPathPoints([]);
+    setPaths([[]]);
+    setActivePathIndex(0);
     setPlacementSpots([]);
     setWaves([]);
     setSelectedLevelKey('NEW_LEVEL');
@@ -67,9 +75,11 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
     y: number
   ) => {
     if (type === 'PATH') {
-      setPathPoints((prev) => {
+      setPaths((prev) => {
         const next = [...prev];
-        next[index] = { ...next[index], x, y };
+        const currentPath = [...(next[activePathIndex] || [])];
+        currentPath[index] = { ...currentPath[index], x, y };
+        next[activePathIndex] = currentPath;
         return next;
       });
     } else {
@@ -83,14 +93,27 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
 
   const handlePointDelete = (type: PointType, index: number) => {
     if (type === 'PATH') {
-      setPathPoints((prev) => prev.filter((_, i) => i !== index));
+      setPaths((prev) => {
+        const next = [...prev];
+        if (next[activePathIndex]) {
+          next[activePathIndex] = next[activePathIndex].filter(
+            (_, i) => i !== index
+          );
+        }
+        return next;
+      });
     } else {
       setPlacementSpots((prev) => prev.filter((_, i) => i !== index));
     }
   };
 
   const addPathPoint = () => {
-    setPathPoints((prev) => [...prev, { x: 50, y: 50 }]);
+    setPaths((prev) => {
+      const next = [...prev];
+      if (!next[activePathIndex]) next[activePathIndex] = [];
+      next[activePathIndex] = [...next[activePathIndex], { x: 50, y: 50 }];
+      return next;
+    });
   };
 
   const addPlacementSpot = () => {
@@ -112,10 +135,12 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
     setIsSaving(true);
     try {
       const data: TDLevelData = {
-        path: pathPoints.map((p) => ({
-          x: Number(p.x.toFixed(2)),
-          y: Number(p.y.toFixed(2)),
-        })),
+        paths: paths.map((path) =>
+          path.map((p) => ({
+            x: Number(p.x.toFixed(2)),
+            y: Number(p.y.toFixed(2)),
+          }))
+        ),
         placementSpots: placementSpots.map((s) => ({
           x: Number(s.x.toFixed(2)),
           y: Number(s.y.toFixed(2)),
@@ -168,6 +193,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
         count: 5,
         spawnIntervalMs: 1000,
         delayBeforeGroupMs: 0,
+        pathIndex: 0,
       });
       return next;
     });
@@ -263,6 +289,40 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="flex items-center gap-4">
+          <select
+            value={activePathIndex}
+            onChange={(e) => setActivePathIndex(Number(e.target.value))}
+            className="bg-slate-950 text-white px-2 py-1 rounded text-sm border border-slate-700"
+          >
+            {paths.map((_, i) => (
+              <option key={i} value={i}>
+                Path {i}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={() => setPaths((prev) => [...prev, []])}
+            className="text-xs bg-cyan-700 hover:bg-cyan-600 px-2 py-1 rounded text-white"
+          >
+            + New Path
+          </button>
+          <button
+            onClick={() => {
+              if (paths.length > 1) {
+                setPaths((prev) =>
+                  prev.filter((_, i) => i !== activePathIndex)
+                );
+                setActivePathIndex((prev) => Math.max(0, prev - 1));
+              }
+            }}
+            disabled={paths.length <= 1}
+            className="text-xs bg-red-700 hover:bg-red-600 px-2 py-1 rounded text-white disabled:bg-slate-600"
+          >
+            Del Path
+          </button>
+
+          <div className="w-px h-6 bg-slate-600 mx-2" />
+
           <button
             onClick={addPathPoint}
             className="px-4 py-2 bg-red-700 hover:bg-red-600 rounded text-white font-bold text-sm"
@@ -310,7 +370,8 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
 
       <div className="flex-1 flex overflow-hidden">
         <PixiTDLevelEditor
-          pathPoints={pathPoints}
+          paths={paths}
+          activePathIndex={activePathIndex}
           placementSpots={placementSpots}
           deleteMode={deleteMode}
           onPointMove={handlePointMove}
@@ -452,6 +513,29 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
                             }
                             className="w-full bg-slate-950 text-white rounded p-1 border border-slate-700"
                           />
+                        </div>
+                        <div>
+                          <label className="block text-slate-400 mb-1">
+                            Path Index
+                          </label>
+                          <select
+                            value={group.pathIndex}
+                            onChange={(e) =>
+                              updateGroup(
+                                wIdx,
+                                gIdx,
+                                'pathIndex',
+                                parseInt(e.target.value)
+                              )
+                            }
+                            className="w-full bg-slate-950 text-white rounded p-1 border border-slate-700"
+                          >
+                            {paths.map((_, i) => (
+                              <option key={i} value={i}>
+                                Path {i}
+                              </option>
+                            ))}
+                          </select>
                         </div>
                       </div>
                     </div>

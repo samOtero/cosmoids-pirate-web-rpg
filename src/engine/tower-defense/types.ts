@@ -27,6 +27,7 @@ export interface TDWaveGroup {
   count: number; // How many to spawn
   spawnIntervalMs: number; // Time between each spawn in this group
   delayBeforeGroupMs: number; // Delay before this group starts (after wave start or previous group ends)
+  pathIndex: number; // Which path enemies in this group should take
 }
 
 export interface TDWave {
@@ -35,7 +36,7 @@ export interface TDWave {
 }
 
 export interface TDLevelData {
-  path: Point[];
+  paths: Point[][];
   placementSpots: Point[];
   waves?: TDWave[]; // Optional for backwards compatibility
 }
@@ -70,6 +71,7 @@ export interface Enemy {
   currentAttack: number;
   statusConditions: StatusCondition[];
   currentWaypointIndex: number;
+  pathIndex: number; // Index into the level's `paths` array
 }
 
 export interface Projectile {

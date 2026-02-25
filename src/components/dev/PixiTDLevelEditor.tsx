@@ -4,7 +4,8 @@ import * as PIXI from 'pixi.js';
 export type PointType = 'PATH' | 'PLACEMENT';
 
 interface PixiTDLevelEditorProps {
-  pathPoints: { x: number; y: number }[];
+  paths: { x: number; y: number }[][];
+  activePathIndex: number;
   placementSpots: { x: number; y: number }[];
   deleteMode: boolean;
   onPointMove: (type: PointType, index: number, x: number, y: number) => void;
@@ -12,7 +13,8 @@ interface PixiTDLevelEditorProps {
 }
 
 export default function PixiTDLevelEditor({
-  pathPoints,
+  paths,
+  activePathIndex,
   placementSpots,
   deleteMode,
   onPointMove,
@@ -22,7 +24,8 @@ export default function PixiTDLevelEditor({
   const onPointMoveRef = useRef(onPointMove);
   const onPointDeleteRef = useRef(onPointDelete);
   const deleteModeRef = useRef(deleteMode);
-  const pathPointsRef = useRef(pathPoints);
+  const pathsRef = useRef(paths);
+  const activePathIndexRef = useRef(activePathIndex);
   const placementSpotsRef = useRef(placementSpots);
 
   useEffect(() => {
@@ -35,8 +38,11 @@ export default function PixiTDLevelEditor({
     deleteModeRef.current = deleteMode;
   }, [deleteMode]);
   useEffect(() => {
-    pathPointsRef.current = pathPoints;
-  }, [pathPoints]);
+    pathsRef.current = paths;
+  }, [paths]);
+  useEffect(() => {
+    activePathIndexRef.current = activePathIndex;
+  }, [activePathIndex]);
   useEffect(() => {
     placementSpotsRef.current = placementSpots;
   }, [placementSpots]);
@@ -216,27 +222,37 @@ export default function PixiTDLevelEditor({
       app.ticker.add(() => {
         if (bgBounds.width === 0) return;
 
-        const currentPathPoints = pathPointsRef.current;
+        const currentPaths = pathsRef.current;
+        const currentActivePathIndex = activePathIndexRef.current;
         const currentPlacementSpots = placementSpotsRef.current;
 
         // Draw Path lines
         pathGraphics.clear();
         app.stage.setChildIndex(pathGraphics, 1); // just above background
-        if (currentPathPoints.length > 0) {
-          pathGraphics.moveTo(
-            bgBounds.x + (currentPathPoints[0].x / 100) * bgBounds.width,
-            bgBounds.y + (currentPathPoints[0].y / 100) * bgBounds.height
-          );
-          for (let i = 1; i < currentPathPoints.length; i++) {
-            pathGraphics.lineTo(
-              bgBounds.x + (currentPathPoints[i].x / 100) * bgBounds.width,
-              bgBounds.y + (currentPathPoints[i].y / 100) * bgBounds.height
-            );
-          }
-          pathGraphics.stroke({ color: 0xff0000, width: 4, alpha: 0.6 });
-        }
 
-        // Render Path Points
+        currentPaths.forEach((pathPoints, pIdx) => {
+          if (pathPoints.length > 0) {
+            pathGraphics.moveTo(
+              bgBounds.x + (pathPoints[0].x / 100) * bgBounds.width,
+              bgBounds.y + (pathPoints[0].y / 100) * bgBounds.height
+            );
+            for (let i = 1; i < pathPoints.length; i++) {
+              pathGraphics.lineTo(
+                bgBounds.x + (pathPoints[i].x / 100) * bgBounds.width,
+                bgBounds.y + (pathPoints[i].y / 100) * bgBounds.height
+              );
+            }
+            const isActive = pIdx === currentActivePathIndex;
+            pathGraphics.stroke({
+              color: isActive ? 0xff0000 : 0xaaaaaa,
+              width: isActive ? 4 : 2,
+              alpha: isActive ? 0.8 : 0.4,
+            });
+          }
+        });
+
+        // Render Path Points for the active path only
+        const currentPathPoints = currentPaths[currentActivePathIndex] || [];
         for (const [key, node] of pathNodes.entries()) {
           if (key >= currentPathPoints.length) {
             app.stage.removeChild(node);
