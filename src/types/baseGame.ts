@@ -50,6 +50,7 @@ export enum BackgroundImageKey {
   ISLAND_1 = 'Island_1',
   FOREST = 'Forest',
   FOREST_2 = 'Forest_2',
+  DOCK_PIXEL = 'Dock_Pixel',
   DEFAULT = 'default',
 }
 

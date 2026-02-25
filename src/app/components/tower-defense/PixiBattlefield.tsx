@@ -89,12 +89,10 @@ export default function PixiBattlefield({
       containerRef.current!.appendChild(app.canvas);
 
       // Add background
-      await PIXI.Assets.load('/battles/bg/bg_first_island_forest_battle.png');
+      await PIXI.Assets.load('/battles/bg/bg_dock_battle_pixel.png');
       if (isDestroyed) return;
 
-      const bgSprite = PIXI.Sprite.from(
-        '/battles/bg/bg_first_island_forest_battle.png'
-      );
+      const bgSprite = PIXI.Sprite.from('/battles/bg/bg_dock_battle_pixel.png');
       bgSprite.width = app.screen.width;
       bgSprite.height = app.screen.height;
       app.stage.addChild(bgSprite);
