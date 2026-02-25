@@ -308,7 +308,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
         </div>
       </div>
 
-      <div className="flex-1 relative flex">
+      <div className="flex-1 flex overflow-hidden">
         <PixiTDLevelEditor
           pathPoints={pathPoints}
           placementSpots={placementSpots}
@@ -318,7 +318,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
         />
 
         {/* Waves Editor Sidebar */}
-        <div className="absolute right-0 top-0 bottom-0 w-80 bg-slate-800 border-l border-cyan-800 overflow-y-auto p-4 opacity-95">
+        <div className="w-80 shrink-0 bg-slate-800 border-l border-cyan-800 overflow-y-auto p-4 origin-right">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold text-cyan-400">
               Waves ({waves.length})
