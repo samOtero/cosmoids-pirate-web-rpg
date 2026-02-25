@@ -53,6 +53,7 @@ interface GameState {
   selectProfile: (slotId: number) => void;
   addCreatureToProfile: (slotId: number, creature: Creature) => void;
   updateCreatures: (creatures: Creature[]) => void;
+  overwriteProfileCreatures: (creatures: Creature[]) => void;
   useItem: (itemId: string, targetCreatureId?: string) => boolean | void;
 
   // Progression
@@ -510,6 +511,27 @@ export const useGameStore = create<GameState>()(
             },
             false,
             'updateCreatures'
+          ),
+        overwriteProfileCreatures: (creatures: Creature[]) =>
+          set(
+            (state) => {
+              const profileId = state.currentProfileId;
+              if (profileId === null || !state.profiles[profileId])
+                return state;
+
+              const newProfiles = [...state.profiles];
+              newProfiles[profileId] = {
+                ...newProfiles[profileId]!,
+                creatures: creatures.map((c) => ({
+                  ...c,
+                  speciesId: c.id,
+                  id: crypto.randomUUID(),
+                })),
+              };
+              return { profiles: newProfiles };
+            },
+            false,
+            'overwriteProfileCreatures'
           ),
         useItem: (itemId: string, targetCreatureId?: string) => {
           let catchSuccess = false;

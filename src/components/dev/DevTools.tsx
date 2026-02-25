@@ -1,6 +1,13 @@
 'use client';
 
 import React, { useEffect, useState, lazy, Suspense } from 'react';
+import { useGameStore } from '@/store/gameStore';
+import {
+  STARTER_CRAB,
+  STARTER_IGUANA,
+  STARTER_MONKEY,
+  BUG_STAGE_1,
+} from '@/constants/creatures';
 
 const DialogEditor = lazy(() => import('./DialogEditor'));
 const AnimationEditor = lazy(() => import('./AnimationEditor'));
@@ -25,6 +32,9 @@ type ToolType =
 export default function DevTools() {
   const [activeTool, setActiveTool] = useState<ToolType>(null);
   const [showMenu, setShowMenu] = useState(false);
+  const overwriteProfileCreatures = useGameStore(
+    (state) => state.overwriteProfileCreatures
+  );
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -112,6 +122,26 @@ export default function DevTools() {
                 className="text-sm bg-slate-800 hover:bg-cyan-700 px-3 py-2 rounded text-left"
               >
                 TD Level Editor
+              </button>
+              <button
+                onClick={() => {
+                  const level1Starters = [
+                    STARTER_CRAB,
+                    STARTER_IGUANA,
+                    STARTER_MONKEY,
+                    BUG_STAGE_1,
+                  ].map((c) => ({
+                    ...c,
+                    level: 1,
+                    currentHp: c.maxHp,
+                    xp: 0,
+                  }));
+                  overwriteProfileCreatures(level1Starters);
+                  setShowMenu(false);
+                }}
+                className="text-sm bg-purple-900 border border-purple-500 hover:bg-purple-700 px-3 py-2 rounded text-left font-bold"
+              >
+                Set LVL 1 Starters + Bug
               </button>
             </div>
           </div>
