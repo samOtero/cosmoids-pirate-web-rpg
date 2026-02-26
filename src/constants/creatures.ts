@@ -20,6 +20,7 @@ export const SENTICLE: Creature = {
   currentEnergy: 0,
   battlePosition: { bottom: 8, left: 15 },
   battleScale: 0.85,
+  speciesId: '',
 };
 
 export const BUG_STAGE_1: Creature = {
@@ -41,6 +42,7 @@ export const BUG_STAGE_1: Creature = {
   movementId: 'lizard',
   battlePosition: { bottom: -0.5, left: 17 },
   battleScale: 0.75,
+  speciesId: '',
 };
 
 export const BUG_STAGE_2: Creature = {
@@ -62,6 +64,7 @@ export const BUG_STAGE_2: Creature = {
   movementId: 'lizard',
   battlePosition: { bottom: 21.5, left: 23.5 },
   battleScale: 1.25,
+  speciesId: '',
 };
 
 export const BUG_STAGE_3: Creature = {
@@ -83,6 +86,7 @@ export const BUG_STAGE_3: Creature = {
   movementId: 'lizard',
   battlePosition: { bottom: 19, left: 12 },
   battleScale: 0.85,
+  speciesId: '',
 };
 
 // Starter Cosmoid Definitions
@@ -102,6 +106,7 @@ export const STARTER_CRAB: Creature = {
   battleSpriteUrl: '/crab-starter-grass-neutral-skin-1.png',
   startingEnergy: 100,
   currentEnergy: 100,
+  speciesId: '',
 };
 
 export const STARTER_IGUANA: Creature = {
@@ -116,14 +121,14 @@ export const STARTER_IGUANA: Creature = {
   level: 1,
   xp: 0,
   moves: ['Ember', 'Scratch'],
-  spriteUrl: '/iguana_starter_fire_neutral_skin_1.png',
-  battleSpriteUrl:
-    '/battles/cosmoids/iguana_starter_fire_neutral_skin_1_transparent_actual.png',
+  spriteUrl: '/battles/cosmoids/fueguana_left_1.png',
+  battleSpriteUrl: '/battles/cosmoids/fueguana_left_1.png',
   movementId: 'lizard',
   startingEnergy: 100,
   currentEnergy: 100,
   battlePosition: { bottom: 2.5, left: 14.5 },
   battleScale: 0.85,
+  speciesId: '',
 };
 
 export const STARTER_MONKEY: Creature = {
@@ -142,4 +147,5 @@ export const STARTER_MONKEY: Creature = {
   battleSpriteUrl: '/monkey_starter_water_battle_skin_1_actual.png',
   startingEnergy: 100,
   currentEnergy: 100,
+  speciesId: '',
 };
