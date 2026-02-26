@@ -283,6 +283,7 @@ export default function PixiBattlefield({
             PIXI.Assets.load(spriteUrl).then((texture) => {
               if (isDestroyed || !towerSprites.has(cacheKey)) return;
               const tsprite = new PIXI.Sprite(texture);
+              tsprite.label = 'tower_sprite';
               tsprite.anchor.set(0.5);
               const scale = baseCreature.tdSpriteScale || 1;
               tsprite.scale.set(scale);
@@ -309,6 +310,23 @@ export default function PixiBattlefield({
           const rCircle = container.getChildByLabel('rangeCircle');
           if (rCircle) {
             rCircle.visible = draggingTowerCreatureId === tower.creatureId;
+          }
+
+          const tsprite = container.getChildByLabel('tower_sprite') as
+            | PIXI.Sprite
+            | undefined;
+          if (tsprite) {
+            const baseCreature = TD_CREATURE_DEFS[tower.speciesId].baseCreature;
+            const bScale = baseCreature.tdSpriteScale || 1;
+            tsprite.scale.x =
+              tower.facingDirection === 'right' ? -bScale : bScale;
+          }
+
+          const shadow = container.getChildByLabel('shadow') as
+            | PIXI.Graphics
+            | undefined;
+          if (shadow) {
+            shadow.scale.x = tower.facingDirection === 'right' ? -1 : 1;
           }
         }
 

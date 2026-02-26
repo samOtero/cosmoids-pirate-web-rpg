@@ -52,6 +52,7 @@ export interface Tower {
   currentAttack: number;
   equippedAttacks: Array<{ definitionId: string; lastFiredTime: number }>;
   selectedAttackIndex: number;
+  facingDirection?: 'left' | 'right';
 }
 
 export interface StatusCondition {

@@ -230,7 +230,27 @@ export class TowerDefenseEngine {
       const attackDef = ATTACK_DEFS[attackInstance.definitionId];
       if (!attackDef) return;
 
-      if (time - attackInstance.lastFiredTime > attackDef.cooldownMs) {
+      const isReady =
+        time - attackInstance.lastFiredTime > attackDef.cooldownMs;
+
+      if (isReady) {
+        let nearestEnemy: Enemy | null = null;
+        let minTargetDist = attackDef.rangeIndex;
+        for (const enemy of newEnemies) {
+          const dx = enemy.position.x - tower.position.x;
+          const dy = enemy.position.y - tower.position.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist <= minTargetDist) {
+            minTargetDist = dist;
+            nearestEnemy = enemy;
+          }
+        }
+
+        if (nearestEnemy) {
+          tower.facingDirection =
+            nearestEnemy.position.x > tower.position.x ? 'right' : 'left';
+        }
+
         const behavior = AttackBehaviorRegistry[attackDef.behaviorType];
 
         if (behavior && behavior.canExecute(this, tower, attackDef)) {
@@ -504,6 +524,7 @@ export class TowerDefenseEngine {
         lastFiredTime: 0,
       })),
       selectedAttackIndex: this.playerSelectedAttacks[creature.id] || 0,
+      facingDirection: 'left',
     });
     return true;
   }
