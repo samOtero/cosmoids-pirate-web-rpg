@@ -90,6 +90,10 @@ export interface Creature {
   battlePosition?: { bottom: number; left: number }; // percentage 0-100
   battleScale?: number; // multiplier, 1 = default
   tdSpriteScale?: number; // multiplier, 1 = default (80x80)
+  tdShadowScaleX?: number; // multiplier for shadow X size, 1 = default
+  tdShadowScaleY?: number; // multiplier for shadow Y size, 1 = default
+  tdShadowOffsetX?: number; // X offset for shadow, 0 = default
+  tdShadowOffsetY?: number; // Y offset for shadow, 0 = default
   movementId?: string;
   startingEnergy: number;
   currentEnergy: number;

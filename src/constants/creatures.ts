@@ -130,6 +130,10 @@ export const STARTER_IGUANA: Creature = {
 
   speciesId: '',
   tdSpriteScale: 0.3,
+  tdShadowScaleX: 1.9,
+  tdShadowScaleY: 1.15,
+  tdShadowOffsetX: -7,
+  tdShadowOffsetY: 13,
 };
 
 export const STARTER_MONKEY: Creature = {

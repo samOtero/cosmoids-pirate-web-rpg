@@ -260,6 +260,24 @@ export default function PixiBattlefield({
             });
 
             const baseCreature = TD_CREATURE_DEFS[tower.speciesId].baseCreature;
+
+            // Shadow
+            const shadow = new PIXI.Graphics();
+            shadow.label = 'shadow';
+            const shadowScaleX = baseCreature.tdShadowScaleX ?? 1;
+            const shadowScaleY = baseCreature.tdShadowScaleY ?? 1;
+            const shadowOffsetX = baseCreature.tdShadowOffsetX ?? 0;
+            const shadowOffsetY = baseCreature.tdShadowOffsetY ?? 0;
+            const spriteScale = baseCreature.tdSpriteScale ?? 1;
+            shadow.ellipse(
+              0 + shadowOffsetX,
+              30 * spriteScale + shadowOffsetY,
+              25 * shadowScaleX,
+              12 * shadowScaleY
+            );
+            shadow.fill({ color: 0x000000, alpha: 0.4 });
+            container.addChild(shadow);
+
             const spriteUrl =
               baseCreature.battleSpriteUrl || baseCreature.spriteUrl;
             PIXI.Assets.load(spriteUrl).then((texture) => {
@@ -268,7 +286,7 @@ export default function PixiBattlefield({
               tsprite.anchor.set(0.5);
               const scale = baseCreature.tdSpriteScale || 1;
               tsprite.scale.set(scale);
-              container!.addChildAt(tsprite, 0);
+              container!.addChildAt(tsprite, 1);
             });
 
             const rangeCircle = new PIXI.Graphics();

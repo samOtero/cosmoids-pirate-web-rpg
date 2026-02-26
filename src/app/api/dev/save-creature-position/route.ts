@@ -17,8 +17,16 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { creatureVarName, battlePosition, battleScale, tdSpriteScale } =
-      body;
+    const {
+      creatureVarName,
+      battlePosition,
+      battleScale,
+      tdSpriteScale,
+      tdShadowScaleX,
+      tdShadowScaleY,
+      tdShadowOffsetX,
+      tdShadowOffsetY,
+    } = body;
 
     if (!creatureVarName) {
       return NextResponse.json(
@@ -60,11 +68,27 @@ export async function POST(request: NextRequest) {
       '\n'
     );
     creatureBlock = creatureBlock.replace(
-      /\s*battleScale:\s*[\d.]+,?\n?/,
+      /\s*tdSpriteScale:\s*[\d.]+,?\n?/,
       '\n'
     );
     creatureBlock = creatureBlock.replace(
-      /\s*tdSpriteScale:\s*[\d.]+,?\n?/,
+      /\s*tdShadowScale:\s*[\d.]+,?\n?/,
+      '\n'
+    );
+    creatureBlock = creatureBlock.replace(
+      /\s*tdShadowScaleX:\s*[\d.]+,?\n?/,
+      '\n'
+    );
+    creatureBlock = creatureBlock.replace(
+      /\s*tdShadowScaleY:\s*[\d.]+,?\n?/,
+      '\n'
+    );
+    creatureBlock = creatureBlock.replace(
+      /\s*tdShadowOffsetX:\s*[+-]?[\d.]+,?\n?/,
+      '\n'
+    );
+    creatureBlock = creatureBlock.replace(
+      /\s*tdShadowOffsetY:\s*[+-]?[\d.]+,?\n?/,
       '\n'
     );
 
@@ -83,6 +107,18 @@ export async function POST(request: NextRequest) {
     }
     if (tdSpriteScale !== undefined && tdSpriteScale !== 1) {
       creatureBlock += `  tdSpriteScale: ${tdSpriteScale},\n`;
+    }
+    if (tdShadowScaleX !== undefined && tdShadowScaleX !== 1) {
+      creatureBlock += `  tdShadowScaleX: ${tdShadowScaleX},\n`;
+    }
+    if (tdShadowScaleY !== undefined && tdShadowScaleY !== 1) {
+      creatureBlock += `  tdShadowScaleY: ${tdShadowScaleY},\n`;
+    }
+    if (tdShadowOffsetX !== undefined && tdShadowOffsetX !== 0) {
+      creatureBlock += `  tdShadowOffsetX: ${tdShadowOffsetX},\n`;
+    }
+    if (tdShadowOffsetY !== undefined && tdShadowOffsetY !== 0) {
+      creatureBlock += `  tdShadowOffsetY: ${tdShadowOffsetY},\n`;
     }
 
     const newBlock = match[1] + creatureBlock + match[3];

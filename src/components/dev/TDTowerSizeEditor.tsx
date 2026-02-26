@@ -35,23 +35,55 @@ export default function TDTowerSizeEditor({
 
   // Position state – initialized from creature data or defaults
   const [scale, setScale] = useState(creature.tdSpriteScale ?? 1);
+  const [shadowScaleX, setShadowScaleX] = useState(
+    creature.tdShadowScaleX ?? 1
+  );
+  const [shadowScaleY, setShadowScaleY] = useState(
+    creature.tdShadowScaleY ?? 1
+  );
+  const [shadowOffsetX, setShadowOffsetX] = useState(
+    creature.tdShadowOffsetX ?? 0
+  );
+  const [shadowOffsetY, setShadowOffsetY] = useState(
+    creature.tdShadowOffsetY ?? 0
+  );
 
   const [saving, setSaving] = useState(false);
   const [statusMsg, setStatusMsg] = useState('');
 
   const containerRef = useRef<HTMLDivElement>(null);
   const scaleRef = useRef(scale);
+  const shadowScaleXRef = useRef(shadowScaleX);
+  const shadowScaleYRef = useRef(shadowScaleY);
+  const shadowOffsetXRef = useRef(shadowOffsetX);
+  const shadowOffsetYRef = useRef(shadowOffsetY);
 
   // Keep ref in sync for PIXI ticker without re-instantiating PIXI
   useEffect(() => {
     scaleRef.current = scale;
   }, [scale]);
+  useEffect(() => {
+    shadowScaleXRef.current = shadowScaleX;
+  }, [shadowScaleX]);
+  useEffect(() => {
+    shadowScaleYRef.current = shadowScaleY;
+  }, [shadowScaleY]);
+  useEffect(() => {
+    shadowOffsetXRef.current = shadowOffsetX;
+  }, [shadowOffsetX]);
+  useEffect(() => {
+    shadowOffsetYRef.current = shadowOffsetY;
+  }, [shadowOffsetY]);
 
   // When creature selection changes, load its saved values
   const handleCreatureChange = (index: number) => {
     setSelectedIndex(index);
     const c = ALL_CREATURES[index].creature;
     setScale(c.tdSpriteScale ?? 1);
+    setShadowScaleX(c.tdShadowScaleX ?? 1);
+    setShadowScaleY(c.tdShadowScaleY ?? 1);
+    setShadowOffsetX(c.tdShadowOffsetX ?? 0);
+    setShadowOffsetY(c.tdShadowOffsetY ?? 0);
   };
 
   const handleSave = async () => {
@@ -64,6 +96,10 @@ export default function TDTowerSizeEditor({
         body: JSON.stringify({
           creatureVarName: selectedEntry.varName,
           tdSpriteScale: scale,
+          tdShadowScaleX: shadowScaleX,
+          tdShadowScaleY: shadowScaleY,
+          tdShadowOffsetX: shadowOffsetX,
+          tdShadowOffsetY: shadowOffsetY,
         }),
       });
       const data = await res.json();
@@ -86,6 +122,7 @@ export default function TDTowerSizeEditor({
     let isDestroyed = false;
     let sprite: PIXI.Sprite | null = null;
     let box: PIXI.Graphics | null = null;
+    let shadow: PIXI.Graphics | null = null;
 
     const initPixi = async () => {
       await app.init({
@@ -111,6 +148,10 @@ export default function TDTowerSizeEditor({
       // 80x80 reference box
       box = new PIXI.Graphics();
       app.stage.addChild(box);
+
+      // Shadow
+      shadow = new PIXI.Graphics();
+      app.stage.addChild(shadow);
 
       const spriteUrl = creature.battleSpriteUrl || creature.spriteUrl;
       const texture = await PIXI.Assets.load(spriteUrl);
@@ -144,6 +185,19 @@ export default function TDTowerSizeEditor({
         box!.clear();
         box!.rect(centerX - 40, centerY - 40, 80, 80);
         box!.stroke({ color: 0xef4444, width: 2, alpha: 0.5 }); // Red reference box
+
+        if (shadow) {
+          shadow.clear();
+          const currentShadowScaleX = shadowScaleXRef.current;
+          const currentShadowScaleY = shadowScaleYRef.current;
+          shadow.ellipse(
+            centerX + shadowOffsetXRef.current,
+            centerY + 30 * scaleRef.current + shadowOffsetYRef.current,
+            25 * currentShadowScaleX,
+            12 * currentShadowScaleY
+          );
+          shadow.fill({ color: 0x000000, alpha: 0.4 });
+        }
 
         if (sprite) {
           sprite.x = centerX;
@@ -208,7 +262,6 @@ export default function TDTowerSizeEditor({
               Tower Sprite Scale
             </label>
 
-            {/* Scale */}
             <div className="space-y-0.5">
               <div className="flex justify-between text-[10px] text-slate-400">
                 <span>Scale (Default is 1 = Original Size)</span>
@@ -226,8 +279,81 @@ export default function TDTowerSizeEditor({
                 className="w-full accent-cyan-500 h-2"
               />
             </div>
-            <div className="flex justify-between text-[10px] text-slate-500 font-mono">
-              <span>Current Scale: {scale}x</span>
+
+            {/* Shadow Scale X */}
+            <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mt-4">
+              Tower Shadow Shape
+            </label>
+            <div className="space-y-0.5 mt-2">
+              <div className="flex justify-between text-[10px] text-slate-400">
+                <span>Scale X (Default is 1)</span>
+                <span className="font-mono text-cyan-400">
+                  {shadowScaleX.toFixed(2)}x
+                </span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={3}
+                step={0.05}
+                value={shadowScaleX}
+                onChange={(e) => setShadowScaleX(Number(e.target.value))}
+                className="w-full accent-cyan-500 h-2"
+              />
+            </div>
+            {/* Shadow Scale Y */}
+            <div className="space-y-0.5 mt-2">
+              <div className="flex justify-between text-[10px] text-slate-400">
+                <span>Scale Y (Default is 1)</span>
+                <span className="font-mono text-cyan-400">
+                  {shadowScaleY.toFixed(2)}x
+                </span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={3}
+                step={0.05}
+                value={shadowScaleY}
+                onChange={(e) => setShadowScaleY(Number(e.target.value))}
+                className="w-full accent-cyan-500 h-2"
+              />
+            </div>
+            {/* Shadow Offset X */}
+            <div className="space-y-0.5 mt-2">
+              <div className="flex justify-between text-[10px] text-slate-400">
+                <span>Offset X (Default is 0)</span>
+                <span className="font-mono text-cyan-400">
+                  {shadowOffsetX}px
+                </span>
+              </div>
+              <input
+                type="range"
+                min={-100}
+                max={100}
+                step={1}
+                value={shadowOffsetX}
+                onChange={(e) => setShadowOffsetX(Number(e.target.value))}
+                className="w-full accent-cyan-500 h-2"
+              />
+            </div>
+            {/* Shadow Offset Y */}
+            <div className="space-y-0.5 mt-2">
+              <div className="flex justify-between text-[10px] text-slate-400">
+                <span>Offset Y (Default is 0)</span>
+                <span className="font-mono text-cyan-400">
+                  {shadowOffsetY}px
+                </span>
+              </div>
+              <input
+                type="range"
+                min={-100}
+                max={100}
+                step={1}
+                value={shadowOffsetY}
+                onChange={(e) => setShadowOffsetY(Number(e.target.value))}
+                className="w-full accent-cyan-500 h-2"
+              />
             </div>
           </div>
 
@@ -254,6 +380,10 @@ export default function TDTowerSizeEditor({
               {JSON.stringify(
                 {
                   tdSpriteScale: scale,
+                  tdShadowScaleX: shadowScaleX,
+                  tdShadowScaleY: shadowScaleY,
+                  tdShadowOffsetX: shadowOffsetX,
+                  tdShadowOffsetY: shadowOffsetY,
                 },
                 null,
                 2
