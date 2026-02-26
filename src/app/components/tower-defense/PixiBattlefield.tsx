@@ -266,8 +266,8 @@ export default function PixiBattlefield({
               if (isDestroyed || !towerSprites.has(cacheKey)) return;
               const tsprite = new PIXI.Sprite(texture);
               tsprite.anchor.set(0.5);
-              tsprite.width = 80;
-              tsprite.height = 80;
+              const scale = baseCreature.tdSpriteScale || 1;
+              tsprite.scale.set(scale);
               container!.addChildAt(tsprite, 0);
             });
 

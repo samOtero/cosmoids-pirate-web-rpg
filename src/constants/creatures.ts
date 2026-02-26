@@ -18,9 +18,9 @@ export const SENTICLE: Creature = {
   movementId: 'lizard',
   startingEnergy: 0,
   currentEnergy: 0,
-  battlePosition: { bottom: 8, left: 15 },
-  battleScale: 0.85,
+
   speciesId: '',
+  tdSpriteScale: 0.35,
 };
 
 export const BUG_STAGE_1: Creature = {
@@ -40,9 +40,9 @@ export const BUG_STAGE_1: Creature = {
   startingEnergy: 50,
   currentEnergy: 50,
   movementId: 'lizard',
-  battlePosition: { bottom: -0.5, left: 17 },
-  battleScale: 0.75,
+
   speciesId: '',
+  tdSpriteScale: 0.1,
 };
 
 export const BUG_STAGE_2: Creature = {
@@ -107,6 +107,7 @@ export const STARTER_CRAB: Creature = {
   startingEnergy: 100,
   currentEnergy: 100,
   speciesId: '',
+  tdSpriteScale: 0.1,
 };
 
 export const STARTER_IGUANA: Creature = {
@@ -126,9 +127,9 @@ export const STARTER_IGUANA: Creature = {
   movementId: 'lizard',
   startingEnergy: 100,
   currentEnergy: 100,
-  battlePosition: { bottom: 2.5, left: 14.5 },
-  battleScale: 0.85,
+
   speciesId: '',
+  tdSpriteScale: 0.3,
 };
 
 export const STARTER_MONKEY: Creature = {
@@ -148,4 +149,5 @@ export const STARTER_MONKEY: Creature = {
   startingEnergy: 100,
   currentEnergy: 100,
   speciesId: '',
+  tdSpriteScale: 0.1,
 };

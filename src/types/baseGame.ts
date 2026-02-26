@@ -89,6 +89,7 @@ export interface Creature {
   battleSpriteUrl?: string;
   battlePosition?: { bottom: number; left: number }; // percentage 0-100
   battleScale?: number; // multiplier, 1 = default
+  tdSpriteScale?: number; // multiplier, 1 = default (80x80)
   movementId?: string;
   startingEnergy: number;
   currentEnergy: number;

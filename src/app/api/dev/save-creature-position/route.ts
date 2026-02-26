@@ -4,7 +4,7 @@ import path from 'path';
 
 /**
  * Dev-only API route to save creature battle position & scale directly to creatures.ts.
- * POST body: { creatureVarName: string, battlePosition: { bottom: number, left: number }, battleScale: number }
+ * POST body: { creatureVarName: string, battlePosition: { bottom: number, left: number }, battleScale: number, tdSpriteScale: number }
  */
 export async function POST(request: NextRequest) {
   // Only allow in development
@@ -17,7 +17,8 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { creatureVarName, battlePosition, battleScale } = body;
+    const { creatureVarName, battlePosition, battleScale, tdSpriteScale } =
+      body;
 
     if (!creatureVarName) {
       return NextResponse.json(
@@ -53,14 +54,17 @@ export async function POST(request: NextRequest) {
 
     let creatureBlock = match[2];
 
-    // Remove existing battlePosition if present
+    // Remove existing properties if present
     creatureBlock = creatureBlock.replace(
       /\s*battlePosition:\s*\{[^}]*\},?\n?/,
       '\n'
     );
-    // Remove existing battleScale if present
     creatureBlock = creatureBlock.replace(
       /\s*battleScale:\s*[\d.]+,?\n?/,
+      '\n'
+    );
+    creatureBlock = creatureBlock.replace(
+      /\s*tdSpriteScale:\s*[\d.]+,?\n?/,
       '\n'
     );
 
@@ -76,6 +80,9 @@ export async function POST(request: NextRequest) {
     }
     if (battleScale !== undefined && battleScale !== 1) {
       creatureBlock += `  battleScale: ${battleScale},\n`;
+    }
+    if (tdSpriteScale !== undefined && tdSpriteScale !== 1) {
+      creatureBlock += `  tdSpriteScale: ${tdSpriteScale},\n`;
     }
 
     const newBlock = match[1] + creatureBlock + match[3];
