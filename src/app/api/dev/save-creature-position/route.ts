@@ -68,19 +68,19 @@ export async function POST(request: NextRequest) {
       '\n'
     );
     creatureBlock = creatureBlock.replace(
-      /\s*tdSpriteScale:\s*[\d.]+,?\n?/,
+      /\s*tdSpriteScale:\s*[+-]?[\d.]+,?\n?/,
       '\n'
     );
     creatureBlock = creatureBlock.replace(
-      /\s*tdShadowScale:\s*[\d.]+,?\n?/,
+      /\s*tdShadowScale:\s*[+-]?[\d.]+,?\n?/,
       '\n'
     );
     creatureBlock = creatureBlock.replace(
-      /\s*tdShadowScaleX:\s*[\d.]+,?\n?/,
+      /\s*tdShadowScaleX:\s*[+-]?[\d.]+,?\n?/,
       '\n'
     );
     creatureBlock = creatureBlock.replace(
-      /\s*tdShadowScaleY:\s*[\d.]+,?\n?/,
+      /\s*tdShadowScaleY:\s*[+-]?[\d.]+,?\n?/,
       '\n'
     );
     creatureBlock = creatureBlock.replace(

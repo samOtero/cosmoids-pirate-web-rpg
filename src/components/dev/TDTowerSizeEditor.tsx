@@ -271,9 +271,9 @@ export default function TDTowerSizeEditor({
               </div>
               <input
                 type="range"
-                min={0.1}
-                max={3}
-                step={0.05}
+                min={-2}
+                max={5}
+                step={0.01}
                 value={scale}
                 onChange={(e) => setScale(Number(e.target.value))}
                 className="w-full accent-cyan-500 h-2"
@@ -293,8 +293,8 @@ export default function TDTowerSizeEditor({
               </div>
               <input
                 type="range"
-                min={0}
-                max={3}
+                min={-5}
+                max={5}
                 step={0.05}
                 value={shadowScaleX}
                 onChange={(e) => setShadowScaleX(Number(e.target.value))}
@@ -311,8 +311,8 @@ export default function TDTowerSizeEditor({
               </div>
               <input
                 type="range"
-                min={0}
-                max={3}
+                min={-5}
+                max={5}
                 step={0.05}
                 value={shadowScaleY}
                 onChange={(e) => setShadowScaleY(Number(e.target.value))}

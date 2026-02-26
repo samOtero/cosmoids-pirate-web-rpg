@@ -515,14 +515,34 @@ export default function PixiBattlefield({
               TD_CREATURE_DEFS[enemy.definitionId].baseCreature;
             const spriteUrl =
               baseCreature.battleSpriteUrl || baseCreature.spriteUrl;
+
+            // Shadow
+            const shadow = new PIXI.Graphics();
+            shadow.label = 'shadow';
+            const shadowScaleX = baseCreature.tdShadowScaleX ?? 1;
+            const shadowScaleY = baseCreature.tdShadowScaleY ?? 1;
+            const shadowOffsetX = baseCreature.tdShadowOffsetX ?? 0;
+            const shadowOffsetY = baseCreature.tdShadowOffsetY ?? 0;
+            const spriteScale = baseCreature.tdSpriteScale ?? 1;
+            shadow.ellipse(
+              0 + shadowOffsetX,
+              30 * spriteScale + shadowOffsetY,
+              25 * shadowScaleX,
+              12 * shadowScaleY
+            );
+            shadow.fill({ color: 0x000000, alpha: 0.4 });
+            shadow.scale.x = -1; // Enemies originally rendered with flipped scale
+            container.addChild(shadow);
+
             PIXI.Assets.load(spriteUrl).then((texture) => {
               if (isDestroyed || !enemySprites.has(enemy.id)) return;
               const esprite = new PIXI.Sprite(texture);
+              esprite.label = 'enemy_sprite';
               esprite.anchor.set(0.5);
-              esprite.width = 64;
-              esprite.height = 64;
-              esprite.scale.x *= -1;
-              container!.addChildAt(esprite, 0);
+              const scale = baseCreature.tdSpriteScale || 1;
+              esprite.scale.set(scale);
+              esprite.scale.x = -scale;
+              container!.addChildAt(esprite, 1);
             });
 
             // Health bar background
