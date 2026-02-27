@@ -19,6 +19,7 @@ const TowerDefenseScreen = lazy(
   () => import('@/app/components/tower-defense/TowerDefenseScreen')
 );
 const TDLevelEditor = lazy(() => import('./TDLevelEditor'));
+const CutsceneEditor = lazy(() => import('./CutsceneEditor'));
 
 type ToolType =
   | 'DIALOG'
@@ -29,6 +30,7 @@ type ToolType =
   | 'TOWER_DEFENSE'
   | 'TD_LEVEL_EDITOR'
   | 'TD_TOWER_SIZE_EDITOR'
+  | 'CUTSCENE'
   | null;
 
 export default function DevTools() {
@@ -106,6 +108,15 @@ export default function DevTools() {
                 className="text-sm bg-slate-800 hover:bg-cyan-700 px-3 py-2 rounded text-left"
               >
                 Creature Position Editor
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTool('CUTSCENE');
+                  setShowMenu(false);
+                }}
+                className="text-sm bg-fuchsia-900 hover:bg-fuchsia-700 border border-fuchsia-500 px-3 py-2 rounded text-left font-bold"
+              >
+                Cutscene Editor
               </button>
               <button
                 onClick={() => {
@@ -201,6 +212,9 @@ export default function DevTools() {
           )}
           {activeTool === 'CREATURE_POSITION' && (
             <CreaturePositionEditor onClose={() => setActiveTool(null)} />
+          )}
+          {activeTool === 'CUTSCENE' && (
+            <CutsceneEditor onClose={() => setActiveTool(null)} />
           )}
           {activeTool === 'TD_TOWER_SIZE_EDITOR' && (
             <TDTowerSizeEditor onClose={() => setActiveTool(null)} />
