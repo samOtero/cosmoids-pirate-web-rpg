@@ -3,8 +3,45 @@ import { UnitVisuals } from '@/types/baseGame';
 export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   senticle: {
     default: {
-      url: '/battles/cosmoids/eel-basic-normal-neutral-skin-battle-ground-2.png',
-      scale: 0.35,
+      url: '/battles/cosmoids/senticle_left_1.png',
+      scale: 0.39,
+      offsetY: -31,
+      shadowOffsetY: -8,
+      shadowScaleX: 1.5,
+      shadowScaleY: 0.7,
+    },
+    left: {
+      url: '/battles/cosmoids/senticle_left_1.png',
+      scale: 0.39,
+      offsetY: -31,
+      shadowOffsetY: -8,
+      shadowScaleX: 1.5,
+      shadowScaleY: 0.7,
+    },
+    right: {
+      url: '/battles/cosmoids/senticle_left_1.png',
+      scale: 0.39,
+      offsetY: -31,
+      shadowOffsetY: -8,
+      shadowScaleX: 1.5,
+      shadowScaleY: 0.7,
+      flipX: true,
+    },
+    up: {
+      url: '/battles/cosmoids/senticle_up_1.png',
+      scale: 0.39,
+      offsetY: -31,
+      shadowOffsetY: -8,
+      shadowScaleX: 1.5,
+      shadowScaleY: 0.7,
+    },
+    down: {
+      url: '/battles/cosmoids/senticle_down_1.png',
+      scale: 0.39,
+      offsetY: -31,
+      shadowOffsetY: -8,
+      shadowScaleX: 1.5,
+      shadowScaleY: 0.7,
     },
   },
   bug_stage_1: {
