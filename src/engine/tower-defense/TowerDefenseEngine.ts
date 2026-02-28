@@ -145,6 +145,7 @@ export class TowerDefenseEngine {
           statusConditions: [],
           currentWaypointIndex: 1,
           pathIndex: pathIndex,
+          facingDirection: 'down',
         });
         this.lastSpawnTime = time;
       }
@@ -201,6 +202,13 @@ export class TowerDefenseEngine {
           enemy.position.x += (dx / dist) * frameDistance;
           // Apply inverse normalization to the actual movement
           enemy.position.y += (dy / dist) * frameDistance * this.aspectRatio;
+
+          // Update facing direction based on primary movement axis
+          if (Math.abs(dx) > Math.abs(dy)) {
+            enemy.facingDirection = dx > 0 ? 'right' : 'left';
+          } else {
+            enemy.facingDirection = dy > 0 ? 'down' : 'up';
+          }
         }
       }
     });
@@ -247,8 +255,13 @@ export class TowerDefenseEngine {
         }
 
         if (nearestEnemy) {
-          tower.facingDirection =
-            nearestEnemy.position.x > tower.position.x ? 'right' : 'left';
+          const dx = nearestEnemy.position.x - tower.position.x;
+          const dy = nearestEnemy.position.y - tower.position.y;
+          if (Math.abs(dx) > Math.abs(dy)) {
+            tower.facingDirection = dx > 0 ? 'right' : 'left';
+          } else {
+            tower.facingDirection = dy > 0 ? 'down' : 'up';
+          }
         }
 
         const behavior = AttackBehaviorRegistry[attackDef.behaviorType];
@@ -438,6 +451,7 @@ export class TowerDefenseEngine {
       statusConditions: [],
       currentWaypointIndex: 1,
       pathIndex: pathIndex,
+      facingDirection: 'down',
     });
   }
 

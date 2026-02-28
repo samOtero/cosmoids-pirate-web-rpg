@@ -52,7 +52,7 @@ export interface Tower {
   currentAttack: number;
   equippedAttacks: Array<{ definitionId: string; lastFiredTime: number }>;
   selectedAttackIndex: number;
-  facingDirection?: 'left' | 'right';
+  facingDirection: 'up' | 'down' | 'left' | 'right';
 }
 
 export interface StatusCondition {
@@ -73,6 +73,7 @@ export interface Enemy {
   statusConditions: StatusCondition[];
   currentWaypointIndex: number;
   pathIndex: number; // Index into the level's `paths` array
+  facingDirection: 'up' | 'down' | 'left' | 'right';
 }
 
 export interface Projectile {

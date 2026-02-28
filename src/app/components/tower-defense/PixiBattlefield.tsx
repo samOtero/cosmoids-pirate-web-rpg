@@ -261,34 +261,14 @@ export default function PixiBattlefield({
 
             const baseCreature = TD_CREATURE_DEFS[tower.speciesId].baseCreature;
 
-            // Shadow
             const shadow = new PIXI.Graphics();
             shadow.label = 'shadow';
-            const shadowScaleX = baseCreature.tdShadowScaleX ?? 1;
-            const shadowScaleY = baseCreature.tdShadowScaleY ?? 1;
-            const shadowOffsetX = baseCreature.tdShadowOffsetX ?? 0;
-            const shadowOffsetY = baseCreature.tdShadowOffsetY ?? 0;
-            const spriteScale = baseCreature.tdSpriteScale ?? 1;
-            shadow.ellipse(
-              0 + shadowOffsetX,
-              30 * spriteScale + shadowOffsetY,
-              25 * shadowScaleX,
-              12 * shadowScaleY
-            );
-            shadow.fill({ color: 0x000000, alpha: 0.4 });
             container.addChild(shadow);
 
-            const spriteUrl =
-              baseCreature.battleSpriteUrl || baseCreature.spriteUrl;
-            PIXI.Assets.load(spriteUrl).then((texture) => {
-              if (isDestroyed || !towerSprites.has(cacheKey)) return;
-              const tsprite = new PIXI.Sprite(texture);
-              tsprite.label = 'tower_sprite';
-              tsprite.anchor.set(0.5);
-              const scale = baseCreature.tdSpriteScale || 1;
-              tsprite.scale.set(scale);
-              container!.addChildAt(tsprite, 1);
-            });
+            const tsprite = new PIXI.Sprite();
+            tsprite.label = 'tower_sprite';
+            tsprite.anchor.set(0.5);
+            container.addChildAt(tsprite, 1);
 
             const rangeCircle = new PIXI.Graphics();
             rangeCircle.label = 'rangeCircle';
@@ -315,18 +295,46 @@ export default function PixiBattlefield({
           const tsprite = container.getChildByLabel('tower_sprite') as
             | PIXI.Sprite
             | undefined;
-          if (tsprite) {
-            const baseCreature = TD_CREATURE_DEFS[tower.speciesId].baseCreature;
-            const bScale = baseCreature.tdSpriteScale || 1;
-            tsprite.scale.x =
-              tower.facingDirection === 'right' ? -bScale : bScale;
-          }
-
           const shadow = container.getChildByLabel('shadow') as
             | PIXI.Graphics
             | undefined;
-          if (shadow) {
-            shadow.scale.x = tower.facingDirection === 'right' ? -1 : 1;
+
+          if (tsprite && shadow) {
+            const baseCreature = TD_CREATURE_DEFS[tower.speciesId].baseCreature;
+            const tdConfig =
+              baseCreature.tdConfig[tower.facingDirection] ||
+              baseCreature.tdConfig.default;
+
+            const bScale = tdConfig.scale ?? 1;
+            const flipX = tdConfig.flipX ?? false;
+            tsprite.scale.x = flipX ? -bScale : bScale;
+            tsprite.scale.y = tdConfig.flipY ? -bScale : bScale;
+
+            const spriteUrl =
+              tdConfig.url ||
+              baseCreature.battleSpriteUrl ||
+              baseCreature.spriteUrl;
+            if ((tsprite as any).currentUrl !== spriteUrl) {
+              (tsprite as any).currentUrl = spriteUrl;
+              PIXI.Assets.load(spriteUrl).then((t) => {
+                if (!isDestroyed) tsprite.texture = t;
+              });
+            }
+
+            const shadowScaleX = tdConfig.shadowScaleX ?? 1;
+            const shadowScaleY = tdConfig.shadowScaleY ?? 1;
+            const shadowOffsetX = tdConfig.shadowOffsetX ?? 0;
+            const shadowOffsetY = tdConfig.shadowOffsetY ?? 0;
+
+            shadow.clear();
+            shadow.ellipse(
+              0 + shadowOffsetX,
+              30 * bScale + shadowOffsetY,
+              25 * shadowScaleX,
+              12 * shadowScaleY
+            );
+            shadow.fill({ color: 0x000000, alpha: 0.4 });
+            shadow.scale.x = flipX ? -1 : 1;
           }
         }
 
@@ -511,39 +519,14 @@ export default function PixiBattlefield({
           if (!container) {
             container = new PIXI.Container();
 
-            const baseCreature =
-              TD_CREATURE_DEFS[enemy.definitionId].baseCreature;
-            const spriteUrl =
-              baseCreature.battleSpriteUrl || baseCreature.spriteUrl;
-
-            // Shadow
             const shadow = new PIXI.Graphics();
             shadow.label = 'shadow';
-            const shadowScaleX = baseCreature.tdShadowScaleX ?? 1;
-            const shadowScaleY = baseCreature.tdShadowScaleY ?? 1;
-            const shadowOffsetX = baseCreature.tdShadowOffsetX ?? 0;
-            const shadowOffsetY = baseCreature.tdShadowOffsetY ?? 0;
-            const spriteScale = baseCreature.tdSpriteScale ?? 1;
-            shadow.ellipse(
-              0 + shadowOffsetX,
-              30 * spriteScale + shadowOffsetY,
-              25 * shadowScaleX,
-              12 * shadowScaleY
-            );
-            shadow.fill({ color: 0x000000, alpha: 0.4 });
-            shadow.scale.x = -1; // Enemies originally rendered with flipped scale
             container.addChild(shadow);
 
-            PIXI.Assets.load(spriteUrl).then((texture) => {
-              if (isDestroyed || !enemySprites.has(enemy.id)) return;
-              const esprite = new PIXI.Sprite(texture);
-              esprite.label = 'enemy_sprite';
-              esprite.anchor.set(0.5);
-              const scale = baseCreature.tdSpriteScale || 1;
-              esprite.scale.set(scale);
-              esprite.scale.x = -scale;
-              container!.addChildAt(esprite, 1);
-            });
+            const esprite = new PIXI.Sprite();
+            esprite.label = 'enemy_sprite';
+            esprite.anchor.set(0.5);
+            container.addChildAt(esprite, 1);
 
             // Health bar background
             const hpBg = new PIXI.Graphics();
@@ -564,6 +547,52 @@ export default function PixiBattlefield({
           }
           container.x = offsetX + (enemy.position.x / 100) * screenW;
           container.y = offsetY + (enemy.position.y / 100) * screenH;
+
+          const esprite = container.getChildByLabel('enemy_sprite') as
+            | PIXI.Sprite
+            | undefined;
+          const shadow = container.getChildByLabel('shadow') as
+            | PIXI.Graphics
+            | undefined;
+
+          if (esprite && shadow) {
+            const baseCreature =
+              TD_CREATURE_DEFS[enemy.definitionId].baseCreature;
+            const tdConfig =
+              baseCreature.tdConfig[enemy.facingDirection] ||
+              baseCreature.tdConfig.default;
+
+            const bScale = tdConfig.scale ?? 1;
+            const flipX = tdConfig.flipX ?? false;
+            esprite.scale.x = flipX ? -bScale : bScale;
+            esprite.scale.y = tdConfig.flipY ? -bScale : bScale;
+
+            const spriteUrl =
+              tdConfig.url ||
+              baseCreature.battleSpriteUrl ||
+              baseCreature.spriteUrl;
+            if ((esprite as any).currentUrl !== spriteUrl) {
+              (esprite as any).currentUrl = spriteUrl;
+              PIXI.Assets.load(spriteUrl).then((t) => {
+                if (!isDestroyed) esprite.texture = t;
+              });
+            }
+
+            const shadowScaleX = tdConfig.shadowScaleX ?? 1;
+            const shadowScaleY = tdConfig.shadowScaleY ?? 1;
+            const shadowOffsetX = tdConfig.shadowOffsetX ?? 0;
+            const shadowOffsetY = tdConfig.shadowOffsetY ?? 0;
+
+            shadow.clear();
+            shadow.ellipse(
+              0 + shadowOffsetX,
+              30 * bScale + shadowOffsetY,
+              25 * shadowScaleX,
+              12 * shadowScaleY
+            );
+            shadow.fill({ color: 0x000000, alpha: 0.4 });
+            shadow.scale.x = flipX ? -1 : 1;
+          }
 
           // Update health bar (it is always the last child added)
           const hpRatio = enemy.hp / enemy.maxHp;

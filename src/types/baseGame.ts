@@ -63,6 +63,25 @@ export const GameFlag = {
 
 export type GameFlagValue = (typeof GameFlag)[keyof typeof GameFlag];
 
+export interface UnitSpriteConfig {
+  url?: string;
+  scale?: number;
+  flipX?: boolean;
+  flipY?: boolean;
+  shadowScaleX?: number;
+  shadowScaleY?: number;
+  shadowOffsetX?: number;
+  shadowOffsetY?: number;
+}
+
+export interface UnitVisuals {
+  default: UnitSpriteConfig;
+  up?: UnitSpriteConfig;
+  down?: UnitSpriteConfig;
+  left?: UnitSpriteConfig;
+  right?: UnitSpriteConfig;
+}
+
 export interface Item {
   id: string;
   name: string;
@@ -89,14 +108,10 @@ export interface Creature {
   battleSpriteUrl?: string;
   battlePosition?: { bottom: number; left: number }; // percentage 0-100
   battleScale?: number; // multiplier, 1 = default
-  tdSpriteScale?: number; // multiplier, 1 = default (80x80)
-  tdShadowScaleX?: number; // multiplier for shadow X size, 1 = default
-  tdShadowScaleY?: number; // multiplier for shadow Y size, 1 = default
-  tdShadowOffsetX?: number; // X offset for shadow, 0 = default
-  tdShadowOffsetY?: number; // Y offset for shadow, 0 = default
   movementId?: string;
   startingEnergy: number;
   currentEnergy: number;
+  tdConfig: UnitVisuals;
 }
 
 export interface IslandNode {
