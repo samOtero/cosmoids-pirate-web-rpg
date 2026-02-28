@@ -36,6 +36,7 @@ const BATTLE_SPRITES = [
   '/battles/cosmoids/senticle_down_1.png',
   '/battles/cosmoids/senticle_left_1.png',
   '/battles/cosmoids/senticle_up_1.png',
+  '/battles/units/map_1.png',
 ];
 
 const ALL_CONFIG_KEYS = Object.keys(CREATURE_TD_CONFIGS);

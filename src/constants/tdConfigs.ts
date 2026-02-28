@@ -187,4 +187,12 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       flipX: true,
     },
   },
+  map_1: {
+    default: {
+      url: '/battles/units/map_1.png',
+      scale: 0.27,
+      shadowScaleX: 1.15,
+      shadowOffsetY: 1,
+    },
+  },
 };

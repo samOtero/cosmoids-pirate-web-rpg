@@ -107,7 +107,7 @@ export const FIRST_LEVEL: TDLevelData = {
       facingDirection: 'down',
     },
     {
-      tdConfigId: 'bug_stage_1',
+      tdConfigId: 'map_1',
       position: {
         x: 20,
         y: 80,
