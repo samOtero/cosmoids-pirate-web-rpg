@@ -45,16 +45,16 @@ export const FIRST_LEVEL: TDLevelData = {
   ],
   "placementSpots": [
     {
-      "x": 63.89,
-      "y": 83.28
+      "x": 63.6,
+      "y": 88.58
     },
     {
       "x": 39.6,
       "y": 32.75
     },
     {
-      "x": 38.36,
-      "y": 81.71
+      "x": 37.93,
+      "y": 89.32
     },
     {
       "x": 63.73,
@@ -66,7 +66,7 @@ export const FIRST_LEVEL: TDLevelData = {
       "id": "wave_1771807082096",
       "groups": [
         {
-          "definitionId": "bug_stage_1",
+          "definitionId": "senticle",
           "count": 1,
           "spawnIntervalMs": 1500,
           "delayBeforeGroupMs": 100,
@@ -87,7 +87,7 @@ export const FIRST_LEVEL: TDLevelData = {
           "pathIndex": 1
         },
         {
-          "definitionId": "bug_stage_2",
+          "definitionId": "senticle",
           "count": 5,
           "spawnIntervalMs": 1500,
           "delayBeforeGroupMs": 3000,
@@ -96,6 +96,6 @@ export const FIRST_LEVEL: TDLevelData = {
       ]
     }
   ],
-  "surviveUntil": 5
+  "surviveUntil": 60
 };
 

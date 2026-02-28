@@ -2,6 +2,7 @@ import {
   BUG_STAGE_1,
   BUG_STAGE_2,
   BUG_STAGE_3,
+  SENTICLE,
   STARTER_CRAB,
   STARTER_IGUANA,
   STARTER_MONKEY,
@@ -45,6 +46,10 @@ export const TD_CREATURE_DEFS: Record<string, TDCreatureMetadata> = {
   [STARTER_MONKEY.id]: {
     baseCreature: STARTER_MONKEY,
     xpYield: 0,
+  },
+  [SENTICLE.id]: {
+    baseCreature: SENTICLE,
+    xpYield: 20,
   },
 };
 
@@ -544,7 +549,7 @@ export class TowerDefenseEngine {
         lastFiredTime: 0,
       })),
       selectedAttackIndex: this.playerSelectedAttacks[creature.id] || 0,
-      facingDirection: 'left',
+      facingDirection: 'down',
     });
     return true;
   }
