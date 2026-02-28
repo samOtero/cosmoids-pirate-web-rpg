@@ -101,12 +101,20 @@ export default function TowerDefenseScreen({
       }
 
       // 3. Check win condition
-      if (
+      // Time-based survive win condition
+      const surviveWin =
+        engineRef.current.surviveUntil &&
+        engineRef.current.surviveUntil > 0 &&
+        engineRef.current.elapsedTimeMs >=
+          engineRef.current.surviveUntil * 1000 &&
+        engineRef.current.lives > 0;
+
+      const normalWin =
         engineRef.current.hasFinishedAllWaves &&
         engineRef.current.enemies.length === 0 &&
-        engineRef.current.lives > 0 &&
-        !hasEndedRef.current
-      ) {
+        engineRef.current.lives > 0;
+
+      if ((surviveWin || normalWin) && !hasEndedRef.current) {
         hasEndedRef.current = true;
         setIsPlaying(false);
         if (onWin) onWin();
@@ -280,7 +288,7 @@ export default function TowerDefenseScreen({
         })}
 
         {/* Permanent Capture Device Tool */}
-        <div className="w-px h-16 bg-cyan-800 mx-2 flex-shrink-0" />
+        <div className="w-px h-16 bg-cyan-800 mx-2 shrink-0" />
         <button
           draggable={true}
           onDragStart={(e) => {

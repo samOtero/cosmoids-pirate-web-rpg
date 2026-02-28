@@ -39,6 +39,7 @@ export interface TDLevelData {
   paths: Point[][];
   placementSpots: Point[];
   waves?: TDWave[]; // Optional for backwards compatibility
+  surviveUntil?: number; // Win after surviving for this many seconds
 }
 
 export interface Tower {

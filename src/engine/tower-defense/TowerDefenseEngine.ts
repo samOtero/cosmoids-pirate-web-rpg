@@ -73,6 +73,9 @@ export class TowerDefenseEngine {
 
   public playerSelectedAttacks: Record<string, number> = {};
 
+  public surviveUntil?: number;
+  public elapsedTimeMs: number = 0;
+
   public aspectRatio: number = 1;
 
   public setAspectRatio(ratio: number) {
@@ -87,6 +90,7 @@ export class TowerDefenseEngine {
     this.paths = levelData.paths || [];
     this.placementSpots = levelData.placementSpots || [];
     this.waves = levelData.waves || [];
+    this.surviveUntil = levelData.surviveUntil;
 
     // Initialize first wave group if available
     if (this.waves.length > 0 && this.waves[0].groups.length > 0) {
@@ -110,6 +114,8 @@ export class TowerDefenseEngine {
   }
 
   public tick(time: number, deltaMs: number) {
+    this.elapsedTimeMs += deltaMs;
+
     let newEnemies = [...this.enemies];
     // Notice: we do NOT clone projectiles here anymore, we filter them at the end.
     // Behaviors push directly to engine.projectiles during the tick.

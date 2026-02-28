@@ -15,6 +15,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
     { x: number; y: number }[]
   >([]);
   const [waves, setWaves] = useState<TDWave[]>([]);
+  const [surviveUntil, setSurviveUntil] = useState<number>(0);
   const [deleteMode, setDeleteMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showNewModal, setShowNewModal] = useState(false);
@@ -49,11 +50,13 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
       setWaves(
         levelData.waves ? JSON.parse(JSON.stringify(levelData.waves)) : []
       );
+      setSurviveUntil(levelData.surviveUntil || 0);
     } else {
       setPaths([[]]);
       setActivePathIndex(0);
       setPlacementSpots([]);
       setWaves([]);
+      setSurviveUntil(0);
     }
     setSelectedLevelKey(key);
   };
@@ -63,6 +66,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
     setActivePathIndex(0);
     setPlacementSpots([]);
     setWaves([]);
+    setSurviveUntil(0);
     setSelectedLevelKey('NEW_LEVEL');
     setNewLevelName('');
     setShowNewModal(true);
@@ -146,6 +150,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
           y: Number(s.y.toFixed(2)),
         })),
         waves: waves,
+        surviveUntil: surviveUntil > 0 ? surviveUntil : undefined,
       };
 
       const res = await fetch('/api/dev/td-levels/save', {
@@ -335,6 +340,22 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
           >
             + Placement Spot
           </button>
+
+          <div className="w-px h-6 bg-slate-600 mx-2" />
+
+          <div className="flex items-center gap-2">
+            <label className="text-slate-400 text-sm font-bold">
+              Survive (s):
+            </label>
+            <input
+              type="number"
+              min="0"
+              value={surviveUntil}
+              onChange={(e) => setSurviveUntil(parseInt(e.target.value) || 0)}
+              className="w-20 bg-slate-950 text-white rounded p-1 border border-slate-700 text-sm"
+              placeholder="0 = clear waves"
+            />
+          </div>
 
           <div className="w-px h-6 bg-slate-600 mx-2" />
 

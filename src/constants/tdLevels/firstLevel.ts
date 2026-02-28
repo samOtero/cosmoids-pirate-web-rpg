@@ -95,6 +95,7 @@ export const FIRST_LEVEL: TDLevelData = {
         }
       ]
     }
-  ]
+  ],
+  "surviveUntil": 5
 };
 
