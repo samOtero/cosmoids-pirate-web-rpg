@@ -90,12 +90,24 @@ export class TowerDefenseEngine {
   // Loaded at initialization
   public paths: { x: number; y: number }[][] = [];
   public placementSpots: { x: number; y: number }[] = [];
+  public environmentUnits: import('./types').EnvironmentUnit[] = [];
 
   constructor(levelData: import('./types').TDLevelData | any) {
     this.paths = levelData.paths || [];
     this.placementSpots = levelData.placementSpots || [];
     this.waves = levelData.waves || [];
     this.surviveUntil = levelData.surviveUntil;
+
+    if (levelData.environmentUnits) {
+      this.environmentUnits = levelData.environmentUnits.map(
+        (eu: any, index: number) => ({
+          id: `env_unit_${index}_${Math.random().toString(36).substring(7)}`,
+          tdConfigId: eu.tdConfigId,
+          position: { x: eu.position.x, y: eu.position.y },
+          facingDirection: eu.facingDirection || 'down',
+        })
+      );
+    }
 
     // Initialize first wave group if available
     if (this.waves.length > 0 && this.waves[0].groups.length > 0) {

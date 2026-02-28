@@ -35,11 +35,23 @@ export interface TDWave {
   groups: TDWaveGroup[];
 }
 
+export interface EnvironmentUnit {
+  id: string;
+  tdConfigId: string;
+  position: Point;
+  facingDirection: 'up' | 'down' | 'left' | 'right';
+}
+
 export interface TDLevelData {
   paths: Point[][];
   placementSpots: Point[];
   waves?: TDWave[]; // Optional for backwards compatibility
   surviveUntil?: number; // Win after surviving for this many seconds
+  environmentUnits?: {
+    tdConfigId: string;
+    position: Point;
+    facingDirection?: 'up' | 'down' | 'left' | 'right';
+  }[];
 }
 
 export interface Tower {

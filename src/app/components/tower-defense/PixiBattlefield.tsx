@@ -137,6 +137,7 @@ export default function PixiBattlefield({
       // Sprite caching structure
       const towerSprites = new Map<string, PIXI.Container>();
       const enemySprites = new Map<string, PIXI.Container>();
+      const environmentUnitSprites = new Map<string, PIXI.Container>();
       const projectileSprites = new Map<string, PIXI.Graphics>();
       const spotGraphics = new PIXI.Graphics();
       const invalidSpotGraphics = new PIXI.Graphics();
@@ -226,6 +227,91 @@ export default function PixiBattlefield({
           externalDragState === 'tower' ||
           (!isDraggingCapture && dragPosRef.current !== null) ||
           draggingTowerCreatureId !== null;
+
+        // --- Render Environment Units ---
+        const currentEnvUnitIds = new Set(
+          engine.environmentUnits.map((e) => e.id)
+        );
+        for (const [id, sprite] of environmentUnitSprites.entries()) {
+          if (!currentEnvUnitIds.has(id)) {
+            app.stage.removeChild(sprite);
+            sprite.destroy({ children: true });
+            environmentUnitSprites.delete(id);
+          }
+        }
+
+        for (const envUnit of engine.environmentUnits) {
+          let container = environmentUnitSprites.get(envUnit.id);
+          if (!container) {
+            container = new PIXI.Container();
+            container.eventMode = 'none'; // Not interactive
+
+            const shadow = new PIXI.Graphics();
+            shadow.label = 'shadow';
+            container.addChild(shadow);
+
+            const sprite = new PIXI.Sprite();
+            sprite.label = 'env_sprite';
+            sprite.anchor.set(0.5);
+            container.addChildAt(sprite, 1);
+
+            app.stage.addChild(container);
+            app.stage.setChildIndex(container, 1); // just above background
+
+            environmentUnitSprites.set(envUnit.id, container);
+          }
+
+          container.x = offsetX + (envUnit.position.x / 100) * screenW;
+          container.y = offsetY + (envUnit.position.y / 100) * screenH;
+
+          const sprite = container.getChildByLabel('env_sprite') as
+            | PIXI.Sprite
+            | undefined;
+          const shadow = container.getChildByLabel('shadow') as
+            | PIXI.Graphics
+            | undefined;
+
+          if (sprite && shadow) {
+            const tdConfigMap = CREATURE_TD_CONFIGS[envUnit.tdConfigId];
+            if (tdConfigMap) {
+              const tdConfig =
+                tdConfigMap[envUnit.facingDirection] || tdConfigMap.default;
+
+              const bScale = tdConfig.scale ?? 1;
+              const flipX = tdConfig.flipX ?? false;
+              sprite.scale.x = flipX ? -bScale : bScale;
+              sprite.scale.y = tdConfig.flipY ? -bScale : bScale;
+
+              const sOffsetX = tdConfig.offsetX ?? 0;
+              const sOffsetY = tdConfig.offsetY ?? 0;
+              sprite.x = sOffsetX;
+              sprite.y = sOffsetY;
+
+              const spriteUrl = tdConfig.url;
+              if (spriteUrl && (sprite as any).currentUrl !== spriteUrl) {
+                (sprite as any).currentUrl = spriteUrl;
+                PIXI.Assets.load(spriteUrl).then((t) => {
+                  if (!isDestroyed) sprite.texture = t;
+                });
+              }
+
+              const shadowScaleX = tdConfig.shadowScaleX ?? 1;
+              const shadowScaleY = tdConfig.shadowScaleY ?? 1;
+              const shadowOffsetX = tdConfig.shadowOffsetX ?? 0;
+              const shadowOffsetY = tdConfig.shadowOffsetY ?? 0;
+
+              shadow.clear();
+              shadow.ellipse(
+                0 + shadowOffsetX,
+                30 * bScale + shadowOffsetY,
+                25 * shadowScaleX,
+                12 * shadowScaleY
+              );
+              shadow.fill({ color: 0x000000, alpha: 0.4 });
+              shadow.scale.x = flipX ? -1 : 1;
+            }
+          }
+        }
 
         // --- Render Towers ---
         const currentTowerKeys = new Set(
