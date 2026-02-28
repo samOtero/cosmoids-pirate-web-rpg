@@ -12,6 +12,7 @@ import {
   STARTER_MONKEY,
 } from '@/constants/creatures';
 import { Creature } from '@/types/baseGame';
+import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 
 const BATTLE_SPRITES = [
   '/battles/cosmoids/bug-1-basic-normal-neutral-skin-1.png',
@@ -67,7 +68,11 @@ export default function TDTowerSizeEditor({
   >('default');
 
   const [currentTdConfig, setCurrentTdConfig] = useState<any>(
-    JSON.parse(JSON.stringify(creature.tdConfig || { default: { scale: 1 } }))
+    JSON.parse(
+      JSON.stringify(
+        CREATURE_TD_CONFIGS[creature.id] || { default: { scale: 1 } }
+      )
+    )
   );
 
   const activeConfig = currentTdConfig[selectedDirection] || {};
@@ -138,7 +143,9 @@ export default function TDTowerSizeEditor({
     setSelectedIndex(index);
     const c = ALL_CREATURES[index].creature;
     setCurrentTdConfig(
-      JSON.parse(JSON.stringify(c.tdConfig || { default: { scale: 1 } }))
+      JSON.parse(
+        JSON.stringify(CREATURE_TD_CONFIGS[c.id] || { default: { scale: 1 } })
+      )
     );
     setSelectedDirection('default');
   };
@@ -154,7 +161,7 @@ export default function TDTowerSizeEditor({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          creatureVarName: selectedEntry.varName,
+          creatureId: creature.id,
           tdConfig: configToSave,
         }),
       });

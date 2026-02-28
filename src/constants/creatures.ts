@@ -20,11 +20,6 @@ export const SENTICLE: Creature = {
   currentEnergy: 0,
 
   speciesId: '',
-  tdConfig: {
-    default: {
-      scale: 0.35,
-    },
-  },
 };
 
 export const BUG_STAGE_1: Creature = {
@@ -46,32 +41,6 @@ export const BUG_STAGE_1: Creature = {
   movementId: 'lizard',
 
   speciesId: '',
-  tdConfig: {
-    default: {
-      scale: 0.4,
-      shadowScaleX: 1.55,
-      shadowScaleY: 0.85,
-      shadowOffsetY: 9,
-      flipX: true,
-    },
-    left: {
-      scale: 0.4,
-      shadowScaleX: 1.55,
-      shadowScaleY: 0.85,
-      shadowOffsetY: 9,
-      flipX: false,
-    },
-    right: {
-      scale: 0.4,
-      shadowScaleX: 1.55,
-      shadowScaleY: 0.85,
-      shadowOffsetY: 9,
-      flipX: true,
-    },
-    up: {
-      url: '/battles/cosmoids/bug_1_up_1.png',
-    },
-  },
 };
 
 export const BUG_STAGE_2: Creature = {
@@ -94,16 +63,6 @@ export const BUG_STAGE_2: Creature = {
 
   battleScale: 1.25,
   speciesId: '',
-  tdConfig: {
-    default: {
-      scale: 0.15,
-      shadowScaleX: 1.2,
-      shadowOffsetY: 52,
-      flipX: true,
-    },
-    left: { scale: 0.15, shadowScaleX: 1.2, shadowOffsetY: 52, flipX: false },
-    right: { scale: 0.15, shadowScaleX: 1.2, shadowOffsetY: 52, flipX: true },
-  },
 };
 
 export const BUG_STAGE_3: Creature = {
@@ -126,11 +85,6 @@ export const BUG_STAGE_3: Creature = {
 
   battleScale: 0.85,
   speciesId: '',
-  tdConfig: {
-    default: { scale: 0.17, flipX: true },
-    left: { flipX: false },
-    right: { flipX: true },
-  },
 };
 
 // Starter Cosmoid Definitions
@@ -151,28 +105,6 @@ export const STARTER_CRAB: Creature = {
   startingEnergy: 100,
   currentEnergy: 100,
   speciesId: '',
-  tdConfig: {
-    default: {
-      scale: 0.47,
-      shadowScaleX: 1.25,
-      shadowOffsetX: 5,
-      shadowOffsetY: 6,
-    },
-    left: {
-      scale: 0.47,
-      shadowScaleX: 1.25,
-      shadowOffsetX: 5,
-      shadowOffsetY: 6,
-      flipX: false,
-    },
-    right: {
-      scale: 0.47,
-      shadowScaleX: 1.25,
-      shadowOffsetX: 5,
-      shadowOffsetY: 6,
-      flipX: true,
-    },
-  },
 };
 
 export const STARTER_IGUANA: Creature = {
@@ -194,45 +126,6 @@ export const STARTER_IGUANA: Creature = {
   currentEnergy: 100,
 
   speciesId: '',
-  tdConfig: {
-    default: {
-      scale: 0.65,
-      shadowScaleX: 1.9,
-      shadowScaleY: 0.6,
-      shadowOffsetX: -7,
-      shadowOffsetY: 7,
-    },
-    left: {
-      scale: 0.65,
-      shadowScaleX: 1.9,
-      shadowScaleY: 0.6,
-      shadowOffsetX: -7,
-      shadowOffsetY: 7,
-      flipX: false,
-    },
-    right: {
-      scale: 0.65,
-      shadowScaleX: 1.9,
-      shadowScaleY: 0.6,
-      shadowOffsetX: -7,
-      shadowOffsetY: 7,
-      flipX: true,
-    },
-    up: {
-      url: '/battles/cosmoids/fueguana_up_1_v3.png',
-      scale: 0.65,
-      offsetX: -11,
-      shadowOffsetY: 5,
-      shadowScaleX: 1.15,
-    },
-    down: {
-      url: '/battles/cosmoids/fueguana_down_1_v3.png',
-      scale: 0.65,
-      shadowOffsetX: -3,
-      offsetX: 10,
-      shadowOffsetY: 5,
-    },
-  },
 };
 
 export const STARTER_MONKEY: Creature = {
@@ -252,26 +145,4 @@ export const STARTER_MONKEY: Creature = {
   startingEnergy: 100,
   currentEnergy: 100,
   speciesId: '',
-  tdConfig: {
-    default: {
-      scale: 0.29,
-      shadowScaleX: 1.4,
-      shadowOffsetX: -2,
-      shadowOffsetY: 26,
-    },
-    left: {
-      scale: 0.29,
-      shadowScaleX: 1.4,
-      shadowOffsetX: -2,
-      shadowOffsetY: 26,
-      flipX: false,
-    },
-    right: {
-      scale: 0.29,
-      shadowScaleX: 1.4,
-      shadowOffsetX: -2,
-      shadowOffsetY: 26,
-      flipX: true,
-    },
-  },
 };

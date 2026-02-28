@@ -2,49 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-function removeTdConfig(content: string) {
-  const startIndex = content.indexOf('tdConfig:');
-  if (startIndex === -1) return content;
-
-  let braceCount = 0;
-  let inString = false;
-  let endIndex = -1;
-  let startedBrace = false;
-
-  for (let i = startIndex; i < content.length; i++) {
-    const char = content[i];
-    if (char === "'" || char === '"' || char === '`') {
-      if (!inString) inString = true;
-      else if (content[i - 1] !== '\\') inString = false;
-    }
-    if (!inString) {
-      if (char === '{') {
-        braceCount++;
-        startedBrace = true;
-      }
-      if (char === '}') {
-        braceCount--;
-      }
-    }
-    if (startedBrace && braceCount === 0) {
-      // Find following comma if any
-      let nextChar = i + 1;
-      while (nextChar < content.length && /\\s/.test(content[nextChar]))
-        nextChar++;
-      if (content[nextChar] === ',') nextChar++;
-      endIndex = nextChar;
-      break;
-    }
-  }
-
-  if (endIndex !== -1) {
-    return content.substring(0, startIndex) + content.substring(endIndex);
-  }
-  return content;
-}
-
 /**
- * Dev-only API route to save creature tdConfig directly to creatures.ts.
+ * Dev-only API route to save creature tdConfig directly to tdConfigs.ts
  */
 export async function POST(request: NextRequest) {
   // Only allow in development
@@ -57,11 +16,11 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { creatureVarName, tdConfig } = body;
+    const { creatureId, tdConfig } = body;
 
-    if (!creatureVarName) {
+    if (!creatureId) {
       return NextResponse.json(
-        { error: 'creatureVarName is required' },
+        { error: 'creatureId is required' },
         { status: 400 }
       );
     }
@@ -73,60 +32,61 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const creaturesFilePath = path.join(
+    const configsFilePath = path.join(
       process.cwd(),
       'src',
       'constants',
-      'creatures.ts'
+      'tdConfigs.ts'
     );
-    let fileContent = fs.readFileSync(creaturesFilePath, 'utf-8');
+    let fileContent = fs.readFileSync(configsFilePath, 'utf-8');
 
-    // Find the creature constant block by variable name
-    const creaturePattern = new RegExp(
-      `(export const ${creatureVarName}:\\s*Creature\\s*=\\s*\\{)([\\s\\S]*?)(\\};)`,
-      'm'
-    );
+    // Extract the object part
+    const exportIndex = fileContent.indexOf('CREATURE_TD_CONFIGS');
+    const objStart = fileContent.indexOf('{', exportIndex);
+    const objEnd = fileContent.lastIndexOf('}');
 
-    const match = fileContent.match(creaturePattern);
-    if (!match) {
+    if (objStart === -1 || objEnd === -1) {
       return NextResponse.json(
-        {
-          error: `Creature variable "${creatureVarName}" not found in creatures.ts`,
-        },
-        { status: 404 }
+        { error: 'Could not parse tdConfigs.ts' },
+        { status: 500 }
       );
     }
 
-    let creatureBlock = match[2];
+    // Since it's a dev tool, we evaluate the object string to modify it
+    // Note: evaluating code from the file we just read, which is safe locally
+    const objStr = fileContent.substring(objStart, objEnd + 1);
 
-    // Remove existing tdConfig block
-    creatureBlock = removeTdConfig(creatureBlock);
+    // Evaluate safely by wrapping in parentheses
+    let configsObject;
+    try {
+      configsObject = eval('(' + objStr + ')');
+    } catch (e) {
+      console.error('Eval error:', e);
+      return NextResponse.json(
+        { error: 'Failed to evaluate tdConfigs.ts' },
+        { status: 500 }
+      );
+    }
 
-    // Clean up any double newlines from removal
-    creatureBlock = creatureBlock.replace(/\n\n+/g, '\n');
-    creatureBlock = creatureBlock.replace(/,?\s*$/, ',\n');
+    // Update the specific creature's config
+    configsObject[creatureId] = tdConfig;
 
-    // Format the new tdConfig
-    let formattedJson = JSON.stringify(tdConfig, null, 2);
-    // Remove quotes from known simple property keys
+    // Format new JSON string
+    let formattedJson = JSON.stringify(configsObject, null, 2);
+    // Remove quotes from known simple property keys to look like standard JS
     formattedJson = formattedJson.replace(/"([^"]+)":/g, '$1:');
 
-    // Indent everything inside to match standard prettier format (add 2 spaces)
-    const indentedJson = formattedJson
-      .split('\n')
-      .map((line, idx) => (idx === 0 ? line : '  ' + line))
-      .join('\n');
+    // Reconstruct the file content
+    const newFileContent = `import { UnitVisuals } from '@/types/baseGame';
 
-    creatureBlock += `  tdConfig: ${indentedJson},\n`;
+export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = ${formattedJson};
+`;
 
-    const newBlock = match[1] + creatureBlock + match[3];
-    fileContent = fileContent.replace(match[0], newBlock);
-
-    fs.writeFileSync(creaturesFilePath, fileContent, 'utf-8');
+    fs.writeFileSync(configsFilePath, newFileContent, 'utf-8');
 
     return NextResponse.json({
       success: true,
-      message: `Updated ${creatureVarName}`,
+      message: `Updated tdConfig for ${creatureId}`,
     });
   } catch (error) {
     console.error('Error saving creature tdConfig:', error);

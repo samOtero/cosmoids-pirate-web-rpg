@@ -6,6 +6,7 @@ import {
 } from '@/engine/tower-defense/TowerDefenseEngine';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { ElementType } from '@/types/baseGame';
+import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 
 const TYPE_COLORS: Record<ElementType, number> = {
   [ElementType.WATER]: 0x3b82f6,
@@ -301,9 +302,11 @@ export default function PixiBattlefield({
 
           if (tsprite && shadow) {
             const baseCreature = TD_CREATURE_DEFS[tower.speciesId].baseCreature;
+            const tdConfigMap = CREATURE_TD_CONFIGS[baseCreature.id] || {
+              default: { scale: 1 },
+            };
             const tdConfig =
-              baseCreature.tdConfig[tower.facingDirection] ||
-              baseCreature.tdConfig.default;
+              tdConfigMap[tower.facingDirection] || tdConfigMap.default;
 
             const bScale = tdConfig.scale ?? 1;
             const flipX = tdConfig.flipX ?? false;
@@ -563,9 +566,11 @@ export default function PixiBattlefield({
           if (esprite && shadow) {
             const baseCreature =
               TD_CREATURE_DEFS[enemy.definitionId].baseCreature;
+            const tdConfigMap = CREATURE_TD_CONFIGS[baseCreature.id] || {
+              default: { scale: 1 },
+            };
             const tdConfig =
-              baseCreature.tdConfig[enemy.facingDirection] ||
-              baseCreature.tdConfig.default;
+              tdConfigMap[enemy.facingDirection] || tdConfigMap.default;
 
             const bScale = tdConfig.scale ?? 1;
             const flipX = tdConfig.flipX ?? false;

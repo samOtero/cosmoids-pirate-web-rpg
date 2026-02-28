@@ -113,7 +113,6 @@ export interface Creature {
   movementId?: string;
   startingEnergy: number;
   currentEnergy: number;
-  tdConfig: UnitVisuals;
 }
 
 export interface IslandNode {
