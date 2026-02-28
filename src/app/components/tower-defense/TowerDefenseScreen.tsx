@@ -30,6 +30,8 @@ export default function TowerDefenseScreen({
   const playerCreatures = (profile?.creatures || []).slice(0, 6);
 
   const [uiLives, setUiLives] = useState(engineRef.current.lives);
+  const [uiElapsedSeconds, setUiElapsedSeconds] = useState(0);
+  const lastSecondRef = useRef(0);
   const [activeTowerIds, setActiveTowerIds] = useState<string[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [uiUpdateToggle, setUiUpdateToggle] = useState(false);
@@ -49,6 +51,14 @@ export default function TowerDefenseScreen({
 
   const requestRef = useRef<number | null>(null);
   const previousTimeRef = useRef<number | null>(null);
+
+  const [hasStarted, setHasStarted] = useState(false);
+
+  useEffect(() => {
+    if (isPlaying && !hasStarted) {
+      setHasStarted(true);
+    }
+  }, [isPlaying, hasStarted]);
 
   // Subscribe to engine events that require a UI re-render
   useEffect(() => {
@@ -98,6 +108,12 @@ export default function TowerDefenseScreen({
           if (onLose) onLose();
           else alert('Game Over!');
         }
+      }
+
+      const currentSec = Math.floor(engineRef.current.elapsedTimeMs / 1000);
+      if (currentSec !== lastSecondRef.current) {
+        lastSecondRef.current = currentSec;
+        setUiElapsedSeconds(currentSec);
       }
 
       // 3. Check win condition
@@ -163,7 +179,18 @@ export default function TowerDefenseScreen({
       <div className="bg-slate-800 p-4 shrink-0 flex items-center justify-between border-b border-cyan-800">
         <h2 className="text-xl font-bold text-cyan-400">Tower Defense</h2>
         <div className="flex items-center gap-4 text-white">
-          <span>Lives: {uiLives}</span>
+          {engineRef.current.surviveUntil &&
+            engineRef.current.surviveUntil > 0 &&
+            hasStarted && (
+              <span className="font-mono bg-slate-900 px-3 py-1 rounded text-yellow-400 border border-yellow-700/50 shadow-inner">
+                Time:{' '}
+                {Math.max(0, engineRef.current.surviveUntil - uiElapsedSeconds)}
+                s
+              </span>
+            )}
+          <span className="font-mono bg-slate-900 px-3 py-1 rounded text-red-400 border border-red-900/50 shadow-inner">
+            Lives: {uiLives}
+          </span>
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             className="px-4 py-2 bg-cyan-700 hover:bg-cyan-600 rounded font-bold"
