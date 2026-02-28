@@ -35,16 +35,17 @@ export const BUG_STAGE_1: Creature = {
   level: 3,
   xp: 0,
   moves: ['Tackle', 'String Shot'],
-  spriteUrl: '/bug-2-basic-normal-neutral-skin-1.png',
-  battleSpriteUrl: '/battles/cosmoids/bug-1-basic-normal-neutral-skin-1.png',
+  spriteUrl: '/battles/cosmoids/bug_1_left_1.png',
+  battleSpriteUrl: '/battles/cosmoids/bug_1_left_1.png',
   startingEnergy: 50,
   currentEnergy: 50,
   movementId: 'lizard',
 
   speciesId: '',
-  tdSpriteScale: 0.06,
+  tdSpriteScale: 0.4,
+  tdShadowScaleX: 1.55,
   tdShadowScaleY: 0.85,
-  tdShadowOffsetY: 10,
+  tdShadowOffsetY: 9,
 };
 
 export const BUG_STAGE_2: Creature = {
@@ -108,12 +109,15 @@ export const STARTER_CRAB: Creature = {
   level: 1,
   xp: 0,
   moves: ['Vine Whip', 'Scratch'],
-  spriteUrl: '/crab-starter-grass-neutral-skin-1.png',
-  battleSpriteUrl: '/crab-starter-grass-neutral-skin-1.png',
+  spriteUrl: '/battles/cosmoids/palmit_down_1.png',
+  battleSpriteUrl: '/battles/cosmoids/palmit_down_1.png',
   startingEnergy: 100,
   currentEnergy: 100,
   speciesId: '',
-  tdSpriteScale: 0.1,
+  tdSpriteScale: 0.47,
+  tdShadowScaleX: 1.25,
+  tdShadowOffsetX: 5,
+  tdShadowOffsetY: 6,
 };
 
 export const STARTER_IGUANA: Creature = {
@@ -154,10 +158,13 @@ export const STARTER_MONKEY: Creature = {
   level: 1,
   xp: 0,
   moves: ['Bubble Beam', 'Scratch'],
-  spriteUrl: '/monkey_starter_water_neutral_skin_1.png',
-  battleSpriteUrl: '/monkey_starter_water_battle_skin_1_actual.png',
+  spriteUrl: '/battles/cosmoids/monkeg_down_1_v2.png',
+  battleSpriteUrl: '/battles/cosmoids/monkeg_down_1_v2.png',
   startingEnergy: 100,
   currentEnergy: 100,
   speciesId: '',
-  tdSpriteScale: 0.1,
+  tdSpriteScale: 0.29,
+  tdShadowScaleX: 1.4,
+  tdShadowOffsetX: -2,
+  tdShadowOffsetY: 26,
 };
