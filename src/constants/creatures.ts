@@ -128,18 +128,18 @@ export const STARTER_IGUANA: Creature = {
   level: 1,
   xp: 0,
   moves: ['Ember', 'Scratch'],
-  spriteUrl: '/battles/cosmoids/fueguana_left_1.png',
-  battleSpriteUrl: '/battles/cosmoids/fueguana_left_1.png',
+  spriteUrl: '/battles/cosmoids/fueguana_left_1_v3.png',
+  battleSpriteUrl: '/battles/cosmoids/fueguana_left_1_v3.png',
   movementId: 'lizard',
   startingEnergy: 100,
   currentEnergy: 100,
 
   speciesId: '',
-  tdSpriteScale: 0.3,
+  tdSpriteScale: 0.65,
   tdShadowScaleX: 1.9,
-  tdShadowScaleY: 1.15,
+  tdShadowScaleY: 0.6,
   tdShadowOffsetX: -7,
-  tdShadowOffsetY: 13,
+  tdShadowOffsetY: 7,
 };
 
 export const STARTER_MONKEY: Creature = {

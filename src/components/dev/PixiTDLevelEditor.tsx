@@ -93,10 +93,10 @@ export default function PixiTDLevelEditor({
       containerRef.current!.appendChild(app.canvas);
 
       // Add background
-      await PIXI.Assets.load('/battles/bg/bg_dock_battle_pixel.png');
+      await PIXI.Assets.load('/battles/bg/bg_dock_battle_td.png');
       if (isDestroyed) return;
 
-      const bgSprite = PIXI.Sprite.from('/battles/bg/bg_dock_battle_pixel.png');
+      const bgSprite = PIXI.Sprite.from('/battles/bg/bg_dock_battle_td.png');
       app.stage.addChildAt(bgSprite, 0); // Background at bottom
 
       // Handle resize

@@ -96,10 +96,10 @@ export default function PixiBattlefield({
       containerRef.current!.appendChild(app.canvas);
 
       // Add background
-      await PIXI.Assets.load('/battles/bg/bg_dock_battle_pixel.png');
+      await PIXI.Assets.load('/battles/bg/bg_dock_battle_td.png');
       if (isDestroyed) return;
 
-      const bgSprite = PIXI.Sprite.from('/battles/bg/bg_dock_battle_pixel.png');
+      const bgSprite = PIXI.Sprite.from('/battles/bg/bg_dock_battle_td.png');
       app.stage.addChild(bgSprite);
 
       // Handle resize
