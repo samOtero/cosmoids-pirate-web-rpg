@@ -310,6 +310,11 @@ export default function PixiBattlefield({
             tsprite.scale.x = flipX ? -bScale : bScale;
             tsprite.scale.y = tdConfig.flipY ? -bScale : bScale;
 
+            const sOffsetX = tdConfig.offsetX ?? 0;
+            const sOffsetY = tdConfig.offsetY ?? 0;
+            tsprite.x = sOffsetX;
+            tsprite.y = sOffsetY;
+
             const spriteUrl =
               tdConfig.url ||
               baseCreature.battleSpriteUrl ||
@@ -566,6 +571,11 @@ export default function PixiBattlefield({
             const flipX = tdConfig.flipX ?? false;
             esprite.scale.x = flipX ? -bScale : bScale;
             esprite.scale.y = tdConfig.flipY ? -bScale : bScale;
+
+            const sOffsetX = tdConfig.offsetX ?? 0;
+            const sOffsetY = tdConfig.offsetY ?? 0;
+            esprite.x = sOffsetX;
+            esprite.y = sOffsetY;
 
             const spriteUrl =
               tdConfig.url ||

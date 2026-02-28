@@ -72,6 +72,8 @@ export interface UnitSpriteConfig {
   shadowScaleY?: number;
   shadowOffsetX?: number;
   shadowOffsetY?: number;
+  offsetX?: number;
+  offsetY?: number;
 }
 
 export interface UnitVisuals {

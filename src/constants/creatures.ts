@@ -194,7 +194,6 @@ export const STARTER_IGUANA: Creature = {
   currentEnergy: 100,
 
   speciesId: '',
-
   tdConfig: {
     default: {
       scale: 0.65,
@@ -204,18 +203,34 @@ export const STARTER_IGUANA: Creature = {
       shadowOffsetY: 7,
     },
     left: {
+      scale: 0.65,
+      shadowScaleX: 1.9,
+      shadowScaleY: 0.6,
+      shadowOffsetX: -7,
+      shadowOffsetY: 7,
       flipX: false,
     },
     right: {
+      scale: 0.65,
+      shadowScaleX: 1.9,
+      shadowScaleY: 0.6,
+      shadowOffsetX: -7,
+      shadowOffsetY: 7,
       flipX: true,
     },
     up: {
       url: '/battles/cosmoids/fueguana_up_1_v3.png',
       scale: 0.65,
+      offsetX: -11,
+      shadowOffsetY: 5,
+      shadowScaleX: 1.15,
     },
     down: {
       url: '/battles/cosmoids/fueguana_down_1_v3.png',
       scale: 0.65,
+      shadowOffsetX: -3,
+      offsetX: 10,
+      shadowOffsetY: 5,
     },
   },
 };

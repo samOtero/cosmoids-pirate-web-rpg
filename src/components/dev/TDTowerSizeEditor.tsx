@@ -76,6 +76,8 @@ export default function TDTowerSizeEditor({
   const shadowScaleY = activeConfig.shadowScaleY ?? 1;
   const shadowOffsetX = activeConfig.shadowOffsetX ?? 0;
   const shadowOffsetY = activeConfig.shadowOffsetY ?? 0;
+  const offsetX = activeConfig.offsetX ?? 0;
+  const offsetY = activeConfig.offsetY ?? 0;
   const flipX = activeConfig.flipX ?? false;
   const spriteUrl =
     activeConfig.url || creature.battleSpriteUrl || creature.spriteUrl;
@@ -99,6 +101,8 @@ export default function TDTowerSizeEditor({
   const shadowScaleYRef = useRef(shadowScaleY);
   const shadowOffsetXRef = useRef(shadowOffsetX);
   const shadowOffsetYRef = useRef(shadowOffsetY);
+  const offsetXRef = useRef(offsetX);
+  const offsetYRef = useRef(offsetY);
   const flipXRef = useRef(flipX);
   const spriteUrlRef = useRef(spriteUrl);
 
@@ -117,6 +121,12 @@ export default function TDTowerSizeEditor({
   useEffect(() => {
     shadowOffsetYRef.current = shadowOffsetY;
   }, [shadowOffsetY]);
+  useEffect(() => {
+    offsetXRef.current = offsetX;
+  }, [offsetX]);
+  useEffect(() => {
+    offsetYRef.current = offsetY;
+  }, [offsetY]);
   useEffect(() => {
     flipXRef.current = flipX;
   }, [flipX]);
@@ -247,8 +257,8 @@ export default function TDTowerSizeEditor({
         }
 
         if (sprite) {
-          sprite.x = centerX;
-          sprite.y = centerY;
+          sprite.x = centerX + offsetXRef.current;
+          sprite.y = centerY + offsetYRef.current;
           const bScale = scaleRef.current;
           sprite.scale.x = flipXRef.current ? -bScale : bScale;
           sprite.scale.y = bScale;
@@ -470,6 +480,43 @@ export default function TDTowerSizeEditor({
                 value={shadowOffsetY}
                 onChange={(e) =>
                   updateActiveConfig({ shadowOffsetY: Number(e.target.value) })
+                }
+                className="w-full accent-cyan-500 h-2"
+              />
+            </div>
+
+            {/* Sprite Offset X */}
+            <div className="space-y-0.5 mt-2">
+              <div className="flex justify-between text-[10px] text-slate-400">
+                <span>Sprite Offset X (Default is 0)</span>
+                <span className="font-mono text-cyan-400">{offsetX}px</span>
+              </div>
+              <input
+                type="range"
+                min={-100}
+                max={100}
+                step={1}
+                value={offsetX}
+                onChange={(e) =>
+                  updateActiveConfig({ offsetX: Number(e.target.value) })
+                }
+                className="w-full accent-cyan-500 h-2"
+              />
+            </div>
+            {/* Sprite Offset Y */}
+            <div className="space-y-0.5 mt-2">
+              <div className="flex justify-between text-[10px] text-slate-400">
+                <span>Sprite Offset Y (Default is 0)</span>
+                <span className="font-mono text-cyan-400">{offsetY}px</span>
+              </div>
+              <input
+                type="range"
+                min={-100}
+                max={100}
+                step={1}
+                value={offsetY}
+                onChange={(e) =>
+                  updateActiveConfig({ offsetY: Number(e.target.value) })
                 }
                 className="w-full accent-cyan-500 h-2"
               />
