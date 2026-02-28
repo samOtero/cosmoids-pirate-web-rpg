@@ -3,16 +3,19 @@ import { UnitVisuals } from '@/types/baseGame';
 export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   senticle: {
     default: {
+      url: '/battles/cosmoids/eel-basic-normal-neutral-skin-battle-ground-2.png',
       scale: 0.35,
     },
   },
   bug_stage_1: {
     default: {
+      url: '/battles/cosmoids/bug_1_left_1.png',
       scale: 0.5,
     },
   },
   bug_stage_2: {
     default: {
+      url: '/battles/cosmoids/bug-2-basic-normal-neutral-skin-1.png',
       scale: 0.15,
       shadowScaleX: 1.2,
       shadowOffsetY: 52,
@@ -33,6 +36,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   bug_stage_3: {
     default: {
+      url: '/battles/cosmoids/moth-basic-normal-neutral-skin-1.png',
       scale: 0.17,
       flipX: true,
     },
@@ -45,6 +49,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   starter_crab: {
     default: {
+      url: '/battles/cosmoids/palmit_down_1.png',
       scale: 0.47,
       shadowScaleX: 1.25,
       shadowOffsetX: 5,
@@ -53,16 +58,20 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
     left: {
       scale: 0.47,
       shadowScaleX: 1.25,
-      shadowOffsetX: 5,
-      shadowOffsetY: 6,
+      shadowOffsetX: -2,
+      shadowOffsetY: 7,
       flipX: false,
+      url: '/battles/cosmoids/palmit_left_1.png',
+      offsetX: -3,
     },
     right: {
       scale: 0.47,
       shadowScaleX: 1.25,
-      shadowOffsetX: 5,
-      shadowOffsetY: 6,
+      shadowOffsetX: -2,
+      shadowOffsetY: 7,
       flipX: true,
+      url: '/battles/cosmoids/palmit_left_1.png',
+      offsetX: 3,
     },
     up: {
       url: '/battles/cosmoids/palmit_up_1.png',
@@ -71,9 +80,16 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetY: 8,
       shadowScaleX: 1.3,
     },
+    down: {
+      scale: 0.46,
+      offsetX: -4,
+      shadowOffsetY: 8,
+      shadowScaleX: 1.3,
+    },
   },
   starter_iguana: {
     default: {
+      url: '/battles/cosmoids/fueguana_left_1_v3.png',
       scale: 0.65,
       shadowScaleX: 1.9,
       shadowScaleY: 0.6,
@@ -113,6 +129,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   starter_monkey: {
     default: {
+      url: '/battles/cosmoids/monkeg_down_1_v2.png',
       scale: 0.29,
       shadowScaleX: 1.4,
       shadowOffsetX: -2,

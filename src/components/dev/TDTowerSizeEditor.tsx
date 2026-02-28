@@ -2,15 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import * as PIXI from 'pixi.js';
-import {
-  SENTICLE,
-  BUG_STAGE_1,
-  BUG_STAGE_2,
-  BUG_STAGE_3,
-  STARTER_CRAB,
-  STARTER_IGUANA,
-  STARTER_MONKEY,
-} from '@/constants/creatures';
+import * as CREATURES from '@/constants/creatures';
 import { Creature } from '@/types/baseGame';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 
@@ -43,16 +35,10 @@ const BATTLE_SPRITES = [
   '/battles/cosmoids/parrot_fainted.png',
 ];
 
-// Map variable names to creatures for both display and saving
-const ALL_CREATURES: { varName: string; creature: Creature }[] = [
-  { varName: 'BUG_STAGE_1', creature: BUG_STAGE_1 },
-  { varName: 'BUG_STAGE_2', creature: BUG_STAGE_2 },
-  { varName: 'BUG_STAGE_3', creature: BUG_STAGE_3 },
-  { varName: 'STARTER_CRAB', creature: STARTER_CRAB },
-  { varName: 'STARTER_IGUANA', creature: STARTER_IGUANA },
-  { varName: 'STARTER_MONKEY', creature: STARTER_MONKEY },
-  { varName: 'SENTICLE', creature: SENTICLE },
-];
+const ALL_CONFIG_KEYS = Object.keys(CREATURE_TD_CONFIGS);
+const ALL_CREATURES_LIST = Object.values(CREATURES).filter(
+  (c: any) => c && typeof c === 'object' && 'id' in c
+) as Creature[];
 
 export default function TDTowerSizeEditor({
   onClose,
@@ -60,8 +46,8 @@ export default function TDTowerSizeEditor({
   onClose: () => void;
 }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const selectedEntry = ALL_CREATURES[selectedIndex];
-  const creature = selectedEntry.creature;
+  const selectedConfigKey = ALL_CONFIG_KEYS[selectedIndex];
+  const creature = ALL_CREATURES_LIST.find((c) => c.id === selectedConfigKey);
 
   const [selectedDirection, setSelectedDirection] = useState<
     'default' | 'up' | 'down' | 'left' | 'right'
@@ -70,7 +56,7 @@ export default function TDTowerSizeEditor({
   const [currentTdConfig, setCurrentTdConfig] = useState<any>(
     JSON.parse(
       JSON.stringify(
-        CREATURE_TD_CONFIGS[creature.id] || { default: { scale: 1 } }
+        CREATURE_TD_CONFIGS[selectedConfigKey] || { default: { scale: 1 } }
       )
     )
   );
@@ -85,7 +71,8 @@ export default function TDTowerSizeEditor({
   const offsetY = activeConfig.offsetY ?? 0;
   const flipX = activeConfig.flipX ?? false;
   const spriteUrl =
-    activeConfig.url || creature.battleSpriteUrl || creature.spriteUrl;
+    activeConfig.url ||
+    (creature ? creature.battleSpriteUrl || creature.spriteUrl : '');
 
   const updateActiveConfig = (updates: any) => {
     setCurrentTdConfig((prev: any) => ({
@@ -139,12 +126,12 @@ export default function TDTowerSizeEditor({
     spriteUrlRef.current = spriteUrl;
   }, [spriteUrl]);
 
-  const handleCreatureChange = (index: number) => {
+  const handleConfigChange = (index: number) => {
     setSelectedIndex(index);
-    const c = ALL_CREATURES[index].creature;
+    const key = ALL_CONFIG_KEYS[index];
     setCurrentTdConfig(
       JSON.parse(
-        JSON.stringify(CREATURE_TD_CONFIGS[c.id] || { default: { scale: 1 } })
+        JSON.stringify(CREATURE_TD_CONFIGS[key] || { default: { scale: 1 } })
       )
     );
     setSelectedDirection('default');
@@ -161,13 +148,13 @@ export default function TDTowerSizeEditor({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          creatureId: creature.id,
+          creatureId: selectedConfigKey,
           tdConfig: configToSave,
         }),
       });
       const data = await res.json();
       if (res.ok) {
-        setStatusMsg(`✅ Saved ${selectedEntry.varName}!`);
+        setStatusMsg(`✅ Saved ${selectedConfigKey}!`);
       } else {
         setStatusMsg(`❌ ${data.error}`);
       }
@@ -290,7 +277,7 @@ export default function TDTowerSizeEditor({
         console.warn('Pixi cleanup error:', e);
       }
     };
-  }, [creature.id, creature.battleSpriteUrl, creature.spriteUrl]);
+  }, [selectedConfigKey, creature?.battleSpriteUrl, creature?.spriteUrl]);
 
   return (
     <div className="fixed inset-0 z-9999 flex flex-col bg-black/95 text-white font-sans">
@@ -310,19 +297,19 @@ export default function TDTowerSizeEditor({
       <div className="flex flex-1 min-h-0">
         {/* Controls Panel */}
         <div className="w-72 shrink-0 bg-slate-900 border-r border-slate-700 overflow-y-auto p-3 space-y-4">
-          {/* Creature Picker */}
+          {/* Config Picker */}
           <div className="space-y-1">
             <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">
-              Creature
+              TD Config ID
             </label>
             <select
               value={selectedIndex}
-              onChange={(e) => handleCreatureChange(Number(e.target.value))}
+              onChange={(e) => handleConfigChange(Number(e.target.value))}
               className="w-full bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-cyan-500"
             >
-              {ALL_CREATURES.map((entry, i) => (
-                <option key={entry.varName} value={i}>
-                  {entry.creature.name} ({entry.varName})
+              {ALL_CONFIG_KEYS.map((key, i) => (
+                <option key={key} value={i}>
+                  {key}
                 </option>
               ))}
             </select>
@@ -362,11 +349,13 @@ export default function TDTowerSizeEditor({
                 </option>
               ))}
             </select>
-            {spriteUrl === (creature.battleSpriteUrl || creature.spriteUrl) && (
-              <p className="text-[10px] text-slate-500 italic">
-                Inheriting default creature sprite
-              </p>
-            )}
+            {creature &&
+              spriteUrl ===
+                (creature.battleSpriteUrl || creature.spriteUrl) && (
+                <p className="text-[10px] text-slate-500 italic">
+                  Inheriting default creature sprite
+                </p>
+              )}
           </div>
 
           {/* Sliders */}
