@@ -2,9 +2,49 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
+function removeTdConfig(content: string) {
+  const startIndex = content.indexOf('tdConfig:');
+  if (startIndex === -1) return content;
+
+  let braceCount = 0;
+  let inString = false;
+  let endIndex = -1;
+  let startedBrace = false;
+
+  for (let i = startIndex; i < content.length; i++) {
+    const char = content[i];
+    if (char === "'" || char === '"' || char === '`') {
+      if (!inString) inString = true;
+      else if (content[i - 1] !== '\\') inString = false;
+    }
+    if (!inString) {
+      if (char === '{') {
+        braceCount++;
+        startedBrace = true;
+      }
+      if (char === '}') {
+        braceCount--;
+      }
+    }
+    if (startedBrace && braceCount === 0) {
+      // Find following comma if any
+      let nextChar = i + 1;
+      while (nextChar < content.length && /\\s/.test(content[nextChar]))
+        nextChar++;
+      if (content[nextChar] === ',') nextChar++;
+      endIndex = nextChar;
+      break;
+    }
+  }
+
+  if (endIndex !== -1) {
+    return content.substring(0, startIndex) + content.substring(endIndex);
+  }
+  return content;
+}
+
 /**
- * Dev-only API route to save creature battle position & scale directly to creatures.ts.
- * POST body: { creatureVarName: string, battlePosition: { bottom: number, left: number }, battleScale: number, tdSpriteScale: number }
+ * Dev-only API route to save creature tdConfig directly to creatures.ts.
  */
 export async function POST(request: NextRequest) {
   // Only allow in development
@@ -17,20 +57,18 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const {
-      creatureVarName,
-      battlePosition,
-      battleScale,
-      tdSpriteScale,
-      tdShadowScaleX,
-      tdShadowScaleY,
-      tdShadowOffsetX,
-      tdShadowOffsetY,
-    } = body;
+    const { creatureVarName, tdConfig } = body;
 
     if (!creatureVarName) {
       return NextResponse.json(
         { error: 'creatureVarName is required' },
+        { status: 400 }
+      );
+    }
+
+    if (!tdConfig) {
+      return NextResponse.json(
+        { error: 'tdConfig is required' },
         { status: 400 }
       );
     }
@@ -44,7 +82,6 @@ export async function POST(request: NextRequest) {
     let fileContent = fs.readFileSync(creaturesFilePath, 'utf-8');
 
     // Find the creature constant block by variable name
-    // Pattern: `export const VAR_NAME: Creature = {`
     const creaturePattern = new RegExp(
       `(export const ${creatureVarName}:\\s*Creature\\s*=\\s*\\{)([\\s\\S]*?)(\\};)`,
       'm'
@@ -62,64 +99,25 @@ export async function POST(request: NextRequest) {
 
     let creatureBlock = match[2];
 
-    // Remove existing properties if present
-    creatureBlock = creatureBlock.replace(
-      /\s*battlePosition:\s*\{[^}]*\},?\n?/,
-      '\n'
-    );
-    creatureBlock = creatureBlock.replace(
-      /\s*tdSpriteScale:\s*[+-]?[\d.]+,?\n?/,
-      '\n'
-    );
-    creatureBlock = creatureBlock.replace(
-      /\s*tdShadowScale:\s*[+-]?[\d.]+,?\n?/,
-      '\n'
-    );
-    creatureBlock = creatureBlock.replace(
-      /\s*tdShadowScaleX:\s*[+-]?[\d.]+,?\n?/,
-      '\n'
-    );
-    creatureBlock = creatureBlock.replace(
-      /\s*tdShadowScaleY:\s*[+-]?[\d.]+,?\n?/,
-      '\n'
-    );
-    creatureBlock = creatureBlock.replace(
-      /\s*tdShadowOffsetX:\s*[+-]?[\d.]+,?\n?/,
-      '\n'
-    );
-    creatureBlock = creatureBlock.replace(
-      /\s*tdShadowOffsetY:\s*[+-]?[\d.]+,?\n?/,
-      '\n'
-    );
+    // Remove existing tdConfig block
+    creatureBlock = removeTdConfig(creatureBlock);
 
     // Clean up any double newlines from removal
     creatureBlock = creatureBlock.replace(/\n\n+/g, '\n');
-
-    // Add new values before the closing brace
-    // Ensure the last property has a trailing comma
     creatureBlock = creatureBlock.replace(/,?\s*$/, ',\n');
 
-    if (battlePosition) {
-      creatureBlock += `  battlePosition: { bottom: ${battlePosition.bottom}, left: ${battlePosition.left} },\n`;
-    }
-    if (battleScale !== undefined && battleScale !== 1) {
-      creatureBlock += `  battleScale: ${battleScale},\n`;
-    }
-    if (tdSpriteScale !== undefined && tdSpriteScale !== 1) {
-      creatureBlock += `  tdSpriteScale: ${tdSpriteScale},\n`;
-    }
-    if (tdShadowScaleX !== undefined && tdShadowScaleX !== 1) {
-      creatureBlock += `  tdShadowScaleX: ${tdShadowScaleX},\n`;
-    }
-    if (tdShadowScaleY !== undefined && tdShadowScaleY !== 1) {
-      creatureBlock += `  tdShadowScaleY: ${tdShadowScaleY},\n`;
-    }
-    if (tdShadowOffsetX !== undefined && tdShadowOffsetX !== 0) {
-      creatureBlock += `  tdShadowOffsetX: ${tdShadowOffsetX},\n`;
-    }
-    if (tdShadowOffsetY !== undefined && tdShadowOffsetY !== 0) {
-      creatureBlock += `  tdShadowOffsetY: ${tdShadowOffsetY},\n`;
-    }
+    // Format the new tdConfig
+    let formattedJson = JSON.stringify(tdConfig, null, 2);
+    // Remove quotes from known simple property keys
+    formattedJson = formattedJson.replace(/"([^"]+)":/g, '$1:');
+
+    // Indent everything inside to match standard prettier format (add 2 spaces)
+    const indentedJson = formattedJson
+      .split('\n')
+      .map((line, idx) => (idx === 0 ? line : '  ' + line))
+      .join('\n');
+
+    creatureBlock += `  tdConfig: ${indentedJson},\n`;
 
     const newBlock = match[1] + creatureBlock + match[3];
     fileContent = fileContent.replace(match[0], newBlock);
@@ -131,9 +129,9 @@ export async function POST(request: NextRequest) {
       message: `Updated ${creatureVarName}`,
     });
   } catch (error) {
-    console.error('Error saving creature position:', error);
+    console.error('Error saving creature tdConfig:', error);
     return NextResponse.json(
-      { error: 'Failed to save creature position' },
+      { error: 'Failed to save creature tdConfig' },
       { status: 500 }
     );
   }

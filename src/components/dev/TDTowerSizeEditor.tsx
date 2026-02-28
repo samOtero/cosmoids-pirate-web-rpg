@@ -13,6 +13,35 @@ import {
 } from '@/constants/creatures';
 import { Creature } from '@/types/baseGame';
 
+const BATTLE_SPRITES = [
+  '/battles/cosmoids/bug-1-basic-normal-neutral-skin-1.png',
+  '/battles/cosmoids/bug-2-basic-normal-neutral-skin-1.png',
+  '/battles/cosmoids/bug_1_down_1.png',
+  '/battles/cosmoids/bug_1_left_1.png',
+  '/battles/cosmoids/bug_1_up_1.png',
+  '/battles/cosmoids/eel-basic-normal-neutral-skin-1_transparent_actual.png',
+  '/battles/cosmoids/eel-basic-normal-neutral-skin-battle-ground-2.png',
+  '/battles/cosmoids/fueguana_down_1_v2.png',
+  '/battles/cosmoids/fueguana_down_1_v3.png',
+  '/battles/cosmoids/fueguana_left_1.png',
+  '/battles/cosmoids/fueguana_left_1_v2.png',
+  '/battles/cosmoids/fueguana_left_1_v3.png',
+  '/battles/cosmoids/fueguana_up_1_v2.png',
+  '/battles/cosmoids/fueguana_up_1_v3.png',
+  '/battles/cosmoids/iguana_starter_fire_neutral_skin_1_transparent_actual.png',
+  '/battles/cosmoids/monkeg_down_1.png',
+  '/battles/cosmoids/monkeg_down_1_v2.png',
+  '/battles/cosmoids/monkeg_left_1.png',
+  '/battles/cosmoids/monkeg_left_1_v2.png',
+  '/battles/cosmoids/monkeg_up_1.png',
+  '/battles/cosmoids/monkeg_up_1_v2.png',
+  '/battles/cosmoids/moth-basic-normal-neutral-skin-1.png',
+  '/battles/cosmoids/palmit_down_1.png',
+  '/battles/cosmoids/palmit_left_1.png',
+  '/battles/cosmoids/palmit_up_1.png',
+  '/battles/cosmoids/parrot_fainted.png',
+];
+
 // Map variable names to creatures for both display and saving
 const ALL_CREATURES: { varName: string; creature: Creature }[] = [
   { varName: 'BUG_STAGE_1', creature: BUG_STAGE_1 },
@@ -33,20 +62,33 @@ export default function TDTowerSizeEditor({
   const selectedEntry = ALL_CREATURES[selectedIndex];
   const creature = selectedEntry.creature;
 
-  // Position state – initialized from creature data or defaults
-  const [scale, setScale] = useState(creature.tdSpriteScale ?? 1);
-  const [shadowScaleX, setShadowScaleX] = useState(
-    creature.tdShadowScaleX ?? 1
+  const [selectedDirection, setSelectedDirection] = useState<
+    'default' | 'up' | 'down' | 'left' | 'right'
+  >('default');
+
+  const [currentTdConfig, setCurrentTdConfig] = useState<any>(
+    JSON.parse(JSON.stringify(creature.tdConfig || { default: { scale: 1 } }))
   );
-  const [shadowScaleY, setShadowScaleY] = useState(
-    creature.tdShadowScaleY ?? 1
-  );
-  const [shadowOffsetX, setShadowOffsetX] = useState(
-    creature.tdShadowOffsetX ?? 0
-  );
-  const [shadowOffsetY, setShadowOffsetY] = useState(
-    creature.tdShadowOffsetY ?? 0
-  );
+
+  const activeConfig = currentTdConfig[selectedDirection] || {};
+  const scale = activeConfig.scale ?? 1;
+  const shadowScaleX = activeConfig.shadowScaleX ?? 1;
+  const shadowScaleY = activeConfig.shadowScaleY ?? 1;
+  const shadowOffsetX = activeConfig.shadowOffsetX ?? 0;
+  const shadowOffsetY = activeConfig.shadowOffsetY ?? 0;
+  const flipX = activeConfig.flipX ?? false;
+  const spriteUrl =
+    activeConfig.url || creature.battleSpriteUrl || creature.spriteUrl;
+
+  const updateActiveConfig = (updates: any) => {
+    setCurrentTdConfig((prev: any) => ({
+      ...prev,
+      [selectedDirection]: {
+        ...(prev[selectedDirection] || {}),
+        ...updates,
+      },
+    }));
+  };
 
   const [saving, setSaving] = useState(false);
   const [statusMsg, setStatusMsg] = useState('');
@@ -57,8 +99,9 @@ export default function TDTowerSizeEditor({
   const shadowScaleYRef = useRef(shadowScaleY);
   const shadowOffsetXRef = useRef(shadowOffsetX);
   const shadowOffsetYRef = useRef(shadowOffsetY);
+  const flipXRef = useRef(flipX);
+  const spriteUrlRef = useRef(spriteUrl);
 
-  // Keep ref in sync for PIXI ticker without re-instantiating PIXI
   useEffect(() => {
     scaleRef.current = scale;
   }, [scale]);
@@ -74,32 +117,35 @@ export default function TDTowerSizeEditor({
   useEffect(() => {
     shadowOffsetYRef.current = shadowOffsetY;
   }, [shadowOffsetY]);
+  useEffect(() => {
+    flipXRef.current = flipX;
+  }, [flipX]);
+  useEffect(() => {
+    spriteUrlRef.current = spriteUrl;
+  }, [spriteUrl]);
 
-  // When creature selection changes, load its saved values
   const handleCreatureChange = (index: number) => {
     setSelectedIndex(index);
     const c = ALL_CREATURES[index].creature;
-    setScale(c.tdSpriteScale ?? 1);
-    setShadowScaleX(c.tdShadowScaleX ?? 1);
-    setShadowScaleY(c.tdShadowScaleY ?? 1);
-    setShadowOffsetX(c.tdShadowOffsetX ?? 0);
-    setShadowOffsetY(c.tdShadowOffsetY ?? 0);
+    setCurrentTdConfig(
+      JSON.parse(JSON.stringify(c.tdConfig || { default: { scale: 1 } }))
+    );
+    setSelectedDirection('default');
   };
 
   const handleSave = async () => {
     setSaving(true);
     setStatusMsg('');
     try {
+      // Create a clean copy to save
+      const configToSave = JSON.parse(JSON.stringify(currentTdConfig));
+
       const res = await fetch('/api/dev/save-creature-position', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           creatureVarName: selectedEntry.varName,
-          tdSpriteScale: scale,
-          tdShadowScaleX: shadowScaleX,
-          tdShadowScaleY: shadowScaleY,
-          tdShadowOffsetX: shadowOffsetX,
-          tdShadowOffsetY: shadowOffsetY,
+          tdConfig: configToSave,
         }),
       });
       const data = await res.json();
@@ -153,13 +199,12 @@ export default function TDTowerSizeEditor({
       shadow = new PIXI.Graphics();
       app.stage.addChild(shadow);
 
-      const spriteUrl = creature.battleSpriteUrl || creature.spriteUrl;
-      const texture = await PIXI.Assets.load(spriteUrl);
-      if (isDestroyed) return;
-
-      sprite = new PIXI.Sprite(texture);
+      sprite = new PIXI.Sprite();
       sprite.anchor.set(0.5);
       app.stage.addChild(sprite);
+
+      // Keep track of loaded url to prevent constant reloading
+      let currentLoadedUrl = '';
 
       app.ticker.add(() => {
         if (!app.screen) return;
@@ -190,20 +235,30 @@ export default function TDTowerSizeEditor({
           shadow.clear();
           const currentShadowScaleX = shadowScaleXRef.current;
           const currentShadowScaleY = shadowScaleYRef.current;
+          const bScale = scaleRef.current;
           shadow.ellipse(
             centerX + shadowOffsetXRef.current,
-            centerY + 30 * scaleRef.current + shadowOffsetYRef.current,
+            centerY + 30 * bScale + shadowOffsetYRef.current,
             25 * currentShadowScaleX,
             12 * currentShadowScaleY
           );
           shadow.fill({ color: 0x000000, alpha: 0.4 });
+          shadow.scale.x = flipXRef.current ? -1 : 1;
         }
 
         if (sprite) {
           sprite.x = centerX;
           sprite.y = centerY;
-          const currentScale = scaleRef.current;
-          sprite.scale.set(currentScale);
+          const bScale = scaleRef.current;
+          sprite.scale.x = flipXRef.current ? -bScale : bScale;
+          sprite.scale.y = bScale;
+
+          if (currentLoadedUrl !== spriteUrlRef.current) {
+            currentLoadedUrl = spriteUrlRef.current;
+            PIXI.Assets.load(spriteUrlRef.current).then((t) => {
+              if (!isDestroyed && sprite) sprite.texture = t;
+            });
+          }
         }
       });
     };
@@ -256,6 +311,47 @@ export default function TDTowerSizeEditor({
             </select>
           </div>
 
+          {/* Direction Picker */}
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">
+              Direction Config
+            </label>
+            <select
+              value={selectedDirection}
+              onChange={(e) => setSelectedDirection(e.target.value as any)}
+              className="w-full bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-cyan-500"
+            >
+              {['default', 'up', 'down', 'left', 'right'].map((dir) => (
+                <option key={dir} value={dir}>
+                  {dir} {currentTdConfig[dir] ? '(Configured)' : '(Inherits)'}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-1 pt-2 border-t border-slate-700">
+            <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">
+              Sprite Image
+            </label>
+            <select
+              value={spriteUrl}
+              onChange={(e) => updateActiveConfig({ url: e.target.value })}
+              className="w-full bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-cyan-500"
+            >
+              <option value="">-- Inherit Base Sprite --</option>
+              {BATTLE_SPRITES.map((url) => (
+                <option key={url} value={url}>
+                  {url.split('/').pop()}
+                </option>
+              ))}
+            </select>
+            {spriteUrl === (creature.battleSpriteUrl || creature.spriteUrl) && (
+              <p className="text-[10px] text-slate-500 italic">
+                Inheriting default creature sprite
+              </p>
+            )}
+          </div>
+
           {/* Sliders */}
           <div className="space-y-3 pt-2 border-t border-slate-700">
             <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">
@@ -275,9 +371,24 @@ export default function TDTowerSizeEditor({
                 max={5}
                 step={0.01}
                 value={scale}
-                onChange={(e) => setScale(Number(e.target.value))}
+                onChange={(e) =>
+                  updateActiveConfig({ scale: Number(e.target.value) })
+                }
                 className="w-full accent-cyan-500 h-2"
               />
+            </div>
+
+            {/* Flip X Toggle */}
+            <div className="flex items-center justify-between text-[10px] text-slate-400 mt-2">
+              <span className="font-bold uppercase text-slate-500 tracking-wider">
+                Flip Sprite X
+              </span>
+              <button
+                onClick={() => updateActiveConfig({ flipX: !flipX })}
+                className={`px-3 py-1 rounded text-xs transition border ${flipX ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/50' : 'bg-slate-800 border-slate-600 text-slate-400'}`}
+              >
+                {flipX ? 'ON' : 'OFF'}
+              </button>
             </div>
 
             {/* Shadow Scale X */}
@@ -297,7 +408,9 @@ export default function TDTowerSizeEditor({
                 max={5}
                 step={0.05}
                 value={shadowScaleX}
-                onChange={(e) => setShadowScaleX(Number(e.target.value))}
+                onChange={(e) =>
+                  updateActiveConfig({ shadowScaleX: Number(e.target.value) })
+                }
                 className="w-full accent-cyan-500 h-2"
               />
             </div>
@@ -315,7 +428,9 @@ export default function TDTowerSizeEditor({
                 max={5}
                 step={0.05}
                 value={shadowScaleY}
-                onChange={(e) => setShadowScaleY(Number(e.target.value))}
+                onChange={(e) =>
+                  updateActiveConfig({ shadowScaleY: Number(e.target.value) })
+                }
                 className="w-full accent-cyan-500 h-2"
               />
             </div>
@@ -333,7 +448,9 @@ export default function TDTowerSizeEditor({
                 max={100}
                 step={1}
                 value={shadowOffsetX}
-                onChange={(e) => setShadowOffsetX(Number(e.target.value))}
+                onChange={(e) =>
+                  updateActiveConfig({ shadowOffsetX: Number(e.target.value) })
+                }
                 className="w-full accent-cyan-500 h-2"
               />
             </div>
@@ -351,7 +468,9 @@ export default function TDTowerSizeEditor({
                 max={100}
                 step={1}
                 value={shadowOffsetY}
-                onChange={(e) => setShadowOffsetY(Number(e.target.value))}
+                onChange={(e) =>
+                  updateActiveConfig({ shadowOffsetY: Number(e.target.value) })
+                }
                 className="w-full accent-cyan-500 h-2"
               />
             </div>
@@ -376,18 +495,8 @@ export default function TDTowerSizeEditor({
             <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">
               Current Values
             </label>
-            <pre className="mt-1 bg-slate-950 border border-slate-700 rounded p-2 text-[10px] text-cyan-300 font-mono whitespace-pre-wrap">
-              {JSON.stringify(
-                {
-                  tdSpriteScale: scale,
-                  tdShadowScaleX: shadowScaleX,
-                  tdShadowScaleY: shadowScaleY,
-                  tdShadowOffsetX: shadowOffsetX,
-                  tdShadowOffsetY: shadowOffsetY,
-                },
-                null,
-                2
-              )}
+            <pre className="mt-1 bg-slate-950 border border-slate-700 rounded p-2 text-[10px] text-cyan-300 font-mono whitespace-pre-wrap overflow-x-auto">
+              {JSON.stringify(currentTdConfig, null, 2)}
             </pre>
           </div>
         </div>
