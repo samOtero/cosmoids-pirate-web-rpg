@@ -92,6 +92,7 @@ export class TowerDefenseEngine {
   public placementSpots: { x: number; y: number }[] = [];
   public environmentUnits: import('./types').EnvironmentUnit[] = [];
   public captureUnits: CaptureUnit[] = [];
+  public hasCaptureUnitsGoal: boolean = false;
 
   constructor(levelData: import('./types').TDLevelData | any) {
     const rawPaths: { x: number; y: number }[][] = levelData.paths || [];
@@ -131,7 +132,8 @@ export class TowerDefenseEngine {
       );
     }
 
-    if (levelData.captureUnits) {
+    if (levelData.captureUnits && levelData.captureUnits.length > 0) {
+      this.hasCaptureUnitsGoal = true;
       this.captureUnits = levelData.captureUnits.map(
         (cu: any, index: number) => ({
           id: `cap_unit_${index}_${Math.random().toString(36).substring(7)}`,
@@ -320,7 +322,18 @@ export class TowerDefenseEngine {
     });
 
     if (reachedEnd.length > 0) {
-      this.lives -= reachedEnd.length;
+      let livesToLose = 0;
+      reachedEnd.forEach((e) => {
+        if (this.hasCaptureUnitsGoal) {
+          if (e.heldCaptureUnitId) {
+            livesToLose++;
+          }
+        } else {
+          livesToLose++;
+        }
+      });
+
+      this.lives -= livesToLose;
       if (this.lives <= 0) {
         // We'll let the UI handle game over messaging by watching the lives count
         this.lives = 0;
