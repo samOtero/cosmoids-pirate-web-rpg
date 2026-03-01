@@ -56,6 +56,47 @@ export function applyTDUnitTransforms(
   shadow.scale.x = flipX ? -1 : 1;
 }
 
+export const WEAKENED_THRESHOLD = 0.9;
+
+export function renderHealthBar(
+  unit: BaseTDUnit,
+  container: PIXI.Container,
+  configId: string
+) {
+  const tdConfigMap = CREATURE_TD_CONFIGS[configId] || {
+    default: { scale: 1 },
+  };
+  const tdConfig = tdConfigMap[unit.facingDirection] || tdConfigMap.default;
+  const hpOffsetY = tdConfig.healthBarOffsetY ?? -40; // Default offset
+
+  let hpBg = container.getChildByLabel('hpBg') as PIXI.Graphics | undefined;
+  let hpFg = container.getChildByLabel('hpFg') as PIXI.Graphics | undefined;
+
+  if (!hpBg || !hpFg) {
+    hpBg = new PIXI.Graphics();
+    hpBg.label = 'hpBg';
+    container.addChild(hpBg);
+
+    hpFg = new PIXI.Graphics();
+    hpFg.label = 'hpFg';
+    container.addChild(hpFg);
+  }
+
+  // Draw background
+  hpBg.clear();
+  hpBg.rect(-33, hpOffsetY - 1, 66, 6);
+  hpBg.fill({ color: 0x000000 });
+  hpBg.stroke({ color: 0x111111, width: 1 });
+
+  // Draw foreground
+  const hpRatio = unit.maxHp > 0 ? unit.hp / unit.maxHp : 1;
+  const isWeakened = hpRatio <= WEAKENED_THRESHOLD;
+
+  hpFg.clear();
+  hpFg.rect(-32, hpOffsetY, 64 * Math.max(0, hpRatio), 4);
+  hpFg.fill({ color: isWeakened ? 0xff0000 : 0x22c55e });
+}
+
 const TYPE_COLORS: Record<ElementType, number> = {
   [ElementType.WATER]: 0x3b82f6,
   [ElementType.FIRE]: 0xef4444,
@@ -63,8 +104,6 @@ const TYPE_COLORS: Record<ElementType, number> = {
   [ElementType.ELECTRIC]: 0xeab308,
   [ElementType.NORMAL]: 0xa3a3a3,
 };
-
-export const WEAKENED_THRESHOLD = 0.9;
 
 interface PixiBattlefieldProps {
   engine: TowerDefenseEngine;
@@ -332,6 +371,7 @@ export default function PixiBattlefield({
               }
             );
           }
+          renderHealthBar(envUnit, container, envUnit.tdConfigId);
         }
 
         // --- Render Capture Units ---
@@ -402,6 +442,7 @@ export default function PixiBattlefield({
               }
             );
           }
+          renderHealthBar(capUnit, container, capUnit.tdConfigId);
         }
 
         // --- Render Towers ---
@@ -490,6 +531,7 @@ export default function PixiBattlefield({
               }
             );
           }
+          renderHealthBar(tower, container, tower.speciesId);
         }
 
         // --- Render Placement Spots & Capture Hover ---
@@ -682,20 +724,6 @@ export default function PixiBattlefield({
             esprite.anchor.set(0.5);
             container.addChildAt(esprite, 1);
 
-            // Health bar background
-            const hpBg = new PIXI.Graphics();
-            hpBg.rect(-33, -41, 66, 6);
-            hpBg.fill({ color: 0x000000 });
-            hpBg.stroke({ color: 0x111111, width: 1 });
-
-            // Health bar foreground
-            const hpFg = new PIXI.Graphics();
-            hpFg.rect(-32, -40, 64, 4);
-            hpFg.fill({ color: 0x22c55e });
-
-            container.addChild(hpBg);
-            container.addChild(hpFg);
-
             app.stage.addChild(container);
             enemySprites.set(enemy.id, container);
           }
@@ -724,16 +752,7 @@ export default function PixiBattlefield({
             );
           }
 
-          // Update health bar (it is always the last child added)
-          const hpRatio = enemy.hp / enemy.maxHp;
-          const hpFg = container.children[
-            container.children.length - 1
-          ] as PIXI.Graphics;
-          hpFg.clear();
-          hpFg.rect(-32, -40, 64 * Math.max(0, hpRatio), 4);
-
-          const isEnemyWeakened = hpRatio <= WEAKENED_THRESHOLD;
-          hpFg.fill({ color: isEnemyWeakened ? 0xff0000 : 0x22c55e });
+          renderHealthBar(enemy, container, enemy.definitionId);
         }
 
         // --- Render Projectiles ---

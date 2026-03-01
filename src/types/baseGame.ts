@@ -74,6 +74,7 @@ export interface UnitSpriteConfig {
   shadowOffsetY?: number;
   offsetX?: number;
   offsetY?: number;
+  healthBarOffsetY?: number;
 }
 
 export interface UnitVisuals {

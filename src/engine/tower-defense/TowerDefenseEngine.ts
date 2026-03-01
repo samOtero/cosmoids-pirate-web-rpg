@@ -128,6 +128,8 @@ export class TowerDefenseEngine {
           tdConfigId: eu.tdConfigId,
           position: { x: eu.position.x, y: eu.position.y },
           facingDirection: eu.facingDirection || 'down',
+          hp: 1,
+          maxHp: 1,
         })
       );
     }
@@ -140,6 +142,8 @@ export class TowerDefenseEngine {
           tdConfigId: cu.tdConfigId,
           position: { x: cu.position.x, y: cu.position.y },
           facingDirection: cu.facingDirection || 'down',
+          hp: 1,
+          maxHp: 1,
         })
       );
       this.lives = this.captureUnits.length;
@@ -730,6 +734,8 @@ export class TowerDefenseEngine {
       level: creature.level,
       xp: creature.xp,
       currentAttack: creature.attack,
+      hp: creature.currentHp,
+      maxHp: creature.maxHp,
       equippedAttacks: defaultAttacks.map((atkId) => ({
         definitionId: atkId,
         lastFiredTime: 0,

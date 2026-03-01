@@ -40,6 +40,8 @@ export interface BaseTDUnit {
   id: string;
   position: Point;
   facingDirection: 'up' | 'down' | 'left' | 'right';
+  hp: number;
+  maxHp: number;
 }
 
 export interface EnvironmentUnit extends BaseTDUnit {
@@ -85,8 +87,6 @@ export interface StatusCondition {
 
 export interface Enemy extends BaseTDUnit {
   definitionId: string;
-  hp: number;
-  maxHp: number;
   speed: number;
   currentAttack: number;
   statusConditions: StatusCondition[];
