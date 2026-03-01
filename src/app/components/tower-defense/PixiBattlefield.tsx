@@ -571,12 +571,19 @@ export default function PixiBattlefield({
           const hpFg = container.getChildByLabel('hpFg') as
             | PIXI.Graphics
             | undefined;
+          // Check if tower is currently doing a Dash Attack
+          // It disappears if any of its active projectiles are dash attacks
+          const isDashing = engine.projectiles.some((p) => {
+            if (p.sourceId !== tower.id || !p.attackDefinitionId) return false;
+            const def = ATTACK_DEFS[p.attackDefinitionId];
+            return def && def.isDashAttack;
+          });
 
-          const isTackling = engine.projectiles.some(
-            (p) => p.sourceId === tower.id && p.attackDefinitionId === 'TACKLE'
-          );
-          if (hpBg) hpBg.alpha = isTackling ? 0 : 1;
-          if (hpFg) hpFg.alpha = isTackling ? 0 : 1;
+          if (isDashing) {
+            container.alpha = 0;
+          } else {
+            container.alpha = 1;
+          }
         }
 
         // --- Render Placement Spots & Capture Hover ---
@@ -814,10 +821,13 @@ export default function PixiBattlefield({
           if (!container) {
             container = new PIXI.Container();
 
-            if (proj.attackDefinitionId === 'TACKLE') {
+            const def = proj.attackDefinitionId
+              ? ATTACK_DEFS[proj.attackDefinitionId]
+              : undefined;
+
+            if (def && def.isDashAttack) {
               const shadow = new PIXI.Graphics();
               shadow.label = 'shadow';
-              //shadow.visible = false; // No shadow for tackle projectile
               container.addChild(shadow);
 
               const psprite = new PIXI.Sprite();
@@ -848,7 +858,11 @@ export default function PixiBattlefield({
           container.x = offsetX + (proj.position.x / 100) * screenW;
           container.y = offsetY + (proj.position.y / 100) * screenH;
 
-          if (proj.attackDefinitionId === 'TACKLE') {
+          const def = proj.attackDefinitionId
+            ? ATTACK_DEFS[proj.attackDefinitionId]
+            : undefined;
+
+          if (def && def.isDashAttack) {
             const psprite = container.getChildByLabel('proj_sprite') as
               | PIXI.Sprite
               | undefined;

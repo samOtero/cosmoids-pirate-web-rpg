@@ -25,6 +25,7 @@ export interface AttackDefinition {
     | 'INSTANT_MELEE';
   effects?: AttackEffect[];
   visualEffectConfigId?: string; // which tdConfig to use for a visual effect
+  isDashAttack?: boolean; // whether the base unit itself behaves as the projectile visually
 }
 
 export interface AttackInstance {

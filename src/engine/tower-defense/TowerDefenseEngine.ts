@@ -489,6 +489,17 @@ export class TowerDefenseEngine {
                 target,
                 attackDef
               );
+
+              if (attackDef.visualEffectConfigId) {
+                this.visualEffects.push({
+                  id: `vfx_${Date.now()}_${Math.random()}`,
+                  configId: attackDef.visualEffectConfigId,
+                  position: { ...target.position },
+                  durationMs: 500, // Duration of the visual effect
+                  elapsedMs: 0,
+                  targetId: target.id,
+                });
+              }
             } else {
               target.hp -= p.damage; // Fallback
             }

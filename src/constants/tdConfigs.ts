@@ -228,8 +228,8 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
         type: 'WIPE_LINEAR',
         maskRotation: Math.PI / 4,
         maskSize: 200,
-        fadeOutProgress: 0.8,
       },
+      offsetY: -19,
     },
   },
 };
