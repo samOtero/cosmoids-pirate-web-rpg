@@ -53,6 +53,22 @@ export default function TowerDefenseScreen({
   const previousTimeRef = useRef<number | null>(null);
 
   const [hasStarted, setHasStarted] = useState(false);
+  const [introState, setIntroState] = useState<'ready' | 'go' | 'none'>(
+    'ready'
+  );
+
+  useEffect(() => {
+    if (introState === 'ready') {
+      const t = setTimeout(() => setIntroState('go'), 1000);
+      return () => clearTimeout(t);
+    } else if (introState === 'go') {
+      const t = setTimeout(() => {
+        setIntroState('none');
+        setIsPlaying(true);
+      }, 1000);
+      return () => clearTimeout(t);
+    }
+  }, [introState]);
 
   useEffect(() => {
     if (isPlaying && !hasStarted) {
@@ -176,6 +192,14 @@ export default function TowerDefenseScreen({
 
   return (
     <div className="fixed inset-0 z-9998 bg-slate-900 flex flex-col">
+      {introState !== 'none' && (
+        <div className="fixed inset-0 z-10000 bg-black/60 flex items-center justify-center pointer-events-none">
+          <div className="text-7xl md:text-9xl font-black italic text-transparent bg-clip-text bg-linear-to-br from-yellow-300 to-red-500 drop-shadow-[0_0_25px_rgba(255,165,0,0.8)] uppercase animate-bounce">
+            {introState === 'ready' ? 'Ready!' : 'GO!'}
+          </div>
+        </div>
+      )}
+
       <div className="bg-slate-800 p-4 shrink-0 flex items-center justify-between border-b border-cyan-800">
         <h2 className="text-xl font-bold text-cyan-400">Tower Defense</h2>
         <div className="flex items-center gap-4 text-white">
