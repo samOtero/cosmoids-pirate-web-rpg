@@ -704,10 +704,13 @@ export class TowerDefenseEngine {
           x: existingTower.position.x,
           y: existingTower.position.y,
         };
+        targetTower.facingDirection = 'down';
         existingTower.position = { x, y };
+        existingTower.facingDirection = 'down';
       } else {
         // Move
         existingTower.position = { x, y };
+        existingTower.facingDirection = 'down';
       }
       return true;
     }
