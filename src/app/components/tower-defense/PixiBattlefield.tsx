@@ -380,7 +380,12 @@ export default function PixiBattlefield({
               }
             );
           }
-          renderHealthBar(envUnit, container, envUnit.tdConfigId);
+          renderHealthBar(
+            envUnit,
+            container,
+            envUnit.tdConfigId,
+            true /* hideWhenFull */
+          );
         }
 
         // --- Render Capture Units ---
@@ -451,7 +456,12 @@ export default function PixiBattlefield({
               }
             );
           }
-          renderHealthBar(capUnit, container, capUnit.tdConfigId);
+          renderHealthBar(
+            capUnit,
+            container,
+            capUnit.tdConfigId,
+            true /* hideWhenFull */
+          );
         }
 
         // --- Render Towers ---
