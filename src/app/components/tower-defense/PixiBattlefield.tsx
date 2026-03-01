@@ -900,6 +900,12 @@ export default function PixiBattlefield({
             sprite.label = 'vfx_sprite';
             sprite.anchor.set(0.5);
             container.addChild(sprite);
+
+            const mask = new PIXI.Graphics();
+            mask.label = 'vfx_mask';
+            container.addChild(mask);
+            sprite.mask = mask;
+
             app.stage.addChild(container);
             vfxSprites.set(vfx.id, container);
           }
@@ -907,9 +913,16 @@ export default function PixiBattlefield({
           container.x = offsetX + (vfx.position.x / 100) * screenW;
           container.y = offsetY + (vfx.position.y / 100) * screenH;
 
+          const progress = Math.min(1, vfx.elapsedMs / vfx.durationMs);
+          //container.alpha = progress > 0.8 ? 1 - (progress - 0.8) * 5 : 1;
+
           const sprite = container.getChildByLabel('vfx_sprite') as
             | PIXI.Sprite
             | undefined;
+          const mask = container.getChildByLabel('vfx_mask') as
+            | PIXI.Graphics
+            | undefined;
+
           if (sprite) {
             applyTDUnitTransforms(
               {
@@ -926,6 +939,25 @@ export default function PixiBattlefield({
                 if (!isDestroyed) sprite.texture = t;
               }
             );
+
+            if (mask) {
+              // Create dynamic mask animation based on VFX type
+              if (vfx.configId.includes('scratch')) {
+                const size = 200;
+                mask.clear();
+                mask.rotation = Math.PI / 4; // Wipes from top-right to bottom-left
+                // Wipe down over the progress of the animation
+                // We multiply progress by a slight factor so it completes the wipe before fading
+                const wipeProgress = Math.min(1, progress * 1.5);
+                mask.rect(-size, -size, size * 2, size * 2 * wipeProgress);
+                mask.fill(0xffffff);
+              } else {
+                const size = 500;
+                mask.clear();
+                mask.rect(-size, -size, size * 2, size * 2);
+                mask.fill(0xffffff);
+              }
+            }
           }
         }
       });
