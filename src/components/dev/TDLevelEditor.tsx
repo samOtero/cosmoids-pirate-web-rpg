@@ -26,6 +26,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
   >([]);
   const [waves, setWaves] = useState<TDWave[]>([]);
   const [surviveUntil, setSurviveUntil] = useState<number>(0);
+  const [lives, setLives] = useState<number>(3);
   const [deleteMode, setDeleteMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showNewModal, setShowNewModal] = useState(false);
@@ -75,6 +76,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
         levelData.waves ? JSON.parse(JSON.stringify(levelData.waves)) : []
       );
       setSurviveUntil(levelData.surviveUntil || 0);
+      setLives(levelData.lives !== undefined ? levelData.lives : 3);
     } else {
       setPaths([[]]);
       setActivePathIndex(0);
@@ -83,6 +85,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
       setCaptureUnits([]);
       setWaves([]);
       setSurviveUntil(0);
+      setLives(3);
     }
     setSelectedLevelKey(key);
   };
@@ -95,6 +98,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
     setCaptureUnits([]);
     setWaves([]);
     setSurviveUntil(0);
+    setLives(3);
     setSelectedLevelKey('NEW_LEVEL');
     setNewLevelName('');
     setShowNewModal(true);
@@ -203,6 +207,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
         })),
         waves: waves,
         surviveUntil: surviveUntil > 0 ? surviveUntil : undefined,
+        lives: lives !== 3 ? lives : undefined,
       };
 
       const res = await fetch('/api/dev/td-levels/save', {
@@ -413,6 +418,23 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
               onChange={(e) => setSurviveUntil(parseInt(e.target.value) || 0)}
               className="w-20 bg-slate-950 text-white rounded p-1 border border-slate-700 text-sm"
               placeholder="0 = clear waves"
+            />
+          </div>
+
+          <div className="w-px h-6 bg-slate-600 mx-2" />
+
+          <div className="flex items-center gap-2">
+            <label className="text-slate-400 text-sm font-bold">Lives:</label>
+            <input
+              type="number"
+              min="-1"
+              value={lives}
+              onChange={(e) => {
+                const val = parseInt(e.target.value);
+                setLives(isNaN(val) ? 3 : val);
+              }}
+              className="w-16 bg-slate-950 text-white rounded p-1 border border-slate-700 text-sm"
+              placeholder="3"
             />
           </div>
 

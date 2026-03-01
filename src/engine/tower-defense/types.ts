@@ -56,6 +56,7 @@ export interface TDLevelData {
   placementSpots: Point[];
   waves?: TDWave[]; // Optional for backwards compatibility
   surviveUntil?: number; // Win after surviving for this many seconds
+  lives?: number; // Default is 3 if not provided, or overridden by captureUnits length
   environmentUnits?: {
     tdConfigId: string;
     position: Point;

@@ -61,7 +61,7 @@ export class TowerDefenseEngine {
   public projectiles: Projectile[] = [];
 
   public money: number = 100;
-  public lives: number = 2;
+  public lives: number = 3;
 
   public events = new TDEventBus();
   private progression = new TDProgressionManager(this, this.events);
@@ -142,6 +142,9 @@ export class TowerDefenseEngine {
           facingDirection: cu.facingDirection || 'down',
         })
       );
+      this.lives = this.captureUnits.length;
+    } else {
+      this.lives = levelData.lives !== undefined ? levelData.lives : 3;
     }
 
     // Initialize first wave group if available
@@ -334,7 +337,7 @@ export class TowerDefenseEngine {
       });
 
       this.lives -= livesToLose;
-      if (this.lives <= 0) {
+      if (this.lives <= 0 && this.lives !== -1) {
         // We'll let the UI handle game over messaging by watching the lives count
         this.lives = 0;
       }
