@@ -67,7 +67,8 @@ export function renderHealthBar(
     default: { scale: 1 },
   };
   const tdConfig = tdConfigMap[unit.facingDirection] || tdConfigMap.default;
-  const hpOffsetY = tdConfig.healthBarOffsetY ?? -40; // Default offset
+  const hpOffsetY =
+    tdConfig.healthBarOffsetY ?? tdConfigMap.default?.healthBarOffsetY ?? -40; // Default offset
 
   let hpBg = container.getChildByLabel('hpBg') as PIXI.Graphics | undefined;
   let hpFg = container.getChildByLabel('hpFg') as PIXI.Graphics | undefined;

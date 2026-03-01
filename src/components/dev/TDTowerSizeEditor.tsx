@@ -74,7 +74,10 @@ export default function TDTowerSizeEditor({
   const offsetX = activeConfig.offsetX ?? 0;
   const offsetY = activeConfig.offsetY ?? 0;
   const flipX = activeConfig.flipX ?? false;
-  const healthBarOffsetY = activeConfig.healthBarOffsetY ?? -40;
+  const healthBarOffsetY =
+    activeConfig.healthBarOffsetY ??
+    currentTdConfig.default?.healthBarOffsetY ??
+    -40;
   const spriteUrl =
     activeConfig.url ||
     (creature ? creature.battleSpriteUrl || creature.spriteUrl : '');
