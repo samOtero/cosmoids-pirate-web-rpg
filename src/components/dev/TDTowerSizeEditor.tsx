@@ -74,6 +74,7 @@ export default function TDTowerSizeEditor({
   const offsetX = activeConfig.offsetX ?? 0;
   const offsetY = activeConfig.offsetY ?? 0;
   const flipX = activeConfig.flipX ?? false;
+  const healthBarOffsetY = activeConfig.healthBarOffsetY ?? -40;
   const spriteUrl =
     activeConfig.url ||
     (creature ? creature.battleSpriteUrl || creature.spriteUrl : '');
@@ -100,6 +101,7 @@ export default function TDTowerSizeEditor({
   const offsetXRef = useRef(offsetX);
   const offsetYRef = useRef(offsetY);
   const flipXRef = useRef(flipX);
+  const healthBarOffsetYRef = useRef(healthBarOffsetY);
   const spriteUrlRef = useRef(spriteUrl);
 
   useEffect(() => {
@@ -126,6 +128,9 @@ export default function TDTowerSizeEditor({
   useEffect(() => {
     flipXRef.current = flipX;
   }, [flipX]);
+  useEffect(() => {
+    healthBarOffsetYRef.current = healthBarOffsetY;
+  }, [healthBarOffsetY]);
   useEffect(() => {
     spriteUrlRef.current = spriteUrl;
   }, [spriteUrl]);
@@ -177,6 +182,8 @@ export default function TDTowerSizeEditor({
     let sprite: PIXI.Sprite | null = null;
     let box: PIXI.Graphics | null = null;
     let shadow: PIXI.Graphics | null = null;
+    let hpBg: PIXI.Graphics | null = null;
+    let hpFg: PIXI.Graphics | null = null;
 
     const initPixi = async () => {
       await app.init({
@@ -210,6 +217,12 @@ export default function TDTowerSizeEditor({
       sprite = new PIXI.Sprite();
       sprite.anchor.set(0.5);
       app.stage.addChild(sprite);
+
+      hpBg = new PIXI.Graphics();
+      app.stage.addChild(hpBg);
+
+      hpFg = new PIXI.Graphics();
+      app.stage.addChild(hpFg);
 
       // Keep track of loaded url to prevent constant reloading
       let currentLoadedUrl = '';
@@ -267,6 +280,18 @@ export default function TDTowerSizeEditor({
               if (!isDestroyed && sprite) sprite.texture = t;
             });
           }
+        }
+
+        if (hpBg && hpFg) {
+          const hpY = centerY + healthBarOffsetYRef.current;
+          hpBg.clear();
+          hpBg.rect(centerX - 33, hpY - 1, 66, 6);
+          hpBg.fill({ color: 0x000000 });
+          hpBg.stroke({ color: 0x111111, width: 1 });
+
+          hpFg.clear();
+          hpFg.rect(centerX - 32, hpY, 64, 4);
+          hpFg.fill({ color: 0x22c55e });
         }
       });
     };
@@ -517,6 +542,28 @@ export default function TDTowerSizeEditor({
                 value={offsetY}
                 onChange={(e) =>
                   updateActiveConfig({ offsetY: Number(e.target.value) })
+                }
+                className="w-full accent-cyan-500 h-2"
+              />
+            </div>
+            {/* Health Bar Offset Y */}
+            <div className="space-y-0.5 mt-2">
+              <div className="flex justify-between text-[10px] text-slate-400">
+                <span>Health Bar Offset Y (Default is -40)</span>
+                <span className="font-mono text-cyan-400">
+                  {healthBarOffsetY}px
+                </span>
+              </div>
+              <input
+                type="range"
+                min={-100}
+                max={100}
+                step={1}
+                value={healthBarOffsetY}
+                onChange={(e) =>
+                  updateActiveConfig({
+                    healthBarOffsetY: Number(e.target.value),
+                  })
                 }
                 className="w-full accent-cyan-500 h-2"
               />

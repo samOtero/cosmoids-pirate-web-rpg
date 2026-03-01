@@ -9,6 +9,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetY: -8,
       shadowScaleX: 1.5,
       shadowScaleY: 0.7,
+      healthBarOffsetY: -65,
     },
     left: {
       url: '/battles/cosmoids/senticle_left_1.png',
@@ -171,6 +172,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowScaleX: 1.4,
       shadowOffsetX: -2,
       shadowOffsetY: 26,
+      healthBarOffsetY: -52,
     },
     left: {
       scale: 0.29,
