@@ -235,7 +235,7 @@ export default function PixiBattlefield({
       const enemySprites = new Map<string, PIXI.Container>();
       const environmentUnitSprites = new Map<string, PIXI.Container>();
       const captureUnitSprites = new Map<string, PIXI.Container>();
-      const projectileSprites = new Map<string, PIXI.Graphics>();
+      const projectileSprites = new Map<string, PIXI.Container>();
       const spotGraphics = new PIXI.Graphics();
       const invalidSpotGraphics = new PIXI.Graphics();
 
@@ -549,6 +549,14 @@ export default function PixiBattlefield({
                 if (!isDestroyed) tsprite.texture = t;
               }
             );
+
+            // Fade tower if it's currently performing a Tackle attack
+            const isTackling = engine.projectiles.some(
+              (p) =>
+                p.sourceId === tower.id && p.attackDefinitionId === 'TACKLE'
+            );
+            tsprite.alpha = isTackling ? 0 : 1;
+            shadow.alpha = isTackling ? 0 : 1;
           }
           renderHealthBar(
             tower,
@@ -556,6 +564,19 @@ export default function PixiBattlefield({
             tower.speciesId,
             true /* hideWhenFull */
           );
+
+          const hpBg = container.getChildByLabel('hpBg') as
+            | PIXI.Graphics
+            | undefined;
+          const hpFg = container.getChildByLabel('hpFg') as
+            | PIXI.Graphics
+            | undefined;
+
+          const isTackling = engine.projectiles.some(
+            (p) => p.sourceId === tower.id && p.attackDefinitionId === 'TACKLE'
+          );
+          if (hpBg) hpBg.alpha = isTackling ? 0 : 1;
+          if (hpFg) hpFg.alpha = isTackling ? 0 : 1;
         }
 
         // --- Render Placement Spots & Capture Hover ---
@@ -781,33 +802,85 @@ export default function PixiBattlefield({
 
         // --- Render Projectiles ---
         const currentProjIds = new Set(engine.projectiles.map((p) => p.id));
-        for (const [id, sprite] of projectileSprites.entries()) {
+        for (const [id, container] of projectileSprites.entries()) {
           if (!currentProjIds.has(id)) {
-            app.stage.removeChild(sprite);
-            sprite.destroy();
+            app.stage.removeChild(container);
+            container.destroy({ children: true });
             projectileSprites.delete(id);
           }
         }
         for (const proj of engine.projectiles) {
-          let sprite = projectileSprites.get(proj.id);
-          if (!sprite) {
-            sprite = new PIXI.Graphics();
-            sprite.circle(0, 0, 8);
+          let container = projectileSprites.get(proj.id);
+          if (!container) {
+            container = new PIXI.Container();
 
-            let projColor = 0x22d3ee; // Default cyan
-            if (proj.attackDefinitionId) {
-              const def = ATTACK_DEFS[proj.attackDefinitionId];
-              if (def) {
-                projColor = TYPE_COLORS[def.type] || projColor;
+            if (proj.attackDefinitionId === 'TACKLE') {
+              const shadow = new PIXI.Graphics();
+              shadow.label = 'shadow';
+              //shadow.visible = false; // No shadow for tackle projectile
+              container.addChild(shadow);
+
+              const psprite = new PIXI.Sprite();
+              psprite.label = 'proj_sprite';
+              psprite.anchor.set(0.5);
+              container.addChild(psprite);
+            } else {
+              const g = new PIXI.Graphics();
+              g.label = 'proj_graphics';
+              g.circle(0, 0, 8);
+
+              let projColor = 0x22d3ee; // Default cyan
+              if (proj.attackDefinitionId) {
+                const def = ATTACK_DEFS[proj.attackDefinitionId];
+                if (def) {
+                  projColor = TYPE_COLORS[def.type] || projColor;
+                }
               }
+
+              g.fill({ color: projColor });
+              container.addChild(g);
             }
 
-            sprite.fill({ color: projColor });
-            app.stage.addChild(sprite);
-            projectileSprites.set(proj.id, sprite);
+            app.stage.addChild(container);
+            projectileSprites.set(proj.id, container);
           }
-          sprite.x = offsetX + (proj.position.x / 100) * screenW;
-          sprite.y = offsetY + (proj.position.y / 100) * screenH;
+
+          container.x = offsetX + (proj.position.x / 100) * screenW;
+          container.y = offsetY + (proj.position.y / 100) * screenH;
+
+          if (proj.attackDefinitionId === 'TACKLE') {
+            const psprite = container.getChildByLabel('proj_sprite') as
+              | PIXI.Sprite
+              | undefined;
+            const shadow = container.getChildByLabel('shadow') as
+              | PIXI.Graphics
+              | undefined;
+            if (psprite && shadow) {
+              const sourceTower = engine.towers.find(
+                (t) => t.id === proj.sourceId
+              );
+              if (sourceTower) {
+                const baseCreature =
+                  TD_CREATURE_DEFS[sourceTower.speciesId].baseCreature;
+                applyTDUnitTransforms(
+                  {
+                    ...proj,
+                    hp: 1,
+                    maxHp: 1,
+                    facingDirection: proj.facingDirection || 'down',
+                  } as BaseTDUnit,
+                  psprite,
+                  shadow,
+                  baseCreature.id,
+                  baseCreature.battleSpriteUrl || baseCreature.spriteUrl,
+                  (t) => {
+                    if (!isDestroyed) psprite.texture = t;
+                  }
+                );
+                shadow.visible = false; // Keep shadow hidden
+              }
+            }
+          }
         }
       });
     };

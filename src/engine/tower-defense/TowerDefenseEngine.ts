@@ -509,6 +509,11 @@ export class TowerDefenseEngine {
       } else {
         p.position.x += (dx / dist) * frameSpeed;
         p.position.y += (dy / dist) * frameSpeed;
+        if (Math.abs(dx) > Math.abs(dy)) {
+          p.facingDirection = dx > 0 ? 'right' : 'left';
+        } else {
+          p.facingDirection = dy > 0 ? 'down' : 'up';
+        }
       }
     });
 
@@ -768,7 +773,7 @@ export class TowerDefenseEngine {
   public static getDefaultAttacks(speciesId: string): string[] {
     const defaultAttacks: string[] = [];
     if (speciesId === 'starter_crab')
-      defaultAttacks.push('VINE_WHIP', 'SCRATCH');
+      defaultAttacks.push('TACKLE', 'VINE_WHIP');
     else if (speciesId === 'starter_iguana')
       defaultAttacks.push('EMBER', 'SCRATCH');
     else if (speciesId === 'starter_monkey')

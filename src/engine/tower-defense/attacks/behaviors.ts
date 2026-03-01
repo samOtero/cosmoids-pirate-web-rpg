@@ -36,6 +36,16 @@ export const ProjectileBehavior: AttackBehavior = {
 
     if (nearestEnemy) {
       const enemyTarget = nearestEnemy as Enemy;
+
+      const dx = enemyTarget.position.x - source.position.x;
+      const dy = enemyTarget.position.y - source.position.y;
+      let facingDirection: 'up' | 'down' | 'left' | 'right' = 'down';
+      if (Math.abs(dx) > Math.abs(dy)) {
+        facingDirection = dx > 0 ? 'right' : 'left';
+      } else {
+        facingDirection = dy > 0 ? 'down' : 'up';
+      }
+
       engine.projectiles.push({
         id: `proj_${Date.now()}_${Math.random()}`,
         attackDefinitionId: attackDef.id,
@@ -45,6 +55,7 @@ export const ProjectileBehavior: AttackBehavior = {
         speed: attackDef.projectileSpeed || 1,
         damage: attackDef.power,
         target: { ...enemyTarget.position },
+        facingDirection,
       });
     }
   },

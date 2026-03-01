@@ -107,4 +107,5 @@ export interface Projectile {
   speed: number;
   damage: number;
   target: Point;
+  facingDirection?: 'up' | 'down' | 'left' | 'right';
 }
