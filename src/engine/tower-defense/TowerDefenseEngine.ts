@@ -94,7 +94,28 @@ export class TowerDefenseEngine {
   public captureUnits: CaptureUnit[] = [];
 
   constructor(levelData: import('./types').TDLevelData | any) {
-    this.paths = levelData.paths || [];
+    const rawPaths: { x: number; y: number }[][] = levelData.paths || [];
+    this.paths = rawPaths.map((path) => {
+      if (path.length <= 1) return path;
+      const snappedPath = [{ ...path[0] }];
+      for (let i = 1; i < path.length; i++) {
+        const prev = snappedPath[i - 1];
+        const curr = path[i];
+        const dx = Math.abs(curr.x - prev.x);
+        // Normalize aspect ratio for coordinate comparison if needed?
+        // Actually, we'll just snap to whichever delta is larger purely in percentage coordinates.
+        const dy = Math.abs(curr.y - prev.y);
+
+        if (dx > dy) {
+          // Horizontal
+          snappedPath.push({ x: curr.x, y: prev.y });
+        } else {
+          // Vertical
+          snappedPath.push({ x: prev.x, y: curr.y });
+        }
+      }
+      return snappedPath;
+    });
     this.placementSpots = levelData.placementSpots || [];
     this.waves = levelData.waves || [];
     this.surviveUntil = levelData.surviveUntil;
@@ -220,28 +241,38 @@ export class TowerDefenseEngine {
         const dx = targetPoint.x - enemy.position.x;
         const dy = targetPoint.y - enemy.position.y;
 
-        // Normalize distance by aspect ratio to make vertical movement feel proportional
-        const effectiveDy = dy * this.aspectRatio;
-        const distSq = dx * dx + effectiveDy * effectiveDy;
-
         const frameDistance = moveSpeed * timeScale;
 
-        if (distSq <= frameDistance * frameDistance) {
-          // Reached waypoint, move to target and increment
-          enemy.position.x = targetPoint.x;
-          enemy.position.y = targetPoint.y;
-          enemy.currentWaypointIndex++;
-        } else {
-          // Move towards waypoint
-          const dist = Math.sqrt(distSq);
-          enemy.position.x += (dx / dist) * frameDistance;
-          // Apply inverse normalization to the actual movement
-          enemy.position.y += (dy / dist) * frameDistance * this.aspectRatio;
+        // Since paths are strictly horizontal or vertical, only one of dx or dy is non-zero (or both are close to zero)
+        const isHorizontal = Math.abs(dx) > Math.abs(dy);
 
-          // Update facing direction based on primary movement axis
-          if (Math.abs(dx) > Math.abs(dy)) {
-            enemy.facingDirection = dx > 0 ? 'right' : 'left';
+        if (isHorizontal) {
+          // Horizontal movement
+          const dir = Math.sign(dx);
+          const moveDist = dir * frameDistance;
+
+          if (Math.abs(dx) <= frameDistance) {
+            // Reached waypoint
+            enemy.position.x = targetPoint.x;
+            enemy.position.y = targetPoint.y;
+            enemy.currentWaypointIndex++;
           } else {
+            enemy.position.x += moveDist;
+            enemy.facingDirection = dx > 0 ? 'right' : 'left';
+          }
+        } else {
+          // Vertical movement
+          const dir = Math.sign(dy);
+          // Apply aspect ratio scale directly to vertical speed to keep movement visually consistent
+          const moveDist = dir * frameDistance * this.aspectRatio;
+
+          if (Math.abs(dy) <= Math.abs(moveDist)) {
+            // Reached waypoint
+            enemy.position.x = targetPoint.x;
+            enemy.position.y = targetPoint.y;
+            enemy.currentWaypointIndex++;
+          } else {
+            enemy.position.y += moveDist;
             enemy.facingDirection = dy > 0 ? 'down' : 'up';
           }
         }
@@ -288,10 +319,11 @@ export class TowerDefenseEngine {
           const dy = (enemy.position.y - cu.position.y) * this.aspectRatio;
           const distSq = dx * dx + dy * dy;
 
-          // Original distSq < 25 means a literal distance of ~5 units.
-          // Let's expand this slightly to make sure it's forgiving if they pass closely.
-          if (distSq < 100) {
-            // within ~10 units
+          // Expand pickup radius generously because the new snapped orthogonal paths
+          // might push the enemy's line of movement slightly further from the
+          // original visually-intended path line.
+          if (distSq < 125) {
+            // within ~20 units
             cu.heldByEnemyId = enemy.id;
             enemy.heldCaptureUnitId = cu.id;
             break; // only one enemy picks it up
