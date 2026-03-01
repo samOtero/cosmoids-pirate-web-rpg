@@ -48,7 +48,28 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   bug_stage_1: {
     default: {
       url: '/battles/cosmoids/bug_1_left_1.png',
-      scale: 0.5,
+      scale: 0.34,
+      shadowScaleX: 1.2,
+      shadowOffsetY: 7,
+    },
+    right: {
+      url: '/battles/cosmoids/bug_1_left_1.png',
+      scale: 0.34,
+      shadowScaleX: 1.2,
+      shadowOffsetY: 7,
+      flipX: true,
+    },
+    up: {
+      url: '/battles/cosmoids/bug_1_up_1.png',
+      scale: 0.44,
+      shadowScaleX: 1.05,
+      shadowOffsetY: 7,
+    },
+    down: {
+      url: '/battles/cosmoids/bug_1_down_1.png',
+      scale: 0.44,
+      shadowScaleX: 1.05,
+      shadowOffsetY: 7,
     },
   },
   bug_stage_2: {
