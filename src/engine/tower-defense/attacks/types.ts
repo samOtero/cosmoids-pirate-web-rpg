@@ -24,6 +24,7 @@ export interface AttackDefinition {
     | 'SUPPORT_AURA'
     | 'INSTANT_MELEE';
   effects?: AttackEffect[];
+  visualEffectConfigId?: string; // which tdConfig to use for a visual effect
 }
 
 export interface AttackInstance {

@@ -8,7 +8,7 @@ import {
   STARTER_MONKEY,
 } from '@/constants/creatures';
 import { Creature } from '@/types/baseGame';
-import { Tower, Enemy, Projectile, CaptureUnit } from './types';
+import { Tower, Enemy, Projectile, CaptureUnit, VisualEffect } from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
 import { AttackBehaviorRegistry } from './attacks/behaviors';
 import { EffectProcessor } from './attacks/EffectProcessor';
@@ -67,6 +67,7 @@ export class TowerDefenseEngine {
   public towers: Tower[] = [];
   public enemies: Enemy[] = [];
   public projectiles: Projectile[] = [];
+  public visualEffects: VisualEffect[] = [];
 
   public money: number = 100;
   public lives: number = 3;
@@ -539,6 +540,24 @@ export class TowerDefenseEngine {
 
     // Keep projectiles that haven't hit yet (speed > 0)
     const activeProjectiles = this.projectiles.filter((p) => p.speed > 0);
+
+    // Update Visual Effects
+    this.visualEffects.forEach((effect) => {
+      effect.elapsedMs += deltaMs;
+      // If attached to a target, update position
+      if (effect.targetId) {
+        const target =
+          newEnemies.find((e) => e.id === effect.targetId) ||
+          this.towers.find((t) => t.id === effect.targetId);
+        if (target) {
+          effect.position.x = target.position.x;
+          effect.position.y = target.position.y;
+        }
+      }
+    });
+    this.visualEffects = this.visualEffects.filter(
+      (e) => e.elapsedMs < e.durationMs
+    );
 
     this.enemies = newEnemies;
     this.projectiles = activeProjectiles;

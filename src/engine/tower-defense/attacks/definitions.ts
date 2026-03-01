@@ -9,8 +9,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     power: 10,
     cooldownMs: 1500,
     rangeIndex: 25,
-    behaviorType: 'PROJECTILE',
-    projectileSpeed: 2.0,
+    behaviorType: 'INSTANT_MELEE',
+    visualEffectConfigId: 'attack_scratch_1',
   },
   VINE_WHIP: {
     id: 'VINE_WHIP',

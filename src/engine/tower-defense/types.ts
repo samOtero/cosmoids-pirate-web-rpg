@@ -109,3 +109,13 @@ export interface Projectile {
   target: Point;
   facingDirection?: 'up' | 'down' | 'left' | 'right';
 }
+
+export interface VisualEffect {
+  id: string;
+  configId: string; // references tdConfig key (e.g., 'attack_scratch_1')
+  position: Point;
+  durationMs: number;
+  elapsedMs: number;
+  facingDirection?: 'up' | 'down' | 'left' | 'right';
+  targetId?: string; // If attached to moving unit
+}

@@ -1,6 +1,7 @@
 import { TowerDefenseEngine } from '../TowerDefenseEngine';
 import { Tower, Enemy } from '../types';
 import { AttackDefinition, AttackBehavior } from './types';
+import { EffectProcessor } from './EffectProcessor';
 
 export const ProjectileBehavior: AttackBehavior = {
   canExecute(
@@ -61,6 +62,83 @@ export const ProjectileBehavior: AttackBehavior = {
   },
 };
 
+export const InstantMeleeBehavior: AttackBehavior = {
+  canExecute(
+    engine: TowerDefenseEngine,
+    source: Tower,
+    attackDef: AttackDefinition
+  ): boolean {
+    return engine.enemies.some((enemy) => {
+      const dx = enemy.position.x - source.position.x;
+      const dy = enemy.position.y - source.position.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      return dist <= attackDef.rangeIndex;
+    });
+  },
+
+  execute(
+    engine: TowerDefenseEngine,
+    source: Tower,
+    attackDef: AttackDefinition
+  ): void {
+    let nearestEnemy: Enemy | null = null;
+    let maxDist = attackDef.rangeIndex;
+
+    engine.enemies.forEach((enemy) => {
+      const dx = enemy.position.x - source.position.x;
+      const dy = enemy.position.y - source.position.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist <= maxDist) {
+        maxDist = dist; // Closest
+        nearestEnemy = enemy;
+      }
+    });
+
+    if (nearestEnemy) {
+      const enemyTarget = nearestEnemy as Enemy;
+
+      // Apply damage immediately
+      EffectProcessor.applyDamageAndEffects(
+        engine,
+        source,
+        enemyTarget,
+        attackDef
+      );
+
+      // Check for death
+      if (enemyTarget.hp <= 0) {
+        const meta = (engine.constructor as any).TD_CREATURE_DEFS?.[
+          enemyTarget.definitionId
+        ];
+        // We can't access TD_CREATURE_DEFS easily here without circular dependency if not careful,
+        // but engine already processes dead enemies in tick().
+        // We'll just let the tick loop's deadEnemies filter handle it and award XP.
+        // Actually, Projectile logic emits ENEMY_DIED.
+        // Let's emit it here if we killed it, then let tick loop reap it.
+        engine.events.emit({
+          type: 'ENEMY_DIED',
+          enemyId: enemyTarget.id,
+          killerTowerId: source.id,
+          xpValue: 10, // Default fallback, tick loop doesn't award XP for instant kills if not emitted!
+        });
+      }
+
+      // Add visual effect if configured
+      if (attackDef.visualEffectConfigId) {
+        engine.visualEffects.push({
+          id: `vfx_${Date.now()}_${Math.random()}`,
+          configId: attackDef.visualEffectConfigId,
+          position: { ...enemyTarget.position },
+          durationMs: 500,
+          elapsedMs: 0,
+          targetId: enemyTarget.id,
+        });
+      }
+    }
+  },
+};
+
 export const AttackBehaviorRegistry: Record<string, AttackBehavior> = {
   PROJECTILE: ProjectileBehavior,
+  INSTANT_MELEE: InstantMeleeBehavior,
 };

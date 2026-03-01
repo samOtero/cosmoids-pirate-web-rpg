@@ -218,4 +218,12 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetY: 1,
     },
   },
+  attack_scratch_1: {
+    default: {
+      url: '/battles/attacks/scratch.png',
+      scale: 0.27,
+      shadowScaleX: 1.15,
+      shadowOffsetY: 1,
+    },
+  },
 };

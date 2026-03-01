@@ -235,6 +235,7 @@ export default function PixiBattlefield({
       const environmentUnitSprites = new Map<string, PIXI.Container>();
       const captureUnitSprites = new Map<string, PIXI.Container>();
       const projectileSprites = new Map<string, PIXI.Container>();
+      const vfxSprites = new Map<string, PIXI.Container>();
       const spotGraphics = new PIXI.Graphics();
       const invalidSpotGraphics = new PIXI.Graphics();
 
@@ -879,6 +880,52 @@ export default function PixiBattlefield({
                 shadow.visible = false; // Keep shadow hidden
               }
             }
+          }
+        }
+
+        // --- Render Visual Effects ---
+        const currentVfxIds = new Set(engine.visualEffects.map((v) => v.id));
+        for (const [id, container] of vfxSprites.entries()) {
+          if (!currentVfxIds.has(id)) {
+            app.stage.removeChild(container);
+            container.destroy({ children: true });
+            vfxSprites.delete(id);
+          }
+        }
+        for (const vfx of engine.visualEffects) {
+          let container = vfxSprites.get(vfx.id);
+          if (!container) {
+            container = new PIXI.Container();
+            const sprite = new PIXI.Sprite();
+            sprite.label = 'vfx_sprite';
+            sprite.anchor.set(0.5);
+            container.addChild(sprite);
+            app.stage.addChild(container);
+            vfxSprites.set(vfx.id, container);
+          }
+
+          container.x = offsetX + (vfx.position.x / 100) * screenW;
+          container.y = offsetY + (vfx.position.y / 100) * screenH;
+
+          const sprite = container.getChildByLabel('vfx_sprite') as
+            | PIXI.Sprite
+            | undefined;
+          if (sprite) {
+            applyTDUnitTransforms(
+              {
+                ...vfx,
+                hp: 1,
+                maxHp: 1,
+                facingDirection: vfx.facingDirection || 'down',
+              } as BaseTDUnit,
+              sprite,
+              new PIXI.Graphics(), // dummy shadow
+              vfx.configId,
+              undefined,
+              (t) => {
+                if (!isDestroyed) sprite.texture = t;
+              }
+            );
           }
         }
       });
