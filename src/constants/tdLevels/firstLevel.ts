@@ -61,6 +61,33 @@ export const FIRST_LEVEL: TDLevelData = {
       y: 33.59,
     },
   ],
+  environmentUnits: [
+    {
+      tdConfigId: 'senticle',
+      position: {
+        x: 80,
+        y: 20,
+      },
+      facingDirection: 'down',
+    },
+    {
+      tdConfigId: 'map_1',
+      position: {
+        x: 20,
+        y: 80,
+      },
+      facingDirection: 'right',
+    },
+  ],
+  captureUnits: [
+    {
+      position: {
+        x: 50,
+        y: 43,
+      },
+      tdConfigId: 'map_1',
+    },
+  ],
   waves: [
     {
       id: 'wave_1771807082096',
@@ -97,22 +124,4 @@ export const FIRST_LEVEL: TDLevelData = {
     },
   ],
   surviveUntil: 60,
-  environmentUnits: [
-    {
-      tdConfigId: 'senticle',
-      position: {
-        x: 80,
-        y: 20,
-      },
-      facingDirection: 'down',
-    },
-    {
-      tdConfigId: 'map_1',
-      position: {
-        x: 20,
-        y: 80,
-      },
-      facingDirection: 'right',
-    },
-  ],
 };

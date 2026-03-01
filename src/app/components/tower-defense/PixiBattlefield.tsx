@@ -186,6 +186,7 @@ export default function PixiBattlefield({
       const towerSprites = new Map<string, PIXI.Container>();
       const enemySprites = new Map<string, PIXI.Container>();
       const environmentUnitSprites = new Map<string, PIXI.Container>();
+      const captureUnitSprites = new Map<string, PIXI.Container>();
       const projectileSprites = new Map<string, PIXI.Graphics>();
       const spotGraphics = new PIXI.Graphics();
       const invalidSpotGraphics = new PIXI.Graphics();
@@ -325,6 +326,76 @@ export default function PixiBattlefield({
               sprite,
               shadow,
               envUnit.tdConfigId,
+              undefined,
+              (t) => {
+                if (!isDestroyed) sprite.texture = t;
+              }
+            );
+          }
+        }
+
+        // --- Render Capture Units ---
+        const currentCaptureUnitIds = new Set(
+          engine.captureUnits.map((c) => c.id)
+        );
+        for (const [id, sprite] of captureUnitSprites.entries()) {
+          if (!currentCaptureUnitIds.has(id)) {
+            app.stage.removeChild(sprite);
+            sprite.destroy({ children: true });
+            captureUnitSprites.delete(id);
+          }
+        }
+
+        for (const capUnit of engine.captureUnits) {
+          let container = captureUnitSprites.get(capUnit.id);
+          if (!container) {
+            container = new PIXI.Container();
+            container.eventMode = 'none'; // Not interactive initially
+
+            const shadow = new PIXI.Graphics();
+            shadow.label = 'shadow';
+            container.addChild(shadow);
+
+            const sprite = new PIXI.Sprite();
+            sprite.label = 'cap_sprite';
+            sprite.anchor.set(0.5);
+            container.addChildAt(sprite, 1);
+
+            app.stage.addChild(container);
+            app.stage.setChildIndex(container, 1); // just above background
+
+            captureUnitSprites.set(capUnit.id, container);
+          }
+
+          // If held, maybe offset slightly so it looks carried,
+          // or just render it at the enemy position (with a small Y offset)
+          const heldOffset = capUnit.heldByEnemyId ? screenH * -0.02 : 0;
+
+          container.x = offsetX + (capUnit.position.x / 100) * screenW;
+          container.y =
+            offsetY + (capUnit.position.y / 100) * screenH + heldOffset;
+
+          // Make it render above the enemy if held (enemy might be index 1 or so, we'll just push to top)
+          if (capUnit.heldByEnemyId) {
+            app.stage.setChildIndex(container, app.stage.children.length - 1);
+          }
+
+          const sprite = container.getChildByLabel('cap_sprite') as
+            | PIXI.Sprite
+            | undefined;
+          const shadow = container.getChildByLabel('shadow') as
+            | PIXI.Graphics
+            | undefined;
+
+          if (sprite && shadow) {
+            // Hide shadow if held
+            shadow.visible = !capUnit.heldByEnemyId;
+
+            applyTDUnitTransforms(
+              capUnit,
+              sprite,
+              shadow,
+              capUnit.tdConfigId,
               undefined,
               (t) => {
                 if (!isDestroyed) sprite.texture = t;

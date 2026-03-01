@@ -1,12 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import * as PIXI from 'pixi.js';
 
-export type PointType = 'PATH' | 'PLACEMENT';
+export type PointType = 'PATH' | 'PLACEMENT' | 'CAPTURE';
 
 interface PixiTDLevelEditorProps {
   paths: { x: number; y: number }[][];
   activePathIndex: number;
   placementSpots: { x: number; y: number }[];
+  captureUnits: { x: number; y: number; tdConfigId?: string }[];
   deleteMode: boolean;
   onPointMove: (type: PointType, index: number, x: number, y: number) => void;
   onPointDelete: (type: PointType, index: number) => void;
@@ -16,6 +17,7 @@ export default function PixiTDLevelEditor({
   paths,
   activePathIndex,
   placementSpots,
+  captureUnits,
   deleteMode,
   onPointMove,
   onPointDelete,
@@ -27,6 +29,7 @@ export default function PixiTDLevelEditor({
   const pathsRef = useRef(paths);
   const activePathIndexRef = useRef(activePathIndex);
   const placementSpotsRef = useRef(placementSpots);
+  const captureUnitsRef = useRef(captureUnits);
 
   useEffect(() => {
     onPointMoveRef.current = onPointMove;
@@ -46,6 +49,9 @@ export default function PixiTDLevelEditor({
   useEffect(() => {
     placementSpotsRef.current = placementSpots;
   }, [placementSpots]);
+  useEffect(() => {
+    captureUnitsRef.current = captureUnits;
+  }, [captureUnits]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -60,6 +66,7 @@ export default function PixiTDLevelEditor({
     // Maps for Point Containers so we can reuse them instead of destroying and recreating
     const pathNodes = new Map<number, PIXI.Container>();
     const placementNodes = new Map<number, PIXI.Container>();
+    const captureNodes = new Map<number, PIXI.Container>();
 
     let bgBounds = { x: 0, y: 0, width: 0, height: 0 };
 
@@ -225,6 +232,7 @@ export default function PixiTDLevelEditor({
         const currentPaths = pathsRef.current;
         const currentActivePathIndex = activePathIndexRef.current;
         const currentPlacementSpots = placementSpotsRef.current;
+        const currentCaptureUnits = captureUnitsRef.current;
 
         // Draw Path lines
         pathGraphics.clear();
@@ -319,6 +327,47 @@ export default function PixiTDLevelEditor({
           // Update text
           const text = node.children[1] as PIXI.Text;
           if (text) text.text = i.toString();
+        });
+
+        // Render Capture Units
+        for (const [key, node] of captureNodes.entries()) {
+          if (key >= currentCaptureUnits.length) {
+            app.stage.removeChild(node);
+            node.destroy({ children: true });
+            captureNodes.delete(key);
+          }
+        }
+        currentCaptureUnits.forEach((spot, i) => {
+          let node = captureNodes.get(i);
+          const radius = bgBounds.width * 0.04;
+          if (!node) {
+            node = createDraggablePoint(
+              'CAPTURE',
+              i,
+              0x9333ea, // purple
+              radius,
+              0x9333ea,
+              0.4
+            );
+            captureNodes.set(i, node);
+          }
+          node.x = bgBounds.x + (spot.x / 100) * bgBounds.width;
+          node.y = bgBounds.y + (spot.y / 100) * bgBounds.height;
+          node.cursor = deleteModeRef.current
+            ? 'pointer'
+            : draggingNode === node
+              ? 'grabbing'
+              : 'grab';
+
+          const g = node.children[0] as PIXI.Graphics;
+          g.clear();
+          g.circle(0, 0, radius);
+          g.fill({ color: 0x9333ea, alpha: 0.4 });
+          g.stroke({ color: 0x9333ea, width: 3, alpha: 0.9 });
+
+          // Update text (show a 'C' before the index to distinguish)
+          const text = node.children[1] as PIXI.Text;
+          if (text) text.text = `C${i}`;
         });
       });
     };

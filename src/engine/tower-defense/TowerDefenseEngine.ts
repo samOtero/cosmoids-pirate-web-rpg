@@ -8,7 +8,7 @@ import {
   STARTER_MONKEY,
 } from '@/constants/creatures';
 import { Creature } from '@/types/baseGame';
-import { Tower, Enemy, Projectile } from './types';
+import { Tower, Enemy, Projectile, CaptureUnit } from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
 import { AttackBehaviorRegistry } from './attacks/behaviors';
 import { EffectProcessor } from './attacks/EffectProcessor';
@@ -91,6 +91,7 @@ export class TowerDefenseEngine {
   public paths: { x: number; y: number }[][] = [];
   public placementSpots: { x: number; y: number }[] = [];
   public environmentUnits: import('./types').EnvironmentUnit[] = [];
+  public captureUnits: CaptureUnit[] = [];
 
   constructor(levelData: import('./types').TDLevelData | any) {
     this.paths = levelData.paths || [];
@@ -105,6 +106,17 @@ export class TowerDefenseEngine {
           tdConfigId: eu.tdConfigId,
           position: { x: eu.position.x, y: eu.position.y },
           facingDirection: eu.facingDirection || 'down',
+        })
+      );
+    }
+
+    if (levelData.captureUnits) {
+      this.captureUnits = levelData.captureUnits.map(
+        (cu: any, index: number) => ({
+          id: `cap_unit_${index}_${Math.random().toString(36).substring(7)}`,
+          tdConfigId: cu.tdConfigId,
+          position: { x: cu.position.x, y: cu.position.y },
+          facingDirection: cu.facingDirection || 'down',
         })
       );
     }
@@ -247,11 +259,53 @@ export class TowerDefenseEngine {
         // We'll let the UI handle game over messaging by watching the lives count
         this.lives = 0;
       }
+
+      // Enemies that reached the end take their held unit with them.
+      reachedEnd.forEach((e) => {
+        if (e.heldCaptureUnitId) {
+          // Remove the unit from the map entirely
+          this.captureUnits = this.captureUnits.filter(
+            (cu) => cu.id !== e.heldCaptureUnitId
+          );
+        }
+      });
     }
     newEnemies = newEnemies.filter((e) => {
       const activePath = this.paths[e.pathIndex] || [];
       return e.currentWaypointIndex < activePath.length;
     });
+
+    // CaptureUnit Interaction Logic
+    // 1. Pick up unheld items
+    for (const cu of this.captureUnits) {
+      if (!cu.heldByEnemyId) {
+        // Find closest enemy that isn't holding anything
+        for (const enemy of newEnemies) {
+          if (enemy.heldCaptureUnitId) continue;
+
+          const dx = enemy.position.x - cu.position.x;
+          // Apply aspect ratio properly to dy since screen isn't perfectly square
+          const dy = (enemy.position.y - cu.position.y) * this.aspectRatio;
+          const distSq = dx * dx + dy * dy;
+
+          // Original distSq < 25 means a literal distance of ~5 units.
+          // Let's expand this slightly to make sure it's forgiving if they pass closely.
+          if (distSq < 100) {
+            // within ~10 units
+            cu.heldByEnemyId = enemy.id;
+            enemy.heldCaptureUnitId = cu.id;
+            break; // only one enemy picks it up
+          }
+        }
+      } else {
+        // 2. Update position of held items to match their carrier
+        const carrier = newEnemies.find((e) => e.id === cu.heldByEnemyId);
+        if (carrier) {
+          cu.position.x = carrier.position.x;
+          cu.position.y = carrier.position.y;
+        }
+      }
+    }
 
     // Towers attack
     newTowers.forEach((tower) => {
@@ -350,6 +404,19 @@ export class TowerDefenseEngine {
     const deadEnemies = newEnemies.filter((e) => e.hp <= 0);
     if (deadEnemies.length > 0) {
       this.money += deadEnemies.length * 10;
+
+      // Drop capture units when an enemy dies
+      deadEnemies.forEach((e) => {
+        if (e.heldCaptureUnitId) {
+          const droppedUnit = this.captureUnits.find(
+            (cu) => cu.id === e.heldCaptureUnitId
+          );
+          if (droppedUnit) {
+            droppedUnit.heldByEnemyId = undefined;
+            // The unit drops exactly where the enemy died (which was already set in the update loop)
+          }
+        }
+      });
     }
     newEnemies = newEnemies.filter((e) => e.hp > 0);
 

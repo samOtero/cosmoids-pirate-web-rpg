@@ -14,6 +14,16 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
   const [placementSpots, setPlacementSpots] = useState<
     { x: number; y: number }[]
   >([]);
+  const [environmentUnits, setEnvironmentUnits] = useState<
+    {
+      position: { x: number; y: number };
+      tdConfigId: string;
+      facingDirection?: 'up' | 'down' | 'left' | 'right';
+    }[]
+  >([]);
+  const [captureUnits, setCaptureUnits] = useState<
+    { x: number; y: number; tdConfigId: string }[]
+  >([]);
   const [waves, setWaves] = useState<TDWave[]>([]);
   const [surviveUntil, setSurviveUntil] = useState<number>(0);
   const [deleteMode, setDeleteMode] = useState(false);
@@ -47,6 +57,20 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
       }
       setActivePathIndex(0);
       setPlacementSpots(JSON.parse(JSON.stringify(levelData.placementSpots)));
+      setEnvironmentUnits(
+        levelData.environmentUnits
+          ? JSON.parse(JSON.stringify(levelData.environmentUnits))
+          : []
+      );
+      setCaptureUnits(
+        levelData.captureUnits
+          ? levelData.captureUnits.map((cu) => ({
+              x: cu.position.x,
+              y: cu.position.y,
+              tdConfigId: cu.tdConfigId,
+            }))
+          : []
+      );
       setWaves(
         levelData.waves ? JSON.parse(JSON.stringify(levelData.waves)) : []
       );
@@ -55,6 +79,8 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
       setPaths([[]]);
       setActivePathIndex(0);
       setPlacementSpots([]);
+      setEnvironmentUnits([]);
+      setCaptureUnits([]);
       setWaves([]);
       setSurviveUntil(0);
     }
@@ -65,6 +91,8 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
     setPaths([[]]);
     setActivePathIndex(0);
     setPlacementSpots([]);
+    setEnvironmentUnits([]);
+    setCaptureUnits([]);
     setWaves([]);
     setSurviveUntil(0);
     setSelectedLevelKey('NEW_LEVEL');
@@ -86,8 +114,14 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
         next[activePathIndex] = currentPath;
         return next;
       });
-    } else {
+    } else if (type === 'PLACEMENT') {
       setPlacementSpots((prev) => {
+        const next = [...prev];
+        next[index] = { ...next[index], x, y };
+        return next;
+      });
+    } else if (type === 'CAPTURE') {
+      setCaptureUnits((prev) => {
         const next = [...prev];
         next[index] = { ...next[index], x, y };
         return next;
@@ -106,8 +140,10 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
         }
         return next;
       });
-    } else {
+    } else if (type === 'PLACEMENT') {
       setPlacementSpots((prev) => prev.filter((_, i) => i !== index));
+    } else if (type === 'CAPTURE') {
+      setCaptureUnits((prev) => prev.filter((_, i) => i !== index));
     }
   };
 
@@ -122,6 +158,13 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
 
   const addPlacementSpot = () => {
     setPlacementSpots((prev) => [...prev, { x: 50, y: 50 }]);
+  };
+
+  const addCaptureUnit = () => {
+    setCaptureUnits((prev) => [
+      ...prev,
+      { x: 50, y: 50, tdConfigId: 'chest_wooden' },
+    ]);
   };
 
   const saveLevel = async () => {
@@ -148,6 +191,15 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
         placementSpots: placementSpots.map((s) => ({
           x: Number(s.x.toFixed(2)),
           y: Number(s.y.toFixed(2)),
+        })),
+        environmentUnits:
+          environmentUnits.length > 0 ? environmentUnits : undefined,
+        captureUnits: captureUnits.map((c) => ({
+          position: {
+            x: Number(c.x.toFixed(2)),
+            y: Number(c.y.toFixed(2)),
+          },
+          tdConfigId: c.tdConfigId,
         })),
         waves: waves,
         surviveUntil: surviveUntil > 0 ? surviveUntil : undefined,
@@ -340,6 +392,12 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
           >
             + Placement Spot
           </button>
+          <button
+            onClick={addCaptureUnit}
+            className="px-4 py-2 bg-purple-700 hover:bg-purple-600 rounded text-white font-bold text-sm"
+          >
+            + Capture Unit
+          </button>
 
           <div className="w-px h-6 bg-slate-600 mx-2" />
 
@@ -394,6 +452,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
           paths={paths}
           activePathIndex={activePathIndex}
           placementSpots={placementSpots}
+          captureUnits={captureUnits}
           deleteMode={deleteMode}
           onPointMove={handlePointMove}
           onPointDelete={handlePointDelete}
@@ -414,6 +473,58 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
           </div>
 
           <div className="space-y-4">
+            {/* Environment Units Configs (Read-only rendering loop to show what's there) */}
+            {environmentUnits.length > 0 && (
+              <div className="bg-slate-900 p-3 rounded border border-yellow-800">
+                <h4 className="font-bold text-sm mb-2 text-yellow-400">
+                  Environment Units (Preserved)
+                </h4>
+                {environmentUnits.map((eu, idx) => (
+                  <div
+                    key={idx}
+                    className="flex flex-col mb-2 text-xs text-slate-400"
+                  >
+                    <span>
+                      {eu.tdConfigId} @ [{eu.position.x}, {eu.position.y}]
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Capture Units Configs */}
+            {captureUnits.length > 0 && (
+              <div className="bg-slate-900 p-3 rounded border border-purple-800">
+                <h4 className="font-bold text-sm mb-2 text-purple-400">
+                  Capture Units Config
+                </h4>
+                {captureUnits.map((cu, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between mb-2 text-xs"
+                  >
+                    <span className="text-slate-300 w-16">Unit {idx}</span>
+                    <input
+                      type="text"
+                      className="flex-1 bg-slate-950 text-white rounded p-1 border border-slate-700"
+                      value={cu.tdConfigId}
+                      onChange={(e) => {
+                        setCaptureUnits((prev) => {
+                          const next = [...prev];
+                          next[idx] = {
+                            ...next[idx],
+                            tdConfigId: e.target.value,
+                          };
+                          return next;
+                        });
+                      }}
+                      placeholder="tdConfigId"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
             {waves.map((wave, wIdx) => (
               <div
                 key={wave.id}

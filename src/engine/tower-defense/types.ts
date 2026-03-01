@@ -45,6 +45,11 @@ export interface EnvironmentUnit extends BaseTDUnit {
   tdConfigId: string;
 }
 
+export interface CaptureUnit extends BaseTDUnit {
+  tdConfigId: string;
+  heldByEnemyId?: string;
+}
+
 export interface TDLevelData {
   paths: Point[][];
   placementSpots: Point[];
@@ -55,6 +60,7 @@ export interface TDLevelData {
     position: Point;
     facingDirection?: 'up' | 'down' | 'left' | 'right';
   }[];
+  captureUnits?: { tdConfigId: string; position: Point }[];
 }
 
 export interface Tower extends BaseTDUnit {
@@ -84,6 +90,7 @@ export interface Enemy extends BaseTDUnit {
   statusConditions: StatusCondition[];
   currentWaypointIndex: number;
   pathIndex: number; // Index into the level's `paths` array
+  heldCaptureUnitId?: string; // ID of the CaptureUnit they are holding
 }
 
 export interface Projectile {
