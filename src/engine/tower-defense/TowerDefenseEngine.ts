@@ -236,7 +236,11 @@ export class TowerDefenseEngine {
       }
 
       const activePath = this.paths[enemy.pathIndex] || [];
-      if (enemy.currentWaypointIndex < activePath.length) {
+      if (
+        (!enemy.isMovingBackward &&
+          enemy.currentWaypointIndex < activePath.length) ||
+        (enemy.isMovingBackward && enemy.currentWaypointIndex >= 0)
+      ) {
         const targetPoint = activePath[enemy.currentWaypointIndex];
         const dx = targetPoint.x - enemy.position.x;
         const dy = targetPoint.y - enemy.position.y;
@@ -255,7 +259,13 @@ export class TowerDefenseEngine {
             // Reached waypoint
             enemy.position.x = targetPoint.x;
             enemy.position.y = targetPoint.y;
-            enemy.currentWaypointIndex++;
+
+            // Advance/regress waypoint
+            if (enemy.isMovingBackward) {
+              enemy.currentWaypointIndex--;
+            } else {
+              enemy.currentWaypointIndex++;
+            }
           } else {
             enemy.position.x += moveDist;
             enemy.facingDirection = dx > 0 ? 'right' : 'left';
@@ -270,20 +280,45 @@ export class TowerDefenseEngine {
             // Reached waypoint
             enemy.position.x = targetPoint.x;
             enemy.position.y = targetPoint.y;
-            enemy.currentWaypointIndex++;
+
+            // Advance/regress waypoint
+            if (enemy.isMovingBackward) {
+              enemy.currentWaypointIndex--;
+            } else {
+              enemy.currentWaypointIndex++;
+            }
           } else {
             enemy.position.y += moveDist;
             enemy.facingDirection = dy > 0 ? 'down' : 'up';
           }
         }
       }
+
+      // Check if enemy reached the forward end, and should turnaround instead of despawning
+      if (
+        !enemy.isMovingBackward &&
+        enemy.turnAroundAtEnd &&
+        enemy.currentWaypointIndex >= activePath.length
+      ) {
+        enemy.isMovingBackward = true;
+        // Start heading back to the previous node (the second to last node, since it's already AT the last node)
+        // activePath.length - 1 is the last node, activePath.length - 2 is the one before it.
+        // It might be possible path is shorter than 2 nodes.
+        enemy.currentWaypointIndex = Math.max(0, activePath.length - 2);
+      }
     });
 
     // Enemy reached end
     const reachedEnd = newEnemies.filter((e) => {
       const activePath = this.paths[e.pathIndex] || [];
-      return e.currentWaypointIndex >= activePath.length;
+      if (!e.isMovingBackward && e.currentWaypointIndex >= activePath.length) {
+        return !e.turnAroundAtEnd;
+      } else if (e.isMovingBackward && e.currentWaypointIndex < 0) {
+        return true;
+      }
+      return false;
     });
+
     if (reachedEnd.length > 0) {
       this.lives -= reachedEnd.length;
       if (this.lives <= 0) {
@@ -301,9 +336,21 @@ export class TowerDefenseEngine {
         }
       });
     }
+
     newEnemies = newEnemies.filter((e) => {
       const activePath = this.paths[e.pathIndex] || [];
-      return e.currentWaypointIndex < activePath.length;
+      const reachedForwardEnd = e.currentWaypointIndex >= activePath.length;
+      const reachedBackwardEnd = e.currentWaypointIndex < 0;
+
+      // Keep if it hasn't reached either end
+      if (!reachedForwardEnd && !reachedBackwardEnd) return true;
+
+      // Keep if it reached forward end but is turning around (it will soon be marked as backward)
+      if (reachedForwardEnd && e.turnAroundAtEnd && !e.isMovingBackward)
+        return true;
+
+      // Otherwise remove
+      return false;
     });
 
     // CaptureUnit Interaction Logic
@@ -497,7 +544,8 @@ export class TowerDefenseEngine {
         currentGroup.definitionId,
         time,
         newEnemies,
-        currentGroup.pathIndex
+        currentGroup.pathIndex,
+        currentGroup.turnAroundAtEnd
       );
       this.spawnsRemainingInGroup--;
       this.lastSpawnTime = time;
@@ -554,7 +602,8 @@ export class TowerDefenseEngine {
     definitionId: string,
     time: number,
     newEnemies: Enemy[],
-    groupPathIndex: number
+    groupPathIndex: number,
+    turnAroundAtEnd?: boolean
   ) {
     const meta = TD_CREATURE_DEFS[definitionId];
     if (!meta) return;
@@ -574,6 +623,7 @@ export class TowerDefenseEngine {
       currentWaypointIndex: 1,
       pathIndex: pathIndex,
       facingDirection: 'down',
+      turnAroundAtEnd,
     });
   }
 

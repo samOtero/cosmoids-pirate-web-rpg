@@ -28,6 +28,7 @@ export interface TDWaveGroup {
   spawnIntervalMs: number; // Time between each spawn in this group
   delayBeforeGroupMs: number; // Delay before this group starts (after wave start or previous group ends)
   pathIndex: number; // Which path enemies in this group should take
+  turnAroundAtEnd?: boolean; // Whether the enemy should return to the start instead of despawning
 }
 
 export interface TDWave {
@@ -91,6 +92,8 @@ export interface Enemy extends BaseTDUnit {
   currentWaypointIndex: number;
   pathIndex: number; // Index into the level's `paths` array
   heldCaptureUnitId?: string; // ID of the CaptureUnit they are holding
+  turnAroundAtEnd?: boolean;
+  isMovingBackward?: boolean;
 }
 
 export interface Projectile {
