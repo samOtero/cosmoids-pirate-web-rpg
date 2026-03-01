@@ -257,6 +257,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
         delayBeforeGroupMs: 0,
         pathIndex: 0,
         turnAroundAtEnd: false,
+        concurrentWithPrevious: false,
       });
       return next;
     });
@@ -692,23 +693,44 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
                             ))}
                           </select>
                         </div>
-                        <div className="col-span-2 flex items-center mt-2">
-                          <input
-                            type="checkbox"
-                            checked={!!group.turnAroundAtEnd}
-                            onChange={(e) =>
-                              updateGroup(
-                                wIdx,
-                                gIdx,
-                                'turnAroundAtEnd',
-                                e.target.checked
-                              )
-                            }
-                            className="mr-2 h-4 w-4 bg-slate-950 border-slate-700 rounded cursor-pointer"
-                          />
-                          <label className="text-slate-300">
-                            Turn Around at End
-                          </label>
+                        <div className="col-span-2 flex flex-col gap-2 mt-2">
+                          <div className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={!!group.turnAroundAtEnd}
+                              onChange={(e) =>
+                                updateGroup(
+                                  wIdx,
+                                  gIdx,
+                                  'turnAroundAtEnd',
+                                  e.target.checked
+                                )
+                              }
+                              className="mr-2 h-4 w-4 bg-slate-950 border-slate-700 rounded cursor-pointer"
+                            />
+                            <label className="text-slate-300">
+                              Turn Around at End
+                            </label>
+                          </div>
+
+                          <div className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={!!group.concurrentWithPrevious}
+                              onChange={(e) =>
+                                updateGroup(
+                                  wIdx,
+                                  gIdx,
+                                  'concurrentWithPrevious',
+                                  e.target.checked
+                                )
+                              }
+                              className="mr-2 h-4 w-4 bg-slate-950 border-slate-700 rounded cursor-pointer"
+                            />
+                            <label className="text-slate-300">
+                              Concurrent with Previous Group
+                            </label>
+                          </div>
                         </div>
                       </div>
                     </div>

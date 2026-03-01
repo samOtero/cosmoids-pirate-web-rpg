@@ -55,6 +55,14 @@ export const TD_CREATURE_DEFS: Record<string, TDCreatureMetadata> = {
 
 const ENEMY_TYPES = [BUG_STAGE_1, BUG_STAGE_2, BUG_STAGE_3];
 
+interface ActiveSpawnerState {
+  group: TDWaveGroup;
+  spawnsRemaining: number;
+  lastSpawnTime: number;
+  delayTimer: number;
+  isWaitingForDelay: boolean;
+}
+
 export class TowerDefenseEngine {
   public towers: Tower[] = [];
   public enemies: Enemy[] = [];
@@ -69,12 +77,10 @@ export class TowerDefenseEngine {
   // Wave Management State
   public waves: TDWave[] = [];
   public currentWaveIndex: number = 0;
-  public currentGroupIndex: number = 0;
-  public spawnsRemainingInGroup: number = 0;
-  private lastSpawnTime: number = 0;
-  private waveDelayTimer: number = 0;
-  private isWaitingForDelay: boolean = false;
+  private activeSpawners: ActiveSpawnerState[] = [];
+  private nextGroupIndexToStart: number = 0;
   public hasFinishedAllWaves: boolean = false;
+  private lastSpawnTime: number = 0;
 
   public playerSelectedAttacks: Record<string, number> = {};
 
@@ -154,10 +160,8 @@ export class TowerDefenseEngine {
     // Initialize first wave group if available
     if (this.waves.length > 0 && this.waves[0].groups.length > 0) {
       this.currentWaveIndex = 0;
-      this.currentGroupIndex = 0;
-      this.spawnsRemainingInGroup = this.waves[0].groups[0].count;
-      this.isWaitingForDelay = true;
-      this.waveDelayTimer = this.waves[0].groups[0].delayBeforeGroupMs || 0;
+      this.nextGroupIndexToStart = 0;
+      this.loadNextSpawners();
     } else {
       this.hasFinishedAllWaves = true; // Fallback to random or nothing
     }
@@ -536,6 +540,45 @@ export class TowerDefenseEngine {
     this.towers = newTowers;
   }
 
+  private loadNextSpawners() {
+    const currentWave = this.waves[this.currentWaveIndex];
+    if (
+      !currentWave ||
+      this.nextGroupIndexToStart >= currentWave.groups.length
+    ) {
+      this.advanceToNextWave();
+      return;
+    }
+
+    // Always load at least one group
+    let groupToLoad = currentWave.groups[this.nextGroupIndexToStart];
+    this.activeSpawners.push({
+      group: groupToLoad,
+      spawnsRemaining: groupToLoad.count,
+      lastSpawnTime: 0,
+      delayTimer: groupToLoad.delayBeforeGroupMs || 0,
+      isWaitingForDelay: (groupToLoad.delayBeforeGroupMs || 0) > 0,
+    });
+    this.nextGroupIndexToStart++;
+
+    // Load any subsequent concurrent groups
+    while (this.nextGroupIndexToStart < currentWave.groups.length) {
+      let nextGroup = currentWave.groups[this.nextGroupIndexToStart];
+      if (nextGroup.concurrentWithPrevious) {
+        this.activeSpawners.push({
+          group: nextGroup,
+          spawnsRemaining: nextGroup.count,
+          lastSpawnTime: 0,
+          delayTimer: nextGroup.delayBeforeGroupMs || 0,
+          isWaitingForDelay: (nextGroup.delayBeforeGroupMs || 0) > 0,
+        });
+        this.nextGroupIndexToStart++;
+      } else {
+        break; // Stop when we hit a non-concurrent group
+      }
+    }
+  }
+
   private processWaveSpawns(
     time: number,
     deltaMs: number,
@@ -543,68 +586,49 @@ export class TowerDefenseEngine {
   ) {
     if (this.hasFinishedAllWaves) return;
 
-    const currentWave = this.waves[this.currentWaveIndex];
-    if (!currentWave || currentWave.groups.length === 0) {
-      this.hasFinishedAllWaves = true;
+    if (this.activeSpawners.length === 0) {
+      this.loadNextSpawners();
       return;
     }
 
-    const currentGroup = currentWave.groups[this.currentGroupIndex];
-    if (!currentGroup) {
-      // Move to next wave
-      this.advanceToNextWave();
-      return;
-    }
+    // Process all active spawners backwards so we can safely remove from array
+    for (let i = this.activeSpawners.length - 1; i >= 0; i--) {
+      const spawner = this.activeSpawners[i];
 
-    if (this.isWaitingForDelay) {
-      this.waveDelayTimer -= deltaMs;
-      if (this.waveDelayTimer <= 0) {
-        this.isWaitingForDelay = false;
-        this.lastSpawnTime = time - currentGroup.spawnIntervalMs; // Force immediate spawn
-      } else {
-        return; // Still waiting on delay
+      if (spawner.isWaitingForDelay) {
+        spawner.delayTimer -= deltaMs;
+        if (spawner.delayTimer <= 0) {
+          spawner.isWaitingForDelay = false;
+          spawner.lastSpawnTime = time - spawner.group.spawnIntervalMs; // Force immediate spawn
+        } else {
+          continue; // Still waiting on delay for this spawner
+        }
       }
-    }
 
-    // Checking if it's time to spawn
-    const timeSinceLastSpawn = time - this.lastSpawnTime;
-    if (timeSinceLastSpawn >= currentGroup.spawnIntervalMs) {
-      this.spawnEnemyFromDef(
-        currentGroup.definitionId,
-        time,
-        newEnemies,
-        currentGroup.pathIndex,
-        currentGroup.turnAroundAtEnd
-      );
-      this.spawnsRemainingInGroup--;
-      this.lastSpawnTime = time;
+      // Checking if it's time to spawn
+      const timeSinceLastSpawn = time - spawner.lastSpawnTime;
+      if (timeSinceLastSpawn >= spawner.group.spawnIntervalMs) {
+        this.spawnEnemyFromDef(
+          spawner.group.definitionId,
+          time,
+          newEnemies,
+          spawner.group.pathIndex,
+          spawner.group.turnAroundAtEnd
+        );
+        spawner.spawnsRemaining--;
+        spawner.lastSpawnTime = time;
 
-      if (this.spawnsRemainingInGroup <= 0) {
-        this.advanceToNextGroup();
-      }
-    }
-  }
-
-  private advanceToNextGroup() {
-    this.currentGroupIndex++;
-    const currentWave = this.waves[this.currentWaveIndex];
-
-    if (this.currentGroupIndex >= currentWave.groups.length) {
-      this.advanceToNextWave();
-    } else {
-      // Setup next group in current wave
-      const nextGroup = currentWave.groups[this.currentGroupIndex];
-      this.spawnsRemainingInGroup = nextGroup.count;
-      if (nextGroup.delayBeforeGroupMs > 0) {
-        this.isWaitingForDelay = true;
-        this.waveDelayTimer = nextGroup.delayBeforeGroupMs;
+        if (spawner.spawnsRemaining <= 0) {
+          this.activeSpawners.splice(i, 1);
+        }
       }
     }
   }
 
   private advanceToNextWave() {
     this.currentWaveIndex++;
-    this.currentGroupIndex = 0;
+    this.nextGroupIndexToStart = 0;
+    this.activeSpawners = [];
 
     if (this.currentWaveIndex >= this.waves.length) {
       this.hasFinishedAllWaves = true;
@@ -615,15 +639,7 @@ export class TowerDefenseEngine {
         this.advanceToNextWave();
         return;
       }
-
-      const firstGroup = nextWave.groups[0];
-      this.spawnsRemainingInGroup = firstGroup.count;
-      if (firstGroup.delayBeforeGroupMs > 0) {
-        this.isWaitingForDelay = true;
-        this.waveDelayTimer = firstGroup.delayBeforeGroupMs;
-      } else {
-        this.isWaitingForDelay = false;
-      }
+      this.loadNextSpawners();
     }
   }
 
