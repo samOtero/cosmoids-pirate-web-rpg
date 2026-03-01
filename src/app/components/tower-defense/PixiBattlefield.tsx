@@ -218,10 +218,9 @@ export default function PixiBattlefield({
             height: bgSprite.height,
           };
           bgBoundsRef.current = bgBounds;
-        }
-
-        if (engine && app.screen.height > 0) {
-          engine.setAspectRatio(app.screen.width / app.screen.height);
+          if (engine) {
+            engine.setAspectRatio(ratio);
+          }
         }
       };
       app.renderer.on('resize', updateAspectRatio);
