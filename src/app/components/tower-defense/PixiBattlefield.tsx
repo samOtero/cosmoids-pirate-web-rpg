@@ -61,7 +61,8 @@ export const WEAKENED_THRESHOLD = 0.9;
 export function renderHealthBar(
   unit: BaseTDUnit,
   container: PIXI.Container,
-  configId: string
+  configId: string,
+  hideWhenFull: boolean = false
 ) {
   const tdConfigMap = CREATURE_TD_CONFIGS[configId] || {
     default: { scale: 1 },
@@ -93,9 +94,16 @@ export function renderHealthBar(
   const hpRatio = unit.maxHp > 0 ? unit.hp / unit.maxHp : 1;
   const isWeakened = hpRatio <= WEAKENED_THRESHOLD;
 
-  hpFg.clear();
-  hpFg.rect(-32, hpOffsetY, 64 * Math.max(0, hpRatio), 4);
-  hpFg.fill({ color: isWeakened ? 0xff0000 : 0x22c55e });
+  if (hideWhenFull && hpRatio >= 1) {
+    hpBg.visible = false;
+    hpFg.visible = false;
+  } else {
+    hpBg.visible = true;
+    hpFg.visible = true;
+    hpFg.clear();
+    hpFg.rect(-32, hpOffsetY, 64 * Math.max(0, hpRatio), 4);
+    hpFg.fill({ color: isWeakened ? 0xff0000 : 0x22c55e });
+  }
 }
 
 const TYPE_COLORS: Record<ElementType, number> = {
@@ -532,7 +540,12 @@ export default function PixiBattlefield({
               }
             );
           }
-          renderHealthBar(tower, container, tower.speciesId);
+          renderHealthBar(
+            tower,
+            container,
+            tower.speciesId,
+            true /* hideWhenFull */
+          );
         }
 
         // --- Render Placement Spots & Capture Hover ---
