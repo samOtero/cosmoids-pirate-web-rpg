@@ -224,6 +224,12 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       scale: 0.27,
       shadowScaleX: 1.15,
       shadowOffsetY: 1,
+      vfxAnimation: {
+        type: 'WIPE_LINEAR',
+        maskRotation: Math.PI / 4,
+        maskSize: 200,
+        fadeOutProgress: 0.8,
+      },
     },
   },
 };

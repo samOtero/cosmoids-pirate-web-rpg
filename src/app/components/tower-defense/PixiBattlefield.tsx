@@ -940,18 +940,56 @@ export default function PixiBattlefield({
               }
             );
 
-            if (mask) {
-              // Create dynamic mask animation based on VFX type
-              if (vfx.configId.includes('scratch')) {
-                const size = 200;
-                mask.clear();
-                mask.rotation = Math.PI / 4; // Wipes from top-right to bottom-left
-                // Wipe down over the progress of the animation
-                // We multiply progress by a slight factor so it completes the wipe before fading
-                const wipeProgress = Math.min(1, progress * 1.5);
-                mask.rect(-size, -size, size * 2, size * 2 * wipeProgress);
-                mask.fill(0xffffff);
+            // Fetch the visual effect configuration
+            const tdConfigMap = CREATURE_TD_CONFIGS[vfx.configId] || {
+              default: { scale: 1 },
+            };
+            const tdConfig =
+              tdConfigMap[vfx.facingDirection || 'default'] ||
+              tdConfigMap.default;
+            const animConfig = tdConfig.vfxAnimation;
+
+            if (animConfig) {
+              // Handle Alpha/Fade
+              if (
+                animConfig.fadeOutProgress !== undefined &&
+                progress > animConfig.fadeOutProgress
+              ) {
+                const fadePortion = 1 - animConfig.fadeOutProgress;
+                container.alpha =
+                  1 - (progress - animConfig.fadeOutProgress) / fadePortion;
               } else {
+                container.alpha = 1;
+              }
+
+              // Handle Masks based on Type
+              if (mask) {
+                switch (animConfig.type) {
+                  case 'WIPE_LINEAR': {
+                    const size = animConfig.maskSize || 200;
+                    mask.clear();
+                    mask.rotation = animConfig.maskRotation || 0;
+                    const wipeProgress = Math.min(1, progress * 1.5); // Finishes wiping before full duration usually
+                    mask.rect(-size, -size, size * 2, size * 2 * wipeProgress);
+                    mask.fill(0xffffff);
+                    break;
+                  }
+                  case 'FADE':
+                  case 'SCALE':
+                  case 'CUSTOM':
+                  default: {
+                    const size = 500;
+                    mask.clear();
+                    mask.rect(-size, -size, size * 2, size * 2);
+                    mask.fill(0xffffff);
+                    break;
+                  }
+                }
+              }
+            } else {
+              // Default fallback if no config
+              container.alpha = progress > 0.8 ? 1 - (progress - 0.8) * 5 : 1;
+              if (mask) {
                 const size = 500;
                 mask.clear();
                 mask.rect(-size, -size, size * 2, size * 2);

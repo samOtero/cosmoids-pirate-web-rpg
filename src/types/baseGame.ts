@@ -63,6 +63,14 @@ export const GameFlag = {
 
 export type GameFlagValue = (typeof GameFlag)[keyof typeof GameFlag];
 
+export interface VFXAnimationConfig {
+  type: 'WIPE_LINEAR' | 'FADE' | 'SCALE' | 'CUSTOM';
+  maskRotation?: number; // e.g. Math.PI / 4
+  maskSize?: number; // e.g. 200
+  fadeInProgress?: number; // 0 to 1
+  fadeOutProgress?: number; // 0 to 1
+}
+
 export interface UnitSpriteConfig {
   url?: string;
   scale?: number;
@@ -75,6 +83,7 @@ export interface UnitSpriteConfig {
   offsetX?: number;
   offsetY?: number;
   healthBarOffsetY?: number;
+  vfxAnimation?: VFXAnimationConfig;
 }
 
 export interface UnitVisuals {
