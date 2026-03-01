@@ -386,6 +386,15 @@ export class TowerDefenseEngine {
             // within ~20 units
             cu.heldByEnemyId = enemy.id;
             enemy.heldCaptureUnitId = cu.id;
+
+            if (enemy.turnAroundAtEnd && !enemy.isMovingBackward) {
+              enemy.isMovingBackward = true;
+              enemy.currentWaypointIndex = Math.max(
+                0,
+                enemy.currentWaypointIndex - 1
+              );
+            }
+
             break; // only one enemy picks it up
           }
         }

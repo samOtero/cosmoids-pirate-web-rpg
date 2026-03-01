@@ -4,7 +4,7 @@ export const SENTICLE: Creature = {
   id: 'senticle',
   name: 'Senticle',
   type: ElementType.NORMAL,
-  maxHp: 200,
+  maxHp: 20,
   currentHp: 20,
   attack: 10,
   defense: 5,
