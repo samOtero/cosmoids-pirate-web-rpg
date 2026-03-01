@@ -194,7 +194,7 @@ export default function TowerDefenseScreen({
     <div className="fixed inset-0 z-9998 bg-slate-900 flex flex-col">
       {introState !== 'none' && (
         <div className="fixed inset-0 z-10000 bg-black/60 flex items-center justify-center pointer-events-none">
-          <div className="text-7xl md:text-9xl font-black italic text-transparent bg-clip-text bg-linear-to-br from-yellow-300 to-red-500 drop-shadow-[0_0_25px_rgba(255,165,0,0.8)] uppercase animate-bounce">
+          <div className="text-7xl md:text-9xl font-black italic text-transparent bg-clip-text bg-linear-to-br from-yellow-300 to-red-500 drop-shadow-[0_0_25px_rgba(255,165,0,0.8)] uppercase animate-bounce pr-8 pb-4">
             {introState === 'ready' ? 'Ready!' : 'GO!'}
           </div>
         </div>
