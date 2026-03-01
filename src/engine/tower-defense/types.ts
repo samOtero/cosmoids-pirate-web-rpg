@@ -35,11 +35,14 @@ export interface TDWave {
   groups: TDWaveGroup[];
 }
 
-export interface EnvironmentUnit {
+export interface BaseTDUnit {
   id: string;
-  tdConfigId: string;
   position: Point;
   facingDirection: 'up' | 'down' | 'left' | 'right';
+}
+
+export interface EnvironmentUnit extends BaseTDUnit {
+  tdConfigId: string;
 }
 
 export interface TDLevelData {
@@ -54,18 +57,15 @@ export interface TDLevelData {
   }[];
 }
 
-export interface Tower {
-  id: string; // Unique tower map instance ID
+export interface Tower extends BaseTDUnit {
   creatureId: string; // Reference to the Creature instance ID in the player's party
   speciesId: string; // The base species ID for rendering
-  position: Point;
   lastAttackTime: number; // Deprecate or keep for generic attacks
   level: number;
   xp: number;
   currentAttack: number;
   equippedAttacks: Array<{ definitionId: string; lastFiredTime: number }>;
   selectedAttackIndex: number;
-  facingDirection: 'up' | 'down' | 'left' | 'right';
 }
 
 export interface StatusCondition {
@@ -75,10 +75,8 @@ export interface StatusCondition {
   lastTickTime?: number;
 }
 
-export interface Enemy {
-  id: string;
+export interface Enemy extends BaseTDUnit {
   definitionId: string;
-  position: Point;
   hp: number;
   maxHp: number;
   speed: number;
@@ -86,7 +84,6 @@ export interface Enemy {
   statusConditions: StatusCondition[];
   currentWaypointIndex: number;
   pathIndex: number; // Index into the level's `paths` array
-  facingDirection: 'up' | 'down' | 'left' | 'right';
 }
 
 export interface Projectile {

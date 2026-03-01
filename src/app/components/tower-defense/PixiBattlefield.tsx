@@ -7,6 +7,54 @@ import {
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { ElementType } from '@/types/baseGame';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
+import { BaseTDUnit } from '@/engine/tower-defense/types';
+
+export function applyTDUnitTransforms(
+  unit: BaseTDUnit,
+  sprite: PIXI.Sprite,
+  shadow: PIXI.Graphics,
+  configId: string,
+  fallbackUrl?: string,
+  onImageLoaded?: (texture: PIXI.Texture) => void
+) {
+  const tdConfigMap = CREATURE_TD_CONFIGS[configId] || {
+    default: { scale: 1 },
+  };
+  const tdConfig = tdConfigMap[unit.facingDirection] || tdConfigMap.default;
+
+  const bScale = tdConfig.scale ?? 1;
+  const flipX = tdConfig.flipX ?? false;
+  sprite.scale.x = flipX ? -bScale : bScale;
+  sprite.scale.y = tdConfig.flipY ? -bScale : bScale;
+
+  const sOffsetX = tdConfig.offsetX ?? 0;
+  const sOffsetY = tdConfig.offsetY ?? 0;
+  sprite.x = sOffsetX;
+  sprite.y = sOffsetY;
+
+  const spriteUrl = tdConfig.url || fallbackUrl;
+  if (spriteUrl && (sprite as any).currentUrl !== spriteUrl) {
+    (sprite as any).currentUrl = spriteUrl;
+    PIXI.Assets.load(spriteUrl).then((t) => {
+      if (onImageLoaded) onImageLoaded(t);
+    });
+  }
+
+  const shadowScaleX = tdConfig.shadowScaleX ?? 1;
+  const shadowScaleY = tdConfig.shadowScaleY ?? 1;
+  const shadowOffsetX = tdConfig.shadowOffsetX ?? 0;
+  const shadowOffsetY = tdConfig.shadowOffsetY ?? 0;
+
+  shadow.clear();
+  shadow.ellipse(
+    0 + shadowOffsetX,
+    30 * bScale + shadowOffsetY,
+    25 * shadowScaleX,
+    12 * shadowScaleY
+  );
+  shadow.fill({ color: 0x000000, alpha: 0.4 });
+  shadow.scale.x = flipX ? -1 : 1;
+}
 
 const TYPE_COLORS: Record<ElementType, number> = {
   [ElementType.WATER]: 0x3b82f6,
@@ -272,44 +320,16 @@ export default function PixiBattlefield({
             | undefined;
 
           if (sprite && shadow) {
-            const tdConfigMap = CREATURE_TD_CONFIGS[envUnit.tdConfigId];
-            if (tdConfigMap) {
-              const tdConfig =
-                tdConfigMap[envUnit.facingDirection] || tdConfigMap.default;
-
-              const bScale = tdConfig.scale ?? 1;
-              const flipX = tdConfig.flipX ?? false;
-              sprite.scale.x = flipX ? -bScale : bScale;
-              sprite.scale.y = tdConfig.flipY ? -bScale : bScale;
-
-              const sOffsetX = tdConfig.offsetX ?? 0;
-              const sOffsetY = tdConfig.offsetY ?? 0;
-              sprite.x = sOffsetX;
-              sprite.y = sOffsetY;
-
-              const spriteUrl = tdConfig.url;
-              if (spriteUrl && (sprite as any).currentUrl !== spriteUrl) {
-                (sprite as any).currentUrl = spriteUrl;
-                PIXI.Assets.load(spriteUrl).then((t) => {
-                  if (!isDestroyed) sprite.texture = t;
-                });
+            applyTDUnitTransforms(
+              envUnit,
+              sprite,
+              shadow,
+              envUnit.tdConfigId,
+              undefined,
+              (t) => {
+                if (!isDestroyed) sprite.texture = t;
               }
-
-              const shadowScaleX = tdConfig.shadowScaleX ?? 1;
-              const shadowScaleY = tdConfig.shadowScaleY ?? 1;
-              const shadowOffsetX = tdConfig.shadowOffsetX ?? 0;
-              const shadowOffsetY = tdConfig.shadowOffsetY ?? 0;
-
-              shadow.clear();
-              shadow.ellipse(
-                0 + shadowOffsetX,
-                30 * bScale + shadowOffsetY,
-                25 * shadowScaleX,
-                12 * shadowScaleY
-              );
-              shadow.fill({ color: 0x000000, alpha: 0.4 });
-              shadow.scale.x = flipX ? -1 : 1;
-            }
+            );
           }
         }
 
@@ -388,47 +408,16 @@ export default function PixiBattlefield({
 
           if (tsprite && shadow) {
             const baseCreature = TD_CREATURE_DEFS[tower.speciesId].baseCreature;
-            const tdConfigMap = CREATURE_TD_CONFIGS[baseCreature.id] || {
-              default: { scale: 1 },
-            };
-            const tdConfig =
-              tdConfigMap[tower.facingDirection] || tdConfigMap.default;
-
-            const bScale = tdConfig.scale ?? 1;
-            const flipX = tdConfig.flipX ?? false;
-            tsprite.scale.x = flipX ? -bScale : bScale;
-            tsprite.scale.y = tdConfig.flipY ? -bScale : bScale;
-
-            const sOffsetX = tdConfig.offsetX ?? 0;
-            const sOffsetY = tdConfig.offsetY ?? 0;
-            tsprite.x = sOffsetX;
-            tsprite.y = sOffsetY;
-
-            const spriteUrl =
-              tdConfig.url ||
-              baseCreature.battleSpriteUrl ||
-              baseCreature.spriteUrl;
-            if ((tsprite as any).currentUrl !== spriteUrl) {
-              (tsprite as any).currentUrl = spriteUrl;
-              PIXI.Assets.load(spriteUrl).then((t) => {
+            applyTDUnitTransforms(
+              tower,
+              tsprite,
+              shadow,
+              baseCreature.id,
+              baseCreature.battleSpriteUrl || baseCreature.spriteUrl,
+              (t) => {
                 if (!isDestroyed) tsprite.texture = t;
-              });
-            }
-
-            const shadowScaleX = tdConfig.shadowScaleX ?? 1;
-            const shadowScaleY = tdConfig.shadowScaleY ?? 1;
-            const shadowOffsetX = tdConfig.shadowOffsetX ?? 0;
-            const shadowOffsetY = tdConfig.shadowOffsetY ?? 0;
-
-            shadow.clear();
-            shadow.ellipse(
-              0 + shadowOffsetX,
-              30 * bScale + shadowOffsetY,
-              25 * shadowScaleX,
-              12 * shadowScaleY
+              }
             );
-            shadow.fill({ color: 0x000000, alpha: 0.4 });
-            shadow.scale.x = flipX ? -1 : 1;
           }
         }
 
@@ -652,47 +641,16 @@ export default function PixiBattlefield({
           if (esprite && shadow) {
             const baseCreature =
               TD_CREATURE_DEFS[enemy.definitionId].baseCreature;
-            const tdConfigMap = CREATURE_TD_CONFIGS[baseCreature.id] || {
-              default: { scale: 1 },
-            };
-            const tdConfig =
-              tdConfigMap[enemy.facingDirection] || tdConfigMap.default;
-
-            const bScale = tdConfig.scale ?? 1;
-            const flipX = tdConfig.flipX ?? false;
-            esprite.scale.x = flipX ? -bScale : bScale;
-            esprite.scale.y = tdConfig.flipY ? -bScale : bScale;
-
-            const sOffsetX = tdConfig.offsetX ?? 0;
-            const sOffsetY = tdConfig.offsetY ?? 0;
-            esprite.x = sOffsetX;
-            esprite.y = sOffsetY;
-
-            const spriteUrl =
-              tdConfig.url ||
-              baseCreature.battleSpriteUrl ||
-              baseCreature.spriteUrl;
-            if ((esprite as any).currentUrl !== spriteUrl) {
-              (esprite as any).currentUrl = spriteUrl;
-              PIXI.Assets.load(spriteUrl).then((t) => {
+            applyTDUnitTransforms(
+              enemy,
+              esprite,
+              shadow,
+              baseCreature.id,
+              baseCreature.battleSpriteUrl || baseCreature.spriteUrl,
+              (t) => {
                 if (!isDestroyed) esprite.texture = t;
-              });
-            }
-
-            const shadowScaleX = tdConfig.shadowScaleX ?? 1;
-            const shadowScaleY = tdConfig.shadowScaleY ?? 1;
-            const shadowOffsetX = tdConfig.shadowOffsetX ?? 0;
-            const shadowOffsetY = tdConfig.shadowOffsetY ?? 0;
-
-            shadow.clear();
-            shadow.ellipse(
-              0 + shadowOffsetX,
-              30 * bScale + shadowOffsetY,
-              25 * shadowScaleX,
-              12 * shadowScaleY
+              }
             );
-            shadow.fill({ color: 0x000000, alpha: 0.4 });
-            shadow.scale.x = flipX ? -1 : 1;
           }
 
           // Update health bar (it is always the last child added)
