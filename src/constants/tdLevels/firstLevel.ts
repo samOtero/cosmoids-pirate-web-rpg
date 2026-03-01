@@ -23,6 +23,18 @@ export const FIRST_LEVEL: TDLevelData = {
         x: 0,
         y: 58.38,
       },
+      {
+        x: 12.74,
+        y: 58.78,
+      },
+      {
+        x: 12.65,
+        y: 69.86,
+      },
+      {
+        x: 100,
+        y: 69.98,
+      },
     ],
     [
       {
@@ -40,6 +52,18 @@ export const FIRST_LEVEL: TDLevelData = {
       {
         x: 0,
         y: 59.22,
+      },
+      {
+        x: 13.07,
+        y: 59.42,
+      },
+      {
+        x: 13.24,
+        y: 46.02,
+      },
+      {
+        x: 100,
+        y: 46.41,
       },
     ],
   ],
@@ -61,29 +85,11 @@ export const FIRST_LEVEL: TDLevelData = {
       y: 33.59,
     },
   ],
-  environmentUnits: [
-    {
-      tdConfigId: 'senticle',
-      position: {
-        x: 80,
-        y: 20,
-      },
-      facingDirection: 'down',
-    },
-    {
-      tdConfigId: 'map_1',
-      position: {
-        x: 20,
-        y: 80,
-      },
-      facingDirection: 'right',
-    },
-  ],
   captureUnits: [
     {
       position: {
-        x: 50,
-        y: 43,
+        x: 6.71,
+        y: 58.78,
       },
       tdConfigId: 'map_1',
     },
@@ -106,6 +112,7 @@ export const FIRST_LEVEL: TDLevelData = {
           spawnIntervalMs: 1500,
           delayBeforeGroupMs: 3000,
           pathIndex: 0,
+          turnAroundAtEnd: true,
         },
         {
           definitionId: 'bug_stage_1',
@@ -113,6 +120,7 @@ export const FIRST_LEVEL: TDLevelData = {
           spawnIntervalMs: 1500,
           delayBeforeGroupMs: 3000,
           pathIndex: 1,
+          turnAroundAtEnd: true,
         },
         {
           definitionId: 'senticle',
@@ -120,6 +128,7 @@ export const FIRST_LEVEL: TDLevelData = {
           spawnIntervalMs: 1500,
           delayBeforeGroupMs: 3000,
           pathIndex: 1,
+          turnAroundAtEnd: true,
         },
       ],
     },
