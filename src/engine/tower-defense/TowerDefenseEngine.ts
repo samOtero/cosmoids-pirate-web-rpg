@@ -8,7 +8,14 @@ import {
   STARTER_MONKEY,
 } from '@/constants/creatures';
 import { Creature } from '@/types/baseGame';
-import { Tower, Enemy, Projectile, CaptureUnit, VisualEffect } from './types';
+import {
+  Tower,
+  Enemy,
+  Projectile,
+  CaptureUnit,
+  VisualEffect,
+  FloatingText,
+} from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
 import { AttackBehaviorRegistry } from './attacks/behaviors';
 import { EffectProcessor } from './attacks/EffectProcessor';
@@ -68,6 +75,7 @@ export class TowerDefenseEngine {
   public enemies: Enemy[] = [];
   public projectiles: Projectile[] = [];
   public visualEffects: VisualEffect[] = [];
+  public floatingTexts: FloatingText[] = [];
 
   public money: number = 100;
   public lives: number = 3;
@@ -238,6 +246,15 @@ export class TowerDefenseEngine {
             if (status.tickDamage && time - (status.lastTickTime || 0) > 1000) {
               enemy.hp -= status.tickDamage;
               status.lastTickTime = time;
+
+              this.floatingTexts.push({
+                id: `ft_tick_${time}_${Math.random().toString(36).substring(7)}`,
+                text: Math.ceil(status.tickDamage).toString(),
+                position: { ...enemy.position },
+                color: status.type === 'BURN' ? 0xffaaaa : 0xccffcc,
+                durationMs: 1000,
+                elapsedMs: 0,
+              });
             }
           }
           status.durationMs -= deltaMs;
@@ -502,9 +519,25 @@ export class TowerDefenseEngine {
               }
             } else {
               target.hp -= p.damage; // Fallback
+              this.floatingTexts.push({
+                id: `ft_dmg_${time}_${Math.random().toString(36).substring(7)}`,
+                text: Math.ceil(p.damage).toString(),
+                position: { ...target.position },
+                color: 0xffffff,
+                durationMs: 1000,
+                elapsedMs: 0,
+              });
             }
           } else {
             target.hp -= p.damage;
+            this.floatingTexts.push({
+              id: `ft_dmg_${time}_${Math.random().toString(36).substring(7)}`,
+              text: Math.ceil(p.damage).toString(),
+              position: { ...target.position },
+              color: 0xffffff,
+              durationMs: 1000,
+              elapsedMs: 0,
+            });
           }
 
           if (target.hp <= 0 && sourceTower) {
@@ -568,6 +601,14 @@ export class TowerDefenseEngine {
     });
     this.visualEffects = this.visualEffects.filter(
       (e) => e.elapsedMs < e.durationMs
+    );
+
+    // Update Floating Texts
+    this.floatingTexts.forEach((ft) => {
+      ft.elapsedMs += deltaMs;
+    });
+    this.floatingTexts = this.floatingTexts.filter(
+      (ft) => ft.elapsedMs < ft.durationMs
     );
 
     this.enemies = newEnemies;

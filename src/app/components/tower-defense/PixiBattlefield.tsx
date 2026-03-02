@@ -236,6 +236,7 @@ export default function PixiBattlefield({
       const captureUnitSprites = new Map<string, PIXI.Container>();
       const projectileSprites = new Map<string, PIXI.Container>();
       const vfxSprites = new Map<string, PIXI.Container>();
+      const floatingTextSprites = new Map<string, PIXI.Text>();
       const spotGraphics = new PIXI.Graphics();
       const invalidSpotGraphics = new PIXI.Graphics();
 
@@ -1011,6 +1012,50 @@ export default function PixiBattlefield({
               }
             }
           }
+        }
+
+        // --- Render Floating Texts ---
+        const currentFtIds = new Set(engine.floatingTexts.map((ft) => ft.id));
+        for (const [id, textObj] of floatingTextSprites.entries()) {
+          if (!currentFtIds.has(id)) {
+            app.stage.removeChild(textObj);
+            textObj.destroy();
+            floatingTextSprites.delete(id);
+          }
+        }
+        for (const ft of engine.floatingTexts) {
+          let textObj = floatingTextSprites.get(ft.id);
+          if (!textObj) {
+            textObj = new PIXI.Text({
+              text: ft.text,
+              style: {
+                fontFamily: 'monospace',
+                fontSize: Math.max(16, screenW * 0.02),
+                fontWeight: 'bold',
+                fill: ft.color ?? 0xffffff,
+                stroke: { color: 0x000000, width: 3 },
+              },
+            });
+            textObj.anchor.set(0.5);
+            app.stage.addChild(textObj);
+
+            // Render on top
+            app.stage.setChildIndex(textObj, app.stage.children.length - 1);
+
+            floatingTextSprites.set(ft.id, textObj);
+          }
+
+          const progress = ft.elapsedMs / ft.durationMs;
+
+          textObj.x = offsetX + (ft.position.x / 100) * screenW;
+          // Float up calculation: start at position, go up by up to 5% of screen height
+          textObj.y =
+            offsetY +
+            (ft.position.y / 100) * screenH -
+            progress * screenH * 0.05 -
+            screenH * 0.02;
+
+          textObj.alpha = progress > 0.7 ? 1 - (progress - 0.7) / 0.3 : 1;
         }
       });
     };

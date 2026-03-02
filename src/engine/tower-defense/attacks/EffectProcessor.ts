@@ -13,6 +13,15 @@ export class EffectProcessor {
     const damage = attackDef.power;
     target.hp -= damage;
 
+    engine.floatingTexts.push({
+      id: `ft_dmg_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+      text: Math.ceil(damage).toString(),
+      position: { ...target.position },
+      color: 0xffffff,
+      durationMs: 1000,
+      elapsedMs: 0,
+    });
+
     if (attackDef.effects && target.hp > 0) {
       attackDef.effects.forEach((effect) => {
         if (Math.random() <= effect.chance) {

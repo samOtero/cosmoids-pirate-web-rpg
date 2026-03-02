@@ -110,6 +110,15 @@ export interface Projectile {
   facingDirection?: 'up' | 'down' | 'left' | 'right';
 }
 
+export interface FloatingText {
+  id: string;
+  text: string;
+  position: Point;
+  color?: number;
+  durationMs: number;
+  elapsedMs: number;
+}
+
 export interface VisualEffect {
   id: string;
   configId: string; // references tdConfig key (e.g., 'attack_scratch_1')
