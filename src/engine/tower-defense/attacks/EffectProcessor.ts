@@ -12,6 +12,7 @@ export class EffectProcessor {
   ) {
     const damage = attackDef.power;
     target.hp -= damage;
+    target.damageFlashTimerMs = 150;
 
     engine.floatingTexts.push({
       id: `ft_dmg_${Date.now()}_${Math.random().toString(36).substring(7)}`,

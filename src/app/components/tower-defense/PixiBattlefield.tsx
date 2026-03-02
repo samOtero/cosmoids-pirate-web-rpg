@@ -54,6 +54,39 @@ export function applyTDUnitTransforms(
   );
   shadow.fill({ color: 0x000000, alpha: 0.4 });
   shadow.scale.x = flipX ? -1 : 1;
+
+  if ((unit.damageFlashTimerMs || 0) > 0) {
+    sprite.tint = 0xffffff;
+
+    // Copy existing filters or start fresh
+    const currentFilters = Array.isArray(sprite.filters)
+      ? [...sprite.filters]
+      : sprite.filters
+        ? [sprite.filters]
+        : [];
+
+    let flashFilter = currentFilters.find(
+      (f: any) => f.__isDamageFlash
+    ) as PIXI.ColorMatrixFilter;
+    if (!flashFilter) {
+      flashFilter = new PIXI.ColorMatrixFilter();
+      (flashFilter as any).__isDamageFlash = true;
+      currentFilters.push(flashFilter);
+      sprite.filters = currentFilters; // Re-assign instead of mutating
+    }
+    flashFilter.matrix = [
+      0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0,
+    ];
+  } else {
+    sprite.tint = 0xffffff;
+    if (sprite.filters) {
+      const currentFilters = Array.isArray(sprite.filters)
+        ? [...sprite.filters]
+        : [sprite.filters];
+      const newFilters = currentFilters.filter((f: any) => !f.__isDamageFlash);
+      sprite.filters = newFilters.length > 0 ? newFilters : [];
+    }
+  }
 }
 
 export const WEAKENED_THRESHOLD = 0.9;

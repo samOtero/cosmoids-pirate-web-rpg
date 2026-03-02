@@ -43,6 +43,7 @@ export interface BaseTDUnit {
   facingDirection: 'up' | 'down' | 'left' | 'right';
   hp: number;
   maxHp: number;
+  damageFlashTimerMs?: number;
 }
 
 export interface EnvironmentUnit extends BaseTDUnit {

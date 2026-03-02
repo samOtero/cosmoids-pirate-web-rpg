@@ -231,6 +231,10 @@ export class TowerDefenseEngine {
 
     // Update enemies
     newEnemies.forEach((enemy) => {
+      if (enemy.damageFlashTimerMs) {
+        enemy.damageFlashTimerMs -= deltaMs;
+        if (enemy.damageFlashTimerMs < 0) enemy.damageFlashTimerMs = 0;
+      }
       // the map dev uses speed relative to arbitrary frame timing, with a delta based loop we should scale it,
       // but to keep logic equivalent for now we'll just replicate it roughly
       // if 1 frame was originally ~16.6ms, we can normalize deltaMs / 16.6 to apply speed
@@ -245,6 +249,7 @@ export class TowerDefenseEngine {
           } else if (status.type === 'BURN' || status.type === 'POISON') {
             if (status.tickDamage && time - (status.lastTickTime || 0) > 1000) {
               enemy.hp -= status.tickDamage;
+              enemy.damageFlashTimerMs = 150;
               status.lastTickTime = time;
 
               this.floatingTexts.push({
@@ -439,6 +444,10 @@ export class TowerDefenseEngine {
 
     // Towers attack
     newTowers.forEach((tower) => {
+      if (tower.damageFlashTimerMs) {
+        tower.damageFlashTimerMs -= deltaMs;
+        if (tower.damageFlashTimerMs < 0) tower.damageFlashTimerMs = 0;
+      }
       const attackInstance = tower.equippedAttacks[tower.selectedAttackIndex];
       if (!attackInstance) return;
 
@@ -519,6 +528,7 @@ export class TowerDefenseEngine {
               }
             } else {
               target.hp -= p.damage; // Fallback
+              target.damageFlashTimerMs = 150;
               this.floatingTexts.push({
                 id: `ft_dmg_${time}_${Math.random().toString(36).substring(7)}`,
                 text: Math.ceil(p.damage).toString(),
@@ -530,6 +540,7 @@ export class TowerDefenseEngine {
             }
           } else {
             target.hp -= p.damage;
+            target.damageFlashTimerMs = 150;
             this.floatingTexts.push({
               id: `ft_dmg_${time}_${Math.random().toString(36).substring(7)}`,
               text: Math.ceil(p.damage).toString(),
