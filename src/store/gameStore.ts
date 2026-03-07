@@ -199,6 +199,10 @@ export const useGameStore = create<GameState>()(
                     state.setScreen(Screens.PARTY);
                     break;
                   }
+                  case 'GO_TO_TOWER_DEFENSE': {
+                    state.setScreen(Screens.TOWER_DEFENSE);
+                    break;
+                  }
                   case 'REORDER_CREATURES': {
                     const payload =
                       currentEvent.payload as ReorderCreaturesEventPayload;

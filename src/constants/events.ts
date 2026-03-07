@@ -1,10 +1,10 @@
-import { DialogContext, BattleContext } from '@/types/baseGame';
+import { DialogContext } from '@/types/baseGame';
 import { GameEvent } from '@/types/baseGame';
 
 /**
  * Events queued when a new player starts the game or opens a profile
  * without having picked a starter yet.
- * Sequence: Welcome Dialog → Level 1 Intro → First Battle
+ * Sequence: Welcome Dialog → Level 1 Intro → Tower Defense
  */
 export const NEW_PLAYER_EVENTS: GameEvent[] = [
   {
@@ -21,15 +21,14 @@ export const NEW_PLAYER_EVENTS: GameEvent[] = [
     },
   },
   {
-    type: 'START_BATTLE',
-    payload: { context: BattleContext.FIRST_BATTLE },
+    type: 'GO_TO_TOWER_DEFENSE',
   },
 ];
 
 /**
  * Events queued when a player starts the game or opens a profile
- * after having picked a starter yet haven't finished the first battle.
- * Sequence: Level 1 Intro → First Battle
+ * after having picked a starter but haven't finished the first level.
+ * Sequence: Level 1 Intro → Tower Defense
  */
 export const FIRST_BATTLE_AFTER_GETTING_STARTER: GameEvent[] = [
   {
@@ -39,7 +38,6 @@ export const FIRST_BATTLE_AFTER_GETTING_STARTER: GameEvent[] = [
     },
   },
   {
-    type: 'START_BATTLE',
-    payload: { context: BattleContext.FIRST_BATTLE },
+    type: 'GO_TO_TOWER_DEFENSE',
   },
 ];

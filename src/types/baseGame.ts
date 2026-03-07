@@ -7,6 +7,7 @@ export enum Screens {
   ISLAND_INSIDE = 'ISLAND_INSIDE',
   BATTLE = 'BATTLE',
   PARTY = 'PARTY',
+  TOWER_DEFENSE = 'TOWER_DEFENSE',
 }
 
 export enum ElementType {
@@ -272,7 +273,8 @@ export type GameEventType =
   | 'ADVANCE_NODE'
   | 'GAIN_ITEM'
   | 'GO_TO_PARTY'
-  | 'REORDER_CREATURES';
+  | 'REORDER_CREATURES'
+  | 'GO_TO_TOWER_DEFENSE';
 
 export interface GameEvent {
   type: GameEventType;

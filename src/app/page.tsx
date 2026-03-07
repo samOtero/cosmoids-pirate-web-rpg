@@ -24,6 +24,9 @@ const MapScreen = lazy(() => import('@/app/components/mapScreen'));
 const BattleScreen = lazy(() => import('@/app/components/battleScreen'));
 const IslandMapScreen = lazy(() => import('@/app/components/IslandMapScreen'));
 const PartyScreen = lazy(() => import('@/app/components/PartyScreen'));
+const TowerDefenseScreen = lazy(
+  () => import('@/app/components/tower-defense/TowerDefenseScreen')
+);
 
 export default function Home() {
   const {
@@ -187,6 +190,29 @@ export default function Home() {
           creatures={resolvePlayerCreatures(currentProfile.creatures)}
           onBack={() => setScreen(Screens.MAP)}
           onReorder={reorderCreatures}
+        />
+      </Suspense>
+    );
+  }
+
+  if (currentScreen === Screens.TOWER_DEFENSE) {
+    if (!currentProfile) {
+      return null;
+    }
+
+    return (
+      <Suspense fallback={<div>Loading Tower Defense...</div>}>
+        <TowerDefenseScreen
+          onClose={() => enqueueAndProcessEvents([{ type: 'GO_TO_MAP' }])}
+          onWin={() =>
+            enqueueAndProcessEvents([
+              {
+                type: 'SHOW_DIALOG',
+                payload: { context: DialogContext.LEVEL_1_WIN },
+              },
+            ])
+          }
+          onLose={() => enqueueAndProcessEvents([{ type: 'GO_TO_MAP' }])}
         />
       </Suspense>
     );
