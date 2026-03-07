@@ -8,7 +8,12 @@ import {
   DialogContext,
   BattleContext,
   BackgroundImageKey,
+  Creature,
 } from '@/types/baseGame';
+import {
+  resolvePlayerCreature,
+  resolvePlayerCreatures,
+} from '@/utils/resolvePlayerCreature';
 import { resolveDialog } from '@/utils/dialogResolver';
 import { ISLANDS } from '@/constants/game';
 
@@ -74,7 +79,7 @@ export default function Home() {
     }
 
     // Default to first creature if valid
-    const playerCreature = currentProfile.creatures[0];
+    const playerCreature = resolvePlayerCreature(currentProfile.creatures[0]);
     if (!playerCreature) {
       return null;
     }
@@ -83,15 +88,13 @@ export default function Home() {
       <Suspense fallback={<div>Loading Battle...</div>}>
         <BattleScreen
           playerCreature={playerCreature}
-          party={currentProfile.creatures}
+          party={resolvePlayerCreatures(currentProfile.creatures)}
           enemyCreature={currentEnemy}
           inventory={currentProfile.inventory}
           onUseItem={useItem}
           onBattleEnd={(won, modifiedCreatures) => {
-            // Update creatures if modified
-            if (modifiedCreatures && modifiedCreatures.length > 0) {
-              updateCreatures(modifiedCreatures);
-            }
+            // Battle system returns full Creature[] — we can ignore updates since
+            // PlayerCreature doesn't track HP. Stats persist at the species level.
 
             // For now just go back to map or dialog depending on context?
             // Maybe we need a result screen or dialog
@@ -181,7 +184,7 @@ export default function Home() {
     return (
       <Suspense fallback={<div>Loading Team...</div>}>
         <PartyScreen
-          creatures={currentProfile.creatures}
+          creatures={resolvePlayerCreatures(currentProfile.creatures)}
           onBack={() => setScreen(Screens.MAP)}
           onReorder={reorderCreatures}
         />

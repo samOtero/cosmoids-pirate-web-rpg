@@ -1,8 +1,10 @@
 import React from 'react';
-import { Creature } from '@/types/baseGame';
+import { PlayerCreature } from '@/types/baseGame';
 
 export function TowerButton({
   creature,
+  name,
+  spriteUrl,
   isActive,
   displayLevel,
   displayXp,
@@ -11,7 +13,9 @@ export function TowerButton({
   onDragStart,
   onDragEnd,
 }: {
-  creature: Creature;
+  creature: PlayerCreature;
+  name: string;
+  spriteUrl: string;
   isActive: boolean;
   displayLevel: number;
   displayXp: number;
@@ -37,15 +41,15 @@ export function TowerButton({
       }`}
     >
       <img
-        src={creature.spriteUrl}
-        alt={creature.name}
+        src={spriteUrl}
+        alt={name}
         className="w-10 h-10 object-contain pointer-events-none"
       />
       <div className="flex flex-col items-center w-full mt-1 pointer-events-none">
         <span
           className={`text-[9px] uppercase font-bold truncate w-full text-center leading-tight ${isActive ? 'text-cyan-100' : 'text-white'}`}
         >
-          {creature.name}
+          {name}
         </span>
 
         <div className="w-full flex items-center justify-between px-1 mt-0.5">

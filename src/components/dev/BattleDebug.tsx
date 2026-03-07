@@ -7,6 +7,7 @@ import {
   STARTER_MONKEY,
 } from '@/constants/creatures';
 import { BattleContext, BackgroundImageKey, Screens } from '@/types/baseGame';
+import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 
 export default function BattleDebug({ onClose }: { onClose: () => void }) {
   const {
@@ -73,16 +74,25 @@ export default function BattleDebug({ onClose }: { onClose: () => void }) {
     if (profileId === null) return;
 
     addCreatureToProfile(profileId, {
-      ...STARTER_CRAB,
-      id: `debug_crab_${Date.now()}`,
+      id: STARTER_CRAB.id,
+      speciesId: STARTER_CRAB.id,
+      level: 1,
+      xp: 0,
+      equippedAttacks: TowerDefenseEngine.getDefaultAttacks(STARTER_CRAB.id),
     });
     addCreatureToProfile(profileId, {
-      ...STARTER_IGUANA,
-      id: `debug_iguana_${Date.now()}`,
+      id: STARTER_IGUANA.id,
+      speciesId: STARTER_IGUANA.id,
+      level: 1,
+      xp: 0,
+      equippedAttacks: TowerDefenseEngine.getDefaultAttacks(STARTER_IGUANA.id),
     });
     addCreatureToProfile(profileId, {
-      ...STARTER_MONKEY,
-      id: `debug_monkey_${Date.now()}`,
+      id: STARTER_MONKEY.id,
+      speciesId: STARTER_MONKEY.id,
+      level: 1,
+      xp: 0,
+      equippedAttacks: TowerDefenseEngine.getDefaultAttacks(STARTER_MONKEY.id),
     });
     alert('Added starters to current profile!');
   };
@@ -91,16 +101,13 @@ export default function BattleDebug({ onClose }: { onClose: () => void }) {
     const profileId = ensureProfile();
     if (profileId === null) return;
 
-    const superCrab = {
-      ...STARTER_CRAB,
-      id: `super_crab_${Date.now()}`,
-      name: 'Super Crab',
+    addCreatureToProfile(profileId, {
+      id: STARTER_CRAB.id,
+      speciesId: STARTER_CRAB.id,
       level: 50,
-      currentHp: 200,
-      maxHp: 200,
-      attack: 100,
-    };
-    addCreatureToProfile(profileId, superCrab);
+      xp: 0,
+      equippedAttacks: TowerDefenseEngine.getDefaultAttacks(STARTER_CRAB.id),
+    });
     alert('Added Super Crab!');
   };
 

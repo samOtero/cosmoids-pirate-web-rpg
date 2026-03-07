@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useGameStore } from '@/store/gameStore';
 import { STARTER_CRAB, STARTER_IGUANA } from '@/constants/creatures';
-import { Screens } from '@/types/baseGame';
 
 describe('Creature Store Logic', () => {
   beforeEach(() => {
@@ -10,37 +9,54 @@ describe('Creature Store Logic', () => {
     useGameStore.getState().selectProfile(0);
   });
 
-  it('should update creature stats when updateCreatures is called', () => {
+  it('should update creature level and xp when updateCreatures is called', () => {
     const store = useGameStore.getState();
     const profileId = 0;
 
-    // Setup: Add creature
-    const creature = { ...STARTER_CRAB, currentHp: 50, maxHp: 50 };
-    store.addCreatureToProfile(profileId, creature);
+    // Setup: Add PlayerCreature
+    store.addCreatureToProfile(profileId, {
+      id: STARTER_CRAB.id,
+      speciesId: STARTER_CRAB.id,
+      level: 1,
+      xp: 0,
+      equippedAttacks: STARTER_CRAB.moves,
+    });
 
     // Verify initial state
     let profile = useGameStore.getState().profiles[0]!;
-    expect(profile.creatures[0].currentHp).toBe(50);
+    expect(profile.creatures[0].level).toBe(1);
+    expect(profile.creatures[0].xp).toBe(0);
     const addedCreature = profile.creatures[0];
 
-    // Act: Update Creature
-    const updatedCreature = { ...addedCreature, currentHp: 20 };
+    // Act: Update Creature xp/level via updateCreatures
+    const updatedCreature = { ...addedCreature, level: 5, xp: 500 };
     store.updateCreatures([updatedCreature]);
 
     // Assert
     profile = useGameStore.getState().profiles[0]!;
-    expect(profile.creatures[0].currentHp).toBe(20);
+    expect(profile.creatures[0].level).toBe(5);
+    expect(profile.creatures[0].xp).toBe(500);
   });
 
   it('should update multiple creatures', () => {
     const store = useGameStore.getState();
     const profileId = 0;
 
-    // Setup: Add two creatures
-    const creature1 = { ...STARTER_CRAB, currentHp: 50, maxHp: 50 };
-    const creature2 = { ...STARTER_IGUANA, currentHp: 40, maxHp: 40 };
-    store.addCreatureToProfile(profileId, creature1);
-    store.addCreatureToProfile(profileId, creature2);
+    // Setup: Add two PlayerCreatures
+    store.addCreatureToProfile(profileId, {
+      id: STARTER_CRAB.id,
+      speciesId: STARTER_CRAB.id,
+      level: 1,
+      xp: 0,
+      equippedAttacks: STARTER_CRAB.moves,
+    });
+    store.addCreatureToProfile(profileId, {
+      id: STARTER_IGUANA.id,
+      speciesId: STARTER_IGUANA.id,
+      level: 1,
+      xp: 0,
+      equippedAttacks: STARTER_IGUANA.moves,
+    });
 
     let profileBefore = useGameStore.getState().profiles[0]!;
     const added1 = profileBefore.creatures.find(
@@ -50,9 +66,9 @@ describe('Creature Store Logic', () => {
       (c) => c.speciesId === STARTER_IGUANA.id
     )!;
 
-    // Act: Update both
-    const updated1 = { ...added1, currentHp: 10 };
-    const updated2 = { ...added2, currentHp: 5 };
+    // Act: Update both levels
+    const updated1 = { ...added1, level: 10, xp: 1000 };
+    const updated2 = { ...added2, level: 8, xp: 800 };
     store.updateCreatures([updated1, updated2]);
 
     // Assert
@@ -60,7 +76,7 @@ describe('Creature Store Logic', () => {
     const c1 = profile.creatures.find((c) => c.speciesId === STARTER_CRAB.id);
     const c2 = profile.creatures.find((c) => c.speciesId === STARTER_IGUANA.id);
 
-    expect(c1?.currentHp).toBe(10);
-    expect(c2?.currentHp).toBe(5);
+    expect(c1?.level).toBe(10);
+    expect(c2?.level).toBe(8);
   });
 });

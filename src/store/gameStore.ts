@@ -6,6 +6,7 @@ import {
   DialogContext,
   DialogContextData,
   Creature,
+  PlayerCreature,
   BattleConfig,
   StartBattleEventPayload,
   BattleContext,
@@ -37,6 +38,7 @@ import {
   STARTER_IGUANA,
   STARTER_MONKEY,
 } from '@/constants/creatures';
+import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 
 interface GameState {
   currentScreen: Screens;
@@ -52,9 +54,9 @@ interface GameState {
   createProfile: (slotId: number) => void;
   deleteProfile: (slotId: number) => void;
   selectProfile: (slotId: number) => void;
-  addCreatureToProfile: (slotId: number, creature: Creature) => void;
-  updateCreatures: (creatures: Creature[]) => void;
-  overwriteProfileCreatures: (creatures: Creature[]) => void;
+  addCreatureToProfile: (slotId: number, creature: PlayerCreature) => void;
+  updateCreatures: (creatures: PlayerCreature[]) => void;
+  overwriteProfileCreatures: (creatures: PlayerCreature[]) => void;
   reorderCreatures: (startIndex: number, endIndex: number) => void;
   useItem: (itemId: string, targetCreatureId?: string) => boolean | void;
 
@@ -220,7 +222,19 @@ export const useGameStore = create<GameState>()(
                       const creature = creatureMap[payload.flag];
                       if (creature) {
                         state.setGameFlag(payload.flag);
-                        state.addCreatureToProfile(currentProfileId, creature);
+                        const starterPlayerCreature: PlayerCreature = {
+                          id: creature.id, // will be replaced with UUID in addCreatureToProfile
+                          speciesId: creature.id,
+                          level: creature.level,
+                          xp: creature.xp,
+                          equippedAttacks: TowerDefenseEngine.getDefaultAttacks(
+                            creature.id
+                          ),
+                        };
+                        state.addCreatureToProfile(
+                          currentProfileId,
+                          starterPlayerCreature
+                        );
                       }
                     }
                     break;
@@ -228,9 +242,19 @@ export const useGameStore = create<GameState>()(
                   case 'ADD_CREATURE_TO_PROFILE': {
                     const payload =
                       currentEvent.payload as AddCreatureToProfileEventPayload;
+                    const c = payload.creature;
+                    const playerCreature: PlayerCreature = {
+                      id: c.id,
+                      speciesId: c.speciesId || c.id,
+                      level: c.level,
+                      xp: c.xp,
+                      equippedAttacks: TowerDefenseEngine.getDefaultAttacks(
+                        c.speciesId || c.id
+                      ),
+                    };
                     state.addCreatureToProfile(
                       payload.profileId,
-                      { ...payload.creature } // Clone to avoid mutating static def
+                      playerCreature
                     );
                     break;
                   }
@@ -428,6 +452,34 @@ export const useGameStore = create<GameState>()(
                 return state;
               const newProfiles = [...state.profiles];
               const profile = newProfiles[slotId]!;
+
+              // Version migration: if the profile is outdated, wipe and reset it
+              if (
+                !profile.version ||
+                profile.version < CURRENT_PROFILE_VERSION
+              ) {
+                console.warn(
+                  `[Profile] Slot ${slotId} is version ${profile.version ?? 'unset'}, current is ${CURRENT_PROFILE_VERSION}. Resetting.`
+                );
+                newProfiles[slotId] = {
+                  id: slotId,
+                  name: profile.name,
+                  lastPlayed: Date.now(),
+                  creatures: [],
+                  inventory: [],
+                  unlockedIslands: 0,
+                  currentIslandId: 0,
+                  islandNodeProgress: { 0: 0 },
+                  gameFlags: [],
+                  version: CURRENT_PROFILE_VERSION,
+                };
+                return {
+                  profiles: newProfiles,
+                  currentProfileId: slotId,
+                  eventQueue: [...NEW_PLAYER_EVENTS],
+                };
+              }
+
               // Update last played time
               newProfiles[slotId] = {
                 ...profile,
@@ -465,7 +517,7 @@ export const useGameStore = create<GameState>()(
           get().processNextEvent();
         },
 
-        addCreatureToProfile: (slotId: number, creature: Creature) =>
+        addCreatureToProfile: (slotId: number, creature: PlayerCreature) =>
           set(
             (state) => {
               if (
@@ -476,11 +528,9 @@ export const useGameStore = create<GameState>()(
                 return state;
               const newProfiles = [...state.profiles];
               if (newProfiles[slotId]) {
-                const instanceId = crypto.randomUUID();
-                const newCreatureInstance: Creature = {
+                const newCreatureInstance: PlayerCreature = {
                   ...creature,
-                  speciesId: creature.id,
-                  id: instanceId,
+                  id: crypto.randomUUID(),
                 };
                 newProfiles[slotId] = {
                   ...newProfiles[slotId]!,
@@ -495,7 +545,7 @@ export const useGameStore = create<GameState>()(
             false,
             'addCreatureToProfile'
           ),
-        updateCreatures: (creatures: Creature[]) =>
+        updateCreatures: (creatures: PlayerCreature[]) =>
           set(
             (state) => {
               const profileId = state.currentProfileId;
@@ -527,7 +577,7 @@ export const useGameStore = create<GameState>()(
             false,
             'updateCreatures'
           ),
-        overwriteProfileCreatures: (creatures: Creature[]) =>
+        overwriteProfileCreatures: (creatures: PlayerCreature[]) =>
           set(
             (state) => {
               const profileId = state.currentProfileId;
@@ -539,7 +589,6 @@ export const useGameStore = create<GameState>()(
                 ...newProfiles[profileId]!,
                 creatures: creatures.map((c) => ({
                   ...c,
-                  speciesId: c.id,
                   id: crypto.randomUUID(),
                 })),
               };
@@ -601,25 +650,9 @@ export const useGameStore = create<GameState>()(
               let newCreatures = [...profile.creatures];
 
               if (item.effect === 'HEAL' && targetCreatureId) {
-                const creatureIndex = newCreatures.findIndex(
-                  (c) => c.id === targetCreatureId
-                );
-                if (creatureIndex === -1) return state;
-                const creature = newCreatures[creatureIndex];
-
-                // Don't use if full health
-                if (creature.currentHp >= creature.maxHp) return state;
-
-                const healAmount = item.value;
-                const newHp = Math.min(
-                  creature.currentHp + healAmount,
-                  creature.maxHp
-                );
-
-                newCreatures[creatureIndex] = {
-                  ...creature,
-                  currentHp: newHp,
-                };
+                // Note: PlayerCreature does not store currentHp — HEAL items are for the turn-based battle system
+                // which uses a different Creature type. Skip silently if no hp fields.
+                return state;
               } else if (item.effect === 'CATCH') {
                 const enemy = state.currentEnemy;
                 if (!enemy) return state; // Only works in battle with enemy
@@ -627,7 +660,15 @@ export const useGameStore = create<GameState>()(
                 catchSuccess = Math.random() <= item.value;
 
                 if (catchSuccess) {
-                  newCreatures = [...newCreatures, enemy];
+                  // Convert caught Creature to PlayerCreature
+                  const caught: PlayerCreature = {
+                    id: enemy.id,
+                    speciesId: enemy.speciesId || enemy.id,
+                    level: enemy.level,
+                    xp: enemy.xp,
+                    equippedAttacks: enemy.moves || [],
+                  };
+                  newCreatures = [...newCreatures, caught];
                 }
               }
 
@@ -737,6 +778,32 @@ export const useGameStore = create<GameState>()(
         partialize: (state) => ({
           profiles: state.profiles,
         }),
+        onRehydrateStorage: () => (state) => {
+          if (!state) return;
+          // Reset any profiles that are below the current version
+          const migratedProfiles = state.profiles.map((profile) => {
+            if (!profile) return null;
+            if (!profile.version || profile.version < CURRENT_PROFILE_VERSION) {
+              console.warn(
+                `[Profile] Slot ${profile.id} is version ${profile.version ?? 'unset'}, current is ${CURRENT_PROFILE_VERSION}. Resetting.`
+              );
+              return {
+                id: profile.id,
+                name: profile.name,
+                lastPlayed: Date.now(),
+                creatures: [],
+                inventory: [],
+                unlockedIslands: 0,
+                currentIslandId: 0,
+                islandNodeProgress: { 0: 0 },
+                gameFlags: [],
+                version: CURRENT_PROFILE_VERSION,
+              };
+            }
+            return profile;
+          });
+          state.profiles = migratedProfiles;
+        },
       }
     )
   )

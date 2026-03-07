@@ -1,6 +1,7 @@
-import { Profile } from "@/types/baseGame";
-import Panel from "@/app/components/ui/Panel";
-import { Button } from "@/app/components/ui/Button";
+import { Profile } from '@/types/baseGame';
+import { resolvePlayerCreature } from '@/utils/resolvePlayerCreature';
+import Panel from '@/app/components/ui/Panel';
+import { Button } from '@/app/components/ui/Button';
 
 interface ProfileScreenProps {
   profiles: (Profile | null)[];
@@ -38,12 +39,14 @@ export default function ProfileScreen({
                   <div className="w-16 h-16 bg-blue-900 rounded-full flex items-center justify-center text-3xl mb-2">
                     {profile.creatures[0] ? (
                       <img
-                        src={profile.creatures[0].spriteUrl}
+                        src={
+                          resolvePlayerCreature(profile.creatures[0]).spriteUrl
+                        }
                         className="w-12 h-12"
                         alt="buddy"
                       />
                     ) : (
-                      "⛵"
+                      '⛵'
                     )}
                   </div>
                   <h3 className="text-xl font-bold text-cyan-300">
@@ -53,7 +56,7 @@ export default function ProfileScreen({
                     Island {profile.unlockedIslands + 1}
                   </p>
                   <p className="text-xs text-sand/50">
-                    Last Played:{" "}
+                    Last Played:{' '}
                     {new Date(profile.lastPlayed).toLocaleDateString()}
                   </p>
                 </div>
@@ -61,7 +64,7 @@ export default function ProfileScreen({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (confirm("Delete save?")) onDelete(slotId);
+                      if (confirm('Delete save?')) onDelete(slotId);
                     }}
                     className="text-red-400 hover:text-red-300 text-xs uppercase font-bold"
                   >

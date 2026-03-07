@@ -1,4 +1,5 @@
 import { Profile } from '@/types/baseGame';
+import { resolvePlayerCreature } from '@/utils/resolvePlayerCreature';
 import Panel from '@/app/components/ui/Panel';
 import { useState } from 'react';
 import { Button } from '@/app/components/ui/Button';
@@ -52,25 +53,26 @@ export default function MapScreen({
 
           {/* Creatures */}
           <div className="flex gap-2">
-            {profile.creatures.map((c, i) => (
-              <div key={c.id} className="relative group cursor-help">
-                <img
-                  src={c.spriteUrl}
-                  className="w-12 h-12 border-2 border-wood rounded bg-black/40 hover:border-cyan-400 transition-colors"
-                />
-                <div
-                  className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border border-black"
-                  title="Health"
-                ></div>
-                {/* Tooltip */}
-                <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block bg-black/90 p-2 rounded text-xs whitespace-nowrap z-50 pointer-events-none">
-                  <div className="font-bold text-cyan-300">{c.name}</div>
-                  <div>
-                    HP: {c.currentHp}/{c.maxHp}
+            {profile.creatures.map((pc, i) => {
+              const c = resolvePlayerCreature(pc);
+              return (
+                <div key={pc.id} className="relative group cursor-help">
+                  <img
+                    src={c.spriteUrl}
+                    className="w-12 h-12 border-2 border-wood rounded bg-black/40 hover:border-cyan-400 transition-colors"
+                  />
+                  <div
+                    className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border border-black"
+                    title="Health"
+                  ></div>
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block bg-black/90 p-2 rounded text-xs whitespace-nowrap z-50 pointer-events-none">
+                    <div className="font-bold text-cyan-300">{c.name}</div>
+                    <div>Lv. {pc.level}</div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             {Array.from({
               length: Math.max(0, 3 - profile.creatures.length),
             }).map((_, i) => (
@@ -204,7 +206,7 @@ export default function MapScreen({
       {showInventory && (
         <InventoryModal
           inventory={profile.inventory}
-          creatures={profile.creatures}
+          creatures={profile.creatures.map(resolvePlayerCreature)}
           onClose={() => setShowInventory(false)}
           onUseItem={onUseItem}
         />

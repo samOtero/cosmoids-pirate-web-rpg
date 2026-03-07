@@ -2,12 +2,27 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useGameStore } from '@/store/gameStore';
-import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
+import {
+  TowerDefenseEngine,
+  TD_CREATURE_DEFS,
+} from '@/engine/tower-defense/TowerDefenseEngine';
 import PixiBattlefield from './PixiBattlefield';
 import { FIRST_LEVEL } from '@/constants/tdLevels';
 import { ActiveAttackMenu } from './ActiveAttackMenu';
 import { TowerButton } from './TowerButton';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+
+/** Resolve display info (name, spriteUrl) for a creature from its species definition. */
+function resolveSpeciesVisuals(speciesId: string): {
+  name: string;
+  spriteUrl: string;
+} {
+  const baseDef = TD_CREATURE_DEFS[speciesId]?.baseCreature;
+  return {
+    name: baseDef?.name ?? speciesId,
+    spriteUrl: baseDef?.spriteUrl ?? '',
+  };
+}
 
 export default function TowerDefenseScreen({
   onClose,
@@ -264,16 +279,25 @@ export default function TowerDefenseScreen({
                 ? tower.selectedAttackIndex
                 : engineRef.current.playerSelectedAttacks[creature.id] || 0;
 
+              const { name, spriteUrl } = resolveSpeciesVisuals(
+                creature.speciesId
+              );
+
               return (
                 <ActiveAttackMenu
                   creature={creature}
+                  name={name}
+                  spriteUrl={spriteUrl}
                   isActive={isActive}
                   displayLevel={displayLevel}
                   displayXp={displayXp}
                   equippedAttacks={equippedAttacks}
                   activeAttackIndex={activeAttackIndex}
                   onSelectAttack={(index) => {
-                    engineRef.current.setTowerAttack(selectedCreatureId, index);
+                    engineRef.current.setTowerAttack(
+                      selectedCreatureId!,
+                      index
+                    );
                     setUiUpdateToggle((prev) => !prev);
                   }}
                   onClose={() => {
@@ -304,10 +328,14 @@ export default function TowerDefenseScreen({
             }
           }
 
+          const { name, spriteUrl } = resolveSpeciesVisuals(creature.speciesId);
+
           return (
             <TowerButton
               key={creature.id}
               creature={creature}
+              name={name}
+              spriteUrl={spriteUrl}
               isActive={isActive}
               displayLevel={displayLevel}
               displayXp={displayXp}

@@ -125,6 +125,15 @@ export interface Creature {
   currentEnergy: number;
 }
 
+/** Slim save format for a creature the player owns. Base stats are derived at runtime from species definitions. */
+export interface PlayerCreature {
+  id: string; // Unique instance ID
+  speciesId: string; // References species def (e.g., 'starter_crab')
+  level: number;
+  xp: number;
+  equippedAttacks: string[]; // Attack definition IDs
+}
+
 export interface IslandNode {
   id: number;
   name: string;
@@ -139,7 +148,7 @@ export interface Profile {
   id: number;
   name: string;
   lastPlayed: number; // Timestamp
-  creatures: Creature[];
+  creatures: PlayerCreature[];
   inventory: Item[];
   unlockedIslands: number; // Max island index unlocked
   currentIslandId: number;

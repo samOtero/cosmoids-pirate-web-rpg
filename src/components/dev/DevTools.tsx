@@ -8,6 +8,7 @@ import {
   STARTER_MONKEY,
   BUG_STAGE_1,
 } from '@/constants/creatures';
+import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 
 const DialogEditor = lazy(() => import('./DialogEditor'));
 const AnimationEditor = lazy(() => import('./AnimationEditor'));
@@ -142,10 +143,11 @@ export default function DevTools() {
                     STARTER_MONKEY,
                     BUG_STAGE_1,
                   ].map((c) => ({
-                    ...c,
+                    id: c.id,
+                    speciesId: c.id,
                     level: 1,
-                    currentHp: c.maxHp,
                     xp: 0,
+                    equippedAttacks: TowerDefenseEngine.getDefaultAttacks(c.id),
                   }));
                   overwriteProfileCreatures(level1Starters);
                   setShowMenu(false);
@@ -158,13 +160,13 @@ export default function DevTools() {
                 onClick={() => {
                   const thirtyCreatures = Array.from({ length: 30 }).map(
                     (_, i) => ({
-                      ...STARTER_CRAB,
-                      id: crypto.randomUUID(),
+                      id: STARTER_CRAB.id,
                       speciesId: STARTER_CRAB.id,
                       level: 10,
-                      currentHp: STARTER_CRAB.maxHp,
                       xp: 0,
-                      name: `Crab ${i + 1}`,
+                      equippedAttacks: TowerDefenseEngine.getDefaultAttacks(
+                        STARTER_CRAB.id
+                      ),
                     })
                   );
                   overwriteProfileCreatures(thirtyCreatures);

@@ -1,10 +1,12 @@
 import React from 'react';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { TowerButton } from './TowerButton';
-import { Creature } from '@/types/baseGame';
+import { PlayerCreature } from '@/types/baseGame';
 
 export function ActiveAttackMenu({
   creature,
+  name,
+  spriteUrl,
   isActive,
   displayLevel,
   displayXp,
@@ -13,7 +15,9 @@ export function ActiveAttackMenu({
   onSelectAttack,
   onClose,
 }: {
-  creature: Creature;
+  creature: PlayerCreature;
+  name: string;
+  spriteUrl: string;
   isActive: boolean;
   displayLevel: number;
   displayXp: number;
@@ -29,6 +33,8 @@ export function ActiveAttackMenu({
         <div className="flex flex-col items-center shrink-0">
           <TowerButton
             creature={creature}
+            name={name}
+            spriteUrl={spriteUrl}
             isActive={isActive}
             displayLevel={displayLevel}
             displayXp={displayXp}

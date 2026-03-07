@@ -7,7 +7,7 @@ import {
   STARTER_IGUANA,
   STARTER_MONKEY,
 } from '@/constants/creatures';
-import { Creature } from '@/types/baseGame';
+import { Creature, PlayerCreature } from '@/types/baseGame';
 import {
   Tower,
   Enemy,
@@ -763,9 +763,7 @@ export class TowerDefenseEngine {
     this.towers = this.towers.filter((t) => t.creatureId !== creatureId);
   }
 
-  public captureEnemy(
-    enemyId: string
-  ): import('@/types/baseGame').Creature | null {
+  public captureEnemy(enemyId: string): PlayerCreature | null {
     const enemyIndex = this.enemies.findIndex((e) => e.id === enemyId);
     if (enemyIndex === -1) return null;
 
@@ -774,23 +772,20 @@ export class TowerDefenseEngine {
     // Remove the enemy without triggering 'ENEMY_DIED' drops or lives reduction
     this.enemies.splice(enemyIndex, 1);
 
-    const baseCreature = TD_CREATURE_DEFS[enemy.definitionId]?.baseCreature;
-    if (!baseCreature) return null;
+    const meta = TD_CREATURE_DEFS[enemy.definitionId];
+    if (!meta) return null;
 
-    // Return a base Creature object suitable for adding to the profile
+    // Return a slim PlayerCreature suitable for adding to the profile
     return {
-      ...baseCreature,
-      currentHp: baseCreature.maxHp, // Heal them upon capture
-      level: 1, // Base level for captured creatures
+      id: enemy.definitionId, // will be replaced with UUID when added to profile
+      speciesId: enemy.definitionId,
+      level: 1,
       xp: 0,
+      equippedAttacks: TowerDefenseEngine.getDefaultAttacks(enemy.definitionId),
     };
   }
 
-  public placeTower(
-    creature: import('@/types/baseGame').Creature,
-    x: number,
-    y: number
-  ) {
+  public placeTower(creature: PlayerCreature, x: number, y: number) {
     const existingTower = this.towers.find((t) => t.creatureId === creature.id);
     const targetTower = this.towers.find(
       (t) => t.position.x === x && t.position.y === y
@@ -827,9 +822,17 @@ export class TowerDefenseEngine {
     const defMeta = TD_CREATURE_DEFS[creature.speciesId];
     if (!defMeta) return false;
 
-    const defaultAttacks = TowerDefenseEngine.getDefaultAttacks(
-      creature.speciesId
-    );
+    const baseDef = defMeta.baseCreature;
+
+    // Derive base stats from the species definition
+    const statGrowth = 2;
+    const derivedAttack = baseDef.attack + creature.level * statGrowth;
+    const derivedMaxHp = baseDef.maxHp;
+
+    const attacks =
+      creature.equippedAttacks.length > 0
+        ? creature.equippedAttacks
+        : TowerDefenseEngine.getDefaultAttacks(creature.speciesId);
 
     this.towers.push({
       id: `tower_${Date.now()}_${Math.random().toString(36).substring(7)}`,
@@ -839,10 +842,10 @@ export class TowerDefenseEngine {
       lastAttackTime: 0,
       level: creature.level,
       xp: creature.xp,
-      currentAttack: creature.attack,
-      hp: creature.currentHp,
-      maxHp: creature.maxHp,
-      equippedAttacks: defaultAttacks.map((atkId) => ({
+      currentAttack: derivedAttack,
+      hp: derivedMaxHp,
+      maxHp: derivedMaxHp,
+      equippedAttacks: attacks.map((atkId) => ({
         definitionId: atkId,
         lastFiredTime: 0,
       })),
