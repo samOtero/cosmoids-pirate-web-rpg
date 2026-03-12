@@ -37,6 +37,9 @@ const BATTLE_SPRITES = [
   '/battles/cosmoids/senticle_left_1.png',
   '/battles/cosmoids/senticle_up_1.png',
   '/battles/units/map_1.png',
+  '/battles/characters/caleb_battle.png',
+  '/battles/characters/pirate_grunt_battle.png',
+  '/battles/characters/grandpa_battle.png',
 ];
 
 const ALL_CONFIG_KEYS = Object.keys(CREATURE_TD_CONFIGS);
@@ -193,6 +196,8 @@ export default function TDTowerSizeEditor({
         resizeTo: containerRef.current!,
         backgroundAlpha: 0,
         preference: 'webgl',
+        resolution: window.devicePixelRatio || 1,
+        autoDensity: true,
       });
 
       if (isDestroyed) {

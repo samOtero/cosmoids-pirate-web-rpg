@@ -85,6 +85,29 @@ export const FIRST_LEVEL: TDLevelData = {
       y: 33.59,
     },
   ],
+  environmentUnits: [
+    {
+      position: {
+        x: 21.78,
+        y: 40,
+      },
+      tdConfigId: 'caleb_battle',
+    },
+    {
+      position: {
+        x: 89.45,
+        y: 40,
+      },
+      tdConfigId: 'pirate_grunt_battle',
+    },
+    {
+      position: {
+        x: 9,
+        y: 40.37,
+      },
+      tdConfigId: 'grandpa_battle',
+    },
+  ],
   captureUnits: [
     {
       position: {

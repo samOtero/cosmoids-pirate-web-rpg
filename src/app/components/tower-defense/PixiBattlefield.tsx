@@ -215,6 +215,8 @@ export default function PixiBattlefield({
         resizeTo: containerRef.current!,
         backgroundAlpha: 0,
         preference: 'webgl',
+        resolution: window.devicePixelRatio || 1,
+        autoDensity: true,
       });
 
       isInitialized = true;

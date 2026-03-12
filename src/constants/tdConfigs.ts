@@ -218,6 +218,42 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetY: 1,
     },
   },
+  caleb_battle: {
+    default: {
+      url: '/battles/characters/caleb_battle.png',
+      scale: 0.68,
+      shadowScaleX: 3.05,
+      shadowOffsetY: -32,
+      offsetY: -95,
+      healthBarOffsetY: -5,
+      shadowScaleY: 0.7,
+    },
+  },
+  pirate_grunt_battle: {
+    default: {
+      url: '/battles/characters/pirate_grunt_battle.png',
+      scale: 0.29,
+      shadowScaleX: 3.7,
+      shadowOffsetY: 5,
+      offsetY: -91,
+      healthBarOffsetY: -5,
+      offsetX: -2,
+      shadowScaleY: 1,
+    },
+  },
+  grandpa_battle: {
+    default: {
+      url: '/battles/characters/grandpa_battle.png',
+      scale: 0.37,
+      shadowScaleX: 2.65,
+      shadowOffsetY: -6,
+      offsetY: -90,
+      healthBarOffsetY: -5,
+      offsetX: 12,
+      shadowScaleY: 1.25,
+      shadowOffsetX: -1,
+    },
+  },
   attack_scratch_1: {
     default: {
       url: '/battles/attacks/scratch.png',
@@ -226,7 +262,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetY: 1,
       vfxAnimation: {
         type: 'WIPE_LINEAR',
-        maskRotation: Math.PI / 4,
+        maskRotation: 0.7853981633974483,
         maskSize: 200,
       },
       offsetY: -19,
