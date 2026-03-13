@@ -114,7 +114,84 @@ export const FIRST_LEVEL: TDLevelData = {
         x: 6.71,
         y: 58.78,
       },
-      tdConfigId: 'map_1',
+      tdConfigId: 'note_1',
+    },
+    {
+      position: {
+        x: 5.19,
+        y: 55.44,
+      },
+      tdConfigId: 'note_1',
+    },
+    {
+      position: {
+        x: 7.62,
+        y: 62.79,
+      },
+      tdConfigId: 'note_1',
+    },
+    {
+      position: {
+        x: 3.6,
+        y: 62.4,
+      },
+      tdConfigId: 'note_1',
+    },
+    {
+      position: {
+        x: 7.53,
+        y: 55.96,
+      },
+      tdConfigId: 'note_1',
+    },
+    {
+      position: {
+        x: 2.59,
+        y: 56.6,
+      },
+      tdConfigId: 'note_1',
+    },
+    {
+      position: {
+        x: 9.04,
+        y: 62.92,
+      },
+      tdConfigId: 'note_1',
+    },
+    {
+      position: {
+        x: 3.26,
+        y: 63.95,
+      },
+      tdConfigId: 'note_1',
+    },
+    {
+      position: {
+        x: 6.44,
+        y: 56.73,
+      },
+      tdConfigId: 'note_1',
+    },
+    {
+      position: {
+        x: 3.09,
+        y: 63.05,
+      },
+      tdConfigId: 'note_1',
+    },
+    {
+      position: {
+        x: 2.93,
+        y: 54.93,
+      },
+      tdConfigId: 'note_1',
+    },
+    {
+      position: {
+        x: 8.45,
+        y: 56.99,
+      },
+      tdConfigId: 'note_1',
     },
   ],
   waves: [

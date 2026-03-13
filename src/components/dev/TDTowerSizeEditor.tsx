@@ -40,6 +40,7 @@ const BATTLE_SPRITES = [
   '/battles/characters/caleb_battle.png',
   '/battles/characters/pirate_grunt_battle.png',
   '/battles/characters/grandpa_battle.png',
+  '/battles/units/note_1.png',
 ];
 
 const ALL_CONFIG_KEYS = Object.keys(CREATURE_TD_CONFIGS);

@@ -254,6 +254,19 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetX: -1,
     },
   },
+  note_1: {
+    default: {
+      url: '/battles/units/note_1.png',
+      scale: 0.1,
+      shadowScaleX: 0.9,
+      shadowOffsetY: -6,
+      offsetY: -11,
+      healthBarOffsetY: -34,
+      offsetX: -1,
+      shadowScaleY: 0.55,
+      shadowOffsetX: -1,
+    },
+  },
   attack_scratch_1: {
     default: {
       url: '/battles/attacks/scratch.png',
