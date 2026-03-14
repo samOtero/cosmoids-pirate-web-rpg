@@ -38,6 +38,9 @@ export default function DevTools() {
   const overwriteProfileCreatures = useGameStore(
     (state) => state.overwriteProfileCreatures
   );
+  const enqueueAndProcessEvents = useGameStore(
+    (state) => state.enqueueAndProcessEvents
+  );
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -175,6 +178,44 @@ export default function DevTools() {
                 className="text-sm bg-purple-900 border border-purple-500 hover:bg-purple-700 px-3 py-2 rounded text-left font-bold"
               >
                 Populate 30 Creatures
+              </button>
+              <button
+                onClick={() => {
+                  enqueueAndProcessEvents([
+                    { type: 'GO_TO_TOWER_DEFENSE' },
+                    {
+                      type: 'EXECUTE_TD_ACTION',
+                      payload: {
+                        action: {
+                          type: 'SPAWN_ENVIRONMENT_UNIT',
+                          unitId: 'test_caleb',
+                          tdConfigId: 'caleb_battle',
+                          position: { x: 50, y: -20 }, // Off screen top
+                          speed: 30, // 30% per second
+                          facingDirection: 'down',
+                        },
+                      },
+                    },
+                    {
+                      type: 'EXECUTE_TD_ACTION',
+                      payload: {
+                        action: {
+                          type: 'MOVE_ENVIRONMENT_UNIT',
+                          unitId: 'test_caleb',
+                          path: [
+                            { x: 50, y: 50 },
+                            { x: 80, y: 50 },
+                            { x: 80, y: 120 }, // Off screen bottom
+                          ],
+                        },
+                      },
+                    },
+                  ]);
+                  setShowMenu(false);
+                }}
+                className="text-sm bg-red-900 border border-red-500 hover:bg-red-700 px-3 py-2 rounded text-left font-bold"
+              >
+                Test TD Scripting
               </button>
             </div>
           </div>

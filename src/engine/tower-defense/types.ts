@@ -48,7 +48,30 @@ export interface BaseTDUnit {
 
 export interface EnvironmentUnit extends BaseTDUnit {
   tdConfigId: string;
+  speed?: number; // In world units per second, if moving
+  path?: Point[]; // Ordered list of waypoints to follow
+  currentWaypointIndex?: number;
 }
+
+export type TDAction =
+  | {
+      type: 'SPAWN_ENVIRONMENT_UNIT';
+      unitId: string;
+      tdConfigId: string;
+      position: Point;
+      facingDirection?: 'up' | 'down' | 'left' | 'right';
+      speed?: number;
+    }
+  | {
+      type: 'MOVE_ENVIRONMENT_UNIT';
+      unitId: string;
+      path: Point[];
+      speed?: number;
+    }
+  | {
+      type: 'REMOVE_ENVIRONMENT_UNIT';
+      unitId: string;
+    };
 
 export interface CaptureUnit extends BaseTDUnit {
   tdConfigId: string;

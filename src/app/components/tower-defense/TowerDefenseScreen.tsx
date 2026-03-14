@@ -10,6 +10,11 @@ import PixiBattlefield from './PixiBattlefield';
 import { FIRST_LEVEL } from '@/constants/tdLevels';
 import { ActiveAttackMenu } from './ActiveAttackMenu';
 import { TowerButton } from './TowerButton';
+import {
+  resolvePlayerCreature,
+  resolvePlayerCreatures,
+} from '@/utils/resolvePlayerCreature';
+import { ExecuteTDActionEventPayload } from '@/types/baseGame';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 
 /** Resolve display info (name, spriteUrl) for a creature from its species definition. */
@@ -41,6 +46,9 @@ export default function TowerDefenseScreen({
   const addCreatureToProfile = useGameStore(
     (state) => state.addCreatureToProfile
   );
+  const eventQueue = useGameStore((state) => state.eventQueue);
+  const processNextEvent = useGameStore((state) => state.processNextEvent);
+  
   const profile = currentProfileId !== null ? profiles[currentProfileId] : null;
   const playerCreatures = (profile?.creatures || []).slice(0, 6);
 
@@ -120,6 +128,42 @@ export default function TowerDefenseScreen({
     });
     return unsub;
   }, []);
+
+  // Listen for global TD action events
+  useEffect(() => {
+    if (eventQueue.length > 0) {
+      const nextEvent = eventQueue[0];
+      if (nextEvent.type === 'EXECUTE_TD_ACTION') {
+        const payload = nextEvent.payload as ExecuteTDActionEventPayload;
+        const action = payload.action;
+
+        switch (action.type) {
+          case 'SPAWN_ENVIRONMENT_UNIT':
+            engineRef.current.spawnEnvironmentUnit(
+              action.unitId,
+              action.tdConfigId,
+              action.position,
+              action.facingDirection,
+              action.speed
+            );
+            break;
+          case 'MOVE_ENVIRONMENT_UNIT':
+            engineRef.current.moveEnvironmentUnit(
+              action.unitId,
+              action.path,
+              action.speed
+            );
+            break;
+          case 'REMOVE_ENVIRONMENT_UNIT':
+            engineRef.current.removeEnvironmentUnit(action.unitId);
+            break;
+        }
+
+        // Action is executed, move to the next event
+        processNextEvent();
+      }
+    }
+  }, [eventQueue, processNextEvent]);
 
   // The Game Loop
   const animate = (time: number) => {

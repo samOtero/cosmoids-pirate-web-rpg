@@ -274,7 +274,8 @@ export type GameEventType =
   | 'GAIN_ITEM'
   | 'GO_TO_PARTY'
   | 'REORDER_CREATURES'
-  | 'GO_TO_TOWER_DEFENSE';
+  | 'GO_TO_TOWER_DEFENSE'
+  | 'EXECUTE_TD_ACTION';
 
 export interface GameEvent {
   type: GameEventType;
@@ -291,8 +292,15 @@ export interface GameEvent {
     | UnlockIslandEventPayload
     | AdvanceNodeEventPayload
     | GainItemEventPayload
-    | ReorderCreaturesEventPayload;
+    | ReorderCreaturesEventPayload
+    | ExecuteTDActionEventPayload;
   autoProceed?: boolean;
+}
+
+import { TDAction } from '@/engine/tower-defense/types';
+
+export interface ExecuteTDActionEventPayload {
+  action: TDAction;
 }
 
 export interface ShowDialogEventPayload {

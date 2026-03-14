@@ -19,7 +19,7 @@ import {
 import { ATTACK_DEFS } from './attacks/definitions';
 import { AttackBehaviorRegistry } from './attacks/behaviors';
 import { EffectProcessor } from './attacks/EffectProcessor';
-import { TDWave, TDWaveGroup, TDCreatureMetadata } from './types';
+import { TDWave, TDWaveGroup, TDCreatureMetadata, EnvironmentUnit, Point } from './types';
 import { TDEventBus } from './events/TDEventBus';
 import { TDProgressionManager } from './progression/TDProgressionManager';
 
@@ -228,6 +228,58 @@ export class TowerDefenseEngine {
         this.lastSpawnTime = time;
       }
     }
+
+    // Update environment units (moving ones)
+    this.environmentUnits.forEach((unit) => {
+      if (unit.speed && unit.path && unit.path.length > 0) {
+        if (unit.currentWaypointIndex === undefined) {
+          unit.currentWaypointIndex = 0;
+        }
+
+        if (unit.currentWaypointIndex < unit.path.length) {
+          const timeScale = deltaMs / 16.666;
+          const targetPoint = unit.path[unit.currentWaypointIndex];
+          const dx = targetPoint.x - unit.position.x;
+          const dy = targetPoint.y - unit.position.y;
+          const moveSpeed = unit.speed;
+          // speed is in % per second, so distance = speed * (deltaMs / 1000)
+          const frameDistance = moveSpeed * (deltaMs / 1000);
+
+          const isHorizontal = Math.abs(dx) > Math.abs(dy);
+
+          if (isHorizontal) {
+            const dir = Math.sign(dx);
+            const moveDist = dir * frameDistance;
+
+            if (Math.abs(dx) <= frameDistance) {
+              unit.position.x = targetPoint.x;
+              unit.position.y = targetPoint.y;
+              unit.currentWaypointIndex++;
+            } else {
+              unit.position.x += moveDist;
+              unit.facingDirection = dx > 0 ? 'right' : 'left';
+            }
+          } else {
+            const dir = Math.sign(dy);
+            const moveDist = dir * frameDistance * this.aspectRatio;
+
+            if (Math.abs(dy) <= Math.abs(moveDist)) {
+              unit.position.x = targetPoint.x;
+              unit.position.y = targetPoint.y;
+              unit.currentWaypointIndex++;
+            } else {
+              unit.position.y += moveDist;
+              unit.facingDirection = dy > 0 ? 'down' : 'up';
+            }
+          }
+        } else {
+          // Reached end of path, clear path to prevent redundant calculation
+          unit.path = undefined;
+          unit.speed = undefined;
+          unit.currentWaypointIndex = undefined;
+        }
+      }
+    });
 
     // Update enemies
     newEnemies.forEach((enemy) => {
@@ -892,12 +944,48 @@ export class TowerDefenseEngine {
         lastFiredTime: 0,
       };
 
-      // Emit event so the UI can show the success modal if desired, or just to update state
       this.events.emit({
         type: 'TOWER_LEARNED_ATTACK',
         towerId: tower.id,
         attackDefId: newAttackDefId,
       });
     }
+  }
+
+  // Scripted Event Architecture
+  public spawnEnvironmentUnit(
+    unitId: string,
+    tdConfigId: string,
+    position: Point,
+    facingDirection: 'up' | 'down' | 'left' | 'right' = 'down',
+    speed?: number
+  ) {
+    // Avoid duplicates
+    if (this.environmentUnits.some((eu) => eu.id === unitId)) return;
+
+    this.environmentUnits.push({
+      id: unitId,
+      tdConfigId: tdConfigId,
+      position: { x: position.x, y: position.y },
+      facingDirection,
+      hp: 1,
+      maxHp: 1,
+      speed,
+    });
+  }
+
+  public moveEnvironmentUnit(unitId: string, path: Point[], speed?: number) {
+    const unit = this.environmentUnits.find((eu) => eu.id === unitId);
+    if (!unit) return;
+    
+    unit.path = path.map(p => ({ ...p }));
+    unit.currentWaypointIndex = 0;
+    if (speed !== undefined) {
+      unit.speed = speed;
+    }
+  }
+
+  public removeEnvironmentUnit(unitId: string) {
+    this.environmentUnits = this.environmentUnits.filter((eu) => eu.id !== unitId);
   }
 }

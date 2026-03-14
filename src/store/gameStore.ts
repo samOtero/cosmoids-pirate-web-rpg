@@ -27,6 +27,7 @@ import {
   GameFlag,
   GainItemEventPayload,
   ReorderCreaturesEventPayload,
+  ExecuteTDActionEventPayload,
 } from '@/types/baseGame';
 import { BATTLES } from '@/constants/battles';
 import {
@@ -201,6 +202,19 @@ export const useGameStore = create<GameState>()(
                   }
                   case 'GO_TO_TOWER_DEFENSE': {
                     state.setScreen(Screens.TOWER_DEFENSE);
+                    break;
+                  }
+                  case 'EXECUTE_TD_ACTION': {
+                    // This is consumed by TowerDefenseScreen actively when it is open.
+                    // If the TD screen isn't open, we should probably ignore it or log a warning.
+                    if (state.currentScreen !== Screens.TOWER_DEFENSE) {
+                      console.warn('Attempted to execute TD action while not in TD screen.');
+                    } else {
+                      // We don't advance the state here. We expect TowerDefenseScreen to process it.
+                      shouldContinue = false;
+                      // And autoProceed must not skip it here
+                      currentEvent = { ...currentEvent, autoProceed: false };
+                    }
                     break;
                   }
                   case 'REORDER_CREATURES': {
