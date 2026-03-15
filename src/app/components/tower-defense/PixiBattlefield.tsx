@@ -1067,7 +1067,7 @@ export default function PixiBattlefield({
               text: ft.text,
               style: {
                 fontFamily: 'monospace',
-                fontSize: Math.max(16, screenW * 0.02),
+                fontSize: Math.max(16, screenW * 0.02) * (ft.scale ?? 1),
                 fontWeight: 'bold',
                 fill: ft.color ?? 0xffffff,
                 stroke: { color: 0x000000, width: 3 },

@@ -3,7 +3,7 @@ import { Creature, ElementType } from '@/types/baseGame';
 export const SENTICLE: Creature = {
   id: 'senticle',
   name: 'Senticle',
-  type: ElementType.NORMAL,
+  type: ElementType.WATER,
   maxHp: 20,
   currentHp: 20,
   attack: 10,

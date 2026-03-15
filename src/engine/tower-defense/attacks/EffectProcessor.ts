@@ -1,7 +1,45 @@
 import { TowerDefenseEngine, TD_CREATURE_DEFS } from '../TowerDefenseEngine';
 import { Tower, Enemy } from '../types';
 import { AttackDefinition } from './types';
+import { ElementType } from '@/types/baseGame';
 
+const TYPE_EFFECTIVENESS: Record<ElementType, Record<ElementType, number>> = {
+  [ElementType.NORMAL]: {
+    [ElementType.NORMAL]: 1,
+    [ElementType.FIRE]: 1,
+    [ElementType.WATER]: 1,
+    [ElementType.GRASS]: 1,
+    [ElementType.ELECTRIC]: 1,
+  },
+  [ElementType.FIRE]: {
+    [ElementType.NORMAL]: 1,
+    [ElementType.FIRE]: 0.5,
+    [ElementType.WATER]: 0.5,
+    [ElementType.GRASS]: 2,
+    [ElementType.ELECTRIC]: 1,
+  },
+  [ElementType.WATER]: {
+    [ElementType.NORMAL]: 1,
+    [ElementType.FIRE]: 2,
+    [ElementType.WATER]: 0.5,
+    [ElementType.GRASS]: 0.5,
+    [ElementType.ELECTRIC]: 1,
+  },
+  [ElementType.GRASS]: {
+    [ElementType.NORMAL]: 1,
+    [ElementType.FIRE]: 0.5,
+    [ElementType.WATER]: 2,
+    [ElementType.GRASS]: 0.5,
+    [ElementType.ELECTRIC]: 1,
+  },
+  [ElementType.ELECTRIC]: {
+    [ElementType.NORMAL]: 1,
+    [ElementType.FIRE]: 1,
+    [ElementType.WATER]: 2,
+    [ElementType.GRASS]: 0.5,
+    [ElementType.ELECTRIC]: 0.5,
+  },
+};
 export class EffectProcessor {
   public static applyDamageAndEffects(
     engine: TowerDefenseEngine,
@@ -14,23 +52,52 @@ export class EffectProcessor {
     const power = attackDef.power;
     const attack = source.currentAttack;
 
-    // Get Enemy Defense
+    // Get Enemy Defense and Type
     const defenderMeta = TD_CREATURE_DEFS[target.definitionId];
     const defense = defenderMeta ? defenderMeta.baseCreature.defense : 1; // Fallback to 1 to prevent division by zero
+    const defenderType = defenderMeta
+      ? defenderMeta.baseCreature.type
+      : ElementType.NORMAL;
+
+    // Get Attacker Type
+    const attackerMeta = TD_CREATURE_DEFS[source.creature.speciesId];
+    const attackerType = attackerMeta
+      ? attackerMeta.baseCreature.type
+      : ElementType.NORMAL;
 
     // Pokemon Damage Formula
-    const baseDamage = Math.floor(
+    const baseDamage =
       Math.floor(
-        (Math.floor((2 * level) / 5 + 2) * power * attack) / defense
-      ) / 50
-    ) + 2;
+        Math.floor(
+          (Math.floor((2 * level) / 5 + 2) * power * attack) / defense
+        ) / 50
+      ) + 2;
+
+    const isStab = attackerType === attackDef.type;
+    const stabMultiplier = isStab ? 1.5 : 1.0;
+
+    const effectivenessMultiplier =
+      TYPE_EFFECTIVENESS[attackDef.type]?.[defenderType] ?? 1.0;
 
     // Add a slight randomization (85% to 100%)
     const randomModifier = (Math.floor(Math.random() * 16) + 85) / 100;
-    let finalDamage = Math.floor(baseDamage * randomModifier);
+    let finalDamage = Math.floor(
+      baseDamage * stabMultiplier * effectivenessMultiplier * randomModifier
+    );
 
     // Ensure at least 1 damage
     finalDamage = Math.max(1, finalDamage);
+
+    let textColor = 0xffffff;
+    let textScale = 1.0;
+
+    if (effectivenessMultiplier > 1) {
+      textColor = 0xfacc15; // Yellow-ish for super effective
+      textScale = 1.4;
+    } else if (effectivenessMultiplier < 1) {
+      textColor = 0x9ca3af; // Gray for not very effective
+      textScale = 0.75;
+    }
 
     target.hp -= finalDamage;
     target.damageFlashTimerMs = 150;
@@ -39,7 +106,8 @@ export class EffectProcessor {
       id: `ft_dmg_${Date.now()}_${Math.random().toString(36).substring(7)}`,
       text: Math.ceil(finalDamage).toString(),
       position: { ...target.position },
-      color: 0xffffff,
+      color: textColor,
+      scale: textScale,
       durationMs: 1000,
       elapsedMs: 0,
     });

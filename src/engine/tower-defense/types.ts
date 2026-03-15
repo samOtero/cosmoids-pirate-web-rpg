@@ -139,6 +139,7 @@ export interface FloatingText {
   text: string;
   position: Point;
   color?: number;
+  scale?: number;
   durationMs: number;
   elapsedMs: number;
 }
