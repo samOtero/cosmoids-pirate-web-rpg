@@ -502,7 +502,7 @@ export default function PixiBattlefield({
 
         // --- Render Towers ---
         const currentTowerKeys = new Set(
-          engine.towers.map((t) => `${t.id}_${t.creatureId}`)
+          engine.towers.map((t) => `${t.id}_${t.creature.id}`)
         );
         for (const [key, sprite] of towerSprites.entries()) {
           if (!currentTowerKeys.has(key)) {
@@ -512,7 +512,7 @@ export default function PixiBattlefield({
           }
         }
         for (const tower of engine.towers) {
-          const cacheKey = `${tower.id}_${tower.creatureId}`;
+          const cacheKey = `${tower.id}_${tower.creature.id}`;
           let container = towerSprites.get(cacheKey);
           if (!container) {
             const newContainer = new PIXI.Container();
@@ -522,7 +522,7 @@ export default function PixiBattlefield({
             newContainer.cursor = 'grab';
             newContainer.on('pointerdown', (e) => {
               draggingNode = newContainer;
-              draggingTowerCreatureId = tower.creatureId;
+              draggingTowerCreatureId = tower.creature.id;
               newContainer.cursor = 'grabbing';
               app.stage.setChildIndex(
                 newContainer,
@@ -533,7 +533,8 @@ export default function PixiBattlefield({
               }
             });
 
-            const baseCreature = TD_CREATURE_DEFS[tower.speciesId].baseCreature;
+            const baseCreature =
+              TD_CREATURE_DEFS[tower.creature.speciesId].baseCreature;
 
             const shadow = new PIXI.Graphics();
             shadow.label = 'shadow';
@@ -556,14 +557,14 @@ export default function PixiBattlefield({
             app.stage.addChild(container);
             towerSprites.set(cacheKey, container);
           }
-          if (draggingTowerCreatureId !== tower.creatureId) {
+          if (draggingTowerCreatureId !== tower.creature.id) {
             container.x = offsetX + (tower.position.x / 100) * screenW;
             container.y = offsetY + (tower.position.y / 100) * screenH;
           }
 
           const rCircle = container.getChildByLabel('rangeCircle');
           if (rCircle) {
-            rCircle.visible = draggingTowerCreatureId === tower.creatureId;
+            rCircle.visible = draggingTowerCreatureId === tower.creature.id;
           }
 
           const tsprite = container.getChildByLabel('tower_sprite') as
@@ -574,7 +575,8 @@ export default function PixiBattlefield({
             | undefined;
 
           if (tsprite && shadow) {
-            const baseCreature = TD_CREATURE_DEFS[tower.speciesId].baseCreature;
+            const baseCreature =
+              TD_CREATURE_DEFS[tower.creature.speciesId].baseCreature;
             applyTDUnitTransforms(
               tower,
               tsprite,
@@ -597,7 +599,7 @@ export default function PixiBattlefield({
           renderHealthBar(
             tower,
             container,
-            tower.speciesId,
+            tower.creature.speciesId,
             true /* hideWhenFull */
           );
 
@@ -911,7 +913,7 @@ export default function PixiBattlefield({
               );
               if (sourceTower) {
                 const baseCreature =
-                  TD_CREATURE_DEFS[sourceTower.speciesId].baseCreature;
+                  TD_CREATURE_DEFS[sourceTower.creature.speciesId].baseCreature;
                 applyTDUnitTransforms(
                   {
                     ...proj,

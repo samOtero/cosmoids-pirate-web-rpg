@@ -19,7 +19,13 @@ import {
 import { ATTACK_DEFS } from './attacks/definitions';
 import { AttackBehaviorRegistry } from './attacks/behaviors';
 import { EffectProcessor } from './attacks/EffectProcessor';
-import { TDWave, TDWaveGroup, TDCreatureMetadata, EnvironmentUnit, Point } from './types';
+import {
+  TDWave,
+  TDWaveGroup,
+  TDCreatureMetadata,
+  EnvironmentUnit,
+  Point,
+} from './types';
 import { TDEventBus } from './events/TDEventBus';
 import { TDProgressionManager } from './progression/TDProgressionManager';
 
@@ -80,8 +86,24 @@ export class TowerDefenseEngine {
   public money: number = 100;
   public lives: number = 3;
 
+  public static getDefaultAttacks(speciesId: string): string[] {
+    const defaultAttacks: string[] = [];
+    if (speciesId === 'starter_crab')
+      defaultAttacks.push('TACKLE', 'VINE_WHIP');
+    else if (speciesId === 'starter_iguana')
+      defaultAttacks.push('EMBER', 'SCRATCH');
+    else if (speciesId === 'starter_monkey')
+      defaultAttacks.push('BUBBLE_BEAM', 'SCRATCH');
+    else defaultAttacks.push('TACKLE'); // Fallback
+    return defaultAttacks;
+  }
+
+
+
   public events = new TDEventBus();
   private progression = new TDProgressionManager(this, this.events);
+
+  public roster: PlayerCreature[] = [];
 
   // Wave Management State
   public waves: TDWave[] = [];
@@ -109,7 +131,12 @@ export class TowerDefenseEngine {
   public captureUnits: CaptureUnit[] = [];
   public hasCaptureUnitsGoal: boolean = false;
 
-  constructor(levelData: import('./types').TDLevelData | any) {
+  constructor(
+    levelData: import('./types').TDLevelData | any,
+    initialRoster: PlayerCreature[] = []
+  ) {
+    this.roster = JSON.parse(JSON.stringify(initialRoster));
+
     const rawPaths: { x: number; y: number }[][] = levelData.paths || [];
     this.paths = rawPaths.map((path) => {
       if (path.length <= 1) return path;
@@ -500,7 +527,7 @@ export class TowerDefenseEngine {
         tower.damageFlashTimerMs -= deltaMs;
         if (tower.damageFlashTimerMs < 0) tower.damageFlashTimerMs = 0;
       }
-      const attackInstance = tower.equippedAttacks[tower.selectedAttackIndex];
+      const attackInstance = tower.equippedAttacksRuntime[tower.selectedAttackIndex];
       if (!attackInstance) return;
 
       const attackDef = ATTACK_DEFS[attackInstance.definitionId];
@@ -811,34 +838,31 @@ export class TowerDefenseEngine {
     });
   }
 
-  public removeTower(creatureId: string) {
-    this.towers = this.towers.filter((t) => t.creatureId !== creatureId);
-  }
-
   public captureEnemy(enemyId: string): PlayerCreature | null {
-    const enemyIndex = this.enemies.findIndex((e) => e.id === enemyId);
-    if (enemyIndex === -1) return null;
+    const enemy = this.enemies.find((e) => e.id === enemyId);
+    if (!enemy) return null;
 
-    const enemy = this.enemies[enemyIndex];
-
-    // Remove the enemy without triggering 'ENEMY_DIED' drops or lives reduction
-    this.enemies.splice(enemyIndex, 1);
-
-    const meta = TD_CREATURE_DEFS[enemy.definitionId];
-    if (!meta) return null;
-
-    // Return a slim PlayerCreature suitable for adding to the profile
-    return {
+    // Optional: add RNG for capture success here! Currently 100% success.
+    const captured: PlayerCreature = {
       id: enemy.definitionId, // will be replaced with UUID when added to profile
       speciesId: enemy.definitionId,
       level: 1,
       xp: 0,
       equippedAttacks: TowerDefenseEngine.getDefaultAttacks(enemy.definitionId),
     };
+    this.roster.push(captured);
+    return captured;
   }
 
-  public placeTower(creature: PlayerCreature, x: number, y: number) {
-    const existingTower = this.towers.find((t) => t.creatureId === creature.id);
+  public removeTower(creatureId: string) {
+    this.towers = this.towers.filter((t) => t.creature.id !== creatureId);
+  }
+
+  public placeTower(creatureId: string, x: number, y: number) {
+    const creature = this.roster.find((c) => c.id === creatureId);
+    if (!creature) return false;
+
+    const existingTower = this.towers.find((t) => t.creature.id === creature.id);
     const targetTower = this.towers.find(
       (t) => t.position.x === x && t.position.y === y
     );
@@ -888,16 +912,13 @@ export class TowerDefenseEngine {
 
     this.towers.push({
       id: `tower_${Date.now()}_${Math.random().toString(36).substring(7)}`,
-      creatureId: creature.id,
-      speciesId: creature.speciesId,
+      creature: creature,
       position: { x, y },
       lastAttackTime: 0,
-      level: creature.level,
-      xp: creature.xp,
       currentAttack: derivedAttack,
       hp: derivedMaxHp,
       maxHp: derivedMaxHp,
-      equippedAttacks: attacks.map((atkId) => ({
+      equippedAttacksRuntime: attacks.map((atkId) => ({
         definitionId: atkId,
         lastFiredTime: 0,
       })),
@@ -907,25 +928,14 @@ export class TowerDefenseEngine {
     return true;
   }
 
-  public static getDefaultAttacks(speciesId: string): string[] {
-    const defaultAttacks: string[] = [];
-    if (speciesId === 'starter_crab')
-      defaultAttacks.push('TACKLE', 'VINE_WHIP');
-    else if (speciesId === 'starter_iguana')
-      defaultAttacks.push('EMBER', 'SCRATCH');
-    else if (speciesId === 'starter_monkey')
-      defaultAttacks.push('BUBBLE_BEAM', 'SCRATCH');
-    else defaultAttacks.push('TACKLE'); // Fallback
-    return defaultAttacks;
-  }
 
   public setTowerAttack(creatureId: string, attackIndex: number) {
     this.playerSelectedAttacks[creatureId] = attackIndex;
-    const tower = this.towers.find((t) => t.creatureId === creatureId);
+    const tower = this.towers.find((t) => t.creature.id === creatureId);
     if (
       tower &&
       attackIndex >= 0 &&
-      attackIndex < tower.equippedAttacks.length
+      attackIndex < tower.creature.equippedAttacks.length
     ) {
       tower.selectedAttackIndex = attackIndex;
     }
@@ -938,8 +948,9 @@ export class TowerDefenseEngine {
   ) {
     const tower = this.towers.find((t) => t.id === towerId);
     if (!tower) return;
-    if (replaceIndex >= 0 && replaceIndex < tower.equippedAttacks.length) {
-      tower.equippedAttacks[replaceIndex] = {
+    if (replaceIndex >= 0 && replaceIndex < tower.creature.equippedAttacks.length) {
+      tower.creature.equippedAttacks[replaceIndex] = newAttackDefId;
+      tower.equippedAttacksRuntime[replaceIndex] = {
         definitionId: newAttackDefId,
         lastFiredTime: 0,
       };
@@ -977,8 +988,8 @@ export class TowerDefenseEngine {
   public moveEnvironmentUnit(unitId: string, path: Point[], speed?: number) {
     const unit = this.environmentUnits.find((eu) => eu.id === unitId);
     if (!unit) return;
-    
-    unit.path = path.map(p => ({ ...p }));
+
+    unit.path = path.map((p) => ({ ...p }));
     unit.currentWaypointIndex = 0;
     if (speed !== undefined) {
       unit.speed = speed;
@@ -986,6 +997,8 @@ export class TowerDefenseEngine {
   }
 
   public removeEnvironmentUnit(unitId: string) {
-    this.environmentUnits = this.environmentUnits.filter((eu) => eu.id !== unitId);
+    this.environmentUnits = this.environmentUnits.filter(
+      (eu) => eu.id !== unitId
+    );
   }
 }

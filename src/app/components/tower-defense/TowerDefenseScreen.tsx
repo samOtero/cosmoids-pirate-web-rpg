@@ -38,9 +38,6 @@ export default function TowerDefenseScreen({
   onWin?: () => void;
   onLose?: () => void;
 }) {
-  const engineRef = useRef(new TowerDefenseEngine(FIRST_LEVEL));
-  const hasEndedRef = useRef(false);
-
   const profiles = useGameStore((state) => state.profiles);
   const currentProfileId = useGameStore((state) => state.currentProfileId);
   const addCreatureToProfile = useGameStore(
@@ -49,9 +46,16 @@ export default function TowerDefenseScreen({
   const eventQueue = useGameStore((state) => state.eventQueue);
   const processNextEvent = useGameStore((state) => state.processNextEvent);
   const updateCreatures = useGameStore((state) => state.updateCreatures);
-  
+
   const profile = currentProfileId !== null ? profiles[currentProfileId] : null;
+
+  const hasEndedRef = useRef(false);
   const playerCreatures = (profile?.creatures || []).slice(0, 6);
+
+  const engineRef = useRef<TowerDefenseEngine>(null!);
+  if (!engineRef.current) {
+    engineRef.current = new TowerDefenseEngine(FIRST_LEVEL, playerCreatures);
+  }
 
   const [uiLives, setUiLives] = useState(engineRef.current.lives);
   const [uiElapsedSeconds, setUiElapsedSeconds] = useState(0);
@@ -83,26 +87,9 @@ export default function TowerDefenseScreen({
 
   const saveTowerProgress = () => {
     if (currentProfileId === null) return;
-    const activeTowers = engineRef.current.towers;
-    const currentState = useGameStore.getState();
-    const currentProfile = currentState.profiles[currentProfileId];
-    if (!currentProfile) return;
-    
-    const updatedCreatures: any[] = [];
-    activeTowers.forEach((tower: any) => {
-      const pc = currentProfile.creatures.find((c) => c.id === tower.creatureId);
-      if (pc) {
-        updatedCreatures.push({
-          ...pc,
-          level: tower.level,
-          xp: tower.xp,
-          equippedAttacks: tower.equippedAttacks.map((a: any) => a.definitionId),
-        });
-      }
-    });
 
-    if (updatedCreatures.length > 0) {
-      updateCreatures(updatedCreatures);
+    if (engineRef.current.roster.length > 0) {
+      updateCreatures(engineRef.current.roster);
     }
   };
 
@@ -258,15 +245,13 @@ export default function TowerDefenseScreen({
   }, [isPlaying, uiLives]); // Dependencies for state sync closure
 
   const handleMapDrop = (creatureId: string, x: number, y: number) => {
-    const creature = playerCreatures.find((c) => c.id === creatureId);
-    if (!creature) return;
-    engineRef.current.placeTower(creature, x, y);
-    setActiveTowerIds(engineRef.current.towers.map((t: any) => t.creatureId));
+    engineRef.current.placeTower(creatureId, x, y);
+    setActiveTowerIds(engineRef.current.towers.map((t: any) => t.creature.id));
   };
 
   const handleMapRemove = (creatureId: string) => {
     engineRef.current.removeTower(creatureId);
-    setActiveTowerIds(engineRef.current.towers.map((t: any) => t.creatureId));
+    setActiveTowerIds(engineRef.current.towers.map((t: any) => t.creature.id));
   };
 
   const handleEnemyCaptured = (enemyId: string) => {
@@ -331,20 +316,22 @@ export default function TowerDefenseScreen({
       <div className="bg-slate-800 p-4 shrink-0 flex items-center justify-center gap-4 overflow-x-auto border-t border-cyan-800 relative min-h-[140px]">
         {selectedCreatureId
           ? (() => {
-              const creature = playerCreatures.find(
+              const creature = engineRef.current.roster.find(
                 (c) => c.id === selectedCreatureId
               );
               if (!creature) return null;
 
               const tower = engineRef.current.towers.find(
-                (t) => t.creatureId === selectedCreatureId
+                (t: any) => t.creature.id === selectedCreatureId
               );
               const isActive = activeTowerIds.includes(creature.id);
-              const displayLevel = tower ? tower.level : creature.level;
-              const displayXp = tower ? tower.xp : creature.xp;
+              const displayLevel = tower
+                ? tower.creature.level
+                : creature.level;
+              const displayXp = tower ? tower.creature.xp : creature.xp;
 
               const equippedAttacks = tower
-                ? tower.equippedAttacks.map((a: any) => a.definitionId)
+                ? tower.creature.equippedAttacks
                 : TowerDefenseEngine.getDefaultAttacks(creature.speciesId);
 
               const activeAttackIndex = tower
@@ -384,7 +371,7 @@ export default function TowerDefenseScreen({
         <div className="text-slate-400 mr-4 font-bold uppercase text-sm">
           Drag Creature to Place:
         </div>
-        {playerCreatures.map((creature) => {
+        {engineRef.current.roster.map((creature) => {
           const isActive = activeTowerIds.includes(creature.id);
 
           let displayLevel = creature.level;
@@ -392,11 +379,11 @@ export default function TowerDefenseScreen({
 
           if (isActive) {
             const activeTower = engineRef.current.towers.find(
-              (t) => t.creatureId === creature.id
+              (t: any) => t.creature.id === creature.id
             );
             if (activeTower) {
-              displayLevel = activeTower.level;
-              displayXp = activeTower.xp;
+              displayLevel = activeTower.creature.level;
+              displayXp = activeTower.creature.xp;
             }
           }
 
@@ -526,31 +513,33 @@ export default function TowerDefenseScreen({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                   {/* Current Attacks */}
-                  {tower.equippedAttacks.map((atk: any, idx: number) => {
-                    const def = ATTACK_DEFS[atk.definitionId];
-                    return (
-                      <button
-                        key={idx}
-                        onClick={() => {
-                          engineRef.current.replaceTowerAttack(
-                            tower.id,
-                            idx,
-                            replaceAttackPrompt.newAttackDefId
-                          );
-                          setReplaceAttackPrompt(null);
-                          // The engine will emit TOWER_LEARNED_ATTACK, which will show the other modal.
-                        }}
-                        className="p-3 bg-slate-700 hover:bg-red-900/50 border border-slate-600 hover:border-red-500 rounded text-left transition-colors flex flex-col group"
-                      >
-                        <span className="font-bold text-slate-200 group-hover:text-red-400">
-                          Forget {def?.name}
-                        </span>
-                        <span className="text-xs text-slate-400 mt-1 line-clamp-2">
-                          Power: {def?.power}
-                        </span>
-                      </button>
-                    );
-                  })}
+                  {tower.creature.equippedAttacks.map(
+                    (atk: string, idx: number) => {
+                      const def = ATTACK_DEFS[atk];
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => {
+                            engineRef.current.replaceTowerAttack(
+                              tower.id,
+                              idx,
+                              replaceAttackPrompt.newAttackDefId
+                            );
+                            setReplaceAttackPrompt(null);
+                            // The engine will emit TOWER_LEARNED_ATTACK, which will show the other modal.
+                          }}
+                          className="p-3 bg-slate-700 hover:bg-red-900/50 border border-slate-600 hover:border-red-500 rounded text-left transition-colors flex flex-col group"
+                        >
+                          <span className="font-bold text-slate-200 group-hover:text-red-400">
+                            Forget {def?.name}
+                          </span>
+                          <span className="text-xs text-slate-400 mt-1 line-clamp-2">
+                            Power: {def?.power}
+                          </span>
+                        </button>
+                      );
+                    }
+                  )}
                 </div>
 
                 {/* New Attack Info & Cancel */}

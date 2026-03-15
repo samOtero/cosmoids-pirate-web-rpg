@@ -1,4 +1,4 @@
-import { Creature } from '@/types/baseGame';
+import { Creature, PlayerCreature } from '@/types/baseGame';
 
 export interface TDEvolutionNode {
   level: number;
@@ -93,13 +93,13 @@ export interface TDLevelData {
 }
 
 export interface Tower extends BaseTDUnit {
-  creatureId: string; // Reference to the Creature instance ID in the player's party
-  speciesId: string; // The base species ID for rendering
+  creature: PlayerCreature; // The singular source of truth for level, xp, and attacks
   lastAttackTime: number; // Deprecate or keep for generic attacks
-  level: number;
-  xp: number;
   currentAttack: number;
-  equippedAttacks: Array<{ definitionId: string; lastFiredTime: number }>;
+  equippedAttacksRuntime: Array<{
+    definitionId: string;
+    lastFiredTime: number;
+  }>;
   selectedAttackIndex: number;
 }
 
