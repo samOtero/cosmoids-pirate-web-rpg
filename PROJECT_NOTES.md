@@ -16,3 +16,102 @@ This file contains notes and observations about the project and how to work with
 - **Single Page App Structure**: The application main entry point is src/app/page.tsx, which conditionally renders different screens (Start, Profiles, Dialog, Map, Battle) based on the currentScreen state in the Zustand store.
 - **Event-Driven Flow**: Game progression is managed via an eventQueue in gameStore.ts. Events (e.g., SHOW_DIALOG, START_BATTLE) are processed sequentially to drive the game forward.
 - **Data Models**: Core types like Profile, Creature, and Item are defined in src/types/baseGame.ts.
+
+### Features
+
+### Core Concept: Cosmoids (Some are this are still TODO)
+
+Cosmoids are creatures that live alongside humans as companions and helpers.
+
+- **Types:** Similar to classic elemental types (Grass, Water, Fire). Types have distinct strengths and weaknesses against each other. Custom or unique types may be added later.
+- **Attacks:** Cosmoids learn attacks via leveling up or special training. They hold up to 4 attacks at a time, changeable only outside of battle.
+- **Attack Utility:** Primarily used for tower defense battling, but some attacks provide out-of-battle utility.
+- **Limitations:** Cosmoids have restricted movepools based on their species and type.
+
+> **Design Note:** Consider adding out-of-battle passive abilities, but evaluate if the added complexity is necessary for the core loop first.
+
+---
+
+### Tower Defense Battling Mechanics (Some of these are TODO)
+
+Select a party of up to 6 Cosmoids to deploy in a level.
+
+- **Capture:** Use a "Capture Doubloon" to catch weakened wild Cosmoid enemies and add them to your crew.
+- **Progression:** Earn experience points by defeating or capturing enemies. Cosmoids retain their XP, levels, attacks, and evolutions across all levels.
+- **Dynamic Combat:** Swap attacks mid-level for strategy. Freely move and swap deployed Cosmoids to dodge area-of-effect attacks or focus on specific zones.
+- **In-Battle Events:** Cosmoids can level up, learn moves, evolve, take damage, or faint during a level.
+- **Items:** Use items to heal or boost Cosmoids during combat.
+- **Type Matchups:** Enemy and defender types dictate damage scaling (weaknesses and strengths).
+
+### Battle Objectives (Battles are done but we don't cover all the different types of modes yet)
+
+| Objective Type    | Description                                                                                             |
+| :---------------- | :------------------------------------------------------------------------------------------------------ |
+| **Candy Defense** | Protect story-relevant objects ("candy"). Lose a life if one is taken; lose the level if all are taken. |
+| **Area Defense**  | Prevent enemies from reaching a specific map point. Lose points upon breach.                            |
+| **Time Offense**  | Defeat a set number of enemies before the timer runs out.                                               |
+| **Survival Time** | Survive for a specific duration without losing all lives (often combined with other modes).             |
+| **Pending Ideas** | Need brainstorming for additional game modes!                                                           |
+
+> **Potential Upgrade Idea:** Implement temporary in-level evolution or upgrade trees (similar to traditional TD tower upgrades). Need to explore how to make these choices interesting and support diverse playstyles.
+
+---
+
+### Exploration and Traveling (Still TODO)
+
+Time advances as you move from node to node across the world map.
+
+- **By Foot:** Navigate different nodes within a specific landmass or island.
+- **By Ship:** Travel across the ocean between landmarks. Upgrading the ship allows for faster travel or access to dangerous waters.
+- **Backtracking (Metroidvania):** Unlock new areas in older zones using new abilities (e.g., returning to a bush after getting the "Cut" equivalent).
+- **Teleporting:** Befriend specific Cosmoids (e.g., a Thornado-generating Cosmoid) to fast-travel between nodes, similar to _The Wind Waker_.
+- **Out-of-Battle Tools:** Cosmoids provide exploration utilities, such as pulling floating items onto the ship.
+- **Ship Summoning:** Explore mechanics for recalling your docked ship from different coasts (potentially via a specific Cosmoid or upgrade).
+
+---
+
+### Encounters and Events (Still TODO)
+
+Moving between nodes triggers encounters (scripted or random RNG). These are usually smaller than full levels.
+
+| Encounter Type        | Description                                                                                                                                                                     |
+| :-------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Sandbars**          | Find Cosmoids needing rescue, or defend treasure/messages in bottles from wild Cosmoids.                                                                                        |
+| **Other Ships**       | **Aggressive:** Try to board you. **Friendly:** Merchants offering items, quests, or lore. **Ghost Ships:** Appear in specific waters/times.                                    |
+| **Flying Cosmoids**   | Engage airborne enemies; having a high mast or your own flying Cosmoids improves your chances.                                                                                  |
+| **Swimming Cosmoids** | Aquatic enemies attempt to board, or discover a school of them to battle with your Water types. (Potential fishing mechanic?)                                                   |
+| **Stowaways**         | Triggered after leaving an island. Can be destructive (eating sails), thieves, or friendly creatures needing a home. Attracted by cargo and departure location.                 |
+| **Weather Events**    | Storms can push you back to earlier nodes if unprepared. Certain Cosmoids protect against specific weather or only spawn during it. (Need to define in-battle weather effects). |
+| **Legendary Visits**  | Rare Water or Flying legendaries may visit the ship once specific progression or ship upgrades are met.                                                                         |
+
+---
+
+### Economy (Still TODO)
+
+| Category            | Sources / Sinks                                                              |
+| :------------------ | :--------------------------------------------------------------------------- |
+| **Earning Income**  | Completing quests, finding treasure, selling items, defeating rival pirates. |
+| **Spending Income** | Purchasing ship upgrades, buying items (food, tools), purchasing clues.      |
+
+---
+
+### Pokedex and Journal System (Still TODO)
+
+A "Captain's Log" or "Field Journal" tracks creatures and lore.
+
+- **Acquiring Clues:** Talk to NPCs, explore the environment, complete quests, or buy clues.
+- **World Drops:** Find items like Torn Pages, Strange Scales, Maps, or Messages in a Bottle to trigger quests.
+- **Tracking:** The journal catalogs available creatures per area and compiles collected clues (potentially unlocking sketches).
+- **Bounty Board:** Complete specific hunts or quests for rewards.
+
+> **Design Note:** Need to finalize if Cosmoids are found purely by being in the right place/time, or if clue-gathering is a mandatory mechanic for encounters.
+
+---
+
+### Factions and Reputation (Still TODO)
+
+Interact with different Pirate Crews and the Navy.
+
+- **Reputation System:** Gain reputation levels with different factions.
+- **Dynamic Quests:** Unlock different quests depending on your current faction standing.
+- **Potential Rewards:** Outfits, exclusive Cosmoids, unique ship upgrades, special evolutions, or branching story endings.

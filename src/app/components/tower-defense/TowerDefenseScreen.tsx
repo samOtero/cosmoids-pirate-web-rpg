@@ -48,6 +48,7 @@ export default function TowerDefenseScreen({
   );
   const eventQueue = useGameStore((state) => state.eventQueue);
   const processNextEvent = useGameStore((state) => state.processNextEvent);
+  const updateCreatures = useGameStore((state) => state.updateCreatures);
   
   const profile = currentProfileId !== null ? profiles[currentProfileId] : null;
   const playerCreatures = (profile?.creatures || []).slice(0, 6);
@@ -79,6 +80,31 @@ export default function TowerDefenseScreen({
   const [introState, setIntroState] = useState<'ready' | 'go' | 'none'>(
     'ready'
   );
+
+  const saveTowerProgress = () => {
+    if (currentProfileId === null) return;
+    const activeTowers = engineRef.current.towers;
+    const currentState = useGameStore.getState();
+    const currentProfile = currentState.profiles[currentProfileId];
+    if (!currentProfile) return;
+    
+    const updatedCreatures: any[] = [];
+    activeTowers.forEach((tower: any) => {
+      const pc = currentProfile.creatures.find((c) => c.id === tower.creatureId);
+      if (pc) {
+        updatedCreatures.push({
+          ...pc,
+          level: tower.level,
+          xp: tower.xp,
+          equippedAttacks: tower.equippedAttacks.map((a: any) => a.definitionId),
+        });
+      }
+    });
+
+    if (updatedCreatures.length > 0) {
+      updateCreatures(updatedCreatures);
+    }
+  };
 
   useEffect(() => {
     if (introState === 'ready') {
@@ -180,6 +206,7 @@ export default function TowerDefenseScreen({
         if (engineRef.current.lives <= 0 && !hasEndedRef.current) {
           hasEndedRef.current = true;
           setIsPlaying(false);
+          saveTowerProgress();
           if (onLose) onLose();
           else alert('Game Over!');
         }
@@ -208,6 +235,7 @@ export default function TowerDefenseScreen({
       if ((surviveWin || normalWin) && !hasEndedRef.current) {
         hasEndedRef.current = true;
         setIsPlaying(false);
+        saveTowerProgress();
         if (onWin) onWin();
       }
     }
