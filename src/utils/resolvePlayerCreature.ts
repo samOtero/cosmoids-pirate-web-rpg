@@ -21,12 +21,34 @@ const SPECIES_DEFS: Record<string, Creature> = {
 };
 
 /**
+ * Calculates max HP using the standard formula without IVs/EVs.
+ * HP = floor((2 * Base * Level) / 100) + Level + 10
+ */
+export function calculateMaxHp(baseHp: number, level: number): number {
+  return Math.floor((2 * baseHp * level) / 100) + level + 10;
+}
+
+/**
+ * Calculates a non-HP stat using the standard formula without IVs/EVs/Nature.
+ * Stat = floor((2 * Base * Level) / 100) + 5
+ */
+export function calculateStat(baseStat: number, level: number): number {
+  return Math.floor((2 * baseStat * level) / 100) + 5;
+}
+
+/**
  * Resolves a slim PlayerCreature into a full Creature by merging base species
  * stats with the instance's runtime fields (level, xp, moves from equippedAttacks).
  * Used when the battle system or UI components need the full Creature shape.
  */
 export function resolvePlayerCreature(pc: PlayerCreature): Creature {
   const baseDef = SPECIES_DEFS[pc.speciesId] ?? STARTER_CRAB;
+  
+  const maxHp = calculateMaxHp(baseDef.maxHp, pc.level);
+  const attack = calculateStat(baseDef.attack, pc.level);
+  const defense = calculateStat(baseDef.defense, pc.level);
+  const speed = calculateStat(baseDef.speed, pc.level);
+
   return {
     ...baseDef,
     id: pc.id,
@@ -34,7 +56,11 @@ export function resolvePlayerCreature(pc: PlayerCreature): Creature {
     level: pc.level,
     xp: pc.xp,
     moves: pc.equippedAttacks.length > 0 ? pc.equippedAttacks : baseDef.moves,
-    currentHp: baseDef.maxHp, // PlayerCreature doesn't track HP — default to full
+    maxHp,
+    attack,
+    defense,
+    speed,
+    currentHp: maxHp, // PlayerCreature doesn't track HP — default to full
     currentEnergy: baseDef.startingEnergy,
   };
 }
