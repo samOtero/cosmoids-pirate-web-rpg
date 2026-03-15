@@ -133,6 +133,7 @@ export interface PlayerCreature {
   level: number;
   xp: number;
   equippedAttacks: string[]; // Attack definition IDs
+  activeAttackIndex?: number; // The currently selected attack index
 }
 
 export interface IslandNode {

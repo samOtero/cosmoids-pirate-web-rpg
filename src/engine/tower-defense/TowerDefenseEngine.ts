@@ -137,6 +137,13 @@ export class TowerDefenseEngine {
   ) {
     this.roster = JSON.parse(JSON.stringify(initialRoster));
 
+    this.playerSelectedAttacks = {};
+    this.roster.forEach((c) => {
+      if (c.activeAttackIndex !== undefined) {
+        this.playerSelectedAttacks[c.id] = c.activeAttackIndex;
+      }
+    });
+
     const rawPaths: { x: number; y: number }[][] = levelData.paths || [];
     this.paths = rawPaths.map((path) => {
       if (path.length <= 1) return path;
@@ -931,6 +938,10 @@ export class TowerDefenseEngine {
 
   public setTowerAttack(creatureId: string, attackIndex: number) {
     this.playerSelectedAttacks[creatureId] = attackIndex;
+    const rosterCreature = this.roster.find((c) => c.id === creatureId);
+    if (rosterCreature) {
+      rosterCreature.activeAttackIndex = attackIndex;
+    }
     const tower = this.towers.find((t) => t.creature.id === creatureId);
     if (
       tower &&
