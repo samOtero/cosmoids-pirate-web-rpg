@@ -2,6 +2,7 @@ import {
   DialogConfig,
   BackgroundImageKey,
   SpeakerImageKey,
+  Screens,
 } from '@/types/baseGame';
 
 export const LEVEL_1_WIN: DialogConfig = {
@@ -71,4 +72,7 @@ export const LEVEL_1_WIN: DialogConfig = {
     },
   ],
   backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
+  next: {
+    screen: Screens.ISLAND_MAP,
+  },
 };
