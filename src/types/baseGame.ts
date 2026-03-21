@@ -156,6 +156,7 @@ export interface Profile {
   currentIslandId: number;
   islandNodeProgress: Record<number, number>; // IslandID -> MaxUnlockedNodeIndex
   gameFlags: GameFlagValue[]; // Persistent flags set by events (e.g. GameFlag.STARTER_PALMIT)
+  storyProgression: number;
   version?: number;
 }
 

@@ -429,6 +429,7 @@ export const useGameStore = create<GameState>()(
                 currentIslandId: 0,
                 islandNodeProgress: { 0: 0 },
                 gameFlags: [],
+                storyProgression: 0,
                 version: CURRENT_PROFILE_VERSION,
               };
               return {
@@ -489,6 +490,7 @@ export const useGameStore = create<GameState>()(
                   currentIslandId: 0,
                   islandNodeProgress: { 0: 0 },
                   gameFlags: [],
+                  storyProgression: 0,
                   version: CURRENT_PROFILE_VERSION,
                 };
                 return {
@@ -815,6 +817,7 @@ export const useGameStore = create<GameState>()(
                 currentIslandId: 0,
                 islandNodeProgress: { 0: 0 },
                 gameFlags: [],
+                storyProgression: 0,
                 version: CURRENT_PROFILE_VERSION,
               };
             }
