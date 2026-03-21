@@ -8,10 +8,10 @@ export const SENTICLE: Creature = {
   currentHp: 20,
   attack: 10,
   defense: 5,
-  speed: 20,
+  speed: 30,
   level: 15,
   xp: 0,
-  moves: ['T Tackle', 'Leer'], // Placeholder moves
+  moves: ['Tackle', 'Leer'], // Placeholder moves
   spriteUrl: '/eel-basic-normal-neutral-skin-1.png',
   battleSpriteUrl:
     '/battles/cosmoids/eel-basic-normal-neutral-skin-battle-ground-2.png',
