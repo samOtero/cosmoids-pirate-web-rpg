@@ -116,6 +116,7 @@ export class TowerDefenseEngine {
   public surviveUntil?: number;
   public elapsedTimeMs: number = 0;
   public enemyHpMultiplier: number = 1;
+  public disableCapture: boolean = false;
 
   public aspectRatio: number = 1;
 
@@ -169,6 +170,7 @@ export class TowerDefenseEngine {
     this.waves = levelData.waves || [];
     this.surviveUntil = levelData.surviveUntil;
     this.enemyHpMultiplier = levelData.enemyHpMultiplier ?? 1;
+    this.disableCapture = levelData.disableCapture ?? false;
 
     if (levelData.environmentUnits) {
       this.environmentUnits = levelData.environmentUnits.map(
