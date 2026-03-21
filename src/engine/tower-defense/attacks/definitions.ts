@@ -1,13 +1,17 @@
 import { ElementType } from '@/types/baseGame';
 import { AttackDefinition } from './types';
 
+const ATTACK_COOLDOWNS = {
+  NORMAL: 1000,
+};
+
 export const ATTACK_DEFS: Record<string, AttackDefinition> = {
   SCRATCH: {
     id: 'SCRATCH',
     name: 'Scratch',
     type: ElementType.NORMAL,
-    power: 10,
-    cooldownMs: 1500,
+    power: 40,
+    cooldownMs: ATTACK_COOLDOWNS.NORMAL,
     rangeIndex: 25,
     behaviorType: 'PROJECTILE',
     projectileSpeed: 1,
@@ -19,7 +23,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     name: 'Vine Whip',
     type: ElementType.GRASS,
     power: 45,
-    cooldownMs: 2500,
+    cooldownMs: ATTACK_COOLDOWNS.NORMAL,
     rangeIndex: 20,
     behaviorType: 'PROJECTILE',
     projectileSpeed: 1.5,
@@ -29,7 +33,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     name: 'Ember',
     type: ElementType.FIRE,
     power: 35,
-    cooldownMs: 2500,
+    cooldownMs: ATTACK_COOLDOWNS.NORMAL,
     rangeIndex: 25,
     behaviorType: 'PROJECTILE',
     projectileSpeed: 1.2,
@@ -40,7 +44,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     name: 'Bubble Beam',
     type: ElementType.WATER,
     power: 65,
-    cooldownMs: 3500,
+    cooldownMs: ATTACK_COOLDOWNS.NORMAL,
     rangeIndex: 30,
     behaviorType: 'PROJECTILE',
     projectileSpeed: 1.0,
@@ -50,7 +54,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     name: 'Tackle',
     type: ElementType.NORMAL,
     power: 30,
-    cooldownMs: 2000,
+    cooldownMs: ATTACK_COOLDOWNS.NORMAL,
     rangeIndex: 25,
     behaviorType: 'PROJECTILE',
     projectileSpeed: 1,
@@ -61,7 +65,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     name: 'String Shot',
     type: ElementType.GRASS,
     power: 10,
-    cooldownMs: 4000,
+    cooldownMs: ATTACK_COOLDOWNS.NORMAL,
     rangeIndex: 25,
     behaviorType: 'PROJECTILE',
     projectileSpeed: 0.8,
