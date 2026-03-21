@@ -211,7 +211,9 @@ export const useGameStore = create<GameState>()(
                     // This is consumed by TowerDefenseScreen actively when it is open.
                     // If the TD screen isn't open, we should probably ignore it or log a warning.
                     if (state.currentScreen !== Screens.TOWER_DEFENSE) {
-                      console.warn('Attempted to execute TD action while not in TD screen.');
+                      console.warn(
+                        'Attempted to execute TD action while not in TD screen.'
+                      );
                     } else {
                       // We don't advance the state here. We expect TowerDefenseScreen to process it.
                       shouldContinue = false;
@@ -256,7 +258,9 @@ export const useGameStore = create<GameState>()(
                           currentProfileId,
                           starterPlayerCreature
                         );
-                        state.setStoryProgression(StoryProgression.PICK_STARTER);
+                        state.setStoryProgression(
+                          StoryProgression.PICK_STARTER
+                        );
                       }
                     }
                     break;
@@ -281,7 +285,8 @@ export const useGameStore = create<GameState>()(
                     break;
                   }
                   case 'SET_STORY_PROGRESSION': {
-                    const payload = currentEvent.payload as SetStoryProgressionEventPayload;
+                    const payload =
+                      currentEvent.payload as SetStoryProgressionEventPayload;
                     state.setStoryProgression(payload.progression);
                     break;
                   }
@@ -515,23 +520,18 @@ export const useGameStore = create<GameState>()(
                 lastPlayed: Date.now(),
               };
 
-              const isNewPlayer =
-                ((profile.islandNodeProgress &&
-                  profile.islandNodeProgress[0]) ??
-                  0) === 0;
-
               let initialEvents: GameEvent[] = [];
 
-              if (isNewPlayer) {
-                if (profile.creatures.length === 0) {
-                  initialEvents = [...NEW_PLAYER_EVENTS];
-                } else {
-                  initialEvents = [...FIRST_BATTLE_AFTER_GETTING_STARTER];
-                }
-              } else {
-                initialEvents.push({
-                  type: 'GO_TO_MAP',
-                });
+              if (profile.storyProgression === StoryProgression.NEW_GAME) {
+                initialEvents = [...NEW_PLAYER_EVENTS];
+              } else if (
+                profile.storyProgression === StoryProgression.PICK_STARTER
+              ) {
+                initialEvents = [...FIRST_BATTLE_AFTER_GETTING_STARTER];
+              } else if (
+                profile.storyProgression >= StoryProgression.DEFEAT_FIRST_BATTLE
+              ) {
+                initialEvents = [{ type: 'GO_TO_ISLAND_MAP' }];
               }
 
               return {
@@ -727,7 +727,8 @@ export const useGameStore = create<GameState>()(
           set(
             (state) => {
               const profileId = state.currentProfileId;
-              if (profileId === null || !state.profiles[profileId]) return state;
+              if (profileId === null || !state.profiles[profileId])
+                return state;
               const profile = state.profiles[profileId]!;
               if (profile.storyProgression >= progression) return state; // Only advance
               const newProfiles = [...state.profiles];
