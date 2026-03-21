@@ -236,7 +236,8 @@ export default function IslandMapScreen({
                 </div>
 
                 {/* Tooltip */}
-                {(isHover || (isUnlocked && !isCompleted)) && (
+                {(isHover ||
+                  (node.id === currentNodeId && animatingTo === null)) && (
                   <div
                     className={`mt-2 bg-black/90 text-sand p-2 rounded text-center whitespace-nowrap z-10 pointer-events-none border border-wood/50`}
                   >
