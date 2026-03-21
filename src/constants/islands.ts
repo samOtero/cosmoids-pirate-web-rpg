@@ -1,4 +1,9 @@
-import { Island, BackgroundImageKey, BattleContext } from '@/types/baseGame';
+import {
+  Island,
+  BackgroundImageKey,
+  BattleContext,
+  StoryProgression,
+} from '@/types/baseGame';
 
 export const ISLANDS: Island[] = [
   {
@@ -35,6 +40,7 @@ export const ISLANDS: Island[] = [
         id: 1,
         name: 'Coconut Grove',
         description: 'A grove with fresh coconuts.',
+        requiresStoryProgression: StoryProgression.DEFEAT_FIRST_BATTLE,
         coordinates: {
           x: 39.6551724137931,
           y: 42.18390746134908,
@@ -52,6 +58,7 @@ export const ISLANDS: Island[] = [
         id: 2,
         name: 'Mysterious Cave',
         description: 'Dark and echoey.',
+        requiresStoryProgression: StoryProgression.DEFEAT_BUG_STAGE_1,
         coordinates: {
           x: 54.633620689655174,
           y: 53.10344769123414,
@@ -69,6 +76,7 @@ export const ISLANDS: Island[] = [
         id: 3,
         name: 'Node 3',
         description: 'New Node Description',
+        requiresStoryProgression: StoryProgression.DEFEAT_BUG_STAGE_2,
         coordinates: {
           x: 63.254310344827594,
           y: 37.58620631192379,

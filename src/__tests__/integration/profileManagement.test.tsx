@@ -49,7 +49,7 @@ describe('Profile Management Integration', () => {
         inventory: [],
         unlockedIslands: 2,
         currentIslandId: 1,
-        islandNodeProgress: { 0: 1 },
+        storyProgression: 0,
         gameFlags: [],
       };
 
@@ -79,7 +79,7 @@ describe('Profile Management Integration', () => {
         inventory: [],
         unlockedIslands: 3,
         currentIslandId: 2,
-        islandNodeProgress: { 0: 1 },
+        storyProgression: 0,
         gameFlags: [],
       };
 
@@ -113,7 +113,7 @@ describe('Profile Management Integration', () => {
         inventory: [],
         unlockedIslands: 0,
         currentIslandId: 0,
-        islandNodeProgress: { 0: 0 },
+        storyProgression: 0,
         gameFlags: [],
       };
 
@@ -147,7 +147,7 @@ describe('Profile Management Integration', () => {
         inventory: [],
         unlockedIslands: 0,
         currentIslandId: 0,
-        islandNodeProgress: { 0: 0 },
+        storyProgression: 0,
         gameFlags: [],
       };
 

@@ -42,35 +42,40 @@ export default function IslandMapScreen({
   onDialogAction,
   onUseItem,
 }: IslandMapScreenProps) {
-  const [hoverNode, setHoverNode] = useState<number | null>(null);
-  const [showInventory, setShowInventory] = useState(false);
-  const [animatingTo, setAnimatingTo] = useState<number | null>(null);
-  const [currentNodeId, setCurrentNodeId] = useState<number>(profile.islandNodeProgress[island.id] ?? 0);
-  const enqueueAndProcessEvents = useGameStore(
-    (state) => state.enqueueAndProcessEvents
-  );
-
-  // Nodes are stored in island.nodes
-  // Progress is stored in profile.islandNodeProgress[island.id]
-  const maxUnlockedNode = profile.islandNodeProgress[island.id] ?? 0;
   const flags = profile.gameFlags ?? [];
+  const isWorldMapUnlocked = profile.unlockedIslands > 0;
 
-  const isWorldMapUnlocked =
-    profile.islandNodeProgress[1] && profile.islandNodeProgress[1] > 0;
-
-  // Check if a node is accessible based on progress index + flag conditions
-  const isNodeUnlocked = (node: IslandNode, idx: number) => {
-    const withinProgress = idx <= maxUnlockedNode;
+  // Check if a node is accessible based on story progression + flag conditions
+  const isNodeUnlocked = (node: IslandNode) => {
+    const meetsStory =
+      node.requiresStoryProgression === undefined ||
+      profile.storyProgression >= node.requiresStoryProgression;
     const meetsRequirement =
       !node.requiresFlag || flags.includes(node.requiresFlag);
     const notBlocked =
       !node.blockedByFlag || !flags.includes(node.blockedByFlag);
-    return withinProgress && meetsRequirement && notBlocked;
+    return meetsStory && meetsRequirement && notBlocked;
   };
+
+  const maxUnlockedIndex =
+    island.nodes?.reduce(
+      (acc, node, idx) => (isNodeUnlocked(node) ? idx : acc),
+      0
+    ) ?? 0;
+  const initialNodeId = island.nodes?.[maxUnlockedIndex]?.id ?? 0;
+
+  const [hoverNode, setHoverNode] = useState<number | null>(null);
+  const [showInventory, setShowInventory] = useState(false);
+  const [animatingTo, setAnimatingTo] = useState<number | null>(null);
+  const [currentNodeId, setCurrentNodeId] = useState<number>(initialNodeId);
+
+  const enqueueAndProcessEvents = useGameStore(
+    (state) => state.enqueueAndProcessEvents
+  );
 
   const handleNodeClick = (node: IslandNode) => {
     if (animatingTo !== null) return; // Block double clicks
-    
+
     // Only animate if traveling to a DIFFERENT node
     if (currentNodeId !== node.id && island.nodes) {
       setAnimatingTo(node.id);
@@ -84,11 +89,19 @@ export default function IslandMapScreen({
     }
   };
 
-  const leadCreature = profile.creatures[0] ? resolvePlayerCreature(profile.creatures[0]) : null;
+  const leadCreature = profile.creatures[0]
+    ? resolvePlayerCreature(profile.creatures[0])
+    : null;
 
-  const currentConfig = island.nodes?.find((n) => n.id === currentNodeId) || island.nodes?.[0];
-  const targetConfig = animatingTo !== null ? island.nodes?.find((n) => n.id === animatingTo) : null;
-  const avatarPos = targetConfig ? targetConfig.coordinates : (currentConfig?.coordinates || {x:50, y:50});
+  const currentConfig =
+    island.nodes?.find((n) => n.id === currentNodeId) || island.nodes?.[0];
+  const targetConfig =
+    animatingTo !== null
+      ? island.nodes?.find((n) => n.id === animatingTo)
+      : null;
+  const avatarPos = targetConfig
+    ? targetConfig.coordinates
+    : currentConfig?.coordinates || { x: 50, y: 50 };
 
   // Resolve dialog if active
   const resolvedDialog = dialogContext
@@ -99,7 +112,9 @@ export default function IslandMapScreen({
 
   return (
     <>
-      <div className={`relative w-full h-full bg-[#2c3e50] overflow-hidden ${animatingTo !== null ? 'pointer-events-none' : ''}`}>
+      <div
+        className={`relative w-full h-full bg-[#2c3e50] overflow-hidden ${animatingTo !== null ? 'pointer-events-none' : ''}`}
+      >
         {/* Background Grid - slightly different color/style than world map */}
         {island.backgroundImageKey && (
           <div
@@ -161,7 +176,7 @@ export default function IslandMapScreen({
             {island.nodes?.map((node, idx) => {
               if (idx === 0) return null;
               const prev = island.nodes![idx - 1];
-              const isUnlocked = isNodeUnlocked(island.nodes![idx], idx);
+              const isUnlocked = isNodeUnlocked(island.nodes![idx]);
 
               // Only draw line if previous node exists
               if (!prev) return null;
@@ -182,12 +197,12 @@ export default function IslandMapScreen({
           </svg>
 
           {island.nodes?.map((node, idx) => {
-            const isUnlocked = isNodeUnlocked(node, idx);
-            const isNext = idx === maxUnlockedNode + 1; // The next node to unlock
+            const isUnlocked = isNodeUnlocked(node);
+            const isNext = idx === maxUnlockedIndex + 1; // The next node to unlock
             const isHover = hoverNode === node.id;
 
             // You can visually distinguish completed nodes vs current frontier node
-            const isCompleted = idx < maxUnlockedNode;
+            const isCompleted = idx < maxUnlockedIndex;
 
             return (
               <div

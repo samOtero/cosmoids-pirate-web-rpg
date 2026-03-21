@@ -46,14 +46,6 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
         },
       },
       {
-        type: 'ADVANCE_NODE',
-        autoProceed: true,
-        payload: {
-          islandId: 0,
-          nodeIndex: 1,
-        },
-      },
-      {
         type: 'GO_TO_ISLAND_MAP',
         autoProceed: true,
         payload: {
@@ -96,11 +88,10 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
     ],
     winEvents: [
       {
-        type: 'ADVANCE_NODE',
+        type: 'SET_STORY_PROGRESSION',
         autoProceed: true,
         payload: {
-          islandId: 0,
-          nodeIndex: 2,
+          progression: 3, // StoryProgression.DEFEAT_BUG_STAGE_1
         },
       },
       {
@@ -125,11 +116,10 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
     turnEvents: {},
     winEvents: [
       {
-        type: 'ADVANCE_NODE',
+        type: 'SET_STORY_PROGRESSION',
         autoProceed: true,
         payload: {
-          islandId: 0,
-          nodeIndex: 3,
+          progression: 4, // StoryProgression.DEFEAT_BUG_STAGE_2
         },
       },
       {

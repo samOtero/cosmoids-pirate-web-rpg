@@ -25,7 +25,6 @@ import {
   SetStoryProgressionEventPayload,
   StoryProgression,
   UnlockIslandEventPayload,
-  AdvanceNodeEventPayload,
   GameFlag,
   GainItemEventPayload,
   ReorderCreaturesEventPayload,
@@ -68,7 +67,6 @@ interface GameState {
   setGameFlag: (flag: GameFlagValue) => void;
   removeGameFlag: (flag: GameFlagValue) => void;
   unlockIsland: (islandId: number) => void;
-  advanceNode: (islandId: number, nodeIndex: number) => void;
   // Battle Config
   currentBattle: BattleConfig | null;
   handleBattleWin: () => void;
@@ -307,12 +305,6 @@ export const useGameStore = create<GameState>()(
                     state.unlockIsland(payload.islandId);
                     break;
                   }
-                  case 'ADVANCE_NODE': {
-                    const payload =
-                      currentEvent.payload as AdvanceNodeEventPayload;
-                    state.advanceNode(payload.islandId, payload.nodeIndex);
-                    break;
-                  }
                   case 'GAIN_ITEM': {
                     const payload =
                       currentEvent.payload as GainItemEventPayload;
@@ -441,7 +433,6 @@ export const useGameStore = create<GameState>()(
                 inventory: [],
                 unlockedIslands: 0,
                 currentIslandId: 0,
-                islandNodeProgress: { 0: 0 },
                 gameFlags: [],
                 storyProgression: 0,
                 version: CURRENT_PROFILE_VERSION,
@@ -502,7 +493,6 @@ export const useGameStore = create<GameState>()(
                   inventory: [],
                   unlockedIslands: 0,
                   currentIslandId: 0,
-                  islandNodeProgress: { 0: 0 },
                   gameFlags: [],
                   storyProgression: 0,
                   version: CURRENT_PROFILE_VERSION,
@@ -797,28 +787,6 @@ export const useGameStore = create<GameState>()(
             false,
             'unlockIsland'
           ),
-        advanceNode: (islandId: number, nodeIndex: number) =>
-          set(
-            (state) => {
-              const profileId = state.currentProfileId;
-              if (profileId === null || !state.profiles[profileId])
-                return state;
-              const profile = state.profiles[profileId]!;
-              const currentProgress = profile.islandNodeProgress[islandId] ?? 0;
-              if (nodeIndex <= currentProgress) return state;
-              const newProfiles = [...state.profiles];
-              newProfiles[profileId] = {
-                ...profile,
-                islandNodeProgress: {
-                  ...profile.islandNodeProgress,
-                  [islandId]: nodeIndex,
-                },
-              };
-              return { profiles: newProfiles };
-            },
-            false,
-            'advanceNode'
-          ),
       }),
       {
         name: 'cosmoids-game-state',
@@ -842,7 +810,6 @@ export const useGameStore = create<GameState>()(
                 inventory: [],
                 unlockedIslands: 0,
                 currentIslandId: 0,
-                islandNodeProgress: { 0: 0 },
                 gameFlags: [],
                 storyProgression: 0,
                 version: CURRENT_PROFILE_VERSION,

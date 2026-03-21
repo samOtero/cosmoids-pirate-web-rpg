@@ -69,6 +69,8 @@ export const StoryProgression = {
   NEW_GAME: 0,
   PICK_STARTER: 1,
   DEFEAT_FIRST_BATTLE: 2,
+  DEFEAT_BUG_STAGE_1: 3,
+  DEFEAT_BUG_STAGE_2: 4,
 } as const;
 
 export type StoryProgressionValue =
@@ -154,6 +156,7 @@ export interface IslandNode {
   events: GameEvent[];
   requiresFlag?: GameFlagValue; // Node only accessible if this flag is SET
   blockedByFlag?: GameFlagValue; // Node inaccessible while this flag is SET
+  requiresStoryProgression?: number; // Requires specific story progression to unlock
 }
 
 export interface Profile {
@@ -164,7 +167,6 @@ export interface Profile {
   inventory: Item[];
   unlockedIslands: number; // Max island index unlocked
   currentIslandId: number;
-  islandNodeProgress: Record<number, number>; // IslandID -> MaxUnlockedNodeIndex
   gameFlags: GameFlagValue[]; // Persistent flags set by events (e.g. GameFlag.STARTER_PALMIT)
   storyProgression: number;
   version?: number;
@@ -282,7 +284,6 @@ export type GameEventType =
   | 'SET_FLAG'
   | 'REMOVE_FLAG'
   | 'UNLOCK_ISLAND'
-  | 'ADVANCE_NODE'
   | 'GAIN_ITEM'
   | 'GO_TO_PARTY'
   | 'REORDER_CREATURES'
@@ -303,7 +304,6 @@ export interface GameEvent {
     | SetFlagEventPayload
     | RemoveFlagEventPayload
     | UnlockIslandEventPayload
-    | AdvanceNodeEventPayload
     | GainItemEventPayload
     | ReorderCreaturesEventPayload
     | ExecuteTDActionEventPayload
@@ -402,10 +402,7 @@ export interface UnlockIslandEventPayload {
   islandId: number;
 }
 
-export interface AdvanceNodeEventPayload {
-  islandId: number;
-  nodeIndex: number;
-}
+
 
 export interface GainItemEventPayload {
   itemId: string;
