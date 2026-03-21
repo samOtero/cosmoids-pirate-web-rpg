@@ -44,6 +44,8 @@ export default function IslandMapScreen({
 }: IslandMapScreenProps) {
   const [hoverNode, setHoverNode] = useState<number | null>(null);
   const [showInventory, setShowInventory] = useState(false);
+  const [animatingTo, setAnimatingTo] = useState<number | null>(null);
+  const [currentNodeId, setCurrentNodeId] = useState<number>(profile.islandNodeProgress[island.id] ?? 0);
   const enqueueAndProcessEvents = useGameStore(
     (state) => state.enqueueAndProcessEvents
   );
@@ -66,6 +68,28 @@ export default function IslandMapScreen({
     return withinProgress && meetsRequirement && notBlocked;
   };
 
+  const handleNodeClick = (node: IslandNode) => {
+    if (animatingTo !== null) return; // Block double clicks
+    
+    // Only animate if traveling to a DIFFERENT node
+    if (currentNodeId !== node.id && island.nodes) {
+      setAnimatingTo(node.id);
+      setTimeout(() => {
+        setCurrentNodeId(node.id);
+        onNodeClick(node.id);
+        setAnimatingTo(null);
+      }, 600);
+    } else {
+      onNodeClick(node.id);
+    }
+  };
+
+  const leadCreature = profile.creatures[0] ? resolvePlayerCreature(profile.creatures[0]) : null;
+
+  const currentConfig = island.nodes?.find((n) => n.id === currentNodeId) || island.nodes?.[0];
+  const targetConfig = animatingTo !== null ? island.nodes?.find((n) => n.id === animatingTo) : null;
+  const avatarPos = targetConfig ? targetConfig.coordinates : (currentConfig?.coordinates || {x:50, y:50});
+
   // Resolve dialog if active
   const resolvedDialog = dialogContext
     ? resolveDialog(dialogContext, dialogContextData || null)
@@ -75,7 +99,7 @@ export default function IslandMapScreen({
 
   return (
     <>
-      <div className="relative w-full h-full bg-[#2c3e50] overflow-hidden">
+      <div className={`relative w-full h-full bg-[#2c3e50] overflow-hidden ${animatingTo !== null ? 'pointer-events-none' : ''}`}>
         {/* Background Grid - slightly different color/style than world map */}
         {island.backgroundImageKey && (
           <div
@@ -175,7 +199,7 @@ export default function IslandMapScreen({
                 }}
                 onMouseEnter={() => setHoverNode(node.id)}
                 onMouseLeave={() => setHoverNode(null)}
-                onClick={() => isUnlocked && onNodeClick(node.id)}
+                onClick={() => isUnlocked && handleNodeClick(node)}
               >
                 {/* Node Icon */}
                 <div
@@ -218,6 +242,24 @@ export default function IslandMapScreen({
               </div>
             );
           })}
+
+          {/* Dynamic Player Avatar */}
+          {leadCreature && (
+            <div
+              className={`absolute transform -translate-x-1/2 -translate-y-[80%] z-30 pointer-events-none transition-all duration-600 ease-in-out`}
+              style={{
+                left: `${avatarPos.x}%`,
+                top: `${avatarPos.y}%`,
+              }}
+            >
+              <img
+                src={leadCreature.spriteUrl}
+                className={`w-16 h-16 object-contain drop-shadow-xl ${animatingTo === null ? 'animate-bounce' : ''}`}
+                alt="Player Avatar"
+              />
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-3 bg-black/30 rounded-full blur-[2px] -z-10"></div>
+            </div>
+          )}
         </div>
       </div>
 

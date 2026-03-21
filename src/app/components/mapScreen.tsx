@@ -23,14 +23,32 @@ export default function MapScreen({
 }: MapScreenProps) {
   const [hoverIsland, setHoverIsland] = useState<number | null>(null);
   const [showInventory, setShowInventory] = useState(false);
+  const [animatingTo, setAnimatingTo] = useState<number | null>(null);
   const enqueueAndProcessEvents = useGameStore(
     (state) => state.enqueueAndProcessEvents
   );
   const potionCount =
     profile.inventory.find((i) => i.id === 'potion')?.count || 0;
 
+  const handleTravelClick = (islandId: number, isUnlocked: boolean, isCurrent: boolean) => {
+    if (animatingTo !== null) return; // Block while animating
+    if (isCurrent) {
+      onEnterIsland(islandId);
+    } else if (isUnlocked) {
+      setAnimatingTo(islandId);
+      setTimeout(() => {
+        onTravel(islandId);
+        setAnimatingTo(null);
+      }, 600); // Wait for CSS transition to finish
+    }
+  };
+
+  const currentIslandConfig = ISLANDS.find((i) => i.id === profile.currentIslandId) || ISLANDS[0];
+  const targetIslandConfig = animatingTo !== null ? ISLANDS.find((i) => i.id === animatingTo) : null;
+  const shipPos = targetIslandConfig ? targetIslandConfig.coordinates : currentIslandConfig.coordinates;
+
   return (
-    <div className="relative w-full h-full bg-ocean overflow-hidden">
+    <div className={`relative w-full h-full bg-ocean overflow-hidden ${animatingTo !== null ? 'pointer-events-none' : ''}`}>
       {/* Background Grid */}
       <div
         className="absolute inset-0 opacity-10"
@@ -145,13 +163,7 @@ export default function MapScreen({
               }}
               onMouseEnter={() => setHoverIsland(island.id)}
               onMouseLeave={() => setHoverIsland(null)}
-              onClick={() => {
-                if (isCurrent) {
-                  onEnterIsland(island.id);
-                } else if (isUnlocked) {
-                  onTravel(island.id);
-                }
-              }}
+              onClick={() => handleTravelClick(island.id, isUnlocked, isCurrent)}
             >
               {/* Island Node */}
               <div
@@ -165,14 +177,9 @@ export default function MapScreen({
                    }
                 `}
               >
-                {/* Boat Icon if current */}
-                {isCurrent && (
-                  <span className="text-2xl animate-bounce">⛵</span>
-                )}
-                {!isCurrent && isUnlocked && (
-                  <span className="text-xl">🏝️</span>
-                )}
+                {/* Boat Icon is moved to a separate layer */}
                 {!isUnlocked && <span className="text-xl opacity-50">🔒</span>}
+                {isUnlocked && <span className="text-xl">🏝️</span>}
               </div>
 
               {/* Tooltip */}
@@ -201,6 +208,17 @@ export default function MapScreen({
             </div>
           );
         })}
+
+        {/* Dynamic Ship Avatar */}
+        <div
+          className="absolute transform -translate-x-1/2 -translate-y-[80%] z-20 pointer-events-none transition-all duration-600 ease-in-out"
+          style={{
+            left: `${shipPos.x}%`,
+            top: `${shipPos.y}%`,
+          }}
+        >
+          <span className={`text-4xl drop-shadow-md ${animatingTo === null ? 'animate-bounce' : ''}`}>⛵</span>
+        </div>
       </div>
 
       {showInventory && (
