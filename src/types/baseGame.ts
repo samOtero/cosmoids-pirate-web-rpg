@@ -68,6 +68,7 @@ export type GameFlagValue = (typeof GameFlag)[keyof typeof GameFlag];
 export const StoryProgression = {
   NEW_GAME: 0,
   PICK_STARTER: 1,
+  DEFEAT_FIRST_BATTLE: 2,
 } as const;
 
 export type StoryProgressionValue =

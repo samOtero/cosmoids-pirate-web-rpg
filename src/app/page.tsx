@@ -9,6 +9,7 @@ import {
   BattleContext,
   BackgroundImageKey,
   Creature,
+  StoryProgression,
 } from '@/types/baseGame';
 import {
   resolvePlayerCreature,
@@ -206,6 +207,11 @@ export default function Home() {
           onClose={() => enqueueAndProcessEvents([{ type: 'GO_TO_MAP' }])}
           onWin={() =>
             enqueueAndProcessEvents([
+              {
+                type: 'SET_STORY_PROGRESSION',
+                payload: { progression: StoryProgression.DEFEAT_FIRST_BATTLE },
+                autoProceed: true,
+              },
               {
                 type: 'SHOW_DIALOG',
                 payload: { context: DialogContext.LEVEL_1_WIN },
