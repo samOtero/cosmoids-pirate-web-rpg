@@ -22,6 +22,8 @@ import {
   ShowIslandMapDialogEventPayload,
   SetFlagEventPayload,
   RemoveFlagEventPayload,
+  SetStoryProgressionEventPayload,
+  StoryProgression,
   UnlockIslandEventPayload,
   AdvanceNodeEventPayload,
   GameFlag,
@@ -62,6 +64,7 @@ interface GameState {
   useItem: (itemId: string, targetCreatureId?: string) => boolean | void;
 
   // Progression
+  setStoryProgression: (progression: number) => void;
   setGameFlag: (flag: GameFlagValue) => void;
   removeGameFlag: (flag: GameFlagValue) => void;
   unlockIsland: (islandId: number) => void;
@@ -253,6 +256,7 @@ export const useGameStore = create<GameState>()(
                           currentProfileId,
                           starterPlayerCreature
                         );
+                        state.setStoryProgression(StoryProgression.PICK_STARTER);
                       }
                     }
                     break;
@@ -274,6 +278,11 @@ export const useGameStore = create<GameState>()(
                       payload.profileId,
                       playerCreature
                     );
+                    break;
+                  }
+                  case 'SET_STORY_PROGRESSION': {
+                    const payload = currentEvent.payload as SetStoryProgressionEventPayload;
+                    state.setStoryProgression(payload.progression);
                     break;
                   }
                   case 'SET_FLAG': {
@@ -714,6 +723,23 @@ export const useGameStore = create<GameState>()(
           );
           return catchSuccess;
         },
+        setStoryProgression: (progression: number) =>
+          set(
+            (state) => {
+              const profileId = state.currentProfileId;
+              if (profileId === null || !state.profiles[profileId]) return state;
+              const profile = state.profiles[profileId]!;
+              if (profile.storyProgression >= progression) return state; // Only advance
+              const newProfiles = [...state.profiles];
+              newProfiles[profileId] = {
+                ...profile,
+                storyProgression: progression,
+              };
+              return { profiles: newProfiles };
+            },
+            false,
+            'setStoryProgression'
+          ),
         setGameFlag: (flag: GameFlagValue) =>
           set(
             (state) => {

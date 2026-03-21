@@ -64,6 +64,15 @@ export const GameFlag = {
 
 export type GameFlagValue = (typeof GameFlag)[keyof typeof GameFlag];
 
+/** Linear story progression milestones. */
+export const StoryProgression = {
+  NEW_GAME: 0,
+  PICK_STARTER: 1,
+} as const;
+
+export type StoryProgressionValue =
+  (typeof StoryProgression)[keyof typeof StoryProgression];
+
 export interface VFXAnimationConfig {
   type: 'WIPE_LINEAR' | 'FADE' | 'SCALE' | 'CUSTOM';
   maskRotation?: number; // e.g. Math.PI / 4
@@ -277,7 +286,8 @@ export type GameEventType =
   | 'GO_TO_PARTY'
   | 'REORDER_CREATURES'
   | 'GO_TO_TOWER_DEFENSE'
-  | 'EXECUTE_TD_ACTION';
+  | 'EXECUTE_TD_ACTION'
+  | 'SET_STORY_PROGRESSION';
 
 export interface GameEvent {
   type: GameEventType;
@@ -295,7 +305,8 @@ export interface GameEvent {
     | AdvanceNodeEventPayload
     | GainItemEventPayload
     | ReorderCreaturesEventPayload
-    | ExecuteTDActionEventPayload;
+    | ExecuteTDActionEventPayload
+    | SetStoryProgressionEventPayload;
   autoProceed?: boolean;
 }
 
@@ -403,4 +414,8 @@ export interface GainItemEventPayload {
 export interface ReorderCreaturesEventPayload {
   startIndex: number;
   endIndex: number;
+}
+
+export interface SetStoryProgressionEventPayload {
+  progression: StoryProgressionValue;
 }
