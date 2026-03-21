@@ -81,7 +81,6 @@ export default function IslandMapScreen({
       setAnimatingTo(node.id);
       setTimeout(() => {
         setCurrentNodeId(node.id);
-        onNodeClick(node.id);
         setAnimatingTo(null);
       }, 600);
     } else {

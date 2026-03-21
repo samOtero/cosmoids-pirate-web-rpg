@@ -169,6 +169,7 @@ export interface Profile {
   currentIslandId: number;
   gameFlags: GameFlagValue[]; // Persistent flags set by events (e.g. GameFlag.STARTER_PALMIT)
   storyProgression: number;
+  islandPositions: Record<number, number>; // islandId -> nodeId
   version?: number;
 }
 

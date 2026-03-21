@@ -67,6 +67,7 @@ interface GameState {
   setGameFlag: (flag: GameFlagValue) => void;
   removeGameFlag: (flag: GameFlagValue) => void;
   unlockIsland: (islandId: number) => void;
+  setIslandPosition: (islandId: number, nodeId: number) => void;
   // Battle Config
   currentBattle: BattleConfig | null;
   handleBattleWin: () => void;
@@ -434,6 +435,7 @@ export const useGameStore = create<GameState>()(
                 unlockedIslands: 0,
                 currentIslandId: 0,
                 gameFlags: [],
+                islandPositions: { 0: 0 },
                 storyProgression: 0,
                 version: CURRENT_PROFILE_VERSION,
               };
@@ -494,6 +496,7 @@ export const useGameStore = create<GameState>()(
                   unlockedIslands: 0,
                   currentIslandId: 0,
                   gameFlags: [],
+                  islandPositions: { 0: 0 },
                   storyProgression: 0,
                   version: CURRENT_PROFILE_VERSION,
                 };
@@ -787,6 +790,25 @@ export const useGameStore = create<GameState>()(
             false,
             'unlockIsland'
           ),
+        setIslandPosition: (islandId: number, nodeId: number) =>
+          set(
+            (state) => {
+              const profileId = state.currentProfileId;
+              if (profileId === null || !state.profiles[profileId]) return state;
+              const profile = state.profiles[profileId]!;
+              const newProfiles = [...state.profiles];
+              newProfiles[profileId] = {
+                ...profile,
+                islandPositions: {
+                  ...profile.islandPositions,
+                  [islandId]: nodeId,
+                },
+              };
+              return { profiles: newProfiles };
+            },
+            false,
+            'setIslandPosition'
+          ),
       }),
       {
         name: 'cosmoids-game-state',
@@ -811,6 +833,7 @@ export const useGameStore = create<GameState>()(
                 unlockedIslands: 0,
                 currentIslandId: 0,
                 gameFlags: [],
+                islandPositions: { 0: 0 },
                 storyProgression: 0,
                 version: CURRENT_PROFILE_VERSION,
               };
