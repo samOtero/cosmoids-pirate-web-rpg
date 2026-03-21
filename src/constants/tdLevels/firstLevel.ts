@@ -194,6 +194,7 @@ export const FIRST_LEVEL: TDLevelData = {
       tdConfigId: 'note_1',
     },
   ],
+  enemyHpMultiplier: 2,
   waves: [
     {
       id: 'wave_1771807082096',

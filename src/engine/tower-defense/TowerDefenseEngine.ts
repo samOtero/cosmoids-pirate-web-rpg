@@ -98,8 +98,6 @@ export class TowerDefenseEngine {
     return defaultAttacks;
   }
 
-
-
   public events = new TDEventBus();
   private progression = new TDProgressionManager(this, this.events);
 
@@ -117,6 +115,7 @@ export class TowerDefenseEngine {
 
   public surviveUntil?: number;
   public elapsedTimeMs: number = 0;
+  public enemyHpMultiplier: number = 1;
 
   public aspectRatio: number = 1;
 
@@ -169,6 +168,7 @@ export class TowerDefenseEngine {
     this.placementSpots = levelData.placementSpots || [];
     this.waves = levelData.waves || [];
     this.surviveUntil = levelData.surviveUntil;
+    this.enemyHpMultiplier = levelData.enemyHpMultiplier ?? 1;
 
     if (levelData.environmentUnits) {
       this.environmentUnits = levelData.environmentUnits.map(
@@ -246,12 +246,13 @@ export class TowerDefenseEngine {
             ? Math.floor(Math.random() * this.paths.length)
             : 0;
         const startPath = this.paths[pathIndex] || [{ x: 0, y: 0 }];
+        const newEnemyHp = randomEnemyDef.maxHp * this.enemyHpMultiplier;
         newEnemies.push({
           id: `enemy_${time}`,
           definitionId: randomEnemyDef.id,
           position: { x: startPath[0].x, y: startPath[0].y },
-          hp: randomEnemyDef.maxHp,
-          maxHp: randomEnemyDef.maxHp,
+          hp: newEnemyHp,
+          maxHp: newEnemyHp,
           speed: randomEnemyDef.speed / 100,
           currentAttack: randomEnemyDef.attack,
           statusConditions: [],
@@ -534,7 +535,8 @@ export class TowerDefenseEngine {
         tower.damageFlashTimerMs -= deltaMs;
         if (tower.damageFlashTimerMs < 0) tower.damageFlashTimerMs = 0;
       }
-      const attackInstance = tower.equippedAttacksRuntime[tower.selectedAttackIndex];
+      const attackInstance =
+        tower.equippedAttacksRuntime[tower.selectedAttackIndex];
       if (!attackInstance) return;
 
       const attackDef = ATTACK_DEFS[attackInstance.definitionId];
@@ -833,8 +835,8 @@ export class TowerDefenseEngine {
       id: `enemy_${time}_${Math.random().toString(36).substring(7)}`,
       definitionId: definitionId,
       position: { x: startPath[0].x, y: startPath[0].y },
-      hp: meta.baseCreature.maxHp,
-      maxHp: meta.baseCreature.maxHp,
+      hp: meta.baseCreature.maxHp * this.enemyHpMultiplier,
+      maxHp: meta.baseCreature.maxHp * this.enemyHpMultiplier,
       speed: meta.baseCreature.speed / 100,
       currentAttack: meta.baseCreature.attack,
       statusConditions: [],
@@ -869,7 +871,9 @@ export class TowerDefenseEngine {
     const creature = this.roster.find((c) => c.id === creatureId);
     if (!creature) return false;
 
-    const existingTower = this.towers.find((t) => t.creature.id === creature.id);
+    const existingTower = this.towers.find(
+      (t) => t.creature.id === creature.id
+    );
     const targetTower = this.towers.find(
       (t) => t.position.x === x && t.position.y === y
     );
@@ -935,7 +939,6 @@ export class TowerDefenseEngine {
     return true;
   }
 
-
   public setTowerAttack(creatureId: string, attackIndex: number) {
     this.playerSelectedAttacks[creatureId] = attackIndex;
     const rosterCreature = this.roster.find((c) => c.id === creatureId);
@@ -959,7 +962,10 @@ export class TowerDefenseEngine {
   ) {
     const tower = this.towers.find((t) => t.id === towerId);
     if (!tower) return;
-    if (replaceIndex >= 0 && replaceIndex < tower.creature.equippedAttacks.length) {
+    if (
+      replaceIndex >= 0 &&
+      replaceIndex < tower.creature.equippedAttacks.length
+    ) {
       tower.creature.equippedAttacks[replaceIndex] = newAttackDefId;
       tower.equippedAttacksRuntime[replaceIndex] = {
         definitionId: newAttackDefId,

@@ -84,6 +84,7 @@ export interface TDLevelData {
   waves?: TDWave[]; // Optional for backwards compatibility
   surviveUntil?: number; // Win after surviving for this many seconds
   lives?: number; // Default is 3 if not provided, or overridden by captureUnits length
+  enemyHpMultiplier?: number; // Defaults to 1 if not provided
   environmentUnits?: {
     tdConfigId: string;
     position: Point;
