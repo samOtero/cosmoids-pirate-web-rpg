@@ -3,6 +3,7 @@ import {
   BackgroundImageKey,
   BattleContext,
   StoryProgression,
+  TDLevelContext,
 } from '@/types/baseGame';
 
 export const ISLANDS: Island[] = [
@@ -29,9 +30,9 @@ export const ISLANDS: Island[] = [
         },
         events: [
           {
-            type: 'START_BATTLE',
+            type: 'GO_TO_TOWER_DEFENSE',
             payload: {
-              context: 'FIRST_BATTLE',
+              context: TDLevelContext.FIRST_LEVEL,
             },
           },
         ],
