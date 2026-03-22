@@ -9,6 +9,8 @@ import {
   BUG_STAGE_1,
 } from '@/constants/creatures';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
+import { TD_LEVELS } from '@/constants/tdLevels';
+import { TDLevelContext } from '@/types/baseGame';
 
 const DialogEditor = lazy(() => import('./DialogEditor'));
 const AnimationEditor = lazy(() => import('./AnimationEditor'));
@@ -182,7 +184,12 @@ export default function DevTools() {
               <button
                 onClick={() => {
                   enqueueAndProcessEvents([
-                    { type: 'GO_TO_TOWER_DEFENSE' },
+                    {
+                      type: 'GO_TO_TOWER_DEFENSE',
+                      payload: {
+                        context: TDLevelContext.FIRST_LEVEL,
+                      },
+                    },
                     {
                       type: 'EXECUTE_TD_ACTION',
                       payload: {
@@ -250,6 +257,7 @@ export default function DevTools() {
           )}
           {activeTool === 'TOWER_DEFENSE' && (
             <TowerDefenseScreen
+              levelData={TD_LEVELS[TDLevelContext.FIRST_LEVEL].levelData}
               onClose={() => setActiveTool(null)}
               onWin={() => alert('You win!')}
               onLose={() => alert('You lose!?')}

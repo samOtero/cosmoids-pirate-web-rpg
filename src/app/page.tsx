@@ -53,6 +53,7 @@ export default function Home() {
     useItem,
     updateCreatures,
     reorderCreatures,
+    currentTdLevel,
   } = useGameStore();
 
   // Also handle "WAIT" events or similar if implemented in the store processor,
@@ -197,28 +198,17 @@ export default function Home() {
   }
 
   if (currentScreen === Screens.TOWER_DEFENSE) {
-    if (!currentProfile) {
+    if (!currentProfile || !currentTdLevel) {
       return null;
     }
 
     return (
       <Suspense fallback={<div>Loading Tower Defense...</div>}>
         <TowerDefenseScreen
+          levelData={currentTdLevel.levelData}
           onClose={() => enqueueAndProcessEvents([{ type: 'GO_TO_MAP' }])}
-          onWin={() =>
-            enqueueAndProcessEvents([
-              {
-                type: 'SET_STORY_PROGRESSION',
-                payload: { progression: StoryProgression.DEFEAT_FIRST_BATTLE },
-                autoProceed: true,
-              },
-              {
-                type: 'SHOW_DIALOG',
-                payload: { context: DialogContext.LEVEL_1_WIN },
-              },
-            ])
-          }
-          onLose={() => enqueueAndProcessEvents([{ type: 'GO_TO_MAP' }])}
+          onWin={() => enqueueAndProcessEvents(currentTdLevel.winEvents)}
+          onLose={() => enqueueAndProcessEvents(currentTdLevel.loseEvents)}
         />
       </Suspense>
     );

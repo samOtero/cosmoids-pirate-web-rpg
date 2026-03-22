@@ -10,6 +10,16 @@ export enum Screens {
   TOWER_DEFENSE = 'TOWER_DEFENSE',
 }
 
+export enum TDLevelContext {
+  FIRST_LEVEL = 'FIRST_LEVEL',
+}
+
+export interface TDLevelConfig {
+  levelData: TDLevelData;
+  winEvents: GameEvent[];
+  loseEvents: GameEvent[];
+}
+
 export enum ElementType {
   WATER = 'Water',
   FIRE = 'Fire',
@@ -308,11 +318,12 @@ export interface GameEvent {
     | GainItemEventPayload
     | ReorderCreaturesEventPayload
     | ExecuteTDActionEventPayload
-    | SetStoryProgressionEventPayload;
+    | SetStoryProgressionEventPayload
+    | GoToTowerDefenseEventPayload;
   autoProceed?: boolean;
 }
 
-import { TDAction } from '@/engine/tower-defense/types';
+import { TDAction, TDLevelData } from '@/engine/tower-defense/types';
 
 export interface ExecuteTDActionEventPayload {
   action: TDAction;
@@ -391,6 +402,10 @@ export interface GoToIslandMapEventPayload {
   islandId: number;
 }
 
+export interface GoToTowerDefenseEventPayload {
+  context: TDLevelContext;
+}
+
 export interface SetFlagEventPayload {
   flag: GameFlagValue;
 }
@@ -402,8 +417,6 @@ export interface RemoveFlagEventPayload {
 export interface UnlockIslandEventPayload {
   islandId: number;
 }
-
-
 
 export interface GainItemEventPayload {
   itemId: string;

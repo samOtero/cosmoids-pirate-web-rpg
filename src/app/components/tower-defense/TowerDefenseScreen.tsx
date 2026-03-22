@@ -7,18 +7,14 @@ import {
   TD_CREATURE_DEFS,
 } from '@/engine/tower-defense/TowerDefenseEngine';
 import PixiBattlefield from './PixiBattlefield';
-import { FIRST_LEVEL } from '@/constants/tdLevels';
 import { ActiveAttackMenu } from './ActiveAttackMenu';
 import { TowerButton } from './TowerButton';
-import {
-  resolvePlayerCreature,
-  resolvePlayerCreatures,
-} from '@/utils/resolvePlayerCreature';
 import {
   ExecuteTDActionEventPayload,
   StoryProgression,
 } from '@/types/baseGame';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import { TDLevelData } from '@/engine/tower-defense/types';
 
 /** Resolve display info (name, spriteUrl) for a creature from its species definition. */
 function resolveSpeciesVisuals(speciesId: string): {
@@ -33,10 +29,12 @@ function resolveSpeciesVisuals(speciesId: string): {
 }
 
 export default function TowerDefenseScreen({
+  levelData,
   onClose,
   onWin,
   onLose,
 }: {
+  levelData: TDLevelData;
   onClose: () => void;
   onWin?: () => void;
   onLose?: () => void;
@@ -57,7 +55,7 @@ export default function TowerDefenseScreen({
 
   const engineRef = useRef<TowerDefenseEngine>(null!);
   if (!engineRef.current) {
-    engineRef.current = new TowerDefenseEngine(FIRST_LEVEL, playerCreatures);
+    engineRef.current = new TowerDefenseEngine(levelData, playerCreatures);
   }
 
   const [uiLives, setUiLives] = useState(engineRef.current.lives);

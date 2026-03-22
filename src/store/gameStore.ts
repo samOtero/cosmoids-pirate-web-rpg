@@ -12,6 +12,8 @@ import {
   BattleContext,
   AddCreatureToProfileEventPayload,
   GameFlagValue,
+  TDLevelConfig,
+  TDLevelContext,
 } from '@/types/baseGame';
 import { MAX_PROFILES, CURRENT_PROFILE_VERSION } from '@/constants/game';
 import { ITEMS } from '@/constants/items';
@@ -29,8 +31,10 @@ import {
   GainItemEventPayload,
   ReorderCreaturesEventPayload,
   ExecuteTDActionEventPayload,
+  GoToTowerDefenseEventPayload,
 } from '@/types/baseGame';
 import { BATTLES } from '@/constants/battles';
+import { TD_LEVELS } from '@/constants/tdLevels';
 import {
   NEW_PLAYER_EVENTS,
   FIRST_BATTLE_AFTER_GETTING_STARTER,
@@ -79,6 +83,9 @@ interface GameState {
   ) => void;
   setCurrentEnemy: (enemy: Creature) => void;
   clearCurrentEnemy: () => void;
+  // TD Config
+  currentTdLevel: TDLevelConfig | null;
+  setTdLevel: (config: TDLevelConfig | null) => void;
   // Event Queue
   eventQueue: GameEvent[];
   enqueueEvent: (event: GameEvent) => void;
@@ -100,6 +107,7 @@ export const useGameStore = create<GameState>()(
         currentProfileId: null,
         currentEnemy: null,
         currentBattle: null,
+        currentTdLevel: null,
         setScreen: (screen, context = undefined, contextData = undefined) =>
           set(
             {
@@ -203,6 +211,16 @@ export const useGameStore = create<GameState>()(
                     break;
                   }
                   case 'GO_TO_TOWER_DEFENSE': {
+                    const payload =
+                      currentEvent.payload as GoToTowerDefenseEventPayload;
+                    if (payload && payload.context) {
+                      const tdConfig = TD_LEVELS[payload.context];
+                      if (tdConfig) {
+                        state.setTdLevel(tdConfig);
+                      }
+                    } else {
+                      console.error('No TD context provided');
+                    }
                     state.setScreen(Screens.TOWER_DEFENSE);
                     break;
                   }
@@ -421,6 +439,8 @@ export const useGameStore = create<GameState>()(
             'setBattleConfig'
           );
         },
+        setTdLevel: (config: TDLevelConfig | null) =>
+          set({ currentTdLevel: config }, false, 'setTdLevel'),
         createProfile: (slotId: number) => {
           set(
             (state) => {
@@ -794,7 +814,8 @@ export const useGameStore = create<GameState>()(
           set(
             (state) => {
               const profileId = state.currentProfileId;
-              if (profileId === null || !state.profiles[profileId]) return state;
+              if (profileId === null || !state.profiles[profileId])
+                return state;
               const profile = state.profiles[profileId]!;
               const newProfiles = [...state.profiles];
               newProfiles[profileId] = {
