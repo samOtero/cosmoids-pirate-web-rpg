@@ -30,6 +30,7 @@ export interface TDWaveGroup {
   pathIndex: number; // Which path enemies in this group should take
   turnAroundAtEnd?: boolean; // Whether the enemy should return to the start instead of despawning
   concurrentWithPrevious?: boolean; // Whether this group should start its initial delay timer at the same time as the group before it
+  uncapturable?: boolean;
 }
 
 export interface TDWave {
@@ -122,6 +123,7 @@ export interface Enemy extends BaseTDUnit {
   heldCaptureUnitId?: string; // ID of the CaptureUnit they are holding
   turnAroundAtEnd?: boolean;
   isMovingBackward?: boolean;
+  uncapturable?: boolean;
 }
 
 export interface Projectile {

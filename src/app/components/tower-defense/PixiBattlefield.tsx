@@ -126,6 +126,7 @@ export function renderHealthBar(
   // Draw foreground
   const hpRatio = unit.maxHp > 0 ? unit.hp / unit.maxHp : 1;
   const isWeakened = hpRatio <= WEAKENED_THRESHOLD;
+  const isUncapturable = (unit as any).uncapturable;
 
   if (hideWhenFull && hpRatio >= 1) {
     hpBg.visible = false;
@@ -135,7 +136,11 @@ export function renderHealthBar(
     hpFg.visible = true;
     hpFg.clear();
     hpFg.rect(-32, hpOffsetY, 64 * Math.max(0, hpRatio), 4);
-    hpFg.fill({ color: isWeakened ? 0xff0000 : 0x22c55e });
+    if (isUncapturable) {
+      hpFg.fill({ color: 0x3b82f6 }); // Blue
+    } else {
+      hpFg.fill({ color: isWeakened ? 0xff0000 : 0x22c55e });
+    }
   }
 }
 
@@ -661,15 +666,18 @@ export default function PixiBattlefield({
             });
 
             if (targetedEnemyId) {
-              isHoveringValidSpot = isWeakened;
               const enemy = engine.enemies.find(
                 (e) => e.id === targetedEnemyId
               )!;
+              const isValidCapture = isWeakened && !enemy.uncapturable;
+              
+              isHoveringValidSpot = isValidCapture;
+              
               const pxX = offsetX + (enemy.position.x / 100) * screenW;
               const pxY = offsetY + (enemy.position.y / 100) * screenH;
               const radius = screenW * 0.05;
 
-              if (isWeakened) {
+              if (isValidCapture) {
                 // Green circle for valid capture
                 spotGraphics.circle(pxX, pxY, radius);
                 spotGraphics.fill({ color: 0x22c55e, alpha: 0.3 }); // Transparent green

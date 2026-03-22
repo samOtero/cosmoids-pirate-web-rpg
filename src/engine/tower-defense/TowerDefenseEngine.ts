@@ -790,7 +790,8 @@ export class TowerDefenseEngine {
           time,
           newEnemies,
           spawner.group.pathIndex,
-          spawner.group.turnAroundAtEnd
+          spawner.group.turnAroundAtEnd,
+          spawner.group.uncapturable
         );
         spawner.spawnsRemaining--;
         spawner.lastSpawnTime = time;
@@ -825,7 +826,8 @@ export class TowerDefenseEngine {
     time: number,
     newEnemies: Enemy[],
     groupPathIndex: number,
-    turnAroundAtEnd?: boolean
+    turnAroundAtEnd?: boolean,
+    uncapturable?: boolean
   ) {
     const meta = TD_CREATURE_DEFS[definitionId];
     if (!meta) return;
@@ -846,12 +848,13 @@ export class TowerDefenseEngine {
       pathIndex: pathIndex,
       facingDirection: 'down',
       turnAroundAtEnd,
+      uncapturable,
     });
   }
 
   public captureEnemy(enemyId: string): PlayerCreature | null {
     const enemy = this.enemies.find((e) => e.id === enemyId);
-    if (!enemy) return null;
+    if (!enemy || enemy.uncapturable) return null;
 
     // Optional: add RNG for capture success here! Currently 100% success.
     const captured: PlayerCreature = {

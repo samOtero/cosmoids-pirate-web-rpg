@@ -206,6 +206,7 @@ export const FIRST_LEVEL: TDLevelData = {
           delayBeforeGroupMs: 100,
           pathIndex: 0,
           turnAroundAtEnd: true,
+          uncapturable: true,
         },
         {
           definitionId: 'senticle',
@@ -215,6 +216,7 @@ export const FIRST_LEVEL: TDLevelData = {
           pathIndex: 0,
           turnAroundAtEnd: true,
           concurrentWithPrevious: false,
+          uncapturable: true,
         },
         {
           definitionId: 'senticle',
@@ -224,6 +226,7 @@ export const FIRST_LEVEL: TDLevelData = {
           pathIndex: 0,
           turnAroundAtEnd: true,
           concurrentWithPrevious: false,
+          uncapturable: true,
         },
         {
           definitionId: 'senticle',
@@ -233,6 +236,7 @@ export const FIRST_LEVEL: TDLevelData = {
           pathIndex: 1,
           turnAroundAtEnd: true,
           concurrentWithPrevious: false,
+          uncapturable: true,
         },
       ],
     },
