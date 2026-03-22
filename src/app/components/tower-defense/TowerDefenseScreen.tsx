@@ -85,6 +85,7 @@ export default function TowerDefenseScreen({
   const [introState, setIntroState] = useState<'ready' | 'go' | 'none'>(
     'ready'
   );
+  const [outroState, setOutroState] = useState<'none' | 'win' | 'lose'>('none');
 
   const saveTowerProgress = () => {
     if (currentProfileId === null) return;
@@ -106,6 +107,21 @@ export default function TowerDefenseScreen({
       return () => clearTimeout(t);
     }
   }, [introState]);
+
+  useEffect(() => {
+    if (outroState === 'win') {
+      const t = setTimeout(() => {
+        if (onWin) onWin();
+      }, 3000);
+      return () => clearTimeout(t);
+    } else if (outroState === 'lose') {
+      const t = setTimeout(() => {
+        if (onLose) onLose();
+        else alert('Game Over!');
+      }, 3000);
+      return () => clearTimeout(t);
+    }
+  }, [outroState, onWin, onLose]);
 
   useEffect(() => {
     if (isPlaying && !hasStarted) {
@@ -195,8 +211,7 @@ export default function TowerDefenseScreen({
           hasEndedRef.current = true;
           setIsPlaying(false);
           saveTowerProgress();
-          if (onLose) onLose();
-          else alert('Game Over!');
+          setOutroState('lose'); // Show defeat screen before callback
         }
       }
 
@@ -224,7 +239,7 @@ export default function TowerDefenseScreen({
         hasEndedRef.current = true;
         setIsPlaying(false);
         saveTowerProgress();
-        if (onWin) onWin();
+        setOutroState('win'); // Show win screen before callback
       }
     }
     previousTimeRef.current = time;
@@ -270,6 +285,20 @@ export default function TowerDefenseScreen({
           <div className="text-7xl md:text-9xl font-black italic text-transparent bg-clip-text bg-linear-to-br from-yellow-300 to-red-500 drop-shadow-[0_0_25px_rgba(255,165,0,0.8)] uppercase animate-bounce pr-8 pb-4">
             {introState === 'ready' ? 'Ready!' : 'GO!'}
           </div>
+        </div>
+      )}
+
+      {outroState !== 'none' && (
+        <div className="fixed inset-0 z-10000 bg-black/80 flex items-center justify-center pointer-events-none transition-opacity duration-1000">
+          {outroState === 'win' ? (
+            <div className="text-7xl md:text-9xl font-black italic text-transparent bg-clip-text bg-linear-to-br from-green-400 to-blue-500 drop-shadow-[0_0_25px_rgba(0,255,128,0.8)] uppercase animate-bounce pr-8 pb-4">
+              You Win!
+            </div>
+          ) : (
+            <div className="text-7xl md:text-9xl font-black text-red-600 drop-shadow-[0_0_35px_rgba(255,0,0,1)] uppercase tracking-widest animate-pulse pr-8 pb-4">
+              Defeat!
+            </div>
+          )}
         </div>
       )}
 
