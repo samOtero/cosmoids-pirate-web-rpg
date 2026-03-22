@@ -1,4 +1,9 @@
-import { TDLevelContext, TDLevelConfig, DialogContext, StoryProgression } from '@/types/baseGame';
+import {
+  TDLevelContext,
+  TDLevelConfig,
+  DialogContext,
+  StoryProgression,
+} from '@/types/baseGame';
 import { FIRST_LEVEL } from './firstLevel';
 
 export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
@@ -17,7 +22,11 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
     ],
     loseEvents: [
       {
-        type: 'GO_TO_MAP',
+        type: 'SHOW_DIALOG',
+        payload: { context: DialogContext.STARTER_BATTLE_LOSE },
+      },
+      {
+        type: 'GO_TO_ISLAND_MAP',
       },
     ],
   },
