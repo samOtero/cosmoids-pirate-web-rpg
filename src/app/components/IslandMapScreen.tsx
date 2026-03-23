@@ -88,10 +88,6 @@ export default function IslandMapScreen({
     }
   };
 
-  const leadCreature = profile.creatures[0]
-    ? resolvePlayerCreature(profile.creatures[0])
-    : null;
-
   const currentConfig =
     island.nodes?.find((n) => n.id === currentNodeId) || island.nodes?.[0];
   const targetConfig =
@@ -259,22 +255,20 @@ export default function IslandMapScreen({
           })}
 
           {/* Dynamic Player Avatar */}
-          {leadCreature && (
-            <div
-              className={`absolute transform -translate-x-1/2 -translate-y-[80%] z-30 pointer-events-none transition-all duration-600 ease-in-out`}
-              style={{
-                left: `${avatarPos.x}%`,
-                top: `${avatarPos.y}%`,
-              }}
-            >
-              <img
-                src={leadCreature.spriteUrl}
-                className={`w-16 h-16 object-contain drop-shadow-xl ${animatingTo === null ? 'animate-bounce' : ''}`}
-                alt="Player Avatar"
-              />
-              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-3 bg-black/30 rounded-full blur-[2px] -z-10"></div>
-            </div>
-          )}
+          <div
+            className={`absolute transform -translate-x-1/2 -translate-y-[80%] z-30 pointer-events-none transition-all duration-2000 ease-in-out`}
+            style={{
+              left: `${avatarPos.x}%`,
+              top: `${avatarPos.y}%`,
+            }}
+          >
+            <img
+              src="/battles/characters/caleb_battle.png"
+              className={`w-16 h-16 object-contain drop-shadow-xl ${animatingTo === null ? 'animate-bounce' : ''}`}
+              alt="Player Avatar"
+            />
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-3 bg-black/30 rounded-full blur-[2px] -z-10"></div>
+          </div>
         </div>
       </div>
 
