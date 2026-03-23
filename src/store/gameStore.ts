@@ -32,6 +32,7 @@ import {
   ReorderCreaturesEventPayload,
   ExecuteTDActionEventPayload,
   GoToTowerDefenseEventPayload,
+  GoToIslandMapEventPayload,
 } from '@/types/baseGame';
 import { BATTLES } from '@/constants/battles';
 import { TD_LEVELS } from '@/constants/tdLevels';
@@ -199,6 +200,18 @@ export const useGameStore = create<GameState>()(
                     break;
                   }
                   case 'GO_TO_ISLAND_MAP': {
+                    const payload = currentEvent.payload as GoToIslandMapEventPayload | undefined;
+                    const profileId = updates.currentProfileId ?? state.currentProfileId;
+                    
+                    if (payload?.islandId !== undefined && profileId !== null && state.profiles[profileId]) {
+                      const newProfiles = [...(updates.profiles || state.profiles)];
+                      newProfiles[profileId] = {
+                        ...newProfiles[profileId]!,
+                        currentIslandId: payload.islandId,
+                      };
+                      updates.profiles = newProfiles;
+                    }
+                    
                     state.setScreen(Screens.ISLAND_MAP);
                     break;
                   }

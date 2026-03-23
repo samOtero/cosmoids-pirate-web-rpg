@@ -62,7 +62,10 @@ export default function IslandMapScreen({
       (acc, node, idx) => (isNodeUnlocked(node) ? idx : acc),
       0
     ) ?? 0;
-  const initialNodeId = island.nodes?.[maxUnlockedIndex]?.id ?? 0;
+  
+  // Try to use saved position, otherwise fall back to max unlocked node
+  const savedNodeId = profile.islandPositions?.[island.id];
+  const initialNodeId = savedNodeId ?? (island.nodes?.[maxUnlockedIndex]?.id ?? 0);
 
   const [hoverNode, setHoverNode] = useState<number | null>(null);
   const [showInventory, setShowInventory] = useState(false);
@@ -72,6 +75,7 @@ export default function IslandMapScreen({
   const enqueueAndProcessEvents = useGameStore(
     (state) => state.enqueueAndProcessEvents
   );
+  const setIslandPosition = useGameStore((state) => state.setIslandPosition);
 
   const handleNodeClick = (node: IslandNode) => {
     if (animatingTo !== null) return; // Block double clicks
@@ -81,6 +85,7 @@ export default function IslandMapScreen({
       setAnimatingTo(node.id);
       setTimeout(() => {
         setCurrentNodeId(node.id);
+        setIslandPosition(island.id, node.id);
         setAnimatingTo(null);
       }, 600);
     } else {
