@@ -3,7 +3,6 @@ import {
   BackgroundImageKey,
   BattleContext,
   StoryProgression,
-  TDLevelContext,
 } from '@/types/baseGame';
 
 export const ISLANDS: Island[] = [
@@ -25,14 +24,14 @@ export const ISLANDS: Island[] = [
         name: 'Landing Point',
         description: 'Where your journey begins.',
         coordinates: {
-          x: 30.926724137931032,
-          y: 68.04597642686632,
+          x: 36.206896551724135,
+          y: 62.10727910885866,
         },
         events: [
           {
             type: 'GO_TO_TOWER_DEFENSE',
             payload: {
-              context: TDLevelContext.FIRST_LEVEL,
+              context: 'FIRST_LEVEL',
             },
           },
         ],
@@ -43,50 +42,14 @@ export const ISLANDS: Island[] = [
         description: 'A grove with fresh coconuts.',
         requiresStoryProgression: StoryProgression.DEFEAT_FIRST_BATTLE,
         coordinates: {
-          x: 39.6551724137931,
-          y: 42.18390746134908,
+          x: 58.94396551724138,
+          y: 41.226053055218806,
         },
         events: [
           {
             type: 'START_BATTLE',
             payload: {
-              context: BattleContext.FOREST_BUG_BATTLE,
-            },
-          },
-        ],
-      },
-      {
-        id: 2,
-        name: 'Mysterious Cave',
-        description: 'Dark and echoey.',
-        requiresStoryProgression: StoryProgression.DEFEAT_BUG_STAGE_1,
-        coordinates: {
-          x: 54.633620689655174,
-          y: 53.10344769123414,
-        },
-        events: [
-          {
-            type: 'START_BATTLE',
-            payload: {
-              context: BattleContext.FOREST_BUG_STAGE_2_BATTLE,
-            },
-          },
-        ],
-      },
-      {
-        id: 3,
-        name: 'Node 3',
-        description: 'New Node Description',
-        requiresStoryProgression: StoryProgression.DEFEAT_BUG_STAGE_2,
-        coordinates: {
-          x: 63.254310344827594,
-          y: 37.58620631192379,
-        },
-        events: [
-          {
-            type: 'START_BATTLE',
-            payload: {
-              context: BattleContext.FOREST_MOTH_BATTLE,
+              context: 'FOREST_BUG_BATTLE',
             },
           },
         ],
