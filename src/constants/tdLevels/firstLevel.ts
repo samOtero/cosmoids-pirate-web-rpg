@@ -5,11 +5,11 @@ export const FIRST_LEVEL: TDLevelData = {
     [
       {
         x: 100,
-        y: 58.38,
+        y: 65,
       },
       {
         x: 0,
-        y: 58.38,
+        y: 65,
       },
     ],
   ],
@@ -66,84 +66,84 @@ export const FIRST_LEVEL: TDLevelData = {
     {
       position: {
         x: 6.71,
-        y: 58.78,
+        y: 66,
       },
       tdConfigId: 'note_1',
     },
     {
       position: {
         x: 5.19,
-        y: 55.44,
+        y: 62,
       },
       tdConfigId: 'note_1',
     },
     {
       position: {
         x: 7.62,
-        y: 62.79,
+        y: 70,
       },
       tdConfigId: 'note_1',
     },
     {
       position: {
         x: 3.6,
-        y: 62.4,
+        y: 69,
       },
       tdConfigId: 'note_1',
     },
     {
       position: {
         x: 7.53,
-        y: 55.96,
+        y: 63,
       },
       tdConfigId: 'note_1',
     },
     {
       position: {
         x: 2.59,
-        y: 56.6,
+        y: 64,
       },
       tdConfigId: 'note_1',
     },
     {
       position: {
         x: 9.04,
-        y: 62.92,
+        y: 70,
       },
       tdConfigId: 'note_1',
     },
     {
       position: {
         x: 3.26,
-        y: 63.95,
+        y: 71,
       },
       tdConfigId: 'note_1',
     },
     {
       position: {
         x: 6.44,
-        y: 56.73,
+        y: 64,
       },
       tdConfigId: 'note_1',
     },
     {
       position: {
         x: 3.09,
-        y: 63.05,
+        y: 70,
       },
       tdConfigId: 'note_1',
     },
     {
       position: {
         x: 2.93,
-        y: 54.93,
+        y: 62,
       },
       tdConfigId: 'note_1',
     },
     {
       position: {
         x: 8.45,
-        y: 56.99,
+        y: 64,
       },
       tdConfigId: 'note_1',
     },
