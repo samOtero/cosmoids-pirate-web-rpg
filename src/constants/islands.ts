@@ -42,8 +42,8 @@ export const ISLANDS: Island[] = [
         description: 'A grove with fresh coconuts.',
         requiresStoryProgression: StoryProgression.DEFEAT_FIRST_BATTLE,
         coordinates: {
-          x: 58.94396551724138,
-          y: 41.226053055218806,
+          x: 68.10344827586206,
+          y: 34.71264309353298,
         },
         events: [
           {

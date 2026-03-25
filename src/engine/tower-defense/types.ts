@@ -87,6 +87,7 @@ export interface TDLevelData {
   lives?: number; // Default is 3 if not provided, or overridden by captureUnits length
   enemyHpMultiplier?: number; // Defaults to 1 if not provided
   disableCapture?: boolean;
+  backgroundUrl?: string;
   environmentUnits?: {
     tdConfigId: string;
     position: Point;

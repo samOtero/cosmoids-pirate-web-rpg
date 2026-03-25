@@ -11,6 +11,7 @@ interface PixiTDLevelEditorProps {
   deleteMode: boolean;
   onPointMove: (type: PointType, index: number, x: number, y: number) => void;
   onPointDelete: (type: PointType, index: number) => void;
+  backgroundUrl?: string;
 }
 
 export default function PixiTDLevelEditor({
@@ -21,6 +22,7 @@ export default function PixiTDLevelEditor({
   deleteMode,
   onPointMove,
   onPointDelete,
+  backgroundUrl,
 }: PixiTDLevelEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const onPointMoveRef = useRef(onPointMove);
@@ -30,6 +32,11 @@ export default function PixiTDLevelEditor({
   const activePathIndexRef = useRef(activePathIndex);
   const placementSpotsRef = useRef(placementSpots);
   const captureUnitsRef = useRef(captureUnits);
+  const backgroundUrlRef = useRef(backgroundUrl);
+
+  useEffect(() => {
+    backgroundUrlRef.current = backgroundUrl;
+  }, [backgroundUrl]);
 
   useEffect(() => {
     onPointMoveRef.current = onPointMove;
@@ -102,10 +109,11 @@ export default function PixiTDLevelEditor({
       containerRef.current!.appendChild(app.canvas);
 
       // Add background
-      await PIXI.Assets.load('/battles/bg/bg_dock_battle_td.png');
+      let currentBgUrl = backgroundUrlRef.current || '/battles/bg/bg_dock_battle_td.png';
+      await PIXI.Assets.load(currentBgUrl);
       if (isDestroyed) return;
 
-      const bgSprite = PIXI.Sprite.from('/battles/bg/bg_dock_battle_td.png');
+      const bgSprite = PIXI.Sprite.from(currentBgUrl);
       app.stage.addChildAt(bgSprite, 0); // Background at bottom
 
       // Handle resize
@@ -230,6 +238,14 @@ export default function PixiTDLevelEditor({
 
       app.ticker.add(() => {
         if (bgBounds.width === 0) return;
+
+        const bgUrl = backgroundUrlRef.current || '/battles/bg/bg_dock_battle_td.png';
+        if (bgUrl !== currentBgUrl) {
+          currentBgUrl = bgUrl;
+          PIXI.Assets.load(bgUrl).then((t) => {
+            if (!isDestroyed) { bgSprite.texture = t as PIXI.Texture; }
+          }).catch(console.error);
+        }
 
         const currentPaths = pathsRef.current;
         const currentActivePathIndex = activePathIndexRef.current;

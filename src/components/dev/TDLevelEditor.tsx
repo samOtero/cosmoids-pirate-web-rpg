@@ -27,18 +27,21 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
   const [waves, setWaves] = useState<TDWave[]>([]);
   const [surviveUntil, setSurviveUntil] = useState<number>(0);
   const [lives, setLives] = useState<number>(3);
+  const [backgroundUrl, setBackgroundUrl] = useState<string>('');
   const [deleteMode, setDeleteMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showNewModal, setShowNewModal] = useState(false);
   const [newLevelName, setNewLevelName] = useState('');
 
   const availableLevels = useMemo(() => {
-    return Object.entries(tdLevels).filter(([key, value]) => {
-      const val = value as any;
-      return (
-        val && Array.isArray(val.paths) && Array.isArray(val.placementSpots)
-      );
-    }) as [string, TDLevelData][];
+    const registry = (tdLevels as any).TD_LEVELS || {};
+    return Object.entries(registry)
+      .map(([key, value]) => [key, (value as any)?.levelData])
+      .filter(([key, val]) => {
+        return (
+          val && Array.isArray((val as any).paths) && Array.isArray((val as any).placementSpots)
+        );
+      }) as [string, TDLevelData][];
   }, []);
 
   useEffect(() => {
@@ -48,7 +51,8 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
   }, [availableLevels, selectedLevelKey]);
 
   const handleSelectLevel = (key: string) => {
-    const levelData = (tdLevels as any)[key] as TDLevelData;
+    const registry = (tdLevels as any).TD_LEVELS || {};
+    const levelData = registry[key]?.levelData as TDLevelData;
     if (levelData) {
       // Deep copy
       if (levelData.paths) {
@@ -77,6 +81,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
       );
       setSurviveUntil(levelData.surviveUntil || 0);
       setLives(levelData.lives !== undefined ? levelData.lives : 3);
+      setBackgroundUrl(levelData.backgroundUrl || '');
     } else {
       setPaths([[]]);
       setActivePathIndex(0);
@@ -86,6 +91,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
       setWaves([]);
       setSurviveUntil(0);
       setLives(3);
+      setBackgroundUrl('');
     }
     setSelectedLevelKey(key);
   };
@@ -99,6 +105,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
     setWaves([]);
     setSurviveUntil(0);
     setLives(3);
+    setBackgroundUrl('');
     setSelectedLevelKey('NEW_LEVEL');
     setNewLevelName('');
     setShowNewModal(true);
@@ -208,6 +215,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
         waves: waves,
         surviveUntil: surviveUntil > 0 ? surviveUntil : undefined,
         lives: lives !== 3 ? lives : undefined,
+        backgroundUrl: backgroundUrl || undefined,
       };
 
       const res = await fetch('/api/dev/td-levels/save', {
@@ -441,6 +449,19 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
 
           <div className="w-px h-6 bg-slate-600 mx-2" />
 
+          <div className="flex items-center gap-2">
+            <label className="text-slate-400 text-sm font-bold">Bg Url:</label>
+            <input
+              type="text"
+              value={backgroundUrl}
+              onChange={(e) => setBackgroundUrl(e.target.value)}
+              className="w-32 bg-slate-950 text-white rounded p-1 border border-slate-700 text-sm"
+              placeholder="/battles/bg/..."
+            />
+          </div>
+
+          <div className="w-px h-6 bg-slate-600 mx-2" />
+
           <button
             onClick={() => setDeleteMode((prev) => !prev)}
             className={`px-4 py-2 rounded text-white font-bold text-sm border-2 ${
@@ -480,6 +501,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
           deleteMode={deleteMode}
           onPointMove={handlePointMove}
           onPointDelete={handlePointDelete}
+          backgroundUrl={backgroundUrl}
         />
 
         {/* Waves Editor Sidebar */}

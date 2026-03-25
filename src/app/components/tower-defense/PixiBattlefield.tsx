@@ -159,6 +159,7 @@ interface PixiBattlefieldProps {
   onEnemyCaptured?: (enemyId: string) => void;
   onDragStateChange?: (isDragging: boolean) => void;
   getDragState?: () => 'tower' | 'capture' | false;
+  backgroundUrl?: string;
 }
 
 export default function PixiBattlefield({
@@ -168,6 +169,7 @@ export default function PixiBattlefield({
   onEnemyCaptured,
   onDragStateChange,
   getDragState,
+  backgroundUrl,
 }: PixiBattlefieldProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const fpsRef = useRef<HTMLDivElement>(null);
@@ -233,10 +235,11 @@ export default function PixiBattlefield({
       containerRef.current!.appendChild(app.canvas);
 
       // Add background
-      await PIXI.Assets.load('/battles/bg/bg_dock_battle_td.png');
+      const bgUrl = backgroundUrl || '/battles/bg/bg_dock_battle_td.png';
+      await PIXI.Assets.load(bgUrl);
       if (isDestroyed) return;
 
-      const bgSprite = PIXI.Sprite.from('/battles/bg/bg_dock_battle_td.png');
+      const bgSprite = PIXI.Sprite.from(bgUrl);
       app.stage.addChild(bgSprite);
 
       // Handle resize
