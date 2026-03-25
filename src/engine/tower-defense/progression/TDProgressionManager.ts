@@ -1,6 +1,8 @@
 import { TowerDefenseEngine, TD_CREATURE_DEFS } from '../TowerDefenseEngine';
 import { TDEventBus, TDEvent } from '../events/TDEventBus';
 
+const MAX_LEVEL = 10;
+
 export class TDProgressionManager {
   private engine: TowerDefenseEngine;
   private unsubscribe: () => void;
@@ -28,6 +30,9 @@ export class TDProgressionManager {
           xpGained: event.xpValue,
           totalXp: killer.creature.xp,
         });
+
+        // Don't level up past the cap
+        if (killer.creature.level >= MAX_LEVEL) return;
 
         // Simple RPG curve: Level 1->2 is 100xp, 2->3 is 200xp, etc.
         const requiredXp = killer.creature.level * 100;
