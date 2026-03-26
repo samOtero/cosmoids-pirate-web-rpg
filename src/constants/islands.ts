@@ -47,9 +47,9 @@ export const ISLANDS: Island[] = [
         },
         events: [
           {
-            type: 'START_BATTLE',
+            type: 'GO_TO_TOWER_DEFENSE',
             payload: {
-              context: 'FOREST_BUG_BATTLE',
+              context: 'FOREST_LEVEL_2',
             },
           },
         ],

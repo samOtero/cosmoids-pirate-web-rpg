@@ -12,6 +12,7 @@ export enum Screens {
 
 export enum TDLevelContext {
   FIRST_LEVEL = 'FIRST_LEVEL',
+  FOREST_LEVEL_2 = 'FOREST_LEVEL_2',
 }
 
 export interface TDLevelConfig {
