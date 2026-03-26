@@ -115,3 +115,6 @@ Interact with different Pirate Crews and the Navy.
 - **Reputation System:** Gain reputation levels with different factions.
 - **Dynamic Quests:** Unlock different quests depending on your current faction standing.
 - **Potential Rewards:** Outfits, exclusive Cosmoids, unique ship upgrades, special evolutions, or branching story endings.
+
+## [2026-03-26] Scrollable Background for TD Levels
+Added optional `backgroundScale` property to `TDLevelData`. When set > 1 (e.g. 1.5), the background renders at that multiple of the screen height and supports vertical drag-to-scroll. The scroll offset is tracked via `scrollYRef` and applied to `bgBounds.y`, so all percentage-based entity positioning remains correct. Both `PixiBattlefield.tsx` and `PixiTDLevelEditor.tsx` support this feature. The forest level uses `backgroundScale: 1.5`.

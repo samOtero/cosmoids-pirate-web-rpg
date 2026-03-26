@@ -12,6 +12,7 @@ interface PixiTDLevelEditorProps {
   onPointMove: (type: PointType, index: number, x: number, y: number) => void;
   onPointDelete: (type: PointType, index: number) => void;
   backgroundUrl?: string;
+  backgroundScale?: number;
 }
 
 export default function PixiTDLevelEditor({
@@ -23,6 +24,7 @@ export default function PixiTDLevelEditor({
   onPointMove,
   onPointDelete,
   backgroundUrl,
+  backgroundScale = 1,
 }: PixiTDLevelEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const onPointMoveRef = useRef(onPointMove);
@@ -33,10 +35,19 @@ export default function PixiTDLevelEditor({
   const placementSpotsRef = useRef(placementSpots);
   const captureUnitsRef = useRef(captureUnits);
   const backgroundUrlRef = useRef(backgroundUrl);
+  const backgroundScaleRef = useRef(backgroundScale);
+  const scrollRef = useRef({ x: 0, y: 0 });
+  const isScrollDraggingRef = useRef(false);
+  const scrollDragStartRef = useRef<{ x: number; y: number; scrollX: number; scrollY: number } | null>(null);
 
   useEffect(() => {
     backgroundUrlRef.current = backgroundUrl;
   }, [backgroundUrl]);
+  useEffect(() => {
+    backgroundScaleRef.current = backgroundScale;
+    // Reset scroll when scale changes (e.g. level switch)
+    scrollRef.current = { x: 0, y: 0 };
+  }, [backgroundScale]);
 
   useEffect(() => {
     onPointMoveRef.current = onPointMove;
@@ -116,17 +127,29 @@ export default function PixiTDLevelEditor({
       const bgSprite = PIXI.Sprite.from(currentBgUrl);
       app.stage.addChildAt(bgSprite, 0); // Background at bottom
 
-      // Handle resize
-      const updateAspectRatio = () => {
+      let fullBgHeight = 0;
+      let fullBgWidth = 0;
+
+      // Handle resize — reads scale from ref so it stays current
+      const updateBgLayout = () => {
         if (
           bgSprite.texture.width > 0 &&
           bgSprite.texture.height > 0 &&
           app.screen.height > 0
         ) {
+          const scale = backgroundScaleRef.current > 1 ? backgroundScaleRef.current : 1;
           const ratio = bgSprite.texture.width / bgSprite.texture.height;
-          bgSprite.height = app.screen.height;
-          bgSprite.width = app.screen.height * ratio;
-          bgSprite.x = (app.screen.width - bgSprite.width) / 2;
+          fullBgHeight = app.screen.height * scale;
+          fullBgWidth = fullBgHeight * ratio;
+          bgSprite.height = fullBgHeight;
+          bgSprite.width = fullBgWidth;
+
+          const maxScrollY = Math.max(0, fullBgHeight - app.screen.height);
+          const maxScrollX = Math.max(0, fullBgWidth - app.screen.width);
+          scrollRef.current.y = Math.min(scrollRef.current.y, maxScrollY);
+          scrollRef.current.x = Math.min(scrollRef.current.x, maxScrollX);
+          bgSprite.x = (app.screen.width - bgSprite.width) / 2 - scrollRef.current.x;
+          bgSprite.y = -scrollRef.current.y;
 
           bgBounds = {
             x: bgSprite.x,
@@ -136,18 +159,57 @@ export default function PixiTDLevelEditor({
           };
         }
       };
-      app.renderer.on('resize', updateAspectRatio);
-      updateAspectRatio();
+      app.renderer.on('resize', updateBgLayout);
+      updateBgLayout();
 
       bgSprite.eventMode = 'static';
+
+      // --- Scroll drag on background (always listen, check scale dynamically) ---
+      bgSprite.on('pointerdown', (e: PIXI.FederatedPointerEvent) => {
+        const scale = backgroundScaleRef.current > 1 ? backgroundScaleRef.current : 1;
+        if (draggingNode || scale <= 1) return;
+        isScrollDraggingRef.current = true;
+        scrollDragStartRef.current = {
+          x: e.global.x,
+          y: e.global.y,
+          scrollX: scrollRef.current.x,
+          scrollY: scrollRef.current.y,
+        };
+      });
 
       app.stage.eventMode = 'static';
       app.stage.hitArea = new PIXI.Rectangle(0, 0, 10000, 10000);
       app.stage.addChild(pathGraphics);
 
-      app.stage.on('pointerup', onDragEnd);
-      app.stage.on('pointerupoutside', onDragEnd);
+      app.stage.on('pointerup', () => {
+        onDragEnd();
+        isScrollDraggingRef.current = false;
+        scrollDragStartRef.current = null;
+      });
+      app.stage.on('pointerupoutside', () => {
+        onDragEnd();
+        isScrollDraggingRef.current = false;
+        scrollDragStartRef.current = null;
+      });
       app.stage.on('pointermove', (e) => {
+        // Handle scroll dragging
+        if (isScrollDraggingRef.current && scrollDragStartRef.current) {
+          const dx = scrollDragStartRef.current.x - e.global.x;
+          const dy = scrollDragStartRef.current.y - e.global.y;
+          const maxScrollY = Math.max(0, fullBgHeight - app.screen.height);
+          const maxScrollX = Math.max(0, fullBgWidth - app.screen.width);
+          scrollRef.current.y = Math.max(0, Math.min(maxScrollY, scrollDragStartRef.current.scrollY + dy));
+          scrollRef.current.x = Math.max(0, Math.min(maxScrollX, scrollDragStartRef.current.scrollX + dx));
+          bgSprite.x = (app.screen.width - bgSprite.width) / 2 - scrollRef.current.x;
+          bgSprite.y = -scrollRef.current.y;
+          bgBounds = {
+            x: bgSprite.x,
+            y: bgSprite.y,
+            width: bgSprite.width,
+            height: bgSprite.height,
+          };
+        }
+
         if (
           draggingNode &&
           draggingInfo &&
@@ -237,7 +299,12 @@ export default function PixiTDLevelEditor({
       };
 
       app.ticker.add(() => {
+        // Re-evaluate bg layout each tick to pick up scale changes
+        updateBgLayout();
+
         if (bgBounds.width === 0) return;
+
+        const viewportH = app.screen.height;
 
         const bgUrl = backgroundUrlRef.current || '/battles/bg/bg_dock_battle_td.png';
         if (bgUrl !== currentBgUrl) {
@@ -315,7 +382,7 @@ export default function PixiTDLevelEditor({
         }
         currentPlacementSpots.forEach((spot, i) => {
           let node = placementNodes.get(i);
-          const radius = bgBounds.width * 0.05; // 5% of bg width approx
+          const radius = viewportH * 0.05; // 5% of viewport width
           if (!node) {
             node = createDraggablePoint(
               'PLACEMENT',
@@ -357,7 +424,7 @@ export default function PixiTDLevelEditor({
         }
         currentCaptureUnits.forEach((spot, i) => {
           let node = captureNodes.get(i);
-          const radius = bgBounds.width * 0.04;
+          const radius = viewportH * 0.04;
           if (!node) {
             node = createDraggablePoint(
               'CAPTURE',

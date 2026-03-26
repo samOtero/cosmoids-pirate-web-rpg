@@ -124,4 +124,5 @@ export const FOREST_LEVEL: TDLevelData = {
   enemyHpMultiplier: 2.5,
   lives: 10,
   backgroundUrl: '/battles/bg/bg_forest_battle.png',
+  backgroundScale: 2,
 };

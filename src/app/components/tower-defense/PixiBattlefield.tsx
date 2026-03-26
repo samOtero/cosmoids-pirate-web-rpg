@@ -160,6 +160,7 @@ interface PixiBattlefieldProps {
   onDragStateChange?: (isDragging: boolean) => void;
   getDragState?: () => 'tower' | 'capture' | false;
   backgroundUrl?: string;
+  backgroundScale?: number;
 }
 
 export default function PixiBattlefield({
@@ -170,6 +171,7 @@ export default function PixiBattlefield({
   onDragStateChange,
   getDragState,
   backgroundUrl,
+  backgroundScale = 1,
 }: PixiBattlefieldProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const fpsRef = useRef<HTMLDivElement>(null);
@@ -186,6 +188,14 @@ export default function PixiBattlefield({
     width: number;
     height: number;
   }>({ x: 0, y: 0, width: 0, height: 0 });
+  const scrollRef = useRef({ x: 0, y: 0 });
+  const isScrollDraggingRef = useRef(false);
+  const scrollDragStartRef = useRef<{
+    x: number;
+    y: number;
+    scrollX: number;
+    scrollY: number;
+  } | null>(null);
 
   // Keep the latest callback without triggering re-runs of the PIXI initializer
   useEffect(() => {
@@ -236,11 +246,16 @@ export default function PixiBattlefield({
 
       // Add background
       const bgUrl = backgroundUrl || '/battles/bg/bg_dock_battle_td.png';
+      const scale = backgroundScale > 1 ? backgroundScale : 1;
       await PIXI.Assets.load(bgUrl);
       if (isDestroyed) return;
 
       const bgSprite = PIXI.Sprite.from(bgUrl);
       app.stage.addChild(bgSprite);
+
+      // Full (unscrolled) background dimensions — used to derive scroll limits
+      let fullBgHeight = 0;
+      let fullBgWidth = 0;
 
       // Handle resize
       const updateAspectRatio = () => {
@@ -250,9 +265,19 @@ export default function PixiBattlefield({
           app.screen.height > 0
         ) {
           const ratio = bgSprite.texture.width / bgSprite.texture.height;
-          bgSprite.height = app.screen.height;
-          bgSprite.width = app.screen.height * ratio;
-          bgSprite.x = (app.screen.width - bgSprite.width) / 2;
+          fullBgHeight = app.screen.height * scale;
+          fullBgWidth = fullBgHeight * ratio;
+          bgSprite.height = fullBgHeight;
+          bgSprite.width = fullBgWidth;
+
+          // Clamp current scroll on both axes
+          const maxScrollY = Math.max(0, fullBgHeight - app.screen.height);
+          const maxScrollX = Math.max(0, fullBgWidth - app.screen.width);
+          scrollRef.current.y = Math.min(scrollRef.current.y, maxScrollY);
+          scrollRef.current.x = Math.min(scrollRef.current.x, maxScrollX);
+          bgSprite.x =
+            (app.screen.width - bgSprite.width) / 2 - scrollRef.current.x;
+          bgSprite.y = -scrollRef.current.y;
 
           bgBounds = {
             x: bgSprite.x,
@@ -271,6 +296,21 @@ export default function PixiBattlefield({
 
       // Interactive background
       bgSprite.eventMode = 'static';
+
+      // --- Scroll drag on background ---
+      if (scale > 1) {
+        bgSprite.on('pointerdown', (e: PIXI.FederatedPointerEvent) => {
+          // Only start scroll if not dragging a tower or capture device
+          if (draggingTowerCreatureId || getDragStateRef.current?.()) return;
+          isScrollDraggingRef.current = true;
+          scrollDragStartRef.current = {
+            x: e.global.x,
+            y: e.global.y,
+            scrollX: scrollRef.current.x,
+            scrollY: scrollRef.current.y,
+          };
+        });
+      }
 
       // Sprite caching structure
       const towerSprites = new Map<string, PIXI.Container>();
@@ -334,6 +374,36 @@ export default function PixiBattlefield({
       app.stage.on('pointerup', onDragEnd);
       app.stage.on('pointerupoutside', onDragEnd);
       app.stage.on('pointermove', (e) => {
+        // Handle scroll dragging
+        if (
+          isScrollDraggingRef.current &&
+          scrollDragStartRef.current &&
+          scale > 1
+        ) {
+          const dx = scrollDragStartRef.current.x - e.global.x;
+          const dy = scrollDragStartRef.current.y - e.global.y;
+          const maxScrollY = Math.max(0, fullBgHeight - app.screen.height);
+          const maxScrollX = Math.max(0, fullBgWidth - app.screen.width);
+          scrollRef.current.y = Math.max(
+            0,
+            Math.min(maxScrollY, scrollDragStartRef.current.scrollY + dy)
+          );
+          scrollRef.current.x = Math.max(
+            0,
+            Math.min(maxScrollX, scrollDragStartRef.current.scrollX + dx)
+          );
+          bgSprite.x =
+            (app.screen.width - bgSprite.width) / 2 - scrollRef.current.x;
+          bgSprite.y = -scrollRef.current.y;
+          bgBounds = {
+            x: bgSprite.x,
+            y: bgSprite.y,
+            width: bgSprite.width,
+            height: bgSprite.height,
+          };
+          bgBoundsRef.current = bgBounds;
+        }
+
         if (draggingNode && bgBounds.width > 0) {
           draggingNode.x = e.global.x;
           draggingNode.y = e.global.y;
@@ -343,6 +413,16 @@ export default function PixiBattlefield({
             y: ((e.global.y - bgBounds.y) / bgBounds.height) * 100,
           };
         }
+      });
+
+      // Stop scroll dragging on pointer up
+      app.stage.on('pointerup', () => {
+        isScrollDraggingRef.current = false;
+        scrollDragStartRef.current = null;
+      });
+      app.stage.on('pointerupoutside', () => {
+        isScrollDraggingRef.current = false;
+        scrollDragStartRef.current = null;
       });
 
       // PIXI's internal ticker, synced to monitor refresh rate.
@@ -358,6 +438,7 @@ export default function PixiBattlefield({
         const screenH = bgBounds.height;
         const offsetX = bgBounds.x;
         const offsetY = bgBounds.y;
+        const viewportH = app.screen.height; // For sizing UI elements (not affected by bg scale)
 
         const externalDragState = getDragStateRef.current
           ? getDragStateRef.current()
@@ -555,7 +636,7 @@ export default function PixiBattlefield({
 
             const rangeCircle = new PIXI.Graphics();
             rangeCircle.label = 'rangeCircle';
-            const radius = screenW * 0.15; // 30vw approx diameter -> 15vw radius
+            const radius = viewportH * 0.4; // 30vw approx diameter -> 15vw radius
             rangeCircle.circle(0, 0, radius);
             rangeCircle.fill({ color: 0x22d3ee, alpha: 0.05 });
             rangeCircle.stroke({ color: 0x22d3ee, alpha: 0.3, width: 1 });
@@ -673,12 +754,12 @@ export default function PixiBattlefield({
                 (e) => e.id === targetedEnemyId
               )!;
               const isValidCapture = isWeakened && !enemy.uncapturable;
-              
+
               isHoveringValidSpot = isValidCapture;
-              
+
               const pxX = offsetX + (enemy.position.x / 100) * screenW;
               const pxY = offsetY + (enemy.position.y / 100) * screenH;
-              const radius = screenW * 0.05;
+              const radius = viewportH * 0.05;
 
               if (isValidCapture) {
                 // Green circle for valid capture
@@ -718,7 +799,7 @@ export default function PixiBattlefield({
           if (draggingTowerCreatureId === null && dragPosRef.current) {
             const pxX = offsetX + (dragPosRef.current.x / 100) * screenW;
             const pxY = offsetY + (dragPosRef.current.y / 100) * screenH;
-            const radius = screenW * 0.15;
+            const radius = viewportH * 0.15;
             spotGraphics.circle(pxX, pxY, radius);
             spotGraphics.fill({ color: 0x22d3ee, alpha: 0.05 });
             spotGraphics.stroke({ color: 0x22d3ee, alpha: 0.3, width: 1 });
@@ -752,7 +833,7 @@ export default function PixiBattlefield({
             }
 
             if (isHovered) {
-              spotGraphics.circle(pxX, pxY, screenW * 0.05); // 5vw radius
+              spotGraphics.circle(pxX, pxY, viewportH * 0.05); // 5vw radius
               spotGraphics.fill({ color: baseColor, alpha: 0.3 }); // Transparent
               spotGraphics.stroke({
                 color: baseColor,
@@ -760,7 +841,7 @@ export default function PixiBattlefield({
                 width: strokeWidth,
               }); // Solid thicker border
             } else {
-              spotGraphics.circle(pxX, pxY, screenW * 0.05);
+              spotGraphics.circle(pxX, pxY, viewportH * 0.05);
               spotGraphics.stroke({
                 color: baseColor,
                 alpha: alpha,
@@ -777,7 +858,7 @@ export default function PixiBattlefield({
           ) {
             const pxX = offsetX + (dragPosRef.current.x / 100) * screenW;
             const pxY = offsetY + (dragPosRef.current.y / 100) * screenH;
-            const radius = screenW * 0.05;
+            const radius = viewportH * 0.05;
 
             invalidSpotGraphics.circle(pxX, pxY, radius);
             invalidSpotGraphics.fill({ color: 0xef4444, alpha: 0.2 }); // Transparent red
@@ -1078,7 +1159,7 @@ export default function PixiBattlefield({
               text: ft.text,
               style: {
                 fontFamily: 'monospace',
-                fontSize: Math.max(16, screenW * 0.02) * (ft.scale ?? 1),
+                fontSize: Math.max(16, viewportH * 0.02) * (ft.scale ?? 1),
                 fontWeight: 'bold',
                 fill: ft.color ?? 0xffffff,
                 stroke: { color: 0x000000, width: 3 },

@@ -28,6 +28,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
   const [surviveUntil, setSurviveUntil] = useState<number>(0);
   const [lives, setLives] = useState<number>(3);
   const [backgroundUrl, setBackgroundUrl] = useState<string>('');
+  const [backgroundScale, setBackgroundScale] = useState<number>(1);
   const [deleteMode, setDeleteMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showNewModal, setShowNewModal] = useState(false);
@@ -82,6 +83,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
       setSurviveUntil(levelData.surviveUntil || 0);
       setLives(levelData.lives !== undefined ? levelData.lives : 3);
       setBackgroundUrl(levelData.backgroundUrl || '');
+      setBackgroundScale(levelData.backgroundScale || 1);
     } else {
       setPaths([[]]);
       setActivePathIndex(0);
@@ -92,6 +94,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
       setSurviveUntil(0);
       setLives(3);
       setBackgroundUrl('');
+      setBackgroundScale(1);
     }
     setSelectedLevelKey(key);
   };
@@ -106,6 +109,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
     setSurviveUntil(0);
     setLives(3);
     setBackgroundUrl('');
+    setBackgroundScale(1);
     setSelectedLevelKey('NEW_LEVEL');
     setNewLevelName('');
     setShowNewModal(true);
@@ -216,6 +220,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
         surviveUntil: surviveUntil > 0 ? surviveUntil : undefined,
         lives: lives !== 3 ? lives : undefined,
         backgroundUrl: backgroundUrl || undefined,
+        backgroundScale: backgroundScale > 1 ? backgroundScale : undefined,
       };
 
       const res = await fetch('/api/dev/td-levels/save', {
@@ -460,6 +465,20 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
             />
           </div>
 
+          <div className="flex items-center gap-2">
+            <label className="text-slate-400 text-sm font-bold">Scale:</label>
+            <input
+              type="number"
+              min="1"
+              max="3"
+              step="0.1"
+              value={backgroundScale}
+              onChange={(e) => setBackgroundScale(parseFloat(e.target.value) || 1)}
+              className="w-16 bg-slate-950 text-white rounded p-1 border border-slate-700 text-sm"
+              placeholder="1"
+            />
+          </div>
+
           <div className="w-px h-6 bg-slate-600 mx-2" />
 
           <button
@@ -502,6 +521,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
           onPointMove={handlePointMove}
           onPointDelete={handlePointDelete}
           backgroundUrl={backgroundUrl}
+          backgroundScale={backgroundScale}
         />
 
         {/* Waves Editor Sidebar */}

@@ -335,6 +335,7 @@ export default function TowerDefenseScreen({
       <PixiBattlefield
         engine={engineRef.current}
         backgroundUrl={levelData.backgroundUrl}
+        backgroundScale={levelData.backgroundScale}
         onMapDrop={handleMapDrop}
         onMapRemove={handleMapRemove}
         onEnemyCaptured={handleEnemyCaptured}

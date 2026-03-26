@@ -88,6 +88,7 @@ export interface TDLevelData {
   enemyHpMultiplier?: number; // Defaults to 1 if not provided
   disableCapture?: boolean;
   backgroundUrl?: string;
+  backgroundScale?: number; // If > 1, background is taller than viewport and can be scrolled
   environmentUnits?: {
     tdConfigId: string;
     position: Point;
