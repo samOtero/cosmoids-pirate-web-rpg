@@ -19,69 +19,38 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.CALEB_DISAPPOINTED_STARTER_OUTFIT,
+          key: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
           displayName: 'Caleb',
         },
       ],
-      text: "They aren't coming... are they?",
+      text: "Come on, Captain Lance! I'm ready! Let me join your crew today!",
     },
     {
       portraits: [
         {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: 'Grandpa',
+          key: SpeakerImageKey.LANCE_NEUTRAL_OUTFIT_1,
+          displayName: 'Lance',
         },
       ],
-      text: "The sea is unpredictable, lad. It doesn't mean they forgot you.",
+      text: "***Join my crew? Kid, you don't even have a single Cosmoid. You'll never survive as a pirate like that.",
     },
     {
       portraits: [
         {
-          key: SpeakerImageKey.CALEB_DISAPPOINTED_STARTER_OUTFIT,
+          key: SpeakerImageKey.CALEB_SCARED_SURPRISED_STARTER_OUTFIT,
           displayName: 'Caleb',
         },
       ],
-      text: "It's because I'm not good enough...",
+      text: "***That's not fair! I'm tough enough!",
     },
     {
       portraits: [
         {
-          key: SpeakerImageKey.CALEB_DISAPPOINTED_STARTER_OUTFIT,
-          displayName: 'Caleb',
+          key: SpeakerImageKey.LANCE_NEUTRAL_OUTFIT_1,
+          displayName: 'Lance',
         },
       ],
-      text: "If I was a real Captain, they wouldn't leave me behind...",
-    },
-    {
-      portraits: [
-        {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: 'Grandpa',
-        },
-      ],
-      text: "Look at me, Caleb. I've seen you grow up into a smart, capable, hard-working young man.",
-    },
-    {
-      portraits: [
-        {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: 'Grandpa',
-        },
-      ],
-      text: 'Believe me when I say your parents see it too.',
-    },
-    {
-      portraits: [
-        {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: 'Grandpa',
-        },
-        {
-          key: SpeakerImageKey.STARTER_CHEST_CLOSED,
-          displayName: 'Birthday Chest',
-        },
-      ],
-      text: "That's why they sent you this.",
+      text: "***Tough isn't enough out there. But hey, since it's your birthday... catch.",
     },
     {
       portraits: [
@@ -90,36 +59,148 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: '',
         },
       ],
-      text: 'Grandpa hands Caleb a small wooden chest.',
+      text: 'Lance tosses Caleb a handful of Capture Coins.',
     },
     {
       portraits: [
         {
-          key: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
+          key: SpeakerImageKey.LANCE_NEUTRAL_OUTFIT_1,
+          displayName: 'Lance',
+        },
+      ],
+      text: 'Use those to catch your first partner. Maybe start small with a little bird or a dock rat.',
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.CALEB_SCARED_SURPRISED_STARTER_OUTFIT,
+          displayName: 'Caleb',
+        },
+      ],
+      text: '***A dock rat?! No way! Come on, Lance! You have a whole chest of rare Cosmoids right there. Let me have one of those!\n',
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.LANCE_NEUTRAL_OUTFIT_1,
+          displayName: 'Lance',
+        },
+        {
+          key: SpeakerImageKey.STARTER_CHEST_CLOSED,
+          displayName: 'Chest',
+        },
+      ],
+      text: "These aren't toys, Caleb. The Cosmoids in this chest are rare. They rarely even listen to a veteran pirate, let alone a rookie.",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.EMPTY,
+          displayName: '',
+        },
+      ],
+      text: 'Heavy, arrogant footsteps echo on the wooden docks as a local Bandit swaggers up.',
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: 'Grandpa',
+        },
+      ],
+      text: '***Well, look at the big, bad pirate playing with kids.',
+    },
+    {
+      text: 'Just enjoying the morning breeze. No trouble here.',
+      portraits: [
+        {
+          key: SpeakerImageKey.LANCE_NEUTRAL_OUTFIT_1,
+          displayName: 'Lance',
+        },
+      ],
+    },
+    {
+      text: "***You pirates are pathetic. Take away your fancy little monsters, and you're all just cowards playing dress-up on the water.",
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: 'Grandpa',
+        },
+      ],
+    },
+    {
+      text: '***Hey! Shut up! Captain Lance is the greatest!',
+      portraits: [
+        {
+          key: SpeakerImageKey.CALEB_SCARED_SURPRISED_STARTER_OUTFIT,
+          displayName: 'Caleb',
+        },
+      ],
+    },
+    {
+      text: 'Let it go, Caleb. Words can’t sink ships.',
+      portraits: [
+        {
+          key: SpeakerImageKey.LANCE_NEUTRAL_OUTFIT_1,
+          displayName: 'Lance',
+        },
+      ],
+    },
+    {
+      text: ' I need to check the rigging. Watch my cargo.',
+      portraits: [
+        {
+          key: SpeakerImageKey.LANCE_NEUTRAL_OUTFIT_1,
+          displayName: 'Lance',
+        },
+      ],
+    },
+    {
+      text: 'Lance turns his back and walks toward his ship, completely ignoring the Bandit.',
+      portraits: [
+        {
+          key: SpeakerImageKey.EMPTY,
+          displayName: '',
+        },
+      ],
+    },
+    {
+      text: "***See that, kid? A total coward. I think I'll just take his precious cargo then.",
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: 'Grandpa',
+        },
+      ],
+    },
+    {
+      text: "***Don't you dare touch his stuff! I'll show you how a real pirate fights!",
+      portraits: [
+        {
+          key: SpeakerImageKey.CALEB_SCARED_SURPRISED_STARTER_OUTFIT,
+          displayName: 'Caleb',
+        },
+      ],
+    },
+    {
+      text: '***A real pirate? Please. You and what army, kid?',
+      portraits: [
+        {
+          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
+          displayName: 'Grandpa',
+        },
+      ],
+    },
+    {
+      text: '***Me and... ummm... my new partner!',
+      portraits: [
+        {
+          key: SpeakerImageKey.CALEB_SCARED_SURPRISED_STARTER_OUTFIT,
           displayName: 'Caleb',
         },
         {
           key: SpeakerImageKey.STARTER_CHEST_OPEN,
-          displayName: 'Birthday Chest',
-        },
-      ],
-      text: 'No way.. Are these real Cosmoid Doubloons?!',
-    },
-    {
-      portraits: [
-        {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: 'Grandpa',
-        },
-      ],
-      text: 'Aye, your parents wanted to ensure you had a crew worthy of a Captain.',
-    },
-    {
-      text: 'Tradition dictates you must choose your first partner, so choose wisely.',
-      portraits: [
-        {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: 'Grandpa',
+          displayName: 'Chest',
         },
       ],
     },
@@ -140,7 +221,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         },
       ],
       id: 'starter_choice',
-      text: 'Pick your starter Cosmoid!',
+      text: "You ignore Lance's warning and bust open his treasure chest! Three unique Cosmoids are inside. Who will you choose?",
       buttons: [
         {
           label: 'Palmit',
@@ -162,8 +243,8 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: 'Grandpa',
+          key: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
+          displayName: 'Caleb',
         },
         {
           key: SpeakerImageKey.STARTER_1_CRAB,
@@ -171,7 +252,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         },
       ],
       id: 'palmit_choice',
-      text: 'A sturdy choice! It builds its own coconut raft to brave the salt water. So, are you sure you want to choose Palmit?',
+      text: "That's a Palmit! It builds its own coconut raft to brave the salt water. Should I choose it?",
       buttons: [
         {
           label: 'Yes',
@@ -183,7 +264,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
               event: {
                 type: 'PICK_STARTER',
                 payload: {
-                  flag: GameFlag.STARTER_PALMIT,
+                  flag: '0_1',
                 },
               },
             },
@@ -199,8 +280,8 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: 'Grandpa',
+          key: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
+          displayName: 'Caleb',
         },
         {
           key: SpeakerImageKey.STARTER_2_IGUANA,
@@ -209,7 +290,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         },
       ],
       id: 'fueguana_choice',
-      text: 'Oho, a fiery spirit! It has a knack for mischief and gunpowder. So, are you sure you want to choose Fueguana?',
+      text: "That's a Fueguana! It has a knack for mischief and gunpowder. Should I choose it?",
       buttons: [
         {
           label: 'Yes',
@@ -221,7 +302,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
               event: {
                 type: 'PICK_STARTER',
                 payload: {
-                  flag: GameFlag.STARTER_FUEGUANA,
+                  flag: '0_2',
                 },
               },
             },
@@ -237,8 +318,8 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: 'Grandpa',
+          key: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
+          displayName: 'Caleb',
         },
         {
           key: SpeakerImageKey.STARTER_3_MONKEY,
@@ -246,7 +327,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         },
       ],
       id: 'monkeg_choice',
-      text: "Ah, the shy stowaway. It may prefer hiding in its barrel right now, but it's a natural navigator. So, are you sure you want to choose Monkeg?",
+      text: "That's a Monkeg! It may prefer hiding in its barrel right now, but it's a natural navigator. Should I choose it?",
       buttons: [
         {
           label: 'Yes',
@@ -258,7 +339,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
               event: {
                 type: 'PICK_STARTER',
                 payload: {
-                  flag: GameFlag.STARTER_MONKEG,
+                  flag: '0_3',
                 },
               },
             },
@@ -274,15 +355,15 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: 'Grandpa',
+          key: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
+          displayName: 'Caleb',
         },
       ],
       id: 'after_starter_choice',
-      text: "A fine choice. A Captain is nothing without a loyal First Mate, and you've picked a good one.",
+      text: "A Captain is nothing without a loyal First Mate! I've made my choice!",
     },
     {
-      text: 'Your journey officially beg-',
+      text: "***A fancy new pet? Too bad it's stuck with a weak little kid giving the orders. Senticle, crush 'em both!",
       portraits: [
         {
           key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,

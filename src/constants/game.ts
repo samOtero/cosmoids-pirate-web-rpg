@@ -38,6 +38,8 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
     '/dialog_pirate_grunt_aggressive.png',
   [SpeakerImageKey.PIRATE_GRUNT_JOE_ANGRY_POINTING]:
     '/dialog_pirate_grunt_aggressive_point.png',
+  [SpeakerImageKey.LANCE_NEUTRAL_OUTFIT_1]:
+    '/dialog/lance_neutral_outfit_1.png',
   [SpeakerImageKey.NARRATOR]:
     'https://picsum.photos/seed/narrator_book/300/300',
   [SpeakerImageKey.DEFAULT]: 'https://picsum.photos/seed/unknown_npc/300/300',

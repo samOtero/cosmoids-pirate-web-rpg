@@ -42,6 +42,7 @@ const DEFAULT_PORTRAIT: DialogPortrait = {
 };
 
 const getDisplayNameForKey = (key: string): string => {
+  if (key.startsWith('Lance')) return 'Lance';
   if (key.startsWith('Grandpa')) return 'Grandpa';
   if (key.startsWith('Caleb')) return 'Caleb';
   if (key.startsWith('Hookaw')) return 'Scuttles';
