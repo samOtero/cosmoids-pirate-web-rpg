@@ -10,6 +10,7 @@ const TYPE_EFFECTIVENESS: Record<ElementType, Record<ElementType, number>> = {
     [ElementType.WATER]: 1,
     [ElementType.GRASS]: 1,
     [ElementType.ELECTRIC]: 1,
+    [ElementType.FLYING]: 1,
   },
   [ElementType.FIRE]: {
     [ElementType.NORMAL]: 1,
@@ -17,6 +18,7 @@ const TYPE_EFFECTIVENESS: Record<ElementType, Record<ElementType, number>> = {
     [ElementType.WATER]: 0.5,
     [ElementType.GRASS]: 2,
     [ElementType.ELECTRIC]: 1,
+    [ElementType.FLYING]: 1,
   },
   [ElementType.WATER]: {
     [ElementType.NORMAL]: 1,
@@ -24,6 +26,7 @@ const TYPE_EFFECTIVENESS: Record<ElementType, Record<ElementType, number>> = {
     [ElementType.WATER]: 0.5,
     [ElementType.GRASS]: 0.5,
     [ElementType.ELECTRIC]: 1,
+    [ElementType.FLYING]: 1,
   },
   [ElementType.GRASS]: {
     [ElementType.NORMAL]: 1,
@@ -31,6 +34,7 @@ const TYPE_EFFECTIVENESS: Record<ElementType, Record<ElementType, number>> = {
     [ElementType.WATER]: 2,
     [ElementType.GRASS]: 0.5,
     [ElementType.ELECTRIC]: 1,
+    [ElementType.FLYING]: 0.5,
   },
   [ElementType.ELECTRIC]: {
     [ElementType.NORMAL]: 1,
@@ -38,6 +42,15 @@ const TYPE_EFFECTIVENESS: Record<ElementType, Record<ElementType, number>> = {
     [ElementType.WATER]: 2,
     [ElementType.GRASS]: 0.5,
     [ElementType.ELECTRIC]: 0.5,
+    [ElementType.FLYING]: 2,
+  },
+  [ElementType.FLYING]: {
+    [ElementType.NORMAL]: 1,
+    [ElementType.FIRE]: 1,
+    [ElementType.WATER]: 1,
+    [ElementType.GRASS]: 2,
+    [ElementType.ELECTRIC]: 0.5,
+    [ElementType.FLYING]: 1,
   },
 };
 export class EffectProcessor {
