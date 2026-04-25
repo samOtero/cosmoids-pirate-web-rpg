@@ -162,14 +162,14 @@ export const FIRST_LEVEL: TDLevelData = {
           uncapturable: true,
         },
         {
-          definitionId: 'senticle',
+          definitionId: 'mouse_1',
           count: 2,
           spawnIntervalMs: 1500,
           delayBeforeGroupMs: 3000,
           pathIndex: 0,
           turnAroundAtEnd: true,
           concurrentWithPrevious: false,
-          uncapturable: true,
+          uncapturable: false,
         },
         {
           definitionId: 'senticle',

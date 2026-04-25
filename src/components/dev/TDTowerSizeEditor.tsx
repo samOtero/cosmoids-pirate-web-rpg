@@ -41,6 +41,9 @@ const BATTLE_SPRITES = [
   '/battles/characters/pirate_grunt_battle.png',
   '/battles/characters/grandpa_battle.png',
   '/battles/units/note_1.png',
+  '/battles/cosmoids/mouse_1_down_1.png',
+  '/battles/cosmoids/mouse_1_left_1.png',
+  '/battles/cosmoids/mouse_1_up_1.png',
 ];
 
 const ALL_CONFIG_KEYS = Object.keys(CREATURE_TD_CONFIGS);

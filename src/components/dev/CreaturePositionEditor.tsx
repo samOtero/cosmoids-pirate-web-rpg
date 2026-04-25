@@ -9,6 +9,7 @@ import {
   STARTER_CRAB,
   STARTER_IGUANA,
   STARTER_MONKEY,
+  MOUSE_1,
 } from '@/constants/creatures';
 import { BATTLE_BACKGROUND_IMAGES } from '@/constants/game';
 import { BackgroundImageKey, Creature } from '@/types/baseGame';
@@ -23,6 +24,7 @@ const ALL_CREATURES: { varName: string; creature: Creature }[] = [
   { varName: 'STARTER_CRAB', creature: STARTER_CRAB },
   { varName: 'STARTER_IGUANA', creature: STARTER_IGUANA },
   { varName: 'STARTER_MONKEY', creature: STARTER_MONKEY },
+  { varName: 'MOUSE_1', creature: MOUSE_1 },
 ];
 
 type Side = 'left' | 'right';
