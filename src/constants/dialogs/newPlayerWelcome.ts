@@ -68,7 +68,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: 'Lance',
         },
       ],
-      text: 'Use those to catch your first partner. Maybe start small with a little bird or a dock rat.',
+      text: 'Use those to catch your first partner. Maybe start small with a little bird or a dock mouse.',
     },
     {
       portraits: [
@@ -77,7 +77,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: 'Caleb',
         },
       ],
-      text: '***A dock rat?! No way! Come on, Lance! You have a whole chest of rare Cosmoids right there. Let me have one of those!\n',
+      text: '***A dock mouse?! No way! Come on, Lance! You have a whole chest of rare Cosmoids right there. Let me have one of those!\n',
     },
     {
       portraits: [
@@ -99,16 +99,16 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: '',
         },
       ],
-      text: 'Heavy, arrogant footsteps echo on the wooden docks as a local Bandit swaggers up.',
+      text: 'Heavy, arrogant footsteps echo on the wooden docks as a local Rat-Catcher swaggers up.',
     },
     {
       portraits: [
         {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: 'Grandpa',
+          key: SpeakerImageKey.RAT_CATCHER_1,
+          displayName: 'Rat-Catcher',
         },
       ],
-      text: '***Well, look at the big, bad pirate playing with kids.',
+      text: 'Well, look at the big, bad pirate playing with kids.',
     },
     {
       text: 'Just enjoying the morning breeze. No trouble here.',
@@ -120,11 +120,11 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       ],
     },
     {
-      text: "***You pirates are pathetic. Take away your fancy little monsters, and you're all just cowards playing dress-up on the water.",
+      text: "You pirates are pathetic. Take away your fancy little monsters, and you're all just cowards playing dress-up on the water.",
       portraits: [
         {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: 'Grandpa',
+          key: SpeakerImageKey.RAT_CATCHER_1,
+          displayName: 'Rat-Catcher',
         },
       ],
     },
@@ -138,7 +138,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       ],
     },
     {
-      text: 'Let it go, Caleb. Words can’t sink ships.',
+      text: "Let it go, Caleb. Words can't sink ships.",
       portraits: [
         {
           key: SpeakerImageKey.LANCE_NEUTRAL_OUTFIT_1,
@@ -156,7 +156,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       ],
     },
     {
-      text: 'Lance turns his back and walks toward his ship, completely ignoring the Bandit.',
+      text: 'Lance turns his back and walks toward his ship, completely ignoring the Rat-Catcher.',
       portraits: [
         {
           key: SpeakerImageKey.EMPTY,
@@ -165,11 +165,11 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       ],
     },
     {
-      text: "***See that, kid? A total coward. I think I'll just take his precious cargo then.",
+      text: "See that, kid? A total coward. I think I'll just take his precious cargo then.",
       portraits: [
         {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: 'Grandpa',
+          key: SpeakerImageKey.RAT_CATCHER_1,
+          displayName: 'Rat-Catcher',
         },
       ],
     },
@@ -183,11 +183,11 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       ],
     },
     {
-      text: '***A real pirate? Please. You and what army, kid?',
+      text: 'A real pirate? Please. You and what army, kid?',
       portraits: [
         {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: 'Grandpa',
+          key: SpeakerImageKey.RAT_CATCHER_1,
+          displayName: 'Rat-Catcher',
         },
       ],
     },
@@ -363,11 +363,11 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       text: "A Captain is nothing without a loyal First Mate! I've made my choice!",
     },
     {
-      text: "***A fancy new pet? Too bad it's stuck with a weak little kid giving the orders. Senticle, crush 'em both!",
+      text: "A fancy new pet? Too bad it's stuck with a weak little kid giving the orders. Senticle, crush 'em both!",
       portraits: [
         {
-          key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
-          displayName: 'Grandpa',
+          key: SpeakerImageKey.RAT_CATCHER_1,
+          displayName: 'Rat-Catcher',
         },
       ],
     },

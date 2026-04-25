@@ -52,7 +52,7 @@ export const FIRST_LEVEL: TDLevelData = {
         x: 89.45,
         y: 40,
       },
-      tdConfigId: 'pirate_grunt_battle',
+      tdConfigId: 'rat_catcher_battle',
     },
     {
       position: {
@@ -153,13 +153,13 @@ export const FIRST_LEVEL: TDLevelData = {
       id: 'wave_1771807082096',
       groups: [
         {
-          definitionId: 'senticle',
+          definitionId: 'mouse_1',
           count: 1,
           spawnIntervalMs: 1500,
           delayBeforeGroupMs: 100,
           pathIndex: 0,
           turnAroundAtEnd: true,
-          uncapturable: true,
+          uncapturable: false,
         },
         {
           definitionId: 'mouse_1',
@@ -172,7 +172,7 @@ export const FIRST_LEVEL: TDLevelData = {
           uncapturable: false,
         },
         {
-          definitionId: 'bird_1',
+          definitionId: 'mouse_1',
           count: 3,
           spawnIntervalMs: 1500,
           delayBeforeGroupMs: 3000,
@@ -182,14 +182,14 @@ export const FIRST_LEVEL: TDLevelData = {
           uncapturable: false,
         },
         {
-          definitionId: 'senticle',
+          definitionId: 'mouse_1',
           count: 5,
           spawnIntervalMs: 1500,
           delayBeforeGroupMs: 3000,
           pathIndex: 0,
           turnAroundAtEnd: true,
           concurrentWithPrevious: false,
-          uncapturable: true,
+          uncapturable: false,
         },
       ],
     },

@@ -39,6 +39,7 @@ const BATTLE_SPRITES = [
   '/battles/units/map_1.png',
   '/battles/characters/caleb_battle.png',
   '/battles/characters/pirate_grunt_battle.png',
+  '/battles/characters/rat_catcher_battle.png',
   '/battles/characters/grandpa_battle.png',
   '/battles/units/note_1.png',
   '/battles/cosmoids/mouse_1_down_1_25.png',

@@ -241,6 +241,19 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowScaleY: 1,
     },
   },
+  rat_catcher_battle: {
+    default: {
+      url: '/battles/characters/rat_catcher_battle.png',
+      scale: 0.66,
+      shadowScaleX: 2.3,
+      shadowOffsetY: 5,
+      offsetY: -91,
+      healthBarOffsetY: -5,
+      offsetX: -2,
+      shadowScaleY: 1,
+      flipX: true,
+    },
+  },
   grandpa_battle: {
     default: {
       url: '/battles/characters/grandpa_battle.png',

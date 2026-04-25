@@ -27,6 +27,7 @@ export enum ElementType {
   GRASS = 'Grass',
   ELECTRIC = 'Electric',
   NORMAL = 'Normal',
+  FLYING = 'Flying',
 }
 
 export enum SpeakerImageKey {
@@ -52,6 +53,7 @@ export enum SpeakerImageKey {
   PIRATE_GRUNT_JOE_ANGRY = 'Pirate_Grunt_Joe_Angry',
   PIRATE_GRUNT_JOE_ANGRY_POINTING = 'Pirate_Grunt_Joe_Angry_Pointing',
   LANCE_NEUTRAL_OUTFIT_1 = 'Lance_Neutral_Outfit_1',
+  RAT_CATCHER_1 = 'Rat_Catcher_1',
   NARRATOR = 'Narrator',
   DEFAULT = 'default',
   EMPTY = 'empty',
