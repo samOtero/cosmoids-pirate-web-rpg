@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import * as PIXI from 'pixi.js';
 import {
   TowerDefenseEngine,
@@ -163,7 +163,13 @@ interface PixiBattlefieldProps {
   backgroundScale?: number;
 }
 
-export default function PixiBattlefield({
+export interface PixiBattlefieldRef {
+  handleExternalMove: (clientX: number, clientY: number, type: 'tower' | 'capture') => void;
+  handleExternalLeave: () => void;
+  handleExternalDrop: (clientX: number, clientY: number, towerIdStr: string | null, isCaptureDevice: boolean) => void;
+}
+
+const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(({
   engine,
   onMapDrop,
   onMapRemove,
@@ -172,7 +178,7 @@ export default function PixiBattlefield({
   getDragState,
   backgroundUrl,
   backgroundScale = 1,
-}: PixiBattlefieldProps) {
+}, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const fpsRef = useRef<HTMLDivElement>(null);
   const onMapDropRef = useRef(onMapDrop);
@@ -197,6 +203,91 @@ export default function PixiBattlefield({
     scrollY: number;
   } | null>(null);
   const zoomRef = useRef(1); // 1 = normal (max zoom in), < 1 = zoomed out
+
+  useImperativeHandle(ref, () => ({
+    handleExternalMove: (clientX, clientY, type) => {
+      draggingCaptureDeviceRef.current = type === 'capture';
+      const bgBounds = bgBoundsRef.current;
+      if (bgBounds && bgBounds.width > 0 && containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        const localX = clientX - rect.left - bgBounds.x;
+        const localY = clientY - rect.top - bgBounds.y;
+        const x = (localX / bgBounds.width) * 100;
+        const y = (localY / bgBounds.height) * 100;
+        dragPosRef.current = { x, y };
+      }
+    },
+    handleExternalLeave: () => {
+      dragPosRef.current = null;
+      draggingCaptureDeviceRef.current = false;
+    },
+    handleExternalDrop: (clientX, clientY, towerIdStr, isCaptureDevice) => {
+      dragPosRef.current = null;
+      draggingCaptureDeviceRef.current = false;
+
+      const bgBounds = bgBoundsRef.current;
+      if (!bgBounds || bgBounds.width === 0 || !containerRef.current) return;
+
+      const rect = containerRef.current.getBoundingClientRect();
+      const localX = clientX - rect.left - bgBounds.x;
+      const localY = clientY - rect.top - bgBounds.y;
+      const x = (localX / bgBounds.width) * 100;
+      const y = (localY / bgBounds.height) * 100;
+
+      if (isCaptureDevice && engine) {
+        let targetedEnemyId: string | null = null;
+        let isWeakened = false;
+        let minSqDist = Infinity;
+        const CAPTURE_DIST_SQ = 64; // distance squared for hovering enemy
+
+        engine.enemies.forEach((enemy) => {
+          const dx = x - enemy.position.x;
+          const dy = y - enemy.position.y;
+          const distSq = dx * dx + dy * dy;
+
+          if (distSq <= CAPTURE_DIST_SQ && distSq < minSqDist) {
+            minSqDist = distSq;
+            targetedEnemyId = enemy.id;
+            isWeakened = enemy.hp / enemy.maxHp <= WEAKENED_THRESHOLD;
+          }
+        });
+
+        if (targetedEnemyId && isWeakened) {
+          if (onEnemyCapturedRef.current) {
+            onEnemyCapturedRef.current(targetedEnemyId);
+          }
+        }
+        return;
+      }
+
+      if (towerIdStr) {
+        if (engine) {
+          let closestSpot: { x: number; y: number } | null = null;
+          let minSqDist = Infinity;
+          const SNAP_DIST_SQ = 100; // 10 units squared
+
+          for (const spot of engine.placementSpots) {
+            const dx = x - spot.x;
+            const dy = y - spot.y;
+            const distSq = dx * dx + dy * dy;
+
+            if (distSq <= SNAP_DIST_SQ && distSq < minSqDist) {
+              minSqDist = distSq;
+              closestSpot = spot;
+            }
+          }
+
+          if (closestSpot) {
+            onMapDropRef.current(towerIdStr, closestSpot.x, closestSpot.y);
+          } else {
+            if (onMapRemoveRef.current) {
+              onMapRemoveRef.current(towerIdStr);
+            }
+          }
+        }
+      }
+    }
+  }));
 
   // Keep the latest callback without triggering re-runs of the PIXI initializer
   useEffect(() => {
@@ -1216,107 +1307,7 @@ export default function PixiBattlefield({
   }, [engine]);
 
   return (
-    <div
-      className="flex-1 relative overflow-hidden"
-      onDragOver={(e) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'copy';
-
-        // Set dragging capture device ref based on items (types in modern browsers)
-        if (e.dataTransfer.types.includes('application/capture-device')) {
-          draggingCaptureDeviceRef.current = true;
-        } else {
-          draggingCaptureDeviceRef.current = false;
-        }
-
-        // Track hover position
-        const bgBounds = bgBoundsRef.current;
-        if (bgBounds && bgBounds.width > 0) {
-          const rect = e.currentTarget.getBoundingClientRect();
-          const localX = e.clientX - rect.left - bgBounds.x;
-          const localY = e.clientY - rect.top - bgBounds.y;
-          const x = (localX / bgBounds.width) * 100;
-          const y = (localY / bgBounds.height) * 100;
-          dragPosRef.current = { x, y };
-        }
-      }}
-      onDragLeave={() => {
-        dragPosRef.current = null;
-        draggingCaptureDeviceRef.current = false;
-      }}
-      onDrop={(e) => {
-        e.preventDefault();
-        dragPosRef.current = null;
-        draggingCaptureDeviceRef.current = false;
-
-        const bgBounds = bgBoundsRef.current;
-        if (!bgBounds || bgBounds.width === 0) return;
-
-        const rect = e.currentTarget.getBoundingClientRect();
-        const localX = e.clientX - rect.left - bgBounds.x;
-        const localY = e.clientY - rect.top - bgBounds.y;
-        const x = (localX / bgBounds.width) * 100;
-        const y = (localY / bgBounds.height) * 100;
-
-        const towerIdStr = e.dataTransfer.getData('application/tower-id');
-        const isCaptureDevice = e.dataTransfer.getData(
-          'application/capture-device'
-        );
-
-        if (isCaptureDevice && engine) {
-          let targetedEnemyId: string | null = null;
-          let isWeakened = false;
-          let minSqDist = Infinity;
-          const CAPTURE_DIST_SQ = 64; // distance squared for hovering enemy
-
-          engine.enemies.forEach((enemy) => {
-            const dx = x - enemy.position.x;
-            const dy = y - enemy.position.y;
-            const distSq = dx * dx + dy * dy;
-
-            if (distSq <= CAPTURE_DIST_SQ && distSq < minSqDist) {
-              minSqDist = distSq;
-              targetedEnemyId = enemy.id;
-              isWeakened = enemy.hp / enemy.maxHp <= WEAKENED_THRESHOLD;
-            }
-          });
-
-          if (targetedEnemyId && isWeakened) {
-            if (onEnemyCapturedRef.current) {
-              onEnemyCapturedRef.current(targetedEnemyId);
-            }
-          }
-          return;
-        }
-
-        if (towerIdStr) {
-          if (engine) {
-            let closestSpot: { x: number; y: number } | null = null;
-            let minSqDist = Infinity;
-            const SNAP_DIST_SQ = 100; // 10 units squared
-
-            for (const spot of engine.placementSpots) {
-              const dx = x - spot.x;
-              const dy = y - spot.y;
-              const distSq = dx * dx + dy * dy;
-
-              if (distSq <= SNAP_DIST_SQ && distSq < minSqDist) {
-                minSqDist = distSq;
-                closestSpot = spot;
-              }
-            }
-
-            if (closestSpot) {
-              onMapDropRef.current(towerIdStr, closestSpot.x, closestSpot.y);
-            } else {
-              if (onMapRemoveRef.current) {
-                onMapRemoveRef.current(towerIdStr);
-              }
-            }
-          }
-        }
-      }}
-    >
+    <div className="flex-1 relative overflow-hidden">
       <div ref={containerRef} className="absolute inset-0" />
       <div
         ref={fpsRef}
@@ -1349,4 +1340,6 @@ export default function PixiBattlefield({
       )}
     </div>
   );
-}
+});
+
+export default PixiBattlefield;

@@ -9,9 +9,7 @@ export function TowerButton({
   displayLevel,
   displayXp,
   onClick,
-  draggable,
-  onDragStart,
-  onDragEnd,
+  onPointerDown,
 }: {
   creature: PlayerCreature;
   name: string;
@@ -21,17 +19,14 @@ export function TowerButton({
   displayXp: number;
   onClick?: () => void;
   draggable?: boolean;
-  onDragStart?: (e: React.DragEvent<HTMLButtonElement>) => void;
-  onDragEnd?: () => void;
+  onPointerDown?: (e: React.PointerEvent<HTMLButtonElement>) => void;
 }) {
   return (
     <button
-      draggable={draggable}
       onClick={onClick}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      className={`relative w-24 h-24 p-1 rounded flex flex-col items-center justify-center transition-all shrink-0 ${
-        draggable
+      onPointerDown={onPointerDown}
+      className={`relative w-24 h-24 p-1 rounded flex flex-col items-center justify-center transition-all shrink-0 touch-none ${
+        onPointerDown
           ? 'cursor-grab active:cursor-grabbing hover:scale-105'
           : 'cursor-default'
       } ${

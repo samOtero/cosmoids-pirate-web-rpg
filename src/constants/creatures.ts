@@ -43,6 +43,27 @@ export const MOUSE_1: Creature = {
   speciesId: '',
 };
 
+export const BIRD_1: Creature = {
+  id: 'bird_1',
+  name: 'Bird 1',
+  type: ElementType.NORMAL,
+  maxHp: 20,
+  currentHp: 25,
+  attack: 15,
+  defense: 20,
+  speed: 30,
+  level: 3,
+  xp: 0,
+  moves: ['Tackle', 'String Shot'],
+  spriteUrl: '/battles/cosmoids/bird_1_down_1_50.png',
+  battleSpriteUrl: '/battles/cosmoids/bird_1_down_1_50.png',
+  startingEnergy: 50,
+  currentEnergy: 50,
+  movementId: 'lizard',
+
+  speciesId: '',
+};
+
 export const BUG_STAGE_1: Creature = {
   id: 'bug_stage_1',
   name: 'Buglet',

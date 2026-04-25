@@ -6,7 +6,7 @@ import {
   TowerDefenseEngine,
   TD_CREATURE_DEFS,
 } from '@/engine/tower-defense/TowerDefenseEngine';
-import PixiBattlefield from './PixiBattlefield';
+import PixiBattlefield, { PixiBattlefieldRef } from './PixiBattlefield';
 import { ActiveAttackMenu } from './ActiveAttackMenu';
 import { TowerButton } from './TowerButton';
 import {
@@ -77,6 +77,18 @@ export default function TowerDefenseScreen({
     newAttackDefId: string;
   } | null>(null);
   const dragStateRef = useRef<'tower' | 'capture' | false>(false);
+  const pixiRef = useRef<PixiBattlefieldRef>(null);
+
+  const [globalDrag, setGlobalDrag] = useState<{
+    type: 'tower' | 'capture';
+    id?: string;
+    imageUrl?: string;
+    name?: string;
+    offsetX: number;
+    offsetY: number;
+    x: number;
+    y: number;
+  } | null>(null);
 
   const requestRef = useRef<number | null>(null);
   const previousTimeRef = useRef<number | null>(null);
@@ -279,7 +291,46 @@ export default function TowerDefenseScreen({
   };
 
   return (
-    <div className="fixed inset-0 z-9998 bg-slate-900 flex flex-col">
+    <div 
+      className="fixed inset-0 z-9998 bg-slate-900 flex flex-col touch-none"
+      onPointerMove={(e) => {
+        if (globalDrag) {
+          setGlobalDrag((prev) => prev ? { ...prev, x: e.clientX, y: e.clientY } : null);
+          if (pixiRef.current) {
+            pixiRef.current.handleExternalMove(e.clientX, e.clientY, globalDrag.type);
+          }
+        }
+      }}
+      onPointerUp={(e) => {
+        if (globalDrag) {
+          if (pixiRef.current) {
+            pixiRef.current.handleExternalDrop(
+              e.clientX, 
+              e.clientY, 
+              globalDrag.type === 'tower' ? (globalDrag.id || null) : null, 
+              globalDrag.type === 'capture'
+            );
+          }
+           if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+            e.currentTarget.releasePointerCapture(e.pointerId);
+          }
+          dragStateRef.current = false;
+          setGlobalDrag(null);
+        }
+      }}
+      onPointerCancel={(e) => {
+        if (globalDrag) {
+          if (pixiRef.current) {
+            pixiRef.current.handleExternalLeave();
+          }
+          if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+            e.currentTarget.releasePointerCapture(e.pointerId);
+          }
+          dragStateRef.current = false;
+          setGlobalDrag(null);
+        }
+      }}
+    >
       {introState !== 'none' && (
         <div className="fixed inset-0 z-10000 bg-black/60 flex items-center justify-center pointer-events-none">
           <div className="text-7xl md:text-9xl font-black italic text-transparent bg-clip-text bg-linear-to-br from-yellow-300 to-red-500 drop-shadow-[0_0_25px_rgba(255,165,0,0.8)] uppercase animate-bounce pr-8 pb-4">
@@ -333,6 +384,7 @@ export default function TowerDefenseScreen({
       </div>
 
       <PixiBattlefield
+        ref={pixiRef}
         engine={engineRef.current}
         backgroundUrl={levelData.backgroundUrl}
         backgroundScale={levelData.backgroundScale}
@@ -430,7 +482,6 @@ export default function TowerDefenseScreen({
               isActive={isActive}
               displayLevel={displayLevel}
               displayXp={displayXp}
-              draggable={true}
               onClick={() => {
                 if (!dragStateRef.current) {
                   setSelectedCreatureId(creature.id);
@@ -438,20 +489,22 @@ export default function TowerDefenseScreen({
                   setIsPlaying(false);
                 }
               }}
-              onDragStart={(e) => {
+              onPointerDown={(e) => {
+                e.currentTarget.setPointerCapture(e.pointerId);
                 dragStateRef.current = 'tower';
-                e.dataTransfer.setData(
-                  'application/tower-id',
-                  creature.id.toString()
-                );
-                e.dataTransfer.effectAllowed = 'copy';
-                const imgEl = e.currentTarget.querySelector('img');
-                if (imgEl) {
-                  e.dataTransfer.setDragImage(imgEl, 24, 24);
-                }
-              }}
-              onDragEnd={() => {
-                dragStateRef.current = false;
+                const rect = e.currentTarget.getBoundingClientRect();
+                const offsetX = e.clientX - rect.left;
+                const offsetY = e.clientY - rect.top;
+                setGlobalDrag({
+                  type: 'tower',
+                  id: creature.id.toString(),
+                  imageUrl: spriteUrl,
+                  name: name,
+                  offsetX,
+                  offsetY,
+                  x: e.clientX,
+                  y: e.clientY,
+                });
               }}
             />
           );
@@ -464,20 +517,21 @@ export default function TowerDefenseScreen({
             <React.Fragment>
               <div className="w-px h-16 bg-cyan-800 mx-2 shrink-0" />
               <button
-                draggable={true}
-                onDragStart={(e) => {
+                onPointerDown={(e) => {
+                  e.currentTarget.setPointerCapture(e.pointerId);
                   dragStateRef.current = 'capture';
-                  e.dataTransfer.setData('application/capture-device', 'true');
-                  e.dataTransfer.effectAllowed = 'copy';
-                  const imgEl = e.currentTarget.querySelector('img');
-                  if (imgEl) {
-                    e.dataTransfer.setDragImage(imgEl, 24, 24);
-                  }
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const offsetX = e.clientX - rect.left;
+                  const offsetY = e.clientY - rect.top;
+                  setGlobalDrag({
+                    type: 'capture',
+                    offsetX,
+                    offsetY,
+                    x: e.clientX,
+                    y: e.clientY,
+                  });
                 }}
-                onDragEnd={() => {
-                  dragStateRef.current = false;
-                }}
-                className="relative z-0 w-24 h-24 p-2 rounded flex flex-col items-center justify-center transition-all cursor-grab active:cursor-grabbing hover:scale-105 bg-purple-900 border-2 border-purple-500 hover:bg-purple-800 shrink-0"
+                className="relative z-0 w-24 h-24 p-2 rounded flex flex-col items-center justify-center transition-all cursor-grab active:cursor-grabbing hover:scale-105 bg-purple-900 border-2 border-purple-500 hover:bg-purple-800 shrink-0 touch-none"
               >
                 {/* We'll use a placeholder icon or color for the capture device */}
                 <div className="relative w-12 h-12 rounded-full border-4 border-white bg-red-500 flex items-center justify-center shadow-lg pointer-events-none mb-1 overflow-hidden">
@@ -605,6 +659,41 @@ export default function TowerDefenseScreen({
             </div>
           );
         })()}
+
+      {globalDrag && (
+        <div
+          className="fixed pointer-events-none z-[10001]"
+          style={{
+            left: globalDrag.x - globalDrag.offsetX,
+            top: globalDrag.y - globalDrag.offsetY,
+          }}
+        >
+          {globalDrag.type === 'tower' ? (
+            <div className="w-24 h-24 p-1 rounded flex flex-col items-center justify-center bg-cyan-800 border-2 border-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.6)] opacity-80 scale-105">
+              {globalDrag.imageUrl && (
+                <img
+                  src={globalDrag.imageUrl}
+                  alt={globalDrag.name}
+                  className="w-10 h-10 object-contain pointer-events-none"
+                />
+              )}
+              <span className="text-[9px] uppercase font-bold truncate w-full text-center leading-tight text-cyan-100 mt-1">
+                {globalDrag.name}
+              </span>
+            </div>
+          ) : (
+            <div className="w-24 h-24 p-2 rounded flex flex-col items-center justify-center bg-purple-900 border-2 border-purple-500 opacity-80 scale-105">
+              <div className="relative w-12 h-12 rounded-full border-4 border-white bg-red-500 flex items-center justify-center shadow-lg pointer-events-none mb-1 overflow-hidden">
+                <div className="w-full h-1 bg-black absolute top-1/2 -mt-[2px] left-0" />
+                <div className="w-4 h-4 bg-white rounded-full border-2 border-black z-10" />
+              </div>
+              <span className="text-[10px] mt-1 uppercase text-center leading-tight text-purple-200 font-bold">
+                Capture
+              </span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

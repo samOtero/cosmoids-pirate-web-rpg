@@ -1,4 +1,5 @@
 import {
+  BIRD_1,
   BUG_STAGE_1,
   BUG_STAGE_2,
   BUG_STAGE_3,
@@ -67,6 +68,10 @@ export const TD_CREATURE_DEFS: Record<string, TDCreatureMetadata> = {
   },
   [MOUSE_1.id]: {
     baseCreature: MOUSE_1,
+    xpYield: 20,
+  },
+  [BIRD_1.id]: {
+    baseCreature: BIRD_1,
     xpYield: 20,
   },
 };

@@ -172,14 +172,14 @@ export const FIRST_LEVEL: TDLevelData = {
           uncapturable: false,
         },
         {
-          definitionId: 'senticle',
+          definitionId: 'bird_1',
           count: 3,
           spawnIntervalMs: 1500,
           delayBeforeGroupMs: 3000,
           pathIndex: 0,
           turnAroundAtEnd: true,
           concurrentWithPrevious: false,
-          uncapturable: true,
+          uncapturable: false,
         },
         {
           definitionId: 'senticle',
