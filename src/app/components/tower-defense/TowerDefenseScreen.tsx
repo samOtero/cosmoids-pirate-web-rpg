@@ -80,6 +80,18 @@ export default function TowerDefenseScreen({
   const justDraggedRef = useRef(false);
   const pixiRef = useRef<PixiBattlefieldRef>(null);
 
+  const DRAG_THRESHOLD = 10; // pixels before a pointerdown becomes a drag
+  const pendingDragRef = useRef<{
+    type: 'tower' | 'capture';
+    id?: string;
+    imageUrl?: string;
+    name?: string;
+    startX: number;
+    startY: number;
+    offsetX: number;
+    offsetY: number;
+  } | null>(null);
+
   const [globalDrag, setGlobalDrag] = useState<{
     type: 'tower' | 'capture';
     id?: string;
@@ -295,6 +307,28 @@ export default function TowerDefenseScreen({
     <div 
       className="fixed inset-0 z-9998 bg-slate-900 flex flex-col touch-none"
       onPointerMove={(e) => {
+        // Check if a pending drag should become a real drag
+        if (pendingDragRef.current && !globalDrag) {
+          const pd = pendingDragRef.current;
+          const dx = e.clientX - pd.startX;
+          const dy = e.clientY - pd.startY;
+          if (Math.sqrt(dx * dx + dy * dy) >= DRAG_THRESHOLD) {
+            // Threshold exceeded — activate real drag
+            dragStateRef.current = pd.type;
+            setGlobalDrag({
+              type: pd.type,
+              id: pd.id,
+              imageUrl: pd.imageUrl,
+              name: pd.name,
+              offsetX: pd.offsetX,
+              offsetY: pd.offsetY,
+              x: e.clientX,
+              y: e.clientY,
+            });
+            pendingDragRef.current = null;
+          }
+          return;
+        }
         if (globalDrag) {
           setGlobalDrag((prev) => prev ? { ...prev, x: e.clientX, y: e.clientY } : null);
           if (pixiRef.current) {
@@ -303,6 +337,15 @@ export default function TowerDefenseScreen({
         }
       }}
       onPointerUp={(e) => {
+        // Pending drag that never exceeded threshold — treat as a click
+        if (pendingDragRef.current) {
+          pendingDragRef.current = null;
+          if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+            e.currentTarget.releasePointerCapture(e.pointerId);
+          }
+          return;
+        }
+        // Real drag completed — do the drop
         if (globalDrag) {
           if (pixiRef.current) {
             pixiRef.current.handleExternalDrop(
@@ -312,7 +355,7 @@ export default function TowerDefenseScreen({
               globalDrag.type === 'capture'
             );
           }
-           if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+          if (e.currentTarget.hasPointerCapture(e.pointerId)) {
             e.currentTarget.releasePointerCapture(e.pointerId);
           }
           justDraggedRef.current = true;
@@ -321,6 +364,10 @@ export default function TowerDefenseScreen({
         }
       }}
       onPointerCancel={(e) => {
+        // Clear pending drag on cancel
+        if (pendingDragRef.current) {
+          pendingDragRef.current = null;
+        }
         if (globalDrag) {
           if (pixiRef.current) {
             pixiRef.current.handleExternalLeave();
@@ -497,20 +544,17 @@ export default function TowerDefenseScreen({
               }}
               onPointerDown={(e) => {
                 e.currentTarget.setPointerCapture(e.pointerId);
-                dragStateRef.current = 'tower';
                 const rect = e.currentTarget.getBoundingClientRect();
-                const offsetX = e.clientX - rect.left;
-                const offsetY = e.clientY - rect.top;
-                setGlobalDrag({
+                pendingDragRef.current = {
                   type: 'tower',
                   id: creature.id.toString(),
                   imageUrl: spriteUrl,
                   name: name,
-                  offsetX,
-                  offsetY,
-                  x: e.clientX,
-                  y: e.clientY,
-                });
+                  startX: e.clientX,
+                  startY: e.clientY,
+                  offsetX: e.clientX - rect.left,
+                  offsetY: e.clientY - rect.top,
+                };
               }}
             />
           );
@@ -525,17 +569,14 @@ export default function TowerDefenseScreen({
               <button
                 onPointerDown={(e) => {
                   e.currentTarget.setPointerCapture(e.pointerId);
-                  dragStateRef.current = 'capture';
                   const rect = e.currentTarget.getBoundingClientRect();
-                  const offsetX = e.clientX - rect.left;
-                  const offsetY = e.clientY - rect.top;
-                  setGlobalDrag({
+                  pendingDragRef.current = {
                     type: 'capture',
-                    offsetX,
-                    offsetY,
-                    x: e.clientX,
-                    y: e.clientY,
-                  });
+                    startX: e.clientX,
+                    startY: e.clientY,
+                    offsetX: e.clientX - rect.left,
+                    offsetY: e.clientY - rect.top,
+                  };
                 }}
                 className="relative z-0 w-24 h-24 p-2 rounded flex flex-col items-center justify-center transition-all cursor-grab active:cursor-grabbing hover:scale-105 bg-purple-900 border-2 border-purple-500 hover:bg-purple-800 shrink-0 touch-none"
               >
