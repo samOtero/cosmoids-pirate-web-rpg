@@ -121,3 +121,6 @@ Added optional `backgroundScale` property to `TDLevelData`. When set > 1 (e.g. 1
 
 ## [2026-03-26] Zoom Controls for TD Map
 Added zoom in/out buttons (+/-) to PixiBattlefield when `backgroundScale > 1`. Zoom range is `1/backgroundScale` (fully zoomed out, entire bg visible) to `1` (normal view). All entity containers, spot graphics, and floating text scale by `zoom`. The `updateBgLayout` function reads `zoomRef` each tick so zoom changes take effect immediately. Display dimensions = `fullBg * zoom`, scroll limits shrink as you zoom out.
+
+## [2026-04-25] Tower Drag-and-Click Bug Fix
+When dragging a tower via pointer events, the browser fires a 'click' event after 'pointerup'. Since dragStateRef was already reset by the time click fires, the attack selection menu would open. Fixed by adding a justDraggedRef flag that is set to true on pointerup (during a drag) and checked/cleared in the TowerButton onClick handler.

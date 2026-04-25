@@ -77,6 +77,7 @@ export default function TowerDefenseScreen({
     newAttackDefId: string;
   } | null>(null);
   const dragStateRef = useRef<'tower' | 'capture' | false>(false);
+  const justDraggedRef = useRef(false);
   const pixiRef = useRef<PixiBattlefieldRef>(null);
 
   const [globalDrag, setGlobalDrag] = useState<{
@@ -314,6 +315,7 @@ export default function TowerDefenseScreen({
            if (e.currentTarget.hasPointerCapture(e.pointerId)) {
             e.currentTarget.releasePointerCapture(e.pointerId);
           }
+          justDraggedRef.current = true;
           dragStateRef.current = false;
           setGlobalDrag(null);
         }
@@ -483,6 +485,10 @@ export default function TowerDefenseScreen({
               displayLevel={displayLevel}
               displayXp={displayXp}
               onClick={() => {
+                if (justDraggedRef.current) {
+                  justDraggedRef.current = false;
+                  return;
+                }
                 if (!dragStateRef.current) {
                   setSelectedCreatureId(creature.id);
                   setWasPlayingBeforeMenu(isPlaying);
