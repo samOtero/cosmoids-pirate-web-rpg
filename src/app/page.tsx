@@ -10,21 +10,25 @@ import {
   BackgroundImageKey,
   Creature,
   StoryProgression,
+  TDLevelContext,
 } from '@/types/baseGame';
 import {
   resolvePlayerCreature,
   resolvePlayerCreatures,
 } from '@/utils/resolvePlayerCreature';
 import { resolveDialog } from '@/utils/dialogResolver';
-import { ISLANDS } from '@/constants/game';
 
 const StartScreen = lazy(() => import('@/app/components/startScreen'));
 const ProfileScreen = lazy(() => import('@/app/components/profileScreen'));
 const DialogScreen = lazy(() => import('@/app/components/dialogScreen'));
-const MapScreen = lazy(() => import('@/app/components/mapScreen'));
 const BattleScreen = lazy(() => import('@/app/components/battleScreen'));
-const IslandMapScreen = lazy(() => import('@/app/components/IslandMapScreen'));
 const PartyScreen = lazy(() => import('@/app/components/PartyScreen'));
+const LevelSelectScreen = lazy(
+  () => import('@/app/components/LevelSelectScreen')
+);
+const ModeSelectScreen = lazy(
+  () => import('@/app/components/ModeSelectScreen')
+);
 const TowerDefenseScreen = lazy(
   () => import('@/app/components/tower-defense/TowerDefenseScreen')
 );
@@ -56,9 +60,6 @@ export default function Home() {
     currentTdLevel,
   } = useGameStore();
 
-  // Also handle "WAIT" events or similar if implemented in the store processor,
-  // but for now the store updates state immediately for screen changes.
-
   // Deduced state
   const currentProfile =
     currentProfileId !== null ? profiles[currentProfileId] : null;
@@ -67,11 +68,11 @@ export default function Home() {
     // Handle redirects based on state validity
     if (currentScreen === Screens.BATTLE) {
       if (!currentProfile || !currentEnemy) {
-        setScreen(Screens.MAP);
+        setScreen(Screens.LEVEL_SELECT);
       } else if (!currentProfile.creatures[0]) {
-        setScreen(Screens.MAP);
+        setScreen(Screens.LEVEL_SELECT);
       }
-    } else if (currentScreen === Screens.MAP) {
+    } else if (currentScreen === Screens.LEVEL_SELECT) {
       if (!currentProfile) {
         setScreen(Screens.PROFILES);
       }
@@ -98,12 +99,6 @@ export default function Home() {
           inventory={currentProfile.inventory}
           onUseItem={useItem}
           onBattleEnd={(won, modifiedCreatures) => {
-            // Battle system returns full Creature[] — we can ignore updates since
-            // PlayerCreature doesn't track HP. Stats persist at the species level.
-
-            // For now just go back to map or dialog depending on context?
-            // Maybe we need a result screen or dialog
-
             if (eventQueue.length > 0) {
               processNextEvent();
               clearCurrentEnemy();
@@ -190,7 +185,7 @@ export default function Home() {
       <Suspense fallback={<div>Loading Team...</div>}>
         <PartyScreen
           creatures={resolvePlayerCreatures(currentProfile.creatures)}
-          onBack={() => setScreen(Screens.MAP)}
+          onBack={() => setScreen(Screens.LEVEL_SELECT)}
           onReorder={reorderCreatures}
         />
       </Suspense>
@@ -206,7 +201,9 @@ export default function Home() {
       <Suspense fallback={<div>Loading Tower Defense...</div>}>
         <TowerDefenseScreen
           levelData={currentTdLevel.levelData}
-          onClose={() => enqueueAndProcessEvents([{ type: 'GO_TO_MAP' }])}
+          onClose={() =>
+            enqueueAndProcessEvents([{ type: 'GO_TO_LEVEL_SELECT' }])
+          }
           onWin={() => enqueueAndProcessEvents(currentTdLevel.winEvents)}
           onLose={() => enqueueAndProcessEvents(currentTdLevel.loseEvents)}
         />
@@ -245,9 +242,6 @@ export default function Home() {
       if (nextEvents && nextEvents.length > 0) {
         // Add them to the queue
         nextEvents.forEach((e) => enqueueEvent(e));
-        // Process the first one immediately?
-        // Or just wait for the next render?
-        // We should probably process immediately to avoid a dead frame.
         processNextEvent();
         return;
       }
@@ -255,7 +249,7 @@ export default function Home() {
       if (next) {
         setScreen(next.screen, next.context, next.contextData);
       } else {
-        setScreen(Screens.MAP);
+        setScreen(Screens.MODE_SELECT);
       }
     };
 
@@ -272,67 +266,23 @@ export default function Home() {
     );
   }
 
-  if (currentScreen === Screens.MAP) {
-    if (!currentProfile) {
-      return null;
-    }
-
-    return (
-      <Suspense fallback={<div>Loading...</div>}>
-        <MapScreen
-          profile={currentProfile}
-          onTravel={(islandId: number) => {
-            // For now, traveling just starts the level 1 intro sequence
-            // In a real game, this would update currentIslandId
-            enqueueAndProcessEvents([
-              {
-                type: 'SHOW_DIALOG',
-                payload: { context: DialogContext.LEVEL_1_INTRO },
-              },
-              {
-                type: 'START_BATTLE',
-                payload: { context: BattleContext.FIRST_BATTLE },
-              },
-            ]);
-          }}
-          onEnterIsland={(islandId: number) => {
-            enqueueAndProcessEvents([
-              {
-                type: 'GO_TO_ISLAND_MAP',
-                payload: { islandId },
-              },
-            ]);
-          }}
-          onOpenMenu={() => {}}
-          onUseItem={useItem}
-        />
-      </Suspense>
-    );
-  }
-
-  if (currentScreen === Screens.ISLAND_MAP) {
+  if (currentScreen === Screens.LEVEL_SELECT) {
     if (!currentProfile) return null;
-    const island = ISLANDS.find((i) => i.id === currentProfile.currentIslandId);
-
-    // Fallback if island not found or logic error
-    if (!island) {
-      setScreen(Screens.MAP);
-      return null;
-    }
 
     return (
-      <Suspense fallback={<div>Loading Island...</div>}>
-        <IslandMapScreen
+      <Suspense fallback={<div>Loading Levels...</div>}>
+        <LevelSelectScreen
           profile={currentProfile}
-          island={island}
-          onNodeClick={(nodeId) => {
-            const node = island.nodes?.find((n) => n.id === nodeId);
-            if (node && node.events) {
-              enqueueAndProcessEvents(node.events);
-            }
+          onLevelSelect={(context: TDLevelContext) => {
+            enqueueAndProcessEvents([
+              {
+                type: 'GO_TO_TOWER_DEFENSE',
+                payload: { context },
+              },
+            ]);
           }}
-          onBack={() => setScreen(Screens.MAP)}
-          onOpenMenu={() => {}}
+          onBack={() => setScreen(Screens.MODE_SELECT)}
+          onUseItem={useItem}
           dialogContext={dialogContext}
           dialogContextData={dialogContextData}
           onDialogContinue={() => {
@@ -350,7 +300,7 @@ export default function Home() {
               processNextEvent();
             } else {
               // Close dialog
-              setScreen(Screens.ISLAND_MAP);
+              setScreen(Screens.LEVEL_SELECT);
             }
           }}
           onDialogAction={(action) => {
@@ -359,7 +309,21 @@ export default function Home() {
               processNextEvent();
             }
           }}
-          onUseItem={useItem}
+        />
+      </Suspense>
+    );
+  }
+
+  if (currentScreen === Screens.MODE_SELECT) {
+    if (!currentProfile) return null;
+
+    return (
+      <Suspense fallback={<div>Loading...</div>}>
+        <ModeSelectScreen
+          profile={currentProfile}
+          onSelectStory={() => setScreen(Screens.LEVEL_SELECT)}
+          onSelectChallenge={() => {}}
+          onBack={() => setScreen(Screens.PROFILES)}
         />
       </Suspense>
     );

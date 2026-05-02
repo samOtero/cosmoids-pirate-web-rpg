@@ -80,10 +80,9 @@ describe('useGameStore - enqueueAndProcessEvents', () => {
   it('should automatically process the next event if autoProceed is true', () => {
     const { result } = renderHook(() => useGameStore());
 
-    // Event 1: Go to MAP, autoProceed = true
+    // Event 1: Go to Level Select, autoProceed = true
     const event1: GameEvent = {
-      type: 'GO_TO_MAP',
-      payload: { islandId: 1 },
+      type: 'GO_TO_LEVEL_SELECT',
       autoProceed: true,
     };
 
@@ -137,33 +136,32 @@ describe('useGameStore - enqueueAndProcessEvents', () => {
     );
   });
 
-  it('should not switch screen when SHOW_ISLAND_MAP_DIALOG is triggered during ISLAND_MAP', () => {
+  it('should not switch screen when SHOW_LEVEL_SELECT_DIALOG is triggered during LEVEL_SELECT', () => {
     const { result } = renderHook(() => useGameStore());
 
-    // 1. Go to Island Map
+    // 1. Go to Level Select
     act(() => {
       result.current.enqueueAndProcessEvents([
         {
-          type: 'GO_TO_ISLAND_MAP',
-          payload: { islandId: 0 },
+          type: 'GO_TO_LEVEL_SELECT',
         },
       ]);
     });
 
-    expect(result.current.currentScreen).toBe(Screens.ISLAND_MAP);
+    expect(result.current.currentScreen).toBe(Screens.LEVEL_SELECT);
 
-    // 2. Trigger Island Map Dialog
+    // 2. Trigger Level Select Dialog
     act(() => {
       result.current.enqueueAndProcessEvents([
         {
-          type: 'SHOW_ISLAND_MAP_DIALOG',
+          type: 'SHOW_LEVEL_SELECT_DIALOG',
           payload: { context: DialogContext.ISLAND_INTRO },
         },
       ]);
     });
 
-    // 3. Verify screen is STILL Island Map
-    expect(result.current.currentScreen).toBe(Screens.ISLAND_MAP);
+    // 3. Verify screen is STILL Level Select
+    expect(result.current.currentScreen).toBe(Screens.LEVEL_SELECT);
     // 4. Verify dialog context is set
     expect(result.current.dialogContext).toBe(DialogContext.ISLAND_INTRO);
   });

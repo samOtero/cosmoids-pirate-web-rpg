@@ -21,7 +21,7 @@ import {
   GameEvent,
   ShowDialogEventPayload,
   ShowBattleDialogEventPayload,
-  ShowIslandMapDialogEventPayload,
+  ShowLevelSelectDialogEventPayload,
   SetFlagEventPayload,
   RemoveFlagEventPayload,
   SetStoryProgressionEventPayload,
@@ -32,7 +32,6 @@ import {
   ReorderCreaturesEventPayload,
   ExecuteTDActionEventPayload,
   GoToTowerDefenseEventPayload,
-  GoToIslandMapEventPayload,
 } from '@/types/baseGame';
 import { BATTLES } from '@/constants/battles';
 import { TD_LEVELS } from '@/constants/tdLevels';
@@ -175,16 +174,6 @@ export const useGameStore = create<GameState>()(
                     );
                     break;
                   }
-                  case 'SHOW_ISLAND_MAP_DIALOG': {
-                    const dialogPayload =
-                      currentEvent.payload as ShowIslandMapDialogEventPayload;
-                    state.setScreen(
-                      Screens.ISLAND_MAP,
-                      dialogPayload.context || null,
-                      dialogPayload.contextData || undefined
-                    );
-                    break;
-                  }
                   case 'START_BATTLE': {
                     const payload =
                       currentEvent.payload as StartBattleEventPayload;
@@ -195,24 +184,22 @@ export const useGameStore = create<GameState>()(
                     }
                     break;
                   }
-                  case 'GO_TO_MAP': {
-                    state.setScreen(Screens.MAP);
+                  case 'SHOW_LEVEL_SELECT_DIALOG': {
+                    const dialogPayload =
+                      currentEvent.payload as ShowLevelSelectDialogEventPayload;
+                    state.setScreen(
+                      Screens.LEVEL_SELECT,
+                      dialogPayload.context || null,
+                      dialogPayload.contextData || undefined
+                    );
                     break;
                   }
-                  case 'GO_TO_ISLAND_MAP': {
-                    const payload = currentEvent.payload as GoToIslandMapEventPayload | undefined;
-                    const profileId = updates.currentProfileId ?? state.currentProfileId;
-                    
-                    if (payload?.islandId !== undefined && profileId !== null && state.profiles[profileId]) {
-                      const newProfiles = [...(updates.profiles || state.profiles)];
-                      newProfiles[profileId] = {
-                        ...newProfiles[profileId]!,
-                        currentIslandId: payload.islandId,
-                      };
-                      updates.profiles = newProfiles;
-                    }
-                    
-                    state.setScreen(Screens.ISLAND_MAP);
+                  case 'GO_TO_LEVEL_SELECT': {
+                    state.setScreen(Screens.LEVEL_SELECT);
+                    break;
+                  }
+                  case 'GO_TO_MODE_SELECT': {
+                    state.setScreen(Screens.MODE_SELECT);
                     break;
                   }
                   case 'GO_TO_PROFILES': {
@@ -557,7 +544,7 @@ export const useGameStore = create<GameState>()(
               } else if (
                 profile.storyProgression >= StoryProgression.DEFEAT_FIRST_BATTLE
               ) {
-                initialEvents = [{ type: 'GO_TO_ISLAND_MAP' }];
+                initialEvents = [{ type: 'GO_TO_MODE_SELECT' }];
               }
 
               return {

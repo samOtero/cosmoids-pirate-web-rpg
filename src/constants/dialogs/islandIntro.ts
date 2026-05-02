@@ -24,7 +24,7 @@ export const ISLAND_INTRO_DIALOGS: Record<string, DialogConfig> = {
     ],
     backgroundImageKey: BackgroundImageKey.DEFAULT,
     next: {
-      screen: Screens.MAP,
+      screen: Screens.LEVEL_SELECT,
     },
   },
   coral_reef: {
@@ -41,7 +41,7 @@ export const ISLAND_INTRO_DIALOGS: Record<string, DialogConfig> = {
     ],
     backgroundImageKey: BackgroundImageKey.DEFAULT,
     next: {
-      screen: Screens.MAP,
+      screen: Screens.LEVEL_SELECT,
     },
   },
 };

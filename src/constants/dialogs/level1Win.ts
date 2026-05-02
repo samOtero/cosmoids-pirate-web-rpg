@@ -73,6 +73,6 @@ export const LEVEL_1_WIN: DialogConfig = {
   ],
   backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
   next: {
-    screen: Screens.ISLAND_MAP,
+    screen: Screens.LEVEL_SELECT,
   },
 };

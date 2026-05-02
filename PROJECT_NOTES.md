@@ -124,3 +124,9 @@ Added zoom in/out buttons (+/-) to PixiBattlefield when `backgroundScale > 1`. Z
 
 ## [2026-04-25] Tower Drag-and-Click Bug Fix
 When dragging a tower via pointer events, the browser fires a 'click' event after 'pointerup'. Since dragStateRef was already reset by the time click fires, the attack selection menu would open. Fixed by adding a justDraggedRef flag that is set to true on pointerup (during a drag) and checked/cleared in the TowerButton onClick handler.
+
+## [2026-05-01] Level Select Screen Replaces Maps
+Removed the World Map (`Screens.MAP`) and Island Map (`Screens.ISLAND_MAP`) screens. Replaced with a single Level Select screen (`Screens.LEVEL_SELECT`) that displays TD levels as numbered blocks in a grid. The flow is now Start => Profiles => Level Select => Tower Defense. Events `GO_TO_MAP`/`GO_TO_ISLAND_MAP` were consolidated into `GO_TO_LEVEL_SELECT`. `SHOW_ISLAND_MAP_DIALOG` became `SHOW_LEVEL_SELECT_DIALOG`. Level ordering is defined in `LEVEL_ORDER` array in `src/constants/tdLevels/index.ts`. Includes 4 placeholder locked levels beyond the 2 real ones.
+
+## [2026-05-01] Mode Select Screen
+Added `Screens.MODE_SELECT` between Profile and Level Select. Flow is now Start => Profiles => Mode Select => Level Select (Story) => Tower Defense. The Mode Select screen shows two cards: Story (active, routes to Level Select) and Challenge (disabled, 'Coming Soon'). `GO_TO_MODE_SELECT` event type added. Returning players after defeating the first battle now go to Mode Select. The `ModeSelectScreen` component lives at `src/app/components/ModeSelectScreen.tsx`.

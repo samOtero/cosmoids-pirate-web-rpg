@@ -23,7 +23,7 @@ describe('buildTimeDialogValidator', () => {
           },
         ],
         backgroundImageKey: BackgroundImageKey.DEFAULT,
-        next: { screen: Screens.MAP },
+        next: { screen: Screens.LEVEL_SELECT },
       };
 
       const result = validateDialogConfig(dialog, 'TestDialog');

@@ -46,14 +46,14 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
         },
       },
       {
-        type: 'GO_TO_ISLAND_MAP',
+        type: 'GO_TO_LEVEL_SELECT',
         autoProceed: true,
         payload: {
           islandId: 0,
         },
       },
       {
-        type: 'SHOW_ISLAND_MAP_DIALOG',
+        type: 'SHOW_LEVEL_SELECT_DIALOG',
         payload: {
           context: DialogContext.LEVEL_2_ISLAND_MAP_INTRO,
         },
@@ -95,7 +95,7 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
         },
       },
       {
-        type: 'GO_TO_ISLAND_MAP',
+        type: 'GO_TO_LEVEL_SELECT',
         payload: {
           islandId: 0,
         },
@@ -103,7 +103,7 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
     ],
     loseEvents: [
       {
-        type: 'GO_TO_ISLAND_MAP',
+        type: 'GO_TO_LEVEL_SELECT',
         payload: {
           islandId: 0,
         },
@@ -123,7 +123,7 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
         },
       },
       {
-        type: 'GO_TO_ISLAND_MAP',
+        type: 'GO_TO_LEVEL_SELECT',
         payload: {
           islandId: 0,
         },
@@ -131,7 +131,7 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
     ],
     loseEvents: [
       {
-        type: 'GO_TO_ISLAND_MAP',
+        type: 'GO_TO_LEVEL_SELECT',
         payload: {
           islandId: 0,
         },
@@ -144,7 +144,7 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
     turnEvents: {},
     winEvents: [
       {
-        type: 'GO_TO_ISLAND_MAP',
+        type: 'GO_TO_LEVEL_SELECT',
         payload: {
           islandId: 0,
         },
@@ -152,7 +152,7 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
     ],
     loseEvents: [
       {
-        type: 'GO_TO_ISLAND_MAP',
+        type: 'GO_TO_LEVEL_SELECT',
         payload: {
           islandId: 0,
         },

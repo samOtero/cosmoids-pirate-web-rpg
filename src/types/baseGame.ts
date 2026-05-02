@@ -2,9 +2,8 @@ export enum Screens {
   START = 'START',
   PROFILES = 'PROFILES',
   DIALOG = 'DIALOG',
-  MAP = 'MAP',
-  ISLAND_MAP = 'ISLAND_MAP',
-  ISLAND_INSIDE = 'ISLAND_INSIDE',
+  MODE_SELECT = 'MODE_SELECT',
+  LEVEL_SELECT = 'LEVEL_SELECT',
   BATTLE = 'BATTLE',
   PARTY = 'PARTY',
   TOWER_DEFENSE = 'TOWER_DEFENSE',
@@ -289,10 +288,10 @@ export interface DialogConfig {
 export type GameEventType =
   | 'SHOW_DIALOG'
   | 'SHOW_BATTLE_DIALOG'
-  | 'SHOW_ISLAND_MAP_DIALOG'
+  | 'SHOW_LEVEL_SELECT_DIALOG'
   | 'START_BATTLE'
-  | 'GO_TO_MAP'
-  | 'GO_TO_ISLAND_MAP'
+  | 'GO_TO_LEVEL_SELECT'
+  | 'GO_TO_MODE_SELECT'
   | 'GO_TO_PROFILES'
   | 'PICK_STARTER'
   | 'ADD_CREATURE_TO_PROFILE'
@@ -311,10 +310,8 @@ export interface GameEvent {
   payload?:
     | ShowDialogEventPayload
     | ShowBattleDialogEventPayload
-    | ShowIslandMapDialogEventPayload
+    | ShowLevelSelectDialogEventPayload
     | StartBattleEventPayload
-    | GoToMapEventPayload
-    | GoToIslandMapEventPayload
     | AddCreatureToProfileEventPayload
     | SetFlagEventPayload
     | RemoveFlagEventPayload
@@ -343,7 +340,7 @@ export interface ShowBattleDialogEventPayload {
   contextData?: DialogContextData;
 }
 
-export interface ShowIslandMapDialogEventPayload {
+export interface ShowLevelSelectDialogEventPayload {
   context: DialogContext;
   contextData?: DialogContextData;
 }
@@ -396,14 +393,6 @@ export interface StartBattleEventPayload {
   context: BattleContext;
   enemyId?: string;
   backgroundKey?: BackgroundImageKey;
-}
-
-export interface GoToMapEventPayload {
-  islandId: number;
-}
-
-export interface GoToIslandMapEventPayload {
-  islandId: number;
 }
 
 export interface GoToTowerDefenseEventPayload {

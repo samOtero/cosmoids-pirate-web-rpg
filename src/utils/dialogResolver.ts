@@ -19,7 +19,7 @@ function getDefaultDialog(): DialogConfig {
     sequence: [],
     backgroundImageKey: BackgroundImageKey.DEFAULT,
     next: {
-      screen: Screens.MAP,
+      screen: Screens.MODE_SELECT,
     },
   };
 }

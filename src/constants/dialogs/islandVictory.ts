@@ -20,7 +20,7 @@ export const ISLAND_VICTORY_DIALOGS: Record<string, DialogConfig> = {
     ],
     backgroundImageKey: BackgroundImageKey.DEFAULT,
     next: {
-      screen: Screens.MAP,
+      screen: Screens.LEVEL_SELECT,
     },
   },
 };
