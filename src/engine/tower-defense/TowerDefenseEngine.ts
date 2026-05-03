@@ -10,6 +10,7 @@ import {
   STARTER_MONKEY,
 } from '@/constants/creatures';
 import { Creature, PlayerCreature } from '@/types/baseGame';
+import { calculateMaxHp, calculateStat } from '@/utils/resolvePlayerCreature';
 import {
   Tower,
   Enemy,
@@ -258,7 +259,9 @@ export class TowerDefenseEngine {
             ? Math.floor(Math.random() * this.paths.length)
             : 0;
         const startPath = this.paths[pathIndex] || [{ x: 0, y: 0 }];
-        const newEnemyHp = randomEnemyDef.maxHp * this.enemyHpMultiplier;
+        const enemyLevel = randomEnemyDef.level;
+        const newEnemyHp = calculateMaxHp(randomEnemyDef.maxHp, enemyLevel) * this.enemyHpMultiplier;
+        const newEnemyAttack = calculateStat(randomEnemyDef.attack, enemyLevel);
         newEnemies.push({
           id: `enemy_${time}`,
           definitionId: randomEnemyDef.id,
@@ -266,7 +269,7 @@ export class TowerDefenseEngine {
           hp: newEnemyHp,
           maxHp: newEnemyHp,
           speed: randomEnemyDef.speed / 100,
-          currentAttack: randomEnemyDef.attack,
+          currentAttack: newEnemyAttack,
           statusConditions: [],
           currentWaypointIndex: 1,
           pathIndex: pathIndex,
@@ -845,14 +848,18 @@ export class TowerDefenseEngine {
     const pathIndex = groupPathIndex;
     const startPath = this.paths[pathIndex] || [{ x: 0, y: 0 }];
 
+    const enemyLevel = meta.baseCreature.level;
+    const enemyHp = calculateMaxHp(meta.baseCreature.maxHp, enemyLevel) * this.enemyHpMultiplier;
+    const enemyAttack = calculateStat(meta.baseCreature.attack, enemyLevel);
+
     newEnemies.push({
       id: `enemy_${time}_${Math.random().toString(36).substring(7)}`,
       definitionId: definitionId,
       position: { x: startPath[0].x, y: startPath[0].y },
-      hp: meta.baseCreature.maxHp * this.enemyHpMultiplier,
-      maxHp: meta.baseCreature.maxHp * this.enemyHpMultiplier,
+      hp: enemyHp,
+      maxHp: enemyHp,
       speed: meta.baseCreature.speed / 100,
-      currentAttack: meta.baseCreature.attack,
+      currentAttack: enemyAttack,
       statusConditions: [],
       currentWaypointIndex: 1,
       pathIndex: pathIndex,
@@ -926,10 +933,9 @@ export class TowerDefenseEngine {
 
     const baseDef = defMeta.baseCreature;
 
-    // Derive base stats from the species definition
-    const statGrowth = 2;
-    const derivedAttack = baseDef.attack + creature.level * statGrowth;
-    const derivedMaxHp = baseDef.maxHp;
+    // Derive stats using the Pokemon formula (without IV/EV)
+    const derivedAttack = calculateStat(baseDef.attack, creature.level);
+    const derivedMaxHp = calculateMaxHp(baseDef.maxHp, creature.level);
 
     const attacks =
       creature.equippedAttacks.length > 0

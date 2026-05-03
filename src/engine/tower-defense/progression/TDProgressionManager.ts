@@ -1,5 +1,6 @@
 import { TowerDefenseEngine, TD_CREATURE_DEFS } from '../TowerDefenseEngine';
 import { TDEventBus, TDEvent } from '../events/TDEventBus';
+import { calculateMaxHp, calculateStat } from '@/utils/resolvePlayerCreature';
 
 const MAX_LEVEL = 10;
 
@@ -41,11 +42,20 @@ export class TDProgressionManager {
           killer.creature.xp -= requiredXp;
           killer.creature.level += 1;
 
-          // Scale Stats
+          // Scale Stats using Pokemon formula
           const metadata = TD_CREATURE_DEFS[killer.creature.speciesId];
-          const statGrowth = 2; // Flat +2 attack per level as simple example
-          killer.currentAttack =
-            metadata.baseCreature.attack + killer.creature.level * statGrowth;
+          killer.currentAttack = calculateStat(
+            metadata.baseCreature.attack,
+            killer.creature.level
+          );
+
+          // Recalculate HP and restore to full on level-up
+          const newMaxHp = calculateMaxHp(
+            metadata.baseCreature.maxHp,
+            killer.creature.level
+          );
+          killer.maxHp = newMaxHp;
+          killer.hp = newMaxHp;
 
           // We decouple the trigger so Pixi can safely animate
           this.engine.events.emit({
@@ -95,8 +105,18 @@ export class TDProgressionManager {
               tower.creature.speciesId = node.evolutionDefId;
 
               const newMetadata = TD_CREATURE_DEFS[tower.creature.speciesId];
-              tower.currentAttack =
-                newMetadata.baseCreature.attack + tower.creature.level * 2;
+              tower.currentAttack = calculateStat(
+                newMetadata.baseCreature.attack,
+                tower.creature.level
+              );
+
+              // Recalculate HP and restore to full on evolution
+              const newMaxHp = calculateMaxHp(
+                newMetadata.baseCreature.maxHp,
+                tower.creature.level
+              );
+              tower.maxHp = newMaxHp;
+              tower.hp = newMaxHp;
 
               this.engine.events.emit({
                 type: 'TOWER_EVOLVED',

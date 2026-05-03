@@ -130,3 +130,6 @@ Removed the World Map (`Screens.MAP`) and Island Map (`Screens.ISLAND_MAP`) scre
 
 ## [2026-05-01] Mode Select Screen
 Added `Screens.MODE_SELECT` between Profile and Level Select. Flow is now Start => Profiles => Mode Select => Level Select (Story) => Tower Defense. The Mode Select screen shows two cards: Story (active, routes to Level Select) and Challenge (disabled, 'Coming Soon'). `GO_TO_MODE_SELECT` event type added. Returning players after defeating the first battle now go to Mode Select. The `ModeSelectScreen` component lives at `src/app/components/ModeSelectScreen.tsx`.
+
+## [2026-05-02] Pokemon HP/Stat Formulas for TD Units
+Towers and enemies now use the Pokemon stat formula (without IV/EV) for initial HP and attack. HP formula: `floor((2 * Base * Level) / 100) + Level + 10`. Non-HP stat formula: `floor((2 * Base * Level) / 100) + 5`. These are calculated via `calculateMaxHp` and `calculateStat` from `src/utils/resolvePlayerCreature.ts`. On level-up and evolution, tower HP is recalculated while preserving the current HP percentage. The `enemyHpMultiplier` in TDLevelData is still applied as a multiplier on top of the formula result.
