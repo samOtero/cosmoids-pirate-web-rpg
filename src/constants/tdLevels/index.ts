@@ -6,6 +6,7 @@ import {
 } from '@/types/baseGame';
 import { FIRST_LEVEL } from './firstLevel';
 import { FOREST_LEVEL } from './forestLevel';
+import { CHALLENGE_FIRST_LEVEL, CHALLENGE_FIRST_LEVEL_NO_CAPTURE } from './challengeFirstLevel';
 
 export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
   [TDLevelContext.FIRST_LEVEL]: {
@@ -46,6 +47,32 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
     loseEvents: [
       {
         type: 'GO_TO_LEVEL_SELECT',
+      },
+    ],
+  },
+  [TDLevelContext.CHALLENGE_FIRST_LEVEL]: {
+    levelData: CHALLENGE_FIRST_LEVEL,
+    winEvents: [
+      {
+        type: 'GO_TO_CHALLENGE_SELECT',
+      },
+    ],
+    loseEvents: [
+      {
+        type: 'GO_TO_CHALLENGE_SELECT',
+      },
+    ],
+  },
+  [TDLevelContext.CHALLENGE_FIRST_LEVEL_NO_CAPTURE]: {
+    levelData: CHALLENGE_FIRST_LEVEL_NO_CAPTURE,
+    winEvents: [
+      {
+        type: 'GO_TO_CHALLENGE_SELECT',
+      },
+    ],
+    loseEvents: [
+      {
+        type: 'GO_TO_CHALLENGE_SELECT',
       },
     ],
   },
@@ -96,5 +123,19 @@ export const LEVEL_ORDER: LevelInfo[] = [
     name: 'Abyssal Point',
     description: 'The edge of the known world.',
     requiredProgression: 999,
+  },
+];
+
+/** Ordered list of challenge levels for the Challenge Select screen. */
+export const CHALLENGE_LEVEL_ORDER: LevelInfo[] = [
+  {
+    context: TDLevelContext.CHALLENGE_FIRST_LEVEL,
+    name: 'One Life Gauntlet',
+    description: 'Survive Level 1 with a single life and a lone Fueguana.',
+  },
+  {
+    context: TDLevelContext.CHALLENGE_FIRST_LEVEL_NO_CAPTURE,
+    name: 'No Capture Run',
+    description: 'Level 1 with one Fueguana — no capturing allowed.',
   },
 ];

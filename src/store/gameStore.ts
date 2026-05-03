@@ -198,6 +198,10 @@ export const useGameStore = create<GameState>()(
                     state.setScreen(Screens.LEVEL_SELECT);
                     break;
                   }
+                  case 'GO_TO_CHALLENGE_SELECT': {
+                    state.setScreen(Screens.CHALLENGE_SELECT);
+                    break;
+                  }
                   case 'GO_TO_MODE_SELECT': {
                     state.setScreen(Screens.MODE_SELECT);
                     break;

@@ -95,6 +95,10 @@ export interface TDLevelData {
     facingDirection?: 'up' | 'down' | 'left' | 'right';
   }[];
   captureUnits?: { tdConfigId: string; position: Point }[];
+  /** When set, the player uses this fixed roster instead of their profile creatures. */
+  premadeRoster?: PlayerCreature[];
+  /** Marks this level as a challenge level (affects routing and progress saving). */
+  isChallengeLevel?: boolean;
 }
 
 export interface Tower extends BaseTDUnit {

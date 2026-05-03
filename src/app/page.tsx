@@ -32,6 +32,9 @@ const ModeSelectScreen = lazy(
 const TowerDefenseScreen = lazy(
   () => import('@/app/components/tower-defense/TowerDefenseScreen')
 );
+const ChallengeSelectScreen = lazy(
+  () => import('@/app/components/ChallengeSelectScreen')
+);
 
 export default function Home() {
   const {
@@ -202,7 +205,13 @@ export default function Home() {
         <TowerDefenseScreen
           levelData={currentTdLevel.levelData}
           onClose={() =>
-            enqueueAndProcessEvents([{ type: 'GO_TO_LEVEL_SELECT' }])
+            enqueueAndProcessEvents([
+              {
+                type: currentTdLevel.levelData.isChallengeLevel
+                  ? 'GO_TO_CHALLENGE_SELECT'
+                  : 'GO_TO_LEVEL_SELECT',
+              },
+            ])
           }
           onWin={() => enqueueAndProcessEvents(currentTdLevel.winEvents)}
           onLose={() => enqueueAndProcessEvents(currentTdLevel.loseEvents)}
@@ -322,8 +331,29 @@ export default function Home() {
         <ModeSelectScreen
           profile={currentProfile}
           onSelectStory={() => setScreen(Screens.LEVEL_SELECT)}
-          onSelectChallenge={() => {}}
+          onSelectChallenge={() => setScreen(Screens.CHALLENGE_SELECT)}
           onBack={() => setScreen(Screens.PROFILES)}
+        />
+      </Suspense>
+    );
+  }
+
+  if (currentScreen === Screens.CHALLENGE_SELECT) {
+    if (!currentProfile) return null;
+
+    return (
+      <Suspense fallback={<div>Loading Challenges...</div>}>
+        <ChallengeSelectScreen
+          profile={currentProfile}
+          onLevelSelect={(context: TDLevelContext) => {
+            enqueueAndProcessEvents([
+              {
+                type: 'GO_TO_TOWER_DEFENSE',
+                payload: { context },
+              },
+            ]);
+          }}
+          onBack={() => setScreen(Screens.MODE_SELECT)}
         />
       </Suspense>
     );

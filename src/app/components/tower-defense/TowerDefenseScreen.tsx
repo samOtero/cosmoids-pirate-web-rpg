@@ -51,7 +51,10 @@ export default function TowerDefenseScreen({
   const profile = currentProfileId !== null ? profiles[currentProfileId] : null;
 
   const hasEndedRef = useRef(false);
-  const playerCreatures = (profile?.creatures || []).slice(0, 6);
+  const isPremadeLevel = !!levelData.premadeRoster;
+  const playerCreatures = isPremadeLevel
+    ? levelData.premadeRoster!
+    : (profile?.creatures || []).slice(0, 6);
 
   const engineRef = useRef<TowerDefenseEngine>(null!);
   if (!engineRef.current) {
@@ -113,6 +116,7 @@ export default function TowerDefenseScreen({
   const [outroState, setOutroState] = useState<'none' | 'win' | 'lose'>('none');
 
   const saveTowerProgress = () => {
+    if (isPremadeLevel) return; // Challenge mode: don't persist progress
     if (currentProfileId === null) return;
 
     if (engineRef.current.roster.length > 0) {
@@ -297,14 +301,15 @@ export default function TowerDefenseScreen({
 
   const handleEnemyCaptured = (enemyId: string) => {
     const capturedCreature = engineRef.current.captureEnemy(enemyId);
-    if (capturedCreature && currentProfileId !== null) {
+    if (capturedCreature && currentProfileId !== null && !isPremadeLevel) {
       addCreatureToProfile(currentProfileId, capturedCreature);
-      // Optional: Show some success feedback
     }
+    // In challenge mode, the captured creature is still usable in-level
+    // (captureEnemy adds it to the engine roster) but won't persist to profile.
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-9998 bg-slate-900 flex flex-col touch-none"
       onPointerMove={(e) => {
         // Check if a pending drag should become a real drag
@@ -330,9 +335,15 @@ export default function TowerDefenseScreen({
           return;
         }
         if (globalDrag) {
-          setGlobalDrag((prev) => prev ? { ...prev, x: e.clientX, y: e.clientY } : null);
+          setGlobalDrag((prev) =>
+            prev ? { ...prev, x: e.clientX, y: e.clientY } : null
+          );
           if (pixiRef.current) {
-            pixiRef.current.handleExternalMove(e.clientX, e.clientY, globalDrag.type);
+            pixiRef.current.handleExternalMove(
+              e.clientX,
+              e.clientY,
+              globalDrag.type
+            );
           }
         }
       }}
@@ -349,9 +360,9 @@ export default function TowerDefenseScreen({
         if (globalDrag) {
           if (pixiRef.current) {
             pixiRef.current.handleExternalDrop(
-              e.clientX, 
-              e.clientY, 
-              globalDrag.type === 'tower' ? (globalDrag.id || null) : null, 
+              e.clientX,
+              e.clientY,
+              globalDrag.type === 'tower' ? globalDrag.id || null : null,
               globalDrag.type === 'capture'
             );
           }

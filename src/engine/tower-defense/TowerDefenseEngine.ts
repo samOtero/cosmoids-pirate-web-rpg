@@ -870,12 +870,27 @@ export class TowerDefenseEngine {
   }
 
   public captureEnemy(enemyId: string): PlayerCreature | null {
-    const enemy = this.enemies.find((e) => e.id === enemyId);
-    if (!enemy || enemy.uncapturable) return null;
+    const enemyIndex = this.enemies.findIndex((e) => e.id === enemyId);
+    if (enemyIndex === -1 || this.enemies[enemyIndex].uncapturable) return null;
+
+    const enemy = this.enemies[enemyIndex];
+
+    // Remove the enemy from the battlefield
+    this.enemies.splice(enemyIndex, 1);
+
+    // Drop any held capture unit
+    if (enemy.heldCaptureUnitId) {
+      const droppedUnit = this.captureUnits.find(
+        (cu) => cu.id === enemy.heldCaptureUnitId
+      );
+      if (droppedUnit) {
+        droppedUnit.heldByEnemyId = undefined;
+      }
+    }
 
     // Optional: add RNG for capture success here! Currently 100% success.
     const captured: PlayerCreature = {
-      id: enemy.definitionId, // will be replaced with UUID when added to profile
+      id: `captured_${enemy.definitionId}_${Date.now()}_${Math.random().toString(36).substring(7)}`,
       speciesId: enemy.definitionId,
       level: 1,
       xp: 0,

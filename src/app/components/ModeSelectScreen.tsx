@@ -96,30 +96,36 @@ export default function ModeSelectScreen({
           <button
             id="mode-challenge"
             onClick={onSelectChallenge}
-            disabled
-            className="group relative rounded-2xl border-2 border-gray-600/30 bg-gradient-to-br from-gray-900/50 via-gray-800/30 to-gray-900/50 p-6 md:p-8 min-h-[220px] flex flex-col items-center justify-center gap-4
+            className="group relative rounded-2xl border-2 border-amber-500/40 bg-gradient-to-br from-purple-900/40 via-amber-900/30 to-orange-900/40 p-6 md:p-8 min-h-[220px] flex flex-col items-center justify-center gap-4
               transition-all duration-300 ease-out
-              cursor-not-allowed opacity-60 overflow-hidden"
+              hover:border-amber-400 hover:shadow-amber-500/20 hover:shadow-2xl hover:-translate-y-2 active:translate-y-0
+              cursor-pointer overflow-hidden"
           >
+            {/* Glow effect */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl bg-gradient-to-br from-amber-500/10 to-transparent pointer-events-none" />
+
             {/* Icon */}
-            <div className="w-20 h-20 rounded-full bg-gray-700/20 ring-2 ring-gray-600/30 flex items-center justify-center text-4xl">
+            <div className="w-20 h-20 rounded-full bg-amber-500/15 ring-2 ring-amber-400/30 flex items-center justify-center text-4xl group-hover:ring-amber-400/60 group-hover:bg-amber-500/25 transition-all duration-300">
               🏆
             </div>
 
             {/* Title */}
-            <h2 className="text-xl md:text-2xl font-bold text-gray-400 tracking-wide uppercase">
+            <h2 className="text-xl md:text-2xl font-bold text-amber-200 tracking-wide uppercase">
               Challenge
             </h2>
 
             {/* Description */}
-            <p className="text-gray-500 text-sm text-center leading-relaxed max-w-[240px]">
+            <p className="text-amber-200/60 text-sm text-center leading-relaxed max-w-[240px]">
               Test your skills with unique challenges and earn special rewards.
             </p>
 
-            {/* Coming Soon badge */}
-            <div className="bg-gray-700/50 text-gray-400 text-[10px] uppercase tracking-widest font-bold px-3 py-1 rounded-full border border-gray-600/30">
-              Coming Soon
+            {/* Play indicator */}
+            <div className="text-amber-400/70 text-xs uppercase tracking-widest font-semibold mt-1 group-hover:text-amber-300 transition-colors">
+              Play →
             </div>
+
+            {/* Subtle pulse border */}
+            <div className="absolute inset-0 rounded-2xl border-2 border-amber-400/20 animate-pulse pointer-events-none" />
           </button>
         </div>
       </div>
