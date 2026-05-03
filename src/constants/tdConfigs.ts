@@ -3,116 +3,116 @@ import { UnitVisuals } from '@/types/baseGame';
 export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   senticle: {
     default: {
-      url: '/battles/cosmoids/senticle_left_1.png',
+      url: "/battles/cosmoids/senticle_left_1.png",
       scale: 0.39,
       offsetY: -31,
       shadowOffsetY: -8,
       shadowScaleX: 1.5,
       shadowScaleY: 0.7,
-      healthBarOffsetY: -65,
+      healthBarOffsetY: -65
     },
     left: {
-      url: '/battles/cosmoids/senticle_left_1.png',
+      url: "/battles/cosmoids/senticle_left_1.png",
       scale: 0.39,
       offsetY: -31,
       shadowOffsetY: -8,
       shadowScaleX: 1.5,
-      shadowScaleY: 0.7,
+      shadowScaleY: 0.7
     },
     right: {
-      url: '/battles/cosmoids/senticle_left_1.png',
+      url: "/battles/cosmoids/senticle_left_1.png",
       scale: 0.39,
       offsetY: -31,
       shadowOffsetY: -8,
       shadowScaleX: 1.5,
       shadowScaleY: 0.7,
-      flipX: true,
+      flipX: true
     },
     up: {
-      url: '/battles/cosmoids/senticle_up_1.png',
+      url: "/battles/cosmoids/senticle_up_1.png",
       scale: 0.39,
       offsetY: -31,
       shadowOffsetY: -8,
       shadowScaleX: 1.5,
-      shadowScaleY: 0.7,
+      shadowScaleY: 0.7
     },
     down: {
-      url: '/battles/cosmoids/senticle_down_1.png',
+      url: "/battles/cosmoids/senticle_down_1.png",
       scale: 0.39,
       offsetY: -31,
       shadowOffsetY: -8,
       shadowScaleX: 1.5,
-      shadowScaleY: 0.7,
-    },
+      shadowScaleY: 0.7
+    }
   },
   bug_stage_1: {
     default: {
-      url: '/battles/cosmoids/bug_1_left_1.png',
+      url: "/battles/cosmoids/bug_1_left_1.png",
       scale: 0.34,
       shadowScaleX: 1.2,
-      shadowOffsetY: 7,
+      shadowOffsetY: 7
     },
     right: {
-      url: '/battles/cosmoids/bug_1_left_1.png',
+      url: "/battles/cosmoids/bug_1_left_1.png",
       scale: 0.34,
       shadowScaleX: 1.2,
       shadowOffsetY: 7,
-      flipX: true,
+      flipX: true
     },
     up: {
-      url: '/battles/cosmoids/bug_1_up_1.png',
+      url: "/battles/cosmoids/bug_1_up_1.png",
       scale: 0.44,
       shadowScaleX: 1.05,
-      shadowOffsetY: 7,
+      shadowOffsetY: 7
     },
     down: {
-      url: '/battles/cosmoids/bug_1_down_1.png',
+      url: "/battles/cosmoids/bug_1_down_1.png",
       scale: 0.44,
       shadowScaleX: 1.05,
-      shadowOffsetY: 7,
-    },
+      shadowOffsetY: 7
+    }
   },
   bug_stage_2: {
     default: {
-      url: '/battles/cosmoids/bug-2-basic-normal-neutral-skin-1.png',
+      url: "/battles/cosmoids/bug-2-basic-normal-neutral-skin-1.png",
       scale: 0.15,
       shadowScaleX: 1.2,
       shadowOffsetY: 52,
-      flipX: true,
+      flipX: true
     },
     left: {
       scale: 0.15,
       shadowScaleX: 1.2,
       shadowOffsetY: 52,
-      flipX: false,
+      flipX: false
     },
     right: {
       scale: 0.15,
       shadowScaleX: 1.2,
       shadowOffsetY: 52,
-      flipX: true,
-    },
+      flipX: true
+    }
   },
   bug_stage_3: {
     default: {
-      url: '/battles/cosmoids/moth-basic-normal-neutral-skin-1.png',
+      url: "/battles/cosmoids/moth-basic-normal-neutral-skin-1.png",
       scale: 0.17,
-      flipX: true,
+      flipX: true
     },
     left: {
-      flipX: false,
+      flipX: false
     },
     right: {
-      flipX: true,
-    },
+      flipX: true
+    }
   },
   starter_crab: {
     default: {
-      url: '/battles/cosmoids/palmit_down_1.png',
+      url: "/battles/cosmoids/palmit_down_1.png",
       scale: 0.47,
       shadowScaleX: 1.25,
       shadowOffsetX: 5,
-      shadowOffsetY: 6,
+      shadowOffsetY: 6
     },
     left: {
       scale: 0.47,
@@ -120,8 +120,8 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetX: -2,
       shadowOffsetY: 7,
       flipX: false,
-      url: '/battles/cosmoids/palmit_left_1.png',
-      offsetX: -3,
+      url: "/battles/cosmoids/palmit_left_1.png",
+      offsetX: -3
     },
     right: {
       scale: 0.47,
@@ -129,31 +129,31 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetX: -2,
       shadowOffsetY: 7,
       flipX: true,
-      url: '/battles/cosmoids/palmit_left_1.png',
-      offsetX: 3,
+      url: "/battles/cosmoids/palmit_left_1.png",
+      offsetX: 3
     },
     up: {
-      url: '/battles/cosmoids/palmit_up_1.png',
+      url: "/battles/cosmoids/palmit_up_1.png",
       scale: 0.47,
       offsetY: -3,
       shadowOffsetY: 8,
-      shadowScaleX: 1.3,
+      shadowScaleX: 1.3
     },
     down: {
       scale: 0.46,
       offsetX: -4,
       shadowOffsetY: 8,
-      shadowScaleX: 1.3,
-    },
+      shadowScaleX: 1.3
+    }
   },
   starter_iguana: {
     default: {
-      url: '/battles/cosmoids/fueguana_left_1_v3.png',
+      url: "/battles/cosmoids/fueguana_left_1_v3.png",
       scale: 0.65,
       shadowScaleX: 1.9,
       shadowScaleY: 0.6,
       shadowOffsetX: -7,
-      shadowOffsetY: 7,
+      shadowOffsetY: 7
     },
     left: {
       scale: 0.65,
@@ -161,7 +161,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowScaleY: 0.6,
       shadowOffsetX: -7,
       shadowOffsetY: 7,
-      flipX: false,
+      flipX: false
     },
     right: {
       scale: 0.65,
@@ -169,81 +169,89 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowScaleY: 0.6,
       shadowOffsetX: -7,
       shadowOffsetY: 7,
-      flipX: true,
+      flipX: true
     },
     up: {
-      url: '/battles/cosmoids/fueguana_up_1_v3.png',
+      url: "/battles/cosmoids/fueguana_up_1_v3.png",
       scale: 0.65,
       offsetX: -11,
       shadowOffsetY: 5,
-      shadowScaleX: 1.15,
+      shadowScaleX: 1.15
     },
     down: {
-      url: '/battles/cosmoids/fueguana_down_1_v3.png',
+      url: "/battles/cosmoids/fueguana_down_1_v3.png",
       scale: 0.65,
       shadowOffsetX: -3,
       offsetX: 10,
-      shadowOffsetY: 5,
-    },
+      shadowOffsetY: 5
+    }
   },
   starter_monkey: {
     default: {
-      url: '/battles/cosmoids/monkeg_down_1_v2.png',
+      url: "/battles/cosmoids/monkeg_down_1_v2.png",
       scale: 0.29,
       shadowScaleX: 1.4,
       shadowOffsetX: -2,
       shadowOffsetY: 26,
-      healthBarOffsetY: -52,
+      healthBarOffsetY: -52
     },
     left: {
       scale: 0.29,
       shadowScaleX: 1.4,
       shadowOffsetX: -2,
       shadowOffsetY: 26,
-      flipX: false,
+      flipX: false
     },
     right: {
       scale: 0.29,
       shadowScaleX: 1.4,
       shadowOffsetX: -2,
       shadowOffsetY: 26,
-      flipX: true,
-    },
+      flipX: true
+    }
   },
   map_1: {
     default: {
-      url: '/battles/units/map_1.png',
+      url: "/battles/units/map_1.png",
       scale: 0.27,
       shadowScaleX: 1.15,
-      shadowOffsetY: 1,
-    },
+      shadowOffsetY: 1
+    }
+  },
+  coin_1: {
+    default: {
+      url: "/battles/units/coin_1.png",
+      scale: 0.08,
+      shadowScaleX: 0.85,
+      shadowOffsetY: 1
+    }
   },
   caleb_battle: {
     default: {
-      url: '/battles/characters/caleb_battle.png',
+      url: "/battles/characters/caleb_battle.png",
       scale: 0.68,
       shadowScaleX: 3.05,
       shadowOffsetY: -32,
       offsetY: -95,
       healthBarOffsetY: -5,
-      shadowScaleY: 0.7,
-    },
+      shadowScaleY: 0.7
+    }
   },
   pirate_grunt_battle: {
     default: {
-      url: '/battles/characters/pirate_grunt_battle.png',
+      url: "/battles/characters/pirate_grunt_battle.png",
       scale: 0.29,
       shadowScaleX: 3.7,
       shadowOffsetY: 5,
       offsetY: -91,
       healthBarOffsetY: -5,
       offsetX: -2,
-      shadowScaleY: 1,
-    },
+      shadowScaleY: 1
+    }
   },
   rat_catcher_battle: {
     default: {
-      url: '/battles/characters/rat_catcher_battle.png',
+      url: "/battles/characters/rat_catcher_battle.png",
       scale: 0.66,
       shadowScaleX: 2.3,
       shadowOffsetY: 5,
@@ -251,12 +259,12 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -5,
       offsetX: -2,
       shadowScaleY: 1,
-      flipX: true,
-    },
+      flipX: true
+    }
   },
   grandpa_battle: {
     default: {
-      url: '/battles/characters/grandpa_battle.png',
+      url: "/battles/characters/grandpa_battle.png",
       scale: 0.37,
       shadowScaleX: 2.65,
       shadowOffsetY: -6,
@@ -264,12 +272,12 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -5,
       offsetX: 12,
       shadowScaleY: 1.25,
-      shadowOffsetX: -1,
-    },
+      shadowOffsetX: -1
+    }
   },
   note_1: {
     default: {
-      url: '/battles/units/note_1.png',
+      url: "/battles/units/note_1.png",
       scale: 0.1,
       shadowScaleX: 0.9,
       shadowOffsetY: -6,
@@ -277,36 +285,36 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -34,
       offsetX: -1,
       shadowScaleY: 0.55,
-      shadowOffsetX: -1,
-    },
+      shadowOffsetX: -1
+    }
   },
   attack_scratch_1: {
     default: {
-      url: '/battles/attacks/scratch.png',
+      url: "/battles/attacks/scratch.png",
       scale: 0.27,
       shadowScaleX: 1.15,
       shadowOffsetY: 1,
       vfxAnimation: {
-        type: 'WIPE_LINEAR',
+        type: "WIPE_LINEAR",
         maskRotation: 0.7853981633974483,
-        maskSize: 200,
+        maskSize: 200
       },
-      offsetY: -19,
-    },
+      offsetY: -19
+    }
   },
   mouse_1: {
     default: {
-      url: '/battles/cosmoids/mouse_1_left_1_25.png',
+      url: "/battles/cosmoids/mouse_1_left_1_25.png",
       scale: 0.48,
       shadowScaleX: 1.2,
       shadowOffsetY: -1,
       shadowOffsetX: 3,
       offsetX: 10,
       offsetY: -17,
-      healthBarOffsetY: -62,
+      healthBarOffsetY: -62
     },
     right: {
-      url: '/battles/cosmoids/mouse_1_left_1_25.png',
+      url: "/battles/cosmoids/mouse_1_left_1_25.png",
       scale: 0.48,
       shadowScaleX: 1.2,
       shadowOffsetY: 10,
@@ -314,36 +322,36 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       offsetX: -11,
       offsetY: -17,
       healthBarOffsetY: -62,
-      flipX: true,
+      flipX: true
     },
     up: {
-      url: '/battles/cosmoids/mouse_1_up_1_25.png',
+      url: "/battles/cosmoids/mouse_1_up_1_25.png",
       scale: 0.48,
       shadowScaleX: 1.05,
       shadowOffsetY: -1,
-      offsetY: -18,
+      offsetY: -18
     },
     down: {
-      url: '/battles/cosmoids/mouse_1_down_1_25.png',
+      url: "/battles/cosmoids/mouse_1_down_1_25.png",
       scale: 0.48,
       shadowScaleX: 1.05,
       shadowOffsetY: -3,
-      offsetY: -20,
-    },
+      offsetY: -20
+    }
   },
   bird_1: {
     default: {
-      url: '/battles/cosmoids/bird_1_left_1_25.png',
+      url: "/battles/cosmoids/bird_1_left_1_25.png",
       scale: 0.41,
       shadowScaleX: 1.2,
       shadowOffsetY: 10,
       shadowOffsetX: 3,
       offsetX: 10,
       offsetY: -17,
-      healthBarOffsetY: -62,
+      healthBarOffsetY: -62
     },
     right: {
-      url: '/battles/cosmoids/bird_1_left_1_25.png',
+      url: "/battles/cosmoids/bird_1_left_1_25.png",
       scale: 0.41,
       shadowScaleX: 1.2,
       shadowOffsetY: 10,
@@ -351,21 +359,21 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       offsetX: -11,
       offsetY: -17,
       healthBarOffsetY: -62,
-      flipX: true,
+      flipX: true
     },
     up: {
-      url: '/battles/cosmoids/bird_1_up_1_25.png',
+      url: "/battles/cosmoids/bird_1_up_1_25.png",
       scale: 0.41,
       shadowScaleX: 1.05,
       shadowOffsetY: 7,
-      offsetY: -14,
+      offsetY: -14
     },
     down: {
-      url: '/battles/cosmoids/bird_1_down_1_25.png',
+      url: "/battles/cosmoids/bird_1_down_1_25.png",
       scale: 0.41,
       shadowScaleX: 1.05,
       shadowOffsetY: 7,
-      offsetY: -16,
-    },
-  },
+      offsetY: -16
+    }
+  }
 };

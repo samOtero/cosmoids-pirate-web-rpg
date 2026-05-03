@@ -68,84 +68,84 @@ export const FIRST_LEVEL: TDLevelData = {
         x: 6.71,
         y: 66,
       },
-      tdConfigId: 'note_1',
+      tdConfigId: 'coin_1',
     },
     {
       position: {
         x: 5.19,
         y: 62,
       },
-      tdConfigId: 'note_1',
+      tdConfigId: 'coin_1',
     },
     {
       position: {
         x: 7.62,
         y: 70,
       },
-      tdConfigId: 'note_1',
+      tdConfigId: 'coin_1',
     },
     {
       position: {
         x: 3.6,
         y: 69,
       },
-      tdConfigId: 'note_1',
+      tdConfigId: 'coin_1',
     },
     {
       position: {
         x: 7.53,
         y: 63,
       },
-      tdConfigId: 'note_1',
+      tdConfigId: 'coin_1',
     },
     {
       position: {
         x: 2.59,
         y: 64,
       },
-      tdConfigId: 'note_1',
+      tdConfigId: 'coin_1',
     },
     {
       position: {
         x: 9.04,
         y: 70,
       },
-      tdConfigId: 'note_1',
+      tdConfigId: 'coin_1',
     },
     {
       position: {
         x: 3.26,
         y: 71,
       },
-      tdConfigId: 'note_1',
+      tdConfigId: 'coin_1',
     },
     {
       position: {
         x: 6.44,
         y: 64,
       },
-      tdConfigId: 'note_1',
+      tdConfigId: 'coin_1',
     },
     {
       position: {
         x: 3.09,
         y: 70,
       },
-      tdConfigId: 'note_1',
+      tdConfigId: 'coin_1',
     },
     {
       position: {
         x: 2.93,
         y: 62,
       },
-      tdConfigId: 'note_1',
+      tdConfigId: 'coin_1',
     },
     {
       position: {
         x: 8.45,
         y: 64,
       },
-      tdConfigId: 'note_1',
+      tdConfigId: 'coin_1',
     },
   ],
   waves: [
