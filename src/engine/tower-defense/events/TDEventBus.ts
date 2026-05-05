@@ -2,8 +2,9 @@ export type TDEvent =
   | {
       type: 'ENEMY_DIED';
       enemyId: string;
-      killerTowerId: string;
-      xpValue: number;
+      enemyDefinitionId: string;
+      enemyLevel: number;
+      participantTowerIds: string[];
     }
   | {
       type: 'TOWER_XP_GAINED';

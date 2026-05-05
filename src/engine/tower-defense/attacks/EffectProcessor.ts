@@ -123,6 +123,9 @@ export class EffectProcessor {
     target.hp -= finalDamage;
     target.damageFlashTimerMs = 150;
 
+    // Track this tower as a participant for EXP distribution
+    target.damagedByTowerIds.add(source.id);
+
     engine.floatingTexts.push({
       id: `ft_dmg_${Date.now()}_${Math.random().toString(36).substring(7)}`,
       text: Math.ceil(finalDamage).toString(),

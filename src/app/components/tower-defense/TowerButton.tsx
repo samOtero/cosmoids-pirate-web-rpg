@@ -58,7 +58,7 @@ export function TowerButton({
             <div
               className="h-full bg-cyan-400 transition-all duration-300"
               style={{
-                width: `${Math.min(100, Math.max(0, (displayXp / (displayLevel * 100)) * 100))}%`,
+                width: `${Math.min(100, Math.max(0, (displayXp / ((displayLevel + 1) ** 3 - displayLevel ** 3)) * 100))}%`,
               }}
             />
           </div>

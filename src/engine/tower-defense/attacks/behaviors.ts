@@ -1,4 +1,4 @@
-import { TowerDefenseEngine } from '../TowerDefenseEngine';
+import { TowerDefenseEngine, TD_CREATURE_DEFS } from '../TowerDefenseEngine';
 import { Tower, Enemy } from '../types';
 import { AttackDefinition, AttackBehavior } from './types';
 import { EffectProcessor } from './EffectProcessor';
@@ -107,19 +107,15 @@ export const InstantMeleeBehavior: AttackBehavior = {
 
       // Check for death
       if (enemyTarget.hp <= 0) {
-        const meta = (engine.constructor as any).TD_CREATURE_DEFS?.[
-          enemyTarget.definitionId
-        ];
-        // We can't access TD_CREATURE_DEFS easily here without circular dependency if not careful,
-        // but engine already processes dead enemies in tick().
-        // We'll just let the tick loop's deadEnemies filter handle it and award XP.
-        // Actually, Projectile logic emits ENEMY_DIED.
-        // Let's emit it here if we killed it, then let tick loop reap it.
+        // Record the killing blow tower as a participant
+        enemyTarget.damagedByTowerIds.add(source.id);
+        const meta = TD_CREATURE_DEFS[enemyTarget.definitionId];
         engine.events.emit({
           type: 'ENEMY_DIED',
           enemyId: enemyTarget.id,
-          killerTowerId: source.id,
-          xpValue: 10, // Default fallback, tick loop doesn't award XP for instant kills if not emitted!
+          enemyDefinitionId: enemyTarget.definitionId,
+          enemyLevel: meta ? meta.baseCreature.level : 1,
+          participantTowerIds: Array.from(enemyTarget.damagedByTowerIds),
         });
       }
 

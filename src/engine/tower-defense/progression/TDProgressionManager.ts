@@ -19,61 +19,89 @@ export class TDProgressionManager {
 
   private handleEvent(event: TDEvent) {
     if (event.type === 'ENEMY_DIED') {
-      const killer = this.engine.towers.find(
-        (t) => t.id === event.killerTowerId
-      );
-      if (killer) {
-        killer.creature.xp += event.xpValue;
+      const { enemyDefinitionId, enemyLevel, participantTowerIds } = event;
+      const meta = TD_CREATURE_DEFS[enemyDefinitionId];
+      const baseExperience = meta ? meta.baseCreature.baseExperience : 50;
+
+      // Distribute EXP to each participating tower
+      const participantCount = Math.max(1, participantTowerIds.length);
+
+      for (const towerId of participantTowerIds) {
+        const tower = this.engine.towers.find((t) => t.id === towerId);
+        if (!tower) continue;
+
+        const towerLevel = tower.creature.level;
+
+        // Scaled EXP Formula
+        // A = (enemyLevel * 2) + 10
+        // B = (baseExperience * enemyLevel) / 5
+        // C = (enemyLevel + towerLevel + 10)
+        // EXP = floor(floor(√A * A²) * B / floor(√C * C²)) + 1
+        const a = enemyLevel * 2 + 10;
+        const b = (baseExperience * enemyLevel) / 5;
+        const c = enemyLevel + towerLevel + 10;
+
+        const numerator = Math.floor(Math.sqrt(a) * a * a);
+        const denominator = Math.floor(Math.sqrt(c) * c * c);
+
+        let xpGained = Math.floor((numerator * b) / denominator) + 1;
+
+        // split evenly among participants
+        xpGained = Math.max(1, Math.floor(xpGained / participantCount));
+
+        tower.creature.xp += xpGained;
 
         this.engine.events.emit({
           type: 'TOWER_XP_GAINED',
-          towerId: killer.id,
-          xpGained: event.xpValue,
-          totalXp: killer.creature.xp,
+          towerId: tower.id,
+          xpGained: xpGained,
+          totalXp: tower.creature.xp,
         });
 
-        // Don't level up past the cap
-        if (killer.creature.level >= MAX_LEVEL) return;
+        // Process multiple level-ups if enough XP was gained
+        while (tower.creature.level < MAX_LEVEL) {
+          const nextLevel = tower.creature.level + 1;
+          const requiredXp = nextLevel ** 3 - tower.creature.level ** 3;
 
-        // Simple RPG curve: Level 1->2 is 100xp, 2->3 is 200xp, etc.
-        const requiredXp = killer.creature.level * 100;
+          if (tower.creature.xp < requiredXp) {
+            break;
+          }
 
-        if (killer.creature.xp >= requiredXp) {
-          killer.creature.xp -= requiredXp;
-          killer.creature.level += 1;
+          tower.creature.xp -= requiredXp;
+          tower.creature.level += 1;
 
           // Scale Stats using Pokemon formula
-          const metadata = TD_CREATURE_DEFS[killer.creature.speciesId];
-          killer.currentAttack = calculateStat(
-            metadata.baseCreature.attack,
-            killer.creature.level
+          const towerMeta = TD_CREATURE_DEFS[tower.creature.speciesId];
+          tower.currentAttack = calculateStat(
+            towerMeta.baseCreature.attack,
+            tower.creature.level
           );
-          killer.currentSpecialAttack = calculateStat(
-            metadata.baseCreature.specialAttack,
-            killer.creature.level
+          tower.currentSpecialAttack = calculateStat(
+            towerMeta.baseCreature.specialAttack,
+            tower.creature.level
           );
-          killer.currentDefense = calculateStat(
-            metadata.baseCreature.defense,
-            killer.creature.level
+          tower.currentDefense = calculateStat(
+            towerMeta.baseCreature.defense,
+            tower.creature.level
           );
-          killer.currentSpecialDefense = calculateStat(
-            metadata.baseCreature.specialDefense,
-            killer.creature.level
+          tower.currentSpecialDefense = calculateStat(
+            towerMeta.baseCreature.specialDefense,
+            tower.creature.level
           );
 
           // Recalculate HP and restore to full on level-up
           const newMaxHp = calculateMaxHp(
-            metadata.baseCreature.maxHp,
-            killer.creature.level
+            towerMeta.baseCreature.maxHp,
+            tower.creature.level
           );
-          killer.maxHp = newMaxHp;
-          killer.hp = newMaxHp;
+          tower.maxHp = newMaxHp;
+          tower.hp = newMaxHp;
 
           // We decouple the trigger so Pixi can safely animate
           this.engine.events.emit({
             type: 'TOWER_LEVELED_UP',
-            towerId: killer.id,
-            newLevel: killer.creature.level,
+            towerId: tower.id,
+            newLevel: tower.creature.level,
           });
         }
       }

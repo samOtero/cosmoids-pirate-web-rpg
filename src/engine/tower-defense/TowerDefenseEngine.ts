@@ -35,19 +35,15 @@ import { TDProgressionManager } from './progression/TDProgressionManager';
 export const TD_CREATURE_DEFS: Record<string, TDCreatureMetadata> = {
   [BUG_STAGE_1.id]: {
     baseCreature: BUG_STAGE_1,
-    xpYield: 100, // TEMPORARY for testing: faster leveling
   },
   [BUG_STAGE_2.id]: {
     baseCreature: BUG_STAGE_2,
-    xpYield: 30,
   },
   [BUG_STAGE_3.id]: {
     baseCreature: BUG_STAGE_3,
-    xpYield: 50,
   },
   [STARTER_CRAB.id]: {
     baseCreature: STARTER_CRAB,
-    xpYield: 0,
     evolutionNodes: [{ level: 10, evolutionDefId: BUG_STAGE_2.id }], // pushed back for testing
     attackUnlocks: [
       { level: 2, attackDefId: 'EMBER' },
@@ -57,23 +53,18 @@ export const TD_CREATURE_DEFS: Record<string, TDCreatureMetadata> = {
   },
   [STARTER_IGUANA.id]: {
     baseCreature: STARTER_IGUANA,
-    xpYield: 0,
   },
   [STARTER_MONKEY.id]: {
     baseCreature: STARTER_MONKEY,
-    xpYield: 0,
   },
   [SENTICLE.id]: {
     baseCreature: SENTICLE,
-    xpYield: 20,
   },
   [MOUSE_1.id]: {
     baseCreature: MOUSE_1,
-    xpYield: 20,
   },
   [BIRD_1.id]: {
     baseCreature: BIRD_1,
-    xpYield: 20,
   },
 };
 
@@ -291,6 +282,7 @@ export class TowerDefenseEngine {
           currentWaypointIndex: 1,
           pathIndex: pathIndex,
           facingDirection: 'down',
+          damagedByTowerIds: new Set<string>(),
         });
         this.lastSpawnTime = time;
       }
@@ -672,12 +664,15 @@ export class TowerDefenseEngine {
           }
 
           if (target.hp <= 0 && sourceTower) {
+            // Record the killing blow tower as a participant too
+            target.damagedByTowerIds.add(sourceTower.id);
             const meta = TD_CREATURE_DEFS[target.definitionId];
             this.events.emit({
               type: 'ENEMY_DIED',
               enemyId: target.id,
-              killerTowerId: sourceTower.id,
-              xpValue: meta ? meta.xpYield : 10,
+              enemyDefinitionId: target.definitionId,
+              enemyLevel: meta ? meta.baseCreature.level : 1,
+              participantTowerIds: Array.from(target.damagedByTowerIds),
             });
           }
         }
@@ -897,6 +892,7 @@ export class TowerDefenseEngine {
       facingDirection: 'down',
       turnAroundAtEnd,
       uncapturable,
+      damagedByTowerIds: new Set<string>(),
     });
   }
 

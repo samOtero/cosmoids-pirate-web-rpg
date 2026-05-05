@@ -14,7 +14,6 @@ export interface TDCreatureMetadata {
   baseCreature: Creature;
   evolutionNodes?: TDEvolutionNode[];
   attackUnlocks?: TDAttackUnlockNode[];
-  xpYield: number;
 }
 
 export interface Point {
@@ -136,6 +135,7 @@ export interface Enemy extends BaseTDUnit {
   turnAroundAtEnd?: boolean;
   isMovingBackward?: boolean;
   uncapturable?: boolean;
+  damagedByTowerIds: Set<string>; // Tracks which towers dealt damage for EXP distribution
 }
 
 export interface Projectile {

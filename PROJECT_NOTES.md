@@ -117,28 +117,41 @@ Interact with different Pirate Crews and the Navy.
 - **Potential Rewards:** Outfits, exclusive Cosmoids, unique ship upgrades, special evolutions, or branching story endings.
 
 ## [2026-03-26] Scrollable Background for TD Levels
+
 Added optional `backgroundScale` property to `TDLevelData`. When set > 1 (e.g. 1.5), the background renders at that multiple of the screen height and supports vertical drag-to-scroll. The scroll offset is tracked via `scrollYRef` and applied to `bgBounds.y`, so all percentage-based entity positioning remains correct. Both `PixiBattlefield.tsx` and `PixiTDLevelEditor.tsx` support this feature. The forest level uses `backgroundScale: 1.5`.
 
 ## [2026-03-26] Zoom Controls for TD Map
+
 Added zoom in/out buttons (+/-) to PixiBattlefield when `backgroundScale > 1`. Zoom range is `1/backgroundScale` (fully zoomed out, entire bg visible) to `1` (normal view). All entity containers, spot graphics, and floating text scale by `zoom`. The `updateBgLayout` function reads `zoomRef` each tick so zoom changes take effect immediately. Display dimensions = `fullBg * zoom`, scroll limits shrink as you zoom out.
 
 ## [2026-04-25] Tower Drag-and-Click Bug Fix
+
 When dragging a tower via pointer events, the browser fires a 'click' event after 'pointerup'. Since dragStateRef was already reset by the time click fires, the attack selection menu would open. Fixed by adding a justDraggedRef flag that is set to true on pointerup (during a drag) and checked/cleared in the TowerButton onClick handler.
 
 ## [2026-05-01] Level Select Screen Replaces Maps
+
 Removed the World Map (`Screens.MAP`) and Island Map (`Screens.ISLAND_MAP`) screens. Replaced with a single Level Select screen (`Screens.LEVEL_SELECT`) that displays TD levels as numbered blocks in a grid. The flow is now Start => Profiles => Level Select => Tower Defense. Events `GO_TO_MAP`/`GO_TO_ISLAND_MAP` were consolidated into `GO_TO_LEVEL_SELECT`. `SHOW_ISLAND_MAP_DIALOG` became `SHOW_LEVEL_SELECT_DIALOG`. Level ordering is defined in `LEVEL_ORDER` array in `src/constants/tdLevels/index.ts`. Includes 4 placeholder locked levels beyond the 2 real ones.
 
 ## [2026-05-01] Mode Select Screen
+
 Added `Screens.MODE_SELECT` between Profile and Level Select. Flow is now Start => Profiles => Mode Select => Level Select (Story) => Tower Defense. The Mode Select screen shows two cards: Story (active, routes to Level Select) and Challenge (disabled, 'Coming Soon'). `GO_TO_MODE_SELECT` event type added. Returning players after defeating the first battle now go to Mode Select. The `ModeSelectScreen` component lives at `src/app/components/ModeSelectScreen.tsx`.
 
 ## [2026-05-02] Pokemon HP/Stat Formulas for TD Units
+
 Towers and enemies now use the Pokemon stat formula (without IV/EV) for initial HP and attack. HP formula: `floor((2 * Base * Level) / 100) + Level + 10`. Non-HP stat formula: `floor((2 * Base * Level) / 100) + 5`. These are calculated via `calculateMaxHp` and `calculateStat` from `src/utils/resolvePlayerCreature.ts`. On level-up and evolution, tower HP is recalculated while preserving the current HP percentage. The `enemyHpMultiplier` in TDLevelData is still applied as a multiplier on top of the formula result.
 
 ## [2026-05-03] Challenge Mode
+
 Added challenge mode accessible from Mode Select -> Challenge Select -> TD Level. Challenge levels use a `premadeRoster` field on `TDLevelData` to provide fixed creatures instead of the player's party. The first challenge is 'One Life Gauntlet': Level 1's layout with 1 life and a single Fueguana (starter_iguana at level 1). Captures during challenge levels work in-level (added to engine roster) but are never persisted to the player's profile. Tower progress (XP, levels) is also not saved back. The `GO_TO_CHALLENGE_SELECT` event routes back to `Screens.CHALLENGE_SELECT`. The `CHALLENGE_LEVEL_ORDER` array in `src/constants/tdLevels/index.ts` drives the challenge select screen.
 
 ## [2026-05-04] Special Attack / Special Defense Stats
+
 Added `specialAttack` and `specialDefense` base stats to the `Creature` interface and all creature definitions. Added `category: 'physical' | 'special'` to `AttackDefinition`. Physical attacks (Scratch, Tackle, Vine Whip, String Shot) use `attack`/`defense`; special attacks (Ember, Bubble Beam) use `specialAttack`/`specialDefense`. Both `Tower` and `Enemy` runtime types now carry pre-calculated `currentSpecialAttack`, `currentDefense`, and `currentSpecialDefense` (alongside existing `currentAttack`). These stats are computed at spawn/placement time and recalculated on level-up and evolution in `TDProgressionManager`. The damage formula in `EffectProcessor.applyDamageAndEffects()` selects the appropriate stat pair based on the attack's category.
 
 ## [2026-05-05] Base Experience Property Added to Creatures
-Added a `baseExperience` field to the `Creature` interface in `baseGame.ts` and to all creature definitions in `creatures.ts`. This field will be used in the future for calculating how much experience is awarded when a creature is defeated. Values range from ~50 (weak/early creatures like Mouse, Bird) to ~140 (evolved creatures like Moth). No logic changes yet—just the data field.
+
+Added a `baseExperience` field to the `Creature` interface in `baseGame.ts` and to all creature definitions in `creatures.ts`. This field will be used in the future for calculating how much experience is awarded when a creature is defeated. Values range from ~50 (weak/early creatures like Mouse, Bird) to ~140 (evolved creatures like Moth). No logic changes yetï¿½just the data field.
+
+## [2026-05-05] Pokï¿½mon EXP Formula Implemented
+
+Implemented the Pokï¿½mon Gen V+ scaled experience formula in the Tower Defense engine. The flat \xpYield\ system has been replaced. EXP is now calculated using \aseExperience\ from the Creature definition and the levels of the enemy and tower. Using the Gen V rule, the total EXP is split evenly among all towers that participated in damaging the enemy. The level-up curve has also been changed to the Medium Fast curve (\Lï¿½\).
