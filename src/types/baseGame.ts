@@ -143,6 +143,7 @@ export interface Creature {
   defense: number;
   specialAttack: number;
   specialDefense: number;
+  baseExperience: number; // Used to calculate experience yield when defeated
   speed: number;
   level: number;
   xp: number;

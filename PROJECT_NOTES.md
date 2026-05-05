@@ -139,3 +139,6 @@ Added challenge mode accessible from Mode Select -> Challenge Select -> TD Level
 
 ## [2026-05-04] Special Attack / Special Defense Stats
 Added `specialAttack` and `specialDefense` base stats to the `Creature` interface and all creature definitions. Added `category: 'physical' | 'special'` to `AttackDefinition`. Physical attacks (Scratch, Tackle, Vine Whip, String Shot) use `attack`/`defense`; special attacks (Ember, Bubble Beam) use `specialAttack`/`specialDefense`. Both `Tower` and `Enemy` runtime types now carry pre-calculated `currentSpecialAttack`, `currentDefense`, and `currentSpecialDefense` (alongside existing `currentAttack`). These stats are computed at spawn/placement time and recalculated on level-up and evolution in `TDProgressionManager`. The damage formula in `EffectProcessor.applyDamageAndEffects()` selects the appropriate stat pair based on the attack's category.
+
+## [2026-05-05] Base Experience Property Added to Creatures
+Added a `baseExperience` field to the `Creature` interface in `baseGame.ts` and to all creature definitions in `creatures.ts`. This field will be used in the future for calculating how much experience is awarded when a creature is defeated. Values range from ~50 (weak/early creatures like Mouse, Bird) to ~140 (evolved creatures like Moth). No logic changes yet—just the data field.
