@@ -48,6 +48,18 @@ export class TDProgressionManager {
             metadata.baseCreature.attack,
             killer.creature.level
           );
+          killer.currentSpecialAttack = calculateStat(
+            metadata.baseCreature.specialAttack,
+            killer.creature.level
+          );
+          killer.currentDefense = calculateStat(
+            metadata.baseCreature.defense,
+            killer.creature.level
+          );
+          killer.currentSpecialDefense = calculateStat(
+            metadata.baseCreature.specialDefense,
+            killer.creature.level
+          );
 
           // Recalculate HP and restore to full on level-up
           const newMaxHp = calculateMaxHp(
@@ -107,6 +119,18 @@ export class TDProgressionManager {
               const newMetadata = TD_CREATURE_DEFS[tower.creature.speciesId];
               tower.currentAttack = calculateStat(
                 newMetadata.baseCreature.attack,
+                tower.creature.level
+              );
+              tower.currentSpecialAttack = calculateStat(
+                newMetadata.baseCreature.specialAttack,
+                tower.creature.level
+              );
+              tower.currentDefense = calculateStat(
+                newMetadata.baseCreature.defense,
+                tower.creature.level
+              );
+              tower.currentSpecialDefense = calculateStat(
+                newMetadata.baseCreature.specialDefense,
                 tower.creature.level
               );
 

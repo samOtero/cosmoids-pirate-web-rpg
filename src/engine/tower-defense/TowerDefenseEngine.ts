@@ -260,8 +260,22 @@ export class TowerDefenseEngine {
             : 0;
         const startPath = this.paths[pathIndex] || [{ x: 0, y: 0 }];
         const enemyLevel = randomEnemyDef.level;
-        const newEnemyHp = calculateMaxHp(randomEnemyDef.maxHp, enemyLevel) * this.enemyHpMultiplier;
+        const newEnemyHp =
+          calculateMaxHp(randomEnemyDef.maxHp, enemyLevel) *
+          this.enemyHpMultiplier;
         const newEnemyAttack = calculateStat(randomEnemyDef.attack, enemyLevel);
+        const newEnemySpecialAttack = calculateStat(
+          randomEnemyDef.specialAttack,
+          enemyLevel
+        );
+        const newEnemyDefense = calculateStat(
+          randomEnemyDef.defense,
+          enemyLevel
+        );
+        const newEnemySpecialDefense = calculateStat(
+          randomEnemyDef.specialDefense,
+          enemyLevel
+        );
         newEnemies.push({
           id: `enemy_${time}`,
           definitionId: randomEnemyDef.id,
@@ -270,6 +284,9 @@ export class TowerDefenseEngine {
           maxHp: newEnemyHp,
           speed: randomEnemyDef.speed / 100,
           currentAttack: newEnemyAttack,
+          currentSpecialAttack: newEnemySpecialAttack,
+          currentDefense: newEnemyDefense,
+          currentSpecialDefense: newEnemySpecialDefense,
           statusConditions: [],
           currentWaypointIndex: 1,
           pathIndex: pathIndex,
@@ -849,8 +866,19 @@ export class TowerDefenseEngine {
     const startPath = this.paths[pathIndex] || [{ x: 0, y: 0 }];
 
     const enemyLevel = meta.baseCreature.level;
-    const enemyHp = calculateMaxHp(meta.baseCreature.maxHp, enemyLevel) * this.enemyHpMultiplier;
+    const enemyHp =
+      calculateMaxHp(meta.baseCreature.maxHp, enemyLevel) *
+      this.enemyHpMultiplier;
     const enemyAttack = calculateStat(meta.baseCreature.attack, enemyLevel);
+    const enemySpecialAttack = calculateStat(
+      meta.baseCreature.specialAttack,
+      enemyLevel
+    );
+    const enemyDefense = calculateStat(meta.baseCreature.defense, enemyLevel);
+    const enemySpecialDefense = calculateStat(
+      meta.baseCreature.specialDefense,
+      enemyLevel
+    );
 
     newEnemies.push({
       id: `enemy_${time}_${Math.random().toString(36).substring(7)}`,
@@ -860,6 +888,9 @@ export class TowerDefenseEngine {
       maxHp: enemyHp,
       speed: meta.baseCreature.speed / 100,
       currentAttack: enemyAttack,
+      currentSpecialAttack: enemySpecialAttack,
+      currentDefense: enemyDefense,
+      currentSpecialDefense: enemySpecialDefense,
       statusConditions: [],
       currentWaypointIndex: 1,
       pathIndex: pathIndex,
@@ -948,8 +979,17 @@ export class TowerDefenseEngine {
 
     const baseDef = defMeta.baseCreature;
 
-    // Derive stats using the Pokemon formula (without IV/EV)
+    // Derive stats
     const derivedAttack = calculateStat(baseDef.attack, creature.level);
+    const derivedSpecialAttack = calculateStat(
+      baseDef.specialAttack,
+      creature.level
+    );
+    const derivedDefense = calculateStat(baseDef.defense, creature.level);
+    const derivedSpecialDefense = calculateStat(
+      baseDef.specialDefense,
+      creature.level
+    );
     const derivedMaxHp = calculateMaxHp(baseDef.maxHp, creature.level);
 
     const attacks =
@@ -963,6 +1003,9 @@ export class TowerDefenseEngine {
       position: { x, y },
       lastAttackTime: 0,
       currentAttack: derivedAttack,
+      currentSpecialAttack: derivedSpecialAttack,
+      currentDefense: derivedDefense,
+      currentSpecialDefense: derivedSpecialDefense,
       hp: derivedMaxHp,
       maxHp: derivedMaxHp,
       equippedAttacksRuntime: attacks.map((atkId) => ({

@@ -47,6 +47,8 @@ export function resolvePlayerCreature(pc: PlayerCreature): Creature {
   const maxHp = calculateMaxHp(baseDef.maxHp, pc.level);
   const attack = calculateStat(baseDef.attack, pc.level);
   const defense = calculateStat(baseDef.defense, pc.level);
+  const specialAttack = calculateStat(baseDef.specialAttack, pc.level);
+  const specialDefense = calculateStat(baseDef.specialDefense, pc.level);
   const speed = calculateStat(baseDef.speed, pc.level);
 
   return {
@@ -59,6 +61,8 @@ export function resolvePlayerCreature(pc: PlayerCreature): Creature {
     maxHp,
     attack,
     defense,
+    specialAttack,
+    specialDefense,
     speed,
     currentHp: maxHp, // PlayerCreature doesn't track HP — default to full
     currentEnergy: baseDef.startingEnergy,

@@ -12,6 +12,7 @@ export interface AttackDefinition {
   id: string; // e.g., 'BUBBLE_BEAM'
   name: string;
   type: ElementType; // Water
+  category: 'physical' | 'special';
   power: number; // Base damage multiplier
   cooldownMs: number;
   rangeIndex: number; // 30 means 30% of screen distance

@@ -63,11 +63,19 @@ export class EffectProcessor {
   ) {
     const level = source.creature.level;
     const power = attackDef.power;
-    const attack = source.currentAttack;
 
-    // Get Enemy Defense and Type
+    // Physical/Special split: pick the right attack and defense stats
+    const attack =
+      attackDef.category === 'special'
+        ? source.currentSpecialAttack
+        : source.currentAttack;
+    const defense =
+      attackDef.category === 'special'
+        ? target.currentSpecialDefense
+        : target.currentDefense;
+
+    // Get Defender Type
     const defenderMeta = TD_CREATURE_DEFS[target.definitionId];
-    const defense = defenderMeta ? defenderMeta.baseCreature.defense : 1; // Fallback to 1 to prevent division by zero
     const defenderType = defenderMeta
       ? defenderMeta.baseCreature.type
       : ElementType.NORMAL;

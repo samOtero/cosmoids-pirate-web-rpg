@@ -141,6 +141,8 @@ export interface Creature {
   currentHp: number;
   attack: number;
   defense: number;
+  specialAttack: number;
+  specialDefense: number;
   speed: number;
   level: number;
   xp: number;

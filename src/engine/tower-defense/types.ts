@@ -105,6 +105,9 @@ export interface Tower extends BaseTDUnit {
   creature: PlayerCreature; // The singular source of truth for level, xp, and attacks
   lastAttackTime: number; // Deprecate or keep for generic attacks
   currentAttack: number;
+  currentSpecialAttack: number;
+  currentDefense: number;
+  currentSpecialDefense: number;
   equippedAttacksRuntime: Array<{
     definitionId: string;
     lastFiredTime: number;
@@ -123,6 +126,9 @@ export interface Enemy extends BaseTDUnit {
   definitionId: string;
   speed: number;
   currentAttack: number;
+  currentSpecialAttack: number;
+  currentDefense: number;
+  currentSpecialDefense: number;
   statusConditions: StatusCondition[];
   currentWaypointIndex: number;
   pathIndex: number; // Index into the level's `paths` array
