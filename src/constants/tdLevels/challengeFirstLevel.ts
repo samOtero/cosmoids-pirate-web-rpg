@@ -4,7 +4,7 @@ import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 
 /**
  * Challenge version of Level 1: same layout/waves but with only 1 life
- * and a premade roster of a single Fueguana (starter_iguana) at level 1.
+ * and a premade roster of a single Fueguana (starter_iguana) at level 5.
  *
  * Lives are derived from captureUnits.length by the engine, so we keep
  * only a single coin to get exactly 1 life.
@@ -17,7 +17,7 @@ export const CHALLENGE_FIRST_LEVEL: TDLevelData = {
     {
       id: 'challenge_fueguana_1',
       speciesId: 'starter_iguana',
-      level: 1,
+      level: 5,
       xp: 0,
       equippedAttacks: TowerDefenseEngine.getDefaultAttacks('starter_iguana'),
     },
