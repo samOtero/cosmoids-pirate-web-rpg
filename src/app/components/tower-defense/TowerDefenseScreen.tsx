@@ -413,30 +413,30 @@ export default function TowerDefenseScreen({
         </div>
       )}
 
-      <div className="bg-slate-800 p-4 shrink-0 flex items-center justify-between border-b border-cyan-800">
-        <h2 className="text-xl font-bold text-cyan-400">Tower Defense</h2>
-        <div className="flex items-center gap-4 text-white">
+      <div className="bg-slate-800 p-2 lg:p-4 shrink-0 flex flex-wrap items-center justify-between border-b border-cyan-800 gap-2">
+        <h2 className="text-lg lg:text-xl font-bold text-cyan-400 hidden lg:block">Tower Defense</h2>
+        <div className="flex items-center gap-2 lg:gap-4 text-white w-full lg:w-auto justify-between lg:justify-end">
           {engineRef.current.surviveUntil &&
             engineRef.current.surviveUntil > 0 &&
             hasStarted && (
-              <span className="font-mono bg-slate-900 px-3 py-1 rounded text-yellow-400 border border-yellow-700/50 shadow-inner">
+              <span className="font-mono bg-slate-900 px-2 py-1 lg:px-3 lg:py-1 rounded text-yellow-400 border border-yellow-700/50 shadow-inner text-sm lg:text-base">
                 Time:{' '}
                 {Math.max(0, engineRef.current.surviveUntil - uiElapsedSeconds)}
                 s
               </span>
             )}
-          <span className="font-mono bg-slate-900 px-3 py-1 rounded text-red-400 border border-red-900/50 shadow-inner">
+          <span className="font-mono bg-slate-900 px-2 py-1 lg:px-3 lg:py-1 rounded text-red-400 border border-red-900/50 shadow-inner text-sm lg:text-base flex-1 lg:flex-none text-center">
             Lives: {uiLives}
           </span>
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            className="px-4 py-2 bg-cyan-700 hover:bg-cyan-600 rounded font-bold"
+            className="px-3 py-1 lg:px-4 lg:py-2 bg-cyan-700 hover:bg-cyan-600 rounded font-bold text-sm lg:text-base"
           >
             {isPlaying ? 'Pause' : 'Start'}
           </button>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-red-600 hover:bg-red-500 rounded font-bold"
+            className="px-3 py-1 lg:px-4 lg:py-2 bg-red-600 hover:bg-red-500 rounded font-bold text-sm lg:text-base"
           >
             Close
           </button>
@@ -457,7 +457,7 @@ export default function TowerDefenseScreen({
         getDragState={() => dragStateRef.current}
       />
 
-      <div className="bg-slate-800 p-4 shrink-0 flex items-center justify-center gap-4 overflow-x-auto border-t border-cyan-800 relative min-h-[140px]">
+      <div className="bg-slate-800 p-2 lg:p-4 shrink-0 flex items-center justify-start lg:justify-center gap-2 lg:gap-4 overflow-x-auto border-t border-cyan-800 relative min-h-[90px] lg:min-h-[140px]">
         {selectedCreatureId
           ? (() => {
               const creature = engineRef.current.roster.find(
@@ -512,8 +512,8 @@ export default function TowerDefenseScreen({
             })()
           : null}
 
-        <div className="text-slate-400 mr-4 font-bold uppercase text-sm">
-          Drag Creature to Place:
+        <div className="text-slate-400 mr-2 lg:mr-4 font-bold uppercase text-xs lg:text-sm shrink-0 hidden lg:block">
+          Drag to Place:
         </div>
         {engineRef.current.roster.map((creature) => {
           const isActive = activeTowerIds.includes(creature.id);
@@ -587,14 +587,14 @@ export default function TowerDefenseScreen({
                     offsetY: e.clientY - rect.top,
                   };
                 }}
-                className="relative z-0 w-24 h-24 p-2 rounded flex flex-col items-center justify-center transition-all cursor-grab active:cursor-grabbing hover:scale-105 bg-purple-900 border-2 border-purple-500 hover:bg-purple-800 shrink-0 touch-none"
+                className="relative z-0 w-16 h-16 lg:w-24 lg:h-24 p-1 lg:p-2 rounded flex flex-col items-center justify-center transition-all cursor-grab active:cursor-grabbing hover:scale-105 bg-purple-900 border-2 border-purple-500 hover:bg-purple-800 shrink-0 touch-none"
               >
                 {/* We'll use a placeholder icon or color for the capture device */}
-                <div className="relative w-12 h-12 rounded-full border-4 border-white bg-red-500 flex items-center justify-center shadow-lg pointer-events-none mb-1 overflow-hidden">
-                  <div className="w-full h-1 bg-black absolute top-1/2 -mt-[2px] left-0" />
-                  <div className="w-4 h-4 bg-white rounded-full border-2 border-black z-10" />
+                <div className="relative w-8 h-8 lg:w-12 lg:h-12 rounded-full border-[3px] lg:border-4 border-white bg-red-500 flex items-center justify-center shadow-lg pointer-events-none mb-0 lg:mb-1 overflow-hidden">
+                  <div className="w-full h-1 bg-black absolute top-1/2 -mt-[1px] lg:-mt-[2px] left-0" />
+                  <div className="w-3 h-3 lg:w-4 lg:h-4 bg-white rounded-full border-2 border-black z-10" />
                 </div>
-                <span className="text-[10px] mt-1 uppercase text-center leading-tight pointer-events-none text-purple-200 font-bold">
+                <span className="text-[8px] lg:text-[10px] mt-0.5 lg:mt-1 uppercase text-center leading-tight pointer-events-none text-purple-200 font-bold">
                   Capture
                 </span>
               </button>
@@ -659,7 +659,7 @@ export default function TowerDefenseScreen({
                   cancel.
                 </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
                   {/* Current Attacks */}
                   {tower.creature.equippedAttacks.map(
                     (atk: string, idx: number) => {
@@ -691,7 +691,7 @@ export default function TowerDefenseScreen({
                 </div>
 
                 {/* New Attack Info & Cancel */}
-                <div className="flex flex-col sm:flex-row gap-4 items-center justify-between border-t border-slate-700 pt-4">
+                <div className="flex flex-col lg:flex-row gap-4 items-center justify-between border-t border-slate-700 pt-4">
                   <div className="flex-1">
                     <div className="font-bold text-yellow-400">
                       New: {newDef?.name}
@@ -725,25 +725,25 @@ export default function TowerDefenseScreen({
           }}
         >
           {globalDrag.type === 'tower' ? (
-            <div className="w-24 h-24 p-1 rounded flex flex-col items-center justify-center bg-cyan-800 border-2 border-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.6)] opacity-80 scale-105">
+            <div className="w-16 h-16 lg:w-24 lg:h-24 p-1 rounded flex flex-col items-center justify-center bg-cyan-800 border-2 border-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.6)] opacity-80 scale-105">
               {globalDrag.imageUrl && (
                 <img
                   src={globalDrag.imageUrl}
                   alt={globalDrag.name}
-                  className="w-10 h-10 object-contain pointer-events-none"
+                  className="w-8 h-8 lg:w-10 lg:h-10 object-contain pointer-events-none"
                 />
               )}
-              <span className="text-[9px] uppercase font-bold truncate w-full text-center leading-tight text-cyan-100 mt-1">
+              <span className="text-[7px] lg:text-[9px] uppercase font-bold truncate w-full text-center leading-tight text-cyan-100 mt-1">
                 {globalDrag.name}
               </span>
             </div>
           ) : (
-            <div className="w-24 h-24 p-2 rounded flex flex-col items-center justify-center bg-purple-900 border-2 border-purple-500 opacity-80 scale-105">
-              <div className="relative w-12 h-12 rounded-full border-4 border-white bg-red-500 flex items-center justify-center shadow-lg pointer-events-none mb-1 overflow-hidden">
-                <div className="w-full h-1 bg-black absolute top-1/2 -mt-[2px] left-0" />
-                <div className="w-4 h-4 bg-white rounded-full border-2 border-black z-10" />
+            <div className="w-16 h-16 lg:w-24 lg:h-24 p-1 lg:p-2 rounded flex flex-col items-center justify-center bg-purple-900 border-2 border-purple-500 opacity-80 scale-105">
+              <div className="relative w-8 h-8 lg:w-12 lg:h-12 rounded-full border-[3px] lg:border-4 border-white bg-red-500 flex items-center justify-center shadow-lg pointer-events-none mb-0 lg:mb-1 overflow-hidden">
+                <div className="w-full h-1 bg-black absolute top-1/2 -mt-[1px] lg:-mt-[2px] left-0" />
+                <div className="w-3 h-3 lg:w-4 lg:h-4 bg-white rounded-full border-2 border-black z-10" />
               </div>
-              <span className="text-[10px] mt-1 uppercase text-center leading-tight text-purple-200 font-bold">
+              <span className="text-[8px] lg:text-[10px] mt-0.5 lg:mt-1 uppercase text-center leading-tight text-purple-200 font-bold">
                 Capture
               </span>
             </div>

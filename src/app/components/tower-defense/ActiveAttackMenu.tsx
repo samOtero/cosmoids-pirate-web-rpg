@@ -27,8 +27,8 @@ export function ActiveAttackMenu({
   onClose: () => void;
 }) {
   return (
-    <div className="absolute inset-0 bg-slate-900/95 z-50 flex flex-col items-center justify-center p-2 backdrop-blur-sm">
-      <div className="flex items-center justify-center gap-6 w-full px-4 pb-2 overflow-x-auto">
+    <div className="absolute inset-0 bg-slate-900/95 z-50 flex flex-col items-center justify-center p-1 lg:p-2 backdrop-blur-sm">
+      <div className="flex items-center justify-start lg:justify-center gap-2 lg:gap-6 w-full px-2 lg:px-4 pb-2 overflow-x-auto min-h-[90px] lg:min-h-[120px]">
         {/* Tower Identity Side */}
         <div className="flex flex-col items-center shrink-0">
           <TowerButton
@@ -39,15 +39,15 @@ export function ActiveAttackMenu({
             displayLevel={displayLevel}
             displayXp={displayXp}
           />
-          <span className="text-xs text-slate-400 mt-2 font-bold uppercase tracking-wider">
+          <span className="text-[8px] lg:text-xs text-slate-400 mt-1 lg:mt-2 font-bold uppercase tracking-wider hidden lg:block">
             Selected
           </span>
         </div>
 
-        <div className="w-px h-24 bg-cyan-900/50 shrink-0"></div>
+        <div className="w-px h-16 lg:h-24 bg-cyan-900/50 shrink-0"></div>
 
         {/* Attacks Side */}
-        <div className="flex gap-4 overflow-x-auto py-2">
+        <div className="flex gap-2 lg:gap-4 overflow-x-auto py-2">
           {equippedAttacks.map((attackId, index) => {
             const def = ATTACK_DEFS[attackId];
             if (!def) return null;
@@ -58,25 +58,25 @@ export function ActiveAttackMenu({
               <button
                 key={`${attackId}-${index}`}
                 onClick={() => onSelectAttack(index)}
-                className={`flex flex-col items-center p-3 rounded border-2 transition-all min-w-[120px] shrink-0 ${
+                className={`flex flex-col items-center p-1.5 lg:p-3 rounded border-2 transition-all min-w-[90px] lg:min-w-[120px] shrink-0 ${
                   isSelected
                     ? 'bg-cyan-900/50 border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.4)] scale-105'
                     : 'bg-slate-800 border-slate-600 hover:border-cyan-600 hover:bg-slate-700'
                 }`}
               >
                 <span
-                  className={`font-bold mb-1 ${isSelected ? 'text-cyan-300' : 'text-slate-200'}`}
+                  className={`font-bold mb-0.5 lg:mb-1 text-[10px] lg:text-base ${isSelected ? 'text-cyan-300' : 'text-slate-200'}`}
                 >
                   {def.name}
                 </span>
-                <div className="flex gap-2 text-xs">
+                <div className="flex gap-1 lg:gap-2 text-[8px] lg:text-xs">
                   <span className="text-red-400">Pwr: {def.power}</span>
                   <span className="text-blue-400">
                     CD: {def.cooldownMs / 1000}s
                   </span>
                 </div>
                 {isSelected && (
-                  <span className="mt-2 text-[10px] font-bold text-black bg-cyan-400 px-2 py-0.5 rounded-full uppercase">
+                  <span className="mt-1 lg:mt-2 text-[8px] lg:text-[10px] font-bold text-black bg-cyan-400 px-1.5 lg:px-2 py-0.5 rounded-full uppercase">
                     Active
                   </span>
                 )}
@@ -86,11 +86,11 @@ export function ActiveAttackMenu({
         </div>
 
         {/* Close Button Side */}
-        <div className="w-px h-24 bg-cyan-900/50 shrink-0"></div>
-        <div className="flex flex-col items-center justify-center shrink-0 h-24">
+        <div className="w-px h-16 lg:h-24 bg-cyan-900/50 shrink-0"></div>
+        <div className="flex flex-col items-center justify-center shrink-0 h-16 lg:h-24">
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg px-6 py-2 text-sm font-bold transition-colors h-full flex items-center justify-center border-2 border-slate-600 hover:border-red-500/50 group"
+            className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg px-3 lg:px-6 py-1 lg:py-2 text-[10px] lg:text-sm font-bold transition-colors h-full flex items-center justify-center border-2 border-slate-600 hover:border-red-500/50 group"
           >
             <span className="group-hover:text-red-400 transition-colors uppercase tracking-wider">
               Close

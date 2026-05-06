@@ -25,7 +25,7 @@ export function TowerButton({
     <button
       onClick={onClick}
       onPointerDown={onPointerDown}
-      className={`relative w-24 h-24 p-1 rounded flex flex-col items-center justify-center transition-all shrink-0 touch-none ${
+      className={`relative w-16 h-16 lg:w-24 lg:h-24 p-0.5 lg:p-1 rounded flex flex-col items-center justify-center transition-all shrink-0 touch-none ${
         onPointerDown
           ? 'cursor-grab active:cursor-grabbing hover:scale-105'
           : 'cursor-default'
@@ -38,23 +38,23 @@ export function TowerButton({
       <img
         src={spriteUrl}
         alt={name}
-        className="w-10 h-10 object-contain pointer-events-none"
+        className="w-7 h-7 lg:w-10 lg:h-10 object-contain pointer-events-none"
       />
-      <div className="flex flex-col items-center w-full mt-1 pointer-events-none">
+      <div className="flex flex-col items-center w-full mt-0.5 lg:mt-1 pointer-events-none">
         <span
-          className={`text-[9px] uppercase font-bold truncate w-full text-center leading-tight ${isActive ? 'text-cyan-100' : 'text-white'}`}
+          className={`text-[7px] lg:text-[9px] uppercase font-bold truncate w-full text-center leading-tight ${isActive ? 'text-cyan-100' : 'text-white'}`}
         >
           {name}
         </span>
 
-        <div className="w-full flex items-center justify-between px-1 mt-0.5">
-          <span className="text-[8px] text-gray-300 leading-none">
+        <div className="w-full flex items-center justify-between px-0.5 lg:px-1 mt-0.5">
+          <span className="text-[6px] lg:text-[8px] text-gray-300 leading-none">
             Lv.{displayLevel}
           </span>
         </div>
 
-        <div className="w-full px-1 mt-0.5">
-          <div className="w-full h-1.5 bg-gray-900 rounded-full overflow-hidden border border-gray-600">
+        <div className="w-full px-0.5 lg:px-1 mt-0.5">
+          <div className="w-full h-1 lg:h-1.5 bg-gray-900 rounded-full overflow-hidden border border-gray-600">
             <div
               className="h-full bg-cyan-400 transition-all duration-300"
               style={{
