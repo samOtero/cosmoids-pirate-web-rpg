@@ -32,22 +32,21 @@ export class TDProgressionManager {
 
         const towerLevel = tower.creature.level;
 
-        // Scaled EXP Formula
-        // A = (enemyLevel * 2) + 10
-        // B = (baseExperience * enemyLevel) / 5
-        // C = (enemyLevel + towerLevel + 10)
-        // EXP = floor(floor(√A * A²) * B / floor(√C * C²)) + 1
-        const a = enemyLevel * 2 + 10;
-        const b = (baseExperience * enemyLevel) / 5;
-        const c = enemyLevel + towerLevel + 10;
+        // Formula: ΔEXP = ((baseExperience * enemyLevel / 5) * (1 / participantCount) * ((2 * enemyLevel + 10) / (enemyLevel + towerLevel + 10))^2.5) + 1
 
-        const numerator = Math.floor(Math.sqrt(a) * a * a);
-        const denominator = Math.floor(Math.sqrt(c) * c * c);
+        const baseValue = (baseExperience * enemyLevel) / 5;
+        const levelRatio =
+          (2 * enemyLevel + 10) / (enemyLevel + towerLevel + 10);
 
-        let xpGained = Math.floor((numerator * b) / denominator) + 1;
+        // The core scaling factor uses a power of 2.5
+        const scalingFactor = Math.pow(levelRatio, 2.5);
 
-        // split evenly among participants
-        xpGained = Math.max(1, Math.floor(xpGained / participantCount));
+        // Calculate final XP
+        let xpGained =
+          Math.floor((baseValue / participantCount) * scalingFactor) + 1;
+
+        // Ensure at least 1 XP is gained
+        xpGained = Math.max(1, xpGained);
 
         tower.creature.xp += xpGained;
 
