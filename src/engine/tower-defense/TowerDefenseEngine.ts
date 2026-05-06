@@ -929,6 +929,18 @@ export class TowerDefenseEngine {
       equippedAttacks: TowerDefenseEngine.getDefaultAttacks(enemy.definitionId),
     };
     this.roster.push(captured);
+
+    // Distribute EXP to participants as if the enemy was defeated
+    if (enemy.damagedByTowerIds.size > 0) {
+      this.events.emit({
+        type: 'ENEMY_CAPTURED',
+        enemyId: enemy.id,
+        enemyDefinitionId: enemy.definitionId,
+        enemyLevel: capturedLevel,
+        participantTowerIds: Array.from(enemy.damagedByTowerIds),
+      });
+    }
+
     return captured;
   }
 

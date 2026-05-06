@@ -7,6 +7,13 @@ export type TDEvent =
       participantTowerIds: string[];
     }
   | {
+      type: 'ENEMY_CAPTURED';
+      enemyId: string;
+      enemyDefinitionId: string;
+      enemyLevel: number;
+      participantTowerIds: string[];
+    }
+  | {
       type: 'TOWER_XP_GAINED';
       towerId: string;
       xpGained: number;
