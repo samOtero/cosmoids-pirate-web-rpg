@@ -572,9 +572,7 @@ export default function TowerDefenseScreen({
         })}
 
         {/* Permanent Capture Device Tool */}
-        {!engineRef.current.disableCapture &&
-          (profile?.storyProgression ?? 0) >=
-            StoryProgression.DEFEAT_FIRST_BATTLE && (
+        {!engineRef.current.disableCapture && (
             <React.Fragment>
               <div className="w-px h-16 bg-cyan-800 mx-2 shrink-0" />
               <button
