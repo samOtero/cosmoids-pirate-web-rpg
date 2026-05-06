@@ -37,7 +37,7 @@ export const MOUSE_1: Creature = {
   specialDefense: 35,
   baseExperience: 51,
   speed: 30,
-  level: 1,
+  level: 3,
   xp: 0,
   moves: ['Tackle', 'String Shot'],
   spriteUrl: '/battles/cosmoids/mouse_1_down_1_25.png',

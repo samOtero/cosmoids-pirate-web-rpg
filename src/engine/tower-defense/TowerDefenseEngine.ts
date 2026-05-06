@@ -915,11 +915,14 @@ export class TowerDefenseEngine {
       }
     }
 
+    const meta = TD_CREATURE_DEFS[enemy.definitionId];
+    const capturedLevel = meta ? meta.baseCreature.level : 1;
+
     // Optional: add RNG for capture success here! Currently 100% success.
     const captured: PlayerCreature = {
       id: `captured_${enemy.definitionId}_${Date.now()}_${Math.random().toString(36).substring(7)}`,
       speciesId: enemy.definitionId,
-      level: 1,
+      level: capturedLevel,
       xp: 0,
       equippedAttacks: TowerDefenseEngine.getDefaultAttacks(enemy.definitionId),
     };
