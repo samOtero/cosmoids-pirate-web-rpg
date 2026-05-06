@@ -30,6 +30,7 @@ export interface TDWaveGroup {
   turnAroundAtEnd?: boolean; // Whether the enemy should return to the start instead of despawning
   concurrentWithPrevious?: boolean; // Whether this group should start its initial delay timer at the same time as the group before it
   uncapturable?: boolean;
+  speedMultiplier?: number; // Multiplies the base speed of enemies in this group
 }
 
 export interface TDWave {

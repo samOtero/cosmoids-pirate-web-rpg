@@ -816,7 +816,8 @@ export class TowerDefenseEngine {
           newEnemies,
           spawner.group.pathIndex,
           spawner.group.turnAroundAtEnd,
-          spawner.group.uncapturable
+          spawner.group.uncapturable,
+          spawner.group.speedMultiplier
         );
         spawner.spawnsRemaining--;
         spawner.lastSpawnTime = time;
@@ -852,7 +853,8 @@ export class TowerDefenseEngine {
     newEnemies: Enemy[],
     groupPathIndex: number,
     turnAroundAtEnd?: boolean,
-    uncapturable?: boolean
+    uncapturable?: boolean,
+    speedMultiplier?: number
   ) {
     const meta = TD_CREATURE_DEFS[definitionId];
     if (!meta) return;
@@ -881,7 +883,7 @@ export class TowerDefenseEngine {
       position: { x: startPath[0].x, y: startPath[0].y },
       hp: enemyHp,
       maxHp: enemyHp,
-      speed: meta.baseCreature.speed / 100,
+      speed: (meta.baseCreature.speed / 100) * (speedMultiplier ?? 1),
       currentAttack: enemyAttack,
       currentSpecialAttack: enemySpecialAttack,
       currentDefense: enemyDefense,

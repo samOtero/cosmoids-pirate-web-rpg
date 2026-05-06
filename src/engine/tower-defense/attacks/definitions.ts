@@ -2,7 +2,7 @@ import { ElementType } from '@/types/baseGame';
 import { AttackDefinition } from './types';
 
 const ATTACK_COOLDOWNS = {
-  NORMAL: 1000,
+  NORMAL: 800,
 };
 
 export const ATTACK_DEFS: Record<string, AttackDefinition> = {
