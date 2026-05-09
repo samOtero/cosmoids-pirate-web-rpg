@@ -11,7 +11,7 @@ import {
 } from '@/engine/tower-defense/TowerDefenseEngine';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { ElementType } from '@/types/baseGame';
-import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
+import { CREATURE_TD_CONFIGS, TD_BASE_HEIGHT } from '@/constants/tdConfigs';
 import { BaseTDUnit } from '@/engine/tower-defense/types';
 
 export function applyTDUnitTransforms(
@@ -605,7 +605,12 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
             container.x = offsetX + (envUnit.position.x / 100) * screenW;
             container.y = offsetY + (envUnit.position.y / 100) * screenH;
-            container.scale.set(zoom);
+
+            // Calculate responsive scale based on the editor's 80x80 box matching 5vh placement spots
+            const responsiveScale = app.screen.height / TD_BASE_HEIGHT;
+            const finalScale = zoom * responsiveScale;
+
+            container.scale.set(finalScale);
 
             const sprite = container.getChildByLabel('env_sprite') as
               | PIXI.Sprite
@@ -674,7 +679,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             container.x = offsetX + (capUnit.position.x / 100) * screenW;
             container.y =
               offsetY + (capUnit.position.y / 100) * screenH + heldOffset;
-            container.scale.set(zoom);
+
+            const responsiveScale = app.screen.height / TD_BASE_HEIGHT;
+            const finalScale = zoom * responsiveScale;
+            container.scale.set(finalScale);
 
             // Make it render above the enemy if held (enemy might be index 1 or so, we'll just push to top)
             if (capUnit.heldByEnemyId) {
@@ -758,7 +766,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
               const rangeCircle = new PIXI.Graphics();
               rangeCircle.label = 'rangeCircle';
-              const radius = viewportH * 0.4; // 30vw approx diameter -> 15vw radius
+              const radius = TD_BASE_HEIGHT * 0.4; // dynamically scales to viewportH * 0.4
               rangeCircle.circle(0, 0, radius);
               rangeCircle.fill({ color: 0x22d3ee, alpha: 0.05 });
               rangeCircle.stroke({ color: 0x22d3ee, alpha: 0.3, width: 1 });
@@ -771,7 +779,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             if (draggingTowerCreatureId !== tower.creature.id) {
               container.x = offsetX + (tower.position.x / 100) * screenW;
               container.y = offsetY + (tower.position.y / 100) * screenH;
-              container.scale.set(zoom);
+              const responsiveScale = app.screen.height / TD_BASE_HEIGHT;
+              const finalScale = zoom * responsiveScale;
+              container.scale.set(finalScale);
             }
 
             const rCircle = container.getChildByLabel('rangeCircle');
@@ -1035,7 +1045,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             }
             container.x = offsetX + (enemy.position.x / 100) * screenW;
             container.y = offsetY + (enemy.position.y / 100) * screenH;
-            container.scale.set(zoom);
+            const responsiveScale = app.screen.height / TD_BASE_HEIGHT;
+            const finalScale = zoom * responsiveScale;
+            container.scale.set(finalScale);
 
             const esprite = container.getChildByLabel('enemy_sprite') as
               | PIXI.Sprite
@@ -1112,7 +1124,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
             container.x = offsetX + (proj.position.x / 100) * screenW;
             container.y = offsetY + (proj.position.y / 100) * screenH;
-            container.scale.set(zoom);
+            const responsiveScale = app.screen.height / TD_BASE_HEIGHT;
+            const finalScale = zoom * responsiveScale;
+            container.scale.set(finalScale);
 
             const def = proj.attackDefinitionId
               ? ATTACK_DEFS[proj.attackDefinitionId]
@@ -1183,7 +1197,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
             container.x = offsetX + (vfx.position.x / 100) * screenW;
             container.y = offsetY + (vfx.position.y / 100) * screenH;
-            container.scale.set(zoom);
+            const responsiveScale = app.screen.height / TD_BASE_HEIGHT;
+            const finalScale = zoom * responsiveScale;
+            container.scale.set(finalScale);
 
             const progress = Math.min(1, vfx.elapsedMs / vfx.durationMs);
             //container.alpha = progress > 0.8 ? 1 - (progress - 0.8) * 5 : 1;
