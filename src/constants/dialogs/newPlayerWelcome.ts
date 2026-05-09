@@ -19,7 +19,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
+          key: SpeakerImageKey.CALEB_CONFIDENT_STARTER_OUTFIT,
           displayName: 'Caleb',
         },
       ],
@@ -28,29 +28,29 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.LANCE_NEUTRAL_OUTFIT_1,
+          key: SpeakerImageKey.LANCE_AMUSED,
           displayName: 'Lance',
         },
       ],
-      text: "***Join my crew? Kid, you don't even have a single Cosmoid. You'll never survive as a pirate like that.",
+      text: "Join my crew? Kid, you don't even have a single Cosmoid. You'll never survive as a pirate like that.",
     },
     {
       portraits: [
         {
-          key: SpeakerImageKey.CALEB_SCARED_SURPRISED_STARTER_OUTFIT,
+          key: SpeakerImageKey.CALEB_ANNOYED_STARTER_OUTFIT,
           displayName: 'Caleb',
         },
       ],
-      text: "***That's not fair! I'm tough enough!",
+      text: "That's not fair! I'm tough enough!",
     },
     {
       portraits: [
         {
-          key: SpeakerImageKey.LANCE_NEUTRAL_OUTFIT_1,
+          key: SpeakerImageKey.LANCE_SMILING,
           displayName: 'Lance',
         },
       ],
-      text: "***Tough isn't enough out there. But hey, since it's your birthday... catch.",
+      text: "Tough isn't enough out there. But hey, since it's your birthday... catch.",
     },
     {
       portraits: [
@@ -64,7 +64,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.LANCE_NEUTRAL_OUTFIT_1,
+          key: SpeakerImageKey.LANCE_SMILING,
           displayName: 'Lance',
         },
       ],
@@ -73,11 +73,11 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.CALEB_SCARED_SURPRISED_STARTER_OUTFIT,
+          key: SpeakerImageKey.CALEB_ANNOYED_STARTER_OUTFIT,
           displayName: 'Caleb',
         },
       ],
-      text: '***A dock mouse?! No way! Come on, Lance! You have a whole chest of rare Cosmoids right there. Let me have one of those!\n',
+      text: 'A dock mouse?! No way! Come on, Lance! You have a whole chest of rare Cosmoids right there. Let me have one of those!\n',
     },
     {
       portraits: [
@@ -104,7 +104,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.RAT_CATCHER_1,
+          key: SpeakerImageKey.RAT_CATCHER_MOCKING,
           displayName: 'Rat-Catcher',
         },
       ],
@@ -114,7 +114,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       text: 'Just enjoying the morning breeze. No trouble here.',
       portraits: [
         {
-          key: SpeakerImageKey.LANCE_NEUTRAL_OUTFIT_1,
+          key: SpeakerImageKey.LANCE_CALM,
           displayName: 'Lance',
         },
       ],
@@ -123,16 +123,16 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       text: "You pirates are pathetic. Take away your fancy little monsters, and you're all just cowards playing dress-up on the water.",
       portraits: [
         {
-          key: SpeakerImageKey.RAT_CATCHER_1,
+          key: SpeakerImageKey.RAT_CATCHER_SMUG,
           displayName: 'Rat-Catcher',
         },
       ],
     },
     {
-      text: '***Hey! Shut up! Captain Lance is the greatest!',
+      text: 'Hey! Shut up! Captain Lance is the greatest!',
       portraits: [
         {
-          key: SpeakerImageKey.CALEB_SCARED_SURPRISED_STARTER_OUTFIT,
+          key: SpeakerImageKey.CALEB_ANGRY_STARTER_OUTFIT,
           displayName: 'Caleb',
         },
       ],
@@ -141,7 +141,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       text: "Let it go, Caleb. Words can't sink ships.",
       portraits: [
         {
-          key: SpeakerImageKey.LANCE_NEUTRAL_OUTFIT_1,
+          key: SpeakerImageKey.LANCE_CALM,
           displayName: 'Lance',
         },
       ],
@@ -168,16 +168,16 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       text: "See that, kid? A total coward. I think I'll just take his precious cargo then.",
       portraits: [
         {
-          key: SpeakerImageKey.RAT_CATCHER_1,
+          key: SpeakerImageKey.RAT_CATCHER_COCKY,
           displayName: 'Rat-Catcher',
         },
       ],
     },
     {
-      text: "***Don't you dare touch his stuff! I'll show you how a real pirate fights!",
+      text: "Don't you dare touch his stuff! I'll show you how a real pirate fights!",
       portraits: [
         {
-          key: SpeakerImageKey.CALEB_SCARED_SURPRISED_STARTER_OUTFIT,
+          key: SpeakerImageKey.CALEB_ANGRY_STARTER_OUTFIT,
           displayName: 'Caleb',
         },
       ],
@@ -186,16 +186,16 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       text: 'A real pirate? Please. You and what army, kid?',
       portraits: [
         {
-          key: SpeakerImageKey.RAT_CATCHER_1,
+          key: SpeakerImageKey.RAT_CATCHER_MOCKING,
           displayName: 'Rat-Catcher',
         },
       ],
     },
     {
-      text: '***Me and... ummm... my new partner!',
+      text: 'Me and... ummm... my new partner!',
       portraits: [
         {
-          key: SpeakerImageKey.CALEB_SCARED_SURPRISED_STARTER_OUTFIT,
+          key: SpeakerImageKey.CALEB_FLUSTERED_STARTER_OUTFIT,
           displayName: 'Caleb',
         },
         {
@@ -243,7 +243,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
+          key: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
           displayName: 'Caleb',
         },
         {
@@ -280,7 +280,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
+          key: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
           displayName: 'Caleb',
         },
         {
@@ -318,7 +318,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
+          key: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
           displayName: 'Caleb',
         },
         {
@@ -355,7 +355,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT,
+          key: SpeakerImageKey.CALEB_CONFIDENT_STARTER_OUTFIT,
           displayName: 'Caleb',
         },
       ],
@@ -366,7 +366,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       text: "A fancy new pet? Too bad it's stuck with a weak little kid giving the orders. Senticle, crush 'em both!",
       portraits: [
         {
-          key: SpeakerImageKey.RAT_CATCHER_1,
+          key: SpeakerImageKey.RAT_CATCHER_MOCKING,
           displayName: 'Rat-Catcher',
         },
       ],
