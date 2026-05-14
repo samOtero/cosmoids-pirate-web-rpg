@@ -35,10 +35,7 @@ import {
 } from '@/types/baseGame';
 import { BATTLES } from '@/constants/battles';
 import { TD_LEVELS } from '@/constants/tdLevels';
-import {
-  NEW_PLAYER_EVENTS,
-  FIRST_BATTLE_AFTER_GETTING_STARTER,
-} from '@/constants/events';
+import { NEW_PLAYER_EVENTS } from '@/constants/events';
 import {
   STARTER_CRAB,
   STARTER_IGUANA,
@@ -541,13 +538,7 @@ export const useGameStore = create<GameState>()(
 
               if (profile.storyProgression === StoryProgression.NEW_GAME) {
                 initialEvents = [...NEW_PLAYER_EVENTS];
-              } else if (
-                profile.storyProgression === StoryProgression.PICK_STARTER
-              ) {
-                initialEvents = [...FIRST_BATTLE_AFTER_GETTING_STARTER];
-              } else if (
-                profile.storyProgression >= StoryProgression.DEFEAT_FIRST_BATTLE
-              ) {
+              } else {
                 initialEvents = [{ type: 'GO_TO_MODE_SELECT' }];
               }
 

@@ -6,11 +6,22 @@ import {
 } from '@/types/baseGame';
 import { FIRST_LEVEL } from './firstLevel';
 import { FOREST_LEVEL } from './forestLevel';
-import { CHALLENGE_FIRST_LEVEL, CHALLENGE_FIRST_LEVEL_NO_CAPTURE } from './challengeFirstLevel';
+import {
+  CHALLENGE_FIRST_LEVEL,
+  CHALLENGE_FIRST_LEVEL_NO_CAPTURE,
+} from './challengeFirstLevel';
 
 export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
   [TDLevelContext.FIRST_LEVEL]: {
     levelData: FIRST_LEVEL,
+    introEvents: [
+      {
+        type: 'SHOW_DIALOG',
+        payload: {
+          context: DialogContext.LEVEL_1_INTRO,
+        },
+      },
+    ],
     winEvents: [
       {
         type: 'SET_STORY_PROGRESSION',

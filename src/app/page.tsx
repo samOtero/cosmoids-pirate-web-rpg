@@ -12,6 +12,7 @@ import {
   StoryProgression,
   TDLevelContext,
 } from '@/types/baseGame';
+import { TD_LEVELS } from '@/constants/tdLevels';
 import {
   resolvePlayerCreature,
   resolvePlayerCreatures,
@@ -283,7 +284,11 @@ export default function Home() {
         <LevelSelectScreen
           profile={currentProfile}
           onLevelSelect={(context: TDLevelContext) => {
+            const levelConfig = TD_LEVELS[context];
+            const introEvents = levelConfig?.introEvents || [];
+
             enqueueAndProcessEvents([
+              ...introEvents,
               {
                 type: 'GO_TO_TOWER_DEFENSE',
                 payload: { context },
@@ -346,7 +351,11 @@ export default function Home() {
         <ChallengeSelectScreen
           profile={currentProfile}
           onLevelSelect={(context: TDLevelContext) => {
+            const levelConfig = TD_LEVELS[context];
+            const introEvents = levelConfig?.introEvents || [];
+
             enqueueAndProcessEvents([
+              ...introEvents,
               {
                 type: 'GO_TO_TOWER_DEFENSE',
                 payload: { context },

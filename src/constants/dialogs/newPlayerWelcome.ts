@@ -362,15 +362,6 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
       id: 'after_starter_choice',
       text: "A Captain is nothing without a loyal First Mate! I've made my choice!",
     },
-    {
-      text: "A fancy new pet? Too bad it's stuck with a weak little kid giving the orders. Senticle, crush 'em both!",
-      portraits: [
-        {
-          key: SpeakerImageKey.RAT_CATCHER_MOCKING,
-          displayName: 'Rat-Catcher',
-        },
-      ],
-    },
   ],
   backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
 };

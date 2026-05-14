@@ -19,6 +19,7 @@ export enum TDLevelContext {
 
 export interface TDLevelConfig {
   levelData: TDLevelData;
+  introEvents?: GameEvent[];
   winEvents: GameEvent[];
   loseEvents: GameEvent[];
 }
