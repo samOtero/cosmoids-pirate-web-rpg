@@ -278,7 +278,7 @@ export default function DialogContent({
                 alt={p.displayName}
                 width={imgWidth}
                 height={imgHeight}
-                className={`${imgClass} landscape:!w-auto landscape:!h-full landscape:max-h-[40vh] object-cover border-4 border-wood rounded-lg shadow-2xl bg-black transition-all duration-300`}
+                className={`${imgClass} landscape:!w-auto landscape:!h-full landscape:max-h-[30vh] object-cover border-4 border-wood rounded-lg shadow-2xl bg-black transition-all duration-300`}
                 unoptimized
                 draggable={false}
               />
@@ -293,24 +293,24 @@ export default function DialogContent({
   };
 
   const dialogPanelClasses =
-    'min-h-28 sm:min-h-32 md:min-h-40 flex flex-col justify-start items-start bg-ocean-dark/95 border-wood-light relative';
+    'min-h-24 landscape:min-h-20 sm:min-h-32 md:min-h-40 flex flex-col justify-start items-start bg-ocean-dark/95 border-wood-light relative';
 
   return (
     <div
       className="flex flex-col h-full relative cursor-pointer select-none"
       onClick={handleGlobalClick}
     >
-      {/* Content: portrait-mode = vertical stack, landscape-mode = side-by-side */}
-      <div className="relative z-10 flex-1 flex flex-col landscape:flex-row justify-between landscape:items-stretch p-3 sm:p-4 md:p-8 gap-2 landscape:gap-4 overflow-hidden">
+      {/* Content: always vertical stack, portrait on top, dialog on bottom */}
+      <div className="relative z-10 flex-1 flex flex-col justify-between p-3 sm:p-4 md:p-8 gap-1 landscape:gap-1 overflow-hidden">
         {/* Portrait area */}
         {hasPortraits && (
-          <div className="flex justify-center items-center flex-1 landscape:flex-none landscape:w-[40%] landscape:max-w-[45%] min-h-0">
+          <div className="flex justify-center items-center flex-1 min-h-0">
             {renderPortraits()}
           </div>
         )}
 
         {/* Dialog panel */}
-        <div className="flex flex-col landscape:flex-1 min-h-0">
+        <div className="flex flex-col min-h-0 flex-shrink-0">
           <Panel className={dialogPanelClasses}>{renderDialogText()}</Panel>
         </div>
       </div>
@@ -333,7 +333,7 @@ export default function DialogContent({
             </span>
           </div>
         )}
-        <div className="text-base sm:text-lg md:text-2xl text-sand font-mono leading-relaxed drop-shadow-md">
+        <div className="text-sm landscape:text-xs sm:text-base landscape:sm:text-sm md:text-xl landscape:md:text-base text-sand font-mono leading-relaxed landscape:leading-snug drop-shadow-md">
           {displayedText}
           {isTyping && (
             <span className="inline-block w-3 h-5 sm:h-6 bg-cyan-400 ml-1 align-middle animate-pulse"></span>
@@ -341,7 +341,7 @@ export default function DialogContent({
         </div>
 
         {!isTyping && hasButtons() && (
-          <div className="w-full mt-4 sm:mt-6 flex flex-wrap justify-center gap-3 sm:gap-4">
+          <div className="w-full mt-2 sm:mt-4 landscape:mt-1 flex flex-wrap justify-center gap-2 sm:gap-3">
             {currentLine.buttons?.map((button, idx) => (
               <button
                 key={idx}
