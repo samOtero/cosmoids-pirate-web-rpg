@@ -155,3 +155,6 @@ Added a `baseExperience` field to the `Creature` interface in `baseGame.ts` and 
 ## [2026-05-05] Pok�mon EXP Formula Implemented
 
 Implemented the Pok�mon Gen V+ scaled experience formula in the Tower Defense engine. The flat \xpYield\ system has been replaced. EXP is now calculated using \aseExperience\ from the Creature definition and the levels of the enemy and tower. Using the Gen V rule, the total EXP is split evenly among all towers that participated in damaging the enemy. The level-up curve has also been changed to the Medium Fast curve (\L�\).
+
+## [2026-05-14] Dialog Screen Landscape Layout
+The DialogContent component now uses Tailwind's landscape: variant to switch from vertical (portrait stacked above dialog) to horizontal (portrait left, dialog right) layout when in landscape orientation. Custom variants for landscape/portrait were added to globals.css via @custom-variant (required for Tailwind v4). Portrait images are constrained to max-h-[40vh] in landscape mode to prevent overflow.
