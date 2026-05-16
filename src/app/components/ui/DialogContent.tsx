@@ -293,7 +293,7 @@ export default function DialogContent({
   };
 
   const dialogPanelClasses =
-    'min-h-24 landscape:min-h-20 sm:min-h-32 md:min-h-40 flex flex-col justify-start items-start bg-ocean-dark/95 border-wood-light relative';
+    'h-36 landscape:h-28 sm:h-40 md:h-48 flex flex-col justify-start items-start bg-ocean-dark/95 border-wood-light relative overflow-y-auto';
 
   return (
     <div
@@ -342,8 +342,9 @@ export default function DialogContent({
           )}
         </div>
 
-        {!isTyping && hasButtons() && (
-          <div className="w-full mt-2 sm:mt-4 landscape:mt-1 flex flex-wrap justify-center gap-2 sm:gap-3">
+        {/* Buttons area - always rendered for stable height, hidden until ready */}
+        {hasButtons() && (
+          <div className={`w-full mt-2 sm:mt-4 landscape:mt-1 flex flex-wrap justify-center gap-2 sm:gap-3 transition-opacity duration-200 ${!isTyping ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
             {currentLine.buttons?.map((button, idx) => (
               <button
                 key={idx}
@@ -359,9 +360,10 @@ export default function DialogContent({
           </div>
         )}
 
-        {!isTyping && !hasButtons() && (
+        {/* Continue prompt - always rendered for stable height, hidden until ready */}
+        {!hasButtons() && (
           <div
-            className="self-end mt-auto cursor-pointer p-3 sm:p-4 md:p-6 -mr-2 sm:-mr-4 -mb-2 sm:-mb-4 hover:bg-white/5 rounded-lg transition-colors group"
+            className={`self-end mt-auto cursor-pointer p-3 sm:p-4 md:p-6 -mr-2 sm:-mr-4 -mb-2 sm:-mb-4 hover:bg-white/5 rounded-lg transition-opacity duration-200 group ${!isTyping ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
             onClick={(e) => {
               e.stopPropagation();
               handleAdvance();
