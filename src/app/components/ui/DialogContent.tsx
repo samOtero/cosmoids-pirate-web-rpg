@@ -300,6 +300,21 @@ export default function DialogContent({
       className="flex flex-col h-full relative cursor-pointer select-none"
       onClick={handleGlobalClick}
     >
+      {/* Skip button — top-right of screen */}
+      {allowSkip && !hasButtons() && (
+        <div
+          className="absolute top-3 right-3 z-50 cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleSkip();
+          }}
+        >
+          <div className="bg-red-600 hover:bg-red-500 active:bg-red-700 text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-md shadow-lg border border-red-800 transition-colors">
+            Skip
+          </div>
+        </div>
+      )}
+
       {/* Content: always vertical stack, portrait on top, dialog on bottom */}
       <div className="relative z-10 flex-1 flex flex-col justify-between p-3 sm:p-4 md:p-8 gap-1 landscape:gap-1 overflow-hidden">
         {/* Portrait area */}
@@ -320,19 +335,6 @@ export default function DialogContent({
   function renderDialogText() {
     return (
       <>
-        {allowSkip && !hasButtons() && (
-          <div
-            className="absolute top-2 right-2 cursor-pointer p-2 hover:bg-white/10 rounded transition-colors group z-50"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleSkip();
-            }}
-          >
-            <span className="text-sand/50 text-xs font-bold uppercase tracking-widest group-hover:text-sand">
-              Skip
-            </span>
-          </div>
-        )}
         <div className="text-sm landscape:text-xs sm:text-base landscape:sm:text-sm md:text-xl landscape:md:text-base text-sand font-mono leading-relaxed landscape:leading-snug drop-shadow-md">
           {displayedText}
           {isTyping && (
