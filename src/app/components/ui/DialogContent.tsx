@@ -293,7 +293,7 @@ export default function DialogContent({
   };
 
   const dialogPanelClasses =
-    'h-36 landscape:h-28 sm:h-40 md:h-48 flex flex-col justify-start items-start bg-ocean-dark/95 border-wood-light relative overflow-y-auto';
+    'h-36 landscape:h-28 sm:h-40 md:h-48 flex flex-col justify-start items-start bg-ocean-dark/95 border-wood-light relative';
 
   return (
     <div
@@ -315,6 +315,39 @@ export default function DialogContent({
         </div>
       )}
 
+      {/* Continue/Proceed button — floating bottom-right */}
+      {!hasButtons() && !isTyping && (
+        <div
+          className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-50 cursor-pointer hover:bg-white/5 rounded-lg transition-colors group p-2"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleAdvance();
+          }}
+        >
+          <div className="animate-bounce text-cyan-400 text-xs sm:text-sm font-bold uppercase tracking-widest group-hover:text-cyan-300">
+            {lineIndex < sequence.length - 1 ? 'Continue ▼' : 'Proceed ►'}
+          </div>
+        </div>
+      )}
+
+      {/* Choice buttons — floating bottom-center */}
+      {hasButtons() && !isTyping && (
+        <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-50 flex flex-wrap justify-center gap-2 sm:gap-3 animate-[fadeIn_0.3s_ease-in]">
+          {currentLine.buttons?.map((button, idx) => (
+            <button
+              key={idx}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleButtonClick(button);
+              }}
+              className={getButtonClasses(button.type)}
+            >
+              {button.label}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Content: always vertical stack, portrait on top, dialog on bottom */}
       <div className="relative z-10 flex-1 flex flex-col justify-between p-3 sm:p-4 md:p-8 gap-1 landscape:gap-1 overflow-hidden">
         {/* Portrait area */}
@@ -324,7 +357,7 @@ export default function DialogContent({
           </div>
         )}
 
-        {/* Dialog panel */}
+        {/* Dialog panel — text only */}
         <div className="flex flex-col min-h-0 flex-shrink-0">
           <Panel className={dialogPanelClasses}>{renderDialogText()}</Panel>
         </div>
@@ -334,47 +367,12 @@ export default function DialogContent({
 
   function renderDialogText() {
     return (
-      <>
-        <div className="text-sm landscape:text-xs sm:text-base landscape:sm:text-sm md:text-xl landscape:md:text-base text-sand font-mono leading-relaxed landscape:leading-snug drop-shadow-md">
-          {displayedText}
-          {isTyping && (
-            <span className="inline-block w-3 h-5 sm:h-6 bg-cyan-400 ml-1 align-middle animate-pulse"></span>
-          )}
-        </div>
-
-        {/* Buttons area - always rendered for stable height, hidden until ready */}
-        {hasButtons() && (
-          <div className={`w-full mt-2 sm:mt-4 landscape:mt-1 flex flex-wrap justify-center gap-2 sm:gap-3 transition-opacity duration-200 ${!isTyping ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-            {currentLine.buttons?.map((button, idx) => (
-              <button
-                key={idx}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleButtonClick(button);
-                }}
-                className={getButtonClasses(button.type)}
-              >
-                {button.label}
-              </button>
-            ))}
-          </div>
+      <div className="text-sm landscape:text-xs sm:text-base landscape:sm:text-sm md:text-xl landscape:md:text-base text-sand font-mono leading-relaxed landscape:leading-snug drop-shadow-md">
+        {displayedText}
+        {isTyping && (
+          <span className="inline-block w-3 h-5 sm:h-6 bg-cyan-400 ml-1 align-middle animate-pulse"></span>
         )}
-
-        {/* Continue prompt - always rendered for stable height, hidden until ready */}
-        {!hasButtons() && (
-          <div
-            className={`self-end mt-auto cursor-pointer p-3 sm:p-4 md:p-6 -mr-2 sm:-mr-4 -mb-2 sm:-mb-4 hover:bg-white/5 rounded-lg transition-opacity duration-200 group ${!isTyping ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleAdvance();
-            }}
-          >
-            <div className="animate-bounce text-cyan-400 text-xs sm:text-sm font-bold uppercase tracking-widest group-hover:text-cyan-300">
-              {lineIndex < sequence.length - 1 ? 'Continue ▼' : 'Proceed ►'}
-            </div>
-          </div>
-        )}
-      </>
+      </div>
     );
   }
 }
