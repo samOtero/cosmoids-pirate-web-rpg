@@ -21,7 +21,10 @@ interface DialogContentProps {
   dialogName?: string;
   initialLineIndex?: number;
   allowSkip?: boolean;
+  enableTyping?: boolean;
 }
+
+const TYPING_SPEED = 10; // Speed of typing in milliseconds per character
 
 export default function DialogContent({
   sequence,
@@ -30,6 +33,7 @@ export default function DialogContent({
   dialogName,
   initialLineIndex = 0,
   allowSkip = true,
+  enableTyping = true,
 }: DialogContentProps) {
   const [lineIndex, setLineIndex] = useState(initialLineIndex);
   const [displayedText, setDisplayedText] = useState('');
@@ -63,6 +67,13 @@ export default function DialogContent({
   useEffect(() => {
     if (!currentLine) return;
 
+    // If typing is disabled, show full text immediately
+    if (!enableTyping) {
+      setDisplayedText(currentLine.text);
+      setIsTyping(false);
+      return;
+    }
+
     setDisplayedText('');
     setIsTyping(true);
     let charIndex = 0;
@@ -75,12 +86,12 @@ export default function DialogContent({
         if (intervalRef.current) clearInterval(intervalRef.current);
         setIsTyping(false);
       }
-    }, 25); // Speed of typing
+    }, TYPING_SPEED); // Speed of typing
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [currentLine, lineIndex]); // Re-run when line changes
+  }, [currentLine, lineIndex, enableTyping]); // Re-run when line changes
 
   const handleGlobalClick = () => {
     if (isTyping) {
