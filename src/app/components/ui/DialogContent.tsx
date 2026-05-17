@@ -326,7 +326,7 @@ export default function DialogContent({
             handleAdvance();
           }}
         >
-          <div className="bg-green-600 hover:bg-green-500 active:bg-green-700 text-white text-sm font-bold uppercase tracking-widest rounded-md shadow-lg border border-green-800 transition-colors px-3 py-1.5">
+          <div className="bg-green-600 hover:bg-green-500 active:bg-green-700 text-white text-base lg:text-2xl font-bold uppercase tracking-widest rounded-md shadow-lg border border-green-800 transition-colors px-3 lg:px-6 py-1.5">
             Next ►
           </div>
         </div>
