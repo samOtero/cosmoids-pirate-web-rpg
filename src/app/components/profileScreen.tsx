@@ -22,7 +22,7 @@ export default function ProfileScreen({
         Select Save File
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full max-w-4xl">
         {[0, 1, 2].map((slotId) => {
           const profile = profiles[slotId];
 

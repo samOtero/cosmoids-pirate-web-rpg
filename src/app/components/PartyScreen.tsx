@@ -60,7 +60,7 @@ export default function PartyScreen({
       slots.push(
         <div
           key={`storage-slot-${i}`}
-          className={`w-14 h-14 md:w-16 md:h-16 shrink-0 border-2 rounded flex flex-col items-center justify-center relative cursor-grab active:cursor-grabbing transition-colors ${
+          className={`w-14 h-14 lg:w-16 lg:h-16 shrink-0 border-2 rounded flex flex-col items-center justify-center relative cursor-grab active:cursor-grabbing transition-colors ${
             draggedIndex === absoluteIndex ? 'opacity-50' : 'opacity-100'
           } ${
             creature ? 'bg-black/60 border-wood' : 'bg-black/20 border-wood/30'
@@ -75,7 +75,7 @@ export default function PartyScreen({
               <img
                 src={creature.spriteUrl}
                 alt={creature.name}
-                className="w-10 h-10 md:w-12 md:h-12 pixelated pointer-events-none"
+                className="w-10 h-10 lg:w-12 lg:h-12 pixelated pointer-events-none"
               />
               <div className="absolute top-0 right-0 text-[10px] font-bold text-sand bg-black/60 px-1 rounded-bl">
                 Lv{creature.level}
@@ -114,13 +114,13 @@ export default function PartyScreen({
       {/* Active Team Section */}
       <div className="z-10 w-full max-w-4xl mb-8">
         <Panel className="p-4 bg-wood/80 border-cyan-700">
-          <div className="flex justify-center gap-2 md:gap-4 flex-wrap">
+          <div className="flex justify-center gap-2 lg:gap-4 flex-wrap">
             {Array.from({ length: 6 }).map((_, i) => {
               const creature = activeTeam[i];
               return (
                 <div
                   key={`team-slot-${i}`}
-                  className={`w-20 h-20 md:w-24 md:h-24 shrink-0 border-2 rounded flex flex-col items-center justify-center relative transition-colors ${
+                  className={`w-20 h-20 lg:w-24 lg:h-24 shrink-0 border-2 rounded flex flex-col items-center justify-center relative transition-colors ${
                     creature
                       ? 'bg-cyan-900/40 border-cyan-400 cursor-grab active:cursor-grabbing'
                       : 'bg-black/40 border-wood/50'
@@ -135,7 +135,7 @@ export default function PartyScreen({
                       <img
                         src={creature.spriteUrl}
                         alt={creature.name}
-                        className="w-14 h-14 md:w-16 md:h-16 pixelated pointer-events-none"
+                        className="w-14 h-14 lg:w-16 lg:h-16 pixelated pointer-events-none"
                       />
                       <div className="absolute top-1 right-1 text-xs font-bold text-sand bg-black/80 px-1 rounded">
                         Lv{creature.level}
@@ -171,7 +171,7 @@ export default function PartyScreen({
         </div>
 
         <Panel className="flex-1 p-4 bg-black/60 overflow-y-auto flex flex-col min-h-[300px]">
-          <div className="flex-1 grid grid-cols-6 sm:grid-cols-6 md:grid-cols-6 gap-2 md:gap-4 place-items-center sm:content-start">
+          <div className="flex-1 grid grid-cols-6 gap-2 lg:gap-4 place-items-center content-start">
             {renderStorageSlots()}
           </div>
 

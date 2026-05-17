@@ -42,7 +42,7 @@ export default function ChallengeSelectScreen({
       {/* Header */}
       <div className="relative z-10 pt-6 pb-4 px-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-amber-200 tracking-wider uppercase">
+          <h1 className="text-2xl lg:text-3xl font-bold text-amber-200 tracking-wider uppercase">
             🏆 Challenge Mode
           </h1>
           <p className="text-amber-200/50 text-sm mt-1">
@@ -58,7 +58,7 @@ export default function ChallengeSelectScreen({
 
       {/* Challenge Level Grid */}
       <div className="relative z-10 flex-1 overflow-y-auto px-6 pb-24">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 max-w-5xl mx-auto mt-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 max-w-5xl mx-auto mt-4">
           {CHALLENGE_LEVEL_ORDER.map((level, idx) => {
             const levelNum = idx + 1;
             const isUnlocked =

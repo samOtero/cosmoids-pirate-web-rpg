@@ -40,7 +40,7 @@ export default function ModeSelectScreen({
       {/* Header */}
       <div className="relative z-10 pt-6 pb-2 px-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-sand tracking-wider uppercase">
+          <h1 className="text-2xl lg:text-3xl font-bold text-sand tracking-wider uppercase">
             Choose Mode
           </h1>
           <p className="text-sand/50 text-sm mt-1">
@@ -54,12 +54,12 @@ export default function ModeSelectScreen({
 
       {/* Mode Cards */}
       <div className="relative z-10 flex-1 flex items-center justify-center px-6 pb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-3xl w-full">
           {/* Story Mode Card */}
           <button
             id="mode-story"
             onClick={onSelectStory}
-            className="group relative rounded-2xl border-2 border-cyan-500/40 bg-gradient-to-br from-cyan-900/40 via-blue-900/30 to-indigo-900/40 p-6 md:p-8 min-h-[220px] flex flex-col items-center justify-center gap-4
+            className="group relative rounded-2xl border-2 border-cyan-500/40 bg-gradient-to-br from-cyan-900/40 via-blue-900/30 to-indigo-900/40 p-6 lg:p-8 min-h-[220px] flex flex-col items-center justify-center gap-4
               transition-all duration-300 ease-out
               hover:border-cyan-400 hover:shadow-cyan-500/20 hover:shadow-2xl hover:-translate-y-2 active:translate-y-0
               cursor-pointer overflow-hidden"
@@ -73,7 +73,7 @@ export default function ModeSelectScreen({
             </div>
 
             {/* Title */}
-            <h2 className="text-xl md:text-2xl font-bold text-sand tracking-wide uppercase">
+            <h2 className="text-xl lg:text-2xl font-bold text-sand tracking-wide uppercase">
               Story
             </h2>
 
@@ -96,7 +96,7 @@ export default function ModeSelectScreen({
           <button
             id="mode-challenge"
             onClick={onSelectChallenge}
-            className="group relative rounded-2xl border-2 border-amber-500/40 bg-gradient-to-br from-purple-900/40 via-amber-900/30 to-orange-900/40 p-6 md:p-8 min-h-[220px] flex flex-col items-center justify-center gap-4
+            className="group relative rounded-2xl border-2 border-amber-500/40 bg-gradient-to-br from-purple-900/40 via-amber-900/30 to-orange-900/40 p-6 lg:p-8 min-h-[220px] flex flex-col items-center justify-center gap-4
               transition-all duration-300 ease-out
               hover:border-amber-400 hover:shadow-amber-500/20 hover:shadow-2xl hover:-translate-y-2 active:translate-y-0
               cursor-pointer overflow-hidden"
@@ -110,7 +110,7 @@ export default function ModeSelectScreen({
             </div>
 
             {/* Title */}
-            <h2 className="text-xl md:text-2xl font-bold text-amber-200 tracking-wide uppercase">
+            <h2 className="text-xl lg:text-2xl font-bold text-amber-200 tracking-wide uppercase">
               Challenge
             </h2>
 
