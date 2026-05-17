@@ -239,7 +239,7 @@ export type DialogButtonType = keyof typeof DialogButtonTypeConfig;
 
 export function getButtonClasses(type: DialogButtonType): string {
   const BUTTON_BASE_CLASSES =
-    'px-4 py-2 sm:px-6 sm:py-2.5 md:px-10 md:py-3 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-xs sm:text-sm md:text-base';
+    'px-10 py-3 font-bold rounded hover:brightness-110 transition-all uppercase tracking-wider text-base';
   const typeClasses = DialogButtonTypeConfig[type];
   return `${BUTTON_BASE_CLASSES} ${typeClasses}`;
 }

@@ -334,7 +334,7 @@ export default function DialogContent({
 
       {/* Choice buttons — floating bottom-center */}
       {hasButtons() && !isTyping && (
-        <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-50 flex flex-wrap justify-center gap-2 sm:gap-3 animate-[fadeIn_0.3s_ease-in]">
+        <div className="absolute bottom-3 lg:bottom-16 left-1/2 -translate-x-1/2 z-50 flex justify-center gap-2 sm:gap-3 animate-[fadeIn_0.3s_ease-in]">
           {currentLine.buttons?.map((button, idx) => (
             <button
               key={idx}
