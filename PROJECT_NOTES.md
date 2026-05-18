@@ -158,3 +158,11 @@ Implemented the Pok�mon Gen V+ scaled experience formula in the Tower Defense 
 
 ## [2026-05-14] Dialog Screen Landscape Layout
 The DialogContent component now uses Tailwind's landscape: variant to switch from vertical (portrait stacked above dialog) to horizontal (portrait left, dialog right) layout when in landscape orientation. Custom variants for landscape/portrait were added to globals.css via @custom-variant (required for Tailwind v4). Portrait images are constrained to max-h-[40vh] in landscape mode to prevent overflow.
+
+## [2026-05-18] Profile Selection Screen Mobile Landscape Layout (Default Mobile Styling)
+
+Optimized the ProfileScreen component (`src/app/components/profileScreen.tsx`) to support mobile landscape view as the default styling, and desktop using the `lg:` modifier.
+- **Mobile First Approach**: Since the game is intended to be played in landscape mode on mobile and portrait is not supported at the moment, the mobile landscape layout is now the default base styling.
+- **Grid Layout**: Switched the grid to `grid-cols-3` by default to display the 3 slots horizontally in a row on mobile landscape, with desktop overrides under `lg:grid-cols-3`.
+- **Card Scaling**: Reduced panel height to `h-52` by default (perfect for mobile landscape displays), scaling up to `lg:h-64` on desktop.
+- **Visual Improvements**: Default styles (for mobile landscape) feature compact padding/margins, smaller title (`text-xl mb-4`), smaller buddy avatar containers (`w-12 h-12`), and a `text-2xl` plus sign. Larger sizes are layered on using `lg:` modifiers (e.g., `lg:text-3xl`, `lg:w-16 lg:h-16`). This ensures it looks spectacular on both mobile landscape (the default) and desktop without any vertical scrolling or cutoffs.
