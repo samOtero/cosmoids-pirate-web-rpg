@@ -159,10 +159,15 @@ Implemented the Pok�mon Gen V+ scaled experience formula in the Tower Defense 
 ## [2026-05-14] Dialog Screen Landscape Layout
 The DialogContent component now uses Tailwind's landscape: variant to switch from vertical (portrait stacked above dialog) to horizontal (portrait left, dialog right) layout when in landscape orientation. Custom variants for landscape/portrait were added to globals.css via @custom-variant (required for Tailwind v4). Portrait images are constrained to max-h-[40vh] in landscape mode to prevent overflow.
 
-## [2026-05-18] Profile Selection Screen Mobile Landscape Layout (Default Mobile Styling)
+## [2026-05-18] Mobile Landscape Default Layout Policy (Profile & Mode Selection Screens)
 
-Optimized the ProfileScreen component (`src/app/components/profileScreen.tsx`) to support mobile landscape view as the default styling, and desktop using the `lg:` modifier.
-- **Mobile First Approach**: Since the game is intended to be played in landscape mode on mobile and portrait is not supported at the moment, the mobile landscape layout is now the default base styling.
-- **Grid Layout**: Switched the grid to `grid-cols-3` by default to display the 3 slots horizontally in a row on mobile landscape, with desktop overrides under `lg:grid-cols-3`.
-- **Card Scaling**: Reduced panel height to `h-52` by default (perfect for mobile landscape displays), scaling up to `lg:h-64` on desktop.
-- **Visual Improvements**: Default styles (for mobile landscape) feature compact padding/margins, smaller title (`text-xl mb-4`), smaller buddy avatar containers (`w-12 h-12`), and a `text-2xl` plus sign. Larger sizes are layered on using `lg:` modifiers (e.g., `lg:text-3xl`, `lg:w-16 lg:h-16`). This ensures it looks spectacular on both mobile landscape (the default) and desktop without any vertical scrolling or cutoffs.
+Adopted a mobile-first responsive styling policy for screens intended primarily for mobile landscape gameplay where portrait orientation is not supported.
+- **Mobile First Approach**: Mobile landscape layout is the default/base styling, and desktop-specific enhancements are layered on top via `lg:` prefixes.
+- **Profile Selection Screen (`src/app/components/profileScreen.tsx`)**:
+  - Grid: `grid-cols-3` by default horizontally aligns the 3 profiles, with `lg:grid-cols-3` retained for desktop.
+  - Height & Sizing: Uses `h-52` by default to fit perfectly in landscape height without scrollbars, scaling to `lg:h-64` on desktop.
+  - Scale Factors: Shrunk padding/margins (`p-2 lg:p-4`), page titles (`text-xl lg:text-3xl`), avatar containers (`w-12 h-12 lg:w-16 lg:h-16`), and interactive elements to prevent vertical overflow.
+- **Mode Selection Screen (`src/app/components/ModeSelectScreen.tsx`)**:
+  - Grid: `grid-cols-2` by default horizontally aligns the "Story" and "Challenge" cards, overriding the vertical stack layout on mobile devices.
+  - Card Dimensions: Card padding and min-height default to compact styles (`p-4 min-h-[160px]`), scaling up on desktop (`lg:p-8 lg:min-h-[220px]`).
+  - Typography & Icons: Header title (`text-lg lg:text-3xl`), descriptions (`text-xs lg:text-sm`), and buddy icons (`w-12 h-12 lg:w-20 lg:h-20`) scale up gracefully via `lg:` overrides.
