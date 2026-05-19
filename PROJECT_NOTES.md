@@ -171,3 +171,7 @@ Adopted a mobile-first responsive styling policy for screens intended primarily 
   - Grid: `grid-cols-2` by default horizontally aligns the "Story" and "Challenge" cards, overriding the vertical stack layout on mobile devices.
   - Card Dimensions: Card padding and min-height default to compact styles (`p-4 min-h-[160px]`), scaling up on desktop (`lg:p-8 lg:min-h-[220px]`).
   - Typography & Icons: Header title (`text-lg lg:text-3xl`), descriptions (`text-xs lg:text-sm`), and buddy icons (`w-12 h-12 lg:w-20 lg:h-20`) scale up gracefully via `lg:` overrides.
+
+## [2026-05-19] Party Screen Responsive Mobile Landscape Design
+
+Optimized the Party Screen layout (\src/app/components/PartyScreen.tsx\) to natively support mobile landscape viewports in full compliance with the responsive styling policy. Added screen-size listeners to dynamically adjust the pagination limits (6 creatures per page on mobile landscape, 18 on desktop) and scaled slot paddings, margins, and sizes to ensure the active party is always visible and zero vertical overflow occurs on compact viewports.
