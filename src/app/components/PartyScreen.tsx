@@ -1,5 +1,5 @@
 import { Creature } from '@/types/baseGame';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Panel from '@/app/components/ui/Panel';
 import { Button } from '@/app/components/ui/Button';
 import { BACKGROUND_IMAGES } from '@/constants/game';
@@ -38,25 +38,117 @@ export default function PartyScreen({
   // Clamp the page index to prevent rendering an out-of-bounds page
   const activePage = Math.min(currentPage, Math.max(0, totalPages - 1));
 
-  const handleDragStart = (e: React.DragEvent, index: number) => {
-    setDraggedIndex(index);
-    // Needed for Firefox
-    e.dataTransfer.setData('text/plain', index.toString());
+  // Pointer drag states & refs
+  const DRAG_THRESHOLD = 10;
+  const pendingDragRef = useRef<{
+    index: number;
+    startX: number;
+    startY: number;
+    offsetX: number;
+    offsetY: number;
+    spriteUrl: string;
+  } | null>(null);
+
+  const [globalDrag, setGlobalDrag] = useState<{
+    startIndex: number;
+    spriteUrl: string;
+    x: number;
+    y: number;
+    offsetX: number;
+    offsetY: number;
+  } | null>(null);
+
+  const handlePointerDown = (
+    e: React.PointerEvent<HTMLDivElement>,
+    index: number,
+    spriteUrl: string
+  ) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    const rect = e.currentTarget.getBoundingClientRect();
+    pendingDragRef.current = {
+      index,
+      startX: e.clientX,
+      startY: e.clientY,
+      offsetX: e.clientX - rect.left,
+      offsetY: e.clientY - rect.top,
+      spriteUrl,
+    };
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (e: React.DragEvent, targetIndex: number) => {
-    e.preventDefault();
-    if (draggedIndex === null || draggedIndex === targetIndex) {
-      setDraggedIndex(null);
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (pendingDragRef.current && !globalDrag) {
+      const pd = pendingDragRef.current;
+      const dx = e.clientX - pd.startX;
+      const dy = e.clientY - pd.startY;
+      if (Math.sqrt(dx * dx + dy * dy) >= DRAG_THRESHOLD) {
+        // Threshold exceeded — activate real drag
+        setDraggedIndex(pd.index);
+        setGlobalDrag({
+          startIndex: pd.index,
+          spriteUrl: pd.spriteUrl,
+          x: e.clientX,
+          y: e.clientY,
+          offsetX: pd.offsetX,
+          offsetY: pd.offsetY,
+        });
+        pendingDragRef.current = null;
+      }
       return;
     }
+    if (globalDrag) {
+      setGlobalDrag((prev) =>
+        prev ? { ...prev, x: e.clientX, y: e.clientY } : null
+      );
+    }
+  };
 
-    onReorder(draggedIndex, targetIndex);
-    setDraggedIndex(null);
+  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (pendingDragRef.current) {
+      pendingDragRef.current = null;
+      if (e.target instanceof Element && e.target.hasPointerCapture(e.pointerId)) {
+        e.target.releasePointerCapture(e.pointerId);
+      }
+      return;
+    }
+    if (globalDrag) {
+      if (e.target instanceof Element && e.target.hasPointerCapture(e.pointerId)) {
+        e.target.releasePointerCapture(e.pointerId);
+      }
+
+      // Hit test to find slot
+      const dropTarget = document
+        .elementFromPoint(e.clientX, e.clientY)
+        ?.closest('[data-slot-index]');
+      if (dropTarget) {
+        const targetIndexAttr = dropTarget.getAttribute('data-slot-index');
+        if (targetIndexAttr !== null) {
+          const targetIndex = parseInt(targetIndexAttr, 10);
+          if (globalDrag.startIndex !== targetIndex && !isNaN(targetIndex)) {
+            onReorder(globalDrag.startIndex, targetIndex);
+          }
+        }
+      }
+
+      setDraggedIndex(null);
+      setGlobalDrag(null);
+    }
+  };
+
+  const handlePointerCancel = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (pendingDragRef.current) {
+      pendingDragRef.current = null;
+    }
+    if (globalDrag) {
+      if (e.target instanceof Element && e.target.hasPointerCapture(e.pointerId)) {
+        e.target.releasePointerCapture(e.pointerId);
+      }
+      setDraggedIndex(null);
+      setGlobalDrag(null);
+    }
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
   };
 
   // Ensure storage grid always has slots matching creaturesPerPage
@@ -72,13 +164,15 @@ export default function PartyScreen({
       slots.push(
         <div
           key={`storage-slot-${i}`}
-          className={`w-12 h-12 lg:w-16 lg:h-16 shrink-0 border-2 rounded flex flex-col items-center justify-center relative cursor-grab active:cursor-grabbing transition-colors ${draggedIndex === absoluteIndex ? 'opacity-50' : 'opacity-100'
-            } ${creature ? 'bg-black/60 border-wood' : 'bg-black/20 border-wood/30'
-            }`}
-          draggable={!!creature}
-          onDragStart={(e) => creature && handleDragStart(e, absoluteIndex)}
-          onDragOver={handleDragOver}
-          onDrop={(e) => handleDrop(e, absoluteIndex)}
+          data-slot-index={absoluteIndex}
+          onPointerDown={(e) =>
+            creature && handlePointerDown(e, absoluteIndex, creature.spriteUrl)
+          }
+          className={`w-12 h-12 lg:w-16 lg:h-16 shrink-0 border-2 rounded flex flex-col items-center justify-center relative cursor-grab active:cursor-grabbing transition-all duration-200 touch-none ${
+            draggedIndex === absoluteIndex ? 'opacity-50' : 'opacity-100'
+          } ${
+            creature ? 'bg-black/60 border-wood hover:bg-black/40' : 'bg-black/20 border-wood/30 hover:bg-white/5'
+          }`}
         >
           {creature ? (
             <>
@@ -99,7 +193,12 @@ export default function PartyScreen({
   };
 
   return (
-    <div className="relative w-screen h-screen bg-[#111] overflow-hidden flex flex-col items-center p-2 lg:p-6">
+    <div
+      className="relative w-screen h-screen bg-[#111] overflow-hidden flex flex-col items-center p-2 lg:p-6 touch-none"
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
+    >
       {/* Background */}
       <div
         className="absolute inset-0 z-0 opacity-20"
@@ -134,14 +233,14 @@ export default function PartyScreen({
               return (
                 <div
                   key={`team-slot-${i}`}
-                  className={`w-14 h-14 lg:w-24 lg:h-24 shrink-0 border-2 rounded flex flex-col items-center justify-center relative transition-colors ${creature
-                      ? 'bg-cyan-900/40 border-cyan-400 cursor-grab active:cursor-grabbing'
-                      : 'bg-black/40 border-wood/50'
+                  data-slot-index={i}
+                  onPointerDown={(e) =>
+                    creature && handlePointerDown(e, i, creature.spriteUrl)
+                  }
+                  className={`w-14 h-14 lg:w-24 lg:h-24 shrink-0 border-2 rounded flex flex-col items-center justify-center relative transition-all duration-200 touch-none ${creature
+                      ? 'bg-cyan-900/40 border-cyan-400 cursor-grab active:cursor-grabbing hover:bg-cyan-950/60'
+                      : 'bg-black/40 border-wood/50 hover:bg-white/5'
                     } ${draggedIndex === i ? 'opacity-50' : 'opacity-100'}`}
-                  draggable={!!creature}
-                  onDragStart={(e) => creature && handleDragStart(e, i)}
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(e, i)}
                 >
                   {creature ? (
                     <>
@@ -179,7 +278,7 @@ export default function PartyScreen({
         <div className="flex justify-between items-end mb-1 lg:mb-2">
           <h2 className="text-base lg:text-2xl font-bold text-sand">Storage</h2>
           <div className="text-xs lg:text-sm text-sand/70">
-            Drag a creature to swap it into your team or return it to storage.
+            Drag creatures between team slots and storage to reorder.
           </div>
         </div>
 
@@ -194,7 +293,7 @@ export default function PartyScreen({
               <Button
                 variant="wood"
                 className="px-3 py-1 lg:px-6 lg:py-2 text-xs lg:text-base font-bold"
-                onClick={() => setCurrentPage(Math.max(0, activePage - 1))}
+                onClick={() => handlePageChange(Math.max(0, activePage - 1))}
                 disabled={activePage === 0}
               >
                 Previous
@@ -206,7 +305,7 @@ export default function PartyScreen({
                 variant="wood"
                 className="px-3 py-1 lg:px-6 lg:py-2 text-xs lg:text-base font-bold"
                 onClick={() =>
-                  setCurrentPage(Math.min(totalPages - 1, activePage + 1))
+                  handlePageChange(Math.min(totalPages - 1, activePage + 1))
                 }
                 disabled={activePage === totalPages - 1}
               >
@@ -216,6 +315,23 @@ export default function PartyScreen({
           )}
         </Panel>
       </div>
+
+      {/* Floating Drag Preview */}
+      {globalDrag && (
+        <div
+          className="fixed z-9999 pointer-events-none w-14 h-14 lg:w-24 lg:h-24 flex items-center justify-center bg-cyan-500/20 border-2 border-cyan-400 rounded shadow-[0_0_15px_rgba(34,211,238,0.8)] opacity-90 scale-105"
+          style={{
+            left: globalDrag.x - globalDrag.offsetX,
+            top: globalDrag.y - globalDrag.offsetY,
+          }}
+        >
+          <img
+            src={globalDrag.spriteUrl}
+            alt="Dragging Creature"
+            className="w-10 h-10 lg:w-16 lg:h-16 pixelated"
+          />
+        </div>
+      )}
     </div>
   );
 }

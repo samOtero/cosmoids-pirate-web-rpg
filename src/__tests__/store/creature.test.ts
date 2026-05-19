@@ -79,4 +79,58 @@ describe('Creature Store Logic', () => {
     expect(c1?.level).toBe(10);
     expect(c2?.level).toBe(8);
   });
+
+  it('should reorder creatures and clamp out-of-bounds target index', () => {
+    const store = useGameStore.getState();
+    const profileId = 0;
+
+    // Add three creatures
+    store.addCreatureToProfile(profileId, {
+      id: 'c1',
+      speciesId: STARTER_CRAB.id,
+      level: 1,
+      xp: 0,
+      equippedAttacks: STARTER_CRAB.moves,
+    });
+    store.addCreatureToProfile(profileId, {
+      id: 'c2',
+      speciesId: STARTER_IGUANA.id,
+      level: 1,
+      xp: 0,
+      equippedAttacks: STARTER_IGUANA.moves,
+    });
+    store.addCreatureToProfile(profileId, {
+      id: 'c3',
+      speciesId: 'starter_monkey',
+      level: 1,
+      xp: 0,
+      equippedAttacks: [],
+    });
+
+    let profile = useGameStore.getState().profiles[0]!;
+    expect(profile.creatures.length).toBe(3);
+    const initialIds = profile.creatures.map((c) => c.speciesId);
+
+    // 1. Reorder within bounds (move index 0 to 1)
+    store.reorderCreatures(0, 1);
+    profile = useGameStore.getState().profiles[0]!;
+    expect(profile.creatures.map((c) => c.speciesId)).toEqual([
+      initialIds[1],
+      initialIds[0],
+      initialIds[2],
+    ]);
+
+    // Reset and test out-of-bounds clamping
+    // Currently order: [iguana, crab, monkey]
+    // Move index 0 (iguana) to index 10 (out of bounds)
+    store.reorderCreatures(0, 10);
+    profile = useGameStore.getState().profiles[0]!;
+    // It should clamp 10 to 2, and move index 0 to index 2.
+    // Order becomes: [crab, monkey, iguana]
+    expect(profile.creatures.map((c) => c.speciesId)).toEqual([
+      initialIds[0],
+      initialIds[2],
+      initialIds[1],
+    ]);
+  });
 });

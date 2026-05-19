@@ -175,3 +175,14 @@ Adopted a mobile-first responsive styling policy for screens intended primarily 
 ## [2026-05-19] Party Screen Responsive Mobile Landscape Design
 
 Optimized the Party Screen layout (\src/app/components/PartyScreen.tsx\) to natively support mobile landscape viewports in full compliance with the responsive styling policy. Added screen-size listeners to dynamically adjust the pagination limits (6 creatures per page on mobile landscape, 18 on desktop) and scaled slot paddings, margins, and sizes to ensure the active party is always visible and zero vertical overflow occurs on compact viewports.
+
+## [2026-05-19] Party Screen Drag-and-Drop Fix
+
+Fixed a critical bug in the party screen where dragging a creature to empty party slots or empty storage box slots did not work. The issue occurred because the \eorderCreatures\ store action had a strict out-of-bounds check (\endIndex >= creatures.length\) and returned early without modifying the state. Since the UI grid slots are statically sized (6 for active team, and 6/18 for storage pages) and can exceed the player's total creature count, empty slots naturally map to out-of-bounds indices. Clamped \endIndex\ to \creatures.length - 1\ in \eorderCreatures\ so that dropping on any empty slot successfully appends or shifts the creature to the end. Also added \onDragEnd\ handlers in \PartyScreen.tsx\ to ensure \draggedIndex\ is cleared if a drag is canceled.
+
+## [2026-05-19] Mobile Tap-to-Swap Support for Party Screen
+
+Added a tap-to-swap selection fallback to \PartyScreen.tsx\ for mobile and touch-screen viewports since standard HTML5 drag-and-drop does not natively function on touch devices. Tapping any occupied slot selects that creature, applying a premium pulsing cyan outline (\ing-2 ring-cyan-400\), scale zoom (\scale-105\), dropshadow, and higher stacking index (\z-20\). Tapping another slot (whether occupied or empty) performs a swap or reorder and clears the selection. Navigating between pages in storage automatically deselects the current creature to prevent off-screen swaps. Updated visual helper text to guide players: 'Drag or tap to swap creatures between team slots and storage.'
+
+## [2026-05-19] Party Screen Custom Pointer Drag-and-Drop
+Replaced HTML5 Drag & Drop and tap-to-move mechanisms with unified PointerEvents on the Party Screen. Supports smooth drag-and-drop interactions across mouse and mobile landscape touch screens. Uses elementFromPoint hit-testing over data-slot-index attributes on pointerup for drop detection, bypassing a fixed floating drag preview styled with pointer-events-none.

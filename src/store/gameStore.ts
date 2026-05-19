@@ -644,17 +644,18 @@ export const useGameStore = create<GameState>()(
               const profile = state.profiles[profileId]!;
               const newCreatures = [...profile.creatures];
 
-              if (
-                startIndex < 0 ||
-                startIndex >= newCreatures.length ||
-                endIndex < 0 ||
-                endIndex >= newCreatures.length
-              ) {
+              if (startIndex < 0 || startIndex >= newCreatures.length) {
                 return state;
               }
 
+              // Clamp endIndex to be within bounds [0, length - 1] so dragging to empty slots places it at the end
+              const clampedEndIndex = Math.max(
+                0,
+                Math.min(endIndex, newCreatures.length - 1)
+              );
+
               const [removed] = newCreatures.splice(startIndex, 1);
-              newCreatures.splice(endIndex, 0, removed);
+              newCreatures.splice(clampedEndIndex, 0, removed);
 
               const newProfiles = [...state.profiles];
               newProfiles[profileId] = {
