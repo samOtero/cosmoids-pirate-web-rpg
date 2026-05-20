@@ -189,3 +189,9 @@ Replaced HTML5 Drag & Drop and tap-to-move mechanisms with unified PointerEvents
 
 ## [2026-05-20] Storybook Integration\
 Storybook has been integrated into the repository using \pnpm\ and configured for Next.js and Tailwind CSS v4. Added custom viewport support for mobile landscape (896x414) in \.storybook/preview.tsx\ to easily test components in landscape aspect ratios under the project default mobile layout policy. Added first set of component stories for \Button\ and \TypeBadge\ UI components.
+
+## [2026-05-20] Party Screen Storybook Story
+Added Storybook stories for \PartyScreen\ inside \src/app/components/PartyScreen.stories.tsx\. The stories include a stateful interactive wrapper that manages dynamic creature drag-and-drop / tap-to-swap, a minimal early-game view with only the starter creature, and a large roster layout testing the Box pagination controls.
+
+## [2026-05-20] Storybook Fullscreen Layout Decorator Fix
+Fixed a layout overflow issue where fullscreen screens (e.g. \PartyScreen\) in Storybook were padded and flex-centered by the global decorator in \.storybook/preview.tsx\. Modified the global decorator to dynamically inspect \context.parameters.layout\ and omit the \p-4 min-h-screen flex items-center justify-center\ styling when the story has \layout: 'fullscreen'\, applying a clean full-screen layout container instead.

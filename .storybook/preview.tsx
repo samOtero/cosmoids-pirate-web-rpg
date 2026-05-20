@@ -55,11 +55,20 @@ const preview: Preview = {
     },
   },
   decorators: [
-    (Story) => (
-      <div className="antialiased text-[#f4e4bc] p-4 min-h-screen flex items-center justify-center font-sans">
-        <Story />
-      </div>
-    ),
+    (Story, context) => {
+      const isFullscreen = context.parameters.layout === 'fullscreen';
+      return (
+        <div
+          className={`antialiased text-[#f4e4bc] font-sans ${
+            isFullscreen
+              ? 'w-screen h-screen overflow-hidden m-0 p-0'
+              : 'p-4 min-h-screen flex items-center justify-center'
+          }`}
+        >
+          <Story />
+        </div>
+      );
+    },
   ],
 };
 
