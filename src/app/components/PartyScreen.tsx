@@ -214,8 +214,8 @@ export default function PartyScreen({
 
       {/* Active Team Section */}
       <div className="z-10 w-full mb-2 lg:mb-8">
-        <Panel className="p-2 lg:p-4 bg-wood/80 border-cyan-700">
-          <div className="flex justify-center gap-2 lg:gap-4 flex-nowrap">
+        <Panel className="bg-wood/80 border-cyan-700">
+          <div className="flex justify-center gap-6 flex-nowrap">
             {Array.from({ length: 6 }).map((_, i) => {
               const creature = activeTeam[i];
               return (
