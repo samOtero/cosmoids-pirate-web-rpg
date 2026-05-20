@@ -62,6 +62,7 @@ export default function Home() {
     updateCreatures,
     reorderCreatures,
     currentTdLevel,
+    clearQueue,
   } = useGameStore();
 
   // Deduced state
@@ -185,12 +186,24 @@ export default function Home() {
       return null;
     }
 
+    // If there are events queued (e.g. pending level navigation), show the continue button
+    const hasPendingEvents = eventQueue.length > 0;
+
     return (
       <Suspense fallback={<div>Loading Team...</div>}>
         <PartyScreen
           creatures={resolvePlayerCreatures(currentProfile.creatures)}
-          onBack={() => setScreen(Screens.LEVEL_SELECT)}
+          onBack={() => {
+            if (hasPendingEvents) {
+              // Clear the pending level events when going back
+              clearQueue();
+            }
+            setScreen(Screens.LEVEL_SELECT);
+          }}
           onReorder={reorderCreatures}
+          onContinue={
+            hasPendingEvents ? () => processNextEvent() : undefined
+          }
         />
       </Suspense>
     );
@@ -287,7 +300,9 @@ export default function Home() {
             const levelConfig = TD_LEVELS[context];
             const introEvents = levelConfig?.introEvents || [];
 
+            // Story levels route through Party Screen first
             enqueueAndProcessEvents([
+              { type: 'GO_TO_PARTY' },
               ...introEvents,
               {
                 type: 'GO_TO_TOWER_DEFENSE',

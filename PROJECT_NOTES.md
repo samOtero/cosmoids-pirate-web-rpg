@@ -198,3 +198,6 @@ Fixed a layout overflow issue where fullscreen screens (e.g. \PartyScreen\) in S
 
 ## [2026-05-20] Vitest Config Vite 8 Type Mismatch Fix
 Casted the react() plugin to any in vitest.config.ts. This bypasses TypeScript typechecking errors during next build arising from compatibility differences between Vite 8 (using Rolldown plugin types) and Vitest (using Vite 7 Rollup plugin types).
+
+## [2026-05-20] Party Screen Before Level Entry
+When selecting a story level from the Level Select screen, the player is now routed to the Party Screen first to arrange their team before entering the level. The Party Screen shows a 'Set Sail!' button (via the new optional `onContinue` prop) that proceeds through any queued intro events and then into the Tower Defense level. Pressing 'Back' clears the pending level events and returns to Level Select. Challenge levels skip the party screen entirely and go directly to Tower Defense, matching their existing behavior of using premade rosters.

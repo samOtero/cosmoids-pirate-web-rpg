@@ -8,12 +8,14 @@ interface PartyScreenProps {
   creatures: Creature[];
   onBack: () => void;
   onReorder: (startIndex: number, endIndex: number) => void;
+  onContinue?: () => void;
 }
 
 export default function PartyScreen({
   creatures,
   onBack,
   onReorder,
+  onContinue,
 }: PartyScreenProps) {
   const [currentPage, setCurrentPage] = useState(0);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -215,13 +217,24 @@ export default function PartyScreen({
         <h1 className="text-xl font-bold text-sand drop-shadow-md lg:text-3xl">
           Current Team
         </h1>
-        <Button
-          variant="wood"
-          className="px-3 py-1 text-xs font-bold lg:px-6 lg:py-2 lg:text-base"
-          onClick={onBack}
-        >
-          Back
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="wood"
+            className="px-3 py-1 text-xs font-bold lg:px-6 lg:py-2 lg:text-base"
+            onClick={onBack}
+          >
+            Back
+          </Button>
+          {onContinue && (
+            <Button
+              variant="wood"
+              className="px-3 py-1 text-xs font-bold lg:px-6 lg:py-2 lg:text-base"
+              onClick={onContinue}
+            >
+              Start
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Active Team Section */}
