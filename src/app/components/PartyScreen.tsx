@@ -105,13 +105,19 @@ export default function PartyScreen({
   const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
     if (pendingDragRef.current) {
       pendingDragRef.current = null;
-      if (e.target instanceof Element && e.target.hasPointerCapture(e.pointerId)) {
+      if (
+        e.target instanceof Element &&
+        e.target.hasPointerCapture(e.pointerId)
+      ) {
         e.target.releasePointerCapture(e.pointerId);
       }
       return;
     }
     if (globalDrag) {
-      if (e.target instanceof Element && e.target.hasPointerCapture(e.pointerId)) {
+      if (
+        e.target instanceof Element &&
+        e.target.hasPointerCapture(e.pointerId)
+      ) {
         e.target.releasePointerCapture(e.pointerId);
       }
 
@@ -139,7 +145,10 @@ export default function PartyScreen({
       pendingDragRef.current = null;
     }
     if (globalDrag) {
-      if (e.target instanceof Element && e.target.hasPointerCapture(e.pointerId)) {
+      if (
+        e.target instanceof Element &&
+        e.target.hasPointerCapture(e.pointerId)
+      ) {
         e.target.releasePointerCapture(e.pointerId);
       }
       setDraggedIndex(null);
@@ -168,18 +177,22 @@ export default function PartyScreen({
           onPointerDown={(e) =>
             creature && handlePointerDown(e, absoluteIndex, creature.spriteUrl)
           }
-          className={`w-13 h-13 lg:w-16 lg:h-16 shrink-0 border-2 rounded flex flex-col items-center justify-center relative cursor-grab active:cursor-grabbing transition-all duration-200 touch-none ${draggedIndex === absoluteIndex ? 'opacity-50' : 'opacity-100'
-            } ${creature ? 'bg-black/60 border-wood hover:bg-black/40' : 'bg-black/20 border-wood/30 hover:bg-white/5'
-            }`}
+          className={`relative flex h-13 w-13 shrink-0 cursor-grab touch-none flex-col items-center justify-center rounded border-2 transition-all duration-200 active:cursor-grabbing lg:h-16 lg:w-16 ${
+            draggedIndex === absoluteIndex ? 'opacity-50' : 'opacity-100'
+          } ${
+            creature
+              ? 'border-wood bg-black/60 hover:bg-black/40'
+              : 'border-wood/30 bg-black/20 hover:bg-white/5'
+          }`}
         >
           {creature ? (
             <>
               <img
                 src={creature.spriteUrl}
                 alt={creature.name}
-                className="w-8 h-8 lg:w-12 lg:h-12 pointer-events-none"
+                className="pointer-events-none h-8 w-8 lg:h-12 lg:w-12"
               />
-              <div className="absolute top-0 right-0 text-[8px] lg:text-[10px] font-bold text-sand bg-black/60 px-1 rounded-bl">
+              <div className="absolute top-0 right-0 rounded-bl bg-black/60 px-1 text-[8px] font-bold text-sand lg:text-[10px]">
                 Lv{creature.level}
               </div>
             </>
@@ -192,20 +205,19 @@ export default function PartyScreen({
 
   return (
     <div
-      className="relative w-screen h-screen bg-[#111] overflow-hidden flex flex-col items-center p-2 lg:p-6 touch-none"
+      className="relative flex h-screen w-screen touch-none flex-col items-center overflow-hidden bg-[#111] p-2 lg:p-6"
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerCancel}
     >
-
       {/* Top Bar */}
-      <div className="w-full flex justify-between items-center z-10 mb-2 lg:mb-6">
-        <h1 className="text-xl lg:text-3xl font-bold text-sand drop-shadow-md">
+      <div className="z-10 mb-2 flex w-full items-center justify-between lg:mb-6">
+        <h1 className="text-xl font-bold text-sand drop-shadow-md lg:text-3xl">
           Current Team
         </h1>
         <Button
           variant="wood"
-          className="px-3 py-1 lg:px-6 lg:py-2 text-xs lg:text-base font-bold"
+          className="px-3 py-1 text-xs font-bold lg:px-6 lg:py-2 lg:text-base"
           onClick={onBack}
         >
           Back
@@ -213,9 +225,9 @@ export default function PartyScreen({
       </div>
 
       {/* Active Team Section */}
-      <div className="z-10 w-full mb-2 lg:mb-8">
-        <Panel className="bg-wood/80 border-cyan-700">
-          <div className="flex justify-center gap-6 flex-nowrap">
+      <div className="z-10 mb-2 w-full lg:mb-8">
+        <Panel className="border-cyan-700 bg-wood/80">
+          <div className="flex flex-nowrap justify-center gap-6">
             {Array.from({ length: 6 }).map((_, i) => {
               const creature = activeTeam[i];
               return (
@@ -225,23 +237,24 @@ export default function PartyScreen({
                   onPointerDown={(e) =>
                     creature && handlePointerDown(e, i, creature.spriteUrl)
                   }
-                  className={`w-16 h-16 lg:w-24 lg:h-24 shrink-0 border-2 rounded flex flex-col items-center justify-center relative transition-all duration-200 touch-none ${creature
-                    ? 'bg-cyan-900/40 border-cyan-400 cursor-grab active:cursor-grabbing hover:bg-cyan-950/60'
-                    : 'bg-black/40 border-wood/50 hover:bg-white/5'
-                    } ${draggedIndex === i ? 'opacity-50' : 'opacity-100'}`}
+                  className={`relative flex h-16 w-16 shrink-0 touch-none flex-col items-center justify-center rounded border-2 transition-all duration-200 lg:h-24 lg:w-24 ${
+                    creature
+                      ? 'cursor-grab border-cyan-400 bg-cyan-900/40 hover:bg-cyan-950/60 active:cursor-grabbing'
+                      : 'border-wood/50 bg-black/40 hover:bg-white/5'
+                  } ${draggedIndex === i ? 'opacity-50' : 'opacity-100'}`}
                 >
                   {creature ? (
                     <>
                       <img
                         src={creature.spriteUrl}
                         alt={creature.name}
-                        className="w-10 h-10 lg:w-16 lg:h-16 pointer-events-none"
+                        className="pointer-events-none h-10 w-10 lg:h-16 lg:w-16"
                       />
-                      <div className="absolute top-0.5 right-0.5 text-[9px] lg:text-xs font-bold text-sand bg-black/80 px-1 rounded">
+                      <div className="absolute top-0.5 right-0.5 rounded bg-black/80 px-1 text-[9px] font-bold text-sand lg:text-xs">
                         Lv{creature.level}
                       </div>
                       <div className="absolute bottom-1 w-full px-1">
-                        <div className="h-1 lg:h-1.5 w-full bg-red-900 rounded-full overflow-hidden border border-black/50">
+                        <div className="h-1 w-full overflow-hidden rounded-full border border-black/50 bg-red-900 lg:h-1.5">
                           <div
                             className="h-full bg-green-500"
                             style={{
@@ -252,7 +265,7 @@ export default function PartyScreen({
                       </div>
                     </>
                   ) : (
-                    <span className="text-white/20 text-xl lg:text-3xl">+</span>
+                    <span className="text-xl text-white/20 lg:text-3xl">+</span>
                   )}
                 </div>
               );
@@ -262,36 +275,36 @@ export default function PartyScreen({
       </div>
 
       {/* Storage Section */}
-      <div className="z-10 w-full flex-1 flex flex-col min-h-0">
-        <div className="flex justify-between items-end mb-1 lg:mb-2">
-          <h2 className="text-base lg:text-2xl font-bold text-sand">Storage</h2>
-          <div className="text-xs lg:text-sm text-sand/70">
+      <div className="z-10 flex min-h-0 w-full flex-1 flex-col">
+        <div className="mb-1 flex items-end justify-between lg:mb-2">
+          <h2 className="text-base font-bold text-sand lg:text-2xl">Storage</h2>
+          <div className="text-xs text-sand/70 lg:text-sm">
             Drag creatures between team slots and storage to reorder.
           </div>
         </div>
 
-        <Panel className="flex-1 p-2 lg:p-4 bg-black/60 flex flex-col min-h-0 lg:min-h-[300px]">
-          <div className="flex-1 grid grid-cols-6 gap-2 lg:gap-4 place-items-center content-start">
+        <Panel className="flex min-h-0 flex-1 flex-col bg-black/60 p-2 lg:min-h-[300px] lg:p-4">
+          <div className="grid flex-1 grid-cols-6 place-items-center content-start gap-2 lg:gap-4">
             {renderStorageSlots()}
           </div>
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="mt-2 lg:mt-4 flex justify-center items-center gap-4 border-t border-wood pt-2 lg:pt-4">
+            <div className="mt-2 flex items-center justify-center gap-4 border-t border-wood pt-2 lg:mt-4 lg:pt-4">
               <Button
                 variant="wood"
-                className="px-3 py-1 lg:px-6 lg:py-2 text-xs lg:text-base font-bold"
+                className="px-3 py-1 text-xs font-bold lg:px-6 lg:py-2 lg:text-base"
                 onClick={() => handlePageChange(Math.max(0, activePage - 1))}
                 disabled={activePage === 0}
               >
                 Previous
               </Button>
-              <span className="text-sand font-bold text-xs lg:text-sm">
+              <span className="text-xs font-bold text-sand lg:text-sm">
                 Box {activePage + 1} of {totalPages}
               </span>
               <Button
                 variant="wood"
-                className="px-3 py-1 lg:px-6 lg:py-2 text-xs lg:text-base font-bold"
+                className="px-3 py-1 text-xs font-bold lg:px-6 lg:py-2 lg:text-base"
                 onClick={() =>
                   handlePageChange(Math.min(totalPages - 1, activePage + 1))
                 }
@@ -307,7 +320,7 @@ export default function PartyScreen({
       {/* Floating Drag Preview */}
       {globalDrag && (
         <div
-          className="fixed z-9999 pointer-events-none w-14 h-14 lg:w-24 lg:h-24 flex items-center justify-center bg-cyan-500/20 border-2 border-cyan-400 rounded shadow-[0_0_15px_rgba(34,211,238,0.8)] opacity-90 scale-105"
+          className="pointer-events-none fixed z-9999 flex h-14 w-14 scale-105 items-center justify-center rounded border-2 border-cyan-400 bg-cyan-500/20 opacity-90 shadow-[0_0_15px_rgba(34,211,238,0.8)] lg:h-24 lg:w-24"
           style={{
             left: globalDrag.x - globalDrag.offsetX,
             top: globalDrag.y - globalDrag.offsetY,
@@ -316,7 +329,7 @@ export default function PartyScreen({
           <img
             src={globalDrag.spriteUrl}
             alt="Dragging Creature"
-            className="w-10 h-10 lg:w-16 lg:h-16"
+            className="h-10 w-10 lg:h-16 lg:w-16"
           />
         </div>
       )}
