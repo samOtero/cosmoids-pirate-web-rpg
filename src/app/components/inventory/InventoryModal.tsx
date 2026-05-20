@@ -82,7 +82,7 @@ export default function InventoryModal({
                 <img
                   src={creature.spriteUrl}
                   alt={creature.name}
-                  className="w-12 h-12 mr-4 pixelated"
+                  className="w-12 h-12 mr-4"
                 />
                 <div className="flex-1">
                   <div className="font-bold text-cyan-300">{creature.name}</div>
@@ -135,10 +135,9 @@ export default function InventoryModal({
                 setPage(0);
               }}
               className={`px-6 py-2 rounded font-bold uppercase tracking-wider transition-all
-                ${
-                  category === cat
-                    ? 'bg-cyan-600 text-white shadow-lg scale-105'
-                    : 'bg-black/20 text-sand/60 hover:bg-black/40'
+                ${category === cat
+                  ? 'bg-cyan-600 text-white shadow-lg scale-105'
+                  : 'bg-black/20 text-sand/60 hover:bg-black/40'
                 }
               `}
             >

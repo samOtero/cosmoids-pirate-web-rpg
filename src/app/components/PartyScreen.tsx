@@ -168,18 +168,16 @@ export default function PartyScreen({
           onPointerDown={(e) =>
             creature && handlePointerDown(e, absoluteIndex, creature.spriteUrl)
           }
-          className={`w-12 h-12 lg:w-16 lg:h-16 shrink-0 border-2 rounded flex flex-col items-center justify-center relative cursor-grab active:cursor-grabbing transition-all duration-200 touch-none ${
-            draggedIndex === absoluteIndex ? 'opacity-50' : 'opacity-100'
-          } ${
-            creature ? 'bg-black/60 border-wood hover:bg-black/40' : 'bg-black/20 border-wood/30 hover:bg-white/5'
-          }`}
+          className={`w-13 h-13 lg:w-16 lg:h-16 shrink-0 border-2 rounded flex flex-col items-center justify-center relative cursor-grab active:cursor-grabbing transition-all duration-200 touch-none ${draggedIndex === absoluteIndex ? 'opacity-50' : 'opacity-100'
+            } ${creature ? 'bg-black/60 border-wood hover:bg-black/40' : 'bg-black/20 border-wood/30 hover:bg-white/5'
+            }`}
         >
           {creature ? (
             <>
               <img
                 src={creature.spriteUrl}
                 alt={creature.name}
-                className="w-8 h-8 lg:w-12 lg:h-12 pixelated pointer-events-none"
+                className="w-8 h-8 lg:w-12 lg:h-12 pointer-events-none"
               />
               <div className="absolute top-0 right-0 text-[8px] lg:text-[10px] font-bold text-sand bg-black/60 px-1 rounded-bl">
                 Lv{creature.level}
@@ -237,9 +235,9 @@ export default function PartyScreen({
                   onPointerDown={(e) =>
                     creature && handlePointerDown(e, i, creature.spriteUrl)
                   }
-                  className={`w-14 h-14 lg:w-24 lg:h-24 shrink-0 border-2 rounded flex flex-col items-center justify-center relative transition-all duration-200 touch-none ${creature
-                      ? 'bg-cyan-900/40 border-cyan-400 cursor-grab active:cursor-grabbing hover:bg-cyan-950/60'
-                      : 'bg-black/40 border-wood/50 hover:bg-white/5'
+                  className={`w-16 h-16 lg:w-24 lg:h-24 shrink-0 border-2 rounded flex flex-col items-center justify-center relative transition-all duration-200 touch-none ${creature
+                    ? 'bg-cyan-900/40 border-cyan-400 cursor-grab active:cursor-grabbing hover:bg-cyan-950/60'
+                    : 'bg-black/40 border-wood/50 hover:bg-white/5'
                     } ${draggedIndex === i ? 'opacity-50' : 'opacity-100'}`}
                 >
                   {creature ? (
@@ -247,7 +245,7 @@ export default function PartyScreen({
                       <img
                         src={creature.spriteUrl}
                         alt={creature.name}
-                        className="w-10 h-10 lg:w-16 lg:h-16 pixelated pointer-events-none"
+                        className="w-10 h-10 lg:w-16 lg:h-16 pointer-events-none"
                       />
                       <div className="absolute top-0.5 right-0.5 text-[9px] lg:text-xs font-bold text-sand bg-black/80 px-1 rounded">
                         Lv{creature.level}
@@ -328,7 +326,7 @@ export default function PartyScreen({
           <img
             src={globalDrag.spriteUrl}
             alt="Dragging Creature"
-            className="w-10 h-10 lg:w-16 lg:h-16 pixelated"
+            className="w-10 h-10 lg:w-16 lg:h-16"
           />
         </div>
       )}
