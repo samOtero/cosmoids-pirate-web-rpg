@@ -197,16 +197,6 @@ export default function PartyScreen({
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerCancel}
     >
-      {/* Background */}
-      <div
-        className="absolute inset-0 z-0 opacity-20"
-        style={{
-          backgroundImage: `url(${BACKGROUND_IMAGES.Forest})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          filter: 'blur(4px)',
-        }}
-      />
 
       {/* Top Bar */}
       <div className="w-full flex justify-between items-center z-10 mb-2 lg:mb-6">
@@ -223,7 +213,7 @@ export default function PartyScreen({
       </div>
 
       {/* Active Team Section */}
-      <div className="z-10 w-full max-w-4xl mb-2 lg:mb-8">
+      <div className="z-10 w-full mb-2 lg:mb-8">
         <Panel className="p-2 lg:p-4 bg-wood/80 border-cyan-700">
           <div className="flex justify-center gap-2 lg:gap-4 flex-nowrap">
             {Array.from({ length: 6 }).map((_, i) => {
@@ -272,7 +262,7 @@ export default function PartyScreen({
       </div>
 
       {/* Storage Section */}
-      <div className="z-10 w-full max-w-4xl flex-1 flex flex-col min-h-0">
+      <div className="z-10 w-full flex-1 flex flex-col min-h-0">
         <div className="flex justify-between items-end mb-1 lg:mb-2">
           <h2 className="text-base lg:text-2xl font-bold text-sand">Storage</h2>
           <div className="text-xs lg:text-sm text-sand/70">

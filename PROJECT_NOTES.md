@@ -195,3 +195,6 @@ Added Storybook stories for \PartyScreen\ inside \src/app/components/PartyScreen
 
 ## [2026-05-20] Storybook Fullscreen Layout Decorator Fix
 Fixed a layout overflow issue where fullscreen screens (e.g. \PartyScreen\) in Storybook were padded and flex-centered by the global decorator in \.storybook/preview.tsx\. Modified the global decorator to dynamically inspect \context.parameters.layout\ and omit the \p-4 min-h-screen flex items-center justify-center\ styling when the story has \layout: 'fullscreen'\, applying a clean full-screen layout container instead.
+
+## [2026-05-20] Vitest Config Vite 8 Type Mismatch Fix
+Casted the react() plugin to any in vitest.config.ts. This bypasses TypeScript typechecking errors during next build arising from compatibility differences between Vite 8 (using Rolldown plugin types) and Vitest (using Vite 7 Rollup plugin types).
