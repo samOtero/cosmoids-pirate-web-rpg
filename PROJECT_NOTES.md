@@ -186,3 +186,6 @@ Added a tap-to-swap selection fallback to \PartyScreen.tsx\ for mobile and touch
 
 ## [2026-05-19] Party Screen Custom Pointer Drag-and-Drop
 Replaced HTML5 Drag & Drop and tap-to-move mechanisms with unified PointerEvents on the Party Screen. Supports smooth drag-and-drop interactions across mouse and mobile landscape touch screens. Uses elementFromPoint hit-testing over data-slot-index attributes on pointerup for drop detection, bypassing a fixed floating drag preview styled with pointer-events-none.
+
+## [2026-05-20] Storybook Integration\
+Storybook has been integrated into the repository using \pnpm\ and configured for Next.js and Tailwind CSS v4. Added custom viewport support for mobile landscape (896x414) in \.storybook/preview.tsx\ to easily test components in landscape aspect ratios under the project default mobile layout policy. Added first set of component stories for \Button\ and \TypeBadge\ UI components.
