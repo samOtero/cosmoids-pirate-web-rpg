@@ -204,3 +204,7 @@ When selecting a story level from the Level Select screen, the player is now rou
 
 ## [2026-05-21] Separate Storage Array for Party Screen
 Split the single `creatures` array on the `Profile` type into two independent arrays: `creatures` (active party, max 6) and `storageCreatures` (storage box). The Party Screen now receives both arrays as separate props. The `reorderCreatures` store action uses a global index scheme (0-5 = party, 6+ = storage) to support cross-array swaps. `addCreatureToProfile` adds to party if under 6, otherwise to storage. `updateCreatures` only searches and updates the active party (`creatures`) array, as storage creatures are not present/active during a tower defense level. Bumped `CURRENT_PROFILE_VERSION` to 5 to trigger profile migration.
+
+## [2026-05-21] Catch Redirection to Storage on Full Party
+
+Implemented a limit on active party roster additions during levels. In `TowerDefenseEngine.captureEnemy()`, a caught creature is only pushed to the in-level active `roster` if the roster size is under 6. Added comprehensive unit tests in `creature.test.ts` to verify the logic under both state branches.

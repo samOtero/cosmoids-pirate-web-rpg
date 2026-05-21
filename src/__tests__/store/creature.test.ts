@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useGameStore } from '@/store/gameStore';
 import { STARTER_CRAB, STARTER_IGUANA } from '@/constants/creatures';
+import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 
 describe('Creature Store Logic', () => {
   beforeEach(() => {
@@ -133,5 +134,97 @@ describe('Creature Store Logic', () => {
     expect(profile.storageCreatures.map((c) => c.speciesId)).toEqual([
       initialIds[1],
     ]);
+  });
+
+  it('should not add captured creature to active roster if roster has 6 or more creatures', () => {
+    const levelData = {
+      paths: [[{ x: 0, y: 0 }, { x: 10, y: 10 }]],
+      placementSpots: [],
+    };
+    const playerCreatures = Array.from({ length: 6 }, (_, i) => ({
+      id: `c_${i}`,
+      speciesId: 'starter_crab',
+      level: 1,
+      xp: 0,
+      equippedAttacks: [],
+    }));
+
+    const engine = new TowerDefenseEngine(levelData, playerCreatures);
+
+    // Spawn an enemy to capture
+    engine.enemies.push({
+      id: 'enemy_test',
+      definitionId: 'starter_iguana',
+      position: { x: 0, y: 0 },
+      hp: 10,
+      maxHp: 10,
+      speed: 1,
+      currentAttack: 10,
+      currentSpecialAttack: 10,
+      currentDefense: 10,
+      currentSpecialDefense: 10,
+      statusConditions: [],
+      currentWaypointIndex: 1,
+      pathIndex: 0,
+      facingDirection: 'down',
+      damagedByTowerIds: new Set(),
+    });
+
+    expect(engine.roster.length).toBe(6);
+
+    const captured = engine.captureEnemy('enemy_test');
+
+    expect(captured).not.toBeNull();
+    expect(captured?.speciesId).toBe('starter_iguana');
+    // Roster should still be 6, and not have the newly captured creature!
+    expect(engine.roster.length).toBe(6);
+    expect(engine.roster.some((c) => c.speciesId === 'starter_iguana')).toBe(false);
+
+  });
+
+  it('should add captured creature to active roster if roster has less than 6 creatures', () => {
+    const levelData = {
+      paths: [[{ x: 0, y: 0 }, { x: 10, y: 10 }]],
+      placementSpots: [],
+    };
+    const playerCreatures = Array.from({ length: 5 }, (_, i) => ({
+      id: `c_${i}`,
+      speciesId: 'starter_crab',
+      level: 1,
+      xp: 0,
+      equippedAttacks: [],
+    }));
+
+    const engine = new TowerDefenseEngine(levelData, playerCreatures);
+
+    // Spawn an enemy to capture
+    engine.enemies.push({
+      id: 'enemy_test',
+      definitionId: 'starter_iguana',
+      position: { x: 0, y: 0 },
+      hp: 10,
+      maxHp: 10,
+      speed: 1,
+      currentAttack: 10,
+      currentSpecialAttack: 10,
+      currentDefense: 10,
+      currentSpecialDefense: 10,
+      statusConditions: [],
+      currentWaypointIndex: 1,
+      pathIndex: 0,
+      facingDirection: 'down',
+      damagedByTowerIds: new Set(),
+    });
+
+    expect(engine.roster.length).toBe(5);
+
+    const captured = engine.captureEnemy('enemy_test');
+
+    expect(captured).not.toBeNull();
+    expect(captured?.speciesId).toBe('starter_iguana');
+    // Roster should now be 6, and contain the newly captured creature!
+    expect(engine.roster.length).toBe(6);
+    expect(engine.roster.some((c) => c.speciesId === 'starter_iguana')).toBe(true);
+
   });
 });
