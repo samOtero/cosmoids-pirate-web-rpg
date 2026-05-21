@@ -6,6 +6,7 @@ import { BACKGROUND_IMAGES } from '@/constants/game';
 
 interface PartyScreenProps {
   creatures: Creature[];
+  storageCreatures: Creature[];
   onBack: () => void;
   onReorder: (startIndex: number, endIndex: number) => void;
   onContinue?: () => void;
@@ -13,6 +14,7 @@ interface PartyScreenProps {
 
 export default function PartyScreen({
   creatures,
+  storageCreatures,
   onBack,
   onReorder,
   onContinue,
@@ -31,8 +33,7 @@ export default function PartyScreen({
   }, []);
 
   const creaturesPerPage = isDesktop ? 18 : 6;
-  const activeTeam = creatures.slice(0, 6);
-  const storageCreatures = creatures.slice(6);
+  const activeTeam = creatures;
   const totalPages = Math.ceil(
     Math.max(1, storageCreatures.length) / creaturesPerPage
   );

@@ -201,3 +201,6 @@ Casted the react() plugin to any in vitest.config.ts. This bypasses TypeScript t
 
 ## [2026-05-20] Party Screen Before Level Entry
 When selecting a story level from the Level Select screen, the player is now routed to the Party Screen first to arrange their team before entering the level. The Party Screen shows a 'Set Sail!' button (via the new optional `onContinue` prop) that proceeds through any queued intro events and then into the Tower Defense level. Pressing 'Back' clears the pending level events and returns to Level Select. Challenge levels skip the party screen entirely and go directly to Tower Defense, matching their existing behavior of using premade rosters.
+
+## [2026-05-21] Separate Storage Array for Party Screen
+Split the single `creatures` array on the `Profile` type into two independent arrays: `creatures` (active party, max 6) and `storageCreatures` (storage box). The Party Screen now receives both arrays as separate props. The `reorderCreatures` store action uses a global index scheme (0-5 = party, 6+ = storage) to support cross-array swaps. `addCreatureToProfile` adds to party if under 6, otherwise to storage. `updateCreatures` only searches and updates the active party (`creatures`) array, as storage creatures are not present/active during a tower defense level. Bumped `CURRENT_PROFILE_VERSION` to 5 to trigger profile migration.

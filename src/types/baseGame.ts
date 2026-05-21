@@ -199,7 +199,8 @@ export interface Profile {
   id: number;
   name: string;
   lastPlayed: number; // Timestamp
-  creatures: PlayerCreature[];
+  creatures: PlayerCreature[]; // Active party (max 6)
+  storageCreatures: PlayerCreature[]; // Storage box creatures (independent from party)
   inventory: Item[];
   unlockedIslands: number; // Max island index unlocked
   currentIslandId: number;

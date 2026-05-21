@@ -193,6 +193,7 @@ export default function Home() {
       <Suspense fallback={<div>Loading Team...</div>}>
         <PartyScreen
           creatures={resolvePlayerCreatures(currentProfile.creatures)}
+          storageCreatures={resolvePlayerCreatures(currentProfile.storageCreatures)}
           onBack={() => {
             if (hasPendingEvents) {
               // Clear the pending level events when going back

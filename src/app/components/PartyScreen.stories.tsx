@@ -31,30 +31,49 @@ const createMockInstance = (
 
 // Stateful wrapper to enable interactive drag/drop and tap-to-swap inside Storybook
 function PartyScreenStoryWrapper({
-  initialCreatures,
+  initialParty,
+  initialStorage,
   onBack,
 }: {
-  initialCreatures: Creature[];
+  initialParty: Creature[];
+  initialStorage: Creature[];
   onBack: () => void;
 }) {
-  const [creatures, setCreatures] = useState<Creature[]>(initialCreatures);
+  const [party, setParty] = useState<Creature[]>(initialParty);
+  const [storage, setStorage] = useState<Creature[]>(initialStorage);
 
   const handleReorder = (startIndex: number, endIndex: number) => {
-    if (startIndex < 0 || startIndex >= creatures.length) return;
+    const newParty = [...party];
+    const newStorage = [...storage];
 
-    const updated = [...creatures];
-    const clampedEndIndex = Math.max(0, Math.min(endIndex, creatures.length - 1));
+    const resolve = (globalIdx: number) => {
+      if (globalIdx < 6) {
+        return { arr: 'party' as const, localIdx: globalIdx };
+      }
+      return { arr: 'storage' as const, localIdx: globalIdx - 6 };
+    };
 
-    const [removed] = updated.splice(startIndex, 1);
-    updated.splice(clampedEndIndex, 0, removed);
+    const src = resolve(startIndex);
+    const dst = resolve(endIndex);
 
-    setCreatures(updated);
+    const srcArr = src.arr === 'party' ? newParty : newStorage;
+    if (src.localIdx < 0 || src.localIdx >= srcArr.length) return;
+
+    const [removed] = srcArr.splice(src.localIdx, 1);
+
+    const dstArr = dst.arr === 'party' ? newParty : newStorage;
+    const clampedDstIdx = Math.max(0, Math.min(dst.localIdx, dstArr.length));
+    dstArr.splice(clampedDstIdx, 0, removed);
+
+    setParty(newParty);
+    setStorage(newStorage);
   };
 
   return (
     <div className="w-full h-screen overflow-hidden">
       <PartyScreen
-        creatures={creatures}
+        creatures={party}
+        storageCreatures={storage}
         onBack={onBack}
         onReorder={handleReorder}
       />
@@ -84,15 +103,16 @@ type Story = StoryObj<typeof PartyScreen>;
 // Story 1: Interactive Default Story with a full team and a few items in storage
 export const InteractiveDefault: Story = {
   render: (args) => {
-    const mockCreatures: Creature[] = [
-      // Active team (first 6 slots)
+    const mockParty: Creature[] = [
       createMockInstance(STARTER_IGUANA, 1, { name: 'Blazy', level: 15, currentHp: 38 }),
       createMockInstance(STARTER_CRAB, 2, { name: 'Crabby', level: 12, currentHp: 55 }),
-      createMockInstance(STARTER_MONKEY, 3, { name: 'Bubbles', level: 10, currentHp: 15 }), // Weak/Damaged HP bar check
+      createMockInstance(STARTER_MONKEY, 3, { name: 'Bubbles', level: 10, currentHp: 15 }),
       createMockInstance(SENTICLE, 4, { level: 8 }),
       createMockInstance(BUG_STAGE_2, 5, { level: 9 }),
       createMockInstance(BIRD_1, 6, { level: 5 }),
-      // Storage creatures
+    ];
+
+    const mockStorage: Creature[] = [
       createMockInstance(MOUSE_1, 7, { level: 4 }),
       createMockInstance(BUG_STAGE_1, 8, { level: 3 }),
       createMockInstance(BUG_STAGE_3, 9, { level: 18 }),
@@ -101,7 +121,8 @@ export const InteractiveDefault: Story = {
 
     return (
       <PartyScreenStoryWrapper
-        initialCreatures={mockCreatures}
+        initialParty={mockParty}
+        initialStorage={mockStorage}
         onBack={args.onBack}
       />
     );
@@ -111,13 +132,14 @@ export const InteractiveDefault: Story = {
 // Story 2: Minimal party with just the starter, showing empty active slots and empty storage
 export const StarterOnly: Story = {
   render: (args) => {
-    const mockCreatures: Creature[] = [
+    const mockParty: Creature[] = [
       createMockInstance(STARTER_CRAB, 1, { name: 'My Starter', level: 5 }),
     ];
 
     return (
       <PartyScreenStoryWrapper
-        initialCreatures={mockCreatures}
+        initialParty={mockParty}
+        initialStorage={[]}
         onBack={args.onBack}
       />
     );
@@ -127,44 +149,42 @@ export const StarterOnly: Story = {
 // Story 3: Large roster showing multi-page Box storage pagination
 export const LargeRosterPagination: Story = {
   render: (args) => {
-    // 6 active + 20 storage = 26 creatures. Under mobile landscape (6/page), this will create 4 storage pages!
-    const mockCreatures: Creature[] = [
-      // Active team
+    const mockParty: Creature[] = [
       createMockInstance(STARTER_IGUANA, 1, { level: 20 }),
       createMockInstance(STARTER_CRAB, 2, { level: 19 }),
       createMockInstance(STARTER_MONKEY, 3, { level: 18 }),
       createMockInstance(SENTICLE, 4, { level: 16 }),
       createMockInstance(BUG_STAGE_3, 5, { level: 15 }),
       createMockInstance(BIRD_1, 6, { level: 14 }),
-      // Storage Box 1
+    ];
+
+    const mockStorage: Creature[] = [
       createMockInstance(MOUSE_1, 7, { name: 'Storage 1', level: 2 }),
       createMockInstance(BUG_STAGE_1, 8, { name: 'Storage 2', level: 2 }),
       createMockInstance(BUG_STAGE_2, 9, { name: 'Storage 3', level: 6 }),
       createMockInstance(BIRD_1, 10, { name: 'Storage 4', level: 4 }),
       createMockInstance(SENTICLE, 11, { name: 'Storage 5', level: 5 }),
       createMockInstance(STARTER_CRAB, 12, { name: 'Storage 6', level: 5 }),
-      // Storage Box 2
       createMockInstance(STARTER_MONKEY, 13, { name: 'Storage 7', level: 5 }),
       createMockInstance(STARTER_IGUANA, 14, { name: 'Storage 8', level: 5 }),
       createMockInstance(BUG_STAGE_3, 15, { name: 'Storage 9', level: 12 }),
       createMockInstance(MOUSE_1, 16, { name: 'Storage 10', level: 3 }),
       createMockInstance(BUG_STAGE_1, 17, { name: 'Storage 11', level: 2 }),
       createMockInstance(SENTICLE, 18, { name: 'Storage 12', level: 7 }),
-      // Storage Box 3
       createMockInstance(BIRD_1, 19, { name: 'Storage 13', level: 8 }),
       createMockInstance(STARTER_CRAB, 20, { name: 'Storage 14', level: 1 }),
       createMockInstance(STARTER_MONKEY, 21, { name: 'Storage 15', level: 1 }),
       createMockInstance(STARTER_IGUANA, 22, { name: 'Storage 16', level: 1 }),
       createMockInstance(BUG_STAGE_2, 23, { name: 'Storage 17', level: 8 }),
       createMockInstance(MOUSE_1, 24, { name: 'Storage 18', level: 4 }),
-      // Storage Box 4
       createMockInstance(BUG_STAGE_3, 25, { name: 'Storage 19', level: 15 }),
       createMockInstance(SENTICLE, 26, { name: 'Storage 20', level: 9 }),
     ];
 
     return (
       <PartyScreenStoryWrapper
-        initialCreatures={mockCreatures}
+        initialParty={mockParty}
+        initialStorage={mockStorage}
         onBack={args.onBack}
       />
     );

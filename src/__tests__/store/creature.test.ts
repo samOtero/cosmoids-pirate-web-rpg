@@ -120,16 +120,17 @@ describe('Creature Store Logic', () => {
       initialIds[2],
     ]);
 
-    // Reset and test out-of-bounds clamping
+    // Reset and test cross-array move (party to storage)
     // Currently order: [iguana, crab, monkey]
-    // Move index 0 (iguana) to index 10 (out of bounds)
+    // Move index 0 (iguana) to index 10 (storage index 4, clamped to storage end)
     store.reorderCreatures(0, 10);
     profile = useGameStore.getState().profiles[0]!;
-    // It should clamp 10 to 2, and move index 0 to index 2.
-    // Order becomes: [crab, monkey, iguana]
+    // Iguana should be removed from party and placed into storage
     expect(profile.creatures.map((c) => c.speciesId)).toEqual([
       initialIds[0],
       initialIds[2],
+    ]);
+    expect(profile.storageCreatures.map((c) => c.speciesId)).toEqual([
       initialIds[1],
     ]);
   });

@@ -452,6 +452,7 @@ export const useGameStore = create<GameState>()(
                 name: `Caleb`,
                 lastPlayed: Date.now(),
                 creatures: [],
+                storageCreatures: [],
                 inventory: [],
                 unlockedIslands: 0,
                 currentIslandId: 0,
@@ -513,6 +514,7 @@ export const useGameStore = create<GameState>()(
                   name: profile.name,
                   lastPlayed: Date.now(),
                   creatures: [],
+                  storageCreatures: [],
                   inventory: [],
                   unlockedIslands: 0,
                   currentIslandId: 0,
@@ -565,17 +567,29 @@ export const useGameStore = create<GameState>()(
                 return state;
               const newProfiles = [...state.profiles];
               if (newProfiles[slotId]) {
+                const profile = newProfiles[slotId]!;
                 const newCreatureInstance: PlayerCreature = {
                   ...creature,
                   id: crypto.randomUUID(),
                 };
-                newProfiles[slotId] = {
-                  ...newProfiles[slotId]!,
-                  creatures: [
-                    ...newProfiles[slotId]!.creatures,
-                    newCreatureInstance,
-                  ],
-                };
+                // Add to party if under 6, otherwise to storage
+                if (profile.creatures.length < 6) {
+                  newProfiles[slotId] = {
+                    ...profile,
+                    creatures: [
+                      ...profile.creatures,
+                      newCreatureInstance,
+                    ],
+                  };
+                } else {
+                  newProfiles[slotId] = {
+                    ...profile,
+                    storageCreatures: [
+                      ...profile.storageCreatures,
+                      newCreatureInstance,
+                    ],
+                  };
+                }
               }
               return { profiles: newProfiles };
             },
@@ -593,11 +607,11 @@ export const useGameStore = create<GameState>()(
 
               let hasUpdates = false;
               creatures.forEach((updatedCreature) => {
-                const index = newCreatures.findIndex(
+                const partyIndex = newCreatures.findIndex(
                   (c) => c.id === updatedCreature.id
                 );
-                if (index !== -1) {
-                  newCreatures[index] = updatedCreature;
+                if (partyIndex !== -1) {
+                  newCreatures[partyIndex] = updatedCreature;
                   hasUpdates = true;
                 }
               });
@@ -642,25 +656,43 @@ export const useGameStore = create<GameState>()(
                 return state;
 
               const profile = state.profiles[profileId]!;
-              const newCreatures = [...profile.creatures];
+              const newParty = [...profile.creatures];
+              const newStorage = [...profile.storageCreatures];
 
-              if (startIndex < 0 || startIndex >= newCreatures.length) {
+              // Determine which array+local-index the global index maps to
+              const resolve = (globalIdx: number) => {
+                if (globalIdx < 6) {
+                  return { arr: 'party' as const, localIdx: globalIdx };
+                }
+                return { arr: 'storage' as const, localIdx: globalIdx - 6 };
+              };
+
+              const src = resolve(startIndex);
+              const dst = resolve(endIndex);
+
+              const srcArr = src.arr === 'party' ? newParty : newStorage;
+
+              // Source must exist
+              if (src.localIdx < 0 || src.localIdx >= srcArr.length) {
                 return state;
               }
 
-              // Clamp endIndex to be within bounds [0, length - 1] so dragging to empty slots places it at the end
-              const clampedEndIndex = Math.max(
-                0,
-                Math.min(endIndex, newCreatures.length - 1)
-              );
+              // Remove from source
+              const [removed] = srcArr.splice(src.localIdx, 1);
 
-              const [removed] = newCreatures.splice(startIndex, 1);
-              newCreatures.splice(clampedEndIndex, 0, removed);
+              // Insert into destination
+              const dstArr = dst.arr === 'party' ? newParty : newStorage;
+              const clampedDstIdx = Math.max(
+                0,
+                Math.min(dst.localIdx, dstArr.length)
+              );
+              dstArr.splice(clampedDstIdx, 0, removed);
 
               const newProfiles = [...state.profiles];
               newProfiles[profileId] = {
                 ...profile,
-                creatures: newCreatures,
+                creatures: newParty,
+                storageCreatures: newStorage,
               };
               return { profiles: newProfiles };
             },
@@ -686,6 +718,7 @@ export const useGameStore = create<GameState>()(
 
               // Apply Effect
               let newCreatures = [...profile.creatures];
+              let newStorageCreatures = [...profile.storageCreatures];
 
               if (item.effect === 'HEAL' && targetCreatureId) {
                 // Note: PlayerCreature does not store currentHp — HEAL items are for the turn-based battle system
@@ -706,7 +739,12 @@ export const useGameStore = create<GameState>()(
                     xp: enemy.xp,
                     equippedAttacks: enemy.moves || [],
                   };
-                  newCreatures = [...newCreatures, caught];
+                  // Add to party if under 6, otherwise to storage
+                  if (newCreatures.length < 6) {
+                    newCreatures = [...newCreatures, caught];
+                  } else {
+                    newStorageCreatures = [...newStorageCreatures, caught];
+                  }
                 }
               }
 
@@ -722,6 +760,7 @@ export const useGameStore = create<GameState>()(
               newProfiles[profileId] = {
                 ...profile,
                 creatures: newCreatures,
+                storageCreatures: newStorageCreatures,
                 inventory,
               };
 
@@ -846,6 +885,7 @@ export const useGameStore = create<GameState>()(
                 name: profile.name,
                 lastPlayed: Date.now(),
                 creatures: [],
+                storageCreatures: [],
                 inventory: [],
                 unlockedIslands: 0,
                 currentIslandId: 0,
