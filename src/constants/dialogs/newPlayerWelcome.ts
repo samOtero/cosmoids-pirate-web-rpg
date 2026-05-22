@@ -23,7 +23,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: 'Caleb',
         },
       ],
-      text: "Come on, Captain Lance! I'm ready! Let me join your crew today!",
+      text: "Come on, Captain Lance! I'm ready! Let me join your crew!",
     },
     {
       portraits: [
@@ -49,153 +49,17 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           key: SpeakerImageKey.LANCE_SMILING,
           displayName: 'Lance',
         },
+        {
+          key: SpeakerImageKey.STARTER_CHEST_CLOSED,
+          displayName: 'Chest',
+        },
       ],
       text: "Tough isn't enough out there. But hey, since it's your birthday... catch.",
     },
     {
       portraits: [
         {
-          key: SpeakerImageKey.EMPTY,
-          displayName: '',
-        },
-      ],
-      text: 'Lance tosses Caleb a handful of Capture Coins.',
-    },
-    {
-      portraits: [
-        {
-          key: SpeakerImageKey.LANCE_SMILING,
-          displayName: 'Lance',
-        },
-      ],
-      text: 'Use those to catch your first partner. Maybe start small with a little bird or a dock mouse.',
-    },
-    {
-      portraits: [
-        {
-          key: SpeakerImageKey.CALEB_ANNOYED_STARTER_OUTFIT,
-          displayName: 'Caleb',
-        },
-      ],
-      text: 'A dock mouse?! No way! Come on, Lance! You have a whole chest of rare Cosmoids right there. Let me have one of those!\n',
-    },
-    {
-      portraits: [
-        {
-          key: SpeakerImageKey.LANCE_NEUTRAL_OUTFIT_1,
-          displayName: 'Lance',
-        },
-        {
-          key: SpeakerImageKey.STARTER_CHEST_CLOSED,
-          displayName: 'Chest',
-        },
-      ],
-      text: "These aren't toys, Caleb. The Cosmoids in this chest are rare. They rarely even listen to a veteran pirate, let alone a rookie.",
-    },
-    {
-      portraits: [
-        {
-          key: SpeakerImageKey.EMPTY,
-          displayName: '',
-        },
-      ],
-      text: 'Heavy, arrogant footsteps echo on the wooden docks as a local Rat-Catcher swaggers up.',
-    },
-    {
-      portraits: [
-        {
-          key: SpeakerImageKey.RAT_CATCHER_MOCKING,
-          displayName: 'Rat-Catcher',
-        },
-      ],
-      text: 'Well, look at the big, bad pirate playing with kids.',
-    },
-    {
-      text: 'Just enjoying the morning breeze. No trouble here.',
-      portraits: [
-        {
-          key: SpeakerImageKey.LANCE_CALM,
-          displayName: 'Lance',
-        },
-      ],
-    },
-    {
-      text: "You pirates are pathetic. Take away your fancy little monsters, and you're all just cowards playing dress-up on the water.",
-      portraits: [
-        {
-          key: SpeakerImageKey.RAT_CATCHER_SMUG,
-          displayName: 'Rat-Catcher',
-        },
-      ],
-    },
-    {
-      text: 'Hey! Shut up! Captain Lance is the greatest!',
-      portraits: [
-        {
-          key: SpeakerImageKey.CALEB_ANGRY_STARTER_OUTFIT,
-          displayName: 'Caleb',
-        },
-      ],
-    },
-    {
-      text: "Let it go, Caleb. Words can't sink ships.",
-      portraits: [
-        {
-          key: SpeakerImageKey.LANCE_CALM,
-          displayName: 'Lance',
-        },
-      ],
-    },
-    {
-      text: ' I need to check the rigging. Watch my cargo.',
-      portraits: [
-        {
-          key: SpeakerImageKey.LANCE_NEUTRAL_OUTFIT_1,
-          displayName: 'Lance',
-        },
-      ],
-    },
-    {
-      text: 'Lance turns his back and walks toward his ship, completely ignoring the Rat-Catcher.',
-      portraits: [
-        {
-          key: SpeakerImageKey.EMPTY,
-          displayName: '',
-        },
-      ],
-    },
-    {
-      text: "See that, kid? A total coward. I think I'll just take his precious cargo then.",
-      portraits: [
-        {
-          key: SpeakerImageKey.RAT_CATCHER_COCKY,
-          displayName: 'Rat-Catcher',
-        },
-      ],
-    },
-    {
-      text: "Don't you dare touch his stuff! I'll show you how a real pirate fights!",
-      portraits: [
-        {
-          key: SpeakerImageKey.CALEB_ANGRY_STARTER_OUTFIT,
-          displayName: 'Caleb',
-        },
-      ],
-    },
-    {
-      text: 'A real pirate? Please. You and what army, kid?',
-      portraits: [
-        {
-          key: SpeakerImageKey.RAT_CATCHER_MOCKING,
-          displayName: 'Rat-Catcher',
-        },
-      ],
-    },
-    {
-      text: 'Me and... ummm... my new partner!',
-      portraits: [
-        {
-          key: SpeakerImageKey.CALEB_FLUSTERED_STARTER_OUTFIT,
+          key: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
           displayName: 'Caleb',
         },
         {
@@ -203,6 +67,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
           displayName: 'Chest',
         },
       ],
+      text: 'Whoa! Are these Cosmoid coins?!',
     },
     {
       portraits: [
@@ -221,7 +86,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         },
       ],
       id: 'starter_choice',
-      text: "You ignore Lance's warning and bust open his treasure chest! Three unique Cosmoids are inside. Who will you choose?",
+      text: 'Lance has given you a treasure chest! Three unique Cosmoids are inside. Who will you choose?',
       buttons: [
         {
           label: 'Palmit',
@@ -327,7 +192,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         },
       ],
       id: 'monkeg_choice',
-      text: "That's a Monkeg! It may prefer hiding in its barrel right now, but it's a natural navigator. Should I choose it?",
+      text: "That's a Monkeg! It may prefer hiding in its barrel right now, but it's a natural deckhand. Should I choose it?",
       buttons: [
         {
           label: 'Yes',
@@ -360,7 +225,7 @@ export const NEW_PLAYER_WELCOME_DIALOG: DialogConfig = {
         },
       ],
       id: 'after_starter_choice',
-      text: "A Captain is nothing without a loyal First Mate! I've made my choice!",
+      text: "I've made my choice! I choose you, {StarterName}!",
     },
   ],
   backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
