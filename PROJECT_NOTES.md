@@ -211,3 +211,6 @@ Implemented a limit on active party roster additions during levels. In `TowerDef
 
 ## [2026-05-21] Profile Start Dialogue Flow Update
 Updated NEW_PLAYER_EVENTS in src/constants/events.ts so that when a profile is first started, the game plays the initial welcome dialogue (NEW_PLAYER_WELCOME_DIALOG) and then immediately routes the player to the Level Select screen (Screens.LEVEL_SELECT) instead of automatically playing the second dialogue and launching into the first level.
+
+## [2026-05-21] Dynamic Dialog Placeholders
+Added dynamic replacement of the `{StarterName}` placeholder inside the `DialogContent` component. The component resolves the starter name by matching the persistent `gameFlags` (e.g., `STARTER_PALMIT`, `STARTER_FUEGUANA`, `STARTER_MONKEG`) of the active profile against the starter species definitions (`STARTER_CRAB.name` etc.). This ensures the name remains correct even if the player reorders their party, moves their starter to storage, or releases it, while preserving build-time static validation of dialogue configurations.

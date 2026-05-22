@@ -150,7 +150,7 @@ export const BUG_STAGE_3: Creature = {
 // Starter Cosmoid Definitions
 export const STARTER_CRAB: Creature = {
   id: 'starter_crab',
-  name: 'Crabby',
+  name: 'Palmit',
   type: ElementType.GRASS,
   maxHp: 55,
   currentHp: 55,
@@ -172,7 +172,7 @@ export const STARTER_CRAB: Creature = {
 
 export const STARTER_IGUANA: Creature = {
   id: 'starter_iguana',
-  name: 'Blazy',
+  name: 'Fueguana',
   type: ElementType.FIRE,
   maxHp: 38,
   currentHp: 38,
@@ -196,7 +196,7 @@ export const STARTER_IGUANA: Creature = {
 
 export const STARTER_MONKEY: Creature = {
   id: 'starter_monkey',
-  name: 'Bubbles',
+  name: 'Monkeg',
   type: ElementType.WATER,
   maxHp: 62,
   currentHp: 62,

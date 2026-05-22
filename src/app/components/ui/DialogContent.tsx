@@ -8,11 +8,18 @@ import {
   DialogButton,
   getButtonClasses,
   DialogAction,
+  GameFlag,
 } from '@/types/baseGame';
 import {
   validateLineIds,
   findLineIndexById,
 } from '@/utils/dialogLineValidator';
+import { useGameStore } from '@/store/gameStore';
+import {
+  STARTER_CRAB,
+  STARTER_IGUANA,
+  STARTER_MONKEY,
+} from '@/constants/creatures';
 
 interface DialogContentProps {
   sequence: DialogLine[];
@@ -63,13 +70,30 @@ export default function DialogContent({
 
   const currentLine = sequence[lineIndex];
 
+  // Get current starter name from store based on game flags (immune to party re-ordering/storage moves)
+  const { profiles, currentProfileId } = useGameStore();
+  const currentProfile = currentProfileId !== null ? profiles[currentProfileId] : null;
+  
+  let starterName = 'your Cosmoid';
+  if (currentProfile?.gameFlags) {
+    if (currentProfile.gameFlags.includes(GameFlag.STARTER_PALMIT)) {
+      starterName = STARTER_CRAB.name;
+    } else if (currentProfile.gameFlags.includes(GameFlag.STARTER_FUEGUANA)) {
+      starterName = STARTER_IGUANA.name;
+    } else if (currentProfile.gameFlags.includes(GameFlag.STARTER_MONKEG)) {
+      starterName = STARTER_MONKEY.name;
+    }
+  }
+
   // Typewriter effect
   useEffect(() => {
     if (!currentLine) return;
 
+    const textToType = currentLine.text.replace(/{StarterName}/g, starterName);
+
     // If typing is disabled, show full text immediately
     if (!enableTyping) {
-      setDisplayedText(currentLine.text);
+      setDisplayedText(textToType);
       setIsTyping(false);
       return;
     }
@@ -80,8 +104,8 @@ export default function DialogContent({
 
     intervalRef.current = setInterval(() => {
       charIndex++;
-      if (charIndex <= currentLine.text.length) {
-        setDisplayedText(currentLine.text.slice(0, charIndex));
+      if (charIndex <= textToType.length) {
+        setDisplayedText(textToType.slice(0, charIndex));
       } else {
         if (intervalRef.current) clearInterval(intervalRef.current);
         setIsTyping(false);
@@ -91,7 +115,7 @@ export default function DialogContent({
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [currentLine, lineIndex, enableTyping]); // Re-run when line changes
+  }, [currentLine, lineIndex, enableTyping, starterName]); // Re-run when line changes or starterName changes
 
   const handleGlobalClick = () => {
     if (isTyping) {
@@ -100,7 +124,8 @@ export default function DialogContent({
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
-      setDisplayedText(currentLine.text);
+      const textToType = currentLine.text.replace(/{StarterName}/g, starterName);
+      setDisplayedText(textToType);
       setIsTyping(false);
     }
   };
