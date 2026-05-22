@@ -23,6 +23,7 @@ export function resetStore() {
     currentScreen: "START" as Screens,
     profiles: [null, null, null],
     currentProfileId: null,
+    eventQueue: [],
   });
   localStorage.clear();
 }

@@ -208,3 +208,6 @@ Split the single `creatures` array on the `Profile` type into two independent ar
 ## [2026-05-21] Catch Redirection to Storage on Full Party
 
 Implemented a limit on active party roster additions during levels. In `TowerDefenseEngine.captureEnemy()`, a caught creature is only pushed to the in-level active `roster` if the roster size is under 6. Added comprehensive unit tests in `creature.test.ts` to verify the logic under both state branches.
+
+## [2026-05-21] Profile Start Dialogue Flow Update
+Updated NEW_PLAYER_EVENTS in src/constants/events.ts so that when a profile is first started, the game plays the initial welcome dialogue (NEW_PLAYER_WELCOME_DIALOG) and then immediately routes the player to the Level Select screen (Screens.LEVEL_SELECT) instead of automatically playing the second dialogue and launching into the first level.

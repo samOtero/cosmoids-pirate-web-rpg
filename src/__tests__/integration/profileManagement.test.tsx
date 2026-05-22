@@ -250,12 +250,12 @@ describe('Profile Management Integration', () => {
     });
 
     it('selecting empty slot should take you to new player dialog', () => {
-      const { selectProfile } = useGameStore.getState();
+      const { createProfile } = useGameStore.getState();
 
-      selectProfile(0); // Slot is empty
+      createProfile(0); // Slot is empty, triggers profile creation
 
       const state = useGameStore.getState();
-      expect(state.currentProfileId).toBe(null);
+      expect(state.currentProfileId).toBe(0);
       expect(state.currentScreen).toBe(Screens.DIALOG);
     });
   });
