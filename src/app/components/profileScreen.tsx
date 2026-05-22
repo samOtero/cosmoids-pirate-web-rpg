@@ -37,10 +37,12 @@ export default function ProfileScreen({
                   className="flex-1 flex flex-col items-center justify-center space-y-1 lg:space-y-2"
                 >
                   <div className="w-12 h-12 lg:w-16 lg:h-16 bg-blue-900 rounded-full flex items-center justify-center text-2xl lg:text-3xl mb-1 lg:mb-2">
-                    {profile.creatures[0] ? (
+                    {profile.creatures[0] || profile.storageCreatures?.[0] ? (
                       <img
                         src={
-                          resolvePlayerCreature(profile.creatures[0]).spriteUrl
+                          resolvePlayerCreature(
+                            profile.creatures[0] || profile.storageCreatures![0]
+                          ).spriteUrl
                         }
                         className="w-8 h-8 lg:w-12 lg:h-12"
                         alt="buddy"

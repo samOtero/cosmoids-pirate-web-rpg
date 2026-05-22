@@ -227,4 +227,24 @@ describe('Creature Store Logic', () => {
     expect(engine.roster.some((c) => c.speciesId === 'starter_iguana')).toBe(true);
 
   });
+
+  it('should add creature directly to storage when forceStorage is true', () => {
+    const store = useGameStore.getState();
+    const profileId = 0;
+
+    // Act: Add PlayerCreature with forceStorage = true
+    store.addCreatureToProfile(profileId, {
+      id: STARTER_CRAB.id,
+      speciesId: STARTER_CRAB.id,
+      level: 1,
+      xp: 0,
+      equippedAttacks: STARTER_CRAB.moves,
+    }, true);
+
+    // Assert
+    const profile = useGameStore.getState().profiles[0]!;
+    expect(profile.creatures).toHaveLength(0);
+    expect(profile.storageCreatures).toHaveLength(1);
+    expect(profile.storageCreatures[0].speciesId).toBe(STARTER_CRAB.id);
+  });
 });

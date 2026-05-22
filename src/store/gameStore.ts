@@ -57,7 +57,11 @@ interface GameState {
   createProfile: (slotId: number) => void;
   deleteProfile: (slotId: number) => void;
   selectProfile: (slotId: number) => void;
-  addCreatureToProfile: (slotId: number, creature: PlayerCreature) => void;
+  addCreatureToProfile: (
+    slotId: number,
+    creature: PlayerCreature,
+    forceStorage?: boolean
+  ) => void;
   updateCreatures: (creatures: PlayerCreature[]) => void;
   overwriteProfileCreatures: (creatures: PlayerCreature[]) => void;
   reorderCreatures: (startIndex: number, endIndex: number) => void;
@@ -274,7 +278,8 @@ export const useGameStore = create<GameState>()(
                         };
                         state.addCreatureToProfile(
                           currentProfileId,
-                          starterPlayerCreature
+                          starterPlayerCreature,
+                          true
                         );
                         state.setStoryProgression(
                           StoryProgression.PICK_STARTER
@@ -556,7 +561,11 @@ export const useGameStore = create<GameState>()(
           get().processNextEvent();
         },
 
-        addCreatureToProfile: (slotId: number, creature: PlayerCreature) =>
+        addCreatureToProfile: (
+          slotId: number,
+          creature: PlayerCreature,
+          forceStorage?: boolean
+        ) =>
           set(
             (state) => {
               if (
@@ -572,14 +581,11 @@ export const useGameStore = create<GameState>()(
                   ...creature,
                   id: crypto.randomUUID(),
                 };
-                // Add to party if under 6, otherwise to storage
-                if (profile.creatures.length < 6) {
+                // Add to party if under 6 and not forced to storage, otherwise to storage
+                if (profile.creatures.length < 6 && !forceStorage) {
                   newProfiles[slotId] = {
                     ...profile,
-                    creatures: [
-                      ...profile.creatures,
-                      newCreatureInstance,
-                    ],
+                    creatures: [...profile.creatures, newCreatureInstance],
                   };
                 } else {
                   newProfiles[slotId] = {
