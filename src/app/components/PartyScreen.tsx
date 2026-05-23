@@ -231,6 +231,7 @@ export default function PartyScreen({
               variant="wood"
               className="px-3 py-1 text-xs font-bold lg:px-6 lg:py-2 lg:text-base"
               onClick={onContinue}
+              disabled={activeTeam.length === 0}
             >
               Start
             </Button>
@@ -241,6 +242,12 @@ export default function PartyScreen({
       {/* Active Team Section */}
       <div className="z-10 mb-2 w-full lg:mb-8">
         <Panel className="border-cyan-700 bg-wood/80">
+          {onContinue && activeTeam.length === 0 && (
+            <div className="mb-2 animate-pulse text-center text-xs font-bold text-red-400 lg:text-sm">
+              ⚠️ Active party is empty! Drag a creature from your storage to
+              join your team.
+            </div>
+          )}
           <div className="flex flex-nowrap justify-center gap-6">
             {Array.from({ length: 6 }).map((_, i) => {
               const creature = activeTeam[i];
