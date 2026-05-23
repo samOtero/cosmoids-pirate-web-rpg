@@ -41,7 +41,7 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
   [SpeakerImageKey.STARTER_2_IGUANA]: '/iguana_starter_fire_neutral_skin_1.png',
   [SpeakerImageKey.STARTER_3_MONKEY]:
     '/monkey_starter_water_neutral_skin_1.png',
-  [SpeakerImageKey.EEL_SENTICLE]: '/eel-basic-normal-neutral-skin-1.png',
+  [SpeakerImageKey.EEL_SENTICLE]: '/dialog/senticle_dark_aura_small.png',
   [SpeakerImageKey.CREWMATE]: 'https://picsum.photos/seed/crewmate_npc/300/300',
   [SpeakerImageKey.OLD_SAILOR]: 'https://picsum.photos/seed/oldsailor/300/300',
   [SpeakerImageKey.PIRATE_GRUNT_JOE_SMIRK]: '/dialog_pirate_grunt_smirk.png',
@@ -63,6 +63,8 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
   [SpeakerImageKey.RAT_CATCHER_MOCKING]:
     '/dialog/rat_catcher_mocking_small.png',
   [SpeakerImageKey.RAT_CATCHER_SMUG]: '/dialog/rat_catcher_smug_small.png',
+  [SpeakerImageKey.ASTROLAPE]: '/dialog/astrolape_neutral.png',
+  [SpeakerImageKey.ASTROLAPE_ROAR]: '/dialog/astrolape_roar.png',
   [SpeakerImageKey.NARRATOR]:
     'https://picsum.photos/seed/narrator_book/300/300',
   [SpeakerImageKey.DEFAULT]: 'https://picsum.photos/seed/unknown_npc/300/300',

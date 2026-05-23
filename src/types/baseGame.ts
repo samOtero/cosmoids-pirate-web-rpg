@@ -73,6 +73,8 @@ export enum SpeakerImageKey {
   RAT_CATCHER_COCKY = 'Rat_Catcher_Cocky',
   RAT_CATCHER_MOCKING = 'Rat_Catcher_Mocking',
   RAT_CATCHER_SMUG = 'Rat_Catcher_Smug',
+  ASTROLAPE = 'Astrolape',
+  ASTROLAPE_ROAR = 'Astrolape_Roar',
   NARRATOR = 'Narrator',
   DEFAULT = 'default',
   EMPTY = 'empty',
