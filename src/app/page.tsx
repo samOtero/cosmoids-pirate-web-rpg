@@ -193,7 +193,9 @@ export default function Home() {
       <Suspense fallback={<div>Loading Team...</div>}>
         <PartyScreen
           creatures={resolvePlayerCreatures(currentProfile.creatures)}
-          storageCreatures={resolvePlayerCreatures(currentProfile.storageCreatures)}
+          storageCreatures={resolvePlayerCreatures(
+            currentProfile.storageCreatures
+          )}
           onBack={() => {
             if (hasPendingEvents) {
               // Clear the pending level events when going back
@@ -202,9 +204,7 @@ export default function Home() {
             setScreen(Screens.LEVEL_SELECT);
           }}
           onReorder={reorderCreatures}
-          onContinue={
-            hasPendingEvents ? () => processNextEvent() : undefined
-          }
+          onContinue={hasPendingEvents ? () => processNextEvent() : undefined}
         />
       </Suspense>
     );
@@ -219,15 +219,13 @@ export default function Home() {
       <Suspense fallback={<div>Loading Tower Defense...</div>}>
         <TowerDefenseScreen
           levelData={currentTdLevel.levelData}
-          onClose={() =>
-            enqueueAndProcessEvents([
-              {
-                type: currentTdLevel.levelData.isChallengeLevel
-                  ? 'GO_TO_CHALLENGE_SELECT'
-                  : 'GO_TO_LEVEL_SELECT',
-              },
-            ])
-          }
+          onClose={() => {
+            if (currentTdLevel.levelData.isChallengeLevel) {
+              enqueueAndProcessEvents([{ type: 'GO_TO_CHALLENGE_SELECT' }]);
+            } else {
+              enqueueAndProcessEvents(currentTdLevel.loseEvents);
+            }
+          }}
           onWin={() => enqueueAndProcessEvents(currentTdLevel.winEvents)}
           onLose={() => enqueueAndProcessEvents(currentTdLevel.loseEvents)}
         />

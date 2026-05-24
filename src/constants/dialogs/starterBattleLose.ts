@@ -1,27 +1,21 @@
-import { DialogConfig, BackgroundImageKey, SpeakerImageKey } from "@/types/baseGame";
-
-
+import {
+  DialogConfig,
+  BackgroundImageKey,
+  SpeakerImageKey,
+} from '@/types/baseGame';
 
 export const STARTER_BATTLE_LOSE: DialogConfig = {
-  "sequence": [
+  sequence: [
     {
-      "text": "Huff... See? Did you really think... a kid could stop me?",
-      "portraits": [
+      text: 'Hah! What did I tell you? You and your little pet are just playing dress-up. Run home, kid!',
+      portraits: [
         {
-          "key": SpeakerImageKey.PIRATE_GRUNT_JOE_SMIRK,
-          "displayName": "Grunt Pirate Joe"
-        }
-      ]
+          key: SpeakerImageKey.RAT_CATCHER_SMUG,
+          displayName: 'Rat-Catcher',
+          flipped: true,
+        },
+      ],
     },
-    {
-      "text": "I... I knew it. I’m not strong enough... I’m sorry, Scuttles...",
-      "portraits": [
-        {
-          "key": SpeakerImageKey.CALEB_DISAPPOINTED_STARTER_OUTFIT,
-          "displayName": "Caleb"
-        }
-      ]
-    }
   ],
-  "backgroundImageKey": BackgroundImageKey.FIRST_TOWN_DOCKS
+  backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
 };
