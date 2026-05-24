@@ -43,7 +43,7 @@ export const FIRST_LEVEL: TDLevelData = {
     {
       position: {
         x: 21.78,
-        y: 40,
+        y: 45,
       },
       tdConfigId: 'caleb_battle',
     },
@@ -59,7 +59,7 @@ export const FIRST_LEVEL: TDLevelData = {
         x: 9,
         y: 40.37,
       },
-      tdConfigId: 'grandpa_battle',
+      tdConfigId: 'lance_calm_battle',
     },
   ],
   captureUnits: [

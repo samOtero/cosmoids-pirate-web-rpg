@@ -265,6 +265,19 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       flipX: true,
     },
   },
+  lance_calm_battle: {
+    default: {
+      url: '/battles/characters/lance_calm_battle.png',
+      scale: 0.37,
+      shadowScaleX: 2.85,
+      shadowOffsetY: 34,
+      offsetY: -90,
+      healthBarOffsetY: -1,
+      offsetX: 0,
+      shadowScaleY: 1.25,
+      shadowOffsetX: -11,
+    },
+  },
   grandpa_battle: {
     default: {
       url: '/battles/characters/grandpa_battle.png',
