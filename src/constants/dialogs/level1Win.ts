@@ -62,6 +62,28 @@ export const LEVEL_1_WIN: DialogConfig = {
       ],
     },
     {
+      text: 'Look out, kid!',
+      portraits: [
+        {
+          key: SpeakerImageKey.LANCE_SERIOUS,
+          displayName: 'Lance',
+        },
+      ],
+    },
+    {
+      text: 'Lance dives in front of Caleb, throwing his arm out to shield him.',
+      portraits: [
+        {
+          key: SpeakerImageKey.LANCE_SERIOUS,
+          displayName: 'Lance',
+        },
+        {
+          key: SpeakerImageKey.EEL_SENTICLE,
+          displayName: 'Cursed Senticle',
+        },
+      ],
+    },
+    {
       text: 'Gah!',
       portraits: [
         {
@@ -116,7 +138,7 @@ export const LEVEL_1_WIN: DialogConfig = {
       ],
     },
     {
-      text: 'With a single, blinding swipe of cosmic energy, Astrolape blasts the Cursed Senticle and the Rat Catcher straight into the harbor.!',
+      text: 'Astrolape lunges forward with a devastating full-body tackle, blasting the Cursed Senticle and the Rat Catcher straight into the harbor!',
       portraits: [
         {
           key: SpeakerImageKey.ASTROLAPE_ROAR,
