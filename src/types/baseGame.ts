@@ -228,6 +228,7 @@ export interface DialogPortrait {
   key: SpeakerImageKey;
   displayName: string;
   portraitWidth?: 'normal' | 'wide';
+  flipped?: boolean;
 }
 
 export const DialogButtonTypeConfig = {

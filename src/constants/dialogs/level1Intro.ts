@@ -20,6 +20,7 @@ export const LEVEL_1_INTRO: DialogConfig = {
         {
           key: SpeakerImageKey.RAT_CATCHER_MOCKING,
           displayName: 'Rat-Catcher',
+          flipped: true,
         },
       ],
       text: 'Well, look at the big, bad pirate playing with kids.',
@@ -39,6 +40,7 @@ export const LEVEL_1_INTRO: DialogConfig = {
         {
           key: SpeakerImageKey.RAT_CATCHER_SMUG,
           displayName: 'Rat-Catcher',
+          flipped: true,
         },
       ],
     },

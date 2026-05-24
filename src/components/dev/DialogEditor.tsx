@@ -470,6 +470,40 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                       <option value="wide">Wide</option>
                     </select>
                   </div>
+                  <div>
+                    <label className="block text-xs text-slate-500 mb-1">
+                      Orientation
+                    </label>
+                    <div className="flex items-center h-7 mt-1">
+                      <input
+                        type="checkbox"
+                        checked={!!portrait.flipped}
+                        onChange={(e) => {
+                          const newPortraits = [...line.portraits];
+                          newPortraits[pIdx] = {
+                            ...portrait,
+                            flipped: e.target.checked,
+                          };
+                          updateLine(selectedLineIndex, {
+                            ...line,
+                            portraits: newPortraits,
+                          });
+                        }}
+                        className="rounded border-slate-700 bg-slate-950 text-cyan-600 focus:ring-cyan-500 h-4 w-4 cursor-pointer"
+                      />
+                      <span className="text-xs text-slate-400 ml-2 cursor-pointer" onClick={() => {
+                        const newPortraits = [...line.portraits];
+                        newPortraits[pIdx] = {
+                          ...portrait,
+                          flipped: !portrait.flipped,
+                        };
+                        updateLine(selectedLineIndex, {
+                          ...line,
+                          portraits: newPortraits,
+                        });
+                      }}>Flip Horizontally</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}

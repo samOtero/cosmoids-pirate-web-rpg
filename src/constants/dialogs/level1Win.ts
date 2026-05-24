@@ -22,6 +22,7 @@ export const LEVEL_1_WIN: DialogConfig = {
         {
           key: SpeakerImageKey.RAT_CATCHER_ANGRY,
           displayName: 'Rat Catcher',
+          flipped: true,
         },
       ],
     },
@@ -31,6 +32,7 @@ export const LEVEL_1_WIN: DialogConfig = {
         {
           key: SpeakerImageKey.EEL_SENTICLE,
           displayName: 'Cursed Senticle',
+          flipped: true,
         },
       ],
     },
@@ -49,6 +51,7 @@ export const LEVEL_1_WIN: DialogConfig = {
         {
           key: SpeakerImageKey.RAT_CATCHER_ANGRY,
           displayName: 'Rat Catcher',
+          flipped: true,
         },
       ],
     },
@@ -58,6 +61,7 @@ export const LEVEL_1_WIN: DialogConfig = {
         {
           key: SpeakerImageKey.EEL_SENTICLE,
           displayName: 'Cursed Senticle',
+          flipped: true,
         },
       ],
     },
@@ -80,6 +84,7 @@ export const LEVEL_1_WIN: DialogConfig = {
         {
           key: SpeakerImageKey.EEL_SENTICLE,
           displayName: 'Cursed Senticle',
+          flipped: true,
         },
       ],
     },
@@ -107,6 +112,7 @@ export const LEVEL_1_WIN: DialogConfig = {
         {
           key: SpeakerImageKey.RAT_CATCHER_COCKY,
           displayName: 'Rat Catcher',
+          flipped: true,
         },
       ],
     },

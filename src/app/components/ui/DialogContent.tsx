@@ -242,7 +242,7 @@ export default function DialogContent({
                           alt={p.displayName}
                           width={256}
                           height={256}
-                          className={`${imgClass} object-cover border-4 border-wood rounded-lg shadow-2xl bg-black transition-all duration-300`}
+                          className={`${imgClass} object-cover border-4 border-wood rounded-lg shadow-2xl bg-black transition-all duration-300 ${p.flipped ? 'scale-x-[-1]' : ''}`}
                           unoptimized
                           draggable={false}
                         />
@@ -308,7 +308,7 @@ export default function DialogContent({
                 alt={p.displayName}
                 width={imgWidth}
                 height={imgHeight}
-                className={`w-auto h-full max-h-[40vh] object-cover border-4 border-wood rounded-lg shadow-2xl bg-black transition-all duration-300`}
+                className={`w-auto h-full max-h-[40vh] object-cover border-4 border-wood rounded-lg shadow-2xl bg-black transition-all duration-300 ${p.flipped ? 'scale-x-[-1]' : ''}`}
                 unoptimized
                 draggable={false}
               />
