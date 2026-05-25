@@ -98,7 +98,7 @@ export class EffectProcessor {
     const stabMultiplier = isStab ? 1.5 : 1.0;
 
     const effectivenessMultiplier =
-      TYPE_EFFECTIVENESS[attackDef.type]?.[defenderType] ?? 1.0;
+      TYPE_EFFECTIVENESS[attackDef.type]?.[defenderType as ElementType] ?? 1.0;
 
     // Add a slight randomization (85% to 100%)
     const randomModifier = (Math.floor(Math.random() * 16) + 85) / 100;

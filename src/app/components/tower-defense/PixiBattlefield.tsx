@@ -803,7 +803,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 tower,
                 tsprite,
                 shadow,
-                baseCreature.id,
+                tower.creature.speciesId,
                 baseCreature.battleSpriteUrl || baseCreature.spriteUrl,
                 (t) => {
                   if (!isDestroyed) tsprite.texture = t;
@@ -1063,7 +1063,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 enemy,
                 esprite,
                 shadow,
-                baseCreature.id,
+                enemy.definitionId,
                 baseCreature.battleSpriteUrl || baseCreature.spriteUrl,
                 (t) => {
                   if (!isDestroyed) esprite.texture = t;
@@ -1156,7 +1156,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                     } as BaseTDUnit,
                     psprite,
                     shadow,
-                    baseCreature.id,
+                    sourceTower.creature.speciesId,
                     baseCreature.battleSpriteUrl || baseCreature.spriteUrl,
                     (t) => {
                       if (!isDestroyed) psprite.texture = t;

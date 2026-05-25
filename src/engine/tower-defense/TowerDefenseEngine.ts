@@ -8,9 +8,10 @@ import {
   STARTER_CRAB,
   STARTER_IGUANA,
   STARTER_MONKEY,
+  COSMOID_TEMPLATES,
 } from '@/constants/creatures';
 import { Creature, PlayerCreature } from '@/types/baseGame';
-import { calculateMaxHp, calculateStat } from '@/utils/resolvePlayerCreature';
+import { calculateMaxHp, calculateStat, createWildCreature } from '@/utils/resolvePlayerCreature';
 import {
   Tower,
   Enemy,
@@ -18,6 +19,7 @@ import {
   CaptureUnit,
   VisualEffect,
   FloatingText,
+  TDCreatureMetadata,
 } from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
 import { AttackBehaviorRegistry } from './attacks/behaviors';
@@ -25,48 +27,39 @@ import { EffectProcessor } from './attacks/EffectProcessor';
 import {
   TDWave,
   TDWaveGroup,
-  TDCreatureMetadata,
   EnvironmentUnit,
   Point,
 } from './types';
 import { TDEventBus } from './events/TDEventBus';
 import { TDProgressionManager } from './progression/TDProgressionManager';
 
-export const TD_CREATURE_DEFS: Record<string, TDCreatureMetadata> = {
-  [BUG_STAGE_1.id]: {
-    baseCreature: BUG_STAGE_1,
-  },
-  [BUG_STAGE_2.id]: {
-    baseCreature: BUG_STAGE_2,
-  },
-  [BUG_STAGE_3.id]: {
-    baseCreature: BUG_STAGE_3,
-  },
-  [STARTER_CRAB.id]: {
-    baseCreature: STARTER_CRAB,
-    evolutionNodes: [{ level: 10, evolutionDefId: BUG_STAGE_2.id }], // pushed back for testing
-    attackUnlocks: [
-      { level: 2, attackDefId: 'EMBER' },
-      { level: 3, attackDefId: 'BUBBLE_BEAM' },
-      { level: 4, attackDefId: 'STRING_SHOT' },
-    ], // temporary testing progression
-  },
-  [STARTER_IGUANA.id]: {
-    baseCreature: STARTER_IGUANA,
-  },
-  [STARTER_MONKEY.id]: {
-    baseCreature: STARTER_MONKEY,
-  },
-  [SENTICLE.id]: {
-    baseCreature: SENTICLE,
-  },
-  [MOUSE_1.id]: {
-    baseCreature: MOUSE_1,
-  },
-  [BIRD_1.id]: {
-    baseCreature: BIRD_1,
-  },
+const defaultLevels: Record<string, number> = {
+  senticle: 15,
+  mouse_1: 3,
+  bird_1: 3,
+  bug_stage_1: 3,
+  bug_stage_2: 8,
+  bug_stage_3: 8,
+  starter_crab: 5,
+  starter_iguana: 5,
+  starter_monkey: 5,
 };
+
+export const TD_CREATURE_DEFS: Record<string, TDCreatureMetadata> = {};
+
+// Populate TD_CREATURE_DEFS dynamically from COSMOID_TEMPLATES for compatibility
+Object.keys(COSMOID_TEMPLATES).forEach((id) => {
+  const template = COSMOID_TEMPLATES[id];
+  const defaultLevel = defaultLevels[id] ?? 1;
+  TD_CREATURE_DEFS[id] = {
+    baseCreature: createWildCreature(id, defaultLevel),
+    evolutionNodes: template.evolutionNodes,
+    attackUnlocks: template.learnableAttacks.map((a) => ({
+      level: a.level,
+      attackDefId: a.attackId,
+    })),
+  };
+});
 
 const ENEMY_TYPES = [BUG_STAGE_1, BUG_STAGE_2, BUG_STAGE_3];
 
@@ -250,30 +243,31 @@ export class TowerDefenseEngine {
             ? Math.floor(Math.random() * this.paths.length)
             : 0;
         const startPath = this.paths[pathIndex] || [{ x: 0, y: 0 }];
-        const enemyLevel = randomEnemyDef.level;
+        const enemyLevel = defaultLevels[randomEnemyDef.id] ?? 3;
         const newEnemyHp =
-          calculateMaxHp(randomEnemyDef.maxHp, enemyLevel) *
+          calculateMaxHp(randomEnemyDef.baseStats.hp, enemyLevel) *
           this.enemyHpMultiplier;
-        const newEnemyAttack = calculateStat(randomEnemyDef.attack, enemyLevel);
+        const newEnemyAttack = calculateStat(randomEnemyDef.baseStats.attack, enemyLevel);
         const newEnemySpecialAttack = calculateStat(
-          randomEnemyDef.specialAttack,
+          randomEnemyDef.baseStats.specialAttack,
           enemyLevel
         );
         const newEnemyDefense = calculateStat(
-          randomEnemyDef.defense,
+          randomEnemyDef.baseStats.defense,
           enemyLevel
         );
         const newEnemySpecialDefense = calculateStat(
-          randomEnemyDef.specialDefense,
+          randomEnemyDef.baseStats.specialDefense,
           enemyLevel
         );
         newEnemies.push({
           id: `enemy_${time}`,
           definitionId: randomEnemyDef.id,
+          level: enemyLevel,
           position: { x: startPath[0].x, y: startPath[0].y },
           hp: newEnemyHp,
           maxHp: newEnemyHp,
-          speed: randomEnemyDef.speed / 100,
+          speed: randomEnemyDef.baseStats.speed / 100,
           currentAttack: newEnemyAttack,
           currentSpecialAttack: newEnemySpecialAttack,
           currentDefense: newEnemyDefense,
@@ -666,12 +660,11 @@ export class TowerDefenseEngine {
           if (target.hp <= 0 && sourceTower) {
             // Record the killing blow tower as a participant too
             target.damagedByTowerIds.add(sourceTower.id);
-            const meta = TD_CREATURE_DEFS[target.definitionId];
             this.events.emit({
               type: 'ENEMY_DIED',
               enemyId: target.id,
               enemyDefinitionId: target.definitionId,
-              enemyLevel: meta ? meta.baseCreature.level : 1,
+              enemyLevel: target.level,
               participantTowerIds: Array.from(target.damagedByTowerIds),
             });
           }
@@ -817,7 +810,8 @@ export class TowerDefenseEngine {
           spawner.group.pathIndex,
           spawner.group.turnAroundAtEnd,
           spawner.group.uncapturable,
-          spawner.group.speedMultiplier
+          spawner.group.speedMultiplier,
+          spawner.group.level
         );
         spawner.spawnsRemaining--;
         spawner.lastSpawnTime = time;
@@ -854,7 +848,8 @@ export class TowerDefenseEngine {
     groupPathIndex: number,
     turnAroundAtEnd?: boolean,
     uncapturable?: boolean,
-    speedMultiplier?: number
+    speedMultiplier?: number,
+    groupLevel?: number
   ) {
     const meta = TD_CREATURE_DEFS[definitionId];
     if (!meta) return;
@@ -862,7 +857,7 @@ export class TowerDefenseEngine {
     const pathIndex = groupPathIndex;
     const startPath = this.paths[pathIndex] || [{ x: 0, y: 0 }];
 
-    const enemyLevel = meta.baseCreature.level;
+    const enemyLevel = groupLevel ?? meta.baseCreature.level;
     const enemyHp =
       calculateMaxHp(meta.baseCreature.maxHp, enemyLevel) *
       this.enemyHpMultiplier;
@@ -880,6 +875,7 @@ export class TowerDefenseEngine {
     newEnemies.push({
       id: `enemy_${time}_${Math.random().toString(36).substring(7)}`,
       definitionId: definitionId,
+      level: enemyLevel,
       position: { x: startPath[0].x, y: startPath[0].y },
       hp: enemyHp,
       maxHp: enemyHp,
@@ -917,8 +913,7 @@ export class TowerDefenseEngine {
       }
     }
 
-    const meta = TD_CREATURE_DEFS[enemy.definitionId];
-    const capturedLevel = meta ? meta.baseCreature.level : 1;
+    const capturedLevel = enemy.level;
 
     const captured: PlayerCreature = {
       id: `captured_${enemy.definitionId}_${Date.now()}_${Math.random().toString(36).substring(7)}`,
@@ -989,23 +984,21 @@ export class TowerDefenseEngine {
       this.towers = this.towers.filter((t) => t.id !== targetTower.id);
     }
 
-    const defMeta = TD_CREATURE_DEFS[creature.speciesId];
-    if (!defMeta) return false;
-
-    const baseDef = defMeta.baseCreature;
+    const template = COSMOID_TEMPLATES[creature.speciesId];
+    if (!template) return false;
 
     // Derive stats
-    const derivedAttack = calculateStat(baseDef.attack, creature.level);
+    const derivedAttack = calculateStat(template.baseStats.attack, creature.level);
     const derivedSpecialAttack = calculateStat(
-      baseDef.specialAttack,
+      template.baseStats.specialAttack,
       creature.level
     );
-    const derivedDefense = calculateStat(baseDef.defense, creature.level);
+    const derivedDefense = calculateStat(template.baseStats.defense, creature.level);
     const derivedSpecialDefense = calculateStat(
-      baseDef.specialDefense,
+      template.baseStats.specialDefense,
       creature.level
     );
-    const derivedMaxHp = calculateMaxHp(baseDef.maxHp, creature.level);
+    const derivedMaxHp = calculateMaxHp(template.baseStats.hp, creature.level);
 
     const attacks =
       creature.equippedAttacks.length > 0

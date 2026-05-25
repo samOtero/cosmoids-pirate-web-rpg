@@ -6,6 +6,7 @@ import {
   DialogContext,
   DialogContextData,
   Creature,
+  CosmoidTemplate,
   PlayerCreature,
   BattleConfig,
   StartBattleEventPayload,
@@ -259,7 +260,7 @@ export const useGameStore = create<GameState>()(
                       updates.currentProfileId ?? state.currentProfileId; // Use ?? because id can be 0 or null
 
                     if (currentProfileId !== null && payload.flag) {
-                      const creatureMap: Record<string, Creature> = {
+                      const creatureMap: Record<string, CosmoidTemplate> = {
                         [GameFlag.STARTER_PALMIT]: STARTER_CRAB,
                         [GameFlag.STARTER_FUEGUANA]: STARTER_IGUANA,
                         [GameFlag.STARTER_MONKEG]: STARTER_MONKEY,
@@ -270,8 +271,8 @@ export const useGameStore = create<GameState>()(
                         const starterPlayerCreature: PlayerCreature = {
                           id: creature.id, // will be replaced with UUID in addCreatureToProfile
                           speciesId: creature.id,
-                          level: creature.level,
-                          xp: creature.xp,
+                          level: 5, // Starter starts at level 5
+                          xp: 0,
                           equippedAttacks: TowerDefenseEngine.getDefaultAttacks(
                             creature.id
                           ),

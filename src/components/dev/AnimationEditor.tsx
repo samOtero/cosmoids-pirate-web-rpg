@@ -92,7 +92,15 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
 
   // Derived
   const activeAnim = selectedAnimId ? animations[selectedAnimId] : null;
-  const activeCreature = Object.values(allCreatures).find(
+  
+  const creatureList = useMemo(() => {
+    return Object.values(allCreatures).filter(
+      (c): c is import('@/types/baseGame').CosmoidTemplate => 
+        typeof c === 'object' && c !== null && 'baseStats' in c
+    );
+  }, []);
+
+  const activeCreature = creatureList.find(
     (c) => c.id === selectedCreatureId
   );
   const activeKeyframe = activeAnim?.keyframes.find(
@@ -475,7 +483,7 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
                   onChange={(e) => setSelectedCreatureId(e.target.value)}
                   className="bg-slate-900 border border-slate-700 text-xs px-2 py-1 rounded w-48"
                 >
-                  {Object.values(allCreatures).map((c) => (
+                  {creatureList.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
                     </option>

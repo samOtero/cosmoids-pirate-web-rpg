@@ -20,7 +20,7 @@ describe('Creature Store Logic', () => {
       speciesId: STARTER_CRAB.id,
       level: 1,
       xp: 0,
-      equippedAttacks: STARTER_CRAB.moves,
+      equippedAttacks: STARTER_CRAB.learnableAttacks.map(a => a.attackId),
     });
 
     // Verify initial state
@@ -49,14 +49,14 @@ describe('Creature Store Logic', () => {
       speciesId: STARTER_CRAB.id,
       level: 1,
       xp: 0,
-      equippedAttacks: STARTER_CRAB.moves,
+      equippedAttacks: STARTER_CRAB.learnableAttacks.map(a => a.attackId),
     });
     store.addCreatureToProfile(profileId, {
       id: STARTER_IGUANA.id,
       speciesId: STARTER_IGUANA.id,
       level: 1,
       xp: 0,
-      equippedAttacks: STARTER_IGUANA.moves,
+      equippedAttacks: STARTER_IGUANA.learnableAttacks.map(a => a.attackId),
     });
 
     let profileBefore = useGameStore.getState().profiles[0]!;
@@ -91,14 +91,14 @@ describe('Creature Store Logic', () => {
       speciesId: STARTER_CRAB.id,
       level: 1,
       xp: 0,
-      equippedAttacks: STARTER_CRAB.moves,
+      equippedAttacks: STARTER_CRAB.learnableAttacks.map(a => a.attackId),
     });
     store.addCreatureToProfile(profileId, {
       id: 'c2',
       speciesId: STARTER_IGUANA.id,
       level: 1,
       xp: 0,
-      equippedAttacks: STARTER_IGUANA.moves,
+      equippedAttacks: STARTER_IGUANA.learnableAttacks.map(a => a.attackId),
     });
     store.addCreatureToProfile(profileId, {
       id: 'c3',
@@ -155,6 +155,7 @@ describe('Creature Store Logic', () => {
     engine.enemies.push({
       id: 'enemy_test',
       definitionId: 'starter_iguana',
+      level: 5,
       position: { x: 0, y: 0 },
       hp: 10,
       maxHp: 10,
@@ -201,6 +202,7 @@ describe('Creature Store Logic', () => {
     engine.enemies.push({
       id: 'enemy_test',
       definitionId: 'starter_iguana',
+      level: 5,
       position: { x: 0, y: 0 },
       hp: 10,
       maxHp: 10,
@@ -238,7 +240,7 @@ describe('Creature Store Logic', () => {
       speciesId: STARTER_CRAB.id,
       level: 1,
       xp: 0,
-      equippedAttacks: STARTER_CRAB.moves,
+      equippedAttacks: STARTER_CRAB.learnableAttacks.map(a => a.attackId),
     }, true);
 
     // Assert

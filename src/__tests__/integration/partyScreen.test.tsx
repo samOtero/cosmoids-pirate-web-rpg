@@ -3,6 +3,7 @@ import { screen } from '@testing-library/react';
 import { render } from '@/__tests__/utils/test-utils';
 import PartyScreen from '@/app/components/PartyScreen';
 import { STARTER_CRAB } from '@/constants/creatures';
+import { createWildCreature } from '@/utils/resolvePlayerCreature';
 
 describe('PartyScreen Empty Party Rules', () => {
   const mockOnBack = vi.fn();
@@ -33,12 +34,7 @@ describe('PartyScreen Empty Party Rules', () => {
   it('should enable start button and hide warning banner when active party has at least one creature', () => {
     // A mock active creature
     const mockCreatures = [
-      {
-        ...STARTER_CRAB,
-        level: 5,
-        xp: 100,
-        currentHp: STARTER_CRAB.maxHp,
-      },
+      createWildCreature(STARTER_CRAB.id, 5),
     ];
 
     render(

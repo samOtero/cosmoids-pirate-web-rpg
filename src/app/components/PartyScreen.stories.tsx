@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { useState } from 'react';
 import PartyScreen from './PartyScreen';
-import { Creature } from '@/types/baseGame';
+import { Creature, CosmoidTemplate } from '@/types/baseGame';
 import {
   STARTER_IGUANA,
   STARTER_CRAB,
@@ -16,15 +16,34 @@ import {
 
 // Helper to create unique instances of creature definitions
 const createMockInstance = (
-  base: Creature,
+  base: CosmoidTemplate,
   instanceNum: number,
   overrideOverrides?: Partial<Creature>
 ): Creature => {
+  const hp = base.baseStats.hp;
   return {
-    ...base,
     id: `${base.id}_instance_${instanceNum}`,
     speciesId: base.id,
-    currentHp: overrideOverrides?.currentHp ?? base.maxHp,
+    name: base.name,
+    type: base.type,
+    maxHp: hp,
+    currentHp: overrideOverrides?.currentHp ?? hp,
+    attack: base.baseStats.attack,
+    defense: base.baseStats.defense,
+    specialAttack: base.baseStats.specialAttack,
+    specialDefense: base.baseStats.specialDefense,
+    speed: base.baseStats.speed,
+    baseExperience: base.baseExperience,
+    level: 1,
+    xp: 0,
+    moves: base.learnableAttacks.map((a) => a.attackId),
+    spriteUrl: base.spriteUrl,
+    battleSpriteUrl: base.battleSpriteUrl,
+    battlePosition: base.battlePosition,
+    battleScale: base.battleScale,
+    movementId: base.movementId,
+    startingEnergy: base.startingEnergy,
+    currentEnergy: base.startingEnergy,
     ...overrideOverrides,
   };
 };
@@ -70,7 +89,7 @@ function PartyScreenStoryWrapper({
   };
 
   return (
-    <div className="w-full h-screen overflow-hidden">
+    <div className="h-screen w-full overflow-hidden">
       <PartyScreen
         creatures={party}
         storageCreatures={storage}
@@ -104,9 +123,21 @@ type Story = StoryObj<typeof PartyScreen>;
 export const InteractiveDefault: Story = {
   render: (args) => {
     const mockParty: Creature[] = [
-      createMockInstance(STARTER_IGUANA, 1, { name: 'Blazy', level: 15, currentHp: 38 }),
-      createMockInstance(STARTER_CRAB, 2, { name: 'Crabby', level: 12, currentHp: 55 }),
-      createMockInstance(STARTER_MONKEY, 3, { name: 'Bubbles', level: 10, currentHp: 15 }),
+      createMockInstance(STARTER_IGUANA, 1, {
+        name: 'Blazy',
+        level: 15,
+        currentHp: 38,
+      }),
+      createMockInstance(STARTER_CRAB, 2, {
+        name: 'Crabby',
+        level: 12,
+        currentHp: 55,
+      }),
+      createMockInstance(STARTER_MONKEY, 3, {
+        name: 'Bubbles',
+        level: 10,
+        currentHp: 15,
+      }),
       createMockInstance(SENTICLE, 4, { level: 8 }),
       createMockInstance(BUG_STAGE_2, 5, { level: 9 }),
       createMockInstance(BIRD_1, 6, { level: 5 }),

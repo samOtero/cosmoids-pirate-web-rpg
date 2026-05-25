@@ -54,8 +54,8 @@ const BATTLE_SPRITES = [
 
 const ALL_CONFIG_KEYS = Object.keys(CREATURE_TD_CONFIGS);
 const ALL_CREATURES_LIST = Object.values(CREATURES).filter(
-  (c: any) => c && typeof c === 'object' && 'id' in c
-) as Creature[];
+  (c: any) => c && typeof c === 'object' && 'id' in c && 'baseStats' in c
+) as import('@/types/baseGame').CosmoidTemplate[];
 
 export default function TDTowerSizeEditor({
   onClose,

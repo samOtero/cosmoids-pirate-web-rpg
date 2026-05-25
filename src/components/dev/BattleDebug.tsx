@@ -8,6 +8,7 @@ import {
 } from '@/constants/creatures';
 import { BattleContext, BackgroundImageKey, Screens } from '@/types/baseGame';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
+import { createWildCreature } from '@/utils/resolvePlayerCreature';
 
 export default function BattleDebug({ onClose }: { onClose: () => void }) {
   const {
@@ -53,8 +54,8 @@ export default function BattleDebug({ onClose }: { onClose: () => void }) {
     const profileId = ensureProfile();
     if (profileId === null) return;
 
-    // For now hardcode Senticle
-    const enemy = SENTICLE;
+    // For now hardcode Senticle resolved at its default lvl 15
+    const enemy = createWildCreature(SENTICLE.id, 15);
 
     setBattleConfig(
       {

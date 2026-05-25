@@ -4,11 +4,11 @@ import {
   BackgroundImageKey,
   DialogContext,
 } from '@/types/baseGame';
-import { SENTICLE, BUG_STAGE_1, BUG_STAGE_2, BUG_STAGE_3 } from './creatures';
+import { createWildCreature } from '@/utils/resolvePlayerCreature';
 
 export const BATTLES: Record<BattleContext, BattleConfig> = {
   [BattleContext.FIRST_BATTLE]: {
-    enemy: SENTICLE,
+    enemy: createWildCreature('senticle', 15),
     backgroundImageKey: BackgroundImageKey.FIRST_TOWN_DOCKS,
     turnEvents: {
       1: {
@@ -69,7 +69,7 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
     ],
   },
   [BattleContext.FOREST_BUG_BATTLE]: {
-    enemy: BUG_STAGE_1,
+    enemy: createWildCreature('bug_stage_1', 3),
     backgroundImageKey: BackgroundImageKey.FOREST,
     turnEvents: {},
     drops: [
@@ -111,7 +111,7 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
     ],
   },
   [BattleContext.FOREST_BUG_STAGE_2_BATTLE]: {
-    enemy: BUG_STAGE_2,
+    enemy: createWildCreature('bug_stage_2', 8),
     backgroundImageKey: BackgroundImageKey.FOREST,
     turnEvents: {},
     winEvents: [
@@ -139,7 +139,7 @@ export const BATTLES: Record<BattleContext, BattleConfig> = {
     ],
   },
   [BattleContext.FOREST_MOTH_BATTLE]: {
-    enemy: BUG_STAGE_3,
+    enemy: createWildCreature('bug_stage_3', 8),
     backgroundImageKey: BackgroundImageKey.FOREST_2,
     turnEvents: {},
     winEvents: [

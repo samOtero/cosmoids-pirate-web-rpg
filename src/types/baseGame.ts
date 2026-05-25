@@ -151,9 +151,44 @@ export interface Item {
   count: number;
 }
 
+export interface BaseStats {
+  hp: number;
+  attack: number;
+  defense: number;
+  specialAttack: number;
+  specialDefense: number;
+  speed: number;
+}
+
+export interface LearnableAttack {
+  level: number;
+  attackId: string;
+}
+
+export interface EvolutionNode {
+  level: number;
+  evolutionDefId: string;
+}
+
+export interface CosmoidTemplate {
+  id: string; // Species ID (e.g. 'starter_crab')
+  name: string;
+  type: ElementType;
+  baseStats: BaseStats;
+  baseExperience: number;
+  startingEnergy: number;
+  spriteUrl: string;
+  battleSpriteUrl?: string;
+  battlePosition?: { bottom: number; left: number };
+  battleScale?: number;
+  movementId?: string;
+  learnableAttacks: LearnableAttack[];
+  evolutionNodes?: EvolutionNode[];
+}
+
 export interface Creature {
   id: string; // Unique instance ID
-  speciesId: string; // Base definition ID (e.g., 'starter_crab')
+  speciesId: string; // References CosmoidTemplate.id
   name: string;
   type: ElementType;
   maxHp: number;
@@ -162,19 +197,20 @@ export interface Creature {
   defense: number;
   specialAttack: number;
   specialDefense: number;
-  baseExperience: number; // Used to calculate experience yield when defeated
+  baseExperience: number; // Copy from species template
   speed: number;
   level: number;
   xp: number;
   moves: string[];
-  spriteUrl: string; // Placeholder URL
+  spriteUrl: string;
   battleSpriteUrl?: string;
-  battlePosition?: { bottom: number; left: number }; // percentage 0-100
-  battleScale?: number; // multiplier, 1 = default
+  battlePosition?: { bottom: number; left: number };
+  battleScale?: number;
   movementId?: string;
   startingEnergy: number;
   currentEnergy: number;
 }
+
 
 /** Slim save format for a creature the player owns. Base stats are derived at runtime from species definitions. */
 export interface PlayerCreature {

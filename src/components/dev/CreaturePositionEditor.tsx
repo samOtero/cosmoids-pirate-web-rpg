@@ -12,19 +12,20 @@ import {
   MOUSE_1,
 } from '@/constants/creatures';
 import { BATTLE_BACKGROUND_IMAGES } from '@/constants/game';
-import { BackgroundImageKey, Creature } from '@/types/baseGame';
+import { BackgroundImageKey, Creature, CosmoidTemplate } from '@/types/baseGame';
 import { BattleScreenUI } from '@/app/components/battleScreen';
+import { createWildCreature } from '@/utils/resolvePlayerCreature';
 
-// Map variable names to creatures for both display and saving
-const ALL_CREATURES: { varName: string; creature: Creature }[] = [
-  { varName: 'SENTICLE', creature: SENTICLE },
-  { varName: 'BUG_STAGE_1', creature: BUG_STAGE_1 },
-  { varName: 'BUG_STAGE_2', creature: BUG_STAGE_2 },
-  { varName: 'BUG_STAGE_3', creature: BUG_STAGE_3 },
-  { varName: 'STARTER_CRAB', creature: STARTER_CRAB },
-  { varName: 'STARTER_IGUANA', creature: STARTER_IGUANA },
-  { varName: 'STARTER_MONKEY', creature: STARTER_MONKEY },
-  { varName: 'MOUSE_1', creature: MOUSE_1 },
+// Map variable names to templates for both display and saving
+const ALL_CREATURES: { varName: string; template: CosmoidTemplate }[] = [
+  { varName: 'SENTICLE', template: SENTICLE },
+  { varName: 'BUG_STAGE_1', template: BUG_STAGE_1 },
+  { varName: 'BUG_STAGE_2', template: BUG_STAGE_2 },
+  { varName: 'BUG_STAGE_3', template: BUG_STAGE_3 },
+  { varName: 'STARTER_CRAB', template: STARTER_CRAB },
+  { varName: 'STARTER_IGUANA', template: STARTER_IGUANA },
+  { varName: 'STARTER_MONKEY', template: STARTER_MONKEY },
+  { varName: 'MOUSE_1', template: MOUSE_1 },
 ];
 
 type Side = 'left' | 'right';
@@ -42,16 +43,16 @@ export default function CreaturePositionEditor({
   );
 
   const selectedEntry = ALL_CREATURES[selectedIndex];
-  const creature = selectedEntry.creature;
+  const template = selectedEntry.template;
 
-  // Position state – initialized from creature data or defaults
+  // Position state – initialized from template data or defaults
   const [bottom, setBottom] = useState(
-    creature.battlePosition?.bottom ?? (side === 'left' ? 2 : 5)
+    template.battlePosition?.bottom ?? (side === 'left' ? 2 : 5)
   );
   const [left, setLeft] = useState(
-    creature.battlePosition?.left ?? (side === 'left' ? 20 : 20)
+    template.battlePosition?.left ?? (side === 'left' ? 20 : 20)
   );
-  const [scale, setScale] = useState(creature.battleScale ?? 1);
+  const [scale, setScale] = useState(template.battleScale ?? 1);
 
   const [saving, setSaving] = useState(false);
   const [statusMsg, setStatusMsg] = useState('');
@@ -59,17 +60,17 @@ export default function CreaturePositionEditor({
   // When creature selection changes, load its saved values
   const handleCreatureChange = (index: number) => {
     setSelectedIndex(index);
-    const c = ALL_CREATURES[index].creature;
-    setBottom(c.battlePosition?.bottom ?? (side === 'left' ? 2 : 5));
-    setLeft(c.battlePosition?.left ?? (side === 'left' ? 20 : 20));
-    setScale(c.battleScale ?? 1);
+    const t = ALL_CREATURES[index].template;
+    setBottom(t.battlePosition?.bottom ?? (side === 'left' ? 2 : 5));
+    setLeft(t.battlePosition?.left ?? (side === 'left' ? 20 : 20));
+    setScale(t.battleScale ?? 1);
   };
 
   const handleSideChange = (newSide: Side) => {
     setSide(newSide);
     // Reset to defaults for the new side if no saved position
-    const c = ALL_CREATURES[selectedIndex].creature;
-    if (!c.battlePosition) {
+    const t = ALL_CREATURES[selectedIndex].template;
+    if (!t.battlePosition) {
       setBottom(newSide === 'left' ? 2 : 5);
       setLeft(newSide === 'left' ? 20 : 20);
     }
@@ -105,15 +106,17 @@ export default function CreaturePositionEditor({
     BATTLE_BACKGROUND_IMAGES[bgKey] ||
     BATTLE_BACKGROUND_IMAGES[BackgroundImageKey.DEFAULT];
 
+  const resolvedPreviewBase = createWildCreature(template.id, 5);
   // Build a creature with the editor's live position/scale values
   const previewCreature: Creature = {
-    ...creature,
+    ...resolvedPreviewBase,
     battlePosition: { bottom, left },
     battleScale: scale,
   };
 
   // The opposite creature uses its own saved position/scale (read-only)
-  const oppositeCreature = ALL_CREATURES[oppositeIndex].creature;
+  const oppositeTemplate = ALL_CREATURES[oppositeIndex].template;
+  const oppositeCreature = createWildCreature(oppositeTemplate.id, 5);
 
   // Build player + enemy creatures for the BattleScreenUI
   const playerCreature = side === 'left' ? previewCreature : oppositeCreature;
@@ -178,7 +181,7 @@ export default function CreaturePositionEditor({
             >
               {ALL_CREATURES.map((entry, i) => (
                 <option key={entry.varName} value={i}>
-                  {entry.creature.name} ({entry.varName})
+                  {entry.template.name} ({entry.varName})
                 </option>
               ))}
             </select>
@@ -196,7 +199,7 @@ export default function CreaturePositionEditor({
             >
               {ALL_CREATURES.map((entry, i) => (
                 <option key={entry.varName} value={i}>
-                  {entry.creature.name} ({entry.varName})
+                  {entry.template.name} ({entry.varName})
                 </option>
               ))}
             </select>
@@ -337,7 +340,7 @@ export default function CreaturePositionEditor({
           {/* Info Overlay */}
           <div className="absolute top-3 left-3 z-30 bg-black/60 backdrop-blur-sm rounded px-2 py-1">
             <p className="text-[10px] text-slate-400">
-              {creature.name} • {side === 'left' ? 'Player' : 'Enemy'} side •
+              {previewCreature.name} • {side === 'left' ? 'Player' : 'Enemy'} side •
               Uses real BattleScreenUI
             </p>
           </div>

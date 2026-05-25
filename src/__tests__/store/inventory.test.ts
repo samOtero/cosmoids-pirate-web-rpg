@@ -24,7 +24,7 @@ describe('Inventory Logic', () => {
       speciesId: STARTER_CRAB.id,
       level: 1,
       xp: 0,
-      equippedAttacks: STARTER_CRAB.moves,
+      equippedAttacks: STARTER_CRAB.learnableAttacks.map(a => a.attackId),
     });
 
     // Setup: Add Potion (Berry)

@@ -27,6 +27,7 @@ export interface TDWaveGroup {
   spawnIntervalMs: number; // Time between each spawn in this group
   delayBeforeGroupMs: number; // Delay before this group starts (after wave start or previous group ends)
   pathIndex: number; // Which path enemies in this group should take
+  level?: number; // Custom level for enemies in this group
   turnAroundAtEnd?: boolean; // Whether the enemy should return to the start instead of despawning
   concurrentWithPrevious?: boolean; // Whether this group should start its initial delay timer at the same time as the group before it
   uncapturable?: boolean;
@@ -124,6 +125,7 @@ export interface StatusCondition {
 
 export interface Enemy extends BaseTDUnit {
   definitionId: string;
+  level: number; // The level of this specific enemy instance
   speed: number;
   currentAttack: number;
   currentSpecialAttack: number;

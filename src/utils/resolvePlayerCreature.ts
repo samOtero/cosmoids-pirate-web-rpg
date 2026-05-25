@@ -1,24 +1,5 @@
-import { Creature, PlayerCreature } from '@/types/baseGame';
-import {
-  STARTER_CRAB,
-  STARTER_IGUANA,
-  STARTER_MONKEY,
-  BUG_STAGE_1,
-  BUG_STAGE_2,
-  BUG_STAGE_3,
-  SENTICLE,
-} from '@/constants/creatures';
-
-/** All known species definitions, keyed by species ID. */
-const SPECIES_DEFS: Record<string, Creature> = {
-  [STARTER_CRAB.id]: STARTER_CRAB,
-  [STARTER_IGUANA.id]: STARTER_IGUANA,
-  [STARTER_MONKEY.id]: STARTER_MONKEY,
-  [BUG_STAGE_1.id]: BUG_STAGE_1,
-  [BUG_STAGE_2.id]: BUG_STAGE_2,
-  [BUG_STAGE_3.id]: BUG_STAGE_3,
-  [SENTICLE.id]: SENTICLE,
-};
+import { Creature, PlayerCreature, CosmoidTemplate } from '@/types/baseGame';
+import { COSMOID_TEMPLATES } from '@/constants/creatures';
 
 /**
  * Calculates max HP using the standard formula without IVs/EVs.
@@ -37,35 +18,83 @@ export function calculateStat(baseStat: number, level: number): number {
 }
 
 /**
- * Resolves a slim PlayerCreature into a full Creature by merging base species
- * stats with the instance's runtime fields (level, xp, moves from equippedAttacks).
- * Used when the battle system or UI components need the full Creature shape.
+ * Resolves default moves for a species at a given level.
  */
-export function resolvePlayerCreature(pc: PlayerCreature): Creature {
-  const baseDef = SPECIES_DEFS[pc.speciesId] ?? STARTER_CRAB;
-  
-  const maxHp = calculateMaxHp(baseDef.maxHp, pc.level);
-  const attack = calculateStat(baseDef.attack, pc.level);
-  const defense = calculateStat(baseDef.defense, pc.level);
-  const specialAttack = calculateStat(baseDef.specialAttack, pc.level);
-  const specialDefense = calculateStat(baseDef.specialDefense, pc.level);
-  const speed = calculateStat(baseDef.speed, pc.level);
+export function getDefaultAttacksForLevel(template: CosmoidTemplate, level: number): string[] {
+  // Collect all learnable attacks up to the specified level
+  const attacks = template.learnableAttacks
+    .filter((a) => a.level <= level)
+    .map((a) => a.attackId);
+
+  // Return the last 4 unlocked, or tackle as standard fallback
+  if (attacks.length === 0) return ['TACKLE'];
+  return attacks.slice(-4);
+}
+
+/**
+ * Generates a fully-resolved runtime Creature instance for wild/enemy creatures.
+ */
+export function createWildCreature(speciesId: string, level: number): Creature {
+  const template = COSMOID_TEMPLATES[speciesId] || COSMOID_TEMPLATES['starter_crab'];
+  const maxHp = calculateMaxHp(template.baseStats.hp, level);
 
   return {
-    ...baseDef,
+    id: `wild_${speciesId}_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+    speciesId,
+    name: template.name,
+    type: template.type,
+    maxHp,
+    currentHp: maxHp,
+    attack: calculateStat(template.baseStats.attack, level),
+    defense: calculateStat(template.baseStats.defense, level),
+    specialAttack: calculateStat(template.baseStats.specialAttack, level),
+    specialDefense: calculateStat(template.baseStats.specialDefense, level),
+    speed: calculateStat(template.baseStats.speed, level),
+    baseExperience: template.baseExperience,
+    level,
+    xp: 0,
+    moves: getDefaultAttacksForLevel(template, level),
+    spriteUrl: template.spriteUrl,
+    battleSpriteUrl: template.battleSpriteUrl,
+    battlePosition: template.battlePosition,
+    battleScale: template.battleScale,
+    movementId: template.movementId,
+    startingEnergy: template.startingEnergy,
+    currentEnergy: template.startingEnergy,
+  };
+}
+
+/**
+ * Resolves a slim PlayerCreature into a full Creature by merging base species
+ * stats with the instance's runtime fields (level, xp, moves from equippedAttacks).
+ */
+export function resolvePlayerCreature(pc: PlayerCreature): Creature {
+  const template = COSMOID_TEMPLATES[pc.speciesId] || COSMOID_TEMPLATES['starter_crab'];
+  const maxHp = calculateMaxHp(template.baseStats.hp, pc.level);
+
+  return {
     id: pc.id,
     speciesId: pc.speciesId,
+    name: template.name,
+    type: template.type,
+    maxHp,
+    currentHp: maxHp,
+    attack: calculateStat(template.baseStats.attack, pc.level),
+    defense: calculateStat(template.baseStats.defense, pc.level),
+    specialAttack: calculateStat(template.baseStats.specialAttack, pc.level),
+    specialDefense: calculateStat(template.baseStats.specialDefense, pc.level),
+    speed: calculateStat(template.baseStats.speed, pc.level),
+    baseExperience: template.baseExperience,
     level: pc.level,
     xp: pc.xp,
-    moves: pc.equippedAttacks.length > 0 ? pc.equippedAttacks : baseDef.moves,
-    maxHp,
-    attack,
-    defense,
-    specialAttack,
-    specialDefense,
-    speed,
-    currentHp: maxHp, // PlayerCreature doesn't track HP — default to full
-    currentEnergy: baseDef.startingEnergy,
+    moves: pc.equippedAttacks.length > 0 ? pc.equippedAttacks : getDefaultAttacksForLevel(template, pc.level),
+    spriteUrl: template.spriteUrl,
+    battleSpriteUrl: template.battleSpriteUrl,
+    battlePosition: template.battlePosition,
+    battleScale: template.battleScale,
+    movementId: template.movementId,
+    startingEnergy: template.startingEnergy,
+    currentEnergy: template.startingEnergy,
   };
 }
 
