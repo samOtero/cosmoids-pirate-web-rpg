@@ -38,6 +38,7 @@ const createMockInstance = (
     xp: 0,
     moves: base.learnableAttacks.map((a) => a.attackId),
     spriteUrl: base.spriteUrl,
+    iconImg: base.iconImg,
     battleSpriteUrl: base.battleSpriteUrl,
     battlePosition: base.battlePosition,
     battleScale: base.battleScale,

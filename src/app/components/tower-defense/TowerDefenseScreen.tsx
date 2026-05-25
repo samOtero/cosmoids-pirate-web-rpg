@@ -24,7 +24,7 @@ function resolveSpeciesVisuals(speciesId: string): {
   const baseDef = TD_CREATURE_DEFS[speciesId]?.baseCreature;
   return {
     name: baseDef?.name ?? speciesId,
-    spriteUrl: baseDef?.spriteUrl ?? '',
+    spriteUrl: baseDef?.iconImg || baseDef?.spriteUrl || '',
   };
 }
 

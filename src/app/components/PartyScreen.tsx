@@ -178,7 +178,12 @@ export default function PartyScreen({
           key={`storage-slot-${i}`}
           data-slot-index={absoluteIndex}
           onPointerDown={(e) =>
-            creature && handlePointerDown(e, absoluteIndex, creature.spriteUrl)
+            creature &&
+            handlePointerDown(
+              e,
+              absoluteIndex,
+              creature.iconImg || creature.spriteUrl
+            )
           }
           className={`relative flex h-13 w-13 shrink-0 cursor-grab touch-none flex-col items-center justify-center rounded border-2 transition-all duration-200 active:cursor-grabbing lg:h-16 lg:w-16 ${
             draggedIndex === absoluteIndex ? 'opacity-50' : 'opacity-100'
@@ -191,7 +196,7 @@ export default function PartyScreen({
           {creature ? (
             <>
               <img
-                src={creature.spriteUrl}
+                src={creature.iconImg || creature.spriteUrl}
                 alt={creature.name}
                 className="pointer-events-none h-8 w-8 lg:h-12 lg:w-12"
               />
@@ -256,7 +261,12 @@ export default function PartyScreen({
                   key={`team-slot-${i}`}
                   data-slot-index={i}
                   onPointerDown={(e) =>
-                    creature && handlePointerDown(e, i, creature.spriteUrl)
+                    creature &&
+                    handlePointerDown(
+                      e,
+                      i,
+                      creature.iconImg || creature.spriteUrl
+                    )
                   }
                   className={`relative flex h-16 w-16 shrink-0 touch-none flex-col items-center justify-center rounded border-2 transition-all duration-200 lg:h-24 lg:w-24 ${
                     creature
@@ -267,7 +277,7 @@ export default function PartyScreen({
                   {creature ? (
                     <>
                       <img
-                        src={creature.spriteUrl}
+                        src={creature.iconImg || creature.spriteUrl}
                         alt={creature.name}
                         className="pointer-events-none h-10 w-10 lg:h-16 lg:w-16"
                       />

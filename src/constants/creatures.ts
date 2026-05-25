@@ -59,6 +59,7 @@ export const BIRD_1: CosmoidTemplate = {
     speed: 30,
   },
   baseExperience: 50,
+  iconImg: '/UI/Icons/bird_1_icon.png',
   startingEnergy: 50,
   spriteUrl: '/battles/cosmoids/bird_1_down_1_25.png',
   battleSpriteUrl: '/battles/cosmoids/bird_1_down_1_25.png',
@@ -184,6 +185,7 @@ export const STARTER_IGUANA: CosmoidTemplate = {
   baseExperience: 62,
   startingEnergy: 100,
   spriteUrl: '/battles/cosmoids/fueguana_left_1_v3.png',
+  iconImg: '/UI/Icons/fueguana_icon.png',
   battleSpriteUrl: '/battles/cosmoids/fueguana_left_1_v3.png',
   movementId: 'lizard',
   learnableAttacks: [

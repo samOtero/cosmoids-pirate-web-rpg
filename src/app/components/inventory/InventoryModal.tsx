@@ -59,8 +59,8 @@ export default function InventoryModal({
   if (showCreatureSelect && selectedItem) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-        <Panel className="w-full max-w-lg bg-wood-dark p-6">
-          <div className="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
+        <Panel className="bg-wood-dark w-full max-w-lg p-6">
+          <div className="mb-4 flex items-center justify-between border-b border-white/10 pb-2">
             <h2 className="text-xl font-bold text-sand">
               Use {selectedItem.name} on who?
             </h2>
@@ -77,12 +77,12 @@ export default function InventoryModal({
               <div
                 key={creature.id}
                 onClick={() => handleCreatureSelect(creature.id)}
-                className="flex items-center p-3 bg-white/5 rounded cursor-pointer hover:bg-white/10 border border-transparent hover:border-cyan-400 transition-all"
+                className="flex cursor-pointer items-center rounded border border-transparent bg-white/5 p-3 transition-all hover:border-cyan-400 hover:bg-white/10"
               >
                 <img
-                  src={creature.spriteUrl}
+                  src={creature.iconImg || creature.spriteUrl}
                   alt={creature.name}
-                  className="w-12 h-12 mr-4"
+                  className="mr-4 h-12 w-12"
                 />
                 <div className="flex-1">
                   <div className="font-bold text-cyan-300">{creature.name}</div>
@@ -91,11 +91,11 @@ export default function InventoryModal({
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-sand font-bold">
+                  <div className="text-sm font-bold text-sand">
                     HP {creature.currentHp}/{creature.maxHp}
                   </div>
                   {/* Simple HP Bar */}
-                  <div className="w-24 h-2 bg-gray-700 rounded-full mt-1 overflow-hidden">
+                  <div className="mt-1 h-2 w-24 overflow-hidden rounded-full bg-gray-700">
                     <div
                       className={`h-full ${creature.currentHp < creature.maxHp * 0.3 ? 'bg-red-500' : 'bg-green-500'}`}
                       style={{
@@ -114,10 +114,10 @@ export default function InventoryModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <Panel className="w-full max-w-4xl h-[600px] flex flex-col bg-wood-dark">
+      <Panel className="bg-wood-dark flex h-[600px] w-full max-w-4xl flex-col">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6 border-b-2 border-wood-light/30 pb-4">
-          <h2 className="text-3xl font-bold text-sand uppercase tracking-widest">
+        <div className="mb-6 flex items-center justify-between border-b-2 border-wood-light/30 pb-4">
+          <h2 className="text-3xl font-bold tracking-widest text-sand uppercase">
             Inventory
           </h2>
           <Button variant="wood" onClick={onClose}>
@@ -126,7 +126,7 @@ export default function InventoryModal({
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-4 mb-6">
+        <div className="mb-6 flex gap-4">
           {(['ALL', 'HEAL', 'CATCH'] as Category[]).map((cat) => (
             <button
               key={cat}
@@ -134,12 +134,11 @@ export default function InventoryModal({
                 setCategory(cat);
                 setPage(0);
               }}
-              className={`px-6 py-2 rounded font-bold uppercase tracking-wider transition-all
-                ${category === cat
-                  ? 'bg-cyan-600 text-white shadow-lg scale-105'
+              className={`rounded px-6 py-2 font-bold tracking-wider uppercase transition-all ${
+                category === cat
+                  ? 'scale-105 bg-cyan-600 text-white shadow-lg'
                   : 'bg-black/20 text-sand/60 hover:bg-black/40'
-                }
-              `}
+              } `}
             >
               {cat}
             </button>
@@ -147,40 +146,40 @@ export default function InventoryModal({
         </div>
 
         {/* Grid */}
-        <div className="flex-1 overflow-y-auto min-h-0">
+        <div className="min-h-0 flex-1 overflow-y-auto">
           {currentItems.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-sand/30 italic text-xl">
+            <div className="flex h-full items-center justify-center text-xl text-sand/30 italic">
               No items found.
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
               {currentItems.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-black/20 p-4 rounded border border-white/5 flex flex-col items-center text-center hover:bg-black/30 transition-colors group relative"
+                  className="group relative flex flex-col items-center rounded border border-white/5 bg-black/20 p-4 text-center transition-colors hover:bg-black/30"
                 >
-                  <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-3 text-3xl shadow-inner">
+                  <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-white/5 text-3xl shadow-inner">
                     {item.effect === 'HEAL'
                       ? '💊'
                       : item.effect === 'CATCH'
                         ? '🕸️'
                         : '📦'}
                   </div>
-                  <div className="font-bold text-cyan-200 mb-1">
+                  <div className="mb-1 font-bold text-cyan-200">
                     {item.name}
                   </div>
-                  <div className="text-xs text-sand/60 mb-3 h-8 overflow-hidden">
+                  <div className="mb-3 h-8 overflow-hidden text-xs text-sand/60">
                     {item.description}
                   </div>
 
-                  <div className="mt-auto w-full flex items-center justify-between">
-                    <span className="font-mono text-sand font-bold">
+                  <div className="mt-auto flex w-full items-center justify-between">
+                    <span className="font-mono font-bold text-sand">
                       x{item.count}
                     </span>
                     {(item.effect === 'HEAL' || item.effect === 'CATCH') && (
                       <button
                         onClick={() => handleUseClick(item)}
-                        className="px-3 py-1 bg-green-600 text-white text-xs font-bold rounded hover:bg-green-500 transition-colors uppercase"
+                        className="rounded bg-green-600 px-3 py-1 text-xs font-bold text-white uppercase transition-colors hover:bg-green-500"
                       >
                         Use
                       </button>
@@ -194,7 +193,7 @@ export default function InventoryModal({
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex justify-center items-center gap-4 mt-6 pt-4 border-t border-white/10">
+          <div className="mt-6 flex items-center justify-center gap-4 border-t border-white/10 pt-4">
             <Button
               variant="secondary"
               onClick={() => setPage((p) => Math.max(0, p - 1))}
@@ -203,7 +202,7 @@ export default function InventoryModal({
             >
               Prev
             </Button>
-            <span className="text-sand font-mono">
+            <span className="font-mono text-sand">
               Page {page + 1} of {totalPages}
             </span>
             <Button

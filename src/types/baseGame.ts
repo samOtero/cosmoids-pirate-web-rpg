@@ -178,6 +178,7 @@ export interface CosmoidTemplate {
   baseExperience: number;
   startingEnergy: number;
   spriteUrl: string;
+  iconImg?: string;
   battleSpriteUrl?: string;
   battlePosition?: { bottom: number; left: number };
   battleScale?: number;
@@ -203,6 +204,7 @@ export interface Creature {
   xp: number;
   moves: string[];
   spriteUrl: string;
+  iconImg?: string;
   battleSpriteUrl?: string;
   battlePosition?: { bottom: number; left: number };
   battleScale?: number;
