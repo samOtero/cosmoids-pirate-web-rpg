@@ -36,6 +36,7 @@ export const MOUSE_1: CosmoidTemplate = {
     speed: 30,
   },
   baseExperience: 51,
+  iconImg: '/UI/Icons/mouse_1_icon.png',
   startingEnergy: 50,
   spriteUrl: '/battles/cosmoids/mouse_1_down_1_25.png',
   battleSpriteUrl: '/battles/cosmoids/mouse_1_down_1_25.png',

@@ -77,7 +77,7 @@ export default function MapScreen({
                 <div key={pc.id} className="relative group cursor-help">
                   <img
                     src={c.iconImg || c.spriteUrl}
-                    className="w-12 h-12 border-2 border-wood rounded bg-black/40 hover:border-cyan-400 transition-colors"
+                    className="w-12 h-12 border-2 border-wood rounded bg-black/40 object-contain hover:border-cyan-400 transition-colors"
                   />
                   <div
                     className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border border-black"

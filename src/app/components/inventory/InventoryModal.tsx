@@ -82,7 +82,7 @@ export default function InventoryModal({
                 <img
                   src={creature.iconImg || creature.spriteUrl}
                   alt={creature.name}
-                  className="mr-4 h-12 w-12"
+                  className="mr-4 h-12 w-12 object-contain"
                 />
                 <div className="flex-1">
                   <div className="font-bold text-cyan-300">{creature.name}</div>

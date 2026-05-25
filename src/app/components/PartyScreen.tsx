@@ -198,7 +198,7 @@ export default function PartyScreen({
               <img
                 src={creature.iconImg || creature.spriteUrl}
                 alt={creature.name}
-                className="pointer-events-none h-8 w-8 lg:h-12 lg:w-12"
+                className="pointer-events-none h-8 w-8 object-contain lg:h-12 lg:w-12"
               />
               <div className="absolute top-0 right-0 rounded-bl bg-black/60 px-1 text-[8px] font-bold text-sand lg:text-[10px]">
                 Lv{creature.level}
@@ -279,7 +279,7 @@ export default function PartyScreen({
                       <img
                         src={creature.iconImg || creature.spriteUrl}
                         alt={creature.name}
-                        className="pointer-events-none h-10 w-10 lg:h-16 lg:w-16"
+                        className="pointer-events-none h-10 w-10 object-contain lg:h-16 lg:w-16"
                       />
                       <div className="absolute top-0.5 right-0.5 rounded bg-black/80 px-1 text-[9px] font-bold text-sand lg:text-xs">
                         Lv{creature.level}
@@ -360,7 +360,7 @@ export default function PartyScreen({
           <img
             src={globalDrag.spriteUrl}
             alt="Dragging Creature"
-            className="h-10 w-10 lg:h-16 lg:w-16"
+            className="h-10 w-10 object-contain lg:h-16 lg:w-16"
           />
         </div>
       )}

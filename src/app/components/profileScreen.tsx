@@ -45,7 +45,7 @@ export default function ProfileScreen({
                           );
                           return buddy.iconImg || buddy.spriteUrl;
                         })()}
-                        className="h-8 w-8 lg:h-12 lg:w-12"
+                        className="h-8 w-8 object-contain lg:h-12 lg:w-12"
                         alt="buddy"
                       />
                     ) : (
