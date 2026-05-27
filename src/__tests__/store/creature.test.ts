@@ -249,4 +249,11 @@ describe('Creature Store Logic', () => {
     expect(profile.storageCreatures).toHaveLength(1);
     expect(profile.storageCreatures[0].speciesId).toBe(STARTER_CRAB.id);
   });
+
+  it('should only have a single attack at level 1 for starters and mouse', () => {
+    expect(TowerDefenseEngine.getDefaultAttacks('starter_crab')).toEqual(['PINCH']);
+    expect(TowerDefenseEngine.getDefaultAttacks('starter_iguana')).toEqual(['SCRATCH']);
+    expect(TowerDefenseEngine.getDefaultAttacks('starter_monkey')).toEqual(['TACKLE']);
+    expect(TowerDefenseEngine.getDefaultAttacks('mouse_1')).toEqual(['NIBBLE']);
+  });
 });

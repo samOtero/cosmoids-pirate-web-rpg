@@ -42,8 +42,8 @@ export const MOUSE_1: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/mouse_1_down_1_25.png',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'TACKLE' },
-    { level: 1, attackId: 'STRING_SHOT' },
+    { level: 1, attackId: 'NIBBLE' },
+    { level: 3, attackId: 'STRING_SHOT' },
   ],
 };
 
@@ -161,8 +161,8 @@ export const STARTER_CRAB: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/palmit_down_1.png',
   battleSpriteUrl: '/battles/cosmoids/palmit_down_1.png',
   learnableAttacks: [
-    { level: 1, attackId: 'TACKLE' },
-    { level: 1, attackId: 'VINE_WHIP' },
+    { level: 1, attackId: 'PINCH' },
+    { level: 2, attackId: 'VINE_WHIP' },
     { level: 2, attackId: 'EMBER' }, // push back attack unlocks for testing in level 1
     { level: 3, attackId: 'BUBBLE_BEAM' },
     { level: 4, attackId: 'STRING_SHOT' },
@@ -191,8 +191,8 @@ export const STARTER_IGUANA: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/fueguana_left_1_v3.png',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'EMBER' },
     { level: 1, attackId: 'SCRATCH' },
+    { level: 3, attackId: 'EMBER' },
   ],
 };
 
@@ -214,8 +214,9 @@ export const STARTER_MONKEY: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/monkeg_down_1_v2.png',
   battleSpriteUrl: '/battles/cosmoids/monkeg_down_1_v2.png',
   learnableAttacks: [
-    { level: 1, attackId: 'BUBBLE_BEAM' },
-    { level: 1, attackId: 'SCRATCH' },
+    { level: 1, attackId: 'TACKLE' },
+    { level: 3, attackId: 'BUBBLE_BEAM' },
+    { level: 5, attackId: 'SCRATCH' },
   ],
 };
 
