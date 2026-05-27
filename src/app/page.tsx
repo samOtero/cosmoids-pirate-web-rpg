@@ -60,6 +60,7 @@ export default function Home() {
     handleBattleLose,
     useItem,
     updateCreatures,
+    updateCreatureAttacks,
     reorderCreatures,
     currentTdLevel,
     clearQueue,
@@ -205,6 +206,13 @@ export default function Home() {
           }}
           onReorder={reorderCreatures}
           onContinue={hasPendingEvents ? () => processNextEvent() : undefined}
+          onUpdateAttacks={updateCreatureAttacks}
+          getCreatureActiveAttackIndex={(creatureId) => {
+            const pc =
+              currentProfile.creatures.find((c) => c.id === creatureId) ||
+              currentProfile.storageCreatures.find((c) => c.id === creatureId);
+            return pc?.activeAttackIndex ?? 0;
+          }}
         />
       </Suspense>
     );
