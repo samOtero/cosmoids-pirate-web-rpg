@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from 'react';
 import Panel from '@/app/components/ui/Panel';
 import { Button } from '@/app/components/ui/Button';
 import { BACKGROUND_IMAGES } from '@/constants/game';
+import CreatureDetailsScreen from '@/app/components/CreatureDetailsScreen';
+import { useGameStore } from '@/store/gameStore';
 
 interface PartyScreenProps {
   creatures: Creature[];
@@ -22,6 +24,12 @@ export default function PartyScreen({
   const [currentPage, setCurrentPage] = useState(0);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [selectedCreatureIndex, setSelectedCreatureIndex] = useState<number | null>(null);
+
+  const profiles = useGameStore((state) => state.profiles);
+  const currentProfileId = useGameStore((state) => state.currentProfileId);
+  const currentProfile = currentProfileId !== null ? profiles[currentProfileId] : null;
+  const updateCreatureAttacks = useGameStore((state) => state.updateCreatureAttacks);
 
   useEffect(() => {
     const checkDesktop = () => {
@@ -107,12 +115,21 @@ export default function PartyScreen({
 
   const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
     if (pendingDragRef.current) {
+      const clickedIdx = pendingDragRef.current.index;
       pendingDragRef.current = null;
       if (
         e.target instanceof Element &&
         e.target.hasPointerCapture(e.pointerId)
       ) {
         e.target.releasePointerCapture(e.pointerId);
+      }
+      
+      const resolvedCreature = clickedIdx < 6 
+        ? activeTeam[clickedIdx] 
+        : storageCreatures[clickedIdx - 6];
+      
+      if (resolvedCreature) {
+        setSelectedCreatureIndex(clickedIdx);
       }
       return;
     }
@@ -364,6 +381,30 @@ export default function PartyScreen({
           />
         </div>
       )}
+
+      {/* Creature Details Screen Overlay */}
+      {(() => {
+        const selectedCreature = selectedCreatureIndex !== null
+          ? (selectedCreatureIndex < 6 ? activeTeam[selectedCreatureIndex] : storageCreatures[selectedCreatureIndex - 6])
+          : null;
+
+        if (!selectedCreature) return null;
+
+        const pc = currentProfile?.creatures.find(c => c.id === selectedCreature.id) 
+          || currentProfile?.storageCreatures.find(c => c.id === selectedCreature.id);
+        const activeAttackIndex = pc?.activeAttackIndex ?? 0;
+
+        return (
+          <CreatureDetailsScreen
+            creature={selectedCreature}
+            activeAttackIndex={activeAttackIndex}
+            onBack={() => setSelectedCreatureIndex(null)}
+            onUpdateAttacks={(equipped, activeIdx) => {
+              updateCreatureAttacks(selectedCreature.id, equipped, activeIdx);
+            }}
+          />
+        );
+      })()}
     </div>
   );
 }

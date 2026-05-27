@@ -66,6 +66,11 @@ interface GameState {
   updateCreatures: (creatures: PlayerCreature[]) => void;
   overwriteProfileCreatures: (creatures: PlayerCreature[]) => void;
   reorderCreatures: (startIndex: number, endIndex: number) => void;
+  updateCreatureAttacks: (
+    creatureId: string,
+    equippedAttacks: string[],
+    activeAttackIndex: number
+  ) => void;
   useItem: (itemId: string, targetCreatureId?: string) => boolean | void;
 
   // Progression
@@ -705,6 +710,61 @@ export const useGameStore = create<GameState>()(
             },
             false,
             'reorderCreatures'
+          ),
+        updateCreatureAttacks: (
+          creatureId: string,
+          equippedAttacks: string[],
+          activeAttackIndex: number
+        ) =>
+          set(
+            (state) => {
+              const profileId = state.currentProfileId;
+              if (profileId === null || !state.profiles[profileId])
+                return state;
+              const profile = state.profiles[profileId]!;
+
+              // Search in party first
+              let isParty = true;
+              let creatureIdx = profile.creatures.findIndex(
+                (c) => c.id === creatureId
+              );
+
+              if (creatureIdx === -1) {
+                // Search in storage box
+                isParty = false;
+                creatureIdx = profile.storageCreatures.findIndex(
+                  (c) => c.id === creatureId
+                );
+              }
+
+              if (creatureIdx === -1) return state; // Creature not found
+
+              const newProfiles = [...state.profiles];
+              const updatedProfile = { ...profile };
+
+              if (isParty) {
+                const newParty = [...profile.creatures];
+                newParty[creatureIdx] = {
+                  ...newParty[creatureIdx],
+                  equippedAttacks,
+                  activeAttackIndex,
+                };
+                updatedProfile.creatures = newParty;
+              } else {
+                const newStorage = [...profile.storageCreatures];
+                newStorage[creatureIdx] = {
+                  ...newStorage[creatureIdx],
+                  equippedAttacks,
+                  activeAttackIndex,
+                };
+                updatedProfile.storageCreatures = newStorage;
+              }
+
+              newProfiles[profileId] = updatedProfile;
+              return { profiles: newProfiles };
+            },
+            false,
+            'updateCreatureAttacks'
           ),
         useItem: (itemId: string, targetCreatureId?: string) => {
           let catchSuccess = false;
