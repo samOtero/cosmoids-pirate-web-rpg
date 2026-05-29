@@ -15,6 +15,50 @@ import {
 } from '@/types/baseGame';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { TDLevelData } from '@/engine/tower-defense/types';
+import { TDStatSnapshot } from '@/engine/tower-defense/events/TDEventBus';
+
+type QueuedModal =
+  | {
+      type: 'LEVEL_UP';
+      towerId: string;
+      speciesId: string;
+      prevLevel: number;
+      newLevel: number;
+      prevStats: TDStatSnapshot;
+      newStats: TDStatSnapshot;
+    }
+  | {
+      type: 'LEARNED_ATTACK';
+      towerId: string;
+      attackDefId: string;
+    }
+  | {
+      type: 'ASK_REPLACE_ATTACK';
+      towerId: string;
+      newAttackDefId: string;
+    };
+
+const sortModalQueue = (queue: QueuedModal[]): QueuedModal[] => {
+  const typePriority = {
+    'LEVEL_UP': 1,
+    'LEARNED_ATTACK': 2,
+    'ASK_REPLACE_ATTACK': 3,
+  };
+  return [...queue].sort((a, b) => {
+    if (a.towerId !== b.towerId) {
+      return a.towerId.localeCompare(b.towerId);
+    }
+    const prioA = typePriority[a.type] || 99;
+    const prioB = typePriority[b.type] || 99;
+    if (prioA !== prioB) {
+      return prioA - prioB;
+    }
+    if (a.type === 'LEVEL_UP' && b.type === 'LEVEL_UP') {
+      return a.newLevel - b.newLevel;
+    }
+    return 0;
+  });
+};
 
 /** Resolve display info (name, spriteUrl) for a creature from its species definition. */
 function resolveSpeciesVisuals(speciesId: string): {
@@ -71,14 +115,8 @@ export default function TowerDefenseScreen({
     null
   );
   const [wasPlayingBeforeMenu, setWasPlayingBeforeMenu] = useState(false);
-  const [learningAttack, setLearningAttack] = useState<{
-    towerId: string;
-    attackDefId: string;
-  } | null>(null);
-  const [replaceAttackPrompt, setReplaceAttackPrompt] = useState<{
-    towerId: string;
-    newAttackDefId: string;
-  } | null>(null);
+  const [modalQueue, setModalQueue] = useState<QueuedModal[]>([]);
+  const [wasPlayingBeforeModals, setWasPlayingBeforeModals] = useState(false);
   const dragStateRef = useRef<'tower' | 'capture' | false>(false);
   const justDraggedRef = useRef(false);
   const pixiRef = useRef<PixiBattlefieldRef>(null);
@@ -158,28 +196,84 @@ export default function TowerDefenseScreen({
     }
   }, [isPlaying, hasStarted]);
 
+  // Manage pausing and unpausing of the game loop based on modalQueue state
+  useEffect(() => {
+    if (modalQueue.length > 0 && isPlaying) {
+      setWasPlayingBeforeModals(true);
+      setIsPlaying(false);
+    }
+  }, [modalQueue.length, isPlaying]);
+
+  const closeActiveModal = () => {
+    setModalQueue((prev) => {
+      const next = prev.slice(1);
+      if (next.length === 0) {
+        if (wasPlayingBeforeModals) {
+          setIsPlaying(true);
+          setWasPlayingBeforeModals(false);
+        }
+      }
+      return next;
+    });
+  };
+
   // Subscribe to engine events that require a UI re-render
   useEffect(() => {
     const unsub = engineRef.current.events.subscribe((event) => {
       switch (event.type) {
         case 'TOWER_XP_GAINED':
-        case 'TOWER_LEVELED_UP':
         case 'TOWER_EVOLVED':
           setUiUpdateToggle((prev) => !prev);
           break;
+        case 'TOWER_LEVELED_UP':
+          setModalQueue((prev) => {
+            const existingIdx = prev.findIndex(
+              (m) => m.type === 'LEVEL_UP' && m.towerId === event.towerId
+            );
+
+            if (existingIdx !== -1) {
+              const next = [...prev];
+              const existing = next[existingIdx] as Extract<QueuedModal, { type: 'LEVEL_UP' }>;
+              next[existingIdx] = {
+                ...existing,
+                newLevel: event.newLevel,
+                newStats: event.newStats,
+              };
+              return sortModalQueue(next);
+            } else {
+              const added: QueuedModal = {
+                type: 'LEVEL_UP',
+                towerId: event.towerId,
+                speciesId: event.speciesId,
+                prevLevel: event.prevLevel,
+                newLevel: event.newLevel,
+                prevStats: event.prevStats,
+                newStats: event.newStats,
+              };
+              return sortModalQueue([...prev, added]);
+            }
+          });
+          setUiUpdateToggle((prev) => !prev);
+          break;
         case 'TOWER_LEARNED_ATTACK':
-          setIsPlaying(false);
-          setLearningAttack({
-            towerId: event.towerId,
-            attackDefId: event.attackDefId,
+          setModalQueue((prev) => {
+            const added: QueuedModal = {
+              type: 'LEARNED_ATTACK',
+              towerId: event.towerId,
+              attackDefId: event.attackDefId,
+            };
+            return sortModalQueue([...prev, added]);
           });
           setUiUpdateToggle((prev) => !prev);
           break;
         case 'TOWER_ASK_REPLACE_ATTACK':
-          setIsPlaying(false);
-          setReplaceAttackPrompt({
-            towerId: event.towerId,
-            newAttackDefId: event.newAttackDefId,
+          setModalQueue((prev) => {
+            const added: QueuedModal = {
+              type: 'ASK_REPLACE_ATTACK',
+              towerId: event.towerId,
+              newAttackDefId: event.newAttackDefId,
+            };
+            return sortModalQueue([...prev, added]);
           });
           setUiUpdateToggle((prev) => !prev);
           break;
@@ -602,51 +696,130 @@ export default function TowerDefenseScreen({
           )}
       </div>
 
-      {/* Learning Attack Modal */}
-      {learningAttack && (
-        <div className="fixed inset-0 z-9999 bg-black/80 flex items-center justify-center p-4">
-          <div className="bg-slate-800 p-6 rounded-lg text-center border-2 border-cyan-500 max-w-sm w-full">
-            <h3 className="text-2xl font-bold text-cyan-400 mb-4">
-              Learned a New Attack!
-            </h3>
-            <div className="bg-slate-900 p-4 rounded mb-6">
-              <span className="font-bold text-xl text-yellow-400">
-                {ATTACK_DEFS[learningAttack.attackDefId]?.name ||
-                  learningAttack.attackDefId}
-              </span>
-              <p className="text-sm text-slate-300 mt-2">
-                Power: {ATTACK_DEFS[learningAttack.attackDefId]?.power} |
-                Cooldown:{' '}
-                {(ATTACK_DEFS[learningAttack.attackDefId]?.cooldownMs || 1000) /
-                  1000}
-                s
-              </p>
-            </div>
-            <button
-              className="px-6 py-2 bg-cyan-600 hover:bg-cyan-500 rounded font-bold text-white w-full"
-              onClick={() => {
-                setLearningAttack(null);
-                setIsPlaying(true);
-              }}
-            >
-              Awesome!
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Unified In-Level Modals Queue */}
+      {modalQueue.length > 0 && (() => {
+        const activeModal = modalQueue[0];
+        
+        if (activeModal.type === 'LEVEL_UP') {
+          const { name, spriteUrl } = resolveSpeciesVisuals(activeModal.speciesId);
+          const { prevStats, newStats } = activeModal;
 
-      {/* Replace Attack Modal */}
-      {replaceAttackPrompt &&
-        (() => {
+          const statsList = [
+            { key: 'hp', label: 'HP', color: 'text-red-400' },
+            { key: 'attack', label: 'Attack', color: 'text-orange-400' },
+            { key: 'defense', label: 'Defense', color: 'text-blue-400' },
+            { key: 'specialAttack', label: 'Sp. Attack', color: 'text-purple-400' },
+            { key: 'specialDefense', label: 'Sp. Defense', color: 'text-cyan-400' },
+          ] as const;
+
+          return (
+            <div
+              className="fixed inset-0 z-9999 bg-black/80 flex items-center justify-center p-3 backdrop-blur-xs cursor-pointer select-none"
+              onClick={closeActiveModal}
+            >
+              <div
+                className="bg-slate-900 border-2 border-yellow-500/80 rounded-xl shadow-[0_0_30px_rgba(234,179,8,0.2)] w-full max-w-md lg:max-w-lg text-white flex flex-col p-3 overflow-hidden"
+              >
+                {/* Header */}
+                <h3 className="text-center text-xl lg:text-3xl font-black italic tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] pb-1 mb-2 border-b border-yellow-500/20 uppercase">
+                  Level Up!
+                </h3>
+
+                <div className="flex flex-row gap-4 items-center justify-center flex-1">
+                  {/* Left Column: Image & Level Badge */}
+                  <div className="flex flex-col items-center justify-center w-28 lg:w-36 shrink-0">
+                    <div className="relative w-18 h-18 lg:w-24 lg:h-24 bg-gradient-to-b from-yellow-500/10 to-yellow-600/20 rounded-full p-2 border border-yellow-500/30 shadow-inner flex items-center justify-center">
+                      {spriteUrl && (
+                        <img
+                          src={spriteUrl}
+                          alt={name}
+                          className="w-14 h-14 lg:w-20 lg:h-20 object-contain animate-bounce"
+                        />
+                      )}
+                    </div>
+                    <span className="font-black text-xs lg:text-sm text-yellow-400 mt-1.5 uppercase tracking-wide text-center truncate max-w-full">
+                      {name}
+                    </span>
+                    <span className="bg-gradient-to-r from-yellow-500 to-orange-600 text-slate-950 font-extrabold text-[9px] lg:text-[11px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md text-center mt-1 animate-pulse">
+                      Lv. {activeModal.prevLevel} ➔ {activeModal.newLevel}
+                    </span>
+                  </div>
+
+                  {/* Right Column: Stats List */}
+                  <div className="flex-1 flex flex-col gap-1 w-full max-w-xs">
+                    {statsList.map(({ key, label, color }) => {
+                      const prevVal = prevStats[key];
+                      const newVal = newStats[key];
+                      const diff = newVal - prevVal;
+                      return (
+                        <div
+                          key={key}
+                          className="bg-slate-800/60 hover:bg-slate-800/80 border border-slate-700/50 rounded-lg py-1 px-2.5 flex items-center justify-between text-[11px] lg:text-xs transition-colors"
+                        >
+                          <span className={`font-bold uppercase tracking-wider ${color}`}>
+                            {label}
+                          </span>
+                          <div className="flex items-center font-mono">
+                            <span className="text-slate-400">{prevVal}</span>
+                            <span className="mx-1.5 text-yellow-500/80 text-[10px]">➔</span>
+                            <span className="text-white font-bold">{newVal}</span>
+                            <span className="ml-2 bg-emerald-950/80 border border-emerald-500/30 text-emerald-400 font-extrabold px-1.5 py-0.2 rounded text-[9px] lg:text-[10px] min-w-[24px] text-center">
+                              +{diff}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Footer hint */}
+                <div className="text-center text-[9px] lg:text-[10px] text-slate-500 animate-pulse mt-2 pt-1 border-t border-slate-800 uppercase tracking-widest font-semibold">
+                  Tap anywhere to continue
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        if (activeModal.type === 'LEARNED_ATTACK') {
+          const newDef = ATTACK_DEFS[activeModal.attackDefId];
+          return (
+            <div className="fixed inset-0 z-9999 bg-black/80 flex items-center justify-center p-4">
+              <div className="bg-slate-800 p-6 rounded-lg text-center border-2 border-cyan-500 max-w-sm w-full shadow-lg">
+                <h3 className="text-2xl font-bold text-cyan-400 mb-4">
+                  Learned a New Attack!
+                </h3>
+                <div className="bg-slate-900 p-4 rounded mb-6">
+                  <span className="font-bold text-xl text-yellow-400">
+                    {newDef?.name || activeModal.attackDefId}
+                  </span>
+                  <p className="text-sm text-slate-300 mt-2">
+                    Power: {newDef?.power} | Cooldown:{' '}
+                    {(newDef?.cooldownMs || 1000) / 1000}s
+                  </p>
+                </div>
+                <button
+                  className="px-6 py-2 bg-cyan-600 hover:bg-cyan-500 rounded font-bold text-white w-full cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform"
+                  onClick={closeActiveModal}
+                >
+                  Awesome!
+                </button>
+              </div>
+            </div>
+          );
+        }
+
+        if (activeModal.type === 'ASK_REPLACE_ATTACK') {
           const tower = engineRef.current.towers.find(
-            (t: any) => t.id === replaceAttackPrompt.towerId
+            (t: any) => t.id === activeModal.towerId
           );
           if (!tower) return null;
-          const newDef = ATTACK_DEFS[replaceAttackPrompt.newAttackDefId];
+          const newDef = ATTACK_DEFS[activeModal.newAttackDefId];
 
           return (
             <div className="fixed inset-0 z-9999 bg-black/80 flex items-center justify-center p-4">
-              <div className="bg-slate-800 p-6 rounded-lg border-2 border-purple-500 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="bg-slate-800 p-6 rounded-lg border-2 border-purple-500 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-lg">
                 <h3 className="text-2xl font-bold text-purple-400 mb-2">
                   Maximum Attacks Reached!
                 </h3>
@@ -671,12 +844,11 @@ export default function TowerDefenseScreen({
                             engineRef.current.replaceTowerAttack(
                               tower.id,
                               idx,
-                              replaceAttackPrompt.newAttackDefId
+                              activeModal.newAttackDefId
                             );
-                            setReplaceAttackPrompt(null);
-                            // The engine will emit TOWER_LEARNED_ATTACK, which will show the other modal.
+                            closeActiveModal();
                           }}
-                          className="p-3 bg-slate-700 hover:bg-red-900/50 border border-slate-600 hover:border-red-500 rounded text-left transition-colors flex flex-col group"
+                          className="p-3 bg-slate-700 hover:bg-red-900/50 border border-slate-600 hover:border-red-500 rounded text-left transition-colors flex flex-col group cursor-pointer"
                         >
                           <span className="font-bold text-slate-200 group-hover:text-red-400">
                             Forget {def?.name}
@@ -702,11 +874,8 @@ export default function TowerDefenseScreen({
                     </div>
                   </div>
                   <button
-                    className="px-6 py-2 bg-slate-600 hover:bg-slate-500 rounded font-bold text-white whitespace-nowrap"
-                    onClick={() => {
-                      setReplaceAttackPrompt(null);
-                      setIsPlaying(true);
-                    }}
+                    className="px-6 py-2 bg-slate-600 hover:bg-slate-500 rounded font-bold text-white whitespace-nowrap cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform"
+                    onClick={closeActiveModal}
                   >
                     Do Not Learn
                   </button>
@@ -714,7 +883,10 @@ export default function TowerDefenseScreen({
               </div>
             </div>
           );
-        })()}
+        }
+
+        return null;
+      })()}
 
       {globalDrag && (
         <div

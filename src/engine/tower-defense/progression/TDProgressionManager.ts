@@ -25,84 +25,83 @@ export class TDProgressionManager {
         event.enemyLevel,
         event.participantTowerIds
       );
-    } else if (event.type === 'TOWER_LEVELED_UP') {
-      const tower = this.engine.towers.find((t) => t.id === event.towerId);
-      if (tower) {
-        const template = COSMOID_TEMPLATES[tower.creature.speciesId];
-        if (!template) return;
+    }
+  }
 
-        if (template.learnableAttacks) {
-          template.learnableAttacks.forEach((node) => {
-            if (node.level === event.newLevel) {
-              // Avoid duplicates
-              if (!tower.creature.equippedAttacks.includes(node.attackId)) {
-                if (tower.creature.equippedAttacks.length < 4) {
-                  tower.creature.equippedAttacks.push(node.attackId);
-                  tower.equippedAttacksRuntime.push({
-                    definitionId: node.attackId,
-                    lastFiredTime: 0,
-                  });
-                  this.engine.events.emit({
-                    type: 'TOWER_LEARNED_ATTACK',
-                    towerId: tower.id,
-                    attackDefId: node.attackId,
-                  });
-                } else {
-                  this.engine.events.emit({
-                    type: 'TOWER_ASK_REPLACE_ATTACK',
-                    towerId: tower.id,
-                    newAttackDefId: node.attackId,
-                  });
-                }
-              }
+  private processLevelUpProgression(tower: any, newLevel: number) {
+    const template = COSMOID_TEMPLATES[tower.creature.speciesId];
+    if (!template) return;
+
+    if (template.learnableAttacks) {
+      template.learnableAttacks.forEach((node) => {
+        if (node.level === newLevel) {
+          // Avoid duplicates
+          if (!tower.creature.equippedAttacks.includes(node.attackId)) {
+            if (tower.creature.equippedAttacks.length < 4) {
+              tower.creature.equippedAttacks.push(node.attackId);
+              tower.equippedAttacksRuntime.push({
+                definitionId: node.attackId,
+                lastFiredTime: 0,
+              });
+              this.engine.events.emit({
+                type: 'TOWER_LEARNED_ATTACK',
+                towerId: tower.id,
+                attackDefId: node.attackId,
+              });
+            } else {
+              this.engine.events.emit({
+                type: 'TOWER_ASK_REPLACE_ATTACK',
+                towerId: tower.id,
+                newAttackDefId: node.attackId,
+              });
             }
-          });
+          }
         }
+      });
+    }
 
-        if (template.evolutionNodes) {
-          template.evolutionNodes.forEach((node) => {
-            if (node.level === event.newLevel) {
-              const oldDef = tower.creature.speciesId;
-              tower.creature.speciesId = node.evolutionDefId;
+    if (template.evolutionNodes) {
+      template.evolutionNodes.forEach((node) => {
+        if (node.level === newLevel) {
+          const oldDef = tower.creature.speciesId;
+          tower.creature.speciesId = node.evolutionDefId;
 
-              const newTemplate = COSMOID_TEMPLATES[tower.creature.speciesId];
-              if (newTemplate) {
-                tower.currentAttack = calculateStat(
-                  newTemplate.baseStats.attack,
-                  tower.creature.level
-                );
-                tower.currentSpecialAttack = calculateStat(
-                  newTemplate.baseStats.specialAttack,
-                  tower.creature.level
-                );
-                tower.currentDefense = calculateStat(
-                  newTemplate.baseStats.defense,
-                  tower.creature.level
-                );
-                tower.currentSpecialDefense = calculateStat(
-                  newTemplate.baseStats.specialDefense,
-                  tower.creature.level
-                );
+          const newTemplate = COSMOID_TEMPLATES[tower.creature.speciesId];
+          if (newTemplate) {
+            tower.currentAttack = calculateStat(
+              newTemplate.baseStats.attack,
+              tower.creature.level
+            );
+            tower.currentSpecialAttack = calculateStat(
+              newTemplate.baseStats.specialAttack,
+              tower.creature.level
+            );
+            tower.currentDefense = calculateStat(
+              newTemplate.baseStats.defense,
+              tower.creature.level
+            );
+            tower.currentSpecialDefense = calculateStat(
+              newTemplate.baseStats.specialDefense,
+              tower.creature.level
+            );
 
-                // Recalculate HP and restore to full on evolution
-                const newMaxHp = calculateMaxHp(
-                  newTemplate.baseStats.hp,
-                  tower.creature.level
-                );
-                tower.maxHp = newMaxHp;
-                tower.hp = newMaxHp;
+            // Recalculate HP and restore to full on evolution
+            const newMaxHp = calculateMaxHp(
+              newTemplate.baseStats.hp,
+              tower.creature.level
+            );
+            tower.maxHp = newMaxHp;
+            tower.hp = newMaxHp;
 
-                this.engine.events.emit({
-                  type: 'TOWER_EVOLVED',
-                  towerId: tower.id,
-                  oldDefinitionId: oldDef,
-                  newDefinitionId: tower.creature.speciesId,
-                });
-              }
-            }
-          });
+            this.engine.events.emit({
+              type: 'TOWER_EVOLVED',
+              towerId: tower.id,
+              oldDefinitionId: oldDef,
+              newDefinitionId: tower.creature.speciesId,
+            });
+          }
         }
-      }
+      });
     }
   }
 
@@ -148,6 +147,15 @@ export class TDProgressionManager {
         totalXp: tower.creature.xp,
       });
 
+      const initialLevel = tower.creature.level;
+      const initialStats = {
+        hp: tower.maxHp,
+        attack: tower.currentAttack,
+        specialAttack: tower.currentSpecialAttack,
+        defense: tower.currentDefense,
+        specialDefense: tower.currentSpecialDefense,
+      };
+
       // Process multiple level-ups if enough XP was gained
       while (tower.creature.level < MAX_LEVEL) {
         const nextLevel = tower.creature.level + 1;
@@ -189,11 +197,26 @@ export class TDProgressionManager {
           tower.hp = newMaxHp;
         }
 
-        // We decouple the trigger so Pixi can safely animate
+        // Process move-learning and evolution for this intermediate level-up step
+        this.processLevelUpProgression(tower, tower.creature.level);
+      }
+
+      // If we actually leveled up, emit a SINGLE event!
+      if (tower.creature.level > initialLevel) {
         this.engine.events.emit({
           type: 'TOWER_LEVELED_UP',
           towerId: tower.id,
+          speciesId: tower.creature.speciesId,
+          prevLevel: initialLevel,
           newLevel: tower.creature.level,
+          prevStats: initialStats,
+          newStats: {
+            hp: tower.maxHp,
+            attack: tower.currentAttack,
+            specialAttack: tower.currentSpecialAttack,
+            defense: tower.currentDefense,
+            specialDefense: tower.currentSpecialDefense,
+          },
         });
       }
     }

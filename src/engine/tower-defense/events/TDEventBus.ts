@@ -1,3 +1,11 @@
+export interface TDStatSnapshot {
+  hp: number;
+  attack: number;
+  specialAttack: number;
+  defense: number;
+  specialDefense: number;
+}
+
 export type TDEvent =
   | {
       type: 'ENEMY_DIED';
@@ -19,7 +27,15 @@ export type TDEvent =
       xpGained: number;
       totalXp: number;
     }
-  | { type: 'TOWER_LEVELED_UP'; towerId: string; newLevel: number }
+  | {
+      type: 'TOWER_LEVELED_UP';
+      towerId: string;
+      speciesId: string;
+      prevLevel: number;
+      newLevel: number;
+      prevStats: TDStatSnapshot;
+      newStats: TDStatSnapshot;
+    }
   | {
       type: 'TOWER_EVOLVED';
       towerId: string;
