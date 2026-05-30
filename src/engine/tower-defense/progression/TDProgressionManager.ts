@@ -203,6 +203,16 @@ export class TDProgressionManager {
 
       // If we actually leveled up, emit a SINGLE event!
       if (tower.creature.level > initialLevel) {
+        this.engine.floatingTexts.push({
+          id: `ft_lvl_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+          text: `Level Up! Lv.${tower.creature.level}`,
+          position: { ...tower.position },
+          color: 0xfacc15,
+          scale: 1.2,
+          durationMs: 1500,
+          elapsedMs: 0,
+        });
+
         this.engine.events.emit({
           type: 'TOWER_LEVELED_UP',
           towerId: tower.id,

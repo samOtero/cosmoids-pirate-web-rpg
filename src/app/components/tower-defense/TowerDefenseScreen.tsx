@@ -19,15 +19,6 @@ import { TDStatSnapshot } from '@/engine/tower-defense/events/TDEventBus';
 
 type QueuedModal =
   | {
-      type: 'LEVEL_UP';
-      towerId: string;
-      speciesId: string;
-      prevLevel: number;
-      newLevel: number;
-      prevStats: TDStatSnapshot;
-      newStats: TDStatSnapshot;
-    }
-  | {
       type: 'LEARNED_ATTACK';
       towerId: string;
       attackDefId: string;
@@ -40,9 +31,8 @@ type QueuedModal =
 
 const sortModalQueue = (queue: QueuedModal[]): QueuedModal[] => {
   const typePriority = {
-    'LEVEL_UP': 1,
-    'LEARNED_ATTACK': 2,
-    'ASK_REPLACE_ATTACK': 3,
+    'LEARNED_ATTACK': 1,
+    'ASK_REPLACE_ATTACK': 2,
   };
   return [...queue].sort((a, b) => {
     if (a.towerId !== b.towerId) {
@@ -50,13 +40,7 @@ const sortModalQueue = (queue: QueuedModal[]): QueuedModal[] => {
     }
     const prioA = typePriority[a.type] || 99;
     const prioB = typePriority[b.type] || 99;
-    if (prioA !== prioB) {
-      return prioA - prioB;
-    }
-    if (a.type === 'LEVEL_UP' && b.type === 'LEVEL_UP') {
-      return a.newLevel - b.newLevel;
-    }
-    return 0;
+    return prioA - prioB;
   });
 };
 
@@ -226,33 +210,6 @@ export default function TowerDefenseScreen({
           setUiUpdateToggle((prev) => !prev);
           break;
         case 'TOWER_LEVELED_UP':
-          setModalQueue((prev) => {
-            const existingIdx = prev.findIndex(
-              (m) => m.type === 'LEVEL_UP' && m.towerId === event.towerId
-            );
-
-            if (existingIdx !== -1) {
-              const next = [...prev];
-              const existing = next[existingIdx] as Extract<QueuedModal, { type: 'LEVEL_UP' }>;
-              next[existingIdx] = {
-                ...existing,
-                newLevel: event.newLevel,
-                newStats: event.newStats,
-              };
-              return sortModalQueue(next);
-            } else {
-              const added: QueuedModal = {
-                type: 'LEVEL_UP',
-                towerId: event.towerId,
-                speciesId: event.speciesId,
-                prevLevel: event.prevLevel,
-                newLevel: event.newLevel,
-                prevStats: event.prevStats,
-                newStats: event.newStats,
-              };
-              return sortModalQueue([...prev, added]);
-            }
-          });
           setUiUpdateToggle((prev) => !prev);
           break;
         case 'TOWER_LEARNED_ATTACK':
@@ -700,87 +657,7 @@ export default function TowerDefenseScreen({
       {modalQueue.length > 0 && (() => {
         const activeModal = modalQueue[0];
         
-        if (activeModal.type === 'LEVEL_UP') {
-          const { name, spriteUrl } = resolveSpeciesVisuals(activeModal.speciesId);
-          const { prevStats, newStats } = activeModal;
 
-          const statsList = [
-            { key: 'hp', label: 'HP', color: 'text-red-400' },
-            { key: 'attack', label: 'Attack', color: 'text-orange-400' },
-            { key: 'defense', label: 'Defense', color: 'text-blue-400' },
-            { key: 'specialAttack', label: 'Sp. Attack', color: 'text-purple-400' },
-            { key: 'specialDefense', label: 'Sp. Defense', color: 'text-cyan-400' },
-          ] as const;
-
-          return (
-            <div
-              className="fixed inset-0 z-9999 bg-black/80 flex items-center justify-center p-3 backdrop-blur-xs cursor-pointer select-none"
-              onClick={closeActiveModal}
-            >
-              <div
-                className="bg-slate-900 border-2 border-yellow-500/80 rounded-xl shadow-[0_0_30px_rgba(234,179,8,0.2)] w-full max-w-md lg:max-w-lg text-white flex flex-col p-3 overflow-hidden"
-              >
-                {/* Header */}
-                <h3 className="text-center text-xl lg:text-3xl font-black italic tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] pb-1 mb-2 border-b border-yellow-500/20 uppercase">
-                  Level Up!
-                </h3>
-
-                <div className="flex flex-row gap-4 items-center justify-center flex-1">
-                  {/* Left Column: Image & Level Badge */}
-                  <div className="flex flex-col items-center justify-center w-28 lg:w-36 shrink-0">
-                    <div className="relative w-18 h-18 lg:w-24 lg:h-24 bg-gradient-to-b from-yellow-500/10 to-yellow-600/20 rounded-full p-2 border border-yellow-500/30 shadow-inner flex items-center justify-center">
-                      {spriteUrl && (
-                        <img
-                          src={spriteUrl}
-                          alt={name}
-                          className="w-14 h-14 lg:w-20 lg:h-20 object-contain animate-bounce"
-                        />
-                      )}
-                    </div>
-                    <span className="font-black text-xs lg:text-sm text-yellow-400 mt-1.5 uppercase tracking-wide text-center truncate max-w-full">
-                      {name}
-                    </span>
-                    <span className="bg-gradient-to-r from-yellow-500 to-orange-600 text-slate-950 font-extrabold text-[9px] lg:text-[11px] px-2 py-0.5 rounded-full uppercase tracking-wider shadow-md text-center mt-1 animate-pulse">
-                      Lv. {activeModal.prevLevel} ➔ {activeModal.newLevel}
-                    </span>
-                  </div>
-
-                  {/* Right Column: Stats List */}
-                  <div className="flex-1 flex flex-col gap-1 w-full max-w-xs">
-                    {statsList.map(({ key, label, color }) => {
-                      const prevVal = prevStats[key];
-                      const newVal = newStats[key];
-                      const diff = newVal - prevVal;
-                      return (
-                        <div
-                          key={key}
-                          className="bg-slate-800/60 hover:bg-slate-800/80 border border-slate-700/50 rounded-lg py-1 px-2.5 flex items-center justify-between text-[11px] lg:text-xs transition-colors"
-                        >
-                          <span className={`font-bold uppercase tracking-wider ${color}`}>
-                            {label}
-                          </span>
-                          <div className="flex items-center font-mono">
-                            <span className="text-slate-400">{prevVal}</span>
-                            <span className="mx-1.5 text-yellow-500/80 text-[10px]">➔</span>
-                            <span className="text-white font-bold">{newVal}</span>
-                            <span className="ml-2 bg-emerald-950/80 border border-emerald-500/30 text-emerald-400 font-extrabold px-1.5 py-0.2 rounded text-[9px] lg:text-[10px] min-w-[24px] text-center">
-                              +{diff}
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Footer hint */}
-                <div className="text-center text-[9px] lg:text-[10px] text-slate-500 animate-pulse mt-2 pt-1 border-t border-slate-800 uppercase tracking-widest font-semibold">
-                  Tap anywhere to continue
-                </div>
-              </div>
-            </div>
-          );
-        }
 
         if (activeModal.type === 'LEARNED_ATTACK') {
           const newDef = ATTACK_DEFS[activeModal.attackDefId];
