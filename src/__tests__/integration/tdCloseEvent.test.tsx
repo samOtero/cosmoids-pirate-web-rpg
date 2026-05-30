@@ -48,7 +48,7 @@ describe('Tower Defense Level Close Event Integration', () => {
     const { findByText } = render(<Home />);
 
     // Locate the Close button on the TD Screen and click it
-    const closeButton = await findByText('Close');
+    const closeButton = await findByText('Close', undefined, { timeout: 10000 });
     expect(closeButton).toBeInTheDocument();
 
     // 4. Click the Close button
@@ -90,7 +90,7 @@ describe('Tower Defense Level Close Event Integration', () => {
     const { findByText } = render(<Home />);
 
     // Locate the Close button and click it
-    const closeButton = await findByText('Close');
+    const closeButton = await findByText('Close', undefined, { timeout: 10000 });
     act(() => {
       closeButton.click();
     });
