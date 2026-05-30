@@ -2,6 +2,7 @@ import React from 'react';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { TowerButton } from './TowerButton';
 import { PlayerCreature } from '@/types/baseGame';
+import { TowerTargetingMode } from '@/engine/tower-defense/types';
 
 export function ActiveAttackMenu({
   creature,
@@ -13,6 +14,8 @@ export function ActiveAttackMenu({
   equippedAttacks,
   activeAttackIndex,
   onSelectAttack,
+  activeTargetingMode = 'first',
+  onSelectTargetingMode,
   onClose,
 }: {
   creature: PlayerCreature;
@@ -24,6 +27,8 @@ export function ActiveAttackMenu({
   equippedAttacks: string[];
   activeAttackIndex: number;
   onSelectAttack: (index: number) => void;
+  activeTargetingMode?: TowerTargetingMode;
+  onSelectTargetingMode?: (mode: TowerTargetingMode) => void;
   onClose: () => void;
 }) {
   return (
@@ -83,6 +88,35 @@ export function ActiveAttackMenu({
               </button>
             );
           })}
+        </div>
+
+        {/* Targeting Side */}
+        <div className="w-px h-16 lg:h-24 bg-cyan-900/50 shrink-0"></div>
+
+        <div className="flex flex-col justify-center items-center shrink-0 min-w-[100px] lg:min-w-[140px] px-1 lg:px-2">
+          <span className="text-[8px] lg:text-[10px] font-bold text-cyan-400 mb-1 uppercase tracking-wider">
+            Targeting
+          </span>
+          <div className="relative w-full">
+            <select
+              value={activeTargetingMode}
+              onChange={(e) => onSelectTargetingMode?.(e.target.value as TowerTargetingMode)}
+              className="w-full appearance-none bg-slate-800 border-2 border-slate-600 hover:border-cyan-500 rounded px-2.5 py-1 lg:px-3 lg:py-2 text-slate-200 hover:text-white text-[9px] lg:text-xs font-bold transition-all text-center uppercase tracking-wide cursor-pointer focus:outline-none focus:border-cyan-400 pr-6"
+            >
+              <option value="first">First</option>
+              <option value="last">Last</option>
+              <option value="closest">Closest</option>
+              <option value="strongest">Strongest</option>
+              <option value="weakest">Weakest</option>
+              <option value="lowest-hp-percent">Lowest HP %</option>
+              <option value="highest-hp-percent">Highest HP %</option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-1 lg:right-2 flex items-center text-slate-400">
+              <svg className="fill-current h-3 w-3" viewBox="0 0 20 20">
+                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+              </svg>
+            </div>
+          </div>
         </div>
 
         {/* Close Button Side */}

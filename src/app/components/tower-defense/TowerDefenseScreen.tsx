@@ -533,6 +533,10 @@ export default function TowerDefenseScreen({
                 ? tower.selectedAttackIndex
                 : engineRef.current.playerSelectedAttacks[creature.id] || 0;
 
+              const activeTargetingMode = tower
+                ? (tower.targetingMode || 'first')
+                : (engineRef.current.playerSelectedTargetingModes[creature.id] || 'first');
+
               const { name, spriteUrl } = resolveSpeciesVisuals(
                 creature.speciesId
               );
@@ -551,6 +555,14 @@ export default function TowerDefenseScreen({
                     engineRef.current.setTowerAttack(
                       selectedCreatureId!,
                       index
+                    );
+                    setUiUpdateToggle((prev) => !prev);
+                  }}
+                  activeTargetingMode={activeTargetingMode}
+                  onSelectTargetingMode={(mode) => {
+                    engineRef.current.setTowerTargetingMode(
+                      selectedCreatureId!,
+                      mode
                     );
                     setUiUpdateToggle((prev) => !prev);
                   }}

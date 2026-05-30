@@ -20,6 +20,7 @@ import {
   VisualEffect,
   FloatingText,
   TDCreatureMetadata,
+  TowerTargetingMode,
 } from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
 import { AttackBehaviorRegistry } from './attacks/behaviors';
@@ -109,6 +110,7 @@ export class TowerDefenseEngine {
   private lastSpawnTime: number = 0;
 
   public playerSelectedAttacks: Record<string, number> = {};
+  public playerSelectedTargetingModes: Record<string, TowerTargetingMode> = {};
 
   public surviveUntil?: number;
   public elapsedTimeMs: number = 0;
@@ -135,9 +137,13 @@ export class TowerDefenseEngine {
     this.roster = JSON.parse(JSON.stringify(initialRoster));
 
     this.playerSelectedAttacks = {};
+    this.playerSelectedTargetingModes = {};
     this.roster.forEach((c) => {
       if (c.activeAttackIndex !== undefined) {
         this.playerSelectedAttacks[c.id] = c.activeAttackIndex;
+      }
+      if (c.targetingMode !== undefined) {
+        this.playerSelectedTargetingModes[c.id] = c.targetingMode as TowerTargetingMode;
       }
     });
 
@@ -566,21 +572,15 @@ export class TowerDefenseEngine {
         time - attackInstance.lastFiredTime > attackDef.cooldownMs;
 
       if (isReady) {
-        let nearestEnemy: Enemy | null = null;
-        let minTargetDist = attackDef.rangeIndex;
-        for (const enemy of newEnemies) {
-          const dx = enemy.position.x - tower.position.x;
-          const dy = enemy.position.y - tower.position.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist <= minTargetDist) {
-            minTargetDist = dist;
-            nearestEnemy = enemy;
-          }
-        }
+        const targetEnemy = this.getTargetForTower(
+          tower,
+          attackDef.rangeIndex,
+          tower.targetingMode || 'first'
+        );
 
-        if (nearestEnemy) {
-          const dx = nearestEnemy.position.x - tower.position.x;
-          const dy = nearestEnemy.position.y - tower.position.y;
+        if (targetEnemy) {
+          const dx = targetEnemy.position.x - tower.position.x;
+          const dy = targetEnemy.position.y - tower.position.y;
           if (Math.abs(dx) > Math.abs(dy)) {
             tower.facingDirection = dx > 0 ? 'right' : 'left';
           } else {
@@ -1023,6 +1023,7 @@ export class TowerDefenseEngine {
         lastFiredTime: 0,
       })),
       selectedAttackIndex: this.playerSelectedAttacks[creature.id] || 0,
+      targetingMode: this.playerSelectedTargetingModes[creature.id] || 'first',
       facingDirection: 'down',
     });
     return true;
@@ -1041,6 +1042,152 @@ export class TowerDefenseEngine {
       attackIndex < tower.creature.equippedAttacks.length
     ) {
       tower.selectedAttackIndex = attackIndex;
+    }
+  }
+
+  public getEnemyProgress(enemy: Enemy): number {
+    const path = this.paths[enemy.pathIndex];
+    if (!path || path.length === 0) return 0;
+
+    const nextIndex = enemy.currentWaypointIndex;
+    const prevIndex = enemy.isMovingBackward ? nextIndex + 1 : nextIndex - 1;
+
+    const clampedPrev = Math.max(0, Math.min(path.length - 1, prevIndex));
+
+    let progress = 0;
+    for (let i = 0; i < clampedPrev; i++) {
+      const p1 = path[i];
+      const p2 = path[i + 1];
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+      progress += Math.sqrt(dx * dx + dy * dy);
+    }
+
+    const prevWaypoint = path[clampedPrev];
+    if (prevWaypoint) {
+      const dx = enemy.position.x - prevWaypoint.x;
+      const dy = enemy.position.y - prevWaypoint.y;
+      progress += Math.sqrt(dx * dx + dy * dy);
+    }
+
+    return progress;
+  }
+
+  public getTargetForTower(
+    tower: Tower,
+    range: number,
+    mode: TowerTargetingMode = 'first'
+  ): Enemy | null {
+    const enemiesInRange: { enemy: Enemy; dist: number }[] = [];
+    for (const enemy of this.enemies) {
+      if (enemy.hp <= 0) continue;
+      const dx = enemy.position.x - tower.position.x;
+      const dy = enemy.position.y - tower.position.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist <= range) {
+        enemiesInRange.push({ enemy, dist });
+      }
+    }
+
+    if (enemiesInRange.length === 0) return null;
+
+    if (mode === 'closest') {
+      let minDist = Infinity;
+      let target: Enemy | null = null;
+      for (const item of enemiesInRange) {
+        if (item.dist < minDist) {
+          minDist = item.dist;
+          target = item.enemy;
+        }
+      }
+      return target;
+    }
+
+    if (mode === 'lowest-hp-percent') {
+      let minHpPercent = Infinity;
+      let target: Enemy | null = null;
+      for (const item of enemiesInRange) {
+        const hpPercent = item.enemy.hp / item.enemy.maxHp;
+        if (hpPercent < minHpPercent) {
+          minHpPercent = hpPercent;
+          target = item.enemy;
+        }
+      }
+      return target;
+    }
+
+    if (mode === 'highest-hp-percent') {
+      let maxHpPercent = -Infinity;
+      let target: Enemy | null = null;
+      for (const item of enemiesInRange) {
+        const hpPercent = item.enemy.hp / item.enemy.maxHp;
+        if (hpPercent > maxHpPercent) {
+          maxHpPercent = hpPercent;
+          target = item.enemy;
+        }
+      }
+      return target;
+    }
+
+    if (mode === 'strongest') {
+      let maxHp = -Infinity;
+      let target: Enemy | null = null;
+      for (const item of enemiesInRange) {
+        if (item.enemy.hp > maxHp) {
+          maxHp = item.enemy.hp;
+          target = item.enemy;
+        }
+      }
+      return target;
+    }
+
+    if (mode === 'weakest') {
+      let minHp = Infinity;
+      let target: Enemy | null = null;
+      for (const item of enemiesInRange) {
+        if (item.enemy.hp < minHp) {
+          minHp = item.enemy.hp;
+          target = item.enemy;
+        }
+      }
+      return target;
+    }
+
+    if (mode === 'last') {
+      let minProgress = Infinity;
+      let target: Enemy | null = null;
+      for (const item of enemiesInRange) {
+        const progress = this.getEnemyProgress(item.enemy);
+        if (progress < minProgress) {
+          minProgress = progress;
+          target = item.enemy;
+        }
+      }
+      return target;
+    }
+
+    // Default 'first'
+    let maxProgress = -Infinity;
+    let target: Enemy | null = null;
+    for (const item of enemiesInRange) {
+      const progress = this.getEnemyProgress(item.enemy);
+      if (progress > maxProgress) {
+        maxProgress = progress;
+        target = item.enemy;
+      }
+    }
+    return target;
+  }
+
+  public setTowerTargetingMode(creatureId: string, mode: TowerTargetingMode) {
+    this.playerSelectedTargetingModes[creatureId] = mode;
+    const rosterCreature = this.roster.find((c) => c.id === creatureId);
+    if (rosterCreature) {
+      rosterCreature.targetingMode = mode;
+    }
+    const tower = this.towers.find((t) => t.creature.id === creatureId);
+    if (tower) {
+      tower.targetingMode = mode;
     }
   }
 

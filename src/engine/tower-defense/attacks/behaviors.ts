@@ -22,21 +22,14 @@ export const ProjectileBehavior: AttackBehavior = {
     source: Tower,
     attackDef: AttackDefinition
   ): void {
-    let nearestEnemy: Enemy | null = null;
-    let maxDist = attackDef.rangeIndex;
+    const targetEnemy = engine.getTargetForTower(
+      source,
+      attackDef.rangeIndex,
+      source.targetingMode || 'first'
+    );
 
-    engine.enemies.forEach((enemy) => {
-      const dx = enemy.position.x - source.position.x;
-      const dy = enemy.position.y - source.position.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist <= maxDist) {
-        maxDist = dist; // Closest
-        nearestEnemy = enemy;
-      }
-    });
-
-    if (nearestEnemy) {
-      const enemyTarget = nearestEnemy as Enemy;
+    if (targetEnemy) {
+      const enemyTarget = targetEnemy;
 
       const dx = enemyTarget.position.x - source.position.x;
       const dy = enemyTarget.position.y - source.position.y;
@@ -81,21 +74,14 @@ export const InstantMeleeBehavior: AttackBehavior = {
     source: Tower,
     attackDef: AttackDefinition
   ): void {
-    let nearestEnemy: Enemy | null = null;
-    let maxDist = attackDef.rangeIndex;
+    const targetEnemy = engine.getTargetForTower(
+      source,
+      attackDef.rangeIndex,
+      source.targetingMode || 'first'
+    );
 
-    engine.enemies.forEach((enemy) => {
-      const dx = enemy.position.x - source.position.x;
-      const dy = enemy.position.y - source.position.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist <= maxDist) {
-        maxDist = dist; // Closest
-        nearestEnemy = enemy;
-      }
-    });
-
-    if (nearestEnemy) {
-      const enemyTarget = nearestEnemy as Enemy;
+    if (targetEnemy) {
+      const enemyTarget = targetEnemy;
 
       // Apply damage immediately
       EffectProcessor.applyDamageAndEffects(

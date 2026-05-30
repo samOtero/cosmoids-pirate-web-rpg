@@ -222,6 +222,7 @@ export interface PlayerCreature {
   xp: number;
   equippedAttacks: string[]; // Attack definition IDs
   activeAttackIndex?: number; // The currently selected attack index
+  targetingMode?: string; // Persistent selected targeting mode
 }
 
 export interface IslandNode {

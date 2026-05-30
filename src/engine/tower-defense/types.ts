@@ -102,6 +102,15 @@ export interface TDLevelData {
   isChallengeLevel?: boolean;
 }
 
+export type TowerTargetingMode =
+  | 'first'
+  | 'last'
+  | 'closest'
+  | 'strongest'
+  | 'weakest'
+  | 'lowest-hp-percent'
+  | 'highest-hp-percent';
+
 export interface Tower extends BaseTDUnit {
   creature: PlayerCreature; // The singular source of truth for level, xp, and attacks
   lastAttackTime: number; // Deprecate or keep for generic attacks
@@ -114,6 +123,7 @@ export interface Tower extends BaseTDUnit {
     lastFiredTime: number;
   }>;
   selectedAttackIndex: number;
+  targetingMode?: TowerTargetingMode;
 }
 
 export interface StatusCondition {
