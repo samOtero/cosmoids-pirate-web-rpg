@@ -27,20 +27,28 @@ type QueuedModal =
       type: 'ASK_REPLACE_ATTACK';
       towerId: string;
       newAttackDefId: string;
+    }
+  | {
+      type: 'CAPTURED_CREATURE';
+      speciesId: string;
+      wasSentToStorage: boolean;
     };
 
 const sortModalQueue = (queue: QueuedModal[]): QueuedModal[] => {
   const typePriority = {
+    'CAPTURED_CREATURE': 0,
     'LEARNED_ATTACK': 1,
     'ASK_REPLACE_ATTACK': 2,
   };
   return [...queue].sort((a, b) => {
-    if (a.towerId !== b.towerId) {
-      return a.towerId.localeCompare(b.towerId);
+    if (a.type !== b.type) {
+      const prioA = typePriority[a.type] || 99;
+      const prioB = typePriority[b.type] || 99;
+      return prioA - prioB;
     }
-    const prioA = typePriority[a.type] || 99;
-    const prioB = typePriority[b.type] || 99;
-    return prioA - prioB;
+    const idA = 'towerId' in a ? a.towerId : 'speciesId' in a ? a.speciesId : '';
+    const idB = 'towerId' in b ? b.towerId : 'speciesId' in b ? b.speciesId : '';
+    return idA.localeCompare(idB);
   });
 };
 
@@ -351,12 +359,28 @@ export default function TowerDefenseScreen({
   };
 
   const handleEnemyCaptured = (enemyId: string) => {
+    const enemy = engineRef.current.enemies.find((e) => e.id === enemyId);
+    if (!enemy) return;
+
+    const speciesId = enemy.definitionId;
+    const wasSentToStorage = profile ? profile.creatures.length >= 6 : false;
+
     const capturedCreature = engineRef.current.captureEnemy(enemyId);
-    if (capturedCreature && currentProfileId !== null && !isPremadeLevel) {
-      addCreatureToProfile(currentProfileId, capturedCreature);
+    if (capturedCreature) {
+      if (currentProfileId !== null && !isPremadeLevel) {
+        addCreatureToProfile(currentProfileId, capturedCreature);
+      }
+      
+      setModalQueue((prev) => {
+        const added: QueuedModal = {
+          type: 'CAPTURED_CREATURE',
+          speciesId,
+          wasSentToStorage,
+        };
+        return sortModalQueue([...prev, added]);
+      });
+      setUiUpdateToggle((prev) => !prev);
     }
-    // In challenge mode, the captured creature is still usable in-level
-    // (captureEnemy adds it to the engine roster) but won't persist to profile.
   };
 
   return (
@@ -669,7 +693,53 @@ export default function TowerDefenseScreen({
       {modalQueue.length > 0 && (() => {
         const activeModal = modalQueue[0];
         
+        if (activeModal.type === 'CAPTURED_CREATURE') {
+          const { name, spriteUrl } = resolveSpeciesVisuals(activeModal.speciesId);
+          return (
+            <div className="fixed inset-0 z-9999 bg-black/85 flex items-center justify-center p-2 lg:p-4 animate-[fadeIn_0.25s_ease-out]">
+              <div className="bg-slate-900/95 backdrop-blur-md px-4 py-3 lg:px-6 lg:py-5 rounded-2xl text-center border-2 border-purple-500 max-w-xs lg:max-w-sm w-full shadow-[0_0_30px_rgba(168,85,247,0.4)] flex flex-col items-center">
+                <h3 className="text-lg lg:text-2xl font-black text-transparent bg-clip-text bg-linear-to-r from-purple-400 via-pink-400 to-cyan-400 uppercase tracking-wider mb-1 lg:mb-3">
+                  Cosmoid Captured!
+                </h3>
+                
+                <div className="relative w-16 h-16 lg:w-24 lg:h-24 flex items-center justify-center bg-slate-800/80 rounded-full border border-purple-500/30 p-1.5 my-1 lg:my-2 shadow-inner overflow-hidden">
+                  <div className="absolute inset-0 bg-radial from-purple-500/20 to-transparent pointer-events-none" />
+                  {spriteUrl ? (
+                    <img
+                      src={spriteUrl}
+                      alt={name}
+                      className="w-12 h-12 lg:w-18 lg:h-18 object-contain drop-shadow-[0_4px_10px_rgba(168,85,247,0.5)] transform hover:scale-110 transition-transform duration-300 z-10"
+                    />
+                  ) : (
+                    <div className="text-slate-500 text-xs">No sprite</div>
+                  )}
+                </div>
 
+                <div className="mt-1 lg:mt-2 text-center">
+                  <p className="text-xs lg:text-base text-slate-200">
+                    You captured a <span className="font-extrabold text-cyan-400 text-sm lg:text-lg">{name}</span>!
+                  </p>
+                  {activeModal.wasSentToStorage ? (
+                    <p className="text-[10px] lg:text-xs text-purple-300 font-semibold mt-1 px-2.5 py-0.5 lg:px-3 lg:py-1 bg-purple-950/60 rounded-full border border-purple-800/50 inline-block shadow-sm">
+                      Sent to your storage box
+                    </p>
+                  ) : (
+                    <p className="text-[10px] lg:text-xs text-green-400 font-semibold mt-1 px-2.5 py-0.5 lg:px-3 lg:py-1 bg-green-950/40 rounded-full border border-green-800/30 inline-block">
+                      Added to your active party
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  className="mt-3 lg:mt-5 px-5 py-1.5 lg:px-6 lg:py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl font-bold text-white w-full cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-md hover:shadow-purple-500/25 text-xs lg:text-base border border-purple-400/20"
+                  onClick={closeActiveModal}
+                >
+                  Awesome!
+                </button>
+              </div>
+            </div>
+          );
+        }
 
         if (activeModal.type === 'LEARNED_ATTACK') {
           const newDef = ATTACK_DEFS[activeModal.attackDefId];
