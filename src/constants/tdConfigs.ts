@@ -1,8 +1,5 @@
 import { UnitVisuals } from '@/types/baseGame';
 
-// The reference viewport height used for calculating responsive scale of TD units
-export const TD_BASE_HEIGHT = 600;
-
 export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   senticle: {
     default: {
@@ -192,25 +189,42 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   starter_monkey: {
     default: {
       url: '/battles/cosmoids/monkeg_down_1_v2.png',
-      scale: 0.29,
+      scale: 0.46,
       shadowScaleX: 1.4,
       shadowOffsetX: -2,
-      shadowOffsetY: 26,
-      healthBarOffsetY: -52,
+      shadowOffsetY: 17,
+      healthBarOffsetY: -66,
+      shadowScaleY: 0.85,
+      offsetY: -12,
     },
     left: {
-      scale: 0.29,
+      scale: 0.46,
       shadowScaleX: 1.4,
       shadowOffsetX: -2,
-      shadowOffsetY: 26,
+      shadowOffsetY: 16,
       flipX: false,
+      url: '/battles/cosmoids/monkeg_left_1_v2.png',
+      offsetY: -12,
+      offsetX: 3,
     },
     right: {
-      scale: 0.29,
+      scale: 0.46,
       shadowScaleX: 1.4,
       shadowOffsetX: -2,
-      shadowOffsetY: 26,
+      shadowOffsetY: 16,
       flipX: true,
+      url: '/battles/cosmoids/monkeg_left_1_v2.png',
+      offsetY: -12,
+      offsetX: 3,
+    },
+    up: {
+      url: '/battles/cosmoids/monkeg_up_1_v2.png',
+      scale: 0.46,
+      offsetY: -12,
+      offsetX: -4,
+      healthBarOffsetY: -65,
+      shadowOffsetY: 16,
+      shadowScaleX: 1.35,
     },
   },
   map_1: {

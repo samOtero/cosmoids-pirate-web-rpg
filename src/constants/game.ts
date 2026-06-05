@@ -3,6 +3,9 @@ import { SpeakerImageKey, BackgroundImageKey } from '@/types/baseGame';
 export const MAX_PROFILES = 3;
 export const CURRENT_PROFILE_VERSION = 5;
 
+// The reference viewport height used for calculating responsive scale of TD units
+export const TD_BASE_HEIGHT = 600;
+
 export { ISLANDS } from './islands';
 
 export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {

@@ -11,7 +11,8 @@ import {
 } from '@/engine/tower-defense/TowerDefenseEngine';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { ElementType } from '@/types/baseGame';
-import { CREATURE_TD_CONFIGS, TD_BASE_HEIGHT } from '@/constants/tdConfigs';
+import { TD_BASE_HEIGHT } from '@/constants/game';
+import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { BaseTDUnit } from '@/engine/tower-defense/types';
 
 export function applyTDUnitTransforms(
