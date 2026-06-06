@@ -125,8 +125,7 @@ export class TDProgressionManager {
       // Formula: ΔEXP = ((baseExperience * enemyLevel / 5) * (1 / participantCount) * ((2 * enemyLevel + 10) / (enemyLevel + towerLevel + 10))^2.5) + 1
 
       const baseValue = (baseExperience * enemyLevel) / 5;
-      const levelRatio =
-        (2 * enemyLevel + 10) / (enemyLevel + towerLevel + 10);
+      const levelRatio = (2 * enemyLevel + 10) / (enemyLevel + towerLevel + 10);
 
       // The core scaling factor uses a power of 2.5
       const scalingFactor = Math.pow(levelRatio, 2.5);
@@ -205,11 +204,11 @@ export class TDProgressionManager {
       if (tower.creature.level > initialLevel) {
         this.engine.floatingTexts.push({
           id: `ft_lvl_${Date.now()}_${Math.random().toString(36).substring(7)}`,
-          text: `Level Up! Lv.${tower.creature.level}`,
+          text: `Level Up!`,
           position: { ...tower.position },
           color: 0xfacc15,
           scale: 1.2,
-          durationMs: 1500,
+          durationMs: 1400,
           elapsedMs: 0,
         });
 
