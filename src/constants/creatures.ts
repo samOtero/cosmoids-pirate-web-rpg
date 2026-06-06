@@ -25,7 +25,7 @@ export const SENTICLE: CosmoidTemplate = {
 
 export const MOUSE_1: CosmoidTemplate = {
   id: 'mouse_1',
-  name: 'Mouse 1',
+  name: 'Knotia',
   type: ElementType.NORMAL,
   baseStats: {
     hp: 30,
