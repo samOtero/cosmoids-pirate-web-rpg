@@ -4,7 +4,6 @@ import {
   Screens,
   BackgroundImageKey,
   DialogContext,
-  BattleContext
 } from "@/types/baseGame";
 
 export const AFTER_STARTER_CHOICE_DIALOG: DialogConfig = {

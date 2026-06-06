@@ -1,7 +1,6 @@
 import {
   Island,
   BackgroundImageKey,
-  BattleContext,
   StoryProgression,
 } from '@/types/baseGame';
 

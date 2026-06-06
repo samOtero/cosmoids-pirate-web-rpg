@@ -8,9 +8,6 @@ import {
   Creature,
   CosmoidTemplate,
   PlayerCreature,
-  BattleConfig,
-  StartBattleEventPayload,
-  BattleContext,
   AddCreatureToProfileEventPayload,
   GameFlagValue,
   TDLevelConfig,
@@ -21,7 +18,6 @@ import { ITEMS } from '@/constants/items';
 import {
   GameEvent,
   ShowDialogEventPayload,
-  ShowBattleDialogEventPayload,
   ShowLevelSelectDialogEventPayload,
   SetFlagEventPayload,
   RemoveFlagEventPayload,
@@ -34,7 +30,6 @@ import {
   ExecuteTDActionEventPayload,
   GoToTowerDefenseEventPayload,
 } from '@/types/baseGame';
-import { BATTLES } from '@/constants/battles';
 import { TD_LEVELS } from '@/constants/tdLevels';
 import { NEW_PLAYER_EVENTS } from '@/constants/events';
 import {
@@ -71,25 +66,12 @@ interface GameState {
     equippedAttacks: string[],
     activeAttackIndex: number
   ) => void;
-  useItem: (itemId: string, targetCreatureId?: string) => boolean | void;
-
   // Progression
   setStoryProgression: (progression: number) => void;
   setGameFlag: (flag: GameFlagValue) => void;
   removeGameFlag: (flag: GameFlagValue) => void;
   unlockIsland: (islandId: number) => void;
   setIslandPosition: (islandId: number, nodeId: number) => void;
-  // Battle Config
-  currentBattle: BattleConfig | null;
-  handleBattleWin: () => void;
-  handleBattleLose: () => void;
-  currentEnemy: Creature | null;
-  setBattleConfig: (
-    battleConfig: BattleConfig | null,
-    enemy: Creature | null
-  ) => void;
-  setCurrentEnemy: (enemy: Creature) => void;
-  clearCurrentEnemy: () => void;
   // TD Config
   currentTdLevel: TDLevelConfig | null;
   setTdLevel: (config: TDLevelConfig | null) => void;
@@ -112,8 +94,6 @@ export const useGameStore = create<GameState>()(
         eventQueue: [],
         profiles: Array(MAX_PROFILES).fill(null),
         currentProfileId: null,
-        currentEnemy: null,
-        currentBattle: null,
         currentTdLevel: null,
         setScreen: (screen, context = undefined, contextData = undefined) =>
           set(
@@ -171,26 +151,7 @@ export const useGameStore = create<GameState>()(
                     );
                     break;
                   }
-                  case 'SHOW_BATTLE_DIALOG': {
-                    const dialogPayload =
-                      currentEvent.payload as ShowBattleDialogEventPayload;
-                    state.setScreen(
-                      Screens.BATTLE,
-                      dialogPayload.context || null,
-                      dialogPayload.contextData || undefined
-                    );
-                    break;
-                  }
-                  case 'START_BATTLE': {
-                    const payload =
-                      currentEvent.payload as StartBattleEventPayload;
-                    if (payload.context && BATTLES[payload.context]) {
-                      const battleConfig = BATTLES[payload.context];
-                      state.setBattleConfig(battleConfig, battleConfig.enemy);
-                      state.setScreen(Screens.BATTLE);
-                    }
-                    break;
-                  }
+
                   case 'SHOW_LEVEL_SELECT_DIALOG': {
                     const dialogPayload =
                       currentEvent.payload as ShowLevelSelectDialogEventPayload;
@@ -389,68 +350,6 @@ export const useGameStore = create<GameState>()(
             'processNextEvent'
           ),
         clearQueue: () => set({ eventQueue: [] }, false, 'clearQueue'),
-        setCurrentEnemy: (enemy) =>
-          set({ currentEnemy: enemy }, false, 'setCurrentEnemy'),
-        clearCurrentEnemy: () =>
-          set({ currentEnemy: null }, false, 'clearCurrentEnemy'),
-        handleBattleWin: () => {
-          const state = get();
-          if (state.currentBattle) {
-            const extraEvents: GameEvent[] = [];
-            // Handle Drops
-            if (state.currentBattle.drops) {
-              state.currentBattle.drops.forEach((drop) => {
-                if (Math.random() <= drop.chance) {
-                  const count =
-                    Math.floor(Math.random() * (drop.max - drop.min + 1)) +
-                    drop.min;
-                  extraEvents.push({
-                    type: 'SHOW_DIALOG',
-                    payload: {
-                      context: DialogContext.FOUND_ITEM,
-                    },
-                  });
-                  extraEvents.push({
-                    type: 'GAIN_ITEM',
-                    payload: {
-                      itemId: drop.itemId,
-                      count,
-                    },
-                    autoProceed: true,
-                  });
-                }
-              });
-            }
-
-            state.enqueueAndProcessEvents([
-              ...extraEvents,
-              ...state.currentBattle.winEvents,
-            ]);
-          }
-          set(
-            { currentBattle: null, currentEnemy: null },
-            false,
-            'handleBattleWin'
-          );
-        },
-        handleBattleLose: () => {
-          const state = get();
-          if (state.currentBattle) {
-            state.enqueueAndProcessEvents(state.currentBattle.loseEvents);
-          }
-          set(
-            { currentBattle: null, currentEnemy: null },
-            false,
-            'handleBattleLose'
-          );
-        },
-        setBattleConfig(battleConfig, enemy) {
-          set(
-            { currentBattle: battleConfig, currentEnemy: enemy },
-            false,
-            'setBattleConfig'
-          );
-        },
         setTdLevel: (config: TDLevelConfig | null) =>
           set({ currentTdLevel: config }, false, 'setTdLevel'),
         createProfile: (slotId: number) => {
@@ -766,78 +665,6 @@ export const useGameStore = create<GameState>()(
             false,
             'updateCreatureAttacks'
           ),
-        useItem: (itemId: string, targetCreatureId?: string) => {
-          let catchSuccess = false;
-          set(
-            (state) => {
-              const profileId = state.currentProfileId;
-              if (profileId === null || !state.profiles[profileId])
-                return state;
-              const profile = state.profiles[profileId]!;
-              const inventory = [...profile.inventory];
-              const itemIndex = inventory.findIndex((i) => i.id === itemId);
-              if (itemIndex === -1) {
-                return state;
-              }
-              const item = inventory[itemIndex];
-
-              if (item.count <= 0) return state;
-
-              // Apply Effect
-              let newCreatures = [...profile.creatures];
-              let newStorageCreatures = [...profile.storageCreatures];
-
-              if (item.effect === 'HEAL' && targetCreatureId) {
-                // Note: PlayerCreature does not store currentHp — HEAL items are for the turn-based battle system
-                // which uses a different Creature type. Skip silently if no hp fields.
-                return state;
-              } else if (item.effect === 'CATCH') {
-                const enemy = state.currentEnemy;
-                if (!enemy) return state; // Only works in battle with enemy
-
-                catchSuccess = Math.random() <= item.value;
-
-                if (catchSuccess) {
-                  // Convert caught Creature to PlayerCreature
-                  const caught: PlayerCreature = {
-                    id: enemy.id,
-                    speciesId: enemy.speciesId || enemy.id,
-                    level: enemy.level,
-                    xp: enemy.xp,
-                    equippedAttacks: enemy.moves || [],
-                  };
-                  // Add to party if under 6, otherwise to storage
-                  if (newCreatures.length < 6) {
-                    newCreatures = [...newCreatures, caught];
-                  } else {
-                    newStorageCreatures = [...newStorageCreatures, caught];
-                  }
-                }
-              }
-
-              // Decrement count
-              const newItem = { ...item, count: item.count - 1 };
-              if (newItem.count <= 0) {
-                inventory.splice(itemIndex, 1);
-              } else {
-                inventory[itemIndex] = newItem;
-              }
-
-              const newProfiles = [...state.profiles];
-              newProfiles[profileId] = {
-                ...profile,
-                creatures: newCreatures,
-                storageCreatures: newStorageCreatures,
-                inventory,
-              };
-
-              return { profiles: newProfiles };
-            },
-            false,
-            'useItem'
-          );
-          return catchSuccess;
-        },
         setStoryProgression: (progression: number) =>
           set(
             (state) => {

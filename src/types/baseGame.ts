@@ -5,7 +5,6 @@ export enum Screens {
   MODE_SELECT = 'MODE_SELECT',
   LEVEL_SELECT = 'LEVEL_SELECT',
   CHALLENGE_SELECT = 'CHALLENGE_SELECT',
-  BATTLE = 'BATTLE',
   PARTY = 'PARTY',
   TOWER_DEFENSE = 'TOWER_DEFENSE',
 }
@@ -350,9 +349,7 @@ export interface DialogConfig {
 
 export type GameEventType =
   | 'SHOW_DIALOG'
-  | 'SHOW_BATTLE_DIALOG'
   | 'SHOW_LEVEL_SELECT_DIALOG'
-  | 'START_BATTLE'
   | 'GO_TO_LEVEL_SELECT'
   | 'GO_TO_CHALLENGE_SELECT'
   | 'GO_TO_MODE_SELECT'
@@ -373,9 +370,7 @@ export interface GameEvent {
   type: GameEventType;
   payload?:
     | ShowDialogEventPayload
-    | ShowBattleDialogEventPayload
     | ShowLevelSelectDialogEventPayload
-    | StartBattleEventPayload
     | AddCreatureToProfileEventPayload
     | SetFlagEventPayload
     | RemoveFlagEventPayload
@@ -399,11 +394,6 @@ export interface ShowDialogEventPayload {
   contextData?: DialogContextData;
 }
 
-export interface ShowBattleDialogEventPayload {
-  context: DialogContext;
-  contextData?: DialogContextData;
-}
-
 export interface ShowLevelSelectDialogEventPayload {
   context: DialogContext;
   contextData?: DialogContextData;
@@ -412,51 +402,6 @@ export interface ShowLevelSelectDialogEventPayload {
 export interface AddCreatureToProfileEventPayload {
   creature: Creature;
   profileId: number;
-}
-
-export enum BattleContext {
-  FIRST_BATTLE = 'FIRST_BATTLE',
-  FOREST_BUG_BATTLE = 'FOREST_BUG_BATTLE',
-  FOREST_BUG_STAGE_2_BATTLE = 'FOREST_BUG_STAGE_2_BATTLE',
-  FOREST_MOTH_BATTLE = 'FOREST_MOTH_BATTLE',
-}
-
-export type BattleTurnPhase =
-  | 'before'
-  | 'attack'
-  | 'animating'
-  | 'after'
-  | 'end';
-export type BattleTriggerPhase =
-  | 'start'
-  | 'beforePlayerAttack'
-  | 'beforeEnemyAttack'
-  | 'afterEnemyAttack';
-
-export interface BattleDrop {
-  itemId: string;
-  chance: number; // 0-1
-  min: number;
-  max: number;
-}
-
-export interface BattleConfig {
-  enemy: Creature;
-  backgroundImageKey: BackgroundImageKey;
-  turnEvents?: {
-    [turn: number]: {
-      [key in BattleTriggerPhase]?: GameEvent[];
-    };
-  };
-  winEvents: GameEvent[];
-  loseEvents: GameEvent[];
-  drops?: BattleDrop[];
-}
-
-export interface StartBattleEventPayload {
-  context: BattleContext;
-  enemyId?: string;
-  backgroundKey?: BackgroundImageKey;
 }
 
 export interface GoToTowerDefenseEventPayload {

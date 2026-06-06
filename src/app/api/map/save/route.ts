@@ -20,7 +20,6 @@ export async function POST(req: NextRequest) {
     const fileContent = `import {
   Island,
   BackgroundImageKey,
-  BattleContext,
 } from '@/types/baseGame';
 
 export const ISLANDS: Island[] = ${JSON.stringify(islands, null, 2)} as any;

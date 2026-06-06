@@ -6,7 +6,6 @@ import {
   Screens,
   DialogAction,
   DialogContext,
-  BattleContext,
   BackgroundImageKey,
   Creature,
   StoryProgression,
@@ -22,7 +21,6 @@ import { resolveDialog } from '@/utils/dialogResolver';
 const StartScreen = lazy(() => import('@/app/components/startScreen'));
 const ProfileScreen = lazy(() => import('@/app/components/profileScreen'));
 const DialogScreen = lazy(() => import('@/app/components/dialogScreen'));
-const BattleScreen = lazy(() => import('@/app/components/battleScreen'));
 const PartyScreen = lazy(() => import('@/app/components/PartyScreen'));
 const LevelSelectScreen = lazy(
   () => import('@/app/components/LevelSelectScreen')
@@ -48,17 +46,11 @@ export default function Home() {
     selectProfile,
     dialogContext,
     dialogContextData,
-    currentBattle,
-    currentEnemy,
-    clearCurrentEnemy,
     eventQueue,
     processNextEvent,
     enqueueEvent,
     enqueueAndProcessEvents,
     pushEventToFront,
-    handleBattleWin,
-    handleBattleLose,
-    useItem,
     updateCreatures,
     updateCreatureAttacks,
     reorderCreatures,
@@ -72,92 +64,14 @@ export default function Home() {
 
   useEffect(() => {
     // Handle redirects based on state validity
-    if (currentScreen === Screens.BATTLE) {
-      if (!currentProfile || !currentEnemy) {
-        setScreen(Screens.LEVEL_SELECT);
-      } else if (!currentProfile.creatures[0]) {
-        setScreen(Screens.LEVEL_SELECT);
-      }
-    } else if (currentScreen === Screens.LEVEL_SELECT) {
+    if (currentScreen === Screens.LEVEL_SELECT) {
       if (!currentProfile) {
         setScreen(Screens.PROFILES);
       }
     }
-  }, [currentScreen, currentProfile, currentEnemy, setScreen, profiles]);
+  }, [currentScreen, currentProfile, setScreen]);
 
-  if (currentScreen === Screens.BATTLE) {
-    if (!currentProfile || !currentEnemy) {
-      return null;
-    }
 
-    // Default to first creature if valid
-    const playerCreature = resolvePlayerCreature(currentProfile.creatures[0]);
-    if (!playerCreature) {
-      return null;
-    }
-
-    return (
-      <Suspense fallback={<div>Loading Battle...</div>}>
-        <BattleScreen
-          playerCreature={playerCreature}
-          party={resolvePlayerCreatures(currentProfile.creatures)}
-          enemyCreature={currentEnemy}
-          inventory={currentProfile.inventory}
-          onUseItem={useItem}
-          onBattleEnd={(won, modifiedCreatures) => {
-            if (eventQueue.length > 0) {
-              processNextEvent();
-              clearCurrentEnemy();
-              return;
-            }
-
-            if (won) {
-              handleBattleWin();
-            } else {
-              handleBattleLose();
-            }
-          }}
-          backgroundImageKey={
-            currentBattle?.backgroundImageKey || BackgroundImageKey.DEFAULT
-          }
-          dialogContext={dialogContext}
-          dialogContextData={dialogContextData}
-          onDialogContinue={() => {
-            const { nextEvents } = resolveDialog(
-              dialogContext,
-              dialogContextData
-            );
-
-            if (nextEvents && nextEvents.length > 0) {
-              enqueueAndProcessEvents(nextEvents);
-              return;
-            }
-
-            if (eventQueue.length > 0) {
-              processNextEvent();
-            } else {
-              // Close dialog
-              setScreen(Screens.BATTLE);
-            }
-          }}
-          onDialogAction={(action) => {
-            if (action.type === 'PROCESS_EVENT' && action.payload?.event) {
-              pushEventToFront(action.payload.event);
-              processNextEvent();
-            }
-          }}
-          onTriggerTurnEvent={(turn, phase) => {
-            const events = currentBattle?.turnEvents?.[turn]?.[phase];
-            if (events && events.length > 0) {
-              enqueueAndProcessEvents(events);
-              return true;
-            }
-            return false;
-          }}
-        />
-      </Suspense>
-    );
-  }
 
   if (currentScreen === Screens.START) {
     return (
@@ -318,7 +232,6 @@ export default function Home() {
             ]);
           }}
           onBack={() => setScreen(Screens.MODE_SELECT)}
-          onUseItem={useItem}
           dialogContext={dialogContext}
           dialogContextData={dialogContextData}
           onDialogContinue={() => {

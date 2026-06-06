@@ -14,9 +14,7 @@ import { TDLevelContext } from '@/types/baseGame';
 
 const DialogEditor = lazy(() => import('./DialogEditor'));
 const AnimationEditor = lazy(() => import('./AnimationEditor'));
-const BattleDebug = lazy(() => import('./BattleDebug'));
 const MapEditor = lazy(() => import('./MapEditor'));
-const CreaturePositionEditor = lazy(() => import('./CreaturePositionEditor'));
 const TDTowerSizeEditor = lazy(() => import('./TDTowerSizeEditor'));
 const TowerDefenseScreen = lazy(
   () => import('@/app/components/tower-defense/TowerDefenseScreen')
@@ -26,9 +24,7 @@ const TDLevelEditor = lazy(() => import('./TDLevelEditor'));
 type ToolType =
   | 'DIALOG'
   | 'ANIMATION'
-  | 'BATTLE'
   | 'MAP'
-  | 'CREATURE_POSITION'
   | 'TOWER_DEFENSE'
   | 'TD_LEVEL_EDITOR'
   | 'TD_TOWER_SIZE_EDITOR'
@@ -88,30 +84,12 @@ export default function DevTools() {
               </button>
               <button
                 onClick={() => {
-                  setActiveTool('BATTLE');
-                  setShowMenu(false);
-                }}
-                className="text-sm bg-slate-800 hover:bg-cyan-700 px-3 py-2 rounded text-left"
-              >
-                Battle Debug
-              </button>
-              <button
-                onClick={() => {
                   setActiveTool('MAP');
                   setShowMenu(false);
                 }}
                 className="text-sm bg-slate-800 hover:bg-cyan-700 px-3 py-2 rounded text-left"
               >
                 Map Editor
-              </button>
-              <button
-                onClick={() => {
-                  setActiveTool('CREATURE_POSITION');
-                  setShowMenu(false);
-                }}
-                className="text-sm bg-slate-800 hover:bg-cyan-700 px-3 py-2 rounded text-left"
-              >
-                Creature Position Editor
               </button>
               <button
                 onClick={() => {
@@ -243,14 +221,8 @@ export default function DevTools() {
           {activeTool === 'ANIMATION' && (
             <AnimationEditor onClose={() => setActiveTool(null)} />
           )}
-          {activeTool === 'BATTLE' && (
-            <BattleDebug onClose={() => setActiveTool(null)} />
-          )}
           {activeTool === 'MAP' && (
             <MapEditor onClose={() => setActiveTool(null)} />
-          )}
-          {activeTool === 'CREATURE_POSITION' && (
-            <CreaturePositionEditor onClose={() => setActiveTool(null)} />
           )}
           {activeTool === 'TD_TOWER_SIZE_EDITOR' && (
             <TDTowerSizeEditor onClose={() => setActiveTool(null)} />

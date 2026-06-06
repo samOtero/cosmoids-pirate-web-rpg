@@ -14,7 +14,6 @@ import { resolveDialog } from '@/utils/dialogResolver';
 import DialogContent from '@/app/components/ui/DialogContent';
 import InventoryModal from '@/app/components/inventory/InventoryModal';
 import { useGameStore } from '@/store/gameStore';
-import { resolvePlayerCreature } from '@/utils/resolvePlayerCreature';
 
 interface IslandMapScreenProps {
   profile: Profile;
@@ -22,7 +21,6 @@ interface IslandMapScreenProps {
   onNodeClick: (nodeId: number) => void;
   onBack: () => void;
   onOpenMenu: () => void;
-  onUseItem: (itemId: string, targetCreatureId?: string) => void;
   // Dialog Support
   dialogContext?: DialogContext | null;
   dialogContextData?: DialogContextData | null;
@@ -40,7 +38,6 @@ export default function IslandMapScreen({
   dialogContextData,
   onDialogContinue,
   onDialogAction,
-  onUseItem,
 }: IslandMapScreenProps) {
   const flags = profile.gameFlags ?? [];
   const isWorldMapUnlocked = profile.unlockedIslands > 0;
@@ -292,9 +289,7 @@ export default function IslandMapScreen({
       {showInventory && (
         <InventoryModal
           inventory={profile.inventory}
-          creatures={profile.creatures.map(resolvePlayerCreature)}
           onClose={() => setShowInventory(false)}
-          onUseItem={onUseItem}
         />
       )}
     </>

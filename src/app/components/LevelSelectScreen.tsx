@@ -15,13 +15,11 @@ import { resolveDialog } from '@/utils/dialogResolver';
 import DialogContent from '@/app/components/ui/DialogContent';
 import InventoryModal from '@/app/components/inventory/InventoryModal';
 import { useGameStore } from '@/store/gameStore';
-import { resolvePlayerCreature } from '@/utils/resolvePlayerCreature';
 
 interface LevelSelectScreenProps {
   profile: Profile;
   onLevelSelect: (context: TDLevelContext) => void;
   onBack: () => void;
-  onUseItem: (itemId: string, targetCreatureId?: string) => void;
   // Dialog Support
   dialogContext?: DialogContext | null;
   dialogContextData?: DialogContextData | null;
@@ -33,7 +31,6 @@ export default function LevelSelectScreen({
   profile,
   onLevelSelect,
   onBack,
-  onUseItem,
   dialogContext,
   dialogContextData,
   onDialogContinue,
@@ -224,9 +221,7 @@ export default function LevelSelectScreen({
       {showInventory && (
         <InventoryModal
           inventory={profile.inventory}
-          creatures={profile.creatures.map(resolvePlayerCreature)}
           onClose={() => setShowInventory(false)}
-          onUseItem={onUseItem}
         />
       )}
     </>

@@ -1,7 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { useGameStore } from '../../store/gameStore';
 import {
-  BattleContext,
   DialogContext,
   GameEvent,
   Screens,
@@ -46,8 +45,7 @@ describe('useGameStore - enqueueAndProcessEvents', () => {
     const { result } = renderHook(() => useGameStore());
 
     const event1: GameEvent = {
-      type: 'START_BATTLE',
-      payload: { context: BattleContext.FIRST_BATTLE, enemyId: '101' },
+      type: 'GO_TO_PARTY',
     };
 
     const event2: GameEvent = {
@@ -63,8 +61,8 @@ describe('useGameStore - enqueueAndProcessEvents', () => {
     expect(result.current.eventQueue).toHaveLength(1);
     expect(result.current.eventQueue[0]).toEqual(event2);
 
-    // Expect state to change based on the first event (START_BATTLE)
-    expect(result.current.currentScreen).toBe(Screens.BATTLE);
+    // Expect state to change based on the first event (GO_TO_PARTY)
+    expect(result.current.currentScreen).toBe(Screens.PARTY);
   });
 
   it('should handle empty array gracefully', () => {
@@ -86,54 +84,20 @@ describe('useGameStore - enqueueAndProcessEvents', () => {
       autoProceed: true,
     };
 
-    // Event 2: Start Battle (should be processed immediately after Event 1)
+    // Event 2: Go to Party (should be processed immediately after Event 1)
     const event2: GameEvent = {
-      type: 'START_BATTLE',
-      payload: { context: BattleContext.FIRST_BATTLE },
+      type: 'GO_TO_PARTY',
     };
 
     act(() => {
       result.current.enqueueAndProcessEvents([event1, event2]);
     });
 
-    // Final state should be BATTLE, because Event 1 auto-proceeded to Event 2
-    expect(result.current.currentScreen).toBe(Screens.BATTLE);
+    // Final state should be PARTY, because Event 1 auto-proceeded to Event 2
+    expect(result.current.currentScreen).toBe(Screens.PARTY);
 
     // Queue should be empty because both were processed
     expect(result.current.eventQueue).toHaveLength(0);
-  });
-
-  it('should not switch screen when SHOW_BATTLE_DIALOG is triggered during BATTLE', () => {
-    const { result } = renderHook(() => useGameStore());
-
-    // 1. Start Battle
-    act(() => {
-      result.current.enqueueAndProcessEvents([
-        {
-          type: 'START_BATTLE',
-          payload: { context: BattleContext.FIRST_BATTLE },
-        },
-      ]);
-    });
-
-    expect(result.current.currentScreen).toBe(Screens.BATTLE);
-
-    // 2. Trigger Battle Dialog
-    act(() => {
-      result.current.enqueueAndProcessEvents([
-        {
-          type: 'SHOW_BATTLE_DIALOG',
-          payload: { context: DialogContext.NEW_PLAYER_WELCOME_DIALOG },
-        },
-      ]);
-    });
-
-    // 3. Verify screen is STILL Battle
-    expect(result.current.currentScreen).toBe(Screens.BATTLE);
-    // 4. Verify context is set
-    expect(result.current.dialogContext).toBe(
-      DialogContext.NEW_PLAYER_WELCOME_DIALOG
-    );
   });
 
   it('should not switch screen when SHOW_LEVEL_SELECT_DIALOG is triggered during LEVEL_SELECT', () => {

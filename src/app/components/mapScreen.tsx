@@ -1,5 +1,4 @@
 import { Profile } from '@/types/baseGame';
-import { resolvePlayerCreature } from '@/utils/resolvePlayerCreature';
 import Panel from '@/app/components/ui/Panel';
 import { useState } from 'react';
 import { Button } from '@/app/components/ui/Button';
@@ -12,14 +11,12 @@ interface MapScreenProps {
   onTravel: (islandId: number) => void;
   onEnterIsland: (islandId: number) => void;
   onOpenMenu: () => void;
-  onUseItem: (itemId: string, targetCreatureId?: string) => void;
 }
 export default function MapScreen({
   profile,
   onTravel,
   onEnterIsland,
   onOpenMenu,
-  onUseItem,
 }: MapScreenProps) {
   const [hoverIsland, setHoverIsland] = useState<number | null>(null);
   const [showInventory, setShowInventory] = useState(false);
@@ -64,43 +61,6 @@ export default function MapScreen({
         <Panel className="p-3 flex flex-col gap-2 bg-ocean-dark/90 min-w-[150px]">
           <div className="font-bold text-sand text-sm border-b border-wood pb-1 mb-1 flex justify-between">
             <span>{profile.name}</span>
-            <span className="text-cyan-400">
-              Lv {profile.creatures[0]?.level}
-            </span>
-          </div>
-
-          {/* Creatures */}
-          <div className="flex gap-2">
-            {profile.creatures.map((pc, i) => {
-              const c = resolvePlayerCreature(pc);
-              return (
-                <div key={pc.id} className="relative group cursor-help">
-                  <img
-                    src={c.iconImg || c.spriteUrl}
-                    className="w-12 h-12 border-2 border-wood rounded bg-black/40 object-contain hover:border-cyan-400 transition-colors"
-                  />
-                  <div
-                    className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border border-black"
-                    title="Health"
-                  ></div>
-                  {/* Tooltip */}
-                  <div className="absolute bottom-full left-0 mb-2 hidden group-hover:block bg-black/90 p-2 rounded text-xs whitespace-nowrap z-50 pointer-events-none">
-                    <div className="font-bold text-cyan-300">{c.name}</div>
-                    <div>Lv. {pc.level}</div>
-                  </div>
-                </div>
-              );
-            })}
-            {Array.from({
-              length: Math.max(0, 3 - profile.creatures.length),
-            }).map((_, i) => (
-              <div
-                key={i}
-                className="w-12 h-12 border-2 border-wood/50 rounded bg-black/20 flex items-center justify-center text-white/10 text-xl"
-              >
-                +
-              </div>
-            ))}
           </div>
 
           {/* Mini Inventory View */}
@@ -224,9 +184,7 @@ export default function MapScreen({
       {showInventory && (
         <InventoryModal
           inventory={profile.inventory}
-          creatures={profile.creatures.map(resolvePlayerCreature)}
           onClose={() => setShowInventory(false)}
-          onUseItem={onUseItem}
         />
       )}
     </div>
