@@ -77,9 +77,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
             }))
           : []
       );
-      setWaves(
-        levelData.waves ? JSON.parse(JSON.stringify(levelData.waves)) : []
-      );
+      setWaves(JSON.parse(JSON.stringify(levelData.waves)));
       setSurviveUntil(levelData.surviveUntil || 0);
       setLives(levelData.lives !== undefined ? levelData.lives : 3);
       setBackgroundUrl(levelData.backgroundUrl || '');

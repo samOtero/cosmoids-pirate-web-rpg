@@ -9,12 +9,46 @@ import {
   TDLevelContext,
 } from '@/types/baseGame';
 import { LEVEL_ORDER, TD_LEVELS } from '@/constants/tdLevels';
+import { COSMOID_TEMPLATES } from '@/constants/creatures';
 import Panel from '@/app/components/ui/Panel';
 import { Button } from '@/app/components/ui/Button';
 import { resolveDialog } from '@/utils/dialogResolver';
 import DialogContent from '@/app/components/ui/DialogContent';
 import InventoryModal from '@/app/components/inventory/InventoryModal';
 import { useGameStore } from '@/store/gameStore';
+
+function getLevelCreatureIcons(context: TDLevelContext): string[] {
+  if (context === TDLevelContext.FOREST_LEVEL_2) {
+    return [
+      COSMOID_TEMPLATES.starter_crab?.iconImg || '',
+      COSMOID_TEMPLATES.starter_iguana?.iconImg || '',
+      COSMOID_TEMPLATES.starter_monkey?.iconImg || '',
+    ].filter(Boolean);
+  }
+
+  const levelConfig = TD_LEVELS[context];
+  if (!levelConfig || !levelConfig.levelData) return [];
+
+  const uniqueIds = new Set<string>();
+  levelConfig.levelData.waves.forEach((wave) => {
+    wave.groups.forEach((group) => {
+      uniqueIds.add(group.definitionId);
+    });
+  });
+
+  const icons: string[] = [];
+  uniqueIds.forEach((defId) => {
+    const template = COSMOID_TEMPLATES[defId];
+    if (template) {
+      const icon = template.iconImg || template.spriteUrl;
+      if (icon) {
+        icons.push(icon);
+      }
+    }
+  });
+
+  return icons;
+}
 
 interface LevelSelectScreenProps {
   profile: Profile;
@@ -167,6 +201,24 @@ export default function LevelSelectScreen({
                   >
                     {level.name}
                   </span>
+
+                  {/* Creature Icons */}
+                  {isUnlocked && hasTdConfig && (
+                    <div className="flex gap-1 justify-center mt-1">
+                      {getLevelCreatureIcons(level.context).map((iconSrc, iconIdx) => (
+                        <div
+                          key={iconIdx}
+                          className="w-6 h-6 lg:w-7 lg:h-7 rounded-full overflow-hidden bg-black/35 border border-sand/20 flex items-center justify-center shadow-sm"
+                        >
+                          <img
+                            src={iconSrc}
+                            alt="Creature"
+                            className="w-full h-full object-contain p-0.5"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Hover tooltip with description */}
                   {isHover && isUnlocked && (

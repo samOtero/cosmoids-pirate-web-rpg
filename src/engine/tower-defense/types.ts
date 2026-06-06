@@ -83,7 +83,7 @@ export interface CaptureUnit extends BaseTDUnit {
 export interface TDLevelData {
   paths: Point[][];
   placementSpots: Point[];
-  waves?: TDWave[]; // Optional for backwards compatibility
+  waves: TDWave[];
   surviveUntil?: number; // Win after surviving for this many seconds
   lives?: number; // Default is 3 if not provided, or overridden by captureUnits length
   enemyHpMultiplier?: number; // Defaults to 1 if not provided
