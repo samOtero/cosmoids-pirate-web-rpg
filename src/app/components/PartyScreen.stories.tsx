@@ -43,8 +43,6 @@ const createMockInstance = (
     battlePosition: base.battlePosition,
     battleScale: base.battleScale,
     movementId: base.movementId,
-    startingEnergy: base.startingEnergy,
-    currentEnergy: base.startingEnergy,
     ...overrideOverrides,
   };
 };

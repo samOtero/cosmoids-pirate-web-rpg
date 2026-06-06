@@ -7,7 +7,7 @@ import {
 export const LEVEL_1_INSTRUCTION_3: DialogConfig = {
   sequence: [
     {
-      text: 'Ha! It barely grazed you. Look at it trembling, that beast has no Energy left.',
+      text: 'Ha! It barely grazed you. Look at it trembling, that beast is already wearing out.',
       portraits: [
         {
           key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,
@@ -17,7 +17,7 @@ export const LEVEL_1_INSTRUCTION_3: DialogConfig = {
       layout: 'battle-left',
     },
     {
-      text: "It can't fight properly when it's that exhausted. Press the advantage, Captain!",
+      text: "We have the upper hand now. Press the advantage, Captain!",
       portraits: [
         {
           key: SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT,

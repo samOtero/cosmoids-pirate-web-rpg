@@ -199,8 +199,6 @@ interface BattleScreenLogicProps {
   onUseItem?: (itemId: string, targetCreatureId?: string) => boolean | void;
 }
 
-const ENERGY_COST_ATTACK = 10;
-
 export default function BattleScreen({
   playerCreature,
   enemyCreature,
@@ -220,10 +218,6 @@ export default function BattleScreen({
   // Local state for the battle loop so we don't mutate global store directly until the end
   const [playerHp, setPlayerHp] = useState(playerCreature.currentHp);
   const [enemyHp, setEnemyHp] = useState(enemyCreature.currentHp);
-  const [playerEnergy, setPlayerEnergy] = useState(
-    playerCreature.currentEnergy
-  );
-  const [enemyEnergy, setEnemyEnergy] = useState(enemyCreature.currentEnergy);
 
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [battleLog, setBattleLog] = useState<string[]>([]);
@@ -286,19 +280,6 @@ export default function BattleScreen({
     if (turnPhase === 'attack') {
       const timer = setTimeout(() => {
         setTurnPhase('animating'); // Advance phase first to prevent re-entry on state changes
-        // ENERGY CHECK FOR ENEMY
-        if (enemyEnergy <= 0) {
-          const refuse = Math.random() > 0.5;
-          if (refuse) {
-            addLog(`${enemyCreature.name} is too tired to move!`);
-            setTurnPhase('after');
-            return;
-          } else {
-            addLog(`${enemyCreature.name} attacks weakly due to exhaustion...`);
-          }
-        } else {
-          setEnemyEnergy((prev) => Math.max(0, prev - ENERGY_COST_ATTACK));
-        }
 
         // 1. Enemy Tackle Animation
         setEnemyHit('tackle_enemy');
@@ -312,16 +293,6 @@ export default function BattleScreen({
             1,
             Math.floor(enemyCreature.attack - playerCreature.defense / 2)
           );
-
-          // WEAK ATTACK PENALTY
-          if (enemyEnergy <= 0) {
-            damage = Math.max(1, Math.floor(damage * 0.2));
-          }
-
-          // VULNERABLE DEFENSE PENALTY
-          if (playerEnergy <= 0) {
-            damage = Math.floor(damage * 1.5);
-          }
 
           setPlayerHp((prev) => prev - damage);
           addLog(`${enemyCreature.name} attacked doing ${damage} damage!`);
@@ -365,7 +336,6 @@ export default function BattleScreen({
     turnCount,
     enemyCreature,
     playerCreature,
-    enemyEnergy,
   ]);
 
   const handleAttack = (moveIndex: number) => {
@@ -375,20 +345,6 @@ export default function BattleScreen({
     if (triggered) return;
 
     const moveName = playerCreature.moves[moveIndex];
-
-    // ENERGY CHECK FOR PLAYER
-    if (playerEnergy <= 0) {
-      const refuse = Math.random() > 0.5;
-      if (refuse) {
-        addLog(`Your cosmoid is too tired to move!`);
-        setIsPlayerTurn(false); // Skip turn
-        return;
-      } else {
-        addLog(`Your cosmoid attacks weakly due to exhaustion...`);
-      }
-    } else {
-      setPlayerEnergy((prev) => Math.max(0, prev - ENERGY_COST_ATTACK));
-    }
 
     setIsPlayerTurn(false);
 
@@ -403,16 +359,6 @@ export default function BattleScreen({
       // 1,
       // Math.floor(playerCreature.attack - enemyCreature.defense / 2)
       // );
-
-      // WEAK ATTACK PENALTY
-      if (playerEnergy <= 0) {
-        damage = Math.max(1, Math.floor(damage * 0.2));
-      }
-
-      // VULNERABLE DEFENSE PENALTY
-      if (enemyEnergy <= 0) {
-        damage = Math.floor(damage * 1.5);
-      }
 
       setEnemyHp((prev) => prev - damage);
       addLog(`${playerCreature.name} used ${moveName} doing ${damage} damage!`);
@@ -485,12 +431,10 @@ export default function BattleScreen({
   const currentPlayer = {
     ...playerCreature,
     currentHp: Math.max(0, playerHp),
-    currentEnergy: playerEnergy,
   };
   const currentEnemy = {
     ...enemyCreature,
     currentHp: Math.max(0, enemyHp),
-    currentEnergy: enemyEnergy,
   };
 
   const backgroundImageUrl =

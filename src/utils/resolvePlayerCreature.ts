@@ -60,8 +60,6 @@ export function createWildCreature(speciesId: string, level: number): Creature {
     battlePosition: template.battlePosition,
     battleScale: template.battleScale,
     movementId: template.movementId,
-    startingEnergy: template.startingEnergy,
-    currentEnergy: template.startingEnergy,
   };
 }
 
@@ -95,8 +93,6 @@ export function resolvePlayerCreature(pc: PlayerCreature): Creature {
     battlePosition: template.battlePosition,
     battleScale: template.battleScale,
     movementId: template.movementId,
-    startingEnergy: template.startingEnergy,
-    currentEnergy: template.startingEnergy,
   };
 }
 

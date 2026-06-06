@@ -176,7 +176,6 @@ export interface CosmoidTemplate {
   type: ElementType;
   baseStats: BaseStats;
   baseExperience: number;
-  startingEnergy: number;
   spriteUrl: string;
   iconImg?: string;
   battleSpriteUrl?: string;
@@ -209,8 +208,6 @@ export interface Creature {
   battlePosition?: { bottom: number; left: number };
   battleScale?: number;
   movementId?: string;
-  startingEnergy: number;
-  currentEnergy: number;
 }
 
 
