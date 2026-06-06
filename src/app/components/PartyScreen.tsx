@@ -299,16 +299,6 @@ export default function PartyScreen({
                       <div className="absolute top-0.5 right-0.5 rounded bg-black/80 px-1 text-[9px] font-bold text-sand lg:text-xs">
                         Lv{creature.level}
                       </div>
-                      <div className="absolute bottom-1 w-full px-1">
-                        <div className="h-1 w-full overflow-hidden rounded-full border border-black/50 bg-red-900 lg:h-1.5">
-                          <div
-                            className="h-full bg-green-500"
-                            style={{
-                              width: `${(creature.currentHp / creature.maxHp) * 100}%`,
-                            }}
-                          />
-                        </div>
-                      </div>
                     </>
                   ) : (
                     <span className="text-xl text-white/20 lg:text-3xl">+</span>
