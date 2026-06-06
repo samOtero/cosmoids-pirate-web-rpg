@@ -18,14 +18,6 @@ import InventoryModal from '@/app/components/inventory/InventoryModal';
 import { useGameStore } from '@/store/gameStore';
 
 function getLevelCreatureIcons(context: TDLevelContext): string[] {
-  if (context === TDLevelContext.FOREST_LEVEL_2) {
-    return [
-      COSMOID_TEMPLATES.starter_crab?.iconImg || '',
-      COSMOID_TEMPLATES.starter_iguana?.iconImg || '',
-      COSMOID_TEMPLATES.starter_monkey?.iconImg || '',
-    ].filter(Boolean);
-  }
-
   const levelConfig = TD_LEVELS[context];
   if (!levelConfig || !levelConfig.levelData) return [];
 

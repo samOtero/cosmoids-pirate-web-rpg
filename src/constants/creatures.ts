@@ -13,6 +13,7 @@ export const SENTICLE: CosmoidTemplate = {
     speed: 30,
   },
   baseExperience: 62,
+  iconImg: '/UI/Icons/senticle_icon.png',
   spriteUrl: '/eel-basic-normal-neutral-skin-1.png',
   battleSpriteUrl:
     '/battles/cosmoids/eel-basic-normal-neutral-skin-battle-ground-2.png',
