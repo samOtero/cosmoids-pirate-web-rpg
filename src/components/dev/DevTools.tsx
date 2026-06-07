@@ -14,7 +14,6 @@ import { TDLevelContext } from '@/types/baseGame';
 
 const DialogEditor = lazy(() => import('./DialogEditor'));
 const AnimationEditor = lazy(() => import('./AnimationEditor'));
-const MapEditor = lazy(() => import('./MapEditor'));
 const TDTowerSizeEditor = lazy(() => import('./TDTowerSizeEditor'));
 const TowerDefenseScreen = lazy(
   () => import('@/app/components/tower-defense/TowerDefenseScreen')
@@ -24,7 +23,6 @@ const TDLevelEditor = lazy(() => import('./TDLevelEditor'));
 type ToolType =
   | 'DIALOG'
   | 'ANIMATION'
-  | 'MAP'
   | 'TOWER_DEFENSE'
   | 'TD_LEVEL_EDITOR'
   | 'TD_TOWER_SIZE_EDITOR'
@@ -82,15 +80,7 @@ export default function DevTools() {
               >
                 Animation Editor
               </button>
-              <button
-                onClick={() => {
-                  setActiveTool('MAP');
-                  setShowMenu(false);
-                }}
-                className="text-sm bg-slate-800 hover:bg-cyan-700 px-3 py-2 rounded text-left"
-              >
-                Map Editor
-              </button>
+
               <button
                 onClick={() => {
                   setActiveTool('TOWER_DEFENSE');
@@ -221,9 +211,7 @@ export default function DevTools() {
           {activeTool === 'ANIMATION' && (
             <AnimationEditor onClose={() => setActiveTool(null)} />
           )}
-          {activeTool === 'MAP' && (
-            <MapEditor onClose={() => setActiveTool(null)} />
-          )}
+
           {activeTool === 'TD_TOWER_SIZE_EDITOR' && (
             <TDTowerSizeEditor onClose={() => setActiveTool(null)} />
           )}

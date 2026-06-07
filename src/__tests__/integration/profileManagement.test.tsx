@@ -48,9 +48,6 @@ describe('Profile Management Integration', () => {
         creatures: [],
         storageCreatures: [],
         inventory: [],
-        unlockedIslands: 2,
-        currentIslandId: 1,
-        islandPositions: { 0: 0 },
         storyProgression: 0,
         gameFlags: [],
       };
@@ -80,10 +77,7 @@ describe('Profile Management Integration', () => {
         creatures: [],
         storageCreatures: [],
         inventory: [],
-        unlockedIslands: 3,
-        currentIslandId: 2,
-        islandPositions: { 0: 0 },
-        storyProgression: 0,
+        storyProgression: 2, // DEFEAT_FIRST_BATTLE unlocks Level 2
         gameFlags: [],
       };
 
@@ -97,7 +91,7 @@ describe('Profile Management Integration', () => {
       );
 
       expect(screen.getByText('Sea Captain')).toBeInTheDocument();
-      expect(screen.getByText('Island 4')).toBeInTheDocument(); // unlockedIslands + 1
+      expect(screen.getByText('Level 2')).toBeInTheDocument(); // Story progression matches Level 2
       // Use text matcher that works with the actual rendered date format
       expect(screen.getByText(/Last Played:/)).toBeInTheDocument();
       expect(screen.getByText(/11\/\d{1,2}\/2025/)).toBeInTheDocument();
@@ -116,9 +110,6 @@ describe('Profile Management Integration', () => {
         creatures: [],
         storageCreatures: [],
         inventory: [],
-        unlockedIslands: 0,
-        currentIslandId: 0,
-        islandPositions: { 0: 0 },
         storyProgression: 0,
         gameFlags: [],
       };
@@ -152,9 +143,6 @@ describe('Profile Management Integration', () => {
         creatures: [],
         storageCreatures: [],
         inventory: [],
-        unlockedIslands: 0,
-        currentIslandId: 0,
-        islandPositions: { 0: 0 },
         storyProgression: 0,
         gameFlags: [],
       };
@@ -190,8 +178,6 @@ describe('Profile Management Integration', () => {
         name: 'Caleb',
         creatures: [],
         inventory: [],
-        unlockedIslands: 0,
-        currentIslandId: 0,
       });
       expect(state.profiles[0]?.lastPlayed).toBeDefined();
     });

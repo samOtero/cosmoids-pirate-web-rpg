@@ -119,7 +119,7 @@ describe('useGameStore - enqueueAndProcessEvents', () => {
       result.current.enqueueAndProcessEvents([
         {
           type: 'SHOW_LEVEL_SELECT_DIALOG',
-          payload: { context: DialogContext.ISLAND_INTRO },
+          payload: { context: DialogContext.LEVEL_1_INTRO },
         },
       ]);
     });
@@ -127,6 +127,6 @@ describe('useGameStore - enqueueAndProcessEvents', () => {
     // 3. Verify screen is STILL Level Select
     expect(result.current.currentScreen).toBe(Screens.LEVEL_SELECT);
     // 4. Verify dialog context is set
-    expect(result.current.dialogContext).toBe(DialogContext.ISLAND_INTRO);
+    expect(result.current.dialogContext).toBe(DialogContext.LEVEL_1_INTRO);
   });
 });

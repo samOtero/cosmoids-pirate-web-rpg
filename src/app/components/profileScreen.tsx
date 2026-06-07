@@ -1,4 +1,5 @@
 import { Profile } from '@/types/baseGame';
+import { LEVEL_ORDER } from '@/constants/tdLevels';
 import { resolvePlayerCreature } from '@/utils/resolvePlayerCreature';
 import Panel from '@/app/components/ui/Panel';
 import { Button } from '@/app/components/ui/Button';
@@ -56,7 +57,11 @@ export default function ProfileScreen({
                     {profile.name}
                   </h3>
                   <p className="text-xs text-sand/70">
-                    Island {profile.unlockedIslands + 1}
+                    Level {LEVEL_ORDER.filter(
+                      (level) =>
+                        level.requiredProgression === undefined ||
+                        profile.storyProgression >= level.requiredProgression
+                    ).length}
                   </p>
                   <p className="text-xs text-sand/50">
                     Last Played:{' '}

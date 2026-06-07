@@ -6,13 +6,6 @@ import {
   DialogContextData,
 } from '@/types/baseGame';
 import * as AllDialogs from '@/constants/dialogs';
-import { ISLANDS } from '@/constants/game';
-
-function getIslandKey(islandId: number): string {
-  const island = ISLANDS.find((i) => i.id === islandId);
-  if (!island) return '';
-  return island.name.toLowerCase().replace(/ /g, '_');
-}
 
 function getDefaultDialog(): DialogConfig {
   return {

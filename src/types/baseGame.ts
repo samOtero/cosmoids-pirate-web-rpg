@@ -221,17 +221,6 @@ export interface PlayerCreature {
   targetingMode?: string; // Persistent selected targeting mode
 }
 
-export interface IslandNode {
-  id: number;
-  name: string;
-  description: string;
-  coordinates: { x: number; y: number }; // Percentage 0-100
-  events: GameEvent[];
-  requiresFlag?: GameFlagValue; // Node only accessible if this flag is SET
-  blockedByFlag?: GameFlagValue; // Node inaccessible while this flag is SET
-  requiresStoryProgression?: number; // Requires specific story progression to unlock
-}
-
 export interface Profile {
   id: number;
   name: string;
@@ -239,24 +228,9 @@ export interface Profile {
   creatures: PlayerCreature[]; // Active party (max 6)
   storageCreatures: PlayerCreature[]; // Storage box creatures (independent from party)
   inventory: Item[];
-  unlockedIslands: number; // Max island index unlocked
-  currentIslandId: number;
   gameFlags: GameFlagValue[]; // Persistent flags set by events (e.g. GameFlag.STARTER_PALMIT)
   storyProgression: number;
-  islandPositions: Record<number, number>; // islandId -> nodeId
   version?: number;
-}
-
-export interface Island {
-  id: number;
-  name: string;
-  description: string;
-  difficulty: number;
-  coordinates: { x: number; y: number }; // Percentage 0-100
-  backgroundImageKey?: BackgroundImageKey;
-  unlocked: boolean;
-  cleared: boolean;
-  nodes: IslandNode[];
 }
 
 export interface DialogPortrait {
@@ -310,7 +284,6 @@ export interface DialogLine {
 }
 
 export enum DialogContext {
-  LEVEL_2_ISLAND_MAP_INTRO = 'LEVEL_2_ISLAND_MAP_INTRO',
   LEVEL_1_INSTRUCTION_3 = 'LEVEL_1_INSTRUCTION_3',
   LEVEL_1_INSTRUCTION_2 = 'LEVEL_1_INSTRUCTION_2',
   LEVEL_1_INSTRUCTION_1 = 'LEVEL_1_INSTRUCTION_1',
@@ -322,14 +295,10 @@ export enum DialogContext {
   NEW_PLAYER_WELCOME_DIALOG_PART_2 = 'NEW_PLAYER_WELCOME_DIALOG_PART_2',
   GAME_INTRO_AFTER_STARTER = 'GAME_INTRO_AFTER_STARTER',
   GAME_INTRO_PART_3 = 'GAME_INTRO_PART_3',
-  ISLAND_INTRO = 'ISLAND_INTRO',
-  ISLAND_VICTORY = 'ISLAND_VICTORY',
-  ISLAND_DEFEAT = 'ISLAND_DEFEAT',
   FOUND_ITEM = 'FOUND_ITEM',
 }
 
 export interface DialogContextData {
-  islandId?: number;
   creatureId?: string;
   dialogStartIndex?: number;
 }
@@ -358,7 +327,6 @@ export type GameEventType =
   | 'ADD_CREATURE_TO_PROFILE'
   | 'SET_FLAG'
   | 'REMOVE_FLAG'
-  | 'UNLOCK_ISLAND'
   | 'GAIN_ITEM'
   | 'GO_TO_PARTY'
   | 'REORDER_CREATURES'
@@ -374,7 +342,6 @@ export interface GameEvent {
     | AddCreatureToProfileEventPayload
     | SetFlagEventPayload
     | RemoveFlagEventPayload
-    | UnlockIslandEventPayload
     | GainItemEventPayload
     | ReorderCreaturesEventPayload
     | ExecuteTDActionEventPayload
@@ -414,10 +381,6 @@ export interface SetFlagEventPayload {
 
 export interface RemoveFlagEventPayload {
   flag: GameFlagValue;
-}
-
-export interface UnlockIslandEventPayload {
-  islandId: number;
 }
 
 export interface GainItemEventPayload {

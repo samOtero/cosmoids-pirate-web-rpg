@@ -5,9 +5,12 @@ import {
 } from '@/utils/buildTimeDialogValidator';
 import {
   NEW_PLAYER_WELCOME_DIALOG,
-  ISLAND_INTRO_DIALOGS,
-  ISLAND_VICTORY_DIALOGS,
-  ISLAND_DEFEAT_DIALOGS,
+  AFTER_STARTER_CHOICE_DIALOG,
+  STARTER_BATTLE_LOSE,
+  LEVEL_1_THE_MESSAGE,
+  LEVEL_1_WIN,
+  LEVEL_1_INTRO,
+  FOUND_ITEM,
 } from '@/constants/dialogs';
 import { DialogConfig } from '@/types/baseGame';
 
@@ -18,27 +21,12 @@ describe('Dialog Configuration Integration Tests', () => {
     // Collect all dialog configs for validation
     allDialogs = {
       NEW_PLAYER_WELCOME_DIALOG,
-      ...Object.entries(ISLAND_INTRO_DIALOGS).reduce(
-        (acc, [key, dialog]) => {
-          acc[`ISLAND_INTRO_DIALOGS[${key}]`] = dialog;
-          return acc;
-        },
-        {} as Record<string, DialogConfig>
-      ),
-      ...Object.entries(ISLAND_VICTORY_DIALOGS).reduce(
-        (acc, [key, dialog]) => {
-          acc[`ISLAND_VICTORY_DIALOGS[${key}]`] = dialog;
-          return acc;
-        },
-        {} as Record<string, DialogConfig>
-      ),
-      ...Object.entries(ISLAND_DEFEAT_DIALOGS).reduce(
-        (acc, [key, dialog]) => {
-          acc[`ISLAND_DEFEAT_DIALOGS[${key}]`] = dialog;
-          return acc;
-        },
-        {} as Record<string, DialogConfig>
-      ),
+      AFTER_STARTER_CHOICE_DIALOG,
+      STARTER_BATTLE_LOSE,
+      LEVEL_1_THE_MESSAGE,
+      LEVEL_1_WIN,
+      LEVEL_1_INTRO,
+      FOUND_ITEM,
     };
   });
 
@@ -54,43 +42,70 @@ describe('Dialog Configuration Integration Tests', () => {
       expect(result.valid).toBe(true);
     });
 
-    it('should validate all ISLAND_INTRO_DIALOGS', () => {
-      Object.entries(ISLAND_INTRO_DIALOGS).forEach(([key, dialog]) => {
-        const result = validateDialogConfig(
-          dialog,
-          `ISLAND_INTRO_DIALOGS[${key}]`
-        );
-        if (!result.valid) {
-          console.error(formatValidationErrors(result));
-        }
-        expect(result.valid).toBe(true);
-      });
+    it('should validate AFTER_STARTER_CHOICE_DIALOG', () => {
+      const result = validateDialogConfig(
+        AFTER_STARTER_CHOICE_DIALOG,
+        'AFTER_STARTER_CHOICE_DIALOG'
+      );
+      if (!result.valid) {
+        console.error(formatValidationErrors(result));
+      }
+      expect(result.valid).toBe(true);
     });
 
-    it('should validate all ISLAND_VICTORY_DIALOGS', () => {
-      Object.entries(ISLAND_VICTORY_DIALOGS).forEach(([key, dialog]) => {
-        const result = validateDialogConfig(
-          dialog,
-          `ISLAND_VICTORY_DIALOGS[${key}]`
-        );
-        if (!result.valid) {
-          console.error(formatValidationErrors(result));
-        }
-        expect(result.valid).toBe(true);
-      });
+    it('should validate STARTER_BATTLE_LOSE', () => {
+      const result = validateDialogConfig(
+        STARTER_BATTLE_LOSE,
+        'STARTER_BATTLE_LOSE'
+      );
+      if (!result.valid) {
+        console.error(formatValidationErrors(result));
+      }
+      expect(result.valid).toBe(true);
     });
 
-    it('should validate all ISLAND_DEFEAT_DIALOGS', () => {
-      Object.entries(ISLAND_DEFEAT_DIALOGS).forEach(([key, dialog]) => {
-        const result = validateDialogConfig(
-          dialog,
-          `ISLAND_DEFEAT_DIALOGS[${key}]`
-        );
-        if (!result.valid) {
-          console.error(formatValidationErrors(result));
-        }
-        expect(result.valid).toBe(true);
-      });
+    it('should validate LEVEL_1_THE_MESSAGE', () => {
+      const result = validateDialogConfig(
+        LEVEL_1_THE_MESSAGE,
+        'LEVEL_1_THE_MESSAGE'
+      );
+      if (!result.valid) {
+        console.error(formatValidationErrors(result));
+      }
+      expect(result.valid).toBe(true);
+    });
+
+    it('should validate LEVEL_1_WIN', () => {
+      const result = validateDialogConfig(
+        LEVEL_1_WIN,
+        'LEVEL_1_WIN'
+      );
+      if (!result.valid) {
+        console.error(formatValidationErrors(result));
+      }
+      expect(result.valid).toBe(true);
+    });
+
+    it('should validate LEVEL_1_INTRO', () => {
+      const result = validateDialogConfig(
+        LEVEL_1_INTRO,
+        'LEVEL_1_INTRO'
+      );
+      if (!result.valid) {
+        console.error(formatValidationErrors(result));
+      }
+      expect(result.valid).toBe(true);
+    });
+
+    it('should validate FOUND_ITEM', () => {
+      const result = validateDialogConfig(
+        FOUND_ITEM,
+        'FOUND_ITEM'
+      );
+      if (!result.valid) {
+        console.error(formatValidationErrors(result));
+      }
+      expect(result.valid).toBe(true);
     });
   });
 

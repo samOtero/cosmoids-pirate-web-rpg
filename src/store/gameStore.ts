@@ -23,7 +23,6 @@ import {
   RemoveFlagEventPayload,
   SetStoryProgressionEventPayload,
   StoryProgression,
-  UnlockIslandEventPayload,
   GameFlag,
   GainItemEventPayload,
   ReorderCreaturesEventPayload,
@@ -70,8 +69,6 @@ interface GameState {
   setStoryProgression: (progression: number) => void;
   setGameFlag: (flag: GameFlagValue) => void;
   removeGameFlag: (flag: GameFlagValue) => void;
-  unlockIsland: (islandId: number) => void;
-  setIslandPosition: (islandId: number, nodeId: number) => void;
   // TD Config
   currentTdLevel: TDLevelConfig | null;
   setTdLevel: (config: TDLevelConfig | null) => void;
@@ -291,12 +288,6 @@ export const useGameStore = create<GameState>()(
                     state.removeGameFlag(payload.flag);
                     break;
                   }
-                  case 'UNLOCK_ISLAND': {
-                    const payload =
-                      currentEvent.payload as UnlockIslandEventPayload;
-                    state.unlockIsland(payload.islandId);
-                    break;
-                  }
                   case 'GAIN_ITEM': {
                     const payload =
                       currentEvent.payload as GainItemEventPayload;
@@ -364,10 +355,7 @@ export const useGameStore = create<GameState>()(
                 creatures: [],
                 storageCreatures: [],
                 inventory: [],
-                unlockedIslands: 0,
-                currentIslandId: 0,
                 gameFlags: [],
-                islandPositions: { 0: 0 },
                 storyProgression: 0,
                 version: CURRENT_PROFILE_VERSION,
               };
@@ -426,10 +414,7 @@ export const useGameStore = create<GameState>()(
                   creatures: [],
                   storageCreatures: [],
                   inventory: [],
-                  unlockedIslands: 0,
-                  currentIslandId: 0,
                   gameFlags: [],
-                  islandPositions: { 0: 0 },
                   storyProgression: 0,
                   version: CURRENT_PROFILE_VERSION,
                 };
@@ -721,44 +706,6 @@ export const useGameStore = create<GameState>()(
             false,
             'removeGameFlag'
           ),
-        unlockIsland: (islandId: number) =>
-          set(
-            (state) => {
-              const profileId = state.currentProfileId;
-              if (profileId === null || !state.profiles[profileId])
-                return state;
-              const profile = state.profiles[profileId]!;
-              if (islandId <= profile.unlockedIslands) return state;
-              const newProfiles = [...state.profiles];
-              newProfiles[profileId] = {
-                ...profile,
-                unlockedIslands: islandId,
-              };
-              return { profiles: newProfiles };
-            },
-            false,
-            'unlockIsland'
-          ),
-        setIslandPosition: (islandId: number, nodeId: number) =>
-          set(
-            (state) => {
-              const profileId = state.currentProfileId;
-              if (profileId === null || !state.profiles[profileId])
-                return state;
-              const profile = state.profiles[profileId]!;
-              const newProfiles = [...state.profiles];
-              newProfiles[profileId] = {
-                ...profile,
-                islandPositions: {
-                  ...profile.islandPositions,
-                  [islandId]: nodeId,
-                },
-              };
-              return { profiles: newProfiles };
-            },
-            false,
-            'setIslandPosition'
-          ),
       }),
       {
         name: 'cosmoids-game-state',
@@ -781,10 +728,7 @@ export const useGameStore = create<GameState>()(
                 creatures: [],
                 storageCreatures: [],
                 inventory: [],
-                unlockedIslands: 0,
-                currentIslandId: 0,
                 gameFlags: [],
-                islandPositions: { 0: 0 },
                 storyProgression: 0,
                 version: CURRENT_PROFILE_VERSION,
               };
