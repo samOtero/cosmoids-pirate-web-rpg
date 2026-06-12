@@ -101,6 +101,11 @@ export default function CreatureDetailsScreen({
             Lv {creature.level}
           </span>
           <TypeBadge type={creature.type} />
+          {creature.isShiny && (
+            <span className="text-xs lg:text-sm font-black bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-400 text-amber-300">
+              Shiny ✨
+            </span>
+          )}
         </div>
         <Button
           variant="wood"
@@ -115,14 +120,24 @@ export default function CreatureDetailsScreen({
       <div className="flex flex-1 min-h-0 gap-3 lg:gap-6 flex-row">
         {/* Left Column: Visuals & Stats Panel */}
         <div className="w-[38%] shrink-0 flex flex-col gap-2 min-h-0">
-          <Panel className="flex flex-col flex-1 min-h-0 p-3 bg-ocean-dark/70 border-wood/80">
+          <Panel className={`flex flex-col flex-1 min-h-0 p-3 bg-ocean-dark/70 transition-all duration-300 ${
+            creature.isShiny ? 'border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.25)]' : 'border-wood/80'
+          }`}>
             {/* Creature Sprite */}
-            <div className="relative flex flex-1 items-center justify-center bg-black/45 rounded border border-wood/20 p-2 min-h-0">
-              <div className="absolute inset-0 bg-radial from-cyan-500/10 to-transparent pointer-events-none rounded" />
+            <div className={`relative flex flex-1 items-center justify-center bg-black/45 rounded p-2 min-h-0 border ${
+              creature.isShiny ? 'border-amber-500/40' : 'border-wood/20'
+            }`}>
+              <div className={`absolute inset-0 bg-radial pointer-events-none rounded ${
+                creature.isShiny ? 'from-amber-500/15 to-transparent' : 'from-cyan-500/10 to-transparent'
+              }`} />
               <img
                 src={creature.iconImg || creature.spriteUrl}
                 alt={creature.name}
-                className="h-full max-h-[14vh] lg:max-h-[22vh] object-contain drop-shadow-[0_4px_12px_rgba(34,211,238,0.2)]"
+                className={`h-full max-h-[14vh] lg:max-h-[22vh] object-contain transition-all duration-300 ${
+                  creature.isShiny
+                    ? 'drop-shadow-[0_4px_12px_rgba(245,158,11,0.35)] scale-105'
+                    : 'drop-shadow-[0_4px_12px_rgba(34,211,238,0.2)]'
+                }`}
               />
             </div>
 

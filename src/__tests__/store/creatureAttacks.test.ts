@@ -20,6 +20,7 @@ describe('Creature Attacks Store Actions', () => {
       xp: 0,
       equippedAttacks: ['PINCH'],
       activeAttackIndex: 0,
+      isShiny: false,
     });
 
     const profileSetup = useGameStore.getState().profiles[0]!;
@@ -50,6 +51,7 @@ describe('Creature Attacks Store Actions', () => {
         xp: 0,
         equippedAttacks: ['SCRATCH'],
         activeAttackIndex: 0,
+        isShiny: false,
       },
       true // forceStorage
     );
@@ -82,6 +84,7 @@ describe('Creature Attacks Store Actions', () => {
       xp: 0,
       equippedAttacks: ['PINCH'],
       activeAttackIndex: 0,
+      isShiny: false,
     });
 
     const originalProfile = JSON.parse(JSON.stringify(useGameStore.getState().profiles[0]!));

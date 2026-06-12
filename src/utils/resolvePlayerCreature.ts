@@ -34,7 +34,7 @@ export function getDefaultAttacksForLevel(template: CosmoidTemplate, level: numb
 /**
  * Generates a fully-resolved runtime Creature instance for wild/enemy creatures.
  */
-export function createWildCreature(speciesId: string, level: number): Creature {
+export function createWildCreature(speciesId: string, level: number, isShiny: boolean = false): Creature {
   const template = COSMOID_TEMPLATES[speciesId] || COSMOID_TEMPLATES['starter_crab'];
   const maxHp = calculateMaxHp(template.baseStats.hp, level);
 
@@ -60,6 +60,7 @@ export function createWildCreature(speciesId: string, level: number): Creature {
     battlePosition: template.battlePosition,
     battleScale: template.battleScale,
     movementId: template.movementId,
+    isShiny,
   };
 }
 
@@ -93,6 +94,7 @@ export function resolvePlayerCreature(pc: PlayerCreature): Creature {
     battlePosition: template.battlePosition,
     battleScale: template.battleScale,
     movementId: template.movementId,
+    isShiny: pc.isShiny,
   };
 }
 

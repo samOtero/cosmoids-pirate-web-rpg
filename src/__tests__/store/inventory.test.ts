@@ -19,6 +19,7 @@ describe('Inventory & Profile Logic', () => {
       level: 5,
       xp: 200,
       equippedAttacks: ['TACKLE', 'EMBER'],
+      isShiny: false,
     });
 
     const profile = useGameStore.getState().profiles[0]!;

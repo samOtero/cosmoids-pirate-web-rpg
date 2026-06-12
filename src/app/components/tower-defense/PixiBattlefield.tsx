@@ -150,6 +150,74 @@ export function renderHealthBar(
   }
 }
 
+function drawStar(g: PIXI.Graphics, size: number) {
+  g.clear();
+  g.moveTo(0, -size);
+  g.quadraticCurveTo(0, 0, size, 0);
+  g.quadraticCurveTo(0, 0, 0, size);
+  g.quadraticCurveTo(0, 0, -size, 0);
+  g.quadraticCurveTo(0, 0, 0, -size);
+  const colors = [0xffeb3b, 0xffffff, 0xffd54f, 0x80deea, 0xf48fb1];
+  const randomColor = colors[Math.floor(Math.random() * colors.length)];
+  g.fill({ color: randomColor });
+}
+
+function updateSparkles(container: PIXI.Container, unit: BaseTDUnit, delta: number) {
+  let sparkleContainer = container.getChildByLabel('sparkles') as PIXI.Container | undefined;
+  if (unit.isShiny) {
+    if (!sparkleContainer) {
+      sparkleContainer = new PIXI.Container();
+      sparkleContainer.label = 'sparkles';
+      container.addChild(sparkleContainer);
+    }
+
+    // Update existing sparkles
+    const children = [...sparkleContainer.children] as PIXI.Graphics[];
+    children.forEach((child: any) => {
+      child.life -= delta;
+      if (child.life <= 0) {
+        sparkleContainer!.removeChild(child);
+        child.destroy();
+      } else {
+        child.x += child.vx * delta;
+        child.y += child.vy * delta;
+        child.rotation += child.vRot * delta;
+
+        const lifeRatio = child.life / child.maxLife;
+        child.alpha = Math.min(1, lifeRatio * 1.5);
+        child.scale.set(Math.min(1, lifeRatio * 1.5) * child.baseScale);
+      }
+    });
+
+    // Spawn new sparkles if needed
+    if (sparkleContainer.children.length < 6 && Math.random() < 0.15) {
+      const star = new PIXI.Graphics();
+      const size = 3 + Math.random() * 5;
+      drawStar(star, size);
+
+      const angle = Math.random() * Math.PI * 2;
+      const radius = 5 + Math.random() * 20;
+      star.x = Math.cos(angle) * radius;
+      star.y = Math.sin(angle) * radius - 10; // offset slightly upward
+
+      const speed = 0.2 + Math.random() * 0.3;
+      (star as any).vx = Math.cos(angle) * speed;
+      (star as any).vy = Math.sin(angle) * speed - 0.1; // slight upward drift
+      (star as any).vRot = (Math.random() - 0.5) * 0.05;
+      (star as any).maxLife = 30 + Math.random() * 30;
+      (star as any).life = (star as any).maxLife;
+      (star as any).baseScale = 0.6 + Math.random() * 0.4;
+
+      sparkleContainer.addChild(star);
+    }
+  } else {
+    if (sparkleContainer) {
+      container.removeChild(sparkleContainer);
+      sparkleContainer.destroy({ children: true });
+    }
+  }
+}
+
 const TYPE_COLORS: Record<ElementType, number> = {
   [ElementType.WATER]: 0x3b82f6,
   [ElementType.FIRE]: 0xef4444,
@@ -825,6 +893,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               tower.creature.speciesId,
               true /* hideWhenFull */
             );
+            updateSparkles(container, tower, app.ticker.deltaTime);
 
             const hpBg = container.getChildByLabel('hpBg') as
               | PIXI.Graphics
@@ -1073,6 +1142,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             }
 
             renderHealthBar(enemy, container, enemy.definitionId);
+            updateSparkles(container, enemy, app.ticker.deltaTime);
           }
 
           // --- Render Projectiles ---

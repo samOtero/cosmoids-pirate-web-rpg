@@ -43,6 +43,7 @@ const createMockInstance = (
     battlePosition: base.battlePosition,
     battleScale: base.battleScale,
     movementId: base.movementId,
+    isShiny: overrideOverrides?.isShiny ?? false,
     ...overrideOverrides,
   };
 };

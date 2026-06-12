@@ -46,6 +46,7 @@ export interface BaseTDUnit {
   hp: number;
   maxHp: number;
   damageFlashTimerMs?: number;
+  isShiny?: boolean;
 }
 
 export interface EnvironmentUnit extends BaseTDUnit {

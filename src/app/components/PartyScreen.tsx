@@ -70,7 +70,8 @@ export default function PartyScreen({
   const handlePointerDown = (
     e: React.PointerEvent<HTMLDivElement>,
     index: number,
-    spriteUrl: string
+    spriteUrl: string,
+    isShiny: boolean = false
   ) => {
     e.currentTarget.setPointerCapture(e.pointerId);
     const rect = e.currentTarget.getBoundingClientRect();
@@ -81,6 +82,7 @@ export default function PartyScreen({
       offsetX: e.clientX - rect.left,
       offsetY: e.clientY - rect.top,
       spriteUrl,
+      isShiny,
     };
   };
 
@@ -99,6 +101,7 @@ export default function PartyScreen({
           y: e.clientY,
           offsetX: pd.offsetX,
           offsetY: pd.offsetY,
+          isShiny: (pd as any).isShiny,
         });
         pendingDragRef.current = null;
       }
@@ -197,7 +200,8 @@ export default function PartyScreen({
             handlePointerDown(
               e,
               absoluteIndex,
-              creature.iconImg || creature.spriteUrl
+              creature.iconImg || creature.spriteUrl,
+              creature.isShiny
             )
           }
           className={`relative flex h-13 w-13 shrink-0 cursor-grab touch-none flex-col items-center justify-center rounded border-2 transition-all duration-200 active:cursor-grabbing lg:h-16 lg:w-16 ${
@@ -218,6 +222,11 @@ export default function PartyScreen({
               <div className="absolute top-0 right-0 rounded-bl bg-black/60 px-1 text-[8px] font-bold text-sand lg:text-[10px]">
                 Lv{creature.level}
               </div>
+              {creature.isShiny && (
+                <div className="absolute top-0.5 left-0.5 text-[8px] lg:text-[10px]">
+                  ✨
+                </div>
+              )}
             </>
           ) : null}
         </div>
@@ -280,7 +289,8 @@ export default function PartyScreen({
                     handlePointerDown(
                       e,
                       i,
-                      creature.iconImg || creature.spriteUrl
+                      creature.iconImg || creature.spriteUrl,
+                      creature.isShiny
                     )
                   }
                   className={`relative flex h-16 w-16 shrink-0 touch-none flex-col items-center justify-center rounded border-2 transition-all duration-200 lg:h-24 lg:w-24 ${
@@ -299,6 +309,11 @@ export default function PartyScreen({
                       <div className="absolute top-0.5 right-0.5 rounded bg-black/80 px-1 text-[9px] font-bold text-sand lg:text-xs">
                         Lv{creature.level}
                       </div>
+                      {creature.isShiny && (
+                        <div className="absolute top-0.5 left-0.5 text-[9px] lg:text-sm">
+                          ✨
+                        </div>
+                      )}
                     </>
                   ) : (
                     <span className="text-xl text-white/20 lg:text-3xl">+</span>
@@ -367,6 +382,11 @@ export default function PartyScreen({
             alt="Dragging Creature"
             className="h-10 w-10 object-contain lg:h-16 lg:w-16"
           />
+          {(globalDrag as any).isShiny && (
+            <div className="absolute top-1 left-1 text-xs lg:text-lg">
+              ✨
+            </div>
+          )}
         </div>
       )}
 

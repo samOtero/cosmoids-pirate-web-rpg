@@ -239,6 +239,7 @@ export const useGameStore = create<GameState>()(
                           equippedAttacks: TowerDefenseEngine.getDefaultAttacks(
                             creature.id
                           ),
+                          isShiny: false,
                         };
                         state.addCreatureToProfile(
                           currentProfileId,
@@ -264,6 +265,7 @@ export const useGameStore = create<GameState>()(
                       equippedAttacks: TowerDefenseEngine.getDefaultAttacks(
                         c.speciesId || c.id
                       ),
+                      isShiny: c.isShiny ?? false,
                     };
                     state.addCreatureToProfile(
                       payload.profileId,
@@ -537,6 +539,7 @@ export const useGameStore = create<GameState>()(
                 creatures: creatures.map((c) => ({
                   ...c,
                   id: crypto.randomUUID(),
+                  isShiny: c.isShiny ?? false,
                 })),
               };
               return { profiles: newProfiles };

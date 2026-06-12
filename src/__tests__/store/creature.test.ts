@@ -21,6 +21,7 @@ describe('Creature Store Logic', () => {
       level: 1,
       xp: 0,
       equippedAttacks: STARTER_CRAB.learnableAttacks.map(a => a.attackId),
+      isShiny: false,
     });
 
     // Verify initial state
@@ -50,6 +51,7 @@ describe('Creature Store Logic', () => {
       level: 1,
       xp: 0,
       equippedAttacks: STARTER_CRAB.learnableAttacks.map(a => a.attackId),
+      isShiny: false,
     });
     store.addCreatureToProfile(profileId, {
       id: STARTER_IGUANA.id,
@@ -57,6 +59,7 @@ describe('Creature Store Logic', () => {
       level: 1,
       xp: 0,
       equippedAttacks: STARTER_IGUANA.learnableAttacks.map(a => a.attackId),
+      isShiny: false,
     });
 
     let profileBefore = useGameStore.getState().profiles[0]!;
@@ -92,6 +95,7 @@ describe('Creature Store Logic', () => {
       level: 1,
       xp: 0,
       equippedAttacks: STARTER_CRAB.learnableAttacks.map(a => a.attackId),
+      isShiny: false,
     });
     store.addCreatureToProfile(profileId, {
       id: 'c2',
@@ -99,6 +103,7 @@ describe('Creature Store Logic', () => {
       level: 1,
       xp: 0,
       equippedAttacks: STARTER_IGUANA.learnableAttacks.map(a => a.attackId),
+      isShiny: false,
     });
     store.addCreatureToProfile(profileId, {
       id: 'c3',
@@ -106,6 +111,7 @@ describe('Creature Store Logic', () => {
       level: 1,
       xp: 0,
       equippedAttacks: [],
+      isShiny: false,
     });
 
     let profile = useGameStore.getState().profiles[0]!;
@@ -147,6 +153,7 @@ describe('Creature Store Logic', () => {
       level: 1,
       xp: 0,
       equippedAttacks: [],
+      isShiny: false,
     }));
 
     const engine = new TowerDefenseEngine(levelData, playerCreatures);
@@ -194,6 +201,7 @@ describe('Creature Store Logic', () => {
       level: 1,
       xp: 0,
       equippedAttacks: [],
+      isShiny: false,
     }));
 
     const engine = new TowerDefenseEngine(levelData, playerCreatures);
@@ -241,6 +249,7 @@ describe('Creature Store Logic', () => {
       level: 1,
       xp: 0,
       equippedAttacks: STARTER_CRAB.learnableAttacks.map(a => a.attackId),
+      isShiny: false,
     }, true);
 
     // Assert
@@ -248,6 +257,51 @@ describe('Creature Store Logic', () => {
     expect(profile.creatures).toHaveLength(0);
     expect(profile.storageCreatures).toHaveLength(1);
     expect(profile.storageCreatures[0].speciesId).toBe(STARTER_CRAB.id);
+  });
+
+  it('should retain isShiny status on enemy when captured', () => {
+    const levelData = {
+      paths: [[{ x: 0, y: 0 }, { x: 10, y: 10 }]],
+      placementSpots: [],
+    };
+    const playerCreatures = Array.from({ length: 2 }, (_, i) => ({
+      id: `c_${i}`,
+      speciesId: 'starter_crab',
+      level: 1,
+      xp: 0,
+      equippedAttacks: [],
+      isShiny: false,
+    }));
+
+    const engine = new TowerDefenseEngine(levelData, playerCreatures);
+
+    // Spawn a shiny enemy
+    engine.enemies.push({
+      id: 'enemy_shiny',
+      definitionId: 'starter_iguana',
+      level: 5,
+      position: { x: 0, y: 0 },
+      hp: 10,
+      maxHp: 10,
+      speed: 1,
+      currentAttack: 10,
+      currentSpecialAttack: 10,
+      currentDefense: 10,
+      currentSpecialDefense: 10,
+      statusConditions: [],
+      currentWaypointIndex: 1,
+      pathIndex: 0,
+      facingDirection: 'down',
+      damagedByTowerIds: new Set(),
+      isShiny: true,
+    });
+
+    const captured = engine.captureEnemy('enemy_shiny');
+
+    expect(captured).not.toBeNull();
+    expect(captured?.isShiny).toBe(true);
+    expect(engine.roster.length).toBe(3);
+    expect(engine.roster.find((c) => c.id === captured?.id)?.isShiny).toBe(true);
   });
 
   it('should only have a single attack at level 1 for starters and mouse', () => {

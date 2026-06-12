@@ -207,6 +207,7 @@ export interface Creature {
   battlePosition?: { bottom: number; left: number };
   battleScale?: number;
   movementId?: string;
+  isShiny: boolean;
 }
 
 
@@ -219,6 +220,7 @@ export interface PlayerCreature {
   equippedAttacks: string[]; // Attack definition IDs
   activeAttackIndex?: number; // The currently selected attack index
   targetingMode?: string; // Persistent selected targeting mode
+  isShiny: boolean;
 }
 
 export interface Profile {

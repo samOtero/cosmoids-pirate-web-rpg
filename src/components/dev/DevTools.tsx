@@ -121,6 +121,7 @@ export default function DevTools() {
                     level: 1,
                     xp: 0,
                     equippedAttacks: TowerDefenseEngine.getDefaultAttacks(c.id),
+                    isShiny: false,
                   }));
                   overwriteProfileCreatures(level1Starters);
                   setShowMenu(false);
@@ -128,6 +129,28 @@ export default function DevTools() {
                 className="text-sm bg-purple-900 border border-purple-500 hover:bg-purple-700 px-3 py-2 rounded text-left font-bold"
               >
                 Set LVL 1 Starters + Bug
+              </button>
+              <button
+                onClick={() => {
+                  const level1Starters = [
+                    STARTER_CRAB,
+                    STARTER_IGUANA,
+                    STARTER_MONKEY,
+                    BUG_STAGE_1,
+                  ].map((c) => ({
+                    id: c.id,
+                    speciesId: c.id,
+                    level: 1,
+                    xp: 0,
+                    equippedAttacks: TowerDefenseEngine.getDefaultAttacks(c.id),
+                    isShiny: true,
+                  }));
+                  overwriteProfileCreatures(level1Starters);
+                  setShowMenu(false);
+                }}
+                className="text-sm bg-amber-950 border border-amber-500 hover:bg-amber-700 px-3 py-2 rounded text-left font-bold text-amber-300 animate-pulse"
+              >
+                Set Shiny Starters + Bug ✨
               </button>
               <button
                 onClick={() => {
@@ -140,6 +163,7 @@ export default function DevTools() {
                       equippedAttacks: TowerDefenseEngine.getDefaultAttacks(
                         STARTER_CRAB.id
                       ),
+                      isShiny: false,
                     })
                   );
                   overwriteProfileCreatures(thirtyCreatures);

@@ -285,6 +285,7 @@ export class TowerDefenseEngine {
           pathIndex: pathIndex,
           facingDirection: 'down',
           damagedByTowerIds: new Set<string>(),
+          isShiny: true,
         });
         this.lastSpawnTime = time;
       }
@@ -893,6 +894,7 @@ export class TowerDefenseEngine {
       turnAroundAtEnd,
       uncapturable,
       damagedByTowerIds: new Set<string>(),
+      isShiny: true,
     });
   }
 
@@ -923,6 +925,7 @@ export class TowerDefenseEngine {
       level: capturedLevel,
       xp: 0,
       equippedAttacks: TowerDefenseEngine.getDefaultAttacks(enemy.definitionId),
+      isShiny: enemy.isShiny ?? false,
     };
 
     if (this.roster.length < 6) {
@@ -1025,6 +1028,7 @@ export class TowerDefenseEngine {
       selectedAttackIndex: this.playerSelectedAttacks[creature.id] || 0,
       targetingMode: this.playerSelectedTargetingModes[creature.id] || 'first',
       facingDirection: 'down',
+      isShiny: creature.isShiny,
     });
     return true;
   }
