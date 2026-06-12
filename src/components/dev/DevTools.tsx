@@ -31,6 +31,9 @@ type ToolType =
 export default function DevTools() {
   const [activeTool, setActiveTool] = useState<ToolType>(null);
   const [showMenu, setShowMenu] = useState(false);
+  const [forceShiny, setForceShiny] = useState(
+    typeof window !== 'undefined' ? TowerDefenseEngine.forceShinySpawns : false
+  );
   const overwriteProfileCreatures = useGameStore(
     (state) => state.overwriteProfileCreatures
   );
@@ -215,6 +218,20 @@ export default function DevTools() {
                 className="text-sm bg-red-900 border border-red-500 hover:bg-red-700 px-3 py-2 rounded text-left font-bold"
               >
                 Test TD Scripting
+              </button>
+              <button
+                onClick={() => {
+                  const val = !TowerDefenseEngine.forceShinySpawns;
+                  TowerDefenseEngine.forceShinySpawns = val;
+                  setForceShiny(val);
+                }}
+                className={`text-sm px-3 py-2 rounded text-left font-bold border transition-colors ${
+                  forceShiny
+                    ? 'bg-amber-950 border-amber-500 hover:bg-amber-700 text-amber-300'
+                    : 'bg-slate-800 border-slate-700 text-slate-300'
+                }`}
+              >
+                Force Shiny Spawns: {forceShiny ? 'ON ✨' : 'OFF'}
               </button>
             </div>
           </div>

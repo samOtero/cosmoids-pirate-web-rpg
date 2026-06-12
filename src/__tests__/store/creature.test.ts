@@ -310,4 +310,37 @@ describe('Creature Store Logic', () => {
     expect(TowerDefenseEngine.getDefaultAttacks('starter_monkey')).toEqual(['TACKLE']);
     expect(TowerDefenseEngine.getDefaultAttacks('mouse_1')).toEqual(['NIBBLE']);
   });
+
+  it('should emit SHINY_ENEMY_SPAWNED when a shiny capturable enemy spawns', () => {
+    const levelData = {
+      paths: [[{ x: 0, y: 0 }, { x: 10, y: 10 }]],
+      placementSpots: [],
+    };
+    
+    const originalForceShiny = TowerDefenseEngine.forceShinySpawns;
+    TowerDefenseEngine.forceShinySpawns = true;
+    
+    try {
+      const engine = new TowerDefenseEngine(levelData, []);
+      let eventEmitted = false;
+      let eventEnemyId = '';
+      
+      engine.events.subscribe((event) => {
+        if (event.type === 'SHINY_ENEMY_SPAWNED') {
+          eventEmitted = true;
+          eventEnemyId = event.enemyId;
+        }
+      });
+      
+      engine['spawnEnemyFromDef']('starter_iguana', 100, engine.enemies, 0, false, false, 1, 5);
+      
+      expect(eventEmitted).toBe(true);
+      expect(eventEnemyId).not.toBe('');
+      const spawnedEnemy = engine.enemies.find(e => e.id === eventEnemyId);
+      expect(spawnedEnemy?.isShiny).toBe(true);
+      expect(spawnedEnemy?.definitionId).toBe('starter_iguana');
+    } finally {
+      TowerDefenseEngine.forceShinySpawns = originalForceShiny;
+    }
+  });
 });

@@ -32,13 +32,18 @@ type QueuedModal =
       type: 'CAPTURED_CREATURE';
       speciesId: string;
       wasSentToStorage: boolean;
+    }
+  | {
+      type: 'SHINY_APPEARED';
+      speciesId: string;
     };
 
 const sortModalQueue = (queue: QueuedModal[]): QueuedModal[] => {
   const typePriority = {
-    'CAPTURED_CREATURE': 0,
-    'LEARNED_ATTACK': 1,
-    'ASK_REPLACE_ATTACK': 2,
+    SHINY_APPEARED: -1,
+    CAPTURED_CREATURE: 0,
+    LEARNED_ATTACK: 1,
+    ASK_REPLACE_ATTACK: 2,
   };
   return [...queue].sort((a, b) => {
     if (a.type !== b.type) {
@@ -46,8 +51,10 @@ const sortModalQueue = (queue: QueuedModal[]): QueuedModal[] => {
       const prioB = typePriority[b.type] || 99;
       return prioA - prioB;
     }
-    const idA = 'towerId' in a ? a.towerId : 'speciesId' in a ? a.speciesId : '';
-    const idB = 'towerId' in b ? b.towerId : 'speciesId' in b ? b.speciesId : '';
+    const idA =
+      'towerId' in a ? a.towerId : 'speciesId' in a ? a.speciesId : '';
+    const idB =
+      'towerId' in b ? b.towerId : 'speciesId' in b ? b.speciesId : '';
     return idA.localeCompare(idB);
   });
 };
@@ -242,6 +249,18 @@ export default function TowerDefenseScreen({
           });
           setUiUpdateToggle((prev) => !prev);
           break;
+        case 'SHINY_ENEMY_SPAWNED':
+          setTimeout(() => {
+            setModalQueue((prev) => {
+              const added: QueuedModal = {
+                type: 'SHINY_APPEARED',
+                speciesId: event.enemyDefinitionId,
+              };
+              return sortModalQueue([...prev, added]);
+            });
+            setUiUpdateToggle((prev) => !prev);
+          }, 500);
+          break;
       }
     });
     return unsub;
@@ -370,7 +389,7 @@ export default function TowerDefenseScreen({
       if (currentProfileId !== null && !isPremadeLevel) {
         addCreatureToProfile(currentProfileId, capturedCreature);
       }
-      
+
       setModalQueue((prev) => {
         const added: QueuedModal = {
           type: 'CAPTURED_CREATURE',
@@ -385,7 +404,7 @@ export default function TowerDefenseScreen({
 
   return (
     <div
-      className="fixed inset-0 z-9998 bg-slate-900 flex flex-col touch-none"
+      className="fixed inset-0 z-9998 flex touch-none flex-col bg-slate-900"
       onPointerMove={(e) => {
         // Check if a pending drag should become a real drag
         if (pendingDragRef.current && !globalDrag) {
@@ -467,51 +486,53 @@ export default function TowerDefenseScreen({
       }}
     >
       {introState !== 'none' && (
-        <div className="fixed inset-0 z-10000 bg-black/60 flex items-center justify-center pointer-events-none">
-          <div className="text-7xl md:text-9xl font-black italic text-transparent bg-clip-text bg-linear-to-br from-yellow-300 to-red-500 drop-shadow-[0_0_25px_rgba(255,165,0,0.8)] uppercase animate-bounce pr-8 pb-4">
+        <div className="pointer-events-none fixed inset-0 z-10000 flex items-center justify-center bg-black/60">
+          <div className="animate-bounce bg-linear-to-br from-yellow-300 to-red-500 bg-clip-text pr-8 pb-4 text-7xl font-black text-transparent uppercase italic drop-shadow-[0_0_25px_rgba(255,165,0,0.8)] md:text-9xl">
             {introState === 'ready' ? 'Ready!' : 'GO!'}
           </div>
         </div>
       )}
 
       {outroState !== 'none' && (
-        <div className="fixed inset-0 z-10000 bg-black/80 flex items-center justify-center pointer-events-none transition-opacity duration-1000">
+        <div className="pointer-events-none fixed inset-0 z-10000 flex items-center justify-center bg-black/80 transition-opacity duration-1000">
           {outroState === 'win' ? (
-            <div className="text-7xl md:text-9xl font-black italic text-transparent bg-clip-text bg-linear-to-br from-green-400 to-blue-500 drop-shadow-[0_0_25px_rgba(0,255,128,0.8)] uppercase animate-bounce pr-8 pb-4">
+            <div className="animate-bounce bg-linear-to-br from-green-400 to-blue-500 bg-clip-text pr-8 pb-4 text-7xl font-black text-transparent uppercase italic drop-shadow-[0_0_25px_rgba(0,255,128,0.8)] md:text-9xl">
               You Win!
             </div>
           ) : (
-            <div className="text-7xl md:text-9xl font-black text-red-600 drop-shadow-[0_0_35px_rgba(255,0,0,1)] uppercase tracking-widest animate-pulse pr-8 pb-4">
+            <div className="animate-pulse pr-8 pb-4 text-7xl font-black tracking-widest text-red-600 uppercase drop-shadow-[0_0_35px_rgba(255,0,0,1)] md:text-9xl">
               Defeat!
             </div>
           )}
         </div>
       )}
 
-      <div className="bg-slate-800 p-2 lg:p-4 shrink-0 flex flex-wrap items-center justify-between border-b border-cyan-800 gap-2">
-        <h2 className="text-lg lg:text-xl font-bold text-cyan-400 hidden lg:block">Tower Defense</h2>
-        <div className="flex items-center gap-2 lg:gap-4 text-white w-full lg:w-auto justify-between lg:justify-end">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-cyan-800 bg-slate-800 p-2 lg:p-4">
+        <h2 className="hidden text-lg font-bold text-cyan-400 lg:block lg:text-xl">
+          Tower Defense
+        </h2>
+        <div className="flex w-full items-center justify-between gap-2 text-white lg:w-auto lg:justify-end lg:gap-4">
           {engineRef.current.surviveUntil &&
             engineRef.current.surviveUntil > 0 &&
             hasStarted && (
-              <span className="font-mono bg-slate-900 px-2 py-1 lg:px-3 lg:py-1 rounded text-yellow-400 border border-yellow-700/50 shadow-inner text-sm lg:text-base">
+              <span className="rounded border border-yellow-700/50 bg-slate-900 px-2 py-1 font-mono text-sm text-yellow-400 shadow-inner lg:px-3 lg:py-1 lg:text-base">
                 Time:{' '}
                 {Math.max(0, engineRef.current.surviveUntil - uiElapsedSeconds)}
                 s
               </span>
             )}
-          <span className="font-mono bg-slate-900 px-2 py-1 lg:px-3 lg:py-1 rounded text-red-400 border border-red-900/50 shadow-inner text-sm lg:text-base flex-1 lg:flex-none text-center">
+          <span className="flex-1 rounded border border-red-900/50 bg-slate-900 px-2 py-1 text-center font-mono text-sm text-red-400 shadow-inner lg:flex-none lg:px-3 lg:py-1 lg:text-base">
             Lives: {uiLives}
           </span>
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            className="px-3 py-1 lg:px-4 lg:py-2 bg-cyan-700 hover:bg-cyan-600 rounded font-bold text-sm lg:text-base"
+            className="rounded bg-cyan-700 px-3 py-1 text-sm font-bold hover:bg-cyan-600 lg:px-4 lg:py-2 lg:text-base"
           >
             {isPlaying ? 'Pause' : 'Start'}
           </button>
           <button
             onClick={onClose}
-            className="px-3 py-1 lg:px-4 lg:py-2 bg-red-600 hover:bg-red-500 rounded font-bold text-sm lg:text-base"
+            className="rounded bg-red-600 px-3 py-1 text-sm font-bold hover:bg-red-500 lg:px-4 lg:py-2 lg:text-base"
           >
             Close
           </button>
@@ -532,7 +553,7 @@ export default function TowerDefenseScreen({
         getDragState={() => dragStateRef.current}
       />
 
-      <div className="bg-slate-800 p-2 lg:p-4 shrink-0 flex items-center justify-start lg:justify-center gap-2 lg:gap-4 overflow-x-auto border-t border-cyan-800 relative min-h-[90px] lg:min-h-[140px]">
+      <div className="relative flex min-h-[90px] shrink-0 items-center justify-start gap-2 overflow-x-auto border-t border-cyan-800 bg-slate-800 p-2 lg:min-h-[140px] lg:justify-center lg:gap-4 lg:p-4">
         {selectedCreatureId
           ? (() => {
               const creature = engineRef.current.roster.find(
@@ -558,8 +579,9 @@ export default function TowerDefenseScreen({
                 : engineRef.current.playerSelectedAttacks[creature.id] || 0;
 
               const activeTargetingMode = tower
-                ? (tower.targetingMode || 'first')
-                : (engineRef.current.playerSelectedTargetingModes[creature.id] || 'first');
+                ? tower.targetingMode || 'first'
+                : engineRef.current.playerSelectedTargetingModes[creature.id] ||
+                  'first';
 
               const { name, spriteUrl } = resolveSpeciesVisuals(
                 creature.speciesId
@@ -599,7 +621,7 @@ export default function TowerDefenseScreen({
             })()
           : null}
 
-        <div className="text-slate-400 mr-2 lg:mr-4 font-bold uppercase text-xs lg:text-sm shrink-0 hidden lg:block">
+        <div className="mr-2 hidden shrink-0 text-xs font-bold text-slate-400 uppercase lg:mr-4 lg:block lg:text-sm">
           Drag to Place:
         </div>
         {engineRef.current.roster.map((creature) => {
@@ -660,221 +682,283 @@ export default function TowerDefenseScreen({
 
         {/* Permanent Capture Device Tool */}
         {!engineRef.current.disableCapture && (
-            <React.Fragment>
-              <div className="w-px h-16 bg-cyan-800 mx-2 shrink-0" />
-              <button
-                onPointerDown={(e) => {
-                  e.currentTarget.setPointerCapture(e.pointerId);
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  pendingDragRef.current = {
-                    type: 'capture',
-                    startX: e.clientX,
-                    startY: e.clientY,
-                    offsetX: e.clientX - rect.left,
-                    offsetY: e.clientY - rect.top,
-                  };
-                }}
-                className="relative z-0 w-16 h-16 lg:w-24 lg:h-24 p-1 lg:p-2 rounded flex flex-col items-center justify-center transition-all cursor-grab active:cursor-grabbing hover:scale-105 bg-purple-900 border-2 border-purple-500 hover:bg-purple-800 shrink-0 touch-none"
-              >
-                {/* We'll use a placeholder icon or color for the capture device */}
-                <div className="relative w-8 h-8 lg:w-12 lg:h-12 rounded-full border-[3px] lg:border-4 border-white bg-red-500 flex items-center justify-center shadow-lg pointer-events-none mb-0 lg:mb-1 overflow-hidden">
-                  <div className="w-full h-1 bg-black absolute top-1/2 -mt-[1px] lg:-mt-[2px] left-0" />
-                  <div className="w-3 h-3 lg:w-4 lg:h-4 bg-white rounded-full border-2 border-black z-10" />
-                </div>
-                <span className="text-[8px] lg:text-[10px] mt-0.5 lg:mt-1 uppercase text-center leading-tight pointer-events-none text-purple-200 font-bold">
-                  Capture
-                </span>
-              </button>
-            </React.Fragment>
-          )}
+          <React.Fragment>
+            <div className="mx-2 h-16 w-px shrink-0 bg-cyan-800" />
+            <button
+              onPointerDown={(e) => {
+                e.currentTarget.setPointerCapture(e.pointerId);
+                const rect = e.currentTarget.getBoundingClientRect();
+                pendingDragRef.current = {
+                  type: 'capture',
+                  startX: e.clientX,
+                  startY: e.clientY,
+                  offsetX: e.clientX - rect.left,
+                  offsetY: e.clientY - rect.top,
+                };
+              }}
+              className="relative z-0 flex h-16 w-16 shrink-0 cursor-grab touch-none flex-col items-center justify-center rounded border-2 border-purple-500 bg-purple-900 p-1 transition-all hover:scale-105 hover:bg-purple-800 active:cursor-grabbing lg:h-24 lg:w-24 lg:p-2"
+            >
+              {/* We'll use a placeholder icon or color for the capture device */}
+              <div className="pointer-events-none relative mb-0 flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border-[3px] border-white bg-red-500 shadow-lg lg:mb-1 lg:h-12 lg:w-12 lg:border-4">
+                <div className="absolute top-1/2 left-0 -mt-[1px] h-1 w-full bg-black lg:-mt-[2px]" />
+                <div className="z-10 h-3 w-3 rounded-full border-2 border-black bg-white lg:h-4 lg:w-4" />
+              </div>
+              <span className="pointer-events-none mt-0.5 text-center text-[8px] leading-tight font-bold text-purple-200 uppercase lg:mt-1 lg:text-[10px]">
+                Capture
+              </span>
+            </button>
+          </React.Fragment>
+        )}
       </div>
 
       {/* Unified In-Level Modals Queue */}
-      {modalQueue.length > 0 && (() => {
-        const activeModal = modalQueue[0];
-        
-        if (activeModal.type === 'CAPTURED_CREATURE') {
-          const { name, spriteUrl } = resolveSpeciesVisuals(activeModal.speciesId);
-          return (
-            <div className="fixed inset-0 z-9999 bg-black/85 flex items-center justify-center p-2 lg:p-4 animate-[fadeIn_0.25s_ease-out]">
-              <div className="bg-slate-900/95 backdrop-blur-md px-4 py-3 lg:px-6 lg:py-5 rounded-2xl text-center border-2 border-purple-500 max-w-xs lg:max-w-sm w-full shadow-[0_0_30px_rgba(168,85,247,0.4)] flex flex-col items-center">
-                <h3 className="text-lg lg:text-2xl font-black text-transparent bg-clip-text bg-linear-to-r from-purple-400 via-pink-400 to-cyan-400 uppercase tracking-wider mb-1 lg:mb-3">
-                  Cosmoid Captured!
-                </h3>
-                
-                <div className="relative w-16 h-16 lg:w-24 lg:h-24 flex items-center justify-center bg-slate-800/80 rounded-full border border-purple-500/30 p-1.5 my-1 lg:my-2 shadow-inner overflow-hidden">
-                  <div className="absolute inset-0 bg-radial from-purple-500/20 to-transparent pointer-events-none" />
-                  {spriteUrl ? (
-                    <img
-                      src={spriteUrl}
-                      alt={name}
-                      className="w-12 h-12 lg:w-18 lg:h-18 object-contain drop-shadow-[0_4px_10px_rgba(168,85,247,0.5)] transform hover:scale-110 transition-transform duration-300 z-10"
-                    />
-                  ) : (
-                    <div className="text-slate-500 text-xs">No sprite</div>
-                  )}
-                </div>
+      {modalQueue.length > 0 &&
+        (() => {
+          const activeModal = modalQueue[0];
 
-                <div className="mt-1 lg:mt-2 text-center">
-                  <p className="text-xs lg:text-base text-slate-200">
-                    You captured a <span className="font-extrabold text-cyan-400 text-sm lg:text-lg">{name}</span>!
-                  </p>
-                  {activeModal.wasSentToStorage ? (
-                    <p className="text-[10px] lg:text-xs text-purple-300 font-semibold mt-1 px-2.5 py-0.5 lg:px-3 lg:py-1 bg-purple-950/60 rounded-full border border-purple-800/50 inline-block shadow-sm">
-                      Sent to your storage box
-                    </p>
-                  ) : (
-                    <p className="text-[10px] lg:text-xs text-green-400 font-semibold mt-1 px-2.5 py-0.5 lg:px-3 lg:py-1 bg-green-950/40 rounded-full border border-green-800/30 inline-block">
-                      Added to your active party
-                    </p>
-                  )}
-                </div>
-
-                <button
-                  className="mt-3 lg:mt-5 px-5 py-1.5 lg:px-6 lg:py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl font-bold text-white w-full cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-md hover:shadow-purple-500/25 text-xs lg:text-base border border-purple-400/20"
-                  onClick={closeActiveModal}
-                >
-                  Awesome!
-                </button>
-              </div>
-            </div>
-          );
-        }
-
-        if (activeModal.type === 'LEARNED_ATTACK') {
-          const newDef = ATTACK_DEFS[activeModal.attackDefId];
-          return (
-            <div className="fixed inset-0 z-9999 bg-black/80 flex items-center justify-center p-4">
-              <div className="bg-slate-800 p-6 rounded-lg text-center border-2 border-cyan-500 max-w-sm w-full shadow-lg">
-                <h3 className="text-2xl font-bold text-cyan-400 mb-4">
-                  Learned a New Attack!
-                </h3>
-                <div className="bg-slate-900 p-4 rounded mb-6">
-                  <span className="font-bold text-xl text-yellow-400">
-                    {newDef?.name || activeModal.attackDefId}
-                  </span>
-                  <p className="text-sm text-slate-300 mt-2">
-                    Power: {newDef?.power} | Cooldown:{' '}
-                    {(newDef?.cooldownMs || 1000) / 1000}s
-                  </p>
-                </div>
-                <button
-                  className="px-6 py-2 bg-cyan-600 hover:bg-cyan-500 rounded font-bold text-white w-full cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform"
-                  onClick={closeActiveModal}
-                >
-                  Awesome!
-                </button>
-              </div>
-            </div>
-          );
-        }
-
-        if (activeModal.type === 'ASK_REPLACE_ATTACK') {
-          const tower = engineRef.current.towers.find(
-            (t: any) => t.id === activeModal.towerId
-          );
-          if (!tower) return null;
-          const newDef = ATTACK_DEFS[activeModal.newAttackDefId];
-
-          return (
-            <div className="fixed inset-0 z-9999 bg-black/80 flex items-center justify-center p-4">
-              <div className="bg-slate-800 p-6 rounded-lg border-2 border-purple-500 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-lg">
-                <h3 className="text-2xl font-bold text-purple-400 mb-2">
-                  Maximum Attacks Reached!
-                </h3>
-                <p className="text-slate-300 mb-6">
-                  This creature wants to learn{' '}
-                  <span className="font-bold text-yellow-400">
-                    {newDef?.name}
-                  </span>
-                  , but already knows 4 attacks. Choose an attack to forget, or
-                  cancel.
-                </p>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-                  {/* Current Attacks */}
-                  {tower.creature.equippedAttacks.map(
-                    (atk: string, idx: number) => {
-                      const def = ATTACK_DEFS[atk];
-                      return (
-                        <button
-                          key={idx}
-                          onClick={() => {
-                            engineRef.current.replaceTowerAttack(
-                              tower.id,
-                              idx,
-                              activeModal.newAttackDefId
-                            );
-                            closeActiveModal();
-                          }}
-                          className="p-3 bg-slate-700 hover:bg-red-900/50 border border-slate-600 hover:border-red-500 rounded text-left transition-colors flex flex-col group cursor-pointer"
-                        >
-                          <span className="font-bold text-slate-200 group-hover:text-red-400">
-                            Forget {def?.name}
-                          </span>
-                          <span className="text-xs text-slate-400 mt-1 line-clamp-2">
-                            Power: {def?.power}
-                          </span>
-                        </button>
-                      );
-                    }
-                  )}
-                </div>
-
-                {/* New Attack Info & Cancel */}
-                <div className="flex flex-col lg:flex-row gap-4 items-center justify-between border-t border-slate-700 pt-4">
-                  <div className="flex-1">
-                    <div className="font-bold text-yellow-400">
-                      New: {newDef?.name}
-                    </div>
-                    <div className="text-sm text-slate-300">
-                      Power: {newDef?.power} | Cooldown:{' '}
-                      {(newDef?.cooldownMs || 1000) / 1000}s
-                    </div>
+          if (activeModal.type === 'SHINY_APPEARED') {
+            const { name, spriteUrl } = resolveSpeciesVisuals(
+              activeModal.speciesId
+            );
+            return (
+              <div className="fixed inset-0 z-9999 flex animate-[fadeIn_0.25s_ease-out] items-center justify-center bg-black/85 p-2 lg:p-4">
+                <div className="flex w-full max-w-xs flex-row items-center gap-3 rounded-2xl border-2 border-amber-400 bg-slate-900/95 px-4 py-3 text-left shadow-[0_0_30px_rgba(245,158,11,0.55)] backdrop-blur-md lg:max-w-md lg:gap-5 lg:px-6 lg:py-4">
+                  {/* Visuals on the Left for Mobile Landscape */}
+                  <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-amber-500/30 bg-slate-800/80 p-1 shadow-inner lg:h-28 lg:w-28">
+                    <div className="pointer-events-none absolute inset-0 bg-radial from-amber-500/20 to-transparent" />
+                    {spriteUrl ? (
+                      <img
+                        src={spriteUrl}
+                        alt={name}
+                        className="z-10 h-14 w-14 scale-110 transform object-contain drop-shadow-[0_0_12px_rgba(245,158,11,0.6)] lg:h-20 lg:w-20"
+                      />
+                    ) : (
+                      <div className="text-xs text-slate-500">No sprite</div>
+                    )}
+                    {/* CSS sparkles around the icon */}
+                    <span className="absolute top-1 right-2 animate-pulse text-xs lg:text-sm">
+                      ✨
+                    </span>
+                    <span className="absolute bottom-1 left-2 animate-pulse text-xs lg:text-sm">
+                      ✨
+                    </span>
                   </div>
+
+                  {/* Text & Button on the Right */}
+                  <div className="flex h-full min-h-[85px] flex-1 flex-col justify-between lg:min-h-[112px]">
+                    <div>
+                      <h3 className="mb-0.5 flex items-center gap-1 bg-linear-to-r from-amber-400 via-yellow-400 to-orange-400 bg-clip-text text-xs leading-tight font-black tracking-wider text-transparent uppercase lg:text-lg">
+                        Shiny Cosmoids Appeared! ✨
+                      </h3>
+                      <p className="text-[10px] leading-snug text-slate-200 lg:text-sm">
+                        A wild shiny{' '}
+                        <span className="text-xs font-extrabold text-amber-300 lg:text-base">
+                          {name}
+                        </span>{' '}
+                        has shown up on the map! Keep it weakened to capture it!
+                      </p>
+                    </div>
+
+                    <button
+                      className="mt-1.5 w-full cursor-pointer rounded-xl border border-amber-400/20 bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-1 text-center text-[10px] font-bold text-white shadow-md transition-all duration-200 hover:scale-[1.02] hover:from-amber-400 hover:to-orange-400 hover:shadow-amber-500/25 active:scale-[0.98] lg:px-6 lg:py-2 lg:text-sm"
+                      onClick={closeActiveModal}
+                    >
+                      Let's Catch It!
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          if (activeModal.type === 'CAPTURED_CREATURE') {
+            const { name, spriteUrl } = resolveSpeciesVisuals(
+              activeModal.speciesId
+            );
+            return (
+              <div className="fixed inset-0 z-9999 flex animate-[fadeIn_0.25s_ease-out] items-center justify-center bg-black/85 p-2 lg:p-4">
+                <div className="flex w-full max-w-xs flex-col items-center rounded-2xl border-2 border-purple-500 bg-slate-900/95 px-4 py-3 text-center shadow-[0_0_30px_rgba(168,85,247,0.4)] backdrop-blur-md lg:max-w-sm lg:px-6 lg:py-5">
+                  <h3 className="mb-1 bg-linear-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-lg font-black tracking-wider text-transparent uppercase lg:mb-3 lg:text-2xl">
+                    Cosmoid Captured!
+                  </h3>
+
+                  <div className="relative my-1 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-purple-500/30 bg-slate-800/80 p-1.5 shadow-inner lg:my-2 lg:h-24 lg:w-24">
+                    <div className="pointer-events-none absolute inset-0 bg-radial from-purple-500/20 to-transparent" />
+                    {spriteUrl ? (
+                      <img
+                        src={spriteUrl}
+                        alt={name}
+                        className="z-10 h-12 w-12 transform object-contain drop-shadow-[0_4px_10px_rgba(168,85,247,0.5)] transition-transform duration-300 hover:scale-110 lg:h-18 lg:w-18"
+                      />
+                    ) : (
+                      <div className="text-xs text-slate-500">No sprite</div>
+                    )}
+                  </div>
+
+                  <div className="mt-1 text-center lg:mt-2">
+                    <p className="text-xs text-slate-200 lg:text-base">
+                      You captured a{' '}
+                      <span className="text-sm font-extrabold text-cyan-400 lg:text-lg">
+                        {name}
+                      </span>
+                      !
+                    </p>
+                    {activeModal.wasSentToStorage ? (
+                      <p className="mt-1 inline-block rounded-full border border-purple-800/50 bg-purple-950/60 px-2.5 py-0.5 text-[10px] font-semibold text-purple-300 shadow-sm lg:px-3 lg:py-1 lg:text-xs">
+                        Sent to your storage box
+                      </p>
+                    ) : (
+                      <p className="mt-1 inline-block rounded-full border border-green-800/30 bg-green-950/40 px-2.5 py-0.5 text-[10px] font-semibold text-green-400 lg:px-3 lg:py-1 lg:text-xs">
+                        Added to your active party
+                      </p>
+                    )}
+                  </div>
+
                   <button
-                    className="px-6 py-2 bg-slate-600 hover:bg-slate-500 rounded font-bold text-white whitespace-nowrap cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-transform"
+                    className="mt-3 w-full cursor-pointer rounded-xl border border-purple-400/20 bg-gradient-to-r from-purple-600 to-indigo-600 px-5 py-1.5 text-xs font-bold text-white shadow-md transition-all duration-200 hover:scale-[1.02] hover:from-purple-500 hover:to-indigo-500 hover:shadow-purple-500/25 active:scale-[0.98] lg:mt-5 lg:px-6 lg:py-2 lg:text-base"
                     onClick={closeActiveModal}
                   >
-                    Do Not Learn
+                    Awesome!
                   </button>
                 </div>
               </div>
-            </div>
-          );
-        }
+            );
+          }
 
-        return null;
-      })()}
+          if (activeModal.type === 'LEARNED_ATTACK') {
+            const newDef = ATTACK_DEFS[activeModal.attackDefId];
+            return (
+              <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/80 p-4">
+                <div className="w-full max-w-sm rounded-lg border-2 border-cyan-500 bg-slate-800 p-6 text-center shadow-lg">
+                  <h3 className="mb-4 text-2xl font-bold text-cyan-400">
+                    Learned a New Attack!
+                  </h3>
+                  <div className="mb-6 rounded bg-slate-900 p-4">
+                    <span className="text-xl font-bold text-yellow-400">
+                      {newDef?.name || activeModal.attackDefId}
+                    </span>
+                    <p className="mt-2 text-sm text-slate-300">
+                      Power: {newDef?.power} | Cooldown:{' '}
+                      {(newDef?.cooldownMs || 1000) / 1000}s
+                    </p>
+                  </div>
+                  <button
+                    className="w-full cursor-pointer rounded bg-cyan-600 px-6 py-2 font-bold text-white transition-transform hover:scale-[1.02] hover:bg-cyan-500 active:scale-[0.98]"
+                    onClick={closeActiveModal}
+                  >
+                    Awesome!
+                  </button>
+                </div>
+              </div>
+            );
+          }
+
+          if (activeModal.type === 'ASK_REPLACE_ATTACK') {
+            const tower = engineRef.current.towers.find(
+              (t: any) => t.id === activeModal.towerId
+            );
+            if (!tower) return null;
+            const newDef = ATTACK_DEFS[activeModal.newAttackDefId];
+
+            return (
+              <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/80 p-4">
+                <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg border-2 border-purple-500 bg-slate-800 p-6 shadow-lg">
+                  <h3 className="mb-2 text-2xl font-bold text-purple-400">
+                    Maximum Attacks Reached!
+                  </h3>
+                  <p className="mb-6 text-slate-300">
+                    This creature wants to learn{' '}
+                    <span className="font-bold text-yellow-400">
+                      {newDef?.name}
+                    </span>
+                    , but already knows 4 attacks. Choose an attack to forget,
+                    or cancel.
+                  </p>
+
+                  <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+                    {/* Current Attacks */}
+                    {tower.creature.equippedAttacks.map(
+                      (atk: string, idx: number) => {
+                        const def = ATTACK_DEFS[atk];
+                        return (
+                          <button
+                            key={idx}
+                            onClick={() => {
+                              engineRef.current.replaceTowerAttack(
+                                tower.id,
+                                idx,
+                                activeModal.newAttackDefId
+                              );
+                              closeActiveModal();
+                            }}
+                            className="group flex cursor-pointer flex-col rounded border border-slate-600 bg-slate-700 p-3 text-left transition-colors hover:border-red-500 hover:bg-red-900/50"
+                          >
+                            <span className="font-bold text-slate-200 group-hover:text-red-400">
+                              Forget {def?.name}
+                            </span>
+                            <span className="mt-1 line-clamp-2 text-xs text-slate-400">
+                              Power: {def?.power}
+                            </span>
+                          </button>
+                        );
+                      }
+                    )}
+                  </div>
+
+                  {/* New Attack Info & Cancel */}
+                  <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-700 pt-4 lg:flex-row">
+                    <div className="flex-1">
+                      <div className="font-bold text-yellow-400">
+                        New: {newDef?.name}
+                      </div>
+                      <div className="text-sm text-slate-300">
+                        Power: {newDef?.power} | Cooldown:{' '}
+                        {(newDef?.cooldownMs || 1000) / 1000}s
+                      </div>
+                    </div>
+                    <button
+                      className="cursor-pointer rounded bg-slate-600 px-6 py-2 font-bold whitespace-nowrap text-white transition-transform hover:scale-[1.02] hover:bg-slate-500 active:scale-[0.98]"
+                      onClick={closeActiveModal}
+                    >
+                      Do Not Learn
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          return null;
+        })()}
 
       {globalDrag && (
         <div
-          className="fixed pointer-events-none z-[10001]"
+          className="pointer-events-none fixed z-[10001]"
           style={{
             left: globalDrag.x - globalDrag.offsetX,
             top: globalDrag.y - globalDrag.offsetY,
           }}
         >
           {globalDrag.type === 'tower' ? (
-            <div className="w-16 h-16 lg:w-24 lg:h-24 p-1 rounded flex flex-col items-center justify-center bg-cyan-800 border-2 border-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.6)] opacity-80 scale-105">
+            <div className="flex h-16 w-16 scale-105 flex-col items-center justify-center rounded border-2 border-cyan-300 bg-cyan-800 p-1 opacity-80 shadow-[0_0_15px_rgba(34,211,238,0.6)] lg:h-24 lg:w-24">
               {globalDrag.imageUrl && (
                 <img
                   src={globalDrag.imageUrl}
                   alt={globalDrag.name}
-                  className="w-8 h-8 lg:w-10 lg:h-10 object-contain pointer-events-none"
+                  className="pointer-events-none h-8 w-8 object-contain lg:h-10 lg:w-10"
                 />
               )}
-              <span className="text-[7px] lg:text-[9px] uppercase font-bold truncate w-full text-center leading-tight text-cyan-100 mt-1">
+              <span className="mt-1 w-full truncate text-center text-[7px] leading-tight font-bold text-cyan-100 uppercase lg:text-[9px]">
                 {globalDrag.name}
               </span>
             </div>
           ) : (
-            <div className="w-16 h-16 lg:w-24 lg:h-24 p-1 lg:p-2 rounded flex flex-col items-center justify-center bg-purple-900 border-2 border-purple-500 opacity-80 scale-105">
-              <div className="relative w-8 h-8 lg:w-12 lg:h-12 rounded-full border-[3px] lg:border-4 border-white bg-red-500 flex items-center justify-center shadow-lg pointer-events-none mb-0 lg:mb-1 overflow-hidden">
-                <div className="w-full h-1 bg-black absolute top-1/2 -mt-[1px] lg:-mt-[2px] left-0" />
-                <div className="w-3 h-3 lg:w-4 lg:h-4 bg-white rounded-full border-2 border-black z-10" />
+            <div className="flex h-16 w-16 scale-105 flex-col items-center justify-center rounded border-2 border-purple-500 bg-purple-900 p-1 opacity-80 lg:h-24 lg:w-24 lg:p-2">
+              <div className="pointer-events-none relative mb-0 flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border-[3px] border-white bg-red-500 shadow-lg lg:mb-1 lg:h-12 lg:w-12 lg:border-4">
+                <div className="absolute top-1/2 left-0 -mt-[1px] h-1 w-full bg-black lg:-mt-[2px]" />
+                <div className="z-10 h-3 w-3 rounded-full border-2 border-black bg-white lg:h-4 lg:w-4" />
               </div>
-              <span className="text-[8px] lg:text-[10px] mt-0.5 lg:mt-1 uppercase text-center leading-tight text-purple-200 font-bold">
+              <span className="mt-0.5 text-center text-[8px] leading-tight font-bold text-purple-200 uppercase lg:mt-1 lg:text-[10px]">
                 Capture
               </span>
             </div>

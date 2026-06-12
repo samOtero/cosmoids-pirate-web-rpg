@@ -56,6 +56,7 @@ export default function PartyScreen({
     offsetX: number;
     offsetY: number;
     spriteUrl: string;
+    isShiny?: boolean;
   } | null>(null);
 
   const [globalDrag, setGlobalDrag] = useState<{
@@ -65,6 +66,7 @@ export default function PartyScreen({
     y: number;
     offsetX: number;
     offsetY: number;
+    isShiny?: boolean;
   } | null>(null);
 
   const handlePointerDown = (
@@ -101,7 +103,7 @@ export default function PartyScreen({
           y: e.clientY,
           offsetX: pd.offsetX,
           offsetY: pd.offsetY,
-          isShiny: (pd as any).isShiny,
+          isShiny: pd.isShiny,
         });
         pendingDragRef.current = null;
       }
@@ -382,7 +384,7 @@ export default function PartyScreen({
             alt="Dragging Creature"
             className="h-10 w-10 object-contain lg:h-16 lg:w-16"
           />
-          {(globalDrag as any).isShiny && (
+          {globalDrag.isShiny && (
             <div className="absolute top-1 left-1 text-xs lg:text-lg">
               ✨
             </div>

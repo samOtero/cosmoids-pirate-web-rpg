@@ -47,6 +47,12 @@ export type TDEvent =
       type: 'TOWER_ASK_REPLACE_ATTACK';
       towerId: string;
       newAttackDefId: string;
+    }
+  | {
+      type: 'SHINY_ENEMY_SPAWNED';
+      enemyId: string;
+      enemyDefinitionId: string;
+      level: number;
     };
 
 type TDEventHandler = (event: TDEvent) => void;

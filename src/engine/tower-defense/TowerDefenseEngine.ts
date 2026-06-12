@@ -73,6 +73,7 @@ interface ActiveSpawnerState {
 }
 
 export class TowerDefenseEngine {
+  public static forceShinySpawns: boolean = false;
   public towers: Tower[] = [];
   public enemies: Enemy[] = [];
   public projectiles: Projectile[] = [];
@@ -268,7 +269,8 @@ export class TowerDefenseEngine {
           randomEnemyDef.baseStats.specialDefense,
           enemyLevel
         );
-        newEnemies.push({
+        const isShiny = TowerDefenseEngine.forceShinySpawns || (Math.random() < 0.5);
+        const newEnemy: Enemy = {
           id: `enemy_${time}`,
           definitionId: randomEnemyDef.id,
           level: enemyLevel,
@@ -285,8 +287,18 @@ export class TowerDefenseEngine {
           pathIndex: pathIndex,
           facingDirection: 'down',
           damagedByTowerIds: new Set<string>(),
-          isShiny: true,
-        });
+          isShiny,
+        };
+        newEnemies.push(newEnemy);
+
+        if (isShiny && !this.disableCapture) {
+          this.events.emit({
+            type: 'SHINY_ENEMY_SPAWNED',
+            enemyId: newEnemy.id,
+            enemyDefinitionId: newEnemy.definitionId,
+            level: newEnemy.level,
+          });
+        }
         this.lastSpawnTime = time;
       }
     }
@@ -875,7 +887,8 @@ export class TowerDefenseEngine {
       enemyLevel
     );
 
-    newEnemies.push({
+    const isShiny = TowerDefenseEngine.forceShinySpawns || (Math.random() < 0.5);
+    const newEnemy: Enemy = {
       id: `enemy_${time}_${Math.random().toString(36).substring(7)}`,
       definitionId: definitionId,
       level: enemyLevel,
@@ -894,8 +907,18 @@ export class TowerDefenseEngine {
       turnAroundAtEnd,
       uncapturable,
       damagedByTowerIds: new Set<string>(),
-      isShiny: true,
-    });
+      isShiny,
+    };
+    newEnemies.push(newEnemy);
+
+    if (isShiny && !uncapturable && !this.disableCapture) {
+      this.events.emit({
+        type: 'SHINY_ENEMY_SPAWNED',
+        enemyId: newEnemy.id,
+        enemyDefinitionId: newEnemy.definitionId,
+        level: newEnemy.level,
+      });
+    }
   }
 
   public captureEnemy(enemyId: string): PlayerCreature | null {
