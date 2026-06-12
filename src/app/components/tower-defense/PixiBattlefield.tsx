@@ -131,10 +131,10 @@ export function renderHealthBar(
 
   // Draw foreground
   const hpRatio = unit.maxHp > 0 ? unit.hp / unit.maxHp : 1;
-  const isWeakened = hpRatio <= WEAKENED_THRESHOLD;
+  const isWeakened = unit.isShiny || hpRatio <= WEAKENED_THRESHOLD;
   const isUncapturable = (unit as any).uncapturable;
 
-  if (hideWhenFull && hpRatio >= 1) {
+  if (hideWhenFull && hpRatio >= 1 && !unit.isShiny) {
     hpBg.visible = false;
     hpFg.visible = false;
   } else {
@@ -336,7 +336,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             if (distSq <= CAPTURE_DIST_SQ && distSq < minSqDist) {
               minSqDist = distSq;
               targetedEnemyId = enemy.id;
-              isWeakened = enemy.hp / enemy.maxHp <= WEAKENED_THRESHOLD;
+              isWeakened = enemy.isShiny || enemy.hp / enemy.maxHp <= WEAKENED_THRESHOLD;
             }
           });
 
@@ -949,7 +949,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 if (distSq <= CAPTURE_DIST_SQ && distSq < minSqDist) {
                   minSqDist = distSq;
                   targetedEnemyId = enemy.id;
-                  isWeakened = enemy.hp / enemy.maxHp <= WEAKENED_THRESHOLD;
+                  isWeakened = enemy.isShiny || enemy.hp / enemy.maxHp <= WEAKENED_THRESHOLD;
                 }
               });
 
