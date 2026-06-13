@@ -13,6 +13,7 @@ interface PartyScreenProps {
   onContinue?: () => void;
   onUpdateAttacks?: (creatureId: string, equippedAttacks: string[], activeAttackIndex: number) => void;
   getCreatureActiveAttackIndex?: (creatureId: string) => number;
+  showTutorial?: boolean;
 }
 
 export default function PartyScreen({
@@ -23,11 +24,13 @@ export default function PartyScreen({
   onContinue,
   onUpdateAttacks,
   getCreatureActiveAttackIndex,
+  showTutorial = false,
 }: PartyScreenProps) {
   const [currentPage, setCurrentPage] = useState(0);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [isDesktop, setIsDesktop] = useState(false);
   const [selectedCreatureIndex, setSelectedCreatureIndex] = useState<number | null>(null);
+  const [tutorialDismissed, setTutorialDismissed] = useState(false);
 
   useEffect(() => {
     const checkDesktop = () => {
@@ -417,6 +420,46 @@ export default function PartyScreen({
           />
         );
       })()}
+
+      {/* Onboarding Tutorial Overlay */}
+      {showTutorial && !tutorialDismissed && (
+        <div className="absolute inset-0 z-[100] flex items-end justify-center bg-black/60 p-4 pb-6 select-none">
+          {/* Inner Container: aligns panel and character */}
+          <div className="relative w-full max-w-4xl">
+            {/* Dialog Panel */}
+            <Panel className="h-32 lg:h-48 flex flex-col justify-start items-start bg-ocean-dark/95 border-wood-light relative pr-24 sm:pr-32 md:pr-40 lg:pr-48">
+              <div className="text-yellow-400 font-mono text-xs md:text-sm lg:text-2xl font-bold mb-1.5 lg:mb-3">
+                Selecting your team is easy as 1, 2, 3.
+              </div>
+              <div className="text-sand font-mono text-[10px] md:text-xs lg:text-lg leading-relaxed space-y-1 lg:space-y-2">
+                <div>
+                  <span className="text-cyan-400 font-bold">Step 1:</span> Just drag your Cosmoid from &quot;Storage&quot; to a spot on your &quot;Current Team&quot;.
+                </div>
+                <div>
+                  <span className="text-cyan-400 font-bold">Step 2:</span> Tap on the Cosmoid to level it up, change its attack or release it.
+                </div>
+              </div>
+
+              {/* Close button in the bottom right corner of panel (shifted to stay clear of Lance sprite) */}
+              <button
+                onClick={() => setTutorialDismissed(true)}
+                className="absolute bottom-3 right-28 sm:right-36 md:right-44 lg:right-52 bg-green-600 hover:bg-green-500 active:bg-green-700 text-white text-[10px] lg:text-base font-bold uppercase tracking-widest rounded-md shadow-lg border border-green-800 transition-colors px-4 py-1.5 cursor-pointer"
+              >
+                Close
+              </button>
+            </Panel>
+
+            {/* Character Sprite on the right */}
+            <div className="absolute bottom-0 right-0 w-24 sm:w-32 md:w-40 lg:w-48 h-auto pointer-events-none translate-y-6 flex justify-end">
+              <img
+                src="/battles/characters/lance_calm_battle.png"
+                alt="Lance"
+                className="h-auto w-full object-contain drop-shadow-[0_0_15px_rgba(0,0,0,0.8)]"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -103,6 +103,8 @@ export default function Home() {
 
     // If there are events queued (e.g. pending level navigation), show the continue button
     const hasPendingEvents = eventQueue.length > 0;
+    const showTutorial =
+      currentProfile.storyProgression < StoryProgression.DEFEAT_FIRST_BATTLE;
 
     return (
       <Suspense fallback={<div>Loading Team...</div>}>
@@ -127,6 +129,7 @@ export default function Home() {
               currentProfile.storageCreatures.find((c) => c.id === creatureId);
             return pc?.activeAttackIndex ?? 0;
           }}
+          showTutorial={showTutorial}
         />
       </Suspense>
     );
