@@ -943,7 +943,7 @@ export class TowerDefenseEngine {
     const capturedLevel = enemy.level;
 
     const captured: PlayerCreature = {
-      id: `captured_${enemy.definitionId}_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+      id: crypto.randomUUID(),
       speciesId: enemy.definitionId,
       level: capturedLevel,
       xp: 0,

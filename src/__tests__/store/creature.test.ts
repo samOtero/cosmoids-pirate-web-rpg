@@ -343,4 +343,82 @@ describe('Creature Store Logic', () => {
       TowerDefenseEngine.forceShinySpawns = originalForceShiny;
     }
   });
+
+  it('should preserve captured creature ID and successfully update its level and xp on level end', () => {
+    const store = useGameStore.getState();
+    const profileId = 0;
+
+    // 1. Setup the profile with a starter creature
+    const starterCreatureInput = {
+      id: 'starter_crab', // will be replaced with a UUID by addCreatureToProfile
+      speciesId: 'starter_crab',
+      level: 5,
+      xp: 0,
+      equippedAttacks: [],
+      isShiny: false,
+    };
+    store.addCreatureToProfile(profileId, starterCreatureInput);
+
+    // Get the profile after adding the starter to get its correct UUID
+    let profile = useGameStore.getState().profiles[0]!;
+    expect(profile.creatures.length).toBe(1);
+    const profileStarter = profile.creatures[0];
+
+    const levelData = {
+      paths: [[{ x: 0, y: 0 }, { x: 10, y: 10 }]],
+      placementSpots: [],
+    };
+
+    // 2. Initialize the engine with the profile's active party (which contains the starter)
+    const engine = new TowerDefenseEngine(levelData, [profileStarter]);
+
+    // Spawn an enemy
+    engine.enemies.push({
+      id: 'enemy_to_catch',
+      definitionId: 'mouse_1',
+      level: 3,
+      position: { x: 0, y: 0 },
+      hp: 10,
+      maxHp: 10,
+      speed: 1,
+      currentAttack: 5,
+      currentSpecialAttack: 5,
+      currentDefense: 5,
+      currentSpecialDefense: 5,
+      statusConditions: [],
+      currentWaypointIndex: 1,
+      pathIndex: 0,
+      facingDirection: 'down',
+      damagedByTowerIds: new Set(),
+      isShiny: false,
+    });
+
+    // 3. Capture the enemy in-level
+    const captured = engine.captureEnemy('enemy_to_catch');
+    expect(captured).not.toBeNull();
+    // Assert UUID format
+    expect(captured?.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+
+    // 4. Simulate the UI adding the captured creature to the profile
+    store.addCreatureToProfile(profileId, captured!);
+
+    // Verify the profile received the creature with the EXACT SAME ID
+    profile = useGameStore.getState().profiles[0]!;
+    expect(profile.creatures.length).toBe(2);
+    expect(profile.creatures[1].id).toBe(captured?.id);
+
+    // 5. Gain experience and level up on the engine's roster for this captured creature
+    const capturedRosterRef = engine.roster.find((c) => c.id === captured?.id);
+    expect(capturedRosterRef).toBeDefined();
+    capturedRosterRef!.level = 10;
+    capturedRosterRef!.xp = 2000;
+
+    // 6. Simulate level end and save progress
+    store.updateCreatures(engine.roster);
+
+    // Verify that the captured creature on the profile got its level and XP persisted!
+    profile = useGameStore.getState().profiles[0]!;
+    expect(profile.creatures[1].level).toBe(10);
+    expect(profile.creatures[1].xp).toBe(2000);
+  });
 });

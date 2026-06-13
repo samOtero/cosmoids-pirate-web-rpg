@@ -471,7 +471,7 @@ export const useGameStore = create<GameState>()(
                 const profile = newProfiles[slotId]!;
                 const newCreatureInstance: PlayerCreature = {
                   ...creature,
-                  id: crypto.randomUUID(),
+                  id: creature.id && creature.id !== creature.speciesId ? creature.id : crypto.randomUUID(),
                 };
                 // Add to party if under 6 and not forced to storage, otherwise to storage
                 if (profile.creatures.length < 6 && !forceStorage) {
