@@ -388,18 +388,19 @@ export default function PartyScreen({
             className="h-10 w-10 object-contain lg:h-16 lg:w-16"
           />
           {globalDrag.isShiny && (
-            <div className="absolute top-1 left-1 text-xs lg:text-lg">
-              ✨
-            </div>
+            <div className="absolute top-1 left-1 text-xs lg:text-lg">✨</div>
           )}
         </div>
       )}
 
       {/* Creature Details Screen Overlay */}
       {(() => {
-        const selectedCreature = selectedCreatureIndex !== null
-          ? (selectedCreatureIndex < 6 ? activeTeam[selectedCreatureIndex] : storageCreatures[selectedCreatureIndex - 6])
-          : null;
+        const selectedCreature =
+          selectedCreatureIndex !== null
+            ? selectedCreatureIndex < 6
+              ? activeTeam[selectedCreatureIndex]
+              : storageCreatures[selectedCreatureIndex - 6]
+            : null;
 
         if (!selectedCreature) return null;
 
@@ -427,30 +428,34 @@ export default function PartyScreen({
           {/* Inner Container: aligns panel and character */}
           <div className="relative w-full max-w-4xl">
             {/* Dialog Panel */}
-            <Panel className="h-32 lg:h-48 flex flex-col justify-start items-start bg-ocean-dark/95 border-wood-light relative pr-24 sm:pr-32 md:pr-40 lg:pr-48">
-              <div className="text-yellow-400 font-mono text-xs md:text-sm lg:text-2xl font-bold mb-1.5 lg:mb-3">
-                Selecting your team is easy as 1, 2, 3.
+            <Panel className="relative flex h-32 flex-col items-start justify-start border-wood-light bg-ocean-dark/95 pr-24 lg:h-48 lg:pr-48">
+              <div className="mb-1.5 font-mono text-xs font-bold text-yellow-400 md:text-sm lg:mb-3 lg:text-xl">
+                Listen closely, kid! Assembling your crew is simple.
               </div>
-              <div className="text-sand font-mono text-[10px] md:text-xs lg:text-lg leading-relaxed space-y-1 lg:space-y-2">
+              <div className="space-y-1 font-mono text-[10px] leading-relaxed text-sand md:text-xs lg:space-y-2 lg:text-lg">
                 <div>
-                  <span className="text-cyan-400 font-bold">Step 1:</span> Just drag your Cosmoid from &quot;Storage&quot; to a spot on your &quot;Current Team&quot;.
+                  <span className="font-bold text-cyan-400">1.</span> Drag a
+                  Cosmoid from your &quot;Storage&quot; and drop 'em onto your
+                  &quot;Current Team&quot;.
                 </div>
                 <div>
-                  <span className="text-cyan-400 font-bold">Step 2:</span> Tap on the Cosmoid to level it up, change its attack or release it.
+                  <span className="font-bold text-cyan-400">2.</span> Tap on any
+                  partner to swap their attacks, check their stats, or release
+                  them.
                 </div>
               </div>
 
-              {/* Close button in the bottom right corner of panel (shifted to stay clear of Lance sprite) */}
+              {/* Close button in the bottom right corner of panel (under Lance) */}
               <button
                 onClick={() => setTutorialDismissed(true)}
-                className="absolute bottom-3 right-28 sm:right-36 md:right-44 lg:right-52 bg-green-600 hover:bg-green-500 active:bg-green-700 text-white text-[10px] lg:text-base font-bold uppercase tracking-widest rounded-md shadow-lg border border-green-800 transition-colors px-4 py-1.5 cursor-pointer"
+                className="absolute right-4 bottom-2.5 cursor-pointer rounded-md border border-green-800 bg-green-600 px-4 py-1.5 text-[10px] font-bold tracking-widest text-white uppercase shadow-lg transition-colors hover:bg-green-500 active:bg-green-700 lg:right-12 lg:bottom-4 lg:text-base"
               >
                 Close
               </button>
             </Panel>
 
             {/* Character Sprite on the right */}
-            <div className="absolute bottom-0 right-0 w-24 sm:w-32 md:w-40 lg:w-48 h-auto pointer-events-none translate-y-6 flex justify-end">
+            <div className="pointer-events-none absolute right-0 bottom-12 flex h-auto w-32 justify-end lg:bottom-16 lg:w-48">
               <img
                 src="/battles/characters/lance_calm_battle.png"
                 alt="Lance"

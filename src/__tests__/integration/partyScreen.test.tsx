@@ -87,14 +87,14 @@ describe('PartyScreen Empty Party Rules', () => {
 
     // Verify tutorial elements are in the document
     const titleText = screen.getByText(
-      /Selecting your team is easy as 1, 2, 3/i
+      /Listen closely, kid! Assembling your crew is simple/i
     );
     expect(titleText).toBeInTheDocument();
 
-    const step1Text = screen.getByText(/Step 1:/i);
+    const step1Text = screen.getByText(/Drag a Cosmoid/i);
     expect(step1Text).toBeInTheDocument();
 
-    const step2Text = screen.getByText(/Step 2:/i);
+    const step2Text = screen.getByText(/Tap on any partner/i);
     expect(step2Text).toBeInTheDocument();
 
     const lanceImage = screen.getByAltText(/Lance/i);
@@ -106,7 +106,7 @@ describe('PartyScreen Empty Party Rules', () => {
 
     fireEvent.click(closeButton);
     expect(
-      screen.queryByText(/Selecting your team is easy as 1, 2, 3/i)
+      screen.queryByText(/Listen closely, kid! Assembling your crew is simple/i)
     ).not.toBeInTheDocument();
   });
 
