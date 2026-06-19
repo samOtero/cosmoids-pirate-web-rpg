@@ -5,7 +5,12 @@ description: A skill for reading from and writing to the project-wide notes file
 
 # Project Notes Manager
 
-This skill allows you to maintain a persistent `PROJECT_NOTES.md` file in the root of the repository. Use this file to store important information, architectural decisions, and other notes that should persist across sessions.
+This skill allows you to maintain a persistent `PROJECT_NOTES.md` file in the root of the repository. Use this file to store important architectural decisions, design patterns, coding conventions, and tricky engineering quirks/gotchas that persist across sessions.
+
+> [!IMPORTANT]
+> Do NOT use `PROJECT_NOTES.md` as a simple chronological log for routine tasks completed. Only update this file when you discover or introduce a major architectural convention, a complex engineering quirk/gotcha, or a critical data schema change.
+
+---
 
 ## Instructions
 
@@ -13,55 +18,19 @@ This skill allows you to maintain a persistent `PROJECT_NOTES.md` file in the ro
 
 To read the current notes, use the `read_file` tool on `PROJECT_NOTES.md`.
 
-### Adding Notes
+### Modifying Notes
 
-To add a new note, use the `run_command` tool to append text to the file. Do NOT overwrite the file unless you have a specific reason to reformat it entirely.
+When adding new conventions, quirks, or roadmap items:
+1. **Locate the correct section**:
+   - `## 🛠️ Core Architecture & Tech Stack`
+   - `## 🎨 Key Coding Conventions & Standards`
+   - `## ⚠️ Key Engineering Quirks & Gotchas`
+   - `## 🔮 Roadmap Ideas & Features (TODO / Pending)`
+   - `## 📜 Recent Work & Migration Log` (Only for major, breaking, or large-scale migrations like save-file schemas, not routine feature additions).
+2. **Use `replace_file_content`** to insert or update the information in the appropriate section. Do not simply append date-based entries to the end of the file unless updating the major migration log at the bottom.
 
-**Command to append via PowerShell:**
+### Formatting Guidelines
 
-```powershell
-Add-Content -Path "PROJECT_NOTES.md" -Value "`n## [Date] New Note Title`nNote content here."
-```
-
-Make sure to include a newline before the header to separate it from previous content.
-
-### Formatting
-
-- Use Markdown for formatting.
-- key entries with a header level 2 (`##`).
-- Include the date in the header or as the first line of the entry.
-
-## Example Usage
-
-**User:** "Add a note that we decided to use Context API for state management."
-
-**Agent Action:**
-
-1. Check if `PROJECT_NOTES.md` exists.
-2. If it does not exist, create it.
-3. specific command:
-   ```powershell
-   Add-Content -Path "PROJECT_NOTES.md" -Value "`n## [2026-10-27] State Management Decision`nWe have decided to use the React Context API for global state management instead of Redux."
-   ```
-
-### Editing Notes
-
-To edit an existing note (e.g., to update status, correct information, or add details to a specific section), use the `replace_file_content` tool.
-
-1.  **Read the file first** to ensure you have the exact context and line numbers.
-2.  **Use `replace_file_content`** to target the specific block of text you want to change.
-
-**Example:**
-Updating a previous note about state management.
-
-```json
-{
-  "TargetFile": "PROJECT_NOTES.md",
-  "TargetContent": "We have decided to use the React Context API",
-  "ReplacementContent": "We have decided to use Redux Toolkit"
-}
-```
-
-### Formatting
-
-- Use Markdown for formatting.
+- Use clear, concise Markdown bullet points and headers.
+- Provide links to referenced files (e.g. `[globals.css](file:///c:/Projects/2026/cosmoids_web/src/app/globals.css)`).
+- When documenting quirks or code implementations, explain *why* it was done that way (e.g., event propagation workarounds, type compatibility shims).
