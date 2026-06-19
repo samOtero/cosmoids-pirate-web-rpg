@@ -19,6 +19,7 @@ const TowerDefenseScreen = lazy(
   () => import('@/app/components/tower-defense/TowerDefenseScreen')
 );
 const TDLevelEditor = lazy(() => import('./TDLevelEditor'));
+const TDEffectEditor = lazy(() => import('./TDEffectEditor'));
 
 type ToolType =
   | 'DIALOG'
@@ -26,6 +27,7 @@ type ToolType =
   | 'TOWER_DEFENSE'
   | 'TD_LEVEL_EDITOR'
   | 'TD_TOWER_SIZE_EDITOR'
+  | 'TD_EFFECT_EDITOR'
   | null;
 
 export default function DevTools() {
@@ -110,6 +112,15 @@ export default function DevTools() {
                 className="text-sm bg-slate-800 hover:bg-cyan-700 px-3 py-2 rounded text-left"
               >
                 TD Level Editor
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTool('TD_EFFECT_EDITOR');
+                  setShowMenu(false);
+                }}
+                className="text-sm bg-slate-800 hover:bg-cyan-700 px-3 py-2 rounded text-left"
+              >
+                VFX Effect Editor
               </button>
               <button
                 onClick={() => {
@@ -266,6 +277,9 @@ export default function DevTools() {
           )}
           {activeTool === 'TD_LEVEL_EDITOR' && (
             <TDLevelEditor onClose={() => setActiveTool(null)} />
+          )}
+          {activeTool === 'TD_EFFECT_EDITOR' && (
+            <TDEffectEditor onClose={() => setActiveTool(null)} />
           )}
         </Suspense>
       )}

@@ -110,12 +110,29 @@ export const StoryProgression = {
 export type StoryProgressionValue =
   (typeof StoryProgression)[keyof typeof StoryProgression];
 
+export interface VFXSpriteKeyframe {
+  progress: number; // 0 to 1
+  x?: number; // relative X offset
+  y?: number; // relative Y offset
+  scaleX?: number;
+  scaleY?: number;
+  rotation?: number; // angle in degrees
+  alpha?: number; // 0 to 1
+}
+
+export interface VFXSpriteLayer {
+  url: string;
+  keyframes: VFXSpriteKeyframe[];
+}
+
 export interface VFXAnimationConfig {
-  type: 'WIPE_LINEAR' | 'FADE' | 'SCALE' | 'CUSTOM' | 'NIBBLE';
+  type: 'WIPE_LINEAR' | 'FADE' | 'SCALE' | 'CUSTOM' | 'NIBBLE' | 'KEYFRAME_SPRITES';
   maskRotation?: number; // e.g. Math.PI / 4
   maskSize?: number; // e.g. 200
   fadeInProgress?: number; // 0 to 1
   fadeOutProgress?: number; // 0 to 1
+  durationMs?: number; // overall duration of effect in ms
+  layers?: VFXSpriteLayer[];
 }
 
 export interface UnitSpriteConfig {

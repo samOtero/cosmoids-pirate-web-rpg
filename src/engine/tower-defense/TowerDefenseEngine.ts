@@ -25,6 +25,7 @@ import {
 import { ATTACK_DEFS } from './attacks/definitions';
 import { AttackBehaviorRegistry } from './attacks/behaviors';
 import { EffectProcessor } from './attacks/EffectProcessor';
+import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import {
   TDWave,
   TDWaveGroup,
@@ -638,11 +639,14 @@ export class TowerDefenseEngine {
               );
 
               if (attackDef.visualEffectConfigId) {
+                const configMap = CREATURE_TD_CONFIGS[attackDef.visualEffectConfigId];
+                const vfxConfig = configMap?.default?.vfxAnimation;
+                const durationMs = vfxConfig?.durationMs ?? 500;
                 this.visualEffects.push({
                   id: `vfx_${Date.now()}_${Math.random()}`,
                   configId: attackDef.visualEffectConfigId,
                   position: { ...target.position },
-                  durationMs: 500, // Duration of the visual effect
+                  durationMs,
                   elapsedMs: 0,
                   targetId: target.id,
                 });

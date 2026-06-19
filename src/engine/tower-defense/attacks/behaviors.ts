@@ -2,6 +2,7 @@ import { TowerDefenseEngine, TD_CREATURE_DEFS } from '../TowerDefenseEngine';
 import { Tower, Enemy } from '../types';
 import { AttackDefinition, AttackBehavior } from './types';
 import { EffectProcessor } from './EffectProcessor';
+import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 
 export const ProjectileBehavior: AttackBehavior = {
   canExecute(
@@ -107,11 +108,14 @@ export const InstantMeleeBehavior: AttackBehavior = {
 
       // Add visual effect if configured
       if (attackDef.visualEffectConfigId) {
+        const configMap = CREATURE_TD_CONFIGS[attackDef.visualEffectConfigId];
+        const vfxConfig = configMap?.default?.vfxAnimation;
+        const durationMs = vfxConfig?.durationMs ?? 500;
         engine.visualEffects.push({
           id: `vfx_${Date.now()}_${Math.random()}`,
           configId: attackDef.visualEffectConfigId,
           position: { ...enemyTarget.position },
-          durationMs: 500,
+          durationMs,
           elapsedMs: 0,
           targetId: enemyTarget.id,
         });

@@ -14,6 +14,7 @@ import { ElementType } from '@/types/baseGame';
 import { TD_BASE_HEIGHT } from '@/constants/game';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { BaseTDUnit } from '@/engine/tower-defense/types';
+import { interpolateKeyframes } from '@/utils/animationUtils';
 
 export function applyTDUnitTransforms(
   unit: BaseTDUnit,
@@ -1263,24 +1264,16 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             if (!container) {
               container = new PIXI.Container();
 
-              if (animConfig && animConfig.type === 'NIBBLE') {
-                const topSprite = new PIXI.Sprite();
-                topSprite.label = 'vfx_top_teeth';
-                topSprite.anchor.set(0.5);
-                container.addChild(topSprite);
+              if (animConfig && animConfig.type === 'KEYFRAME_SPRITES') {
+                animConfig.layers?.forEach((layer, layerIdx) => {
+                  const sprite = new PIXI.Sprite();
+                  sprite.label = `vfx_layer_${layerIdx}`;
+                  sprite.anchor.set(0.5);
+                  container.addChild(sprite);
 
-                const bottomSprite = new PIXI.Sprite();
-                bottomSprite.label = 'vfx_bottom_teeth';
-                bottomSprite.anchor.set(0.5);
-                container.addChild(bottomSprite);
-
-                const topUrl = '/battles/attacks/nibble_top_teeth.png';
-                const bottomUrl = '/battles/attacks/nibble_bottom_teeth.png';
-                PIXI.Assets.load(topUrl).then((t) => {
-                  if (!isDestroyed) topSprite.texture = t;
-                });
-                PIXI.Assets.load(bottomUrl).then((t) => {
-                  if (!isDestroyed) bottomSprite.texture = t;
+                  PIXI.Assets.load(layer.url).then((t) => {
+                    if (!isDestroyed) sprite.texture = t;
+                  });
                 });
               } else {
                 const sprite = new PIXI.Sprite();
@@ -1306,51 +1299,25 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
             const progress = Math.min(1, vfx.elapsedMs / vfx.durationMs);
 
-            if (animConfig && animConfig.type === 'NIBBLE') {
-              const topSprite = container.getChildByLabel('vfx_top_teeth') as
-                | PIXI.Sprite
-                | undefined;
-              const bottomSprite = container.getChildByLabel('vfx_bottom_teeth') as
-                | PIXI.Sprite
-                | undefined;
+            if (animConfig && animConfig.type === 'KEYFRAME_SPRITES') {
+              animConfig.layers?.forEach((layer, layerIdx) => {
+                const sprite = container.getChildByLabel(`vfx_layer_${layerIdx}`) as
+                  | PIXI.Sprite
+                  | undefined;
+                if (sprite) {
+                  const baseScale = tdConfig.scale ?? 0.3;
+                  const ox = tdConfig.offsetX ?? 0;
+                  const oy = tdConfig.offsetY ?? 0;
 
-              if (topSprite && bottomSprite) {
-                const baseScale = tdConfig.scale ?? 0.3;
-                topSprite.scale.set(baseScale);
-                bottomSprite.scale.set(baseScale);
+                  const values = interpolateKeyframes(layer.keyframes, progress);
 
-                const ox = tdConfig.offsetX ?? 0;
-                const oy = tdConfig.offsetY ?? 0;
-
-                // bite animation:
-                // separation distance starts at 35, decreases to 0, bounces up to 15, goes to 0 again.
-                let separation = 0;
-                if (progress < 0.2) {
-                  const t = progress / 0.2;
-                  separation = 35 * (1 - t);
-                } else if (progress < 0.4) {
-                  const t = (progress - 0.2) / 0.2;
-                  separation = 15 * t;
-                } else if (progress < 0.6) {
-                  const t = (progress - 0.4) / 0.2;
-                  separation = 15 * (1 - t);
-                } else {
-                  separation = 0;
+                  sprite.scale.set(baseScale * values.scaleX, baseScale * values.scaleY);
+                  sprite.x = ox + values.x;
+                  sprite.y = oy + values.y;
+                  sprite.rotation = (values.rotation * Math.PI) / 180;
+                  sprite.alpha = values.alpha;
                 }
-
-                topSprite.x = ox;
-                topSprite.y = oy - separation;
-
-                bottomSprite.x = ox;
-                bottomSprite.y = oy + separation;
-
-                if (progress > 0.6) {
-                  const fadeProgress = (progress - 0.6) / 0.4;
-                  container.alpha = 1 - fadeProgress;
-                } else {
-                  container.alpha = 1;
-                }
-              }
+              });
             } else {
               const sprite = container.getChildByLabel('vfx_sprite') as
                 | PIXI.Sprite

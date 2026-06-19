@@ -338,7 +338,30 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowScaleX: 1.15,
       shadowOffsetY: 1,
       vfxAnimation: {
-        type: 'NIBBLE',
+        type: 'KEYFRAME_SPRITES',
+        durationMs: 500,
+        layers: [
+          {
+            url: '/battles/attacks/nibble_top_teeth.png',
+            keyframes: [
+              { progress: 0, x: 0, y: -35, scaleX: 1, scaleY: 1, rotation: 0, alpha: 1 },
+              { progress: 0.2, x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0, alpha: 1 },
+              { progress: 0.4, x: 0, y: -15, scaleX: 1, scaleY: 1, rotation: 0, alpha: 1 },
+              { progress: 0.6, x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0, alpha: 1 },
+              { progress: 1.0, x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0, alpha: 0 }
+            ]
+          },
+          {
+            url: '/battles/attacks/nibble_bottom_teeth.png',
+            keyframes: [
+              { progress: 0, x: 0, y: 35, scaleX: 1, scaleY: 1, rotation: 0, alpha: 1 },
+              { progress: 0.2, x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0, alpha: 1 },
+              { progress: 0.4, x: 0, y: 15, scaleX: 1, scaleY: 1, rotation: 0, alpha: 1 },
+              { progress: 0.6, x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0, alpha: 1 },
+              { progress: 1.0, x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0, alpha: 0 }
+            ]
+          }
+        ]
       },
       offsetY: -5,
     },
