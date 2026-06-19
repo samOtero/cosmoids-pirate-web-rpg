@@ -111,7 +111,7 @@ export type StoryProgressionValue =
   (typeof StoryProgression)[keyof typeof StoryProgression];
 
 export interface VFXAnimationConfig {
-  type: 'WIPE_LINEAR' | 'FADE' | 'SCALE' | 'CUSTOM';
+  type: 'WIPE_LINEAR' | 'FADE' | 'SCALE' | 'CUSTOM' | 'NIBBLE';
   maskRotation?: number; // e.g. Math.PI / 4
   maskSize?: number; // e.g. 200
   fadeInProgress?: number; // 0 to 1

@@ -1250,17 +1250,49 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           }
           for (const vfx of engine.visualEffects) {
             let container = vfxSprites.get(vfx.id);
+
+            // Fetch the visual effect configuration
+            const tdConfigMap = CREATURE_TD_CONFIGS[vfx.configId] || {
+              default: { scale: 1 },
+            };
+            const tdConfig =
+              tdConfigMap[vfx.facingDirection || 'default'] ||
+              tdConfigMap.default;
+            const animConfig = tdConfig.vfxAnimation;
+
             if (!container) {
               container = new PIXI.Container();
-              const sprite = new PIXI.Sprite();
-              sprite.label = 'vfx_sprite';
-              sprite.anchor.set(0.5);
-              container.addChild(sprite);
 
-              const mask = new PIXI.Graphics();
-              mask.label = 'vfx_mask';
-              container.addChild(mask);
-              sprite.mask = mask;
+              if (animConfig && animConfig.type === 'NIBBLE') {
+                const topSprite = new PIXI.Sprite();
+                topSprite.label = 'vfx_top_teeth';
+                topSprite.anchor.set(0.5);
+                container.addChild(topSprite);
+
+                const bottomSprite = new PIXI.Sprite();
+                bottomSprite.label = 'vfx_bottom_teeth';
+                bottomSprite.anchor.set(0.5);
+                container.addChild(bottomSprite);
+
+                const topUrl = '/battles/attacks/nibble_top_teeth.png';
+                const bottomUrl = '/battles/attacks/nibble_bottom_teeth.png';
+                PIXI.Assets.load(topUrl).then((t) => {
+                  if (!isDestroyed) topSprite.texture = t;
+                });
+                PIXI.Assets.load(bottomUrl).then((t) => {
+                  if (!isDestroyed) bottomSprite.texture = t;
+                });
+              } else {
+                const sprite = new PIXI.Sprite();
+                sprite.label = 'vfx_sprite';
+                sprite.anchor.set(0.5);
+                container.addChild(sprite);
+
+                const mask = new PIXI.Graphics();
+                mask.label = 'vfx_mask';
+                container.addChild(mask);
+                sprite.mask = mask;
+              }
 
               app.stage.addChild(container);
               vfxSprites.set(vfx.id, container);
@@ -1273,91 +1305,128 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             container.scale.set(finalScale);
 
             const progress = Math.min(1, vfx.elapsedMs / vfx.durationMs);
-            //container.alpha = progress > 0.8 ? 1 - (progress - 0.8) * 5 : 1;
 
-            const sprite = container.getChildByLabel('vfx_sprite') as
-              | PIXI.Sprite
-              | undefined;
-            const mask = container.getChildByLabel('vfx_mask') as
-              | PIXI.Graphics
-              | undefined;
+            if (animConfig && animConfig.type === 'NIBBLE') {
+              const topSprite = container.getChildByLabel('vfx_top_teeth') as
+                | PIXI.Sprite
+                | undefined;
+              const bottomSprite = container.getChildByLabel('vfx_bottom_teeth') as
+                | PIXI.Sprite
+                | undefined;
 
-            if (sprite) {
-              applyTDUnitTransforms(
-                {
-                  ...vfx,
-                  hp: 1,
-                  maxHp: 1,
-                  facingDirection: vfx.facingDirection || 'down',
-                } as BaseTDUnit,
-                sprite,
-                new PIXI.Graphics(), // dummy shadow
-                vfx.configId,
-                undefined,
-                (t) => {
-                  if (!isDestroyed) sprite.texture = t;
+              if (topSprite && bottomSprite) {
+                const baseScale = tdConfig.scale ?? 0.3;
+                topSprite.scale.set(baseScale);
+                bottomSprite.scale.set(baseScale);
+
+                const ox = tdConfig.offsetX ?? 0;
+                const oy = tdConfig.offsetY ?? 0;
+
+                // bite animation:
+                // separation distance starts at 35, decreases to 0, bounces up to 15, goes to 0 again.
+                let separation = 0;
+                if (progress < 0.2) {
+                  const t = progress / 0.2;
+                  separation = 35 * (1 - t);
+                } else if (progress < 0.4) {
+                  const t = (progress - 0.2) / 0.2;
+                  separation = 15 * t;
+                } else if (progress < 0.6) {
+                  const t = (progress - 0.4) / 0.2;
+                  separation = 15 * (1 - t);
+                } else {
+                  separation = 0;
                 }
-              );
 
-              // Fetch the visual effect configuration
-              const tdConfigMap = CREATURE_TD_CONFIGS[vfx.configId] || {
-                default: { scale: 1 },
-              };
-              const tdConfig =
-                tdConfigMap[vfx.facingDirection || 'default'] ||
-                tdConfigMap.default;
-              const animConfig = tdConfig.vfxAnimation;
+                topSprite.x = ox;
+                topSprite.y = oy - separation;
 
-              if (animConfig) {
-                // Handle Alpha/Fade
-                if (
-                  animConfig.fadeOutProgress !== undefined &&
-                  progress > animConfig.fadeOutProgress
-                ) {
-                  const fadePortion = 1 - animConfig.fadeOutProgress;
-                  container.alpha =
-                    1 - (progress - animConfig.fadeOutProgress) / fadePortion;
+                bottomSprite.x = ox;
+                bottomSprite.y = oy + separation;
+
+                if (progress > 0.6) {
+                  const fadeProgress = (progress - 0.6) / 0.4;
+                  container.alpha = 1 - fadeProgress;
                 } else {
                   container.alpha = 1;
                 }
+              }
+            } else {
+              const sprite = container.getChildByLabel('vfx_sprite') as
+                | PIXI.Sprite
+                | undefined;
+              const mask = container.getChildByLabel('vfx_mask') as
+                | PIXI.Graphics
+                | undefined;
 
-                // Handle Masks based on Type
-                if (mask) {
-                  switch (animConfig.type) {
-                    case 'WIPE_LINEAR': {
-                      const size = animConfig.maskSize || 200;
-                      mask.clear();
-                      mask.rotation = animConfig.maskRotation || 0;
-                      const wipeProgress = Math.min(1, progress * 1.5); // Finishes wiping before full duration usually
-                      mask.rect(
-                        -size,
-                        -size,
-                        size * 2,
-                        size * 2 * wipeProgress
-                      );
-                      mask.fill(0xffffff);
-                      break;
-                    }
-                    case 'FADE':
-                    case 'SCALE':
-                    case 'CUSTOM':
-                    default: {
-                      const size = 500;
-                      mask.clear();
-                      mask.rect(-size, -size, size * 2, size * 2);
-                      mask.fill(0xffffff);
-                      break;
+              if (sprite) {
+                applyTDUnitTransforms(
+                  {
+                    ...vfx,
+                    hp: 1,
+                    maxHp: 1,
+                    facingDirection: vfx.facingDirection || 'down',
+                  } as BaseTDUnit,
+                  sprite,
+                  new PIXI.Graphics(), // dummy shadow
+                  vfx.configId,
+                  undefined,
+                  (t) => {
+                    if (!isDestroyed) sprite.texture = t;
+                  }
+                );
+
+                if (animConfig) {
+                  // Handle Alpha/Fade
+                  if (
+                    animConfig.fadeOutProgress !== undefined &&
+                    progress > animConfig.fadeOutProgress
+                  ) {
+                    const fadePortion = 1 - animConfig.fadeOutProgress;
+                    container.alpha =
+                      1 - (progress - animConfig.fadeOutProgress) / fadePortion;
+                  } else {
+                    container.alpha = 1;
+                  }
+
+                  // Handle Masks based on Type
+                  if (mask) {
+                    switch (animConfig.type) {
+                      case 'WIPE_LINEAR': {
+                        const size = animConfig.maskSize || 200;
+                        mask.clear();
+                        mask.rotation = animConfig.maskRotation || 0;
+                        const wipeProgress = Math.min(1, progress * 1.5); // Finishes wiping before full duration usually
+                        mask.rect(
+                          -size,
+                          -size,
+                          size * 2,
+                          size * 2 * wipeProgress
+                        );
+                        mask.fill(0xffffff);
+                        break;
+                      }
+                      case 'FADE':
+                      case 'SCALE':
+                      case 'CUSTOM':
+                      default: {
+                        const size = 500;
+                        mask.clear();
+                        mask.rect(-size, -size, size * 2, size * 2);
+                        mask.fill(0xffffff);
+                        break;
+                      }
                     }
                   }
-                }
-              } else {
-                // Default fallback if no config
-                container.alpha = progress > 0.8 ? 1 - (progress - 0.8) * 5 : 1;
-                if (mask) {
-                  const size = 500;
-                  mask.clear();
-                  mask.rect(-size, -size, size * 2, size * 2);
-                  mask.fill(0xffffff);
+                } else {
+                  // Default fallback if no config
+                  container.alpha = progress > 0.8 ? 1 - (progress - 0.8) * 5 : 1;
+                  if (mask) {
+                    const size = 500;
+                    mask.clear();
+                    mask.rect(-size, -size, size * 2, size * 2);
+                    mask.fill(0xffffff);
+                  }
                 }
               }
             }

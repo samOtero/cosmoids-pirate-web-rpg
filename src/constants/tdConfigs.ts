@@ -332,6 +332,17 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       offsetY: -19,
     },
   },
+  attack_nibble_1: {
+    default: {
+      scale: 0.32,
+      shadowScaleX: 1.15,
+      shadowOffsetY: 1,
+      vfxAnimation: {
+        type: 'NIBBLE',
+      },
+      offsetY: -5,
+    },
+  },
   mouse_1: {
     default: {
       url: '/battles/cosmoids/mouse_1_left_1_25.png',

@@ -75,6 +75,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     rangeIndex: 25,
     behaviorType: 'PROJECTILE',
     projectileSpeed: 1,
+    visualEffectConfigId: 'attack_nibble_1',
     isDashAttack: true,
   },
   PINCH: {
