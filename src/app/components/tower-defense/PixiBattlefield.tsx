@@ -1250,7 +1250,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             }
           }
           for (const vfx of engine.visualEffects) {
-            let container = vfxSprites.get(vfx.id);
+            const existingContainer = vfxSprites.get(vfx.id);
+            const container = existingContainer || new PIXI.Container();
 
             // Fetch the visual effect configuration
             const tdConfigMap = CREATURE_TD_CONFIGS[vfx.configId] || {
@@ -1261,9 +1262,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               tdConfigMap.default;
             const animConfig = tdConfig.vfxAnimation;
 
-            if (!container) {
-              container = new PIXI.Container();
-
+            if (!existingContainer) {
               if (animConfig && animConfig.type === 'KEYFRAME_SPRITES') {
                 animConfig.layers?.forEach((layer, layerIdx) => {
                   const sprite = new PIXI.Sprite();
