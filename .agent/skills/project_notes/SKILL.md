@@ -26,7 +26,6 @@ When adding new conventions, quirks, or roadmap items:
    - `## 🎨 Key Coding Conventions & Standards`
    - `## ⚠️ Key Engineering Quirks & Gotchas`
    - `## 🔮 Roadmap Ideas & Features (TODO / Pending)`
-   - `## 📜 Recent Work & Migration Log` (Only for major, breaking, or large-scale migrations like save-file schemas, not routine feature additions).
 2. **Use `replace_file_content`** to insert or update the information in the appropriate section. Do not simply append date-based entries to the end of the file unless updating the major migration log at the bottom.
 
 ### Formatting Guidelines

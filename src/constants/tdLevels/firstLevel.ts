@@ -160,7 +160,7 @@ export const FIRST_LEVEL: TDLevelData = {
           pathIndex: 0,
           turnAroundAtEnd: true,
           uncapturable: false,
-          speedMultiplier: 0.7,
+          speedMultiplier: 2,
         },
         {
           definitionId: 'mouse_1',
@@ -171,7 +171,7 @@ export const FIRST_LEVEL: TDLevelData = {
           turnAroundAtEnd: true,
           concurrentWithPrevious: false,
           uncapturable: false,
-          speedMultiplier: 0.7,
+          speedMultiplier: 2,
         },
         {
           definitionId: 'mouse_1',
@@ -182,7 +182,7 @@ export const FIRST_LEVEL: TDLevelData = {
           turnAroundAtEnd: true,
           concurrentWithPrevious: false,
           uncapturable: false,
-          speedMultiplier: 0.7,
+          speedMultiplier: 2,
         },
         {
           definitionId: 'mouse_1',
@@ -193,7 +193,7 @@ export const FIRST_LEVEL: TDLevelData = {
           turnAroundAtEnd: true,
           concurrentWithPrevious: false,
           uncapturable: false,
-          speedMultiplier: 0.7,
+          speedMultiplier: 2,
         },
       ],
     },

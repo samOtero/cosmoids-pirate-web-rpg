@@ -270,7 +270,7 @@ export class TowerDefenseEngine {
           randomEnemyDef.baseStats.specialDefense,
           enemyLevel
         );
-        const isShiny = TowerDefenseEngine.forceShinySpawns || (Math.random() < 0.5);
+        const isShiny = false; //TowerDefenseEngine.forceShinySpawns || (Math.random() < 0.5);
         const newEnemy: Enemy = {
           id: `enemy_${time}`,
           definitionId: randomEnemyDef.id,
@@ -891,7 +891,7 @@ export class TowerDefenseEngine {
       enemyLevel
     );
 
-    const isShiny = TowerDefenseEngine.forceShinySpawns || (Math.random() < 0.5);
+    const isShiny = false; //TowerDefenseEngine.forceShinySpawns || (Math.random() < 0.5);
     const newEnemy: Enemy = {
       id: `enemy_${time}_${Math.random().toString(36).substring(7)}`,
       definitionId: definitionId,
