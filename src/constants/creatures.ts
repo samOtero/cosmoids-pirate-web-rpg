@@ -93,6 +93,30 @@ export const MOPUP: CosmoidTemplate = {
   ],
 };
 
+export const CAFFIQUI: CosmoidTemplate = {
+  id: 'caffiqui',
+  name: 'Caffiqui',
+  type: ElementType.GRASS,
+  baseStats: {
+    hp: 44,
+    attack: 60,
+    defense: 42,
+    specialAttack: 38,
+    specialDefense: 50,
+    speed: 72,
+  },
+  baseExperience: 64,
+  iconImg: '/UI/Icons/caffiqui_icon.png',
+  spriteUrl: '/battles/cosmoids/caffiqui_down.png',
+  battleSpriteUrl: '/battles/cosmoids/caffiqui_left.png',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'TACKLE' },
+    { level: 3, attackId: 'VINE_WHIP' },
+    { level: 6, attackId: 'STRING_SHOT' },
+  ],
+};
+
 export const SNOUTASCO: CosmoidTemplate = {
   id: 'snoutasco',
   name: 'Snoutasco',
@@ -113,6 +137,30 @@ export const SNOUTASCO: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'NIBBLE' },
     { level: 3, attackId: 'VINE_WHIP' },
+    { level: 6, attackId: 'STRING_SHOT' },
+  ],
+};
+
+export const ZAPYBARA: CosmoidTemplate = {
+  id: 'zapybara',
+  name: 'Zapybara',
+  type: ElementType.ELECTRIC,
+  baseStats: {
+    hp: 65,
+    attack: 68,
+    defense: 72,
+    specialAttack: 36,
+    specialDefense: 58,
+    speed: 45,
+  },
+  baseExperience: 65,
+  iconImg: '/UI/Icons/zapybara_icon.png',
+  spriteUrl: '/battles/cosmoids/zapybara_down.png',
+  battleSpriteUrl: '/battles/cosmoids/zapybara_left.png',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'NIBBLE' },
+    { level: 3, attackId: 'TACKLE' },
     { level: 6, attackId: 'STRING_SHOT' },
   ],
 };
@@ -272,5 +320,7 @@ export const COSMOID_TEMPLATES: Record<string, CosmoidTemplate> = {
   [MOUSE_1.id]: MOUSE_1,
   [BIRD_1.id]: BIRD_1,
   [MOPUP.id]: MOPUP,
+  [CAFFIQUI.id]: CAFFIQUI,
   [SNOUTASCO.id]: SNOUTASCO,
+  [ZAPYBARA.id]: ZAPYBARA,
 };
