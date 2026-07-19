@@ -50,6 +50,9 @@ const BATTLE_SPRITES = [
   '/battles/cosmoids/bird_1_down_1_25.png',
   '/battles/cosmoids/bird_1_left_1_25.png',
   '/battles/cosmoids/bird_1_up_1_25.png',
+  '/battles/cosmoids/mopup_left.png',
+  '/battles/cosmoids/mopup_up.png',
+  '/battles/cosmoids/mopup_down.png',
 ];
 
 const ALL_CONFIG_KEYS = Object.keys(CREATURE_TD_CONFIGS);

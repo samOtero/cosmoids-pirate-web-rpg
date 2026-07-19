@@ -39,6 +39,7 @@ const defaultLevels: Record<string, number> = {
   senticle: 15,
   mouse_1: 3,
   bird_1: 3,
+  mopup: 5,
   bug_stage_1: 3,
   bug_stage_2: 8,
   bug_stage_3: 8,

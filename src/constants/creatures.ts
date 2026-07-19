@@ -69,6 +69,30 @@ export const BIRD_1: CosmoidTemplate = {
   ],
 };
 
+export const MOPUP: CosmoidTemplate = {
+  id: 'mopup',
+  name: 'Mopup',
+  type: ElementType.WATER,
+  baseStats: {
+    hp: 55,
+    attack: 40,
+    defense: 60,
+    specialAttack: 55,
+    specialDefense: 60,
+    speed: 40,
+  },
+  baseExperience: 62,
+  iconImg: '/UI/Icons/mopup_icon.png',
+  spriteUrl: '/battles/cosmoids/mopup_down.png',
+  battleSpriteUrl: '/battles/cosmoids/mopup_left.png',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'TACKLE' },
+    { level: 3, attackId: 'BUBBLE_BEAM' },
+    { level: 6, attackId: 'STRING_SHOT' },
+  ],
+};
+
 export const BUG_STAGE_1: CosmoidTemplate = {
   id: 'bug_stage_1',
   name: 'Buglet',
@@ -223,4 +247,5 @@ export const COSMOID_TEMPLATES: Record<string, CosmoidTemplate> = {
   [SENTICLE.id]: SENTICLE,
   [MOUSE_1.id]: MOUSE_1,
   [BIRD_1.id]: BIRD_1,
+  [MOPUP.id]: MOPUP,
 };
