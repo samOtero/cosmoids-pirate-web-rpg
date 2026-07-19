@@ -93,6 +93,30 @@ export const MOPUP: CosmoidTemplate = {
   ],
 };
 
+export const SNOUTASCO: CosmoidTemplate = {
+  id: 'snoutasco',
+  name: 'Snoutasco',
+  type: ElementType.POISON,
+  baseStats: {
+    hp: 48,
+    attack: 62,
+    defense: 44,
+    specialAttack: 35,
+    specialDefense: 50,
+    speed: 58,
+  },
+  baseExperience: 63,
+  iconImg: '/UI/Icons/snoutasco_icon.png',
+  spriteUrl: '/battles/cosmoids/snoutasco_down.png',
+  battleSpriteUrl: '/battles/cosmoids/snoutasco_left.png',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'NIBBLE' },
+    { level: 3, attackId: 'VINE_WHIP' },
+    { level: 6, attackId: 'STRING_SHOT' },
+  ],
+};
+
 export const BUG_STAGE_1: CosmoidTemplate = {
   id: 'bug_stage_1',
   name: 'Buglet',
@@ -248,4 +272,5 @@ export const COSMOID_TEMPLATES: Record<string, CosmoidTemplate> = {
   [MOUSE_1.id]: MOUSE_1,
   [BIRD_1.id]: BIRD_1,
   [MOPUP.id]: MOPUP,
+  [SNOUTASCO.id]: SNOUTASCO,
 };

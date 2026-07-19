@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "id": "mopup",
+  "name": "Mopup",
+  "element": "WATER",
+  "addedAt": "2026-07-18",
+  "sourceImage": "dog_inspo_1.png",
+  "baseStats": {
+    "hp": 55,
+    "attack": 40,
+    "defense": 60,
+    "specialAttack": 55,
+    "specialDefense": 60,
+    "speed": 40
+  },
+  "baseExperience": 62,
+  "movementId": "lizard",
+  "learnableAttacks": [
+    { "level": 1, "attackId": "TACKLE" },
+    { "level": 3, "attackId": "BUBBLE_BEAM" },
+    { "level": 6, "attackId": "STRING_SHOT" }
+  ],
+  "assets": {
+    "icon": {
+      "url": "/UI/Icons/mopup_icon.png",
+      "width": 160,
+      "height": 160
+    },
+    "left": {
+      "url": "/battles/cosmoids/mopup_left.png",
+      "width": 300,
+      "height": 198
+    },
+    "up": {
+      "url": "/battles/cosmoids/mopup_up.png",
+      "width": 158,
+      "height": 220
+    },
+    "down": {
+      "url": "/battles/cosmoids/mopup_down.png",
+      "width": 159,
+      "height": 220
+    }
+  },
+  "storyPlacement": {
+    "levelContext": "FOREST_LEVEL_2",
+    "capturable": true,
+    "waves": [
+      { "id": "wave_1", "count": 1, "level": 5 },
+      { "id": "wave_2", "count": 2, "level": 5 },
+      { "id": "wave_3", "count": 3, "level": 5 }
+    ]
+  }
+}

@@ -16,6 +16,8 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "validate:dialogs": "node scripts/validate-dialogs.js",
+    "validate:creature-manifests": "node scripts/creatures/validate-manifests.mjs",
+    "test:creatures": "vitest run src/__tests__/integration/creatureManifest.test.ts --project=!storybook",
     "prepare": "husky",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
