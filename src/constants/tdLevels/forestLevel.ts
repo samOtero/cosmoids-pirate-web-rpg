@@ -47,6 +47,87 @@ export const FOREST_LEVEL: TDLevelData = {
       y: 68,
     },
   ],
+  environmentUnits: [
+    {
+      position: {
+        x: 26,
+        y: 87,
+      },
+      tdConfigId: 'rebuilt_boat',
+    },
+  ],
+  captureUnits: [
+    {
+      position: {
+        x: 34,
+        y: 76,
+      },
+      tdConfigId: 'food_supplies',
+    },
+    {
+      position: {
+        x: 36.5,
+        y: 76.5,
+      },
+      tdConfigId: 'food_supplies',
+    },
+    {
+      position: {
+        x: 39,
+        y: 77,
+      },
+      tdConfigId: 'food_supplies',
+    },
+    {
+      position: {
+        x: 41.5,
+        y: 77.5,
+      },
+      tdConfigId: 'food_supplies',
+    },
+    {
+      position: {
+        x: 44,
+        y: 78,
+      },
+      tdConfigId: 'food_supplies',
+    },
+    {
+      position: {
+        x: 34,
+        y: 82,
+      },
+      tdConfigId: 'food_supplies',
+    },
+    {
+      position: {
+        x: 36.5,
+        y: 82.5,
+      },
+      tdConfigId: 'food_supplies',
+    },
+    {
+      position: {
+        x: 39,
+        y: 83,
+      },
+      tdConfigId: 'food_supplies',
+    },
+    {
+      position: {
+        x: 41.5,
+        y: 83.5,
+      },
+      tdConfigId: 'food_supplies',
+    },
+    {
+      position: {
+        x: 44,
+        y: 84,
+      },
+      tdConfigId: 'food_supplies',
+    },
+  ],
   waves: [
     {
       id: 'wave_1',

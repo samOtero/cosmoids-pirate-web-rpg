@@ -243,6 +243,27 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetY: 1,
     },
   },
+  rebuilt_boat: {
+    default: {
+      url: '/battles/units/rebuilt_boat.png',
+      scale: 0.25,
+      offsetY: -112,
+      shadowScaleX: 6.4,
+      shadowScaleY: 0.75,
+      shadowOffsetX: 12,
+      shadowOffsetY: 1,
+    },
+  },
+  food_supplies: {
+    default: {
+      url: '/battles/units/food_supplies.png',
+      scale: 0.045,
+      offsetY: -23,
+      shadowScaleX: 0.85,
+      shadowScaleY: 0.55,
+      shadowOffsetY: 1,
+    },
+  },
   caleb_battle: {
     default: {
       url: '/battles/characters/caleb_battle.png',
