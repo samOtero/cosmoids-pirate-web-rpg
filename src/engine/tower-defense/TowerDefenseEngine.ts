@@ -830,6 +830,7 @@ export class TowerDefenseEngine {
           spawner.group.pathIndex,
           spawner.group.turnAroundAtEnd,
           spawner.group.uncapturable,
+          spawner.group.isCursed,
           spawner.group.speedMultiplier,
           spawner.group.level
         );
@@ -868,6 +869,7 @@ export class TowerDefenseEngine {
     groupPathIndex: number,
     turnAroundAtEnd?: boolean,
     uncapturable?: boolean,
+    isCursed?: boolean,
     speedMultiplier?: number,
     groupLevel?: number
   ) {
@@ -910,13 +912,14 @@ export class TowerDefenseEngine {
       pathIndex: pathIndex,
       facingDirection: 'down',
       turnAroundAtEnd,
-      uncapturable,
+      uncapturable: uncapturable || isCursed,
       damagedByTowerIds: new Set<string>(),
       isShiny,
+      isCursed,
     };
     newEnemies.push(newEnemy);
 
-    if (isShiny && !uncapturable && !this.disableCapture) {
+    if (isShiny && !newEnemy.uncapturable && !this.disableCapture) {
       this.events.emit({
         type: 'SHINY_ENEMY_SPAWNED',
         enemyId: newEnemy.id,

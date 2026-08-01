@@ -31,6 +31,8 @@ export interface TDWaveGroup {
   turnAroundAtEnd?: boolean; // Whether the enemy should return to the start instead of despawning
   concurrentWithPrevious?: boolean; // Whether this group should start its initial delay timer at the same time as the group before it
   uncapturable?: boolean;
+  /** Gives spawned enemies the cursed aura and makes them uncapturable. */
+  isCursed?: boolean;
   speedMultiplier?: number; // Multiplies the base speed of enemies in this group
 }
 
@@ -47,6 +49,7 @@ export interface BaseTDUnit {
   maxHp: number;
   damageFlashTimerMs?: number;
   isShiny?: boolean;
+  isCursed?: boolean;
 }
 
 export interface EnvironmentUnit extends BaseTDUnit {

@@ -219,6 +219,178 @@ function updateSparkles(container: PIXI.Container, unit: BaseTDUnit, delta: numb
   }
 }
 
+type CursedFlame = PIXI.Graphics & {
+  age: number;
+  life: number;
+  maxLife: number;
+  vx: number;
+  vy: number;
+  phase: number;
+  wobbleSpeed: number;
+  baseScale: number;
+};
+
+type CursedAuraContainer = PIXI.Container & {
+  elapsed: number;
+};
+
+function drawCursedFlame(flame: PIXI.Graphics, size: number) {
+  const outerColors = [0x3b0764, 0x581c87, 0x6b21a8];
+  const innerColors = [0xa855f7, 0xc084fc, 0xe879f9];
+  const colorIndex = Math.floor(Math.random() * outerColors.length);
+
+  flame.moveTo(0, -size);
+  flame.bezierCurveTo(
+    size * 0.85,
+    -size * 0.05,
+    size * 0.62,
+    size * 0.72,
+    0,
+    size
+  );
+  flame.bezierCurveTo(
+    -size * 0.68,
+    size * 0.68,
+    -size * 0.72,
+    -size * 0.08,
+    0,
+    -size
+  );
+  flame.fill({ color: outerColors[colorIndex], alpha: 0.88 });
+
+  flame.moveTo(size * 0.06, -size * 0.38);
+  flame.bezierCurveTo(
+    size * 0.42,
+    size * 0.04,
+    size * 0.25,
+    size * 0.48,
+    0,
+    size * 0.62
+  );
+  flame.bezierCurveTo(
+    -size * 0.25,
+    size * 0.35,
+    -size * 0.22,
+    0,
+    size * 0.06,
+    -size * 0.38
+  );
+  flame.fill({ color: innerColors[colorIndex], alpha: 0.9 });
+}
+
+function spawnCursedFlame(
+  aura: PIXI.Container,
+  spriteWidth: number,
+  spriteHeight: number
+) {
+  const flame = new PIXI.Graphics() as CursedFlame;
+  flame.label = 'cursedFlame';
+  flame.age = 0;
+  flame.maxLife = 38 + Math.random() * 28;
+  flame.life = flame.maxLife;
+  flame.vx = (Math.random() - 0.5) * 0.18;
+  flame.vy = -(0.22 + Math.random() * 0.28);
+  flame.phase = Math.random() * Math.PI * 2;
+  flame.wobbleSpeed = 0.08 + Math.random() * 0.06;
+  flame.baseScale = 0.62 + Math.random() * 0.48;
+
+  const spawnOnSide = Math.random() < 0.58;
+  if (spawnOnSide) {
+    const side = Math.random() < 0.5 ? -1 : 1;
+    flame.x = side * spriteWidth * (0.4 + Math.random() * 0.12);
+    flame.y = (Math.random() - 0.5) * spriteHeight * 0.78;
+  } else {
+    flame.x = (Math.random() - 0.5) * spriteWidth * 0.82;
+    flame.y = spriteHeight * (0.24 + Math.random() * 0.18);
+  }
+
+  drawCursedFlame(flame, 6 + Math.random() * 5);
+  aura.addChild(flame);
+}
+
+/**
+ * Tints a cursed unit purple and surrounds its silhouette with rising,
+ * flickering purple flames. The effect sizes itself from the current sprite.
+ */
+function updateCursedAura(
+  container: PIXI.Container,
+  unit: BaseTDUnit,
+  sprite: PIXI.Sprite,
+  delta: number
+) {
+  let aura = container.getChildByLabel('cursedAura') as
+    | CursedAuraContainer
+    | undefined;
+
+  if (!unit.isCursed) {
+    if (aura) {
+      container.removeChild(aura);
+      aura.destroy({ children: true });
+    }
+    return;
+  }
+
+  // Damage flash remains bright white; the cursed tint returns afterward.
+  if ((unit.damageFlashTimerMs || 0) <= 0) {
+    sprite.tint = 0xc084fc;
+  }
+
+  if (!aura) {
+    aura = new PIXI.Container() as CursedAuraContainer;
+    aura.label = 'cursedAura';
+    aura.elapsed = 0;
+
+    // Keep the aura above the ground shadow but behind the creature artwork.
+    container.addChildAt(aura, container.getChildIndex(sprite));
+  }
+
+  aura.elapsed += delta;
+  aura.position.set(sprite.x, sprite.y);
+
+  const spriteWidth = sprite.texture.width * Math.abs(sprite.scale.x);
+  const spriteHeight = sprite.texture.height * Math.abs(sprite.scale.y);
+  const effectWidth = Math.max(72, spriteWidth);
+  const effectHeight = Math.max(42, spriteHeight);
+
+  const flames = [...aura.children] as CursedFlame[];
+  for (const flame of flames) {
+    flame.age += delta;
+    flame.life -= delta;
+    if (flame.life <= 0) {
+      aura.removeChild(flame);
+      flame.destroy();
+      continue;
+    }
+
+    flame.x +=
+      (flame.vx +
+        Math.sin(flame.age * flame.wobbleSpeed + flame.phase) * 0.11) *
+      delta;
+    flame.y += flame.vy * delta;
+    flame.rotation =
+      Math.sin(flame.age * flame.wobbleSpeed + flame.phase) * 0.16;
+
+    const lifeRatio = flame.life / flame.maxLife;
+    const fadeIn = Math.min(1, flame.age / 7);
+    flame.alpha = fadeIn * Math.min(1, lifeRatio * 1.65);
+    const flicker = 1 + Math.sin(flame.age * 0.32 + flame.phase) * 0.1;
+    flame.scale.set(flame.baseScale * (0.65 + lifeRatio * 0.4) * flicker);
+  }
+
+  if (aura.children.length === 0) {
+    for (let index = 0; index < 7; index++) {
+      spawnCursedFlame(aura, effectWidth, effectHeight);
+      const flame = aura.children[aura.children.length - 1] as CursedFlame;
+      flame.age = Math.random() * flame.maxLife * 0.75;
+      flame.life = flame.maxLife - flame.age;
+    }
+  }
+
+  if (aura.children.length < 14 && Math.random() < Math.min(0.5, delta * 0.3)) {
+    spawnCursedFlame(aura, effectWidth, effectHeight);
+  }
+}
+
 const TYPE_COLORS: Record<ElementType, number> = {
   [ElementType.WATER]: 0x3b82f6,
   [ElementType.FIRE]: 0xef4444,
@@ -1145,6 +1317,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
             renderHealthBar(enemy, container, enemy.definitionId);
             updateSparkles(container, enemy, app.ticker.deltaTime);
+            if (esprite) {
+              updateCursedAura(container, enemy, esprite, app.ticker.deltaTime);
+            }
           }
 
           // --- Render Projectiles ---

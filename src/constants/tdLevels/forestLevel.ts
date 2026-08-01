@@ -156,6 +156,7 @@ export const FOREST_LEVEL: TDLevelData = {
           pathIndex: 0,
           turnAroundAtEnd: true,
           uncapturable: true,
+          isCursed: true,
         },
         {
           definitionId: 'senticle',
@@ -166,6 +167,7 @@ export const FOREST_LEVEL: TDLevelData = {
           turnAroundAtEnd: true,
           concurrentWithPrevious: false,
           uncapturable: true,
+          isCursed: true,
         },
         {
           definitionId: 'mopup',
@@ -190,6 +192,7 @@ export const FOREST_LEVEL: TDLevelData = {
           pathIndex: 0,
           turnAroundAtEnd: true,
           uncapturable: true,
+          isCursed: true,
         },
         {
           definitionId: 'senticle',
@@ -200,6 +203,7 @@ export const FOREST_LEVEL: TDLevelData = {
           turnAroundAtEnd: true,
           concurrentWithPrevious: false,
           uncapturable: true,
+          isCursed: true,
         },
         {
           definitionId: 'mopup',
@@ -253,6 +257,7 @@ export const FOREST_LEVEL: TDLevelData = {
           pathIndex: 0,
           turnAroundAtEnd: true,
           uncapturable: true,
+          isCursed: true,
         },
         {
           definitionId: 'senticle',
@@ -263,6 +268,7 @@ export const FOREST_LEVEL: TDLevelData = {
           turnAroundAtEnd: true,
           concurrentWithPrevious: false,
           uncapturable: true,
+          isCursed: true,
         },
         {
           definitionId: 'mopup',

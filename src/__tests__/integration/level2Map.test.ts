@@ -33,6 +33,57 @@ describe('Coconut Grove map integration', () => {
     engine.destroy();
   });
 
+  it('marks every Senticle group as cursed and uncapturable', () => {
+    const senticleGroups = FOREST_LEVEL.waves.flatMap(({ groups }) =>
+      groups.filter(({ definitionId }) => definitionId === 'senticle')
+    );
+
+    expect(senticleGroups.length).toBeGreaterThan(0);
+    expect(
+      senticleGroups.every(
+        ({ isCursed, uncapturable }) => isCursed && uncapturable
+      )
+    ).toBe(true);
+  });
+
+  it('automatically prevents cursed enemies from being captured', () => {
+    const engine = new TowerDefenseEngine({
+      paths: [
+        [
+          { x: 0, y: 50 },
+          { x: 100, y: 50 },
+        ],
+      ],
+      placementSpots: [],
+      waves: [
+        {
+          id: 'cursed_test',
+          groups: [
+            {
+              definitionId: 'senticle',
+              count: 1,
+              spawnIntervalMs: 0,
+              delayBeforeGroupMs: 0,
+              pathIndex: 0,
+              isCursed: true,
+            },
+          ],
+        },
+      ],
+    });
+
+    engine.tick(0, 16);
+
+    expect(engine.enemies).toHaveLength(1);
+    expect(engine.enemies[0]).toMatchObject({
+      isCursed: true,
+      uncapturable: true,
+    });
+    expect(engine.captureEnemy(engine.enemies[0].id)).toBeNull();
+
+    engine.destroy();
+  });
+
   it('ships the referenced painted assets', () => {
     for (const configId of [
       'rebuilt_boat',
