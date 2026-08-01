@@ -1,0 +1,4 @@
+interface:
+  display_name: "Explore Cosmoid Directions"
+  short_description: "Find meaningful directions before creature design"
+  default_prompt: "Use $explore-cosmoid-directions to turn a creature and theme into distinct, meaningful creative directions before detailed Cosmoid design."
