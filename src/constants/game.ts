@@ -33,6 +33,8 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
     '/dialog/dialog_caleb_flustered_starter_outfit_small.png',
   [SpeakerImageKey.CALEB_SCARED_STARTER_OUTFIT]:
     '/dialog/dialog_caleb_scared_starter_outfit_small.png',
+  [SpeakerImageKey.CALEB_SHIPWRECKED_DAZED_STARTER_OUTFIT]:
+    '/dialog/dialog_caleb_shipwrecked_dazed.png',
   [SpeakerImageKey.HOOKAW_TIRED_DIVE_SKIN_1]:
     '/dialog_parrot_tired_dive_skin_1.png',
   [SpeakerImageKey.HOOKAW_TIRED_SKIN_1]: '/dialog_parrot_tired_skin_1-v1.png',
@@ -57,6 +59,11 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
   [SpeakerImageKey.LANCE_SERIOUS]: '/dialog/lance_serious_small.png',
   [SpeakerImageKey.LANCE_SMILING]: '/dialog/lance_smiling_small.png',
   [SpeakerImageKey.LANCE_SURPRISED]: '/dialog/lance_surprised_small.png',
+  [SpeakerImageKey.KIP_NERVOUS_NEUTRAL]: '/dialog/kip_nervous_neutral.png',
+  [SpeakerImageKey.KIP_PANICKED]: '/dialog/kip_panicked.png',
+  [SpeakerImageKey.KIP_WORRIED]: '/dialog/kip_worried.png',
+  [SpeakerImageKey.KIP_HOPEFUL_SURPRISED]: '/dialog/kip_hopeful_surprised.png',
+  [SpeakerImageKey.KIP_RELIEVED_HAPPY]: '/dialog/kip_relieved_happy.png',
   [SpeakerImageKey.RAT_CATCHER_1]: '/dialog/rat_catcher_1.png',
   [SpeakerImageKey.RAT_CATCHER_ANGRY]: '/dialog/rat_catcher_angry_small.png',
   [SpeakerImageKey.RAT_CATCHER_CALM]: '/dialog/rat_catcher_calm.png',
@@ -80,7 +87,8 @@ export const BACKGROUND_IMAGES: Record<BackgroundImageKey, string> = {
   [BackgroundImageKey.FOREST_2]:
     '/battles/bg/bg_first_island_forest_battle_2.png',
   [BackgroundImageKey.DOCK_PIXEL]: '/battles/bg/bg_dock_battle_pixel.png',
+  [BackgroundImageKey.LEVEL_2_STORMY_SEA]: '/bg_level_2_stormy_sea.png',
+  [BackgroundImageKey.LEVEL_2_SHIPWRECK_BEACH]:
+    '/bg_level_2_shipwreck_beach.png',
   [BackgroundImageKey.DEFAULT]: '/bg_caleb_house_1.png',
 };
-
-

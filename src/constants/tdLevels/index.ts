@@ -45,6 +45,26 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
   },
   [TDLevelContext.FOREST_LEVEL_2]: {
     levelData: FOREST_LEVEL,
+    introEvents: [
+      {
+        type: 'SHOW_DIALOG',
+        payload: {
+          context: DialogContext.LEVEL_2_DEPARTURE,
+        },
+      },
+      {
+        type: 'SHOW_DIALOG',
+        payload: {
+          context: DialogContext.LEVEL_2_STORM,
+        },
+      },
+      {
+        type: 'SHOW_DIALOG',
+        payload: {
+          context: DialogContext.LEVEL_2_SHIPWRECK_INTRO,
+        },
+      },
+    ],
     winEvents: [
       {
         type: 'SET_STORY_PROGRESSION',

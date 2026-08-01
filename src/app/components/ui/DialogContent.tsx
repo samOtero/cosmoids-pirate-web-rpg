@@ -25,6 +25,7 @@ interface DialogContentProps {
   sequence: DialogLine[];
   onContinue: () => void;
   onDialogAction: (action: DialogAction) => void;
+  onLineChange?: (lineIndex: number) => void;
   dialogName?: string;
   initialLineIndex?: number;
   allowSkip?: boolean;
@@ -37,6 +38,7 @@ export default function DialogContent({
   sequence,
   onContinue,
   onDialogAction,
+  onLineChange,
   dialogName,
   initialLineIndex = 0,
   allowSkip = true,
@@ -70,10 +72,15 @@ export default function DialogContent({
 
   const currentLine = sequence[lineIndex];
 
+  useEffect(() => {
+    onLineChange?.(lineIndex);
+  }, [lineIndex, onLineChange]);
+
   // Get current starter name from store based on game flags (immune to party re-ordering/storage moves)
   const { profiles, currentProfileId } = useGameStore();
-  const currentProfile = currentProfileId !== null ? profiles[currentProfileId] : null;
-  
+  const currentProfile =
+    currentProfileId !== null ? profiles[currentProfileId] : null;
+
   let starterName = 'your Cosmoid';
   if (currentProfile?.gameFlags) {
     if (currentProfile.gameFlags.includes(GameFlag.STARTER_PALMIT)) {
@@ -124,7 +131,10 @@ export default function DialogContent({
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
-      const textToType = currentLine.text.replace(/{StarterName}/g, starterName);
+      const textToType = currentLine.text.replace(
+        /{StarterName}/g,
+        starterName
+      );
       setDisplayedText(textToType);
       setIsTyping(false);
     }
@@ -203,7 +213,7 @@ export default function DialogContent({
   // For battle layouts, keep the original absolute-positioned approach
   if (!isDefaultLayout) {
     let containerClasses = '';
-    let contentWrapperClasses = 'relative z-10 flex flex-col p-2';
+    const contentWrapperClasses = 'relative z-10 flex flex-col p-2';
     let portraitContainerClasses = '';
     const dialogPanelContainerClasses =
       'min-h-32 sm:min-h-40 flex flex-col justify-start items-start bg-ocean-dark/95 border-wood-light relative';
@@ -235,18 +245,18 @@ export default function DialogContent({
                     return (
                       <div
                         key={`${p.key}-${i}`}
-                        className="transition-all duration-500 transform flex flex-col items-center scale-105 brightness-110"
+                        className="flex scale-105 transform flex-col items-center brightness-110 transition-all duration-500"
                       >
                         <Image
                           src={getPortrait(p.key)}
                           alt={p.displayName}
                           width={256}
                           height={256}
-                          className={`${imgClass} object-cover border-4 border-wood rounded-lg shadow-2xl bg-black transition-all duration-300 ${p.flipped ? 'scale-x-[-1]' : ''}`}
+                          className={`${imgClass} rounded-lg border-4 border-wood bg-black object-cover shadow-2xl transition-all duration-300 ${p.flipped ? 'scale-x-[-1]' : ''}`}
                           unoptimized
                           draggable={false}
                         />
-                        <div className="bg-wood text-sand font-bold text-center py-1 px-2 mt-1 border-2 border-black rounded shadow-lg uppercase tracking-wider text-xs leading-tight w-full max-w-[95%]">
+                        <div className="mt-1 w-full max-w-[95%] rounded border-2 border-black bg-wood px-2 py-1 text-center text-xs leading-tight font-bold tracking-wider text-sand uppercase shadow-lg">
                           {p.displayName}
                         </div>
                       </div>
@@ -301,18 +311,18 @@ export default function DialogContent({
           return (
             <div
               key={`${p.key}-${i}`}
-              className="transition-all duration-500 transform flex flex-col items-center brightness-110"
+              className="flex transform flex-col items-center brightness-110 transition-all duration-500"
             >
               <Image
                 src={getPortrait(p.key)}
                 alt={p.displayName}
                 width={imgWidth}
                 height={imgHeight}
-                className={`w-auto h-full max-h-[40vh] object-cover border-4 border-wood rounded-lg shadow-2xl bg-black transition-all duration-300 ${p.flipped ? 'scale-x-[-1]' : ''}`}
+                className={`h-full max-h-[40vh] w-auto rounded-lg border-4 border-wood bg-black object-cover shadow-2xl transition-all duration-300 ${p.flipped ? 'scale-x-[-1]' : ''}`}
                 unoptimized
                 draggable={false}
               />
-              <div className="bg-wood text-sand font-bold text-center py-1 px-2 mt-1 lg:mt-2 border-2 border-black rounded shadow-lg uppercase tracking-wider text-sm lg:text-base leading-tight w-full max-w-[95%]">
+              <div className="mt-1 w-full max-w-[95%] rounded border-2 border-black bg-wood px-2 py-1 text-center text-sm leading-tight font-bold tracking-wider text-sand uppercase shadow-lg lg:mt-2 lg:text-base">
                 {p.displayName}
               </div>
             </div>
@@ -324,7 +334,7 @@ export default function DialogContent({
 
   return (
     <div
-      className="flex flex-col h-full relative cursor-pointer select-none"
+      className="relative flex h-full cursor-pointer flex-col select-none"
       onClick={handleGlobalClick}
     >
       {/* Skip button — top-right of screen */}
@@ -336,7 +346,7 @@ export default function DialogContent({
             handleSkip();
           }}
         >
-          <div className="bg-red-600 hover:bg-red-500 active:bg-red-700 text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-md shadow-lg border border-red-800 transition-colors">
+          <div className="rounded-md border border-red-800 bg-red-600 px-3 py-1.5 text-xs font-bold tracking-wider text-white uppercase shadow-lg transition-colors hover:bg-red-500 active:bg-red-700">
             Skip
           </div>
         </div>
@@ -345,13 +355,13 @@ export default function DialogContent({
       {/* Continue/Proceed button — floating bottom-right */}
       {!hasButtons() && !isTyping && (
         <div
-          className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-50 cursor-pointer hover:bg-white/5 rounded-lg transition-colors group p-2"
+          className="group absolute right-3 bottom-3 z-50 cursor-pointer rounded-lg p-2 transition-colors hover:bg-white/5 sm:right-4 sm:bottom-4"
           onClick={(e) => {
             e.stopPropagation();
             handleAdvance();
           }}
         >
-          <div className="bg-green-600 hover:bg-green-500 active:bg-green-700 text-white text-base lg:text-2xl font-bold uppercase tracking-widest rounded-md shadow-lg border border-green-800 transition-colors px-3 lg:px-6 py-1.5">
+          <div className="rounded-md border border-green-800 bg-green-600 px-3 py-1.5 text-base font-bold tracking-widest text-white uppercase shadow-lg transition-colors hover:bg-green-500 active:bg-green-700 lg:px-6 lg:text-2xl">
             Next ►
           </div>
         </div>
@@ -359,7 +369,7 @@ export default function DialogContent({
 
       {/* Choice buttons — floating bottom-center */}
       {hasButtons() && !isTyping && (
-        <div className="absolute bottom-3 lg:bottom-16 left-1/2 -translate-x-1/2 z-50 flex justify-center gap-2 sm:gap-3 animate-[fadeIn_0.3s_ease-in]">
+        <div className="absolute bottom-3 left-1/2 z-50 flex -translate-x-1/2 animate-[fadeIn_0.3s_ease-in] justify-center gap-2 sm:gap-3 lg:bottom-16">
           {currentLine.buttons?.map((button, idx) => (
             <button
               key={idx}
@@ -376,17 +386,17 @@ export default function DialogContent({
       )}
 
       {/* Content: always vertical stack, portrait on top, dialog on bottom */}
-      <div className="relative z-10 flex-1 flex flex-col justify-between p-8 gap-1 overflow-hidden">
+      <div className="relative z-10 flex flex-1 flex-col justify-between gap-1 overflow-hidden p-8">
         {/* Portrait area */}
         {hasPortraits && (
-          <div className="flex justify-center items-center flex-1 min-h-0">
+          <div className="flex min-h-0 flex-1 items-center justify-center">
             {renderPortraits()}
           </div>
         )}
 
         {/* Dialog panel — text only */}
-        <div className="flex flex-col min-h-0 shrink-0">
-          <Panel className="h-28 lg:h-48 flex flex-col justify-start items-start bg-ocean-dark/95 border-wood-light relative">
+        <div className="flex min-h-0 shrink-0 flex-col">
+          <Panel className="relative flex h-28 flex-col items-start justify-start border-wood-light bg-ocean-dark/95 lg:h-48">
             {renderDialogText()}
           </Panel>
         </div>
@@ -396,10 +406,10 @@ export default function DialogContent({
 
   function renderDialogText() {
     return (
-      <div className="text-base lg:text-2xl text-sand font-mono leading-snug">
+      <div className="font-mono text-base leading-snug text-sand lg:text-2xl">
         {displayedText}
         {isTyping && (
-          <span className="inline-block w-3 h-5 sm:h-6 bg-cyan-400 ml-1 align-middle animate-pulse"></span>
+          <span className="ml-1 inline-block h-5 w-3 animate-pulse bg-cyan-400 align-middle sm:h-6"></span>
         )}
       </div>
     );

@@ -10,6 +10,9 @@ import {
   LEVEL_1_THE_MESSAGE,
   LEVEL_1_WIN,
   LEVEL_1_INTRO,
+  LEVEL_2_DEPARTURE,
+  LEVEL_2_STORM,
+  LEVEL_2_SHIPWRECK_INTRO,
   FOUND_ITEM,
 } from '@/constants/dialogs';
 import { DialogConfig } from '@/types/baseGame';
@@ -26,6 +29,9 @@ describe('Dialog Configuration Integration Tests', () => {
       LEVEL_1_THE_MESSAGE,
       LEVEL_1_WIN,
       LEVEL_1_INTRO,
+      LEVEL_2_DEPARTURE,
+      LEVEL_2_STORM,
+      LEVEL_2_SHIPWRECK_INTRO,
       FOUND_ITEM,
     };
   });
@@ -76,10 +82,7 @@ describe('Dialog Configuration Integration Tests', () => {
     });
 
     it('should validate LEVEL_1_WIN', () => {
-      const result = validateDialogConfig(
-        LEVEL_1_WIN,
-        'LEVEL_1_WIN'
-      );
+      const result = validateDialogConfig(LEVEL_1_WIN, 'LEVEL_1_WIN');
       if (!result.valid) {
         console.error(formatValidationErrors(result));
       }
@@ -87,9 +90,36 @@ describe('Dialog Configuration Integration Tests', () => {
     });
 
     it('should validate LEVEL_1_INTRO', () => {
+      const result = validateDialogConfig(LEVEL_1_INTRO, 'LEVEL_1_INTRO');
+      if (!result.valid) {
+        console.error(formatValidationErrors(result));
+      }
+      expect(result.valid).toBe(true);
+    });
+
+    it('should validate LEVEL_2_DEPARTURE', () => {
       const result = validateDialogConfig(
-        LEVEL_1_INTRO,
-        'LEVEL_1_INTRO'
+        LEVEL_2_DEPARTURE,
+        'LEVEL_2_DEPARTURE'
+      );
+      if (!result.valid) {
+        console.error(formatValidationErrors(result));
+      }
+      expect(result.valid).toBe(true);
+    });
+
+    it('should validate LEVEL_2_STORM', () => {
+      const result = validateDialogConfig(LEVEL_2_STORM, 'LEVEL_2_STORM');
+      if (!result.valid) {
+        console.error(formatValidationErrors(result));
+      }
+      expect(result.valid).toBe(true);
+    });
+
+    it('should validate LEVEL_2_SHIPWRECK_INTRO', () => {
+      const result = validateDialogConfig(
+        LEVEL_2_SHIPWRECK_INTRO,
+        'LEVEL_2_SHIPWRECK_INTRO'
       );
       if (!result.valid) {
         console.error(formatValidationErrors(result));
@@ -98,10 +128,7 @@ describe('Dialog Configuration Integration Tests', () => {
     });
 
     it('should validate FOUND_ITEM', () => {
-      const result = validateDialogConfig(
-        FOUND_ITEM,
-        'FOUND_ITEM'
-      );
+      const result = validateDialogConfig(FOUND_ITEM, 'FOUND_ITEM');
       if (!result.valid) {
         console.error(formatValidationErrors(result));
       }

@@ -47,6 +47,7 @@ export enum SpeakerImageKey {
   CALEB_CONFIDENT_STARTER_OUTFIT = 'Caleb_Confident_Starter_Outfit',
   CALEB_FLUSTERED_STARTER_OUTFIT = 'Caleb_Flustered_Starter_Outfit',
   CALEB_SCARED_STARTER_OUTFIT = 'Caleb_Scared_Starter_Outfit',
+  CALEB_SHIPWRECKED_DAZED_STARTER_OUTFIT = 'Caleb_Shipwrecked_Dazed_Starter_Outfit',
   HOOKAW_TIRED_DIVE_SKIN_1 = 'Hookaw_Tired_Dive_Skin_1',
   HOOKAW_TIRED_SKIN_1 = 'Hookaw_Tired_Skin_1',
   STARTER_CHEST_CLOSED = 'Starter_Chest_Closed',
@@ -67,6 +68,11 @@ export enum SpeakerImageKey {
   LANCE_SERIOUS = 'Lance_Serious',
   LANCE_SMILING = 'Lance_Smiling',
   LANCE_SURPRISED = 'Lance_Surprised',
+  KIP_NERVOUS_NEUTRAL = 'Kip_Nervous_Neutral',
+  KIP_PANICKED = 'Kip_Panicked',
+  KIP_WORRIED = 'Kip_Worried',
+  KIP_HOPEFUL_SURPRISED = 'Kip_Hopeful_Surprised',
+  KIP_RELIEVED_HAPPY = 'Kip_Relieved_Happy',
   RAT_CATCHER_1 = 'Rat_Catcher_1',
   RAT_CATCHER_ANGRY = 'Rat_Catcher_Angry',
   RAT_CATCHER_CALM = 'Rat_Catcher_Calm',
@@ -87,6 +93,8 @@ export enum BackgroundImageKey {
   FOREST = 'Forest',
   FOREST_2 = 'Forest_2',
   DOCK_PIXEL = 'Dock_Pixel',
+  LEVEL_2_STORMY_SEA = 'Level_2_Stormy_Sea',
+  LEVEL_2_SHIPWRECK_BEACH = 'Level_2_Shipwreck_Beach',
   DEFAULT = 'default',
 }
 
@@ -127,7 +135,13 @@ export interface VFXSpriteLayer {
 }
 
 export interface VFXAnimationConfig {
-  type: 'WIPE_LINEAR' | 'FADE' | 'SCALE' | 'CUSTOM' | 'NIBBLE' | 'KEYFRAME_SPRITES';
+  type:
+    | 'WIPE_LINEAR'
+    | 'FADE'
+    | 'SCALE'
+    | 'CUSTOM'
+    | 'NIBBLE'
+    | 'KEYFRAME_SPRITES';
   maskRotation?: number; // e.g. Math.PI / 4
   maskSize?: number; // e.g. 200
   fadeInProgress?: number; // 0 to 1
@@ -228,7 +242,6 @@ export interface Creature {
   isShiny: boolean;
 }
 
-
 /** Slim save format for a creature the player owns. Base stats are derived at runtime from species definitions. */
 export interface PlayerCreature {
   id: string; // Unique instance ID
@@ -311,6 +324,9 @@ export enum DialogContext {
   LEVEL_1_INTRO = 'LEVEL_1_INTRO',
   LEVEL_1_WIN = 'LEVEL_1_WIN',
   LEVEL_1_THE_MESSAGE = 'LEVEL_1_THE_MESSAGE',
+  LEVEL_2_DEPARTURE = 'LEVEL_2_DEPARTURE',
+  LEVEL_2_STORM = 'LEVEL_2_STORM',
+  LEVEL_2_SHIPWRECK_INTRO = 'LEVEL_2_SHIPWRECK_INTRO',
   STARTER_BATTLE_LOSE = 'STARTER_BATTLE_LOSE',
   NEW_PLAYER_WELCOME_DIALOG_PART_2 = 'NEW_PLAYER_WELCOME_DIALOG_PART_2',
   GAME_INTRO_AFTER_STARTER = 'GAME_INTRO_AFTER_STARTER',

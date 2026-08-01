@@ -2,6 +2,8 @@
 
 This file contains the core architecture guidelines, key conventions, engineering quirks, and roadmap ideas for Cosmoids Web. **Keep this file updated with persistent design patterns and gotchas.**
 
+For the narrative premise, world lore, themes, character art direction, and dialogue-writing rules, see [`STORY_AND_THEMES.md`](./STORY_AND_THEMES.md).
+
 ---
 
 ## 🛠️ Core Architecture & Tech Stack
