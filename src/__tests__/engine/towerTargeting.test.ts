@@ -52,6 +52,7 @@ describe('Tower Targeting Modes', () => {
       level: 1,
       xp: 0,
       equippedAttacks: ['PINCH'],
+      isShiny: false,
     },
     position: { x, y },
     lastAttackTime: 0,
@@ -176,6 +177,7 @@ describe('Tower Targeting Modes', () => {
         level: 1,
         xp: 0,
         equippedAttacks: ['PINCH'],
+        isShiny: false,
         targetingMode: 'strongest',
       },
     ];

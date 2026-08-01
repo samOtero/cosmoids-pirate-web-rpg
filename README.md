@@ -10,6 +10,7 @@ Next.js 16 • React 19 • TypeScript • Tailwind CSS 4 • Zustand • Vitest
 ```bash
 pnpm install    # Auto-configures git hooks
 pnpm dev        # http://localhost:3000
+pnpm verify:quick # Typecheck, validate content, and run unit tests
 pnpm test       # Run tests
 pnpm build      # Production build
 ```
@@ -140,7 +141,22 @@ Available line IDs: choice_start, choice_fire, choice_grass, choice_water.
 - **Pre-push hook** runs tests automatically before `git push`
 - Coverage: Profile CRUD, navigation, form validation
 
+For a fast, non-browser verification pass after making a change, run:
+
+```bash
+pnpm verify:quick
+```
+
+This checks TypeScript, validates dialogs and creature manifests, and runs the
+Vitest unit and integration projects without the browser-based Storybook
+project. Run `pnpm lint` separately while the existing lint backlog is being
+cleaned up.
+
 ## Scripts
+- `pnpm verify:quick` - Run the fast local verification suite
+- `pnpm typecheck` - Check TypeScript without emitting files
+- `pnpm lint` - Run the complete ESLint suite
+- `pnpm test:unit` - Run non-Storybook Vitest tests once
 - `pnpm test run` - Run all tests once
 - `pnpm test:ui` - Visual test runner
 - `pnpm test:coverage` - Coverage report

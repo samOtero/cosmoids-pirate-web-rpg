@@ -122,7 +122,7 @@ describe('PartyScreen Empty Party Rules', () => {
     );
 
     const titleText = screen.queryByText(
-      /Selecting your team is easy as 1, 2, 3/i
+      /Listen closely, kid! Assembling your crew is simple/i
     );
     expect(titleText).not.toBeInTheDocument();
   });

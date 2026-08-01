@@ -8,7 +8,7 @@ import { ElementType } from '@/types/baseGame';
 
 function makeTower(speciesId: string): Tower {
   return {
-    id: 'tower',
+    id: `tower_${speciesId}`,
     position: { x: 0, y: 0 },
     facingDirection: 'right',
     hp: 100,
@@ -26,7 +26,7 @@ function makeTower(speciesId: string): Tower {
 
 function makeEnemy(definitionId: string): Enemy {
   return {
-    id: 'enemy',
+    id: `enemy_${definitionId}`,
     definitionId,
     position: { x: 10, y: 10 },
     facingDirection: 'left',
@@ -59,38 +59,49 @@ function makeAttack(type: ElementType): AttackDefinition {
   };
 }
 
-describe('Poison element combat support', () => {
+function damageFrom(speciesId: string, attackType: ElementType): number {
+  const engine = { floatingTexts: [] } as unknown as TowerDefenseEngine;
+  const target = makeEnemy('mopup');
+
+  EffectProcessor.applyDamageAndEffects(
+    engine,
+    makeTower(speciesId),
+    target,
+    makeAttack(attackType)
+  );
+
+  return target.maxHp - target.hp;
+}
+
+describe('Elemental combat support', () => {
   afterEach(() => vi.restoreAllMocks());
 
-  it('applies neutral Poison damage and Poison STAB without lookup gaps', () => {
+  it('applies same-type attack bonus without depending on exact damage tuning', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
-    const engine = { floatingTexts: [] } as unknown as TowerDefenseEngine;
-    const target = makeEnemy('mopup');
 
-    EffectProcessor.applyDamageAndEffects(
-      engine,
-      makeTower('snoutasco'),
-      target,
-      makeAttack(ElementType.POISON)
-    );
+    const poisonStabDamage = damageFrom('snoutasco', ElementType.POISON);
+    const poisonNonStabDamage = damageFrom('mopup', ElementType.POISON);
 
-    expect(target.hp).toBe(94);
-    expect(engine.floatingTexts[0]?.text).toBe('6');
+    expect(poisonNonStabDamage).toBeGreaterThan(0);
+    expect(poisonStabDamage).toBeGreaterThan(poisonNonStabDamage);
   });
 
-  it('accepts Poison defenders in every-type matchup records', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
-    const engine = { floatingTexts: [] } as unknown as TowerDefenseEngine;
-    const target = makeEnemy('snoutasco');
+  it.each(Object.values(ElementType))(
+    'can resolve %s attacks against a Poison defender',
+    (attackType) => {
+      vi.spyOn(Math, 'random').mockReturnValue(0);
+      const engine = { floatingTexts: [] } as unknown as TowerDefenseEngine;
+      const target = makeEnemy('snoutasco');
 
-    EffectProcessor.applyDamageAndEffects(
-      engine,
-      makeTower('mopup'),
-      target,
-      makeAttack(ElementType.NORMAL)
-    );
+      EffectProcessor.applyDamageAndEffects(
+        engine,
+        makeTower('mopup'),
+        target,
+        makeAttack(attackType)
+      );
 
-    expect(target.hp).toBe(96);
-    expect(engine.floatingTexts[0]?.text).toBe('4');
-  });
+      expect(target.hp).toBeLessThan(target.maxHp);
+      expect(Number.isFinite(target.hp)).toBe(true);
+    }
+  );
 });

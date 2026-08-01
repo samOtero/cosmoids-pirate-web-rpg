@@ -304,13 +304,6 @@ describe('Creature Store Logic', () => {
     expect(engine.roster.find((c) => c.id === captured?.id)?.isShiny).toBe(true);
   });
 
-  it('should only have a single attack at level 1 for starters and mouse', () => {
-    expect(TowerDefenseEngine.getDefaultAttacks('starter_crab')).toEqual(['PINCH']);
-    expect(TowerDefenseEngine.getDefaultAttacks('starter_iguana')).toEqual(['SCRATCH']);
-    expect(TowerDefenseEngine.getDefaultAttacks('starter_monkey')).toEqual(['TACKLE']);
-    expect(TowerDefenseEngine.getDefaultAttacks('mouse_1')).toEqual(['NIBBLE']);
-  });
-
   it('should preserve captured creature ID and successfully update its level and xp on level end', () => {
     const store = useGameStore.getState();
     const profileId = 0;

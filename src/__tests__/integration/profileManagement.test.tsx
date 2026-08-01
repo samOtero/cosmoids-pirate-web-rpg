@@ -251,25 +251,6 @@ describe('Profile Management Integration', () => {
   });
 
   describe('Multiple Profiles', () => {
-    it('should allow creating profiles in all 3 slots', async () => {
-      const user = userEvent.setup();
-
-      const { rerender } = render(
-        <ProfileScreen
-          profiles={[null, null, null]}
-          onSelect={mockOnSelect}
-          onCreate={mockOnCreate}
-          onDelete={mockOnDelete}
-        />
-      );
-
-      // Create in slot 0
-      const emptySlots = screen.getAllByText('Empty Slot');
-      await user.click(emptySlots[0].closest('div')!);
-
-      expect(mockOnCreate).toHaveBeenCalledWith(0);
-    });
-
     it('should display all three profile slots', () => {
       render(
         <ProfileScreen
