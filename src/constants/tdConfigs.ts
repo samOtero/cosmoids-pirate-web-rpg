@@ -275,6 +275,18 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowScaleY: 0.7,
     },
   },
+  kip_battle: {
+    default: {
+      url: '/battles/characters/kip_battle.png',
+      scale: 0.13,
+      shadowScaleX: 3.4,
+      shadowScaleY: 0.7,
+      shadowOffsetX: -3,
+      shadowOffsetY: -14,
+      offsetY: -87,
+      healthBarOffsetY: -5,
+    },
+  },
   pirate_grunt_battle: {
     default: {
       url: '/battles/characters/pirate_grunt_battle.png',

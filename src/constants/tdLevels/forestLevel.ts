@@ -55,6 +55,22 @@ export const FOREST_LEVEL: TDLevelData = {
       },
       tdConfigId: 'rebuilt_boat',
     },
+    {
+      position: {
+        x: 43,
+        y: 65,
+      },
+      tdConfigId: 'caleb_battle',
+      facingDirection: 'right',
+    },
+    {
+      position: {
+        x: 55,
+        y: 65,
+      },
+      tdConfigId: 'kip_battle',
+      facingDirection: 'right',
+    },
   ],
   captureUnits: [
     {
