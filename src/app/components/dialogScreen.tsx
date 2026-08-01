@@ -37,6 +37,8 @@ export default function DialogScreen({
   };
 
   const currentLine = sequence[currentLineIndex];
+  const activeBackgroundImageKey =
+    currentLine?.backgroundImageKey ?? backgroundImageKey;
   const isNarrationOnly = !currentLine?.portraits?.some(
     (portrait) => portrait.key !== SpeakerImageKey.EMPTY
   );
@@ -57,7 +59,7 @@ export default function DialogScreen({
       {/* Background */}
       <div className="absolute inset-0 z-0 bg-black/60">
         <Image
-          src={getBackgroundImage(backgroundImageKey)}
+          src={getBackgroundImage(activeBackgroundImageKey)}
           alt="Story background"
           fill
           className={`object-cover ${

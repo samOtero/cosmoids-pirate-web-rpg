@@ -44,4 +44,21 @@ describe('DialogScreen background dimming', () => {
       expect(screen.getByAltText('Story background')).toHaveClass('opacity-50')
     );
   });
+
+  it('uses a line-specific background when one is provided', async () => {
+    renderDialog([
+      {
+        text: 'A towering wave strikes the boat.',
+        portraits: [{ key: SpeakerImageKey.EMPTY, displayName: '' }],
+        backgroundImageKey: BackgroundImageKey.LEVEL_2_WAVE_IMPACT,
+      },
+    ]);
+
+    await waitFor(() =>
+      expect(screen.getByAltText('Story background')).toHaveAttribute(
+        'src',
+        '/bg_level_2_wave_impact.png'
+      )
+    );
+  });
 });

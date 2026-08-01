@@ -94,7 +94,9 @@ export enum BackgroundImageKey {
   FOREST_2 = 'Forest_2',
   DOCK_PIXEL = 'Dock_Pixel',
   LEVEL_2_STORMY_SEA = 'Level_2_Stormy_Sea',
+  LEVEL_2_WAVE_IMPACT = 'Level_2_Wave_Impact',
   LEVEL_2_SHIPWRECK_BEACH = 'Level_2_Shipwreck_Beach',
+  LEVEL_2_REPAIRED_BOAT_SUPPLIES = 'Level_2_Repaired_Boat_Supplies',
   DEFAULT = 'default',
 }
 
@@ -312,6 +314,7 @@ export interface DialogLine {
   id?: string; // Optional unique identifier for jumping to this line
   portraits: DialogPortrait[];
   text: string;
+  backgroundImageKey?: BackgroundImageKey;
   buttons?: DialogButton[]; // Optional buttons for this line
   layout?: DialogLayout;
 }

@@ -9,6 +9,7 @@ export const LEVEL_2_SHIPWRECK_INTRO: DialogConfig = {
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: '' }],
       text: 'A towering wave smashes the boat and sends Caleb drifting toward an unfamiliar island.',
+      backgroundImageKey: BackgroundImageKey.LEVEL_2_WAVE_IMPACT,
     },
     {
       portraits: [
@@ -103,10 +104,14 @@ export const LEVEL_2_SHIPWRECK_INTRO: DialogConfig = {
         },
       ],
       text: "We did it! It's not pretty, but it should float.",
+      backgroundImageKey:
+        BackgroundImageKey.LEVEL_2_REPAIRED_BOAT_SUPPLIES,
     },
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: '' }],
       text: 'A rustling sound comes from the bushes beside their food supplies.',
+      backgroundImageKey:
+        BackgroundImageKey.LEVEL_2_REPAIRED_BOAT_SUPPLIES,
     },
     {
       portraits: [
@@ -116,6 +121,8 @@ export const LEVEL_2_SHIPWRECK_INTRO: DialogConfig = {
         },
       ],
       text: 'Wild Cosmoids! They must be hungry!',
+      backgroundImageKey:
+        BackgroundImageKey.LEVEL_2_REPAIRED_BOAT_SUPPLIES,
     },
     {
       portraits: [
@@ -125,6 +132,8 @@ export const LEVEL_2_SHIPWRECK_INTRO: DialogConfig = {
         },
       ],
       text: 'Protect the supplies!',
+      backgroundImageKey:
+        BackgroundImageKey.LEVEL_2_REPAIRED_BOAT_SUPPLIES,
     },
   ],
   backgroundImageKey: BackgroundImageKey.LEVEL_2_SHIPWRECK_BEACH,

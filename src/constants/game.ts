@@ -88,7 +88,11 @@ export const BACKGROUND_IMAGES: Record<BackgroundImageKey, string> = {
     '/battles/bg/bg_first_island_forest_battle_2.png',
   [BackgroundImageKey.DOCK_PIXEL]: '/battles/bg/bg_dock_battle_pixel.png',
   [BackgroundImageKey.LEVEL_2_STORMY_SEA]: '/bg_level_2_stormy_sea.png',
+  [BackgroundImageKey.LEVEL_2_WAVE_IMPACT]:
+    '/bg_level_2_wave_impact.png',
   [BackgroundImageKey.LEVEL_2_SHIPWRECK_BEACH]:
     '/bg_level_2_shipwreck_beach.png',
+  [BackgroundImageKey.LEVEL_2_REPAIRED_BOAT_SUPPLIES]:
+    '/bg_level_2_repaired_boat_supplies.png',
   [BackgroundImageKey.DEFAULT]: '/bg_caleb_house_1.png',
 };
