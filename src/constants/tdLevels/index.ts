@@ -49,19 +49,7 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
       {
         type: 'SHOW_DIALOG',
         payload: {
-          context: DialogContext.LEVEL_2_DEPARTURE,
-        },
-      },
-      {
-        type: 'SHOW_DIALOG',
-        payload: {
-          context: DialogContext.LEVEL_2_STORM,
-        },
-      },
-      {
-        type: 'SHOW_DIALOG',
-        payload: {
-          context: DialogContext.LEVEL_2_SHIPWRECK_INTRO,
+          context: DialogContext.LEVEL_2_INTRO,
         },
       },
     ],
