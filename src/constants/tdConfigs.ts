@@ -516,7 +516,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       offsetY: -20,
     },
   },
-  bird_1: {
+  harlequill: {
     default: {
       url: '/battles/cosmoids/bird_1_left_1_25.png',
       scale: 0.41,

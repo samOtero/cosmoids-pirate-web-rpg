@@ -157,7 +157,7 @@ export const FOREST_LEVEL: TDLevelData = {
           turnAroundAtEnd: true,
         },
         {
-          definitionId: 'bird_1',
+          definitionId: 'harlequill',
           count: 2,
           spawnIntervalMs: 1200,
           delayBeforeGroupMs: 3000,
@@ -179,7 +179,7 @@ export const FOREST_LEVEL: TDLevelData = {
           turnAroundAtEnd: true,
         },
         {
-          definitionId: 'bird_1',
+          definitionId: 'harlequill',
           count: 4,
           spawnIntervalMs: 1000,
           delayBeforeGroupMs: 2000,
@@ -203,7 +203,7 @@ export const FOREST_LEVEL: TDLevelData = {
       id: 'wave_3',
       groups: [
         {
-          definitionId: 'bird_1',
+          definitionId: 'harlequill',
           count: 1,
           spawnIntervalMs: 1500,
           delayBeforeGroupMs: 100,

@@ -47,8 +47,8 @@ export const MOUSE_1: CosmoidTemplate = {
 };
 
 export const BIRD_1: CosmoidTemplate = {
-  id: 'bird_1',
-  name: 'Bird 1',
+  id: 'harlequill',
+  name: 'Harlequill',
   type: ElementType.NORMAL,
   baseStats: {
     hp: 20,

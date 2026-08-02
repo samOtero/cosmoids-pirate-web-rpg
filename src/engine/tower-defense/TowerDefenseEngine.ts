@@ -1,17 +1,15 @@
 import {
-  BIRD_1,
   BUG_STAGE_1,
   BUG_STAGE_2,
   BUG_STAGE_3,
-  MOUSE_1,
-  SENTICLE,
-  STARTER_CRAB,
-  STARTER_IGUANA,
-  STARTER_MONKEY,
   COSMOID_TEMPLATES,
 } from '@/constants/creatures';
 import { Creature, PlayerCreature } from '@/types/baseGame';
-import { calculateMaxHp, calculateStat, createWildCreature } from '@/utils/resolvePlayerCreature';
+import {
+  calculateMaxHp,
+  calculateStat,
+  createWildCreature,
+} from '@/utils/resolvePlayerCreature';
 import {
   Tower,
   Enemy,
@@ -26,19 +24,14 @@ import { ATTACK_DEFS } from './attacks/definitions';
 import { AttackBehaviorRegistry } from './attacks/behaviors';
 import { EffectProcessor } from './attacks/EffectProcessor';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
-import {
-  TDWave,
-  TDWaveGroup,
-  EnvironmentUnit,
-  Point,
-} from './types';
+import { TDWave, TDWaveGroup, EnvironmentUnit, Point } from './types';
 import { TDEventBus } from './events/TDEventBus';
 import { TDProgressionManager } from './progression/TDProgressionManager';
 
 const defaultLevels: Record<string, number> = {
   senticle: 15,
   mouse_1: 3,
-  bird_1: 3,
+  harlequill: 3,
   mopup: 5,
   bug_stage_1: 3,
   bug_stage_2: 8,
@@ -87,16 +80,11 @@ export class TowerDefenseEngine {
 
   public static getDefaultAttacks(speciesId: string): string[] {
     const defaultAttacks: string[] = [];
-    if (speciesId === 'starter_crab')
-      defaultAttacks.push('PINCH');
-    else if (speciesId === 'starter_iguana')
-      defaultAttacks.push('SCRATCH');
-    else if (speciesId === 'starter_monkey')
-      defaultAttacks.push('TACKLE');
-    else if (speciesId === 'mouse_1')
-      defaultAttacks.push('NIBBLE');
-    else if (speciesId === 'bettle')
-      defaultAttacks.push('PINCH');
+    if (speciesId === 'starter_crab') defaultAttacks.push('PINCH');
+    else if (speciesId === 'starter_iguana') defaultAttacks.push('SCRATCH');
+    else if (speciesId === 'starter_monkey') defaultAttacks.push('TACKLE');
+    else if (speciesId === 'mouse_1') defaultAttacks.push('NIBBLE');
+    else if (speciesId === 'bettle') defaultAttacks.push('PINCH');
     else defaultAttacks.push('TACKLE'); // Fallback
     return defaultAttacks;
   }
@@ -148,7 +136,8 @@ export class TowerDefenseEngine {
         this.playerSelectedAttacks[c.id] = c.activeAttackIndex;
       }
       if (c.targetingMode !== undefined) {
-        this.playerSelectedTargetingModes[c.id] = c.targetingMode as TowerTargetingMode;
+        this.playerSelectedTargetingModes[c.id] =
+          c.targetingMode as TowerTargetingMode;
       }
     });
 
@@ -260,7 +249,10 @@ export class TowerDefenseEngine {
         const newEnemyHp =
           calculateMaxHp(randomEnemyDef.baseStats.hp, enemyLevel) *
           this.enemyHpMultiplier;
-        const newEnemyAttack = calculateStat(randomEnemyDef.baseStats.attack, enemyLevel);
+        const newEnemyAttack = calculateStat(
+          randomEnemyDef.baseStats.attack,
+          enemyLevel
+        );
         const newEnemySpecialAttack = calculateStat(
           randomEnemyDef.baseStats.specialAttack,
           enemyLevel
@@ -642,7 +634,8 @@ export class TowerDefenseEngine {
               );
 
               if (attackDef.visualEffectConfigId) {
-                const configMap = CREATURE_TD_CONFIGS[attackDef.visualEffectConfigId];
+                const configMap =
+                  CREATURE_TD_CONFIGS[attackDef.visualEffectConfigId];
                 const vfxConfig = configMap?.default?.vfxAnimation;
                 const durationMs = vfxConfig?.durationMs ?? 500;
                 this.visualEffects.push({
@@ -1026,12 +1019,18 @@ export class TowerDefenseEngine {
     if (!template) return false;
 
     // Derive stats
-    const derivedAttack = calculateStat(template.baseStats.attack, creature.level);
+    const derivedAttack = calculateStat(
+      template.baseStats.attack,
+      creature.level
+    );
     const derivedSpecialAttack = calculateStat(
       template.baseStats.specialAttack,
       creature.level
     );
-    const derivedDefense = calculateStat(template.baseStats.defense, creature.level);
+    const derivedDefense = calculateStat(
+      template.baseStats.defense,
+      creature.level
+    );
     const derivedSpecialDefense = calculateStat(
       template.baseStats.specialDefense,
       creature.level
