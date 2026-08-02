@@ -75,71 +75,71 @@ export const FOREST_LEVEL: TDLevelData = {
   captureUnits: [
     {
       position: {
-        x: 34,
-        y: 76,
+        x: 34.16,
+        y: 77.14,
       },
       tdConfigId: 'food_supplies',
     },
     {
       position: {
-        x: 36.5,
-        y: 76.5,
+        x: 36.25,
+        y: 77.53,
       },
       tdConfigId: 'food_supplies',
     },
     {
       position: {
-        x: 39,
-        y: 77,
+        x: 38.3,
+        y: 78.11,
       },
       tdConfigId: 'food_supplies',
     },
     {
       position: {
-        x: 41.5,
-        y: 77.5,
+        x: 39.93,
+        y: 78.24,
       },
       tdConfigId: 'food_supplies',
     },
     {
       position: {
-        x: 44,
-        y: 78,
+        x: 41.98,
+        y: 78.95,
       },
       tdConfigId: 'food_supplies',
     },
     {
       position: {
-        x: 34,
-        y: 82,
+        x: 33.79,
+        y: 80.49,
       },
       tdConfigId: 'food_supplies',
     },
     {
       position: {
-        x: 36.5,
-        y: 82.5,
+        x: 35.75,
+        y: 80.69,
       },
       tdConfigId: 'food_supplies',
     },
     {
       position: {
-        x: 39,
-        y: 83,
+        x: 38.22,
+        y: 81.59,
       },
       tdConfigId: 'food_supplies',
     },
     {
       position: {
-        x: 41.5,
-        y: 83.5,
+        x: 40.35,
+        y: 81.46,
       },
       tdConfigId: 'food_supplies',
     },
     {
       position: {
-        x: 44,
-        y: 84,
+        x: 42.94,
+        y: 82.04,
       },
       tdConfigId: 'food_supplies',
     },

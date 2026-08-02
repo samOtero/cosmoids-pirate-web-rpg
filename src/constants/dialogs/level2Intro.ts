@@ -40,10 +40,15 @@ export const LEVEL_2_INTRO: DialogConfig = {
       backgroundImageKey: BackgroundImageKey.LEVEL_2_WAVE_IMPACT,
     },
     {
+      portraits: [{ key: SpeakerImageKey.EMPTY, displayName: '' }],
+      text: 'A few minutes later...',
+      backgroundImageKey: BackgroundImageKey.LEVEL_2_SHIPWRECK_BEACH,
+    },
+    {
       portraits: [
         {
           key: SpeakerImageKey.KIP_PANICKED,
-          displayName: 'Kip',
+          displayName: '???',
         },
       ],
       text: "Hey! Wake up! Please don't be dead!",
@@ -63,7 +68,7 @@ export const LEVEL_2_INTRO: DialogConfig = {
       portraits: [
         {
           key: SpeakerImageKey.KIP_NERVOUS_NEUTRAL,
-          displayName: 'Kip',
+          displayName: '???',
         },
       ],
       text: 'Mostly scattered along the beach.',
@@ -73,7 +78,7 @@ export const LEVEL_2_INTRO: DialogConfig = {
       portraits: [
         {
           key: SpeakerImageKey.KIP_NERVOUS_NEUTRAL,
-          displayName: 'Kip',
+          displayName: '???',
         },
       ],
       text: "I'm Kip. Cabin boy for the pirate crew camped across the island.",
@@ -132,7 +137,7 @@ export const LEVEL_2_INTRO: DialogConfig = {
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: '' }],
       text: 'Together, Caleb and Kip piece the battered boat back together.',
-      backgroundImageKey: BackgroundImageKey.LEVEL_2_SHIPWRECK_BEACH,
+      backgroundImageKey: BackgroundImageKey.LEVEL_2_REPAIRED_BOAT_SUPPLIES,
     },
     {
       portraits: [
