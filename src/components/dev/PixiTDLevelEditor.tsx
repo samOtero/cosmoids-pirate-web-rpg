@@ -1,18 +1,32 @@
 import React, { useEffect, useRef } from 'react';
 import * as PIXI from 'pixi.js';
+import { TDInitialView } from '@/engine/tower-defense/types';
+import { TD_BASE_HEIGHT } from '@/constants/game';
+import { resolveTDInitialView } from '@/utils/tdInitialView';
+import { applyTDUnitTransforms } from '@/utils/tdUnitVisuals';
+import {
+  clampTDLevelEditorScroll,
+  getTDLevelEditorScrollLimits,
+} from '@/utils/tdLevelEditorViewport';
 
-export type PointType = 'PATH' | 'PLACEMENT' | 'CAPTURE';
+export type PointType = 'PATH' | 'PLACEMENT' | 'CAPTURE' | 'ENVIRONMENT';
 
 interface PixiTDLevelEditorProps {
   paths: { x: number; y: number }[][];
   activePathIndex: number;
   placementSpots: { x: number; y: number }[];
   captureUnits: { x: number; y: number; tdConfigId?: string }[];
+  environmentUnits: {
+    position: { x: number; y: number };
+    tdConfigId: string;
+    facingDirection?: 'up' | 'down' | 'left' | 'right';
+  }[];
   deleteMode: boolean;
   onPointMove: (type: PointType, index: number, x: number, y: number) => void;
   onPointDelete: (type: PointType, index: number) => void;
   backgroundUrl?: string;
   backgroundScale?: number;
+  initialView?: TDInitialView;
 }
 
 export default function PixiTDLevelEditor({
@@ -20,11 +34,13 @@ export default function PixiTDLevelEditor({
   activePathIndex,
   placementSpots,
   captureUnits,
+  environmentUnits,
   deleteMode,
   onPointMove,
   onPointDelete,
   backgroundUrl,
   backgroundScale = 1,
+  initialView,
 }: PixiTDLevelEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const onPointMoveRef = useRef(onPointMove);
@@ -34,20 +50,32 @@ export default function PixiTDLevelEditor({
   const activePathIndexRef = useRef(activePathIndex);
   const placementSpotsRef = useRef(placementSpots);
   const captureUnitsRef = useRef(captureUnits);
+  const environmentUnitsRef = useRef(environmentUnits);
   const backgroundUrlRef = useRef(backgroundUrl);
   const backgroundScaleRef = useRef(backgroundScale);
+  const initialViewRef = useRef(initialView);
+  const shouldApplyInitialViewRef = useRef(true);
   const scrollRef = useRef({ x: 0, y: 0 });
   const isScrollDraggingRef = useRef(false);
-  const scrollDragStartRef = useRef<{ x: number; y: number; scrollX: number; scrollY: number } | null>(null);
+  const scrollDragStartRef = useRef<{
+    x: number;
+    y: number;
+    scrollX: number;
+    scrollY: number;
+  } | null>(null);
 
   useEffect(() => {
     backgroundUrlRef.current = backgroundUrl;
+    shouldApplyInitialViewRef.current = true;
   }, [backgroundUrl]);
   useEffect(() => {
     backgroundScaleRef.current = backgroundScale;
-    // Reset scroll when scale changes (e.g. level switch)
-    scrollRef.current = { x: 0, y: 0 };
+    shouldApplyInitialViewRef.current = true;
   }, [backgroundScale]);
+  useEffect(() => {
+    initialViewRef.current = initialView;
+    shouldApplyInitialViewRef.current = true;
+  }, [initialView]);
 
   useEffect(() => {
     onPointMoveRef.current = onPointMove;
@@ -70,6 +98,9 @@ export default function PixiTDLevelEditor({
   useEffect(() => {
     captureUnitsRef.current = captureUnits;
   }, [captureUnits]);
+  useEffect(() => {
+    environmentUnitsRef.current = environmentUnits;
+  }, [environmentUnits]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -85,6 +116,7 @@ export default function PixiTDLevelEditor({
     const pathNodes = new Map<number, PIXI.Container>();
     const placementNodes = new Map<number, PIXI.Container>();
     const captureNodes = new Map<number, PIXI.Container>();
+    const environmentNodes = new Map<number, PIXI.Container>();
 
     let bgBounds = { x: 0, y: 0, width: 0, height: 0 };
 
@@ -120,7 +152,8 @@ export default function PixiTDLevelEditor({
       containerRef.current!.appendChild(app.canvas);
 
       // Add background
-      let currentBgUrl = backgroundUrlRef.current || '/battles/bg/bg_dock_battle_td.png';
+      let currentBgUrl =
+        backgroundUrlRef.current || '/battles/bg/bg_dock_battle_td.png';
       await PIXI.Assets.load(currentBgUrl);
       if (isDestroyed) return;
 
@@ -129,6 +162,8 @@ export default function PixiTDLevelEditor({
 
       let fullBgHeight = 0;
       let fullBgWidth = 0;
+      let displayBgHeight = 0;
+      let displayBgWidth = 0;
 
       // Handle resize — reads scale from ref so it stays current
       const updateBgLayout = () => {
@@ -137,19 +172,56 @@ export default function PixiTDLevelEditor({
           bgSprite.texture.height > 0 &&
           app.screen.height > 0
         ) {
-          const scale = backgroundScaleRef.current > 1 ? backgroundScaleRef.current : 1;
+          const scale = Math.max(1, backgroundScaleRef.current);
+          const resolvedView = resolveTDInitialView(
+            scale,
+            initialViewRef.current
+          );
           const ratio = bgSprite.texture.width / bgSprite.texture.height;
           fullBgHeight = app.screen.height * scale;
           fullBgWidth = fullBgHeight * ratio;
-          bgSprite.height = fullBgHeight;
-          bgSprite.width = fullBgWidth;
+          displayBgHeight = fullBgHeight * resolvedView.zoom;
+          displayBgWidth = fullBgWidth * resolvedView.zoom;
+          bgSprite.height = displayBgHeight;
+          bgSprite.width = displayBgWidth;
 
-          const maxScrollY = Math.max(0, fullBgHeight - app.screen.height);
-          const maxScrollX = Math.max(0, fullBgWidth - app.screen.width);
-          scrollRef.current.y = Math.min(scrollRef.current.y, maxScrollY);
-          scrollRef.current.x = Math.min(scrollRef.current.x, maxScrollX);
-          bgSprite.x = (app.screen.width - bgSprite.width) / 2 - scrollRef.current.x;
-          bgSprite.y = -scrollRef.current.y;
+          const maxScrollY = Math.max(0, displayBgHeight - app.screen.height);
+          const maxScrollX = Math.max(0, displayBgWidth - app.screen.width);
+          if (shouldApplyInitialViewRef.current) {
+            scrollRef.current = {
+              x: maxScrollX * (resolvedView.offsetX / 100),
+              y: maxScrollY * (resolvedView.offsetY / 100),
+            };
+            shouldApplyInitialViewRef.current = false;
+          } else {
+            const limits = getTDLevelEditorScrollLimits(
+              displayBgWidth,
+              displayBgHeight,
+              app.screen.width,
+              app.screen.height
+            );
+            scrollRef.current.x = clampTDLevelEditorScroll(
+              scrollRef.current.x,
+              limits.minX,
+              limits.maxX
+            );
+            scrollRef.current.y = clampTDLevelEditorScroll(
+              scrollRef.current.y,
+              limits.minY,
+              limits.maxY
+            );
+          }
+
+          const centeredX = Math.max(
+            0,
+            (app.screen.width - displayBgWidth) / 2
+          );
+          const centeredY = Math.max(
+            0,
+            (app.screen.height - displayBgHeight) / 2
+          );
+          bgSprite.x = centeredX - scrollRef.current.x;
+          bgSprite.y = centeredY - scrollRef.current.y;
 
           bgBounds = {
             x: bgSprite.x,
@@ -164,10 +236,8 @@ export default function PixiTDLevelEditor({
 
       bgSprite.eventMode = 'static';
 
-      // --- Scroll drag on background (always listen, check scale dynamically) ---
-      bgSprite.on('pointerdown', (e: PIXI.FederatedPointerEvent) => {
-        const scale = backgroundScaleRef.current > 1 ? backgroundScaleRef.current : 1;
-        if (draggingNode || scale <= 1) return;
+      const beginScrollDrag = (e: PIXI.FederatedPointerEvent) => {
+        if (draggingNode) return;
         isScrollDraggingRef.current = true;
         scrollDragStartRef.current = {
           x: e.global.x,
@@ -175,10 +245,12 @@ export default function PixiTDLevelEditor({
           scrollX: scrollRef.current.x,
           scrollY: scrollRef.current.y,
         };
-      });
+      };
 
       app.stage.eventMode = 'static';
       app.stage.hitArea = new PIXI.Rectangle(0, 0, 10000, 10000);
+      // Listen on the stage so the empty overscroll area can drag the map too.
+      app.stage.on('pointerdown', beginScrollDrag);
       app.stage.addChild(pathGraphics);
 
       app.stage.on('pointerup', () => {
@@ -196,12 +268,32 @@ export default function PixiTDLevelEditor({
         if (isScrollDraggingRef.current && scrollDragStartRef.current) {
           const dx = scrollDragStartRef.current.x - e.global.x;
           const dy = scrollDragStartRef.current.y - e.global.y;
-          const maxScrollY = Math.max(0, fullBgHeight - app.screen.height);
-          const maxScrollX = Math.max(0, fullBgWidth - app.screen.width);
-          scrollRef.current.y = Math.max(0, Math.min(maxScrollY, scrollDragStartRef.current.scrollY + dy));
-          scrollRef.current.x = Math.max(0, Math.min(maxScrollX, scrollDragStartRef.current.scrollX + dx));
-          bgSprite.x = (app.screen.width - bgSprite.width) / 2 - scrollRef.current.x;
-          bgSprite.y = -scrollRef.current.y;
+          const limits = getTDLevelEditorScrollLimits(
+            displayBgWidth,
+            displayBgHeight,
+            app.screen.width,
+            app.screen.height
+          );
+          scrollRef.current.x = clampTDLevelEditorScroll(
+            scrollDragStartRef.current.scrollX + dx,
+            limits.minX,
+            limits.maxX
+          );
+          scrollRef.current.y = clampTDLevelEditorScroll(
+            scrollDragStartRef.current.scrollY + dy,
+            limits.minY,
+            limits.maxY
+          );
+          const centeredX = Math.max(
+            0,
+            (app.screen.width - displayBgWidth) / 2
+          );
+          const centeredY = Math.max(
+            0,
+            (app.screen.height - displayBgHeight) / 2
+          );
+          bgSprite.x = centeredX - scrollRef.current.x;
+          bgSprite.y = centeredY - scrollRef.current.y;
           bgBounds = {
             x: bgSprite.x,
             y: bgSprite.y,
@@ -216,12 +308,8 @@ export default function PixiTDLevelEditor({
           !deleteModeRef.current &&
           bgBounds.width > 0
         ) {
-          let newX = ((e.global.x - bgBounds.x) / bgBounds.width) * 100;
-          let newY = ((e.global.y - bgBounds.y) / bgBounds.height) * 100;
-
-          // Clamp to 0-100
-          newX = Math.max(0, Math.min(100, newX));
-          newY = Math.max(0, Math.min(100, newY));
+          const newX = ((e.global.x - bgBounds.x) / bgBounds.width) * 100;
+          const newY = ((e.global.y - bgBounds.y) / bgBounds.height) * 100;
 
           onPointMoveRef.current(
             draggingInfo.type,
@@ -265,7 +353,8 @@ export default function PixiTDLevelEditor({
         container.addChild(g);
         container.addChild(text);
 
-        container.on('pointerdown', () => {
+        container.on('pointerdown', (e: PIXI.FederatedPointerEvent) => {
+          e.stopPropagation();
           if (deleteModeRef.current) {
             onPointDeleteRef.current(type, index);
           } else {
@@ -298,6 +387,66 @@ export default function PixiTDLevelEditor({
         return container;
       };
 
+      const createDraggableEnvironmentUnit = (index: number) => {
+        const container = new PIXI.Container();
+        container.eventMode = 'static';
+        container.cursor = deleteModeRef.current ? 'pointer' : 'grab';
+        container.hitArea = new PIXI.Circle(0, 0, 42);
+
+        const marker = new PIXI.Graphics();
+        marker.circle(0, 0, 36);
+        marker.fill({ color: 0xfacc15, alpha: 0.12 });
+        marker.stroke({ color: 0xfacc15, width: 3, alpha: 0.95 });
+        container.addChild(marker);
+
+        const visual = new PIXI.Container();
+        visual.label = 'environment_visual';
+        const shadow = new PIXI.Graphics();
+        shadow.label = 'shadow';
+        visual.addChild(shadow);
+        const sprite = new PIXI.Sprite();
+        sprite.label = 'environment_sprite';
+        sprite.anchor.set(0.5);
+        visual.addChild(sprite);
+        container.addChild(visual);
+
+        const label = new PIXI.Text({
+          text: `E${index}`,
+          style: new PIXI.TextStyle({
+            fontFamily: 'Arial',
+            fontSize: 14,
+            fill: 0xffffff,
+            fontWeight: 'bold',
+            stroke: { color: 0x000000, width: 3 },
+          }),
+        });
+        label.label = 'environment_label';
+        label.anchor.set(0.5);
+        label.y = -48;
+        container.addChild(label);
+
+        container.on('pointerdown', (event: PIXI.FederatedPointerEvent) => {
+          event.stopPropagation();
+          if (deleteModeRef.current) {
+            onPointDeleteRef.current('ENVIRONMENT', index);
+          } else {
+            draggingNode = container;
+            draggingInfo = { type: 'ENVIRONMENT', index };
+            container.cursor = 'grabbing';
+            app.stage.setChildIndex(container, app.stage.children.length - 1);
+          }
+        });
+        container.on('pointerover', () => {
+          marker.alpha = deleteModeRef.current ? 0.5 : 1;
+        });
+        container.on('pointerout', () => {
+          marker.alpha = 1;
+        });
+
+        app.stage.addChild(container);
+        return container;
+      };
+
       app.ticker.add(() => {
         // Re-evaluate bg layout each tick to pick up scale changes
         updateBgLayout();
@@ -306,18 +455,24 @@ export default function PixiTDLevelEditor({
 
         const viewportH = app.screen.height;
 
-        const bgUrl = backgroundUrlRef.current || '/battles/bg/bg_dock_battle_td.png';
+        const bgUrl =
+          backgroundUrlRef.current || '/battles/bg/bg_dock_battle_td.png';
         if (bgUrl !== currentBgUrl) {
           currentBgUrl = bgUrl;
-          PIXI.Assets.load(bgUrl).then((t) => {
-            if (!isDestroyed) { bgSprite.texture = t as PIXI.Texture; }
-          }).catch(console.error);
+          PIXI.Assets.load(bgUrl)
+            .then((t) => {
+              if (!isDestroyed) {
+                bgSprite.texture = t as PIXI.Texture;
+              }
+            })
+            .catch(console.error);
         }
 
         const currentPaths = pathsRef.current;
         const currentActivePathIndex = activePathIndexRef.current;
         const currentPlacementSpots = placementSpotsRef.current;
         const currentCaptureUnits = captureUnitsRef.current;
+        const currentEnvironmentUnits = environmentUnitsRef.current;
 
         // Draw Path lines
         pathGraphics.clear();
@@ -454,6 +609,64 @@ export default function PixiTDLevelEditor({
           const text = node.children[1] as PIXI.Text;
           if (text) text.text = `C${i}`;
         });
+
+        // Render environment units with the same visual configuration as runtime.
+        for (const [key, node] of environmentNodes.entries()) {
+          if (key >= currentEnvironmentUnits.length) {
+            app.stage.removeChild(node);
+            node.destroy({ children: true });
+            environmentNodes.delete(key);
+          }
+        }
+        currentEnvironmentUnits.forEach((unit, i) => {
+          let node = environmentNodes.get(i);
+          if (!node) {
+            node = createDraggableEnvironmentUnit(i);
+            environmentNodes.set(i, node);
+          }
+
+          node.x = bgBounds.x + (unit.position.x / 100) * bgBounds.width;
+          node.y = bgBounds.y + (unit.position.y / 100) * bgBounds.height;
+          node.cursor = deleteModeRef.current
+            ? 'pointer'
+            : draggingNode === node
+              ? 'grabbing'
+              : 'grab';
+
+          const visual = node.getChildByLabel(
+            'environment_visual'
+          ) as PIXI.Container;
+          visual.scale.set(
+            resolveTDInitialView(
+              backgroundScaleRef.current,
+              initialViewRef.current
+            ).zoom *
+              (app.screen.height / TD_BASE_HEIGHT)
+          );
+          const sprite = visual.getChildByLabel(
+            'environment_sprite'
+          ) as PIXI.Sprite;
+          const shadow = visual.getChildByLabel('shadow') as PIXI.Graphics;
+          applyTDUnitTransforms(
+            {
+              id: `editor-environment-${i}`,
+              position: unit.position,
+              facingDirection: unit.facingDirection ?? 'down',
+              hp: 1,
+              maxHp: 1,
+            },
+            sprite,
+            shadow,
+            unit.tdConfigId,
+            undefined,
+            (texture) => {
+              if (!isDestroyed) sprite.texture = texture;
+            }
+          );
+
+          const label = node.getChildByLabel('environment_label') as PIXI.Text;
+          label.text = `E${i}`;
+        });
       });
     };
 
@@ -468,7 +681,7 @@ export default function PixiTDLevelEditor({
   }, []); // Run once, strictly use refs inside ticker!
 
   return (
-    <div className="flex-1 relative overflow-hidden">
+    <div className="relative flex-1 overflow-hidden">
       <div ref={containerRef} className="absolute inset-0" />
     </div>
   );

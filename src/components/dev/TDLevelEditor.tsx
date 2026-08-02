@@ -2,47 +2,53 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import PixiTDLevelEditor, { PointType } from './PixiTDLevelEditor';
-import * as tdLevels from '@/constants/tdLevels';
-import { TDLevelData, TDWave, TDWaveGroup } from '@/engine/tower-defense/types';
+import { TD_LEVELS } from '@/constants/tdLevels';
+import { TDLevelData, TDWaveGroup } from '@/engine/tower-defense/types';
 import { TD_CREATURE_DEFS } from '@/engine/tower-defense/TowerDefenseEngine';
+import { TDLevelContext } from '@/types/baseGame';
+import {
+  cloneTDLevelDraft,
+  createEmptyTDLevelDraft,
+  prepareTDLevelDraftForSave,
+  validateTDLevelDraft,
+} from '@/utils/tdLevelDraft';
+import { resolveTDInitialView } from '@/utils/tdInitialView';
+
+type EditorSidebarTab = 'LEVEL' | 'MAP' | 'WAVES';
 
 export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
   const [selectedLevelKey, setSelectedLevelKey] = useState<string | null>(null);
-
-  const [paths, setPaths] = useState<{ x: number; y: number }[][]>([[]]);
+  const [draft, setDraft] = useState<TDLevelData>(createEmptyTDLevelDraft);
   const [activePathIndex, setActivePathIndex] = useState(0);
-  const [placementSpots, setPlacementSpots] = useState<
-    { x: number; y: number }[]
-  >([]);
-  const [environmentUnits, setEnvironmentUnits] = useState<
-    {
-      position: { x: number; y: number };
-      tdConfigId: string;
-      facingDirection?: 'up' | 'down' | 'left' | 'right';
-    }[]
-  >([]);
-  const [captureUnits, setCaptureUnits] = useState<
-    { x: number; y: number; tdConfigId: string }[]
-  >([]);
-  const [waves, setWaves] = useState<TDWave[]>([]);
-  const [surviveUntil, setSurviveUntil] = useState<number>(0);
-  const [lives, setLives] = useState<number>(3);
-  const [backgroundUrl, setBackgroundUrl] = useState<string>('');
-  const [backgroundScale, setBackgroundScale] = useState<number>(1);
   const [deleteMode, setDeleteMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showNewModal, setShowNewModal] = useState(false);
   const [newLevelName, setNewLevelName] = useState('');
+  const [activeSidebarTab, setActiveSidebarTab] =
+    useState<EditorSidebarTab>('MAP');
+
+  const paths = draft.paths;
+  const placementSpots = draft.placementSpots;
+  const environmentUnits = draft.environmentUnits ?? [];
+  const captureUnits = draft.captureUnits ?? [];
+  const waves = draft.waves;
+  const surviveUntil = draft.surviveUntil ?? 0;
+  const lives = draft.lives ?? 3;
+  const backgroundUrl = draft.backgroundUrl ?? '';
+  const backgroundScale = draft.backgroundScale ?? 1;
+  const initialView = resolveTDInitialView(
+    draft.backgroundScale,
+    draft.initialView
+  );
+  const captureUnitPoints = captureUnits.map((unit) => ({
+    ...unit.position,
+    tdConfigId: unit.tdConfigId,
+  }));
 
   const availableLevels = useMemo(() => {
-    const registry = (tdLevels as any).TD_LEVELS || {};
-    return Object.entries(registry)
-      .map(([key, value]) => [key, (value as any)?.levelData])
-      .filter(([key, val]) => {
-        return (
-          val && Array.isArray((val as any).paths) && Array.isArray((val as any).placementSpots)
-        );
-      }) as [string, TDLevelData][];
+    return Object.entries(TD_LEVELS).map(
+      ([key, config]) => [key, config.levelData] as [string, TDLevelData]
+    );
   }, []);
 
   useEffect(() => {
@@ -52,62 +58,20 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
   }, [availableLevels, selectedLevelKey]);
 
   const handleSelectLevel = (key: string) => {
-    const registry = (tdLevels as any).TD_LEVELS || {};
-    const levelData = registry[key]?.levelData as TDLevelData;
+    const levelData = TD_LEVELS[key as TDLevelContext]?.levelData;
     if (levelData) {
-      // Deep copy
-      if (levelData.paths) {
-        setPaths(JSON.parse(JSON.stringify(levelData.paths)));
-      } else {
-        setPaths([[]]);
-      }
+      setDraft(cloneTDLevelDraft(levelData));
       setActivePathIndex(0);
-      setPlacementSpots(JSON.parse(JSON.stringify(levelData.placementSpots)));
-      setEnvironmentUnits(
-        levelData.environmentUnits
-          ? JSON.parse(JSON.stringify(levelData.environmentUnits))
-          : []
-      );
-      setCaptureUnits(
-        levelData.captureUnits
-          ? levelData.captureUnits.map((cu) => ({
-              x: cu.position.x,
-              y: cu.position.y,
-              tdConfigId: cu.tdConfigId,
-            }))
-          : []
-      );
-      setWaves(JSON.parse(JSON.stringify(levelData.waves)));
-      setSurviveUntil(levelData.surviveUntil || 0);
-      setLives(levelData.lives !== undefined ? levelData.lives : 3);
-      setBackgroundUrl(levelData.backgroundUrl || '');
-      setBackgroundScale(levelData.backgroundScale || 1);
     } else {
-      setPaths([[]]);
+      setDraft(createEmptyTDLevelDraft());
       setActivePathIndex(0);
-      setPlacementSpots([]);
-      setEnvironmentUnits([]);
-      setCaptureUnits([]);
-      setWaves([]);
-      setSurviveUntil(0);
-      setLives(3);
-      setBackgroundUrl('');
-      setBackgroundScale(1);
     }
     setSelectedLevelKey(key);
   };
 
   const handleCreateNew = () => {
-    setPaths([[]]);
+    setDraft(createEmptyTDLevelDraft());
     setActivePathIndex(0);
-    setPlacementSpots([]);
-    setEnvironmentUnits([]);
-    setCaptureUnits([]);
-    setWaves([]);
-    setSurviveUntil(0);
-    setLives(3);
-    setBackgroundUrl('');
-    setBackgroundScale(1);
     setSelectedLevelKey('NEW_LEVEL');
     setNewLevelName('');
     setShowNewModal(true);
@@ -120,64 +84,104 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
     y: number
   ) => {
     if (type === 'PATH') {
-      setPaths((prev) => {
-        const next = [...prev];
-        const currentPath = [...(next[activePathIndex] || [])];
+      setDraft((previousDraft) => {
+        const nextPaths = [...previousDraft.paths];
+        const currentPath = [...(nextPaths[activePathIndex] || [])];
         currentPath[index] = { ...currentPath[index], x, y };
-        next[activePathIndex] = currentPath;
-        return next;
+        nextPaths[activePathIndex] = currentPath;
+        return { ...previousDraft, paths: nextPaths };
       });
     } else if (type === 'PLACEMENT') {
-      setPlacementSpots((prev) => {
-        const next = [...prev];
-        next[index] = { ...next[index], x, y };
-        return next;
+      setDraft((previousDraft) => {
+        const nextSpots = [...previousDraft.placementSpots];
+        nextSpots[index] = { ...nextSpots[index], x, y };
+        return { ...previousDraft, placementSpots: nextSpots };
       });
     } else if (type === 'CAPTURE') {
-      setCaptureUnits((prev) => {
-        const next = [...prev];
-        next[index] = { ...next[index], x, y };
-        return next;
+      setDraft((previousDraft) => {
+        const nextUnits = [...(previousDraft.captureUnits ?? [])];
+        const currentUnit = nextUnits[index];
+        nextUnits[index] = {
+          ...currentUnit,
+          position: { ...currentUnit.position, x, y },
+        };
+        return { ...previousDraft, captureUnits: nextUnits };
+      });
+    } else if (type === 'ENVIRONMENT') {
+      setDraft((previousDraft) => {
+        const nextUnits = [...(previousDraft.environmentUnits ?? [])];
+        const currentUnit = nextUnits[index];
+        nextUnits[index] = {
+          ...currentUnit,
+          position: { ...currentUnit.position, x, y },
+        };
+        return { ...previousDraft, environmentUnits: nextUnits };
       });
     }
   };
 
   const handlePointDelete = (type: PointType, index: number) => {
     if (type === 'PATH') {
-      setPaths((prev) => {
-        const next = [...prev];
-        if (next[activePathIndex]) {
-          next[activePathIndex] = next[activePathIndex].filter(
+      setDraft((previousDraft) => {
+        const nextPaths = [...previousDraft.paths];
+        if (nextPaths[activePathIndex]) {
+          nextPaths[activePathIndex] = nextPaths[activePathIndex].filter(
             (_, i) => i !== index
           );
         }
-        return next;
+        return { ...previousDraft, paths: nextPaths };
       });
     } else if (type === 'PLACEMENT') {
-      setPlacementSpots((prev) => prev.filter((_, i) => i !== index));
+      setDraft((previousDraft) => ({
+        ...previousDraft,
+        placementSpots: previousDraft.placementSpots.filter(
+          (_, i) => i !== index
+        ),
+      }));
     } else if (type === 'CAPTURE') {
-      setCaptureUnits((prev) => prev.filter((_, i) => i !== index));
+      setDraft((previousDraft) => ({
+        ...previousDraft,
+        captureUnits: (previousDraft.captureUnits ?? []).filter(
+          (_, i) => i !== index
+        ),
+      }));
+    } else if (type === 'ENVIRONMENT') {
+      setDraft((previousDraft) => ({
+        ...previousDraft,
+        environmentUnits: (previousDraft.environmentUnits ?? []).filter(
+          (_, i) => i !== index
+        ),
+      }));
     }
   };
 
   const addPathPoint = () => {
-    setPaths((prev) => {
-      const next = [...prev];
-      if (!next[activePathIndex]) next[activePathIndex] = [];
-      next[activePathIndex] = [...next[activePathIndex], { x: 50, y: 50 }];
-      return next;
+    setDraft((previousDraft) => {
+      const nextPaths = [...previousDraft.paths];
+      if (!nextPaths[activePathIndex]) nextPaths[activePathIndex] = [];
+      nextPaths[activePathIndex] = [
+        ...nextPaths[activePathIndex],
+        { x: 50, y: 50 },
+      ];
+      return { ...previousDraft, paths: nextPaths };
     });
   };
 
   const addPlacementSpot = () => {
-    setPlacementSpots((prev) => [...prev, { x: 50, y: 50 }]);
+    setDraft((previousDraft) => ({
+      ...previousDraft,
+      placementSpots: [...previousDraft.placementSpots, { x: 50, y: 50 }],
+    }));
   };
 
   const addCaptureUnit = () => {
-    setCaptureUnits((prev) => [
-      ...prev,
-      { x: 50, y: 50, tdConfigId: 'chest_wooden' },
-    ]);
+    setDraft((previousDraft) => ({
+      ...previousDraft,
+      captureUnits: [
+        ...(previousDraft.captureUnits ?? []),
+        { position: { x: 50, y: 50 }, tdConfigId: 'chest_wooden' },
+      ],
+    }));
   };
 
   const saveLevel = async () => {
@@ -187,44 +191,36 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
         setShowNewModal(true);
         return;
       }
+      if (!/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(newLevelName)) {
+        alert(
+          'Level names must be valid TypeScript identifiers (letters, numbers, _ or $, and cannot start with a number).'
+        );
+        return;
+      }
       nameToSave = newLevelName;
     }
 
     if (!nameToSave) return;
 
+    const validationErrors = validateTDLevelDraft(
+      draft,
+      new Set(Object.keys(TD_CREATURE_DEFS))
+    );
+    if (validationErrors.length > 0) {
+      alert(`Cannot save this level:\n\n${validationErrors.join('\n')}`);
+      return;
+    }
+
     setIsSaving(true);
     try {
-      const data: TDLevelData = {
-        paths: paths.map((path) =>
-          path.map((p) => ({
-            x: Number(p.x.toFixed(2)),
-            y: Number(p.y.toFixed(2)),
-          }))
-        ),
-        placementSpots: placementSpots.map((s) => ({
-          x: Number(s.x.toFixed(2)),
-          y: Number(s.y.toFixed(2)),
-        })),
-        environmentUnits:
-          environmentUnits.length > 0 ? environmentUnits : undefined,
-        captureUnits: captureUnits.map((c) => ({
-          position: {
-            x: Number(c.x.toFixed(2)),
-            y: Number(c.y.toFixed(2)),
-          },
-          tdConfigId: c.tdConfigId,
-        })),
-        waves: waves,
-        surviveUntil: surviveUntil > 0 ? surviveUntil : undefined,
-        lives: lives !== 3 ? lives : undefined,
-        backgroundUrl: backgroundUrl || undefined,
-        backgroundScale: backgroundScale > 1 ? backgroundScale : undefined,
-      };
+      const data = prepareTDLevelDraftForSave(draft);
 
       const res = await fetch('/api/dev/td-levels/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          levelContext:
+            selectedLevelKey === 'NEW_LEVEL' ? undefined : selectedLevelKey,
           levelName: nameToSave,
           fileName: nameToSave,
           config: data,
@@ -236,9 +232,6 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
       }
 
       alert('Saved successfully!');
-      if (selectedLevelKey === 'NEW_LEVEL') {
-        setSelectedLevelKey(nameToSave);
-      }
       setShowNewModal(false);
     } catch (err) {
       console.error(err);
@@ -249,19 +242,22 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
   };
 
   const addWave = () => {
-    setWaves((prev) => [
-      ...prev,
-      {
-        id: `wave_${Date.now()}`,
-        groups: [],
-      },
-    ]);
+    setDraft((previousDraft) => ({
+      ...previousDraft,
+      waves: [
+        ...previousDraft.waves,
+        {
+          id: `wave_${Date.now()}`,
+          groups: [],
+        },
+      ],
+    }));
   };
 
   const addGroupToWave = (waveIndex: number) => {
-    setWaves((prev) => {
-      const next = [...prev];
-      next[waveIndex].groups.push({
+    setDraft((previousDraft) => {
+      const nextWaves = cloneTDLevelDraft(previousDraft).waves;
+      nextWaves[waveIndex].groups.push({
         definitionId: Object.keys(TD_CREATURE_DEFS)[0] || '',
         count: 5,
         spawnIntervalMs: 1000,
@@ -270,47 +266,50 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
         turnAroundAtEnd: false,
         concurrentWithPrevious: false,
       });
-      return next;
+      return { ...previousDraft, waves: nextWaves };
     });
   };
 
-  const updateGroup = (
+  const updateGroup = <K extends keyof TDWaveGroup>(
     waveIndex: number,
     groupIndex: number,
-    field: keyof TDWaveGroup,
-    value: any
+    field: K,
+    value: TDWaveGroup[K]
   ) => {
-    setWaves((prev) => {
-      const next = JSON.parse(JSON.stringify(prev)); // deep copy to ensure re-render
-      next[waveIndex].groups[groupIndex][field] = value;
-      return next;
+    setDraft((previousDraft) => {
+      const nextWaves = cloneTDLevelDraft(previousDraft).waves;
+      nextWaves[waveIndex].groups[groupIndex][field] = value;
+      return { ...previousDraft, waves: nextWaves };
     });
   };
 
   const deleteWave = (waveIndex: number) => {
-    setWaves((prev) => prev.filter((_, i) => i !== waveIndex));
+    setDraft((previousDraft) => ({
+      ...previousDraft,
+      waves: previousDraft.waves.filter((_, i) => i !== waveIndex),
+    }));
   };
 
   const deleteGroup = (waveIndex: number, groupIndex: number) => {
-    setWaves((prev) => {
-      const next = JSON.parse(JSON.stringify(prev));
-      next[waveIndex].groups.splice(groupIndex, 1);
-      return next;
+    setDraft((previousDraft) => {
+      const nextWaves = cloneTDLevelDraft(previousDraft).waves;
+      nextWaves[waveIndex].groups.splice(groupIndex, 1);
+      return { ...previousDraft, waves: nextWaves };
     });
   };
 
   return (
-    <div className="fixed inset-0 z-9998 bg-slate-900 flex flex-col">
+    <div className="fixed inset-0 z-9998 flex flex-col bg-slate-900">
       {/* New Level Modal */}
       {showNewModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-slate-800 p-6 rounded-lg shadow-lg">
-            <h3 className="text-lg font-bold text-white mb-4">
+        <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
+          <div className="rounded-lg bg-slate-800 p-6 shadow-lg">
+            <h3 className="mb-4 text-lg font-bold text-white">
               Enter New Level Name
             </h3>
             <input
               type="text"
-              className="w-full p-2 bg-slate-700 text-white rounded mb-4"
+              className="mb-4 w-full rounded bg-slate-700 p-2 text-white"
               value={newLevelName}
               onChange={(e) => setNewLevelName(e.target.value)}
               placeholder="e.g., MyNewLevel"
@@ -318,14 +317,14 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowNewModal(false)}
-                className="px-4 py-2 bg-slate-600 hover:bg-slate-500 rounded text-white"
+                className="rounded bg-slate-600 px-4 py-2 text-white hover:bg-slate-500"
               >
                 Cancel
               </button>
               <button
                 onClick={saveLevel}
                 disabled={!newLevelName || isSaving}
-                className="px-4 py-2 bg-green-700 hover:bg-green-600 rounded text-white disabled:bg-slate-600"
+                className="rounded bg-green-700 px-4 py-2 text-white hover:bg-green-600 disabled:bg-slate-600"
               >
                 {isSaving ? 'Saving...' : 'Create & Save'}
               </button>
@@ -335,13 +334,13 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
       )}
 
       {/* Top Header */}
-      <div className="bg-slate-800 p-4 shrink-0 flex items-center justify-between border-b border-cyan-800">
+      <div className="flex shrink-0 items-center justify-between border-b border-cyan-800 bg-slate-800 p-4">
         <div className="flex items-center gap-4">
           <h2 className="text-xl font-bold text-cyan-400">TD Level Editor</h2>
           <select
             value={selectedLevelKey || ''}
             onChange={(e) => handleSelectLevel(e.target.value)}
-            className="bg-slate-950 text-white px-2 py-1 rounded text-sm border border-slate-700"
+            className="rounded border border-slate-700 bg-slate-950 px-2 py-1 text-sm text-white"
           >
             <option value="" disabled>
               Select a Level...
@@ -352,446 +351,638 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
               </option>
             ))}
             {selectedLevelKey === 'NEW_LEVEL' && (
-              <option value="NEW_LEVEL">(New Level)</option>
+              <option value="NEW_LEVEL">
+                {newLevelName ? `(New: ${newLevelName})` : '(New Level)'}
+              </option>
             )}
           </select>
           <button
             onClick={handleCreateNew}
-            className="text-xs bg-cyan-700 hover:bg-cyan-600 px-2 py-1 rounded text-white"
+            className="rounded bg-cyan-700 px-2 py-1 text-xs text-white hover:bg-cyan-600"
           >
             + New
           </button>
         </div>
 
-        <div className="flex items-center gap-4">
-          <select
-            value={activePathIndex}
-            onChange={(e) => setActivePathIndex(Number(e.target.value))}
-            className="bg-slate-950 text-white px-2 py-1 rounded text-sm border border-slate-700"
-          >
-            {paths.map((_, i) => (
-              <option key={i} value={i}>
-                Path {i}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={() => setPaths((prev) => [...prev, []])}
-            className="text-xs bg-cyan-700 hover:bg-cyan-600 px-2 py-1 rounded text-white"
-          >
-            + New Path
-          </button>
-          <button
-            onClick={() => {
-              if (paths.length > 1) {
-                setPaths((prev) =>
-                  prev.filter((_, i) => i !== activePathIndex)
-                );
-                setActivePathIndex((prev) => Math.max(0, prev - 1));
-              }
-            }}
-            disabled={paths.length <= 1}
-            className="text-xs bg-red-700 hover:bg-red-600 px-2 py-1 rounded text-white disabled:bg-slate-600"
-          >
-            Del Path
-          </button>
-
-          <div className="w-px h-6 bg-slate-600 mx-2" />
-
-          <button
-            onClick={addPathPoint}
-            className="px-4 py-2 bg-red-700 hover:bg-red-600 rounded text-white font-bold text-sm"
-          >
-            + Path Point
-          </button>
-          <button
-            onClick={addPlacementSpot}
-            className="px-4 py-2 bg-orange-700 hover:bg-orange-600 rounded text-white font-bold text-sm"
-          >
-            + Placement Spot
-          </button>
-          <button
-            onClick={addCaptureUnit}
-            className="px-4 py-2 bg-purple-700 hover:bg-purple-600 rounded text-white font-bold text-sm"
-          >
-            + Capture Unit
-          </button>
-
-          <div className="w-px h-6 bg-slate-600 mx-2" />
-
-          <div className="flex items-center gap-2">
-            <label className="text-slate-400 text-sm font-bold">
-              Survive (s):
-            </label>
-            <input
-              type="number"
-              min="0"
-              value={surviveUntil}
-              onChange={(e) => setSurviveUntil(parseInt(e.target.value) || 0)}
-              className="w-20 bg-slate-950 text-white rounded p-1 border border-slate-700 text-sm"
-              placeholder="0 = clear waves"
-            />
-          </div>
-
-          <div className="w-px h-6 bg-slate-600 mx-2" />
-
-          <div className="flex items-center gap-2">
-            <label className="text-slate-400 text-sm font-bold">Lives:</label>
-            <input
-              type="number"
-              min="-1"
-              value={lives}
-              onChange={(e) => {
-                const val = parseInt(e.target.value);
-                setLives(isNaN(val) ? 3 : val);
-              }}
-              className="w-16 bg-slate-950 text-white rounded p-1 border border-slate-700 text-sm"
-              placeholder="3"
-            />
-          </div>
-
-          <div className="w-px h-6 bg-slate-600 mx-2" />
-
-          <div className="flex items-center gap-2">
-            <label className="text-slate-400 text-sm font-bold">Bg Url:</label>
-            <input
-              type="text"
-              value={backgroundUrl}
-              onChange={(e) => setBackgroundUrl(e.target.value)}
-              className="w-32 bg-slate-950 text-white rounded p-1 border border-slate-700 text-sm"
-              placeholder="/battles/bg/..."
-            />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <label className="text-slate-400 text-sm font-bold">Scale:</label>
-            <input
-              type="number"
-              min="1"
-              max="3"
-              step="0.1"
-              value={backgroundScale}
-              onChange={(e) => setBackgroundScale(parseFloat(e.target.value) || 1)}
-              className="w-16 bg-slate-950 text-white rounded p-1 border border-slate-700 text-sm"
-              placeholder="1"
-            />
-          </div>
-
-          <div className="w-px h-6 bg-slate-600 mx-2" />
-
-          <button
-            onClick={() => setDeleteMode((prev) => !prev)}
-            className={`px-4 py-2 rounded text-white font-bold text-sm border-2 ${
-              deleteMode
-                ? 'bg-red-900 border-red-500'
-                : 'bg-slate-700 border-transparent hover:bg-slate-600'
-            }`}
-          >
-            Delete Mode: {deleteMode ? 'ON' : 'OFF'}
-          </button>
-
-          <div className="w-px h-6 bg-slate-600 mx-2" />
-
+        <div className="flex shrink-0 items-center gap-3">
           <button
             onClick={saveLevel}
             disabled={isSaving || !selectedLevelKey}
-            className={`px-4 py-2 rounded text-white font-bold text-sm ${isSaving ? 'bg-slate-600' : 'bg-green-700 hover:bg-green-600'}`}
+            className={`rounded px-4 py-2 text-sm font-bold text-white ${isSaving ? 'bg-slate-600' : 'bg-green-700 hover:bg-green-600'}`}
           >
-            {isSaving ? 'Saving...' : 'Save Level API'}
+            {isSaving ? 'Saving...' : 'Save Level'}
           </button>
-
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-slate-600 hover:bg-slate-500 rounded text-white font-bold ml-4"
+            className="rounded bg-slate-600 px-4 py-2 font-bold text-white hover:bg-slate-500"
           >
             Close
           </button>
         </div>
       </div>
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex flex-1 overflow-hidden">
         <PixiTDLevelEditor
           paths={paths}
           activePathIndex={activePathIndex}
           placementSpots={placementSpots}
-          captureUnits={captureUnits}
+          captureUnits={captureUnitPoints}
+          environmentUnits={environmentUnits}
           deleteMode={deleteMode}
           onPointMove={handlePointMove}
           onPointDelete={handlePointDelete}
           backgroundUrl={backgroundUrl}
           backgroundScale={backgroundScale}
+          initialView={draft.initialView}
         />
 
-        {/* Waves Editor Sidebar */}
-        <div className="w-80 shrink-0 bg-slate-800 border-l border-cyan-800 overflow-y-auto p-4 origin-right">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-cyan-400">
-              Waves ({waves.length})
-            </h3>
-            <button
-              onClick={addWave}
-              className="px-2 py-1 bg-cyan-700 hover:bg-cyan-600 rounded text-white text-xs font-bold"
-            >
-              + Add Wave
-            </button>
+        {/* Editor Sidebar */}
+        <aside className="flex w-96 shrink-0 flex-col border-l border-cyan-800 bg-slate-800">
+          <div className="grid grid-cols-3 border-b border-slate-700 bg-slate-900 p-2">
+            {(['LEVEL', 'MAP', 'WAVES'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveSidebarTab(tab)}
+                className={
+                  activeSidebarTab === tab
+                    ? 'rounded bg-cyan-700 px-3 py-2 text-sm font-bold text-white'
+                    : 'rounded px-3 py-2 text-sm font-bold text-slate-400 hover:bg-slate-700 hover:text-white'
+                }
+              >
+                {tab === 'LEVEL' ? 'Level' : tab === 'MAP' ? 'Map' : 'Waves'}
+              </button>
+            ))}
           </div>
 
-          <div className="space-y-4">
-            {/* Environment Units Configs (Read-only rendering loop to show what's there) */}
-            {environmentUnits.length > 0 && (
-              <div className="bg-slate-900 p-3 rounded border border-yellow-800">
-                <h4 className="font-bold text-sm mb-2 text-yellow-400">
-                  Environment Units (Preserved)
-                </h4>
-                {environmentUnits.map((eu, idx) => (
-                  <div
-                    key={idx}
-                    className="flex flex-col mb-2 text-xs text-slate-400"
-                  >
-                    <span>
-                      {eu.tdConfigId} @ [{eu.position.x}, {eu.position.y}]
-                    </span>
+          <div className="flex-1 overflow-y-auto p-4">
+            {activeSidebarTab === 'LEVEL' && (
+              <div className="space-y-6">
+                <section>
+                  <h3 className="mb-3 text-sm font-bold tracking-wide text-cyan-400 uppercase">
+                    Gameplay
+                  </h3>
+                  <div className="space-y-3 rounded border border-slate-700 bg-slate-900 p-3">
+                    <label className="block text-sm text-slate-300">
+                      <span className="mb-1 block font-bold">
+                        Survive (seconds)
+                      </span>
+                      <input
+                        type="number"
+                        min="0"
+                        value={surviveUntil}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value) || 0;
+                          setDraft((previousDraft) => ({
+                            ...previousDraft,
+                            surviveUntil: value > 0 ? value : undefined,
+                          }));
+                        }}
+                        className="w-full rounded border border-slate-700 bg-slate-950 p-2 text-white"
+                        placeholder="0 = clear waves"
+                      />
+                    </label>
+                    <label className="block text-sm text-slate-300">
+                      <span className="mb-1 block font-bold">Lives</span>
+                      <input
+                        type="number"
+                        min="-1"
+                        value={lives}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value);
+                          setDraft((previousDraft) => ({
+                            ...previousDraft,
+                            lives:
+                              isNaN(value) || value === 3 ? undefined : value,
+                          }));
+                        }}
+                        className="w-full rounded border border-slate-700 bg-slate-950 p-2 text-white"
+                        placeholder="3"
+                      />
+                    </label>
                   </div>
-                ))}
+                </section>
+
+                <section>
+                  <h3 className="mb-3 text-sm font-bold tracking-wide text-cyan-400 uppercase">
+                    Background
+                  </h3>
+                  <div className="space-y-3 rounded border border-slate-700 bg-slate-900 p-3">
+                    <label className="block text-sm text-slate-300">
+                      <span className="mb-1 block font-bold">Image URL</span>
+                      <input
+                        type="text"
+                        value={backgroundUrl}
+                        onChange={(e) =>
+                          setDraft((previousDraft) => ({
+                            ...previousDraft,
+                            backgroundUrl: e.target.value || undefined,
+                          }))
+                        }
+                        className="w-full rounded border border-slate-700 bg-slate-950 p-2 text-white"
+                        placeholder="/battles/bg/..."
+                      />
+                    </label>
+                    <label className="block text-sm text-slate-300">
+                      <span className="mb-1 block font-bold">
+                        Background scale
+                      </span>
+                      <input
+                        type="number"
+                        min="1"
+                        max="3"
+                        step="0.1"
+                        value={backgroundScale}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value) || 1;
+                          setDraft((previousDraft) => {
+                            const nextScale = value > 1 ? value : undefined;
+                            const currentView = resolveTDInitialView(
+                              previousDraft.backgroundScale,
+                              previousDraft.initialView
+                            );
+                            return {
+                              ...previousDraft,
+                              backgroundScale: nextScale,
+                              initialView: previousDraft.initialView
+                                ? resolveTDInitialView(nextScale, currentView)
+                                : undefined,
+                            };
+                          });
+                        }}
+                        className="w-full rounded border border-slate-700 bg-slate-950 p-2 text-white"
+                      />
+                    </label>
+                  </div>
+                </section>
+
+                <section>
+                  <div className="mb-3">
+                    <h3 className="text-sm font-bold tracking-wide text-cyan-400 uppercase">
+                      Starting View
+                    </h3>
+                    <p className="mt-1 text-xs text-slate-500">
+                      Offsets use the available pannable area. Zoom matches the
+                      in-level +/− controls.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 rounded border border-slate-700 bg-slate-900 p-3">
+                    <label className="block text-sm text-slate-300">
+                      <span className="mb-1 block font-bold">X offset %</span>
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value={initialView.offsetX}
+                        onChange={(e) => {
+                          const offsetX = Number(e.target.value);
+                          setDraft((previousDraft) => ({
+                            ...previousDraft,
+                            initialView: {
+                              ...resolveTDInitialView(
+                                previousDraft.backgroundScale,
+                                previousDraft.initialView
+                              ),
+                              offsetX,
+                            },
+                          }));
+                        }}
+                        className="w-full rounded border border-slate-700 bg-slate-950 p-2 text-white"
+                      />
+                    </label>
+                    <label className="block text-sm text-slate-300">
+                      <span className="mb-1 block font-bold">Y offset %</span>
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value={initialView.offsetY}
+                        onChange={(e) => {
+                          const offsetY = Number(e.target.value);
+                          setDraft((previousDraft) => ({
+                            ...previousDraft,
+                            initialView: {
+                              ...resolveTDInitialView(
+                                previousDraft.backgroundScale,
+                                previousDraft.initialView
+                              ),
+                              offsetY,
+                            },
+                          }));
+                        }}
+                        className="w-full rounded border border-slate-700 bg-slate-950 p-2 text-white"
+                      />
+                    </label>
+                    <label className="col-span-2 block text-sm text-slate-300">
+                      <span className="mb-1 block font-bold">Zoom</span>
+                      <input
+                        type="number"
+                        min={1 / backgroundScale}
+                        max="1"
+                        step="0.1"
+                        value={initialView.zoom}
+                        onChange={(e) => {
+                          const zoom = Number(e.target.value);
+                          setDraft((previousDraft) => ({
+                            ...previousDraft,
+                            initialView: {
+                              ...resolveTDInitialView(
+                                previousDraft.backgroundScale,
+                                previousDraft.initialView
+                              ),
+                              zoom,
+                            },
+                          }));
+                        }}
+                        className="w-full rounded border border-slate-700 bg-slate-950 p-2 text-white"
+                      />
+                    </label>
+                  </div>
+                </section>
               </div>
             )}
 
-            {/* Capture Units Configs */}
-            {captureUnits.length > 0 && (
-              <div className="bg-slate-900 p-3 rounded border border-purple-800">
-                <h4 className="font-bold text-sm mb-2 text-purple-400">
-                  Capture Units Config
-                </h4>
-                {captureUnits.map((cu, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between mb-2 text-xs"
-                  >
-                    <span className="text-slate-300 w-16">Unit {idx}</span>
-                    <input
-                      type="text"
-                      className="flex-1 bg-slate-950 text-white rounded p-1 border border-slate-700"
-                      value={cu.tdConfigId}
-                      onChange={(e) => {
-                        setCaptureUnits((prev) => {
-                          const next = [...prev];
-                          next[idx] = {
-                            ...next[idx],
-                            tdConfigId: e.target.value,
-                          };
-                          return next;
-                        });
-                      }}
-                      placeholder="tdConfigId"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {waves.map((wave, wIdx) => (
-              <div
-                key={wave.id}
-                className="bg-slate-900 p-3 rounded border border-slate-700"
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <h4 className="font-bold text-white text-sm">
-                    Wave {wIdx + 1}
-                  </h4>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => addGroupToWave(wIdx)}
-                      className="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-white"
+            {activeSidebarTab === 'MAP' && (
+              <div className="space-y-6">
+                <section>
+                  <h3 className="mb-3 text-sm font-bold tracking-wide text-cyan-400 uppercase">
+                    Enemy Paths
+                  </h3>
+                  <div className="space-y-3 rounded border border-slate-700 bg-slate-900 p-3">
+                    <p className="text-xs text-slate-500">
+                      Drag anywhere on the canvas to pan beyond the map edges.
+                      Path points may be placed outside the 0–100 map bounds.
+                    </p>
+                    <select
+                      value={activePathIndex}
+                      onChange={(e) =>
+                        setActivePathIndex(Number(e.target.value))
+                      }
+                      className="w-full rounded border border-slate-700 bg-slate-950 p-2 text-sm text-white"
                     >
-                      + Group
-                    </button>
-                    <button
-                      onClick={() => deleteWave(wIdx)}
-                      className="text-xs bg-red-900 hover:bg-red-800 px-2 py-1 rounded text-white"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  {wave.groups.map((group, gIdx) => (
-                    <div
-                      key={gIdx}
-                      className="bg-slate-800 p-2 rounded relative border border-slate-600 text-xs"
-                    >
+                      {paths.map((_, index) => (
+                        <option key={index} value={index}>
+                          Path {index + 1}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="grid grid-cols-2 gap-2">
                       <button
-                        onClick={() => deleteGroup(wIdx, gIdx)}
-                        className="absolute top-1 right-1 text-red-500 hover:text-red-400 font-bold"
+                        onClick={() =>
+                          setDraft((previousDraft) => ({
+                            ...previousDraft,
+                            paths: [...previousDraft.paths, []],
+                          }))
+                        }
+                        className="rounded bg-cyan-700 px-3 py-2 text-sm font-bold text-white hover:bg-cyan-600"
                       >
-                        X
+                        New Path
                       </button>
+                      <button
+                        onClick={() => {
+                          if (paths.length > 1) {
+                            setDraft((previousDraft) => ({
+                              ...previousDraft,
+                              paths: previousDraft.paths.filter(
+                                (_, index) => index !== activePathIndex
+                              ),
+                            }));
+                            setActivePathIndex((previous) =>
+                              Math.max(0, previous - 1)
+                            );
+                          }
+                        }}
+                        disabled={paths.length <= 1}
+                        className="rounded bg-red-800 px-3 py-2 text-sm font-bold text-white hover:bg-red-700 disabled:bg-slate-700"
+                      >
+                        Delete Path
+                      </button>
+                    </div>
+                    <button
+                      onClick={addPathPoint}
+                      className="w-full rounded bg-red-700 px-3 py-2 text-sm font-bold text-white hover:bg-red-600"
+                    >
+                      Add Path Point
+                    </button>
+                  </div>
+                </section>
 
-                      <div className="grid grid-cols-2 gap-2 mt-2">
-                        <div>
-                          <label className="block text-slate-400 mb-1">
-                            Enemy Type
-                          </label>
-                          <select
-                            value={group.definitionId}
-                            onChange={(e) =>
-                              updateGroup(
-                                wIdx,
-                                gIdx,
-                                'definitionId',
-                                e.target.value
-                              )
-                            }
-                            className="w-full bg-slate-950 text-white rounded p-1 border border-slate-700"
-                          >
-                            {Object.keys(TD_CREATURE_DEFS).map((defId) => (
-                              <option key={defId} value={defId}>
-                                {defId}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-slate-400 mb-1">
-                            Count
-                          </label>
-                          <input
-                            type="number"
-                            min="1"
-                            value={group.count}
-                            onChange={(e) =>
-                              updateGroup(
-                                wIdx,
-                                gIdx,
-                                'count',
-                                parseInt(e.target.value) || 1
-                              )
-                            }
-                            className="w-full bg-slate-950 text-white rounded p-1 border border-slate-700"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-slate-400 mb-1">
-                            Interval (ms)
-                          </label>
-                          <input
-                            type="number"
-                            min="0"
-                            step="100"
-                            value={group.spawnIntervalMs}
-                            onChange={(e) =>
-                              updateGroup(
-                                wIdx,
-                                gIdx,
-                                'spawnIntervalMs',
-                                parseInt(e.target.value) || 0
-                              )
-                            }
-                            className="w-full bg-slate-950 text-white rounded p-1 border border-slate-700"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-slate-400 mb-1">
-                            Delay Before (ms)
-                          </label>
-                          <input
-                            type="number"
-                            min="0"
-                            step="100"
-                            value={group.delayBeforeGroupMs}
-                            onChange={(e) =>
-                              updateGroup(
-                                wIdx,
-                                gIdx,
-                                'delayBeforeGroupMs',
-                                parseInt(e.target.value) || 0
-                              )
-                            }
-                            className="w-full bg-slate-950 text-white rounded p-1 border border-slate-700"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-slate-400 mb-1">
-                            Path Index
-                          </label>
-                          <select
-                            value={group.pathIndex}
-                            onChange={(e) =>
-                              updateGroup(
-                                wIdx,
-                                gIdx,
-                                'pathIndex',
-                                parseInt(e.target.value)
-                              )
-                            }
-                            className="w-full bg-slate-950 text-white rounded p-1 border border-slate-700"
-                          >
-                            {paths.map((_, i) => (
-                              <option key={i} value={i}>
-                                Path {i}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className="col-span-2 flex flex-col gap-2 mt-2">
-                          <div className="flex items-center">
-                            <input
-                              type="checkbox"
-                              checked={!!group.turnAroundAtEnd}
-                              onChange={(e) =>
-                                updateGroup(
-                                  wIdx,
-                                  gIdx,
-                                  'turnAroundAtEnd',
-                                  e.target.checked
-                                )
-                              }
-                              className="mr-2 h-4 w-4 bg-slate-950 border-slate-700 rounded cursor-pointer"
-                            />
-                            <label className="text-slate-300">
-                              Turn Around at End
-                            </label>
-                          </div>
+                <section>
+                  <h3 className="mb-3 text-sm font-bold tracking-wide text-cyan-400 uppercase">
+                    Map Objects
+                  </h3>
+                  <div className="space-y-2 rounded border border-slate-700 bg-slate-900 p-3">
+                    <button
+                      onClick={addPlacementSpot}
+                      className="w-full rounded bg-orange-700 px-3 py-2 text-sm font-bold text-white hover:bg-orange-600"
+                    >
+                      Add Placement Spot
+                    </button>
+                    <button
+                      onClick={addCaptureUnit}
+                      className="w-full rounded bg-purple-700 px-3 py-2 text-sm font-bold text-white hover:bg-purple-600"
+                    >
+                      Add Capture Unit
+                    </button>
+                    <button
+                      onClick={() => setDeleteMode((previous) => !previous)}
+                      className={
+                        deleteMode
+                          ? 'w-full rounded border-2 border-red-500 bg-red-900 px-3 py-2 text-sm font-bold text-white'
+                          : 'w-full rounded border-2 border-transparent bg-slate-700 px-3 py-2 text-sm font-bold text-white hover:bg-slate-600'
+                      }
+                    >
+                      Delete Mode: {deleteMode ? 'On' : 'Off'}
+                    </button>
+                  </div>
+                </section>
 
-                          <div className="flex items-center">
-                            <input
-                              type="checkbox"
-                              checked={!!group.concurrentWithPrevious}
-                              onChange={(e) =>
-                                updateGroup(
-                                  wIdx,
-                                  gIdx,
-                                  'concurrentWithPrevious',
-                                  e.target.checked
-                                )
-                              }
-                              className="mr-2 h-4 w-4 bg-slate-950 border-slate-700 rounded cursor-pointer"
-                            />
-                            <label className="text-slate-300">
-                              Concurrent with Previous Group
-                            </label>
-                          </div>
+                {captureUnits.length > 0 && (
+                  <section>
+                    <h3 className="mb-3 text-sm font-bold tracking-wide text-purple-400 uppercase">
+                      Capture Units
+                    </h3>
+                    <div className="space-y-2 rounded border border-purple-800 bg-slate-900 p-3">
+                      {captureUnits.map((unit, index) => (
+                        <label
+                          key={index}
+                          className="block text-xs text-slate-300"
+                        >
+                          <span className="mb-1 block">Unit {index + 1}</span>
+                          <input
+                            type="text"
+                            className="w-full rounded border border-slate-700 bg-slate-950 p-2 text-white"
+                            value={unit.tdConfigId}
+                            onChange={(e) => {
+                              setDraft((previousDraft) => {
+                                const nextUnits = [
+                                  ...(previousDraft.captureUnits ?? []),
+                                ];
+                                nextUnits[index] = {
+                                  ...nextUnits[index],
+                                  tdConfigId: e.target.value,
+                                };
+                                return {
+                                  ...previousDraft,
+                                  captureUnits: nextUnits,
+                                };
+                              });
+                            }}
+                            placeholder="tdConfigId"
+                          />
+                        </label>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {environmentUnits.length > 0 && (
+                  <section>
+                    <h3 className="mb-3 text-sm font-bold tracking-wide text-yellow-400 uppercase">
+                      Environment Units
+                    </h3>
+                    <div className="space-y-2 rounded border border-yellow-800 bg-slate-900 p-3">
+                      {environmentUnits.map((unit, index) => (
+                        <div key={index} className="text-xs text-slate-400">
+                          E{index}: {unit.tdConfigId} @ [
+                          {unit.position.x.toFixed(1)},{' '}
+                          {unit.position.y.toFixed(1)}]
                         </div>
+                      ))}
+                      <p className="text-xs text-yellow-200/70">
+                        Drag the yellow E markers to move these units. Their
+                        gameplay sprites and facing directions are previewed on
+                        the map.
+                      </p>
+                    </div>
+                  </section>
+                )}
+              </div>
+            )}
+
+            {activeSidebarTab === 'WAVES' && (
+              <div>
+                <div className="mb-4 flex items-center justify-between">
+                  <h3 className="text-lg font-bold text-cyan-400">
+                    Waves ({waves.length})
+                  </h3>
+                  <button
+                    onClick={addWave}
+                    className="rounded bg-cyan-700 px-3 py-2 text-xs font-bold text-white hover:bg-cyan-600"
+                  >
+                    Add Wave
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  {waves.map((wave, wIdx) => (
+                    <div
+                      key={wave.id}
+                      className="rounded border border-slate-700 bg-slate-900 p-3"
+                    >
+                      <div className="mb-2 flex items-center justify-between">
+                        <h4 className="text-sm font-bold text-white">
+                          Wave {wIdx + 1}
+                        </h4>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => addGroupToWave(wIdx)}
+                            className="rounded bg-slate-700 px-2 py-1 text-xs text-white hover:bg-slate-600"
+                          >
+                            + Group
+                          </button>
+                          <button
+                            onClick={() => deleteWave(wIdx)}
+                            className="rounded bg-red-900 px-2 py-1 text-xs text-white hover:bg-red-800"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        {wave.groups.map((group, gIdx) => (
+                          <div
+                            key={gIdx}
+                            className="relative rounded border border-slate-600 bg-slate-800 p-2 text-xs"
+                          >
+                            <button
+                              onClick={() => deleteGroup(wIdx, gIdx)}
+                              className="absolute top-1 right-1 font-bold text-red-500 hover:text-red-400"
+                            >
+                              X
+                            </button>
+
+                            <div className="mt-2 grid grid-cols-2 gap-2">
+                              <div>
+                                <label className="mb-1 block text-slate-400">
+                                  Enemy Type
+                                </label>
+                                <select
+                                  value={group.definitionId}
+                                  onChange={(e) =>
+                                    updateGroup(
+                                      wIdx,
+                                      gIdx,
+                                      'definitionId',
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full rounded border border-slate-700 bg-slate-950 p-1 text-white"
+                                >
+                                  {Object.keys(TD_CREATURE_DEFS).map(
+                                    (defId) => (
+                                      <option key={defId} value={defId}>
+                                        {defId}
+                                      </option>
+                                    )
+                                  )}
+                                </select>
+                              </div>
+                              <div>
+                                <label className="mb-1 block text-slate-400">
+                                  Count
+                                </label>
+                                <input
+                                  type="number"
+                                  min="1"
+                                  value={group.count}
+                                  onChange={(e) =>
+                                    updateGroup(
+                                      wIdx,
+                                      gIdx,
+                                      'count',
+                                      parseInt(e.target.value) || 1
+                                    )
+                                  }
+                                  className="w-full rounded border border-slate-700 bg-slate-950 p-1 text-white"
+                                />
+                              </div>
+                              <div>
+                                <label className="mb-1 block text-slate-400">
+                                  Interval (ms)
+                                </label>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  step="100"
+                                  value={group.spawnIntervalMs}
+                                  onChange={(e) =>
+                                    updateGroup(
+                                      wIdx,
+                                      gIdx,
+                                      'spawnIntervalMs',
+                                      parseInt(e.target.value) || 0
+                                    )
+                                  }
+                                  className="w-full rounded border border-slate-700 bg-slate-950 p-1 text-white"
+                                />
+                              </div>
+                              <div>
+                                <label className="mb-1 block text-slate-400">
+                                  Delay Before (ms)
+                                </label>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  step="100"
+                                  value={group.delayBeforeGroupMs}
+                                  onChange={(e) =>
+                                    updateGroup(
+                                      wIdx,
+                                      gIdx,
+                                      'delayBeforeGroupMs',
+                                      parseInt(e.target.value) || 0
+                                    )
+                                  }
+                                  className="w-full rounded border border-slate-700 bg-slate-950 p-1 text-white"
+                                />
+                              </div>
+                              <div>
+                                <label className="mb-1 block text-slate-400">
+                                  Path Index
+                                </label>
+                                <select
+                                  value={group.pathIndex}
+                                  onChange={(e) =>
+                                    updateGroup(
+                                      wIdx,
+                                      gIdx,
+                                      'pathIndex',
+                                      parseInt(e.target.value)
+                                    )
+                                  }
+                                  className="w-full rounded border border-slate-700 bg-slate-950 p-1 text-white"
+                                >
+                                  {paths.map((_, i) => (
+                                    <option key={i} value={i}>
+                                      Path {i}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div className="col-span-2 mt-2 flex flex-col gap-2">
+                                <div className="flex items-center">
+                                  <input
+                                    type="checkbox"
+                                    checked={!!group.turnAroundAtEnd}
+                                    onChange={(e) =>
+                                      updateGroup(
+                                        wIdx,
+                                        gIdx,
+                                        'turnAroundAtEnd',
+                                        e.target.checked
+                                      )
+                                    }
+                                    className="mr-2 h-4 w-4 cursor-pointer rounded border-slate-700 bg-slate-950"
+                                  />
+                                  <label className="text-slate-300">
+                                    Turn Around at End
+                                  </label>
+                                </div>
+
+                                <div className="flex items-center">
+                                  <input
+                                    type="checkbox"
+                                    checked={!!group.concurrentWithPrevious}
+                                    onChange={(e) =>
+                                      updateGroup(
+                                        wIdx,
+                                        gIdx,
+                                        'concurrentWithPrevious',
+                                        e.target.checked
+                                      )
+                                    }
+                                    className="mr-2 h-4 w-4 cursor-pointer rounded border-slate-700 bg-slate-950"
+                                  />
+                                  <label className="text-slate-300">
+                                    Concurrent with Previous Group
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                        {wave.groups.length === 0 && (
+                          <p className="py-2 text-center text-xs text-slate-500 italic">
+                            No enemy groups in this wave yet.
+                          </p>
+                        )}
                       </div>
                     </div>
                   ))}
-                  {wave.groups.length === 0 && (
-                    <p className="text-slate-500 text-xs italic text-center py-2">
-                      No enemy groups in this wave yet.
+
+                  {waves.length === 0 && (
+                    <p className="py-8 text-center text-sm text-slate-500 italic">
+                      No waves defined. Enemies will not spawn using the new
+                      wave system.
                     </p>
                   )}
                 </div>
               </div>
-            ))}
-
-            {waves.length === 0 && (
-              <p className="text-slate-500 text-sm italic text-center py-8">
-                No waves defined. Enemies will not spawn using the new wave
-                system.
-              </p>
             )}
           </div>
-        </div>
+        </aside>
       </div>
     </div>
   );

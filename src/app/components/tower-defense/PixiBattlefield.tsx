@@ -13,88 +13,10 @@ import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { ElementType } from '@/types/baseGame';
 import { TD_BASE_HEIGHT } from '@/constants/game';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
-import { BaseTDUnit } from '@/engine/tower-defense/types';
+import { BaseTDUnit, TDInitialView } from '@/engine/tower-defense/types';
 import { interpolateKeyframes } from '@/utils/animationUtils';
-
-export function applyTDUnitTransforms(
-  unit: BaseTDUnit,
-  sprite: PIXI.Sprite,
-  shadow: PIXI.Graphics,
-  configId: string,
-  fallbackUrl?: string,
-  onImageLoaded?: (texture: PIXI.Texture) => void
-) {
-  const tdConfigMap = CREATURE_TD_CONFIGS[configId] || {
-    default: { scale: 1 },
-  };
-  const tdConfig = tdConfigMap[unit.facingDirection] || tdConfigMap.default;
-
-  const bScale = tdConfig.scale ?? 1;
-  const flipX = tdConfig.flipX ?? false;
-  sprite.scale.x = flipX ? -bScale : bScale;
-  sprite.scale.y = tdConfig.flipY ? -bScale : bScale;
-
-  const sOffsetX = tdConfig.offsetX ?? 0;
-  const sOffsetY = tdConfig.offsetY ?? 0;
-  sprite.x = sOffsetX;
-  sprite.y = sOffsetY;
-
-  const spriteUrl = tdConfig.url || fallbackUrl;
-  if (spriteUrl && (sprite as any).currentUrl !== spriteUrl) {
-    (sprite as any).currentUrl = spriteUrl;
-    PIXI.Assets.load(spriteUrl).then((t) => {
-      if (onImageLoaded) onImageLoaded(t);
-    });
-  }
-
-  const shadowScaleX = tdConfig.shadowScaleX ?? 1;
-  const shadowScaleY = tdConfig.shadowScaleY ?? 1;
-  const shadowOffsetX = tdConfig.shadowOffsetX ?? 0;
-  const shadowOffsetY = tdConfig.shadowOffsetY ?? 0;
-
-  shadow.clear();
-  shadow.ellipse(
-    0 + shadowOffsetX,
-    30 * bScale + shadowOffsetY,
-    25 * shadowScaleX,
-    12 * shadowScaleY
-  );
-  shadow.fill({ color: 0x000000, alpha: 0.4 });
-  shadow.scale.x = flipX ? -1 : 1;
-
-  if ((unit.damageFlashTimerMs || 0) > 0) {
-    sprite.tint = 0xffffff;
-
-    // Copy existing filters or start fresh
-    const currentFilters = Array.isArray(sprite.filters)
-      ? [...sprite.filters]
-      : sprite.filters
-        ? [sprite.filters]
-        : [];
-
-    let flashFilter = currentFilters.find(
-      (f: any) => f.__isDamageFlash
-    ) as PIXI.ColorMatrixFilter;
-    if (!flashFilter) {
-      flashFilter = new PIXI.ColorMatrixFilter();
-      (flashFilter as any).__isDamageFlash = true;
-      currentFilters.push(flashFilter);
-      sprite.filters = currentFilters; // Re-assign instead of mutating
-    }
-    flashFilter.matrix = [
-      0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0,
-    ];
-  } else {
-    sprite.tint = 0xffffff;
-    if (sprite.filters) {
-      const currentFilters = Array.isArray(sprite.filters)
-        ? [...sprite.filters]
-        : [sprite.filters];
-      const newFilters = currentFilters.filter((f: any) => !f.__isDamageFlash);
-      sprite.filters = newFilters.length > 0 ? newFilters : [];
-    }
-  }
-}
+import { resolveTDInitialView } from '@/utils/tdInitialView';
+import { applyTDUnitTransforms } from '@/utils/tdUnitVisuals';
 
 export const WEAKENED_THRESHOLD = 0.9;
 
@@ -163,8 +85,14 @@ function drawStar(g: PIXI.Graphics, size: number) {
   g.fill({ color: randomColor });
 }
 
-function updateSparkles(container: PIXI.Container, unit: BaseTDUnit, delta: number) {
-  let sparkleContainer = container.getChildByLabel('sparkles') as PIXI.Container | undefined;
+function updateSparkles(
+  container: PIXI.Container,
+  unit: BaseTDUnit,
+  delta: number
+) {
+  let sparkleContainer = container.getChildByLabel('sparkles') as
+    | PIXI.Container
+    | undefined;
   if (unit.isShiny) {
     if (!sparkleContainer) {
       sparkleContainer = new PIXI.Container();
@@ -412,6 +340,7 @@ interface PixiBattlefieldProps {
   getDragState?: () => 'tower' | 'capture' | false;
   backgroundUrl?: string;
   backgroundScale?: number;
+  initialView?: TDInitialView;
 }
 
 export interface PixiBattlefieldRef {
@@ -440,6 +369,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
       getDragState,
       backgroundUrl,
       backgroundScale = 1,
+      initialView,
     },
     ref
   ) => {
@@ -466,7 +396,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
       scrollX: number;
       scrollY: number;
     } | null>(null);
-    const zoomRef = useRef(1); // 1 = normal (max zoom in), < 1 = zoomed out
+    const zoomRef = useRef(
+      resolveTDInitialView(backgroundScale, initialView).zoom
+    ); // Same value changed by the in-game +/- controls.
 
     useImperativeHandle(ref, () => ({
       handleExternalMove: (clientX, clientY, type) => {
@@ -512,7 +444,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             if (distSq <= CAPTURE_DIST_SQ && distSq < minSqDist) {
               minSqDist = distSq;
               targetedEnemyId = enemy.id;
-              isWeakened = enemy.isShiny || enemy.hp / enemy.maxHp <= WEAKENED_THRESHOLD;
+              isWeakened =
+                enemy.isShiny || enemy.hp / enemy.maxHp <= WEAKENED_THRESHOLD;
             }
           });
 
@@ -603,6 +536,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         // Add background
         const bgUrl = backgroundUrl || '/battles/bg/bg_dock_battle_td.png';
         const scale = backgroundScale > 1 ? backgroundScale : 1;
+        const resolvedInitialView = resolveTDInitialView(scale, initialView);
+        zoomRef.current = resolvedInitialView.zoom;
         await PIXI.Assets.load(bgUrl);
         if (isDestroyed) return;
 
@@ -612,6 +547,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         // Full (unscrolled) background dimensions — used to derive scroll limits
         let fullBgHeight = 0;
         let fullBgWidth = 0;
+        let displayBgHeight = 0;
+        let displayBgWidth = 0;
+        let shouldApplyInitialView = true;
 
         // Handle resize + zoom — called each tick to pick up zoom changes
         const updateBgLayout = () => {
@@ -628,17 +566,29 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             // Display dimensions = world dims * zoom
             const displayH = fullBgHeight * zoom;
             const displayW = fullBgWidth * zoom;
+            displayBgHeight = displayH;
+            displayBgWidth = displayW;
             bgSprite.height = displayH;
             bgSprite.width = displayW;
 
             // Clamp scroll (in pixel space)
             const maxScrollY = Math.max(0, displayH - app.screen.height);
             const maxScrollX = Math.max(0, displayW - app.screen.width);
-            scrollRef.current.y = Math.min(scrollRef.current.y, maxScrollY);
-            scrollRef.current.x = Math.min(scrollRef.current.x, maxScrollX);
-            bgSprite.x =
-              (app.screen.width - displayW) / 2 - scrollRef.current.x;
-            bgSprite.y = -scrollRef.current.y;
+            if (shouldApplyInitialView) {
+              scrollRef.current = {
+                x: maxScrollX * (resolvedInitialView.offsetX / 100),
+                y: maxScrollY * (resolvedInitialView.offsetY / 100),
+              };
+              shouldApplyInitialView = false;
+            } else {
+              scrollRef.current.y = Math.min(scrollRef.current.y, maxScrollY);
+              scrollRef.current.x = Math.min(scrollRef.current.x, maxScrollX);
+            }
+
+            const centeredX = Math.max(0, (app.screen.width - displayW) / 2);
+            const centeredY = Math.max(0, (app.screen.height - displayH) / 2);
+            bgSprite.x = centeredX - scrollRef.current.x;
+            bgSprite.y = centeredY - scrollRef.current.y;
 
             bgBounds = {
               x: bgSprite.x,
@@ -743,8 +693,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           ) {
             const dx = scrollDragStartRef.current.x - e.global.x;
             const dy = scrollDragStartRef.current.y - e.global.y;
-            const maxScrollY = Math.max(0, fullBgHeight - app.screen.height);
-            const maxScrollX = Math.max(0, fullBgWidth - app.screen.width);
+            const maxScrollY = Math.max(0, displayBgHeight - app.screen.height);
+            const maxScrollX = Math.max(0, displayBgWidth - app.screen.width);
             scrollRef.current.y = Math.max(
               0,
               Math.min(maxScrollY, scrollDragStartRef.current.scrollY + dy)
@@ -753,9 +703,16 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               0,
               Math.min(maxScrollX, scrollDragStartRef.current.scrollX + dx)
             );
-            bgSprite.x =
-              (app.screen.width - bgSprite.width) / 2 - scrollRef.current.x;
-            bgSprite.y = -scrollRef.current.y;
+            const centeredX = Math.max(
+              0,
+              (app.screen.width - displayBgWidth) / 2
+            );
+            const centeredY = Math.max(
+              0,
+              (app.screen.height - displayBgHeight) / 2
+            );
+            bgSprite.x = centeredX - scrollRef.current.x;
+            bgSprite.y = centeredY - scrollRef.current.y;
             bgBounds = {
               x: bgSprite.x,
               y: bgSprite.y,
@@ -1125,7 +1082,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 if (distSq <= CAPTURE_DIST_SQ && distSq < minSqDist) {
                   minSqDist = distSq;
                   targetedEnemyId = enemy.id;
-                  isWeakened = enemy.isShiny || enemy.hp / enemy.maxHp <= WEAKENED_THRESHOLD;
+                  isWeakened =
+                    enemy.isShiny ||
+                    enemy.hp / enemy.maxHp <= WEAKENED_THRESHOLD;
                 }
               });
 
@@ -1478,17 +1437,23 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
             if (animConfig && animConfig.type === 'KEYFRAME_SPRITES') {
               animConfig.layers?.forEach((layer, layerIdx) => {
-                const sprite = container.getChildByLabel(`vfx_layer_${layerIdx}`) as
-                  | PIXI.Sprite
-                  | undefined;
+                const sprite = container.getChildByLabel(
+                  `vfx_layer_${layerIdx}`
+                ) as PIXI.Sprite | undefined;
                 if (sprite) {
                   const baseScale = tdConfig.scale ?? 0.3;
                   const ox = tdConfig.offsetX ?? 0;
                   const oy = tdConfig.offsetY ?? 0;
 
-                  const values = interpolateKeyframes(layer.keyframes, progress);
+                  const values = interpolateKeyframes(
+                    layer.keyframes,
+                    progress
+                  );
 
-                  sprite.scale.set(baseScale * values.scaleX, baseScale * values.scaleY);
+                  sprite.scale.set(
+                    baseScale * values.scaleX,
+                    baseScale * values.scaleY
+                  );
                   sprite.x = ox + values.x;
                   sprite.y = oy + values.y;
                   sprite.rotation = (values.rotation * Math.PI) / 180;
@@ -1564,7 +1529,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                   }
                 } else {
                   // Default fallback if no config
-                  container.alpha = progress > 0.8 ? 1 - (progress - 0.8) * 5 : 1;
+                  container.alpha =
+                    progress > 0.8 ? 1 - (progress - 0.8) * 5 : 1;
                   if (mask) {
                     const size = 500;
                     mask.clear();
@@ -1630,23 +1596,23 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           app.destroy(true, { children: true });
         }
       };
-    }, [engine]);
+    }, [engine, backgroundScale, backgroundUrl, initialView]);
 
     return (
-      <div className="flex-1 relative overflow-hidden">
+      <div className="relative flex-1 overflow-hidden">
         <div ref={containerRef} className="absolute inset-0" />
         <div
           ref={fpsRef}
-          className="absolute top-2 left-2 bg-black/60 text-green-400 font-mono font-bold px-2 py-1 text-sm rounded shadow select-none pointer-events-none z-10"
+          className="pointer-events-none absolute top-2 left-2 z-10 rounded bg-black/60 px-2 py-1 font-mono text-sm font-bold text-green-400 shadow select-none"
         >
           FPS: 0
         </div>
 
         {/* Zoom Controls */}
         {backgroundScale > 1 && (
-          <div className="absolute bottom-3 right-3 flex flex-col gap-1 z-10">
+          <div className="absolute right-3 bottom-3 z-10 flex flex-col gap-1">
             <button
-              className="w-9 h-9 bg-black/60 hover:bg-black/80 text-white rounded-lg font-bold text-lg select-none cursor-pointer flex items-center justify-center transition-colors"
+              className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg bg-black/60 text-lg font-bold text-white transition-colors select-none hover:bg-black/80"
               onClick={() => {
                 zoomRef.current = Math.min(1, zoomRef.current + 0.1);
               }}
@@ -1654,7 +1620,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               +
             </button>
             <button
-              className="w-9 h-9 bg-black/60 hover:bg-black/80 text-white rounded-lg font-bold text-lg select-none cursor-pointer flex items-center justify-center transition-colors"
+              className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg bg-black/60 text-lg font-bold text-white transition-colors select-none hover:bg-black/80"
               onClick={() => {
                 const minZoom = 1 / backgroundScale;
                 zoomRef.current = Math.max(minZoom, zoomRef.current - 0.1);

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
-import { TDLevelData } from '@/engine/tower-defense/types';
+import { getTDLevelSaveTarget } from '@/constants/tdLevelSaveTargets';
 
 export async function POST(req: NextRequest) {
   try {
-    const { fileName, levelName, config } = await req.json();
+    const { fileName, levelName, levelContext, config } = await req.json();
 
     if (!levelName || !config) {
       return NextResponse.json(
@@ -22,9 +22,31 @@ export async function POST(req: NextRequest) {
       'tdLevels.ts'
     );
 
-    let targetFileName = fileName;
+    const registeredTarget = levelContext
+      ? getTDLevelSaveTarget(levelContext)
+      : undefined;
 
-    if (!targetFileName || targetFileName === levelName) {
+    if (levelContext && !registeredTarget) {
+      return NextResponse.json(
+        { error: `Unknown level context: ${levelContext}` },
+        { status: 400 }
+      );
+    }
+
+    const targetExportName = registeredTarget?.exportName ?? levelName;
+    let targetFileName = registeredTarget?.fileName ?? fileName;
+
+    if (!/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(targetExportName)) {
+      return NextResponse.json(
+        { error: 'Level name must be a valid TypeScript identifier.' },
+        { status: 400 }
+      );
+    }
+
+    if (
+      !registeredTarget &&
+      (!targetFileName || targetFileName === levelName)
+    ) {
       try {
         const files = await fs.readdir(levelsDir);
         for (const file of files) {
@@ -32,8 +54,8 @@ export async function POST(req: NextRequest) {
           const content = await fs.readFile(filePath, 'utf-8');
 
           if (
-            content.includes(`export const ${levelName}:`) ||
-            content.includes(`export const ${levelName} =`)
+            content.includes(`export const ${targetExportName}:`) ||
+            content.includes(`export const ${targetExportName} =`)
           ) {
             targetFileName = file.replace(/\.ts$/, '');
             break;
@@ -45,7 +67,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!targetFileName) {
-      targetFileName = levelName; // Fallback to using the exported variable name as filename
+      targetFileName = targetExportName; // Fallback to using the exported variable name as filename
     }
 
     if (!targetFileName) {
@@ -61,26 +83,26 @@ export async function POST(req: NextRequest) {
 
     // Format JSON
     const jsonString = JSON.stringify(config, null, 2);
-    const newExportStr = `export const ${levelName}: TDLevelData = ${jsonString};`;
+    const newExportStr = `export const ${targetExportName}: TDLevelData = ${jsonString};`;
 
     let fileContent = '';
 
     try {
       fileContent = await fs.readFile(filePath, 'utf-8');
 
-      const exportStartMarker = `export const ${levelName}`;
+      const exportStartMarker = `export const ${targetExportName}`;
 
       if (fileContent.includes(exportStartMarker)) {
         // Find existing export and replace
         const looseRegex = new RegExp(
-          `export const ${levelName}[\\s\\S]*?(?=(export const|$))`
+          `export const ${targetExportName}[\\s\\S]*?(?=(export const|$))`
         );
         fileContent = fileContent.replace(looseRegex, newExportStr + '\n\n');
       } else {
         // Append
         fileContent += `\n\n${newExportStr}`;
       }
-    } catch (e) {
+    } catch {
       // File doesn't exist, create fresh
       fileContent = `import { TDLevelData } from "@/engine/tower-defense/types";\n\n${newExportStr}\n`;
     }
@@ -88,21 +110,24 @@ export async function POST(req: NextRequest) {
     // Write back to file
     await fs.writeFile(filePath, fileContent, 'utf-8');
 
-    // Ensure the index file exports this
-    try {
-      const indexContent = await fs.readFile(indexPath, 'utf-8');
-      const exportStatement = `export * from './tdLevels/${sanitizedFileName}';`;
+    // Existing levels are already reachable through TD_LEVELS. New standalone
+    // levels still need a barrel export so they can be registered afterward.
+    if (!registeredTarget) {
+      try {
+        const indexContent = await fs.readFile(indexPath, 'utf-8');
+        const exportStatement = `export * from './tdLevels/${sanitizedFileName}';`;
 
-      if (!indexContent.includes(exportStatement)) {
-        await fs.appendFile(indexPath, `\n${exportStatement}`);
+        if (!indexContent.includes(exportStatement)) {
+          await fs.appendFile(indexPath, `\n${exportStatement}`);
+        }
+      } catch {
+        // create index if not exist
+        await fs.writeFile(
+          indexPath,
+          `export * from './tdLevels/${sanitizedFileName}';\n`,
+          'utf-8'
+        );
       }
-    } catch (e) {
-      // create index if not exist
-      await fs.writeFile(
-        indexPath,
-        `export * from './tdLevels/${sanitizedFileName}';\n`,
-        'utf-8'
-      );
     }
 
     return NextResponse.json({ success: true, path: filePath });

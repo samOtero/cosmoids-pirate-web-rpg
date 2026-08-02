@@ -4,47 +4,47 @@ export const FOREST_LEVEL: TDLevelData = {
   paths: [
     [
       {
-        x: 100,
-        y: 50,
+        x: 102.24,
+        y: 21.21,
       },
       {
-        x: 60,
-        y: 50,
+        x: 60.1,
+        y: 21.21,
       },
       {
         x: 60,
         y: 80,
       },
       {
-        x: 0,
-        y: 80,
+        x: 27.33,
+        y: 79.74,
       },
     ],
   ],
   placementSpots: [
     {
-      x: 80,
-      y: 38,
+      x: 78.7,
+      y: 12.48,
     },
     {
-      x: 80,
-      y: 62,
+      x: 67.56,
+      y: 33.07,
     },
     {
-      x: 60,
-      y: 38,
+      x: 49.48,
+      y: 33.21,
     },
     {
-      x: 45,
-      y: 68,
+      x: 52.12,
+      y: 67.3,
     },
     {
-      x: 45,
-      y: 90,
+      x: 67.12,
+      y: 67.3,
     },
     {
-      x: 25,
-      y: 68,
+      x: 67.21,
+      y: 48.58,
     },
   ],
   environmentUnits: [
@@ -57,16 +57,16 @@ export const FOREST_LEVEL: TDLevelData = {
     },
     {
       position: {
-        x: 43,
-        y: 65,
+        x: 51.5,
+        y: 24.51,
       },
       tdConfigId: 'caleb_battle',
       facingDirection: 'right',
     },
     {
       position: {
-        x: 55,
-        y: 65,
+        x: 44.96,
+        y: 58.51,
       },
       tdConfigId: 'kip_battle',
       facingDirection: 'right',
@@ -75,15 +75,15 @@ export const FOREST_LEVEL: TDLevelData = {
   captureUnits: [
     {
       position: {
-        x: 34.16,
-        y: 77.14,
+        x: 33.48,
+        y: 78,
       },
       tdConfigId: 'food_supplies',
     },
     {
       position: {
-        x: 36.25,
-        y: 77.53,
+        x: 35.56,
+        y: 81.68,
       },
       tdConfigId: 'food_supplies',
     },
@@ -110,15 +110,15 @@ export const FOREST_LEVEL: TDLevelData = {
     },
     {
       position: {
-        x: 33.79,
-        y: 80.49,
+        x: 33.14,
+        y: 81.27,
       },
       tdConfigId: 'food_supplies',
     },
     {
       position: {
-        x: 35.75,
-        y: 80.69,
+        x: 35.96,
+        y: 78.13,
       },
       tdConfigId: 'food_supplies',
     },
@@ -230,4 +230,10 @@ export const FOREST_LEVEL: TDLevelData = {
   lives: 10,
   backgroundUrl: '/battles/bg/bg_coastal_island_battle.png',
   backgroundScale: 2,
+  initialView: {
+    offsetX: 50,
+    offsetY: 0,
+    zoom: 0.9,
+  },
 };
+

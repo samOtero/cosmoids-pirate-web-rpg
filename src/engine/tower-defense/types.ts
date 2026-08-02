@@ -21,6 +21,15 @@ export interface Point {
   y: number;
 }
 
+export interface TDInitialView {
+  /** Horizontal position within the pannable overflow: 0 = left, 100 = right. */
+  offsetX: number;
+  /** Vertical position within the pannable overflow: 0 = top, 100 = bottom. */
+  offsetY: number;
+  /** Battlefield zoom-button value: 1 = maximum, minimum = 1 / backgroundScale. */
+  zoom: number;
+}
+
 export interface TDWaveGroup {
   definitionId: string; // The enemy ID to spawn
   count: number; // How many to spawn
@@ -94,6 +103,7 @@ export interface TDLevelData {
   disableCapture?: boolean;
   backgroundUrl?: string;
   backgroundScale?: number; // If > 1, background is taller than viewport and can be scrolled
+  initialView?: TDInitialView;
   environmentUnits?: {
     tdConfigId: string;
     position: Point;

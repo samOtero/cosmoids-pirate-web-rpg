@@ -544,6 +544,7 @@ export default function TowerDefenseScreen({
         engine={engineRef.current}
         backgroundUrl={levelData.backgroundUrl}
         backgroundScale={levelData.backgroundScale}
+        initialView={levelData.initialView}
         onMapDrop={handleMapDrop}
         onMapRemove={handleMapRemove}
         onEnemyCaptured={handleEnemyCaptured}
