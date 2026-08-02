@@ -1,4 +1,4 @@
 interface:
   display_name: "Design Cosmoid Concepts"
   short_description: "Design ten researched anime-style Cosmoids"
-  default_prompt: "Use $design-cosmoid-concepts to synthesize real-world facts into ten creature-first Cosmoids with signature hooks, then render them as vintage ink-and-watercolor anime monster-design concept art."
+  default_prompt: "Use $design-cosmoid-concepts to synthesize real-world facts into ten creature-first Cosmoids with signature hooks, then render them as polished 2D creature-collection RPG character art with clean outlines and softly blended cel shading."

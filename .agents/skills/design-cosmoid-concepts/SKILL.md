@@ -1,6 +1,6 @@
 ---
 name: design-cosmoid-concepts
-description: Generate batches of ten original, creature-first Cosmoid concepts by synthesizing multiple researched facts into a cohesive theme and a distinctive signature hook, from a required single or dual typing and a short seed containing any mix of animal, organism, object, material, theme, habitat, mood, behavior, or story. Use when the user asks to brainstorm, design, explore, or visualize new Cosmoid concepts, then automatically render all ten as vintage ink-and-watercolor anime monster-design concept art, preserve the numbered batch, and generate separate full-body concept art for explicitly selected results. Do not use when the user already has a concept image and wants it integrated into the game; use add-cosmoid for that.
+description: Generate batches of ten original, creature-first Cosmoid concepts by synthesizing multiple researched facts into a cohesive theme and a distinctive signature hook, from a required single or dual typing and a short seed containing any mix of animal, organism, object, material, theme, habitat, mood, behavior, or story. Use when the user asks to brainstorm, design, explore, or visualize new Cosmoid concepts, then automatically render all ten as polished 2D creature-collection RPG character art, preserve the numbered batch, and generate full-body concept art for explicitly selected results. Do not use when the user already has a concept image and wants it integrated into the game; use add-cosmoid for that.
 ---
 
 # Design Cosmoid Concepts
@@ -136,9 +136,9 @@ Preserve unchanged numbers and identity across follow-ups. If numbering could re
 
 After a `Revise` or `Replace` request changes any concept's visible design, automatically render a refreshed ten-creature ensemble at the end. Do not regenerate it for an `Explore` request unless the user chooses a variation or explicitly asks for an image.
 
-## Render vintage anime monster-design concept art
+## Render polished creature-collection RPG character art
 
-Render ensemble sheets and selected concept previews as original anime monster designs with a vintage hand-inked, watercolor concept-art finish. This direction applies to concept exploration only. After the user approves a concept and asks to add it to the game, the `add-cosmoid` workflow remains responsible for converting it into the project's smooth painted battle-asset style.
+Render ensemble sheets and selected concept previews as original polished 2D creature-collection RPG character art with anime-influenced mascot design, clean cartoon linework, simplified animal anatomy, expressive features, and softly blended cel shading. This direction applies to concept exploration only. After the user approves a concept and asks to add it to the game, the `add-cosmoid` workflow remains responsible for converting it into directional battle assets.
 
 Before generating, optionally inspect these three Fueguana v3 sprites with `view_image` only to calibrate silhouette clarity and facial readability at game scale:
 
@@ -148,34 +148,35 @@ public/battles/cosmoids/fueguana_up_1_v3.png
 public/battles/cosmoids/fueguana_down_1_v3.png
 ```
 
-Do not pass the Fueguana files to the image generator as style references during concept generation. Their smooth digital painted-cel finish conflicts with this workflow's ink-and-watercolor concept-art direction. Do not copy Fueguana's anatomy, markings, flame tail, orange palette, proportions, line treatment, or shading.
+Do not pass the Fueguana files or other existing creature art to the image generator as style references during concept generation. Use the written art direction below without copying an existing creature's anatomy, markings, palette, proportions, or signature features.
 
 Apply this style consistently:
 
-- clearly read as an original anime monster design rather than wildlife illustration, a generic western cartoon mascot, or a realistic animal;
+- clearly read as an original, family-friendly creature-collection RPG design rather than wildlife illustration, a generic western cartoon mascot, or a realistic animal;
 - ground the design in believable creature anatomy, then exaggerate one dominant biological hook and two to four supporting traits;
-- use compact but not chibi proportions: reduce oversized heads and keep expressive eyes moderate in size, structurally integrated into the face, and free of glossy doll-like highlights;
+- use simplified rounded proportions with selective exaggeration, avoiding extreme baby-like chibi anatomy; keep expressive eyes structurally integrated into the face;
 - use lively asymmetrical three-quarter poses that reveal anatomy, locomotion, and the signature hook; avoid rigid front views, perfect bilateral posing, and repeated stance templates;
-- use fine expressive brown-black ink contours with natural line-weight variation, slight hand-drawn irregularity, occasional open edges, and restrained interior construction lines;
-- use translucent watercolor or watercolor-gouache washes, a restrained two- or three-hue palette plus one small accent, visible unpainted paper highlights, subtle pigment pooling, and minimal single-wash shadows;
-- use warm off-white paper with very faint natural paper grain as the background; do not add scenery, floor planes, cast shadows, or decorative frames;
-- keep the facial focal point and full silhouette readable when reduced to battle-sprite size even though the concept illustration itself is looser and more organic;
+- use smooth, clean, antialiased dark-charcoal outlines with controlled line-weight variation and restrained interior detail;
+- use rich flat base colors, controlled two-to-three-tone cel shading, softly blended shadow transitions, and restrained painted highlights; make surfaces feel smooth and tactile without becoming photorealistic;
+- use moderate-to-high saturation, one cohesive dominant palette with a contrasting accent, and strong value separation so color regions remain readable at game-sprite size;
+- use a clean white, off-white, or transparent background according to the requested output; do not add scenery, floor planes, cast shadows, or decorative frames;
+- keep the facial focal point and full silhouette readable when reduced to battle-sprite size;
 - simplify mechanical-looking biology: avoid evenly spaced nodes, exposed hinge systems, perfect manufactured geometry, or anatomy that reads as held equipment;
 - preserve species individuality through body plan, posture, proportions, and shape rhythm rather than relying on surface markings or elemental effects.
 
-Reject glossy modern mascot rendering, thick sticker-like outlines, smooth vector curves, plastic highlights, airbrushed gradients, polished digital cel shading, uniform saturated palettes, exaggerated baby proportions, and symmetrical character-sheet posing. Also reject photorealism, individual fur strands, pores, dense wrinkles, visible veins, photographic eyes, detailed musculature, cinematic lighting, and recognizable franchise character features.
+Reject pixel art, pixelated edges, dithering, jagged outlines, photorealism, realistic wildlife painting, 3D rendering, plastic toy surfaces, heavy painterly brushwork, watercolor washes, rough sketches, thin unfinished linework, flat vector clip art, excessive gradients, extreme chibi proportions, generic plush-mascot anatomy, overly human anatomy, cluttered costumes, arbitrary accessories, excessive surface detail, muddy colors, dramatic environmental lighting, complex backgrounds, text, labels, logos, watermarks, cropped anatomy, and recognizable franchise character features.
 
-Do not name or request the exact style of a living artist or an existing franchise in image prompts. Use the descriptive phrase `original vintage ink-and-watercolor anime monster-design concept art` and the concrete visual characteristics above.
+Do not name or request the exact style of a living artist or an existing franchise in image prompts. Use the descriptive phrase `original polished 2D creature-collection RPG character art with anime-influenced mascot design and softly blended cel shading` and the concrete visual characteristics above. Keep creature count and composition instructions separate from this reusable style direction so it works for both solo and group images.
 
 ## Generate the automatic ensemble sheet
 
 After presenting the ten textual concepts, use the installed `imagegen` skill and announce that use before generating. Do not ask for approval; requesting a concept batch authorizes this required ensemble preview.
 
-Generate one landscape image containing exactly the ten concepts in a clean two-row grid of five. Arrange concepts 1 through 5 from left to right on the top row and 6 through 10 from left to right on the bottom row, but include no written numbers or labels. Build each creature from its `Visual Traits`, then `Signature Hook`, then `Core Concept`, then `Research Synthesis`, then `Type`. Use the written vintage anime monster-design direction above without image style references unless the user explicitly supplies a compatible reference.
+Generate one landscape image containing exactly the ten concepts in a clean two-row grid of five. Arrange concepts 1 through 5 from left to right on the top row and 6 through 10 from left to right on the bottom row, but include no written numbers or labels. Build each creature from its `Visual Traits`, then `Signature Hook`, then `Core Concept`, then `Research Synthesis`, then `Type`. Use the written polished creature-collection RPG direction above without image style references unless the user explicitly supplies a compatible reference.
 
-Apply the creature-first visual direction below to every design. Keep each entire silhouette visible with generous spacing, consistent rendering, and no overlap. Use warm off-white paper with faint natural grain and no grounding shadows. Do not add scenery, humans, trainers, extra creatures, text, labels, UI, borders, logos, or watermarks.
+Apply the creature-first visual direction below to every design. Keep each entire silhouette visible with generous spacing, consistent rendering, and no overlap. Use a clean white or off-white background with no grounding shadows. Do not add scenery, humans, trainers, extra creatures, text, labels, UI, borders, logos, or watermarks.
 
-Inspect the result for exactly ten distinct creatures, correct row count, recognizable concept-specific anatomy, a readable signature hook for each design, complete silhouettes, absence of humanoid anatomy or removable props, and a cohesive original anime monster-design finish using fine ink and restrained watercolor rather than glossy mascot art or realistic wildlife rendering. Check specifically for moderate eye size, varied asymmetrical poses, organic anatomy, and the absence of manufactured-looking detail. If the sheet materially fails one of those checks, make one targeted correction and inspect again. Render the final sheet inline.
+Inspect the result for exactly ten distinct creatures, correct row count, recognizable concept-specific anatomy, a readable signature hook for each design, complete silhouettes, absence of humanoid anatomy or removable props, and a cohesive polished 2D finish using clean antialiased outlines, clear color regions, and softly blended cel shading rather than realistic wildlife rendering, 3D surfaces, or rough media. Check specifically for expressive structurally integrated eyes, varied asymmetrical poses, organic anatomy, and the absence of manufactured-looking detail. If the sheet materially fails one of those checks, make one targeted correction and inspect again. Render the final sheet inline.
 
 The ensemble sheet is a batch overview, not approval to create individual asset images, icons, sprites, or game integration.
 
@@ -183,24 +184,24 @@ The ensemble sheet is a batch overview, not approval to create individual asset 
 
 When the user explicitly selects one or more concepts for images, use the installed `imagegen` skill and announce that use before generating. The selection itself is approval; do not insert another prompt-approval step.
 
-Generate one separate image per selected concept. Do not make a collage unless requested. Build each prompt from the selected record with this priority: `Visual Traits`, then `Signature Hook`, then `Core Concept`, then `Research Synthesis`, then `Type`. Translate the fact synthesis and signature hook into visible anatomy, markings, proportions, or pose without adding props. Do not add literal elemental effects solely because of the typing.
+Default to one separate image per selected concept. If the user explicitly requests a group interaction, comparison, evolution lineup, or several selected Cosmoids in one composition, generate the requested shared image instead. Build each prompt from every selected record with this priority: `Visual Traits`, then `Signature Hook`, then `Core Concept`, then `Research Synthesis`, then `Type`. Translate the fact synthesis and signature hook into visible anatomy, markings, proportions, or pose without adding props. Do not add literal elemental effects solely because of the typing.
 
-Use the written vintage anime monster-design direction for every selected concept image. Do not supply the Fueguana sprites as style-reference inputs. If the user supplies a compatible concept-art reference, inspect it and use it only for rendering qualities rather than copying creature anatomy or recognizable character features.
+Use the written polished creature-collection RPG direction for every selected concept image. Do not supply the Fueguana sprites or other existing creature art as style-reference inputs. If the user supplies a compatible concept-art reference, inspect it and use it only for rendering qualities rather than copying creature anatomy or recognizable character features.
 
 Use this visual direction:
 
-- one original full-body creature in a clear three-quarter view;
-- entire silhouette and all appendages inside the frame with generous padding;
+- show each depicted Cosmoid as a full-body creature in a clear three-quarter view;
+- keep every silhouette and all appendages inside the frame with generous padding and clear separation;
 - creature-first, non-humanoid anatomy with a natural animal posture and coherent locomotion;
 - personality communicated through anatomy, proportions, expression, and pose;
 - object or thematic motifs integrated into biological structures, markings, or natural materials;
 - no human torso, human hands, human feet, person-shaped stance, clothing, costume, armor, jewelry, gear, handheld item, weapon, tool, instrument, luggage, or removable prop unless the user explicitly requested that exact exception;
 - a restrained design with one dominant biological idea, two to four supporting traits, and a clean uncluttered silhouette;
-- an original vintage ink-and-watercolor anime monster-design finish with fine expressive brown-black contours, slight hand-drawn irregularity, translucent restrained washes, unpainted highlights, and minimal single-wash shadows;
-- moderate expressive eyes, believable creature anatomy, a readable silhouette, a cohesive limited palette, and a clear facial focal point without glossy mascot treatment;
+- an original polished 2D creature-collection RPG finish with smooth antialiased dark-charcoal outlines, controlled line-weight variation, rich flat base colors, two-to-three-tone cel shading, softly blended shadow transitions, and restrained painted highlights;
+- expressive structurally integrated eyes, simplified but believable creature anatomy, readable silhouettes, a cohesive moderately saturated palette, strong value separation, and clear facial focal points;
 - a lively asymmetrical three-quarter action pose that reveals locomotion and the signature hook;
-- a warm off-white paper background with faint natural grain and no floor plane or cast shadow;
-- no text, labels, UI, logo, watermark, trainer, scenery, extra creature, cropped anatomy, pixel art, thick sticker outlines, polished digital cel shading, airbrushed gradients, chibi proportions, realistic fur or skin microtexture, photorealism, or recognizable franchise character features.
+- a clean white, off-white, or transparent background according to the requested output, with no floor plane or cast shadow;
+- no text, labels, UI, logo, watermark, trainer, scenery, cropped anatomy, pixel art, pixelated edges, dithering, jagged outlines, 3D rendering, plastic toy surfaces, heavy painterly brushwork, watercolor washes, rough sketches, flat vector clip art, extreme chibi proportions, realistic fur or skin microtexture, photorealism, muddy colors, complex backgrounds, or recognizable franchise character features.
 
 Inspect every result, including whether its signature hook is visible in silhouette or pose without relying on the written description. If it materially contradicts the selected concept, make one targeted correction and inspect again. Render final previews inline. Do not create icons, directional battle sprites, manifests, registry entries, or story-level integration during this workflow.
 

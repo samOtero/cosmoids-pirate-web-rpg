@@ -4,9 +4,8 @@ import { describe, expect, it } from 'vitest';
 
 import { COSMOID_TEMPLATES } from '@/constants/creatures';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
-import { TD_LEVELS } from '@/constants/tdLevels';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
-import { ElementType, TDLevelContext } from '@/types/baseGame';
+import { ElementType } from '@/types/baseGame';
 
 interface CreatureManifest {
   id: string;
@@ -24,11 +23,6 @@ interface CreatureManifest {
   movementId: string;
   learnableAttacks: Array<{ level: number; attackId: string }>;
   assets: Record<'icon' | 'left' | 'up' | 'down', { url: string }>;
-  storyPlacement: {
-    levelContext: TDLevelContext;
-    capturable: boolean;
-    waves: Array<{ id: string; count: number; level?: number }>;
-  };
 }
 
 const manifestDirectory = join(process.cwd(), 'src', 'content', 'creatures');
@@ -73,29 +67,6 @@ describe.each(manifests)('$name creature manifest', (manifest) => {
       expect(
         existsSync(join(process.cwd(), 'public', asset.url.replace(/^\/+/, '')))
       ).toBe(true);
-    }
-  });
-
-  it('matches its declared story-level placement', () => {
-    const level = TD_LEVELS[manifest.storyPlacement.levelContext];
-    expect(level).toBeDefined();
-
-    for (const expectedWave of manifest.storyPlacement.waves) {
-      const wave = level.levelData.waves.find(
-        ({ id }) => id === expectedWave.id
-      );
-      const group = wave?.groups.find(
-        ({ definitionId }) => definitionId === manifest.id
-      );
-
-      expect(group).toBeDefined();
-      expect(group?.count).toBe(expectedWave.count);
-      expect(group?.level).toBe(expectedWave.level);
-      if (manifest.storyPlacement.capturable) {
-        expect(group?.uncapturable).not.toBe(true);
-      } else {
-        expect(group?.uncapturable).toBe(true);
-      }
     }
   });
 });

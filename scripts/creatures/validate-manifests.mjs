@@ -119,16 +119,6 @@ for (const file of manifestFiles) {
     }
     if (!png.hasAlpha) fail(file, `${role} PNG has no alpha channel`);
   }
-
-  if (!manifest.storyPlacement?.levelContext) {
-    fail(file, 'storyPlacement.levelContext is required');
-  }
-  if (
-    !Array.isArray(manifest.storyPlacement?.waves) ||
-    manifest.storyPlacement.waves.length === 0
-  ) {
-    fail(file, 'storyPlacement.waves must contain at least one wave');
-  }
 }
 
 if (errors.length > 0) {

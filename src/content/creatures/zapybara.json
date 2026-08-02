@@ -41,13 +41,5 @@
       "width": 160,
       "height": 220
     }
-  },
-  "storyPlacement": {
-    "levelContext": "FOREST_LEVEL_2",
-    "capturable": true,
-    "waves": [
-      { "id": "wave_2", "count": 1, "level": 5 },
-      { "id": "wave_3", "count": 2, "level": 6 }
-    ]
   }
 }
