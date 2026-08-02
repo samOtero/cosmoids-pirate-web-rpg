@@ -1,4 +1,4 @@
-import { TDInitialView } from '@/engine/tower-defense/types';
+import { TDInitialView, TDOpeningPan } from '@/engine/tower-defense/types';
 
 export const DEFAULT_TD_VIEW_OFFSET_X = 50;
 export const DEFAULT_TD_VIEW_OFFSET_Y = 0;
@@ -19,5 +19,33 @@ export function resolveTDInitialView(
     offsetX: clamp(initialView?.offsetX ?? DEFAULT_TD_VIEW_OFFSET_X, 0, 100),
     offsetY: clamp(initialView?.offsetY ?? DEFAULT_TD_VIEW_OFFSET_Y, 0, 100),
     zoom: clamp(initialView?.zoom ?? 1, minimumZoom, 1),
+  };
+}
+
+/** Resolves the eased camera position for a level's opening map tour. */
+export function resolveTDOpeningPanView(
+  initialView: TDInitialView,
+  openingPan: TDOpeningPan,
+  progress: number
+): Pick<TDInitialView, 'offsetX' | 'offsetY'> {
+  const clampedProgress = clamp(progress, 0, 1);
+  const easedProgress =
+    clampedProgress < 0.5
+      ? 4 * clampedProgress * clampedProgress * clampedProgress
+      : 1 - Math.pow(-2 * clampedProgress + 2, 3) / 2;
+  const fromOffsetX = clamp(
+    openingPan.fromOffsetX ?? initialView.offsetX,
+    0,
+    100
+  );
+  const fromOffsetY = clamp(
+    openingPan.fromOffsetY ?? initialView.offsetY,
+    0,
+    100
+  );
+
+  return {
+    offsetX: fromOffsetX + (initialView.offsetX - fromOffsetX) * easedProgress,
+    offsetY: fromOffsetY + (initialView.offsetY - fromOffsetY) * easedProgress,
   };
 }

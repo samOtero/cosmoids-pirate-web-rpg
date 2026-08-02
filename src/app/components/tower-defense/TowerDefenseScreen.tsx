@@ -147,9 +147,9 @@ export default function TowerDefenseScreen({
   const previousTimeRef = useRef<number | null>(null);
 
   const [hasStarted, setHasStarted] = useState(false);
-  const [introState, setIntroState] = useState<'ready' | 'go' | 'none'>(
-    'ready'
-  );
+  const [introState, setIntroState] = useState<
+    'cameraPan' | 'ready' | 'go' | 'none'
+  >(levelData.openingPan ? 'cameraPan' : 'ready');
   const [outroState, setOutroState] = useState<'none' | 'win' | 'lose'>('none');
 
   const saveTowerProgress = () => {
@@ -485,7 +485,7 @@ export default function TowerDefenseScreen({
         }
       }}
     >
-      {introState !== 'none' && (
+      {(introState === 'ready' || introState === 'go') && (
         <div className="pointer-events-none fixed inset-0 z-10000 flex items-center justify-center bg-black/60">
           <div className="animate-bounce bg-linear-to-br from-yellow-300 to-red-500 bg-clip-text pr-8 pb-4 text-7xl font-black text-transparent uppercase italic drop-shadow-[0_0_25px_rgba(255,165,0,0.8)] md:text-9xl">
             {introState === 'ready' ? 'Ready!' : 'GO!'}
@@ -507,7 +507,11 @@ export default function TowerDefenseScreen({
         </div>
       )}
 
-      <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-cyan-800 bg-slate-800 p-2 lg:p-4">
+      <div
+        className={`flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-cyan-800 bg-slate-800 p-2 lg:p-4 ${
+          introState === 'cameraPan' ? 'invisible' : ''
+        }`}
+      >
         <h2 className="hidden text-lg font-bold text-cyan-400 lg:block lg:text-xl">
           Tower Defense
         </h2>
@@ -525,8 +529,11 @@ export default function TowerDefenseScreen({
             Lives: {uiLives}
           </span>
           <button
-            onClick={() => setIsPlaying(!isPlaying)}
-            className="rounded bg-cyan-700 px-3 py-1 text-sm font-bold hover:bg-cyan-600 lg:px-4 lg:py-2 lg:text-base"
+            onClick={() => {
+              if (introState === 'none') setIsPlaying(!isPlaying);
+            }}
+            disabled={introState !== 'none'}
+            className="rounded bg-cyan-700 px-3 py-1 text-sm font-bold hover:bg-cyan-600 disabled:cursor-not-allowed disabled:opacity-50 lg:px-4 lg:py-2 lg:text-base"
           >
             {isPlaying ? 'Pause' : 'Start'}
           </button>
@@ -545,6 +552,13 @@ export default function TowerDefenseScreen({
         backgroundUrl={levelData.backgroundUrl}
         backgroundScale={levelData.backgroundScale}
         initialView={levelData.initialView}
+        openingPan={levelData.openingPan}
+        hideUi={introState === 'cameraPan'}
+        onOpeningPanComplete={() => {
+          setIntroState((current) =>
+            current === 'cameraPan' ? 'ready' : current
+          );
+        }}
         onMapDrop={handleMapDrop}
         onMapRemove={handleMapRemove}
         onEnemyCaptured={handleEnemyCaptured}
@@ -554,7 +568,11 @@ export default function TowerDefenseScreen({
         getDragState={() => dragStateRef.current}
       />
 
-      <div className="relative flex min-h-[90px] shrink-0 items-center justify-start gap-2 overflow-x-auto border-t border-cyan-800 bg-slate-800 p-2 lg:min-h-[140px] lg:justify-center lg:gap-4 lg:p-4">
+      <div
+        className={`relative flex min-h-[90px] shrink-0 items-center justify-start gap-2 overflow-x-auto border-t border-cyan-800 bg-slate-800 p-2 lg:min-h-[140px] lg:justify-center lg:gap-4 lg:p-4 ${
+          introState === 'cameraPan' ? 'invisible' : ''
+        }`}
+      >
         {selectedCreatureId
           ? (() => {
               const creature = engineRef.current.roster.find(

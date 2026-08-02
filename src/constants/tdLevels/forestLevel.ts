@@ -235,5 +235,8 @@ export const FOREST_LEVEL: TDLevelData = {
     offsetY: 0,
     zoom: 0.9,
   },
+  openingPan: {
+    fromOffsetY: 100,
+    durationMs: 2000,
+  },
 };
-

@@ -30,6 +30,15 @@ export interface TDInitialView {
   zoom: number;
 }
 
+export interface TDOpeningPan {
+  /** Horizontal starting position within the pannable overflow. Defaults to the normal initial view. */
+  fromOffsetX?: number;
+  /** Vertical starting position within the pannable overflow. Defaults to the normal initial view. */
+  fromOffsetY?: number;
+  /** Length of the camera movement before the Ready/Go countdown begins. */
+  durationMs: number;
+}
+
 export interface TDWaveGroup {
   definitionId: string; // The enemy ID to spawn
   count: number; // How many to spawn
@@ -104,6 +113,7 @@ export interface TDLevelData {
   backgroundUrl?: string;
   backgroundScale?: number; // If > 1, background is taller than viewport and can be scrolled
   initialView?: TDInitialView;
+  openingPan?: TDOpeningPan;
   environmentUnits?: {
     tdConfigId: string;
     position: Point;

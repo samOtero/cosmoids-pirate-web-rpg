@@ -13,9 +13,16 @@ import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { ElementType } from '@/types/baseGame';
 import { TD_BASE_HEIGHT } from '@/constants/game';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
-import { BaseTDUnit, TDInitialView } from '@/engine/tower-defense/types';
+import {
+  BaseTDUnit,
+  TDInitialView,
+  TDOpeningPan,
+} from '@/engine/tower-defense/types';
 import { interpolateKeyframes } from '@/utils/animationUtils';
-import { resolveTDInitialView } from '@/utils/tdInitialView';
+import {
+  resolveTDInitialView,
+  resolveTDOpeningPanView,
+} from '@/utils/tdInitialView';
 import { applyTDUnitTransforms } from '@/utils/tdUnitVisuals';
 
 export const WEAKENED_THRESHOLD = 0.9;
@@ -341,6 +348,9 @@ interface PixiBattlefieldProps {
   backgroundUrl?: string;
   backgroundScale?: number;
   initialView?: TDInitialView;
+  openingPan?: TDOpeningPan;
+  onOpeningPanComplete?: () => void;
+  hideUi?: boolean;
 }
 
 export interface PixiBattlefieldRef {
@@ -370,6 +380,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
       backgroundUrl,
       backgroundScale = 1,
       initialView,
+      openingPan,
+      onOpeningPanComplete,
+      hideUi = false,
     },
     ref
   ) => {
@@ -379,6 +392,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
     const onMapRemoveRef = useRef(onMapRemove);
     const onEnemyCapturedRef = useRef(onEnemyCaptured);
     const onDragStateChangeRef = useRef(onDragStateChange);
+    const onOpeningPanCompleteRef = useRef(onOpeningPanComplete);
     const getDragStateRef = useRef(getDragState);
     const dragPosRef = useRef<{ x: number; y: number } | null>(null);
     const draggingCaptureDeviceRef = useRef<boolean>(false);
@@ -390,6 +404,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
     }>({ x: 0, y: 0, width: 0, height: 0 });
     const scrollRef = useRef({ x: 0, y: 0 });
     const isScrollDraggingRef = useRef(false);
+    const isOpeningPanActiveRef = useRef(!!openingPan);
     const scrollDragStartRef = useRef<{
       x: number;
       y: number;
@@ -402,6 +417,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
     useImperativeHandle(ref, () => ({
       handleExternalMove: (clientX, clientY, type) => {
+        if (isOpeningPanActiveRef.current) return;
         draggingCaptureDeviceRef.current = type === 'capture';
         const bgBounds = bgBoundsRef.current;
         if (bgBounds && bgBounds.width > 0 && containerRef.current) {
@@ -418,6 +434,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         draggingCaptureDeviceRef.current = false;
       },
       handleExternalDrop: (clientX, clientY, towerIdStr, isCaptureDevice) => {
+        if (isOpeningPanActiveRef.current) return;
         dragPosRef.current = null;
         draggingCaptureDeviceRef.current = false;
 
@@ -508,8 +525,13 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
     }, [onEnemyCaptured]);
 
     useEffect(() => {
+      onOpeningPanCompleteRef.current = onOpeningPanComplete;
+    }, [onOpeningPanComplete]);
+
+    useEffect(() => {
       if (!containerRef.current) return;
 
+      isOpeningPanActiveRef.current = !!openingPan;
       const app = new PIXI.Application();
 
       let isDestroyed = false;
@@ -550,6 +572,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         let displayBgHeight = 0;
         let displayBgWidth = 0;
         let shouldApplyInitialView = true;
+        let openingPanStartTime: number | null = null;
+        let openingPanCompleted = !openingPan;
 
         // Handle resize + zoom — called each tick to pick up zoom changes
         const updateBgLayout = () => {
@@ -575,11 +599,40 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             const maxScrollY = Math.max(0, displayH - app.screen.height);
             const maxScrollX = Math.max(0, displayW - app.screen.width);
             if (shouldApplyInitialView) {
+              openingPanStartTime = openingPan ? performance.now() : null;
+              const openingView = openingPan
+                ? resolveTDOpeningPanView(resolvedInitialView, openingPan, 0)
+                : resolvedInitialView;
               scrollRef.current = {
-                x: maxScrollX * (resolvedInitialView.offsetX / 100),
-                y: maxScrollY * (resolvedInitialView.offsetY / 100),
+                x: maxScrollX * (openingView.offsetX / 100),
+                y: maxScrollY * (openingView.offsetY / 100),
               };
               shouldApplyInitialView = false;
+            } else if (
+              openingPan &&
+              openingPanStartTime !== null &&
+              !openingPanCompleted
+            ) {
+              const progress = Math.min(
+                1,
+                (performance.now() - openingPanStartTime) /
+                  Math.max(1, openingPan.durationMs)
+              );
+              const openingView = resolveTDOpeningPanView(
+                resolvedInitialView,
+                openingPan,
+                progress
+              );
+              scrollRef.current = {
+                x: maxScrollX * (openingView.offsetX / 100),
+                y: maxScrollY * (openingView.offsetY / 100),
+              };
+
+              if (progress === 1) {
+                openingPanCompleted = true;
+                isOpeningPanActiveRef.current = false;
+                onOpeningPanCompleteRef.current?.();
+              }
             } else {
               scrollRef.current.y = Math.min(scrollRef.current.y, maxScrollY);
               scrollRef.current.x = Math.min(scrollRef.current.x, maxScrollX);
@@ -612,7 +665,12 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         if (scale > 1) {
           bgSprite.on('pointerdown', (e: PIXI.FederatedPointerEvent) => {
             // Only start scroll if not dragging a tower or capture device
-            if (draggingTowerCreatureId || getDragStateRef.current?.()) return;
+            if (
+              isOpeningPanActiveRef.current ||
+              draggingTowerCreatureId ||
+              getDragStateRef.current?.()
+            )
+              return;
             isScrollDraggingRef.current = true;
             scrollDragStartRef.current = {
               x: e.global.x,
@@ -1592,24 +1650,27 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
       return () => {
         isDestroyed = true;
+        isOpeningPanActiveRef.current = false;
         if (isInitialized) {
           app.destroy(true, { children: true });
         }
       };
-    }, [engine, backgroundScale, backgroundUrl, initialView]);
+    }, [engine, backgroundScale, backgroundUrl, initialView, openingPan]);
 
     return (
       <div className="relative flex-1 overflow-hidden">
         <div ref={containerRef} className="absolute inset-0" />
         <div
           ref={fpsRef}
-          className="pointer-events-none absolute top-2 left-2 z-10 rounded bg-black/60 px-2 py-1 font-mono text-sm font-bold text-green-400 shadow select-none"
+          className={`pointer-events-none absolute top-2 left-2 z-10 rounded bg-black/60 px-2 py-1 font-mono text-sm font-bold text-green-400 shadow select-none ${
+            hideUi ? 'invisible' : ''
+          }`}
         >
           FPS: 0
         </div>
 
         {/* Zoom Controls */}
-        {backgroundScale > 1 && (
+        {backgroundScale > 1 && !hideUi && (
           <div className="absolute right-3 bottom-3 z-10 flex flex-col gap-1">
             <button
               className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg bg-black/60 text-lg font-bold text-white transition-colors select-none hover:bg-black/80"

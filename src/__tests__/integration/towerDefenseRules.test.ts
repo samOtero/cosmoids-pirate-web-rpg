@@ -4,6 +4,13 @@ import { FOREST_LEVEL } from '@/constants/tdLevels/forestLevel';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 
 describe('Tower defense rules', () => {
+  it('always opens Level 2 with its full bottom-to-top camera tour', () => {
+    expect(FOREST_LEVEL.openingPan).toEqual({
+      fromOffsetY: 100,
+      durationMs: 2000,
+    });
+  });
+
   it('derives one life from each capture objective', () => {
     const engine = new TowerDefenseEngine(FOREST_LEVEL);
 

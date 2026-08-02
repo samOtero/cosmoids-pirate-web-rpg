@@ -28,7 +28,7 @@ export const LEVEL_2_WIN: DialogConfig = {
       portraits: [
         {
           key: SpeakerImageKey.CAPTAIN_VANE_HAUGHTY_NEUTRAL,
-          displayName: 'Captain Vane',
+          displayName: '???',
           flipped: true,
         },
       ],
