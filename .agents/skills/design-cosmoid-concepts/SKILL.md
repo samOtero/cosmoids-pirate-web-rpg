@@ -28,6 +28,14 @@ Seed: A moth, an antique lantern, and the theme of guiding lost travelers.
 
 Return exactly ten concepts in the first response. Do not generate or call an image tool during this phase.
 
+### Make every name meaningful wordplay
+
+- Give every concept a clever, pronounceable portmanteau or pun derived from at least two meaningful parts of its premise, such as its organism, anatomy, material, mechanism, behavior, typing, theme, or social role.
+- Make both source ideas relevant to the actual design. Do not combine arbitrary words merely because their sounds fit.
+- Prefer names whose wordplay becomes satisfying once the concept is understood while still sounding natural when spoken aloud.
+- Avoid plain descriptive compounds, an organism name with a generic elemental suffix, minor misspellings of a single word, opaque letter collisions, and names whose only connection is palette or attitude.
+- Keep the underlying source words and wordplay clear internally, but do not add a separate name-etymology field to the user-facing batch.
+
 ### Keep every design creature-first
 
 Design each result as a believable species rather than a costumed character. Apply these rules unless the user explicitly asks for an artificial object creature, humanoid anatomy, clothing, or equipment:
@@ -96,7 +104,7 @@ Before responding, silently audit and replace weak entries. Every pair of concep
 - evolutionary premise;
 - interpretation of the seed theme.
 
-Reject concepts that are cosmetic reskins, reuse the same name construction, use a supplied anchor only as decoration, are too vague to draw, closely resemble an existing Pokemon or Cosmoid, depend on a costume, prop, weapon, tool, or human occupation to communicate their premise, rely on a generic animal fact, or mention a fact without transforming the design. Replace any design that would stop reading clearly if all removable objects were taken away. When available, scan current creature names and concise creature manifests in the repository before naming the batch; do not modify the repository during concept generation.
+Reject concepts that are cosmetic reskins, reuse the same name construction, have a name that is not a meaningful portmanteau or pun, use a supplied anchor only as decoration, are too vague to draw, closely resemble an existing Pokemon or Cosmoid, depend on a costume, prop, weapon, tool, or human occupation to communicate their premise, rely on a generic animal fact, or mention a fact without transforming the design. Replace any design that would stop reading clearly if all removable objects were taken away. When available, scan current creature names and concise creature manifests in the repository before naming the batch; do not modify the repository during concept generation.
 
 Also reject concepts whose selected facts read like a trivia list instead of one thesis, whose signature hook exists only in lore, or whose uniqueness comes only from color, elemental particles, markings, size, or exaggerated personality. Before keeping an entry, summarize it internally as `multiple facts -> one theme -> one signature hook`; if that chain is weak, redesign it.
 
@@ -104,7 +112,7 @@ Also reject concepts whose selected facts read like a trivia list instead of one
 
 Use numbered headings `1` through `10` so later selections remain unambiguous. Render every result with these exact user-facing fields:
 
-- **Name:** A pronounceable, distinctive name connected to the premise.
+- **Name:** A pronounceable, distinctive portmanteau or pun combining at least two meaningful parts of the premise.
 - **Type:** The supplied typing.
 - **Research Synthesis:** Three to five concise verified facts, followed by one sentence explaining how they converge on the concept. Include direct source links when web research was used; group facts supported by the same source instead of repeating links.
 - **Signature Hook:** One sentence naming the creature's memorable defining feature, mechanism, behavior, transformation, or relationship and how it changes the creature in silhouette or action.

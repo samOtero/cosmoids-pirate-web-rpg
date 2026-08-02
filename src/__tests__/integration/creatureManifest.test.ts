@@ -70,3 +70,22 @@ describe.each(manifests)('$name creature manifest', (manifest) => {
     }
   });
 });
+
+describe('COSMOID_TEMPLATES icons', () => {
+  it('has existing icon files for all templates declaring iconImg', () => {
+    for (const [id, template] of Object.entries(COSMOID_TEMPLATES)) {
+      if (template.iconImg) {
+        const iconPath = join(
+          process.cwd(),
+          'public',
+          template.iconImg.replace(/^\/+/, '')
+        );
+        expect(
+          existsSync(iconPath),
+          `Icon file missing for ${id}: ${template.iconImg}`
+        ).toBe(true);
+      }
+    }
+  });
+});
+
