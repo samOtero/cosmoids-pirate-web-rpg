@@ -27,6 +27,8 @@ export enum ElementType {
   WATER = 'Water',
   FIRE = 'Fire',
   GRASS = 'Grass',
+  BUG = 'Bug',
+  STEEL = 'Steel',
   POISON = 'Poison',
   ELECTRIC = 'Electric',
   NORMAL = 'Normal',
@@ -207,6 +209,7 @@ export interface CosmoidTemplate {
   id: string; // Species ID (e.g. 'starter_crab')
   name: string;
   type: ElementType;
+  secondaryType?: ElementType;
   baseStats: BaseStats;
   baseExperience: number;
   spriteUrl: string;
@@ -224,6 +227,7 @@ export interface Creature {
   speciesId: string; // References CosmoidTemplate.id
   name: string;
   type: ElementType;
+  secondaryType?: ElementType;
   maxHp: number;
   currentHp: number;
   attack: number;

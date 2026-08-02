@@ -66,7 +66,12 @@ export const CreaturePortrait: React.FC<CreaturePortraitProps> = ({
               {creature.currentHp} / {creature.maxHp}
             </span>
             <div className="scale-75 origin-right">
-              <TypeBadge type={creature.type} />
+              <div className="flex gap-1">
+                <TypeBadge type={creature.type} />
+                {creature.secondaryType && (
+                  <TypeBadge type={creature.secondaryType} />
+                )}
+              </div>
             </div>
           </div>
         </div>

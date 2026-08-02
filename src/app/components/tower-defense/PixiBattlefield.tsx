@@ -395,6 +395,8 @@ const TYPE_COLORS: Record<ElementType, number> = {
   [ElementType.WATER]: 0x3b82f6,
   [ElementType.FIRE]: 0xef4444,
   [ElementType.GRASS]: 0x22c55e,
+  [ElementType.BUG]: 0x65a30d,
+  [ElementType.STEEL]: 0x64748b,
   [ElementType.POISON]: 0xa855f7,
   [ElementType.ELECTRIC]: 0xeab308,
   [ElementType.NORMAL]: 0xa3a3a3,

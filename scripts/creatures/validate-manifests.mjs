@@ -78,6 +78,12 @@ for (const file of manifestFiles) {
   if (!/^[A-Z]+$/.test(manifest.element ?? '')) {
     fail(file, 'element must be an ElementType enum key');
   }
+  if (
+    manifest.secondaryElement !== undefined &&
+    !/^[A-Z]+$/.test(manifest.secondaryElement)
+  ) {
+    fail(file, 'secondaryElement must be an ElementType enum key');
+  }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(manifest.addedAt ?? '')) {
     fail(file, 'addedAt must use YYYY-MM-DD');
   }

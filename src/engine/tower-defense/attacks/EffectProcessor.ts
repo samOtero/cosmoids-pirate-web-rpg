@@ -3,69 +3,81 @@ import { Tower, Enemy } from '../types';
 import { AttackDefinition } from './types';
 import { ElementType } from '@/types/baseGame';
 
+const NEUTRAL_EFFECTIVENESS: Record<ElementType, number> = {
+  [ElementType.NORMAL]: 1,
+  [ElementType.FIRE]: 1,
+  [ElementType.WATER]: 1,
+  [ElementType.GRASS]: 1,
+  [ElementType.BUG]: 1,
+  [ElementType.STEEL]: 1,
+  [ElementType.POISON]: 1,
+  [ElementType.ELECTRIC]: 1,
+  [ElementType.FLYING]: 1,
+};
+
 const TYPE_EFFECTIVENESS: Record<ElementType, Record<ElementType, number>> = {
   [ElementType.NORMAL]: {
-    [ElementType.NORMAL]: 1,
-    [ElementType.FIRE]: 1,
-    [ElementType.WATER]: 1,
-    [ElementType.GRASS]: 1,
-    [ElementType.POISON]: 1,
-    [ElementType.ELECTRIC]: 1,
-    [ElementType.FLYING]: 1,
+    ...NEUTRAL_EFFECTIVENESS,
+    [ElementType.STEEL]: 0.5,
   },
   [ElementType.FIRE]: {
-    [ElementType.NORMAL]: 1,
+    ...NEUTRAL_EFFECTIVENESS,
     [ElementType.FIRE]: 0.5,
     [ElementType.WATER]: 0.5,
     [ElementType.GRASS]: 2,
-    [ElementType.POISON]: 1,
-    [ElementType.ELECTRIC]: 1,
-    [ElementType.FLYING]: 1,
+    [ElementType.BUG]: 2,
+    [ElementType.STEEL]: 2,
   },
   [ElementType.WATER]: {
-    [ElementType.NORMAL]: 1,
+    ...NEUTRAL_EFFECTIVENESS,
     [ElementType.FIRE]: 2,
     [ElementType.WATER]: 0.5,
     [ElementType.GRASS]: 0.5,
-    [ElementType.POISON]: 1,
-    [ElementType.ELECTRIC]: 1,
-    [ElementType.FLYING]: 1,
   },
   [ElementType.GRASS]: {
-    [ElementType.NORMAL]: 1,
+    ...NEUTRAL_EFFECTIVENESS,
     [ElementType.FIRE]: 0.5,
     [ElementType.WATER]: 2,
     [ElementType.GRASS]: 0.5,
-    [ElementType.POISON]: 1,
-    [ElementType.ELECTRIC]: 1,
+    [ElementType.BUG]: 0.5,
+    [ElementType.STEEL]: 0.5,
+    [ElementType.POISON]: 0.5,
     [ElementType.FLYING]: 0.5,
   },
   [ElementType.ELECTRIC]: {
-    [ElementType.NORMAL]: 1,
-    [ElementType.FIRE]: 1,
+    ...NEUTRAL_EFFECTIVENESS,
     [ElementType.WATER]: 2,
     [ElementType.GRASS]: 0.5,
-    [ElementType.POISON]: 1,
     [ElementType.ELECTRIC]: 0.5,
     [ElementType.FLYING]: 2,
   },
   [ElementType.FLYING]: {
-    [ElementType.NORMAL]: 1,
-    [ElementType.FIRE]: 1,
-    [ElementType.WATER]: 1,
+    ...NEUTRAL_EFFECTIVENESS,
     [ElementType.GRASS]: 2,
-    [ElementType.POISON]: 1,
+    [ElementType.BUG]: 2,
+    [ElementType.STEEL]: 0.5,
     [ElementType.ELECTRIC]: 0.5,
-    [ElementType.FLYING]: 1,
   },
   [ElementType.POISON]: {
-    [ElementType.NORMAL]: 1,
-    [ElementType.FIRE]: 1,
-    [ElementType.WATER]: 1,
+    ...NEUTRAL_EFFECTIVENESS,
     [ElementType.GRASS]: 1,
-    [ElementType.POISON]: 1,
-    [ElementType.ELECTRIC]: 1,
-    [ElementType.FLYING]: 1,
+    [ElementType.POISON]: 0.5,
+    [ElementType.STEEL]: 0,
+  },
+  [ElementType.BUG]: {
+    ...NEUTRAL_EFFECTIVENESS,
+    [ElementType.FIRE]: 0.5,
+    [ElementType.GRASS]: 2,
+    [ElementType.POISON]: 0.5,
+    [ElementType.FLYING]: 0.5,
+    [ElementType.STEEL]: 0.5,
+  },
+  [ElementType.STEEL]: {
+    ...NEUTRAL_EFFECTIVENESS,
+    [ElementType.FIRE]: 0.5,
+    [ElementType.WATER]: 0.5,
+    [ElementType.ELECTRIC]: 0.5,
+    [ElementType.STEEL]: 0.5,
   },
 };
 export class EffectProcessor {
@@ -91,15 +103,21 @@ export class EffectProcessor {
 
     // Get Defender Type
     const defenderMeta = TD_CREATURE_DEFS[target.definitionId];
-    const defenderType = defenderMeta
-      ? defenderMeta.baseCreature.type
-      : ElementType.NORMAL;
+    const defenderTypes = defenderMeta
+      ? [
+          defenderMeta.baseCreature.type,
+          defenderMeta.baseCreature.secondaryType,
+        ].filter((type): type is ElementType => type !== undefined)
+      : [ElementType.NORMAL];
 
     // Get Attacker Type
     const attackerMeta = TD_CREATURE_DEFS[source.creature.speciesId];
-    const attackerType = attackerMeta
-      ? attackerMeta.baseCreature.type
-      : ElementType.NORMAL;
+    const attackerTypes = attackerMeta
+      ? [
+          attackerMeta.baseCreature.type,
+          attackerMeta.baseCreature.secondaryType,
+        ].filter((type): type is ElementType => type !== undefined)
+      : [ElementType.NORMAL];
 
     // Pokemon Damage Formula
     const baseDamage =
@@ -109,11 +127,15 @@ export class EffectProcessor {
         ) / 50
       ) + 2;
 
-    const isStab = attackerType === attackDef.type;
+    const isStab = attackerTypes.includes(attackDef.type);
     const stabMultiplier = isStab ? 1.5 : 1.0;
 
-    const effectivenessMultiplier =
-      TYPE_EFFECTIVENESS[attackDef.type]?.[defenderType as ElementType] ?? 1.0;
+    const effectivenessMultiplier = defenderTypes.reduce(
+      (multiplier, defenderType) =>
+        multiplier *
+        (TYPE_EFFECTIVENESS[attackDef.type]?.[defenderType] ?? 1.0),
+      1.0
+    );
 
     // Add a slight randomization (85% to 100%)
     const randomModifier = (Math.floor(Math.random() * 16) + 85) / 100;

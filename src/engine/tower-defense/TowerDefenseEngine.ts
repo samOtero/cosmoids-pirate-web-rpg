@@ -95,6 +95,8 @@ export class TowerDefenseEngine {
       defaultAttacks.push('TACKLE');
     else if (speciesId === 'mouse_1')
       defaultAttacks.push('NIBBLE');
+    else if (speciesId === 'bettle')
+      defaultAttacks.push('PINCH');
     else defaultAttacks.push('TACKLE'); // Fallback
     return defaultAttacks;
   }

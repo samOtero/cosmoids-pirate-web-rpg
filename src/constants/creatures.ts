@@ -165,6 +165,31 @@ export const ZAPYBARA: CosmoidTemplate = {
   ],
 };
 
+export const BETTLE: CosmoidTemplate = {
+  id: 'bettle',
+  name: 'Bettle',
+  type: ElementType.BUG,
+  secondaryType: ElementType.STEEL,
+  baseStats: {
+    hp: 72,
+    attack: 70,
+    defense: 88,
+    specialAttack: 28,
+    specialDefense: 72,
+    speed: 24,
+  },
+  baseExperience: 68,
+  iconImg: '/UI/Icons/bettle_icon.png',
+  spriteUrl: '/battles/cosmoids/bettle_down.png',
+  battleSpriteUrl: '/battles/cosmoids/bettle_left.png',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'PINCH' },
+    { level: 3, attackId: 'TACKLE' },
+    { level: 6, attackId: 'STRING_SHOT' },
+  ],
+};
+
 export const BUG_STAGE_1: CosmoidTemplate = {
   id: 'bug_stage_1',
   name: 'Buglet',
@@ -323,4 +348,5 @@ export const COSMOID_TEMPLATES: Record<string, CosmoidTemplate> = {
   [CAFFIQUI.id]: CAFFIQUI,
   [SNOUTASCO.id]: SNOUTASCO,
   [ZAPYBARA.id]: ZAPYBARA,
+  [BETTLE.id]: BETTLE,
 };

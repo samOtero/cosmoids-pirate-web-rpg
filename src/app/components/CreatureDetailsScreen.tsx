@@ -101,6 +101,9 @@ export default function CreatureDetailsScreen({
             Lv {creature.level}
           </span>
           <TypeBadge type={creature.type} />
+          {creature.secondaryType && (
+            <TypeBadge type={creature.secondaryType} />
+          )}
           {creature.isShiny && (
             <span className="text-xs lg:text-sm font-black bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-400 text-amber-300">
               Shiny ✨

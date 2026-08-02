@@ -68,6 +68,8 @@ export class TDProgressionManager {
 
           const newTemplate = COSMOID_TEMPLATES[tower.creature.speciesId];
           if (newTemplate) {
+            tower.creature.type = newTemplate.type;
+            tower.creature.secondaryType = newTemplate.secondaryType;
             tower.currentAttack = calculateStat(
               newTemplate.baseStats.attack,
               tower.creature.level

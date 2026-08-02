@@ -11,6 +11,7 @@ interface CreatureManifest {
   id: string;
   name: string;
   element: keyof typeof ElementType;
+  secondaryElement?: keyof typeof ElementType;
   baseStats: {
     hp: number;
     attack: number;
@@ -39,6 +40,11 @@ describe.each(manifests)('$name creature manifest', (manifest) => {
     expect(template).toBeDefined();
     expect(template.name).toBe(manifest.name);
     expect(template.type).toBe(ElementType[manifest.element]);
+    expect(template.secondaryType).toBe(
+      manifest.secondaryElement
+        ? ElementType[manifest.secondaryElement]
+        : undefined
+    );
     expect(template.baseStats).toEqual(manifest.baseStats);
     expect(template.baseExperience).toBe(manifest.baseExperience);
     expect(template.movementId).toBe(manifest.movementId);
@@ -88,4 +94,3 @@ describe('COSMOID_TEMPLATES icons', () => {
     }
   });
 });
-
