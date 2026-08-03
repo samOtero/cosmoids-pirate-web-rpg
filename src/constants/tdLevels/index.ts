@@ -131,7 +131,7 @@ export const LEVEL_ORDER: LevelInfo[] = [
     context: 'LOCKED_3' as TDLevelContext,
     name: 'More levels coming soon',
     description: 'TBD.',
-    requiredProgression: 999,
+    requiredProgression: StoryProgression.DEFEAT_BUG_STAGE_1,
   },
 ];
 

@@ -182,7 +182,7 @@ export default function LevelSelectScreen({
                           : 'text-gray-500'
                     }`}
                   >
-                    {level.name}
+                    {isUnlocked ? level.name : 'Locked'}
                   </span>
 
                   {/* Creature Icons */}
