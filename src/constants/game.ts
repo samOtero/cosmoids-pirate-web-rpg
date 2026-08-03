@@ -44,6 +44,7 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
   [SpeakerImageKey.STARTER_2_IGUANA]: '/iguana_starter_fire_neutral_skin_1.png',
   [SpeakerImageKey.STARTER_3_MONKEY]:
     '/monkey_starter_water_neutral_skin_1.png',
+  [SpeakerImageKey.MOPUP]: '/UI/Icons/mopup_icon.png',
   [SpeakerImageKey.EEL_SENTICLE]: '/dialog/senticle_dark_aura_small.png',
   [SpeakerImageKey.CREWMATE]: 'https://picsum.photos/seed/crewmate_npc/300/300',
   [SpeakerImageKey.OLD_SAILOR]: 'https://picsum.photos/seed/oldsailor/300/300',

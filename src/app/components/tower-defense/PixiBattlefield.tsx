@@ -997,20 +997,22 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               const newContainer = new PIXI.Container();
               container = newContainer;
 
-              newContainer.eventMode = 'static';
-              newContainer.cursor = 'grab';
-              newContainer.on('pointerdown', (e) => {
-                draggingNode = newContainer;
-                draggingTowerCreatureId = tower.creature.id;
-                newContainer.cursor = 'grabbing';
-                app.stage.setChildIndex(
-                  newContainer,
-                  app.stage.children.length - 1
-                );
-                if (onDragStateChangeRef.current) {
-                  onDragStateChangeRef.current(true);
-                }
-              });
+              newContainer.eventMode = tower.isFixed ? 'none' : 'static';
+              newContainer.cursor = tower.isFixed ? 'default' : 'grab';
+              if (!tower.isFixed) {
+                newContainer.on('pointerdown', () => {
+                  draggingNode = newContainer;
+                  draggingTowerCreatureId = tower.creature.id;
+                  newContainer.cursor = 'grabbing';
+                  app.stage.setChildIndex(
+                    newContainer,
+                    app.stage.children.length - 1
+                  );
+                  if (onDragStateChangeRef.current) {
+                    onDragStateChangeRef.current(true);
+                  }
+                });
+              }
 
               const baseCreature =
                 TD_CREATURE_DEFS[tower.creature.speciesId].baseCreature;

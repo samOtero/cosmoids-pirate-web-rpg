@@ -120,6 +120,16 @@ export interface TDLevelData {
     facingDirection?: 'up' | 'down' | 'left' | 'right';
   }[];
   captureUnits?: { tdConfigId: string; position: Point }[];
+  /** Allied towers that begin on the battlefield without joining the player's roster. */
+  startingTowers?: {
+    creature: PlayerCreature;
+    position: Point;
+    facingDirection?: 'up' | 'down' | 'left' | 'right';
+    /** Prevents the tower from being moved, removed, or replaced. */
+    isFixed?: boolean;
+    /** Guest allies normally do not gain persistent creature experience. */
+    receivesExperience?: boolean;
+  }[];
   /** When set, the player uses this fixed roster instead of their profile creatures. */
   premadeRoster?: PlayerCreature[];
   /** Marks this level as a challenge level (affects routing and progress saving). */
@@ -148,6 +158,8 @@ export interface Tower extends BaseTDUnit {
   }>;
   selectedAttackIndex: number;
   targetingMode?: TowerTargetingMode;
+  isFixed?: boolean;
+  receivesExperience?: boolean;
 }
 
 export interface StatusCondition {

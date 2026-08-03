@@ -72,6 +72,27 @@ export const FOREST_LEVEL: TDLevelData = {
       facingDirection: 'right',
     },
   ],
+  startingTowers: [
+    {
+      creature: {
+        id: 'kip_mopup',
+        speciesId: 'mopup',
+        level: 5,
+        xp: 0,
+        equippedAttacks: ['TACKLE', 'BUBBLE_BEAM'],
+        activeAttackIndex: 1,
+        targetingMode: 'first',
+        isShiny: false,
+      },
+      position: {
+        x: 45,
+        y: 67,
+      },
+      facingDirection: 'down',
+      isFixed: true,
+      receivesExperience: false,
+    },
+  ],
   captureUnits: [
     {
       position: {

@@ -115,10 +115,17 @@ export class TDProgressionManager {
     const template = COSMOID_TEMPLATES[enemyDefinitionId];
     const baseExperience = template ? template.baseExperience : 50;
 
-    // Distribute EXP to each participating tower
-    const participantCount = Math.max(1, participantTowerIds.length);
+    const experienceRecipients = participantTowerIds.filter((towerId) => {
+      const tower = this.engine.towers.find(
+        (candidate) => candidate.id === towerId
+      );
+      return tower?.receivesExperience !== false;
+    });
 
-    for (const towerId of participantTowerIds) {
+    // Fixed guest allies help in combat without reducing the player's EXP share.
+    const participantCount = Math.max(1, experienceRecipients.length);
+
+    for (const towerId of experienceRecipients) {
       const tower = this.engine.towers.find((t) => t.id === towerId);
       if (!tower) continue;
 

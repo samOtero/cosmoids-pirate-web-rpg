@@ -47,11 +47,21 @@ export const LEVEL_2_INTRO: DialogConfig = {
     {
       portraits: [
         {
+          key: SpeakerImageKey.MOPUP,
+          displayName: 'Mopup',
+        },
+      ],
+      text: 'Mop? Mopup!',
+      backgroundImageKey: BackgroundImageKey.LEVEL_2_SHIPWRECK_BEACH,
+    },
+    {
+      portraits: [
+        {
           key: SpeakerImageKey.KIP_PANICKED,
           displayName: '???',
         },
       ],
-      text: "Hey! Wake up! Please don't be dead!",
+      text: "What did you find, Mopup? Oh no... I hope he's not dead!",
       backgroundImageKey: BackgroundImageKey.LEVEL_2_SHIPWRECK_BEACH,
     },
     {
@@ -136,7 +146,7 @@ export const LEVEL_2_INTRO: DialogConfig = {
     },
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: '' }],
-      text: 'Together, Caleb and Kip piece the battered boat back together.',
+      text: 'With help from their Cosmoids, Caleb and Kip piece the battered boat back together.',
       backgroundImageKey: BackgroundImageKey.LEVEL_2_REPAIRED_BOAT_SUPPLIES,
     },
     {
@@ -152,6 +162,16 @@ export const LEVEL_2_INTRO: DialogConfig = {
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: '' }],
       text: 'A rustling sound comes from the bushes beside their food supplies.',
+      backgroundImageKey: BackgroundImageKey.LEVEL_2_REPAIRED_BOAT_SUPPLIES,
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.MOPUP,
+          displayName: 'Mopup',
+        },
+      ],
+      text: 'Mop! Mop! MOPUP!',
       backgroundImageKey: BackgroundImageKey.LEVEL_2_REPAIRED_BOAT_SUPPLIES,
     },
     {

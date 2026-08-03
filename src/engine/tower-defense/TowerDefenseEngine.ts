@@ -19,6 +19,7 @@ import {
   FloatingText,
   TDCreatureMetadata,
   TowerTargetingMode,
+  TDLevelData,
 } from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
 import { AttackBehaviorRegistry } from './attacks/behaviors';
@@ -124,7 +125,8 @@ export class TowerDefenseEngine {
   public hasCaptureUnitsGoal: boolean = false;
 
   constructor(
-    levelData: import('./types').TDLevelData | any,
+    levelData: Pick<TDLevelData, 'paths' | 'placementSpots'> &
+      Partial<TDLevelData>,
     initialRoster: PlayerCreature[] = []
   ) {
     this.roster = JSON.parse(JSON.stringify(initialRoster));
@@ -197,6 +199,20 @@ export class TowerDefenseEngine {
       this.lives = this.captureUnits.length;
     } else {
       this.lives = levelData.lives !== undefined ? levelData.lives : 3;
+    }
+
+    if (levelData.startingTowers) {
+      for (const startingTower of levelData.startingTowers) {
+        const tower = this.createTower(
+          structuredClone(startingTower.creature),
+          startingTower.position.x,
+          startingTower.position.y,
+          startingTower.facingDirection ?? 'down',
+          startingTower.isFixed ?? false,
+          startingTower.receivesExperience ?? false
+        );
+        if (tower) this.towers.push(tower);
+      }
     }
 
     // Initialize first wave group if available
@@ -973,7 +989,10 @@ export class TowerDefenseEngine {
   }
 
   public removeTower(creatureId: string) {
+    const tower = this.towers.find((t) => t.creature.id === creatureId);
+    if (tower?.isFixed) return false;
     this.towers = this.towers.filter((t) => t.creature.id !== creatureId);
+    return true;
   }
 
   public placeTower(creatureId: string, x: number, y: number) {
@@ -988,11 +1007,14 @@ export class TowerDefenseEngine {
     );
 
     if (existingTower) {
+      if (existingTower.isFixed) return false;
+
       if (existingTower.position.x === x && existingTower.position.y === y) {
         return true; // Dropped on itself
       }
 
       if (targetTower) {
+        if (targetTower.isFixed) return false;
         // Swap positions
         targetTower.position = {
           x: existingTower.position.x,
@@ -1011,12 +1033,27 @@ export class TowerDefenseEngine {
 
     // New tower from the deck
     if (targetTower) {
+      if (targetTower.isFixed) return false;
       // Remove whatever tower was there previously, taking its spot
       this.towers = this.towers.filter((t) => t.id !== targetTower.id);
     }
 
+    const tower = this.createTower(creature, x, y);
+    if (!tower) return false;
+    this.towers.push(tower);
+    return true;
+  }
+
+  private createTower(
+    creature: PlayerCreature,
+    x: number,
+    y: number,
+    facingDirection: Tower['facingDirection'] = 'down',
+    isFixed: boolean = false,
+    receivesExperience: boolean = true
+  ): Tower | null {
     const template = COSMOID_TEMPLATES[creature.speciesId];
-    if (!template) return false;
+    if (!template) return null;
 
     // Derive stats
     const derivedAttack = calculateStat(
@@ -1042,7 +1079,7 @@ export class TowerDefenseEngine {
         ? creature.equippedAttacks
         : TowerDefenseEngine.getDefaultAttacks(creature.speciesId);
 
-    this.towers.push({
+    return {
       id: `tower_${Date.now()}_${Math.random().toString(36).substring(7)}`,
       creature: creature,
       position: { x, y },
@@ -1057,12 +1094,19 @@ export class TowerDefenseEngine {
         definitionId: atkId,
         lastFiredTime: 0,
       })),
-      selectedAttackIndex: this.playerSelectedAttacks[creature.id] || 0,
-      targetingMode: this.playerSelectedTargetingModes[creature.id] || 'first',
-      facingDirection: 'down',
+      selectedAttackIndex:
+        this.playerSelectedAttacks[creature.id] ??
+        creature.activeAttackIndex ??
+        0,
+      targetingMode:
+        this.playerSelectedTargetingModes[creature.id] ??
+        (creature.targetingMode as TowerTargetingMode | undefined) ??
+        'first',
+      facingDirection,
       isShiny: creature.isShiny,
-    });
-    return true;
+      isFixed,
+      receivesExperience,
+    };
   }
 
   public setTowerAttack(creatureId: string, attackIndex: number) {

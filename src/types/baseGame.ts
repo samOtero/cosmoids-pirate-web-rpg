@@ -57,6 +57,7 @@ export enum SpeakerImageKey {
   STARTER_1_CRAB = 'Starter_1_Crab',
   STARTER_2_IGUANA = 'Starter_2_Iguana',
   STARTER_3_MONKEY = 'Starter_3_Monkey',
+  MOPUP = 'Mopup',
   EEL_SENTICLE = 'Eel_Senticle',
   CREWMATE = 'Crewmate',
   OLD_SAILOR = 'Old Sailor',

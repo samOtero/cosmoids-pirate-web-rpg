@@ -21,6 +21,33 @@ describe('Tower defense rules', () => {
     engine.destroy();
   });
 
+  it("starts Level 2 with Kip's fixed Mopup beside him", () => {
+    const engine = new TowerDefenseEngine(FOREST_LEVEL);
+    const mopup = engine.towers.find(
+      (tower) => tower.creature.id === 'kip_mopup'
+    );
+
+    expect(mopup).toMatchObject({
+      position: { x: 45, y: 67 },
+      isFixed: true,
+      receivesExperience: false,
+      creature: {
+        speciesId: 'mopup',
+        equippedAttacks: ['TACKLE', 'BUBBLE_BEAM'],
+      },
+      selectedAttackIndex: 1,
+    });
+    expect(engine.roster).not.toContainEqual(
+      expect.objectContaining({ id: 'kip_mopup' })
+    );
+
+    expect(engine.removeTower('kip_mopup')).toBe(false);
+    expect(engine.placeTower('kip_mopup', 52.12, 67.3)).toBe(false);
+    expect(mopup?.position).toEqual({ x: 45, y: 67 });
+
+    engine.destroy();
+  });
+
   it('automatically prevents cursed enemies from being captured', () => {
     const engine = new TowerDefenseEngine({
       paths: [
