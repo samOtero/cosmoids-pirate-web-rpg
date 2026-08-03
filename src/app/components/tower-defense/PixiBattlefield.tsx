@@ -335,7 +335,7 @@ const TYPE_COLORS: Record<ElementType, number> = {
   [ElementType.POISON]: 0xa855f7,
   [ElementType.ELECTRIC]: 0xeab308,
   [ElementType.NORMAL]: 0xa3a3a3,
-  [ElementType.FLYING]: 0x3b82f6,
+  [ElementType.FLYING]: 0x38bdf8,
 };
 
 interface PixiBattlefieldProps {

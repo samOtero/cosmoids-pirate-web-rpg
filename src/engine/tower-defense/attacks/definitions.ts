@@ -102,4 +102,16 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     projectileSpeed: 0.8,
     effects: [{ type: 'STUN', chance: 0.25, value: 1000 }],
   },
+  PECK: {
+    id: 'PECK',
+    name: 'Peck',
+    type: ElementType.FLYING,
+    category: 'physical',
+    power: 35,
+    cooldownMs: ATTACK_COOLDOWNS.NORMAL,
+    rangeIndex: 25,
+    behaviorType: 'PROJECTILE',
+    projectileSpeed: 1,
+    isDashAttack: true,
+  },
 };

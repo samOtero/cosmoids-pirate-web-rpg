@@ -49,7 +49,7 @@ export const MOUSE_1: CosmoidTemplate = {
 export const BIRD_1: CosmoidTemplate = {
   id: 'harlequill',
   name: 'Harlequill',
-  type: ElementType.NORMAL,
+  type: ElementType.FLYING,
   baseStats: {
     hp: 20,
     attack: 15,
@@ -65,7 +65,8 @@ export const BIRD_1: CosmoidTemplate = {
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
-    { level: 1, attackId: 'STRING_SHOT' },
+    { level: 3, attackId: 'PECK' },
+    { level: 6, attackId: 'STRING_SHOT' },
   ],
 };
 

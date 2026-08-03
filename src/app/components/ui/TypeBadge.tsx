@@ -14,7 +14,7 @@ const TYPE_COLORS: Record<ElementType, string> = {
   [ElementType.POISON]: 'bg-purple-600',
   [ElementType.ELECTRIC]: 'bg-yellow-500',
   [ElementType.NORMAL]: 'bg-gray-500',
-  [ElementType.FLYING]: 'bg-blue-400',
+  [ElementType.FLYING]: 'bg-sky-400',
 };
 
 export const TypeBadge: React.FC<TypeBadgeProps> = ({ type }) => {
