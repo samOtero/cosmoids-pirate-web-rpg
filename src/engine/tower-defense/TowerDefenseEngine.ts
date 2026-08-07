@@ -637,7 +637,7 @@ export class TowerDefenseEngine {
       const frameSpeed = p.speed * timeScale;
 
       if (dist < frameSpeed) {
-        if (target) {
+        if (target && p.dealsDamage !== false) {
           const sourceTower = newTowers.find((t) => t.id === p.sourceId);
           if (p.attackDefinitionId && sourceTower) {
             const attackDef = ATTACK_DEFS[p.attackDefinitionId];

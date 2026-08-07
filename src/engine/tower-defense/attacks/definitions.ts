@@ -40,6 +40,17 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     rangeIndex: 25,
     behaviorType: 'PROJECTILE',
     projectileSpeed: 1.2,
+    projectilePattern: {
+      count: 3,
+      spacing: 3,
+      scales: [1.35, 0.9, 0.6],
+      damageMode: 'FIRST_ONLY',
+    },
+    projectileVisual: {
+      type: 'FLAME',
+      outerColor: 0xdc2626,
+      innerColor: 0xfb4b2b,
+    },
     effects: [{ type: 'BURN', chance: 0.15 }],
   },
   BUBBLE_BEAM: {

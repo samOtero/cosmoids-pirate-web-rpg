@@ -213,6 +213,48 @@ function drawCursedFlame(flame: PIXI.Graphics, size: number) {
   flame.fill({ color: innerColors[colorIndex], alpha: 0.9 });
 }
 
+function drawProjectileFlame(
+  flame: PIXI.Graphics,
+  outerColor: number,
+  innerColor: number
+) {
+  const size = 8;
+
+  flame.moveTo(0, -size * 1.25);
+  flame.bezierCurveTo(
+    size * 0.9,
+    -size * 0.25,
+    size * 0.85,
+    size * 0.75,
+    0,
+    size
+  );
+  flame.bezierCurveTo(
+    -size * 0.85,
+    size * 0.75,
+    -size * 0.9,
+    -size * 0.25,
+    0,
+    -size * 1.25
+  );
+  flame.fill({ color: outerColor });
+
+  flame.moveTo(0, -size * 0.45);
+  flame.bezierCurveTo(size * 0.42, 0, size * 0.38, size * 0.48, 0, size * 0.62);
+  flame.bezierCurveTo(
+    -size * 0.38,
+    size * 0.48,
+    -size * 0.42,
+    0,
+    0,
+    -size * 0.45
+  );
+  flame.fill({ color: innerColor });
+
+  // The flame is drawn vertically; turn its rounded edge toward travel.
+  flame.rotation = -Math.PI / 2;
+}
+
 function spawnCursedFlame(
   aura: PIXI.Container,
   spriteWidth: number,
@@ -1370,6 +1412,15 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 psprite.label = 'proj_sprite';
                 psprite.anchor.set(0.5);
                 container.addChild(psprite);
+              } else if (def?.projectileVisual?.type === 'FLAME') {
+                const flame = new PIXI.Graphics();
+                flame.label = 'proj_graphics';
+                drawProjectileFlame(
+                  flame,
+                  def.projectileVisual.outerColor,
+                  def.projectileVisual.innerColor
+                );
+                container.addChild(flame);
               } else {
                 const g = new PIXI.Graphics();
                 g.label = 'proj_graphics';
@@ -1395,11 +1446,19 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             container.y = offsetY + (proj.position.y / 100) * screenH;
             const responsiveScale = app.screen.height / TD_BASE_HEIGHT;
             const finalScale = zoom * responsiveScale;
-            container.scale.set(finalScale);
+            container.scale.set(finalScale * (proj.visualScale ?? 1));
 
             const def = proj.attackDefinitionId
               ? ATTACK_DEFS[proj.attackDefinitionId]
               : undefined;
+
+            if (def?.projectileVisual?.type === 'FLAME') {
+              const travelX = proj.target.x - proj.position.x;
+              const travelY = proj.target.y - proj.position.y;
+              container.rotation = Math.atan2(travelY, travelX);
+            } else {
+              container.rotation = 0;
+            }
 
             if (def && def.isDashAttack) {
               const psprite = container.getChildByLabel('proj_sprite') as

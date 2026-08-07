@@ -1,11 +1,27 @@
 import { ElementType } from '@/types/baseGame';
 import { TowerDefenseEngine } from '../TowerDefenseEngine';
-import { Tower, Enemy } from '../types';
+import { Tower } from '../types';
 
 export interface AttackEffect {
   type: 'BURN' | 'POISON' | 'STUN' | 'MULTI_HIT' | 'KNOCKBACK';
   chance: number; // 0 to 1
   value?: number; // e.g., how many times to multi-hit, or duration of stun
+}
+
+export interface ProjectilePattern {
+  /** Number of projectiles to show. Runtime behavior caps this at three. */
+  count: number;
+  /** Distance in battlefield units between each projectile. */
+  spacing: number;
+  /** Per-projectile visual scales, ordered from front to back. */
+  scales: number[];
+  damageMode: 'EACH' | 'FIRST_ONLY';
+}
+
+export interface ProjectileVisual {
+  type: 'FLAME';
+  outerColor: number;
+  innerColor: number;
 }
 
 export interface AttackDefinition {
@@ -18,6 +34,8 @@ export interface AttackDefinition {
   rangeIndex: number; // 30 means 30% of screen distance
   projectileSpeed?: number;
   spriteUrl?: string; // e.g., a bubble texture
+  projectilePattern?: ProjectilePattern;
+  projectileVisual?: ProjectileVisual;
   behaviorType:
     | 'PROJECTILE'
     | 'INSTANT_AOE'

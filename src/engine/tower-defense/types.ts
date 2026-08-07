@@ -195,6 +195,9 @@ export interface Projectile {
   position: Point;
   speed: number;
   damage: number;
+  /** Defaults to true. False marks a follow-up projectile as visual-only. */
+  dealsDamage?: boolean;
+  visualScale?: number;
   target: Point;
   facingDirection?: 'up' | 'down' | 'left' | 'right';
 }

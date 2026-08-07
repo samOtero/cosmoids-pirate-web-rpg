@@ -18,9 +18,7 @@ export const SENTICLE: CosmoidTemplate = {
   battleSpriteUrl:
     '/battles/cosmoids/eel-basic-normal-neutral-skin-battle-ground-2.png',
   movementId: 'lizard',
-  learnableAttacks: [
-    { level: 1, attackId: 'TACKLE' },
-  ],
+  learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
 };
 
 export const MOUSE_1: CosmoidTemplate = {
@@ -307,7 +305,7 @@ export const STARTER_IGUANA: CosmoidTemplate = {
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'SCRATCH' },
-    { level: 3, attackId: 'EMBER' },
+    { level: 9, attackId: 'EMBER' },
   ],
 };
 
