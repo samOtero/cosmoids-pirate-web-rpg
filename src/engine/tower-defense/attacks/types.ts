@@ -29,6 +29,13 @@ export type ProjectileVisual =
       outerColor: number;
       innerColor: number;
       highlightColor: number;
+    }
+  | {
+      type: 'COIR_BOLA';
+      shadowColor: number;
+      fiberColor: number;
+      highlightColor: number;
+      sparkColor: number;
     };
 
 export interface AttackDefinition {

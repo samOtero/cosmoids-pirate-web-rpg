@@ -3,6 +3,7 @@ import { AttackDefinition } from './types';
 
 const ATTACK_COOLDOWNS = {
   NORMAL: 800,
+  CONTROL: 1600,
 };
 
 export const ATTACK_DEFS: Record<string, AttackDefinition> = {
@@ -75,6 +76,26 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
       innerColor: 0x38bdf8,
       highlightColor: 0xbae6fd,
     },
+  },
+  COIR_SNARE: {
+    id: 'COIR_SNARE',
+    name: 'Coir Snare',
+    type: ElementType.GRASS,
+    category: 'physical',
+    power: 30,
+    cooldownMs: ATTACK_COOLDOWNS.CONTROL,
+    rangeIndex: 25,
+    behaviorType: 'PROJECTILE',
+    projectileSpeed: 1.2,
+    projectileVisual: {
+      type: 'COIR_BOLA',
+      shadowColor: 0x4a2c1a,
+      fiberColor: 0xb7793f,
+      highlightColor: 0xe7b96c,
+      sparkColor: 0x84cc16,
+    },
+    effects: [{ type: 'STUN', chance: 1, value: 1000 }],
+    visualEffectConfigId: 'attack_coir_snare_1',
   },
   BUBBLE_BEAM: {
     id: 'BUBBLE_BEAM',

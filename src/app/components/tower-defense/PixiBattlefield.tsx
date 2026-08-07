@@ -275,6 +275,170 @@ function drawWaterStreamSegment(
   water.fill({ color: highlightColor, alpha: 0.9 });
 }
 
+function drawCoirBola(
+  container: PIXI.Container,
+  shadowColor: number,
+  fiberColor: number,
+  highlightColor: number,
+  sparkColor: number
+) {
+  const tailShadow = new PIXI.Graphics();
+  tailShadow.label = 'coir_tail_shadow';
+  tailShadow.moveTo(-5, -2);
+  tailShadow.bezierCurveTo(-11, -8, -17, -7, -23, -2);
+  tailShadow.moveTo(-5, 2);
+  tailShadow.bezierCurveTo(-12, 8, -18, 7, -25, 3);
+  tailShadow.stroke({ color: shadowColor, width: 4, alpha: 0.9 });
+  container.addChild(tailShadow);
+
+  const tails = new PIXI.Graphics();
+  tails.label = 'coir_tails';
+  tails.moveTo(-5, -2);
+  tails.bezierCurveTo(-11, -8, -17, -7, -23, -2);
+  tails.moveTo(-5, 2);
+  tails.bezierCurveTo(-12, 8, -18, 7, -25, 3);
+  tails.stroke({ color: fiberColor, width: 2, alpha: 1 });
+  container.addChild(tails);
+
+  const core = new PIXI.Container();
+  core.label = 'coir_bola_core';
+
+  const knot = new PIXI.Graphics();
+  knot.circle(0, 0, 9);
+  knot.fill({ color: shadowColor });
+  knot.circle(0, 0, 7.2);
+  knot.fill({ color: fiberColor });
+  knot.arc(0, 0, 5.2, -0.35, Math.PI * 1.5);
+  knot.stroke({ color: highlightColor, width: 1.7, alpha: 0.95 });
+  knot.arc(0, 0, 3.1, Math.PI * 0.75, Math.PI * 2.35);
+  knot.stroke({ color: shadowColor, width: 1.3, alpha: 0.75 });
+  knot.ellipse(2.2, -3.1, 2.1, 1.2);
+  knot.fill({ color: highlightColor, alpha: 0.72 });
+  core.addChild(knot);
+
+  const leafGlint = new PIXI.Graphics();
+  leafGlint.moveTo(5.5, -7);
+  leafGlint.quadraticCurveTo(10, -9, 10.5, -4.5);
+  leafGlint.quadraticCurveTo(7.5, -3.5, 5.5, -7);
+  leafGlint.fill({ color: sparkColor, alpha: 0.9 });
+  core.addChild(leafGlint);
+
+  container.addChild(core);
+}
+
+function drawCoirSnareImpact(
+  container: PIXI.Container,
+  shadowColor: number,
+  fiberColor: number,
+  highlightColor: number,
+  sparkColor: number
+) {
+  const snare = new PIXI.Container();
+  snare.label = 'coir_snare_loops';
+  snare.y = -9;
+
+  const loops = new PIXI.Graphics();
+  const loopSpecs = [
+    { y: -13, width: 48, height: 11, rotation: -0.08 },
+    { y: -2, width: 55, height: 13, rotation: 0.06 },
+    { y: 9, width: 45, height: 10, rotation: -0.04 },
+  ];
+  loopSpecs.forEach(({ y, width, height }) => {
+    loops.ellipse(0, y, width / 2, height / 2);
+    loops.stroke({ color: shadowColor, width: 6, alpha: 0.9 });
+    loops.ellipse(0, y, width / 2, height / 2);
+    loops.stroke({ color: fiberColor, width: 3.5, alpha: 1 });
+    loops.ellipse(0, y - 0.8, width / 2, height / 2);
+    loops.stroke({ color: highlightColor, width: 1, alpha: 0.75 });
+  });
+  loops.rotation = loopSpecs[1].rotation;
+  snare.addChild(loops);
+
+  const knot = new PIXI.Graphics();
+  knot.label = 'coir_snare_knot';
+  knot.circle(27, -2, 5.2);
+  knot.fill({ color: shadowColor });
+  knot.circle(27, -2, 3.5);
+  knot.fill({ color: fiberColor });
+  knot.moveTo(25, -4);
+  knot.lineTo(30, 1);
+  knot.stroke({ color: highlightColor, width: 1.2, alpha: 0.9 });
+  snare.addChild(knot);
+
+  container.addChild(snare);
+
+  const fibers = new PIXI.Graphics();
+  fibers.label = 'coir_snare_fibers';
+  const fiberAngles = [-2.8, -2.1, -1.3, -0.55, 0.2, 0.85, 1.55, 2.35];
+  fiberAngles.forEach((angle, index) => {
+    const innerRadius = 23 + (index % 2) * 3;
+    const outerRadius = innerRadius + 8 + (index % 3) * 2;
+    fibers.moveTo(
+      Math.cos(angle) * innerRadius,
+      -8 + Math.sin(angle) * innerRadius * 0.45
+    );
+    fibers.lineTo(
+      Math.cos(angle) * outerRadius,
+      -8 + Math.sin(angle) * outerRadius * 0.55
+    );
+  });
+  fibers.stroke({ color: highlightColor, width: 2, alpha: 0.88 });
+  container.addChild(fibers);
+
+  const sparks = new PIXI.Graphics();
+  sparks.label = 'coir_snare_sparks';
+  const sparkPositions = [
+    { x: -30, y: -23, scale: 1 },
+    { x: -21, y: 10, scale: 0.7 },
+    { x: 4, y: -30, scale: 0.85 },
+    { x: 25, y: -19, scale: 0.75 },
+    { x: 32, y: 6, scale: 0.9 },
+  ];
+  sparkPositions.forEach(({ x, y, scale }) => {
+    sparks.moveTo(x, y - 4 * scale);
+    sparks.quadraticCurveTo(x + 4 * scale, y, x, y + 4 * scale);
+    sparks.quadraticCurveTo(x - 4 * scale, y, x, y - 4 * scale);
+    sparks.fill({ color: sparkColor, alpha: 0.95 });
+  });
+  container.addChild(sparks);
+}
+
+function updateCoirSnareImpact(container: PIXI.Container, progress: number) {
+  const snare = container.getChildByLabel('coir_snare_loops') as
+    | PIXI.Container
+    | undefined;
+  const fibers = container.getChildByLabel('coir_snare_fibers') as
+    | PIXI.Graphics
+    | undefined;
+  const sparks = container.getChildByLabel('coir_snare_sparks') as
+    | PIXI.Graphics
+    | undefined;
+
+  const unfurl = Math.min(1, progress / 0.18);
+  const tighten = Math.min(1, Math.max(0, (progress - 0.18) / 0.22));
+  const fade = Math.min(1, Math.max(0, (progress - 0.78) / 0.22));
+
+  if (snare) {
+    const widthScale = (0.2 + unfurl * 0.95) * (1 - tighten * 0.12);
+    const heightScale = (0.35 + unfurl * 0.8) * (1 - tighten * 0.2);
+    snare.scale.set(widthScale, heightScale);
+    snare.rotation = Math.sin(progress * Math.PI * 5) * 0.025;
+  }
+
+  if (fibers) {
+    fibers.scale.set(0.55 + unfurl * 0.65);
+    fibers.alpha = Math.max(0, 1 - progress / 0.42);
+  }
+
+  if (sparks) {
+    sparks.scale.set(0.7 + unfurl * 0.6);
+    sparks.alpha = Math.max(0, 1 - progress / 0.5);
+    sparks.rotation = progress * 0.35;
+  }
+
+  container.alpha = 1 - fade;
+}
+
 function spawnCursedFlame(
   aura: PIXI.Container,
   spriteWidth: number,
@@ -1451,6 +1615,14 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                   def.projectileVisual.highlightColor
                 );
                 container.addChild(water);
+              } else if (def?.projectileVisual?.type === 'COIR_BOLA') {
+                drawCoirBola(
+                  container,
+                  def.projectileVisual.shadowColor,
+                  def.projectileVisual.fiberColor,
+                  def.projectileVisual.highlightColor,
+                  def.projectileVisual.sparkColor
+                );
               } else {
                 const g = new PIXI.Graphics();
                 g.label = 'proj_graphics';
@@ -1484,13 +1656,37 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
             if (
               def?.projectileVisual?.type === 'FLAME' ||
-              def?.projectileVisual?.type === 'WATER_STREAM'
+              def?.projectileVisual?.type === 'WATER_STREAM' ||
+              def?.projectileVisual?.type === 'COIR_BOLA'
             ) {
               const travelX = proj.target.x - proj.position.x;
               const travelY = proj.target.y - proj.position.y;
               container.rotation = Math.atan2(travelY, travelX);
             } else {
               container.rotation = 0;
+            }
+
+            if (def?.projectileVisual?.type === 'COIR_BOLA') {
+              const core = container.getChildByLabel('coir_bola_core') as
+                | PIXI.Container
+                | undefined;
+              const tails = container.getChildByLabel('coir_tails') as
+                | PIXI.Graphics
+                | undefined;
+              const tailShadow = container.getChildByLabel(
+                'coir_tail_shadow'
+              ) as PIXI.Graphics | undefined;
+              const coirContainer = container as PIXI.Container & {
+                coirAge?: number;
+              };
+              coirContainer.coirAge =
+                (coirContainer.coirAge ?? 0) + app.ticker.deltaTime;
+              if (core) {
+                core.rotation += 0.3 * app.ticker.deltaTime;
+              }
+              const tailWave = 1 + Math.sin(coirContainer.coirAge * 0.3) * 0.12;
+              tails?.scale.set(1, tailWave);
+              tailShadow?.scale.set(1, tailWave);
             }
 
             if (def && def.isDashAttack) {
@@ -1563,6 +1759,17 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                     if (!isDestroyed) sprite.texture = t;
                   });
                 });
+              } else if (animConfig?.type === 'COIR_SNARE') {
+                const coirVisual = ATTACK_DEFS.COIR_SNARE.projectileVisual;
+                if (coirVisual?.type === 'COIR_BOLA') {
+                  drawCoirSnareImpact(
+                    container,
+                    coirVisual.shadowColor,
+                    coirVisual.fiberColor,
+                    coirVisual.highlightColor,
+                    coirVisual.sparkColor
+                  );
+                }
               } else {
                 const sprite = new PIXI.Sprite();
                 sprite.label = 'vfx_sprite';
@@ -1612,6 +1819,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                   sprite.alpha = values.alpha;
                 }
               });
+            } else if (animConfig?.type === 'COIR_SNARE') {
+              updateCoirSnareImpact(container, progress);
             } else {
               const sprite = container.getChildByLabel('vfx_sprite') as
                 | PIXI.Sprite

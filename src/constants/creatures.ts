@@ -280,9 +280,7 @@ export const STARTER_CRAB: CosmoidTemplate = {
     { level: 2, attackId: 'EMBER' }, // push back attack unlocks for testing in level 1
     { level: 3, attackId: 'BUBBLE_BEAM' },
     { level: 4, attackId: 'STRING_SHOT' },
-  ],
-  evolutionNodes: [
-    { level: 10, evolutionDefId: 'bug_stage_2' }, // push back evolution for testing
+    { level: 6, attackId: 'COIR_SNARE' },
   ],
 };
 

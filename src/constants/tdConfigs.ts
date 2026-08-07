@@ -365,6 +365,14 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       offsetY: -19,
     },
   },
+  attack_coir_snare_1: {
+    default: {
+      vfxAnimation: {
+        type: 'COIR_SNARE',
+        durationMs: 1000,
+      },
+    },
+  },
   attack_nibble_1: {
     default: {
       scale: 0.32,
