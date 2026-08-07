@@ -64,7 +64,7 @@ describe('Quick Attack', () => {
       name: 'Quick Attack',
       type: ElementType.NORMAL,
       category: 'physical',
-      power: 30,
+      power: 15,
       cooldownMs: 400,
       rangeIndex: ATTACK_DEFS.TACKLE.rangeIndex,
       projectileSpeed: ATTACK_DEFS.TACKLE.projectileSpeed,
@@ -101,7 +101,7 @@ describe('Quick Attack', () => {
     expect(engine.projectiles).toHaveLength(1);
     expect(engine.projectiles[0]).toMatchObject({
       attackDefinitionId: 'QUICK_ATTACK',
-      damage: 30,
+      damage: 15,
       dealsDamage: true,
     });
     engine.destroy();

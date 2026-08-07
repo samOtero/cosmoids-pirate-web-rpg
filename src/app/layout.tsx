@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import DevTools from '@/components/dev/DevTools';
 import AnimationProvider from '@/app/components/AnimationProvider';
+import RotateDeviceOverlay from '@/app/components/RotateDeviceOverlay';
 import { Analytics } from '@vercel/analytics/next';
 
 const geistSans = Geist({
@@ -28,12 +29,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased w-screen h-screen bg-[#0d2b45] text-[#f4e4b]`}
+        className={`${geistSans.variable} ${geistMono.variable} h-screen w-screen bg-[#0d2b45] text-[#f4e4b] antialiased`}
       >
         {children}
         <AnimationProvider />
         <DevTools />
         <Analytics />
+        <RotateDeviceOverlay />
       </body>
     </html>
   );

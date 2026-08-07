@@ -33,6 +33,102 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.rotate-device-overlay {
+  display: none;
+}
+
+/* The game UI is designed for a wide playfield on phones and tablets. */
+@media (orientation: portrait) and (max-width: 1024px) {
+  .rotate-device-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483647;
+    display: flex;
+    min-height: 100vh;
+    min-height: 100dvh;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: max(1.5rem, env(safe-area-inset-top))
+      max(1.5rem, env(safe-area-inset-right))
+      max(1.5rem, env(safe-area-inset-bottom))
+      max(1.5rem, env(safe-area-inset-left));
+    color: #f4e4bc;
+    background:
+      radial-gradient(circle at 50% 30%, rgb(26 79 124 / 70%), transparent 52%),
+      linear-gradient(160deg, #102f4a 0%, #071a2b 100%);
+    isolation: isolate;
+    touch-action: none;
+  }
+
+  .rotate-device-overlay::before,
+  .rotate-device-overlay::after {
+    position: absolute;
+    z-index: -1;
+    width: 22rem;
+    height: 22rem;
+    border: 1px solid rgb(244 228 188 / 9%);
+    border-radius: 50%;
+    content: '';
+  }
+
+  .rotate-device-overlay::before {
+    top: -10rem;
+    right: -9rem;
+  }
+
+  .rotate-device-overlay::after {
+    bottom: -12rem;
+    left: -8rem;
+  }
+
+  .rotate-device-card {
+    width: min(100%, 26rem);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    border: 1px solid rgb(244 228 188 / 18%);
+    border-radius: 1.5rem;
+    background: rgb(7 26 43 / 72%);
+    box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 35%);
+    backdrop-filter: blur(12px);
+  }
+
+  .rotate-device-icon {
+    width: 8rem;
+    margin: 0 auto 0.75rem;
+    color: #67e8f9;
+    filter: drop-shadow(0 0 1rem rgb(34 211 238 / 28%));
+  }
+
+  .rotate-device-kicker {
+    margin: 0 0 0.35rem;
+    color: #a67c52;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .rotate-device-card h1 {
+    margin: 0;
+    color: #f4e4bc;
+    font-size: clamp(2rem, 9vw, 3rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+  }
+
+  .rotate-device-card p:last-child {
+    max-width: 20rem;
+    margin: 1rem auto 0;
+    color: rgb(244 228 188 / 78%);
+    font-size: 1rem;
+    line-height: 1.55;
+    text-wrap: balance;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
