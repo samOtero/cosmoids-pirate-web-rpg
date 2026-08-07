@@ -327,8 +327,7 @@ export const STARTER_MONKEY: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/monkeg_down_1_v2.png',
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
-    { level: 3, attackId: 'BUBBLE_BEAM' },
-    { level: 5, attackId: 'SCRATCH' },
+    { level: 8, attackId: 'WATER_GUN' },
   ],
 };
 

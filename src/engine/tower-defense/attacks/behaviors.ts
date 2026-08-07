@@ -4,6 +4,8 @@ import { AttackDefinition, AttackBehavior } from './types';
 import { EffectProcessor } from './EffectProcessor';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 
+const MAX_PROJECTILES_PER_PATTERN = 12;
+
 export const ProjectileBehavior: AttackBehavior = {
   canExecute(
     engine: TowerDefenseEngine,
@@ -44,7 +46,10 @@ export const ProjectileBehavior: AttackBehavior = {
 
       const pattern = attackDef.projectilePattern;
       const projectileCount = pattern
-        ? Math.min(3, Math.max(1, Math.floor(pattern.count)))
+        ? Math.min(
+            MAX_PROJECTILES_PER_PATTERN,
+            Math.max(1, Math.floor(pattern.count))
+          )
         : 1;
       const directionX = distance > 0 ? dx / distance : 0;
       const directionY = distance > 0 ? dy / distance : 0;

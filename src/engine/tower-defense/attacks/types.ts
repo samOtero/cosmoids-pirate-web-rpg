@@ -9,7 +9,7 @@ export interface AttackEffect {
 }
 
 export interface ProjectilePattern {
-  /** Number of projectiles to show. Runtime behavior caps this at three. */
+  /** Number of projectiles to show. Runtime behavior applies a safety cap. */
   count: number;
   /** Distance in battlefield units between each projectile. */
   spacing: number;
@@ -18,11 +18,18 @@ export interface ProjectilePattern {
   damageMode: 'EACH' | 'FIRST_ONLY';
 }
 
-export interface ProjectileVisual {
-  type: 'FLAME';
-  outerColor: number;
-  innerColor: number;
-}
+export type ProjectileVisual =
+  | {
+      type: 'FLAME';
+      outerColor: number;
+      innerColor: number;
+    }
+  | {
+      type: 'WATER_STREAM';
+      outerColor: number;
+      innerColor: number;
+      highlightColor: number;
+    };
 
 export interface AttackDefinition {
   id: string; // e.g., 'BUBBLE_BEAM'

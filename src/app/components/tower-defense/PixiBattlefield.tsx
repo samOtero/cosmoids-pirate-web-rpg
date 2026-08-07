@@ -255,6 +255,26 @@ function drawProjectileFlame(
   flame.rotation = -Math.PI / 2;
 }
 
+function drawWaterStreamSegment(
+  water: PIXI.Graphics,
+  outerColor: number,
+  innerColor: number,
+  highlightColor: number
+) {
+  water.moveTo(-11, 0);
+  water.bezierCurveTo(-5, -6, 5, -7, 11, 0);
+  water.bezierCurveTo(5, 7, -5, 6, -11, 0);
+  water.fill({ color: outerColor });
+
+  water.moveTo(-7, -0.5);
+  water.bezierCurveTo(-2, -3.8, 5, -4.2, 8, -0.3);
+  water.bezierCurveTo(3, 3.7, -2, 3.2, -7, -0.5);
+  water.fill({ color: innerColor });
+
+  water.ellipse(2.5, -2.1, 3.8, 1.25);
+  water.fill({ color: highlightColor, alpha: 0.9 });
+}
+
 function spawnCursedFlame(
   aura: PIXI.Container,
   spriteWidth: number,
@@ -1421,6 +1441,16 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                   def.projectileVisual.innerColor
                 );
                 container.addChild(flame);
+              } else if (def?.projectileVisual?.type === 'WATER_STREAM') {
+                const water = new PIXI.Graphics();
+                water.label = 'proj_graphics';
+                drawWaterStreamSegment(
+                  water,
+                  def.projectileVisual.outerColor,
+                  def.projectileVisual.innerColor,
+                  def.projectileVisual.highlightColor
+                );
+                container.addChild(water);
               } else {
                 const g = new PIXI.Graphics();
                 g.label = 'proj_graphics';
@@ -1452,7 +1482,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               ? ATTACK_DEFS[proj.attackDefinitionId]
               : undefined;
 
-            if (def?.projectileVisual?.type === 'FLAME') {
+            if (
+              def?.projectileVisual?.type === 'FLAME' ||
+              def?.projectileVisual?.type === 'WATER_STREAM'
+            ) {
               const travelX = proj.target.x - proj.position.x;
               const travelY = proj.target.y - proj.position.y;
               container.rotation = Math.atan2(travelY, travelX);
