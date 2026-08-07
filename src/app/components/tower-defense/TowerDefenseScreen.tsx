@@ -702,7 +702,7 @@ export default function TowerDefenseScreen({
         {/* Permanent Capture Device Tool */}
         {!engineRef.current.disableCapture && (
           <React.Fragment>
-            <div className="mx-2 h-16 w-px shrink-0 bg-cyan-800" />
+            <div className="mr-2 ml-auto h-16 w-px shrink-0 bg-cyan-800 lg:ml-2" />
             <button
               onPointerDown={(e) => {
                 e.currentTarget.setPointerCapture(e.pointerId);
