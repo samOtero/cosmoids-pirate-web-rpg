@@ -373,6 +373,14 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       },
     },
   },
+  attack_wind_gust_1: {
+    default: {
+      vfxAnimation: {
+        type: 'WIND_GUST',
+        durationMs: 750,
+      },
+    },
+  },
   attack_nibble_1: {
     default: {
       scale: 0.32,

@@ -439,6 +439,80 @@ function updateCoirSnareImpact(container: PIXI.Container, progress: number) {
   container.alpha = 1 - fade;
 }
 
+function drawWindGust(container: PIXI.Container) {
+  const haze = new PIXI.Graphics();
+  haze.label = 'wind_gust_haze';
+  container.addChild(haze);
+
+  const rings = new PIXI.Graphics();
+  rings.label = 'wind_gust_rings';
+  container.addChild(rings);
+
+  const streaks = new PIXI.Graphics();
+  streaks.label = 'wind_gust_streaks';
+  container.addChild(streaks);
+}
+
+function updateWindGust(
+  container: PIXI.Container,
+  progress: number,
+  maxRadius: number
+) {
+  const haze = container.getChildByLabel('wind_gust_haze') as
+    | PIXI.Graphics
+    | undefined;
+  const rings = container.getChildByLabel('wind_gust_rings') as
+    | PIXI.Graphics
+    | undefined;
+  const streaks = container.getChildByLabel('wind_gust_streaks') as
+    | PIXI.Graphics
+    | undefined;
+  const expansion = 1 - Math.pow(1 - progress, 3);
+  const radius = Math.max(2, maxRadius * expansion);
+  const fade = Math.min(1, Math.max(0, (progress - 0.72) / 0.28));
+  const opacity = 1 - fade;
+
+  if (haze) {
+    haze.clear();
+    haze.circle(0, 0, radius * 0.82);
+    haze.fill({ color: 0xdff7ff, alpha: 0.07 * opacity });
+  }
+
+  if (rings) {
+    rings.clear();
+    for (let index = 0; index < 8; index += 1) {
+      const ringRadius = radius * (0.25 + index * 0.1);
+      const start = index * 0.83 + progress * 4.5;
+      rings.arc(0, 0, ringRadius, start, start + 1.3);
+    }
+    rings.stroke({ color: 0xd8f5ff, width: 4, alpha: 0.72 * opacity });
+  }
+
+  if (streaks) {
+    streaks.clear();
+    for (let index = 0; index < 20; index += 1) {
+      const angle = index * 2.399 + progress * 3.4;
+      const distance = radius * (0.3 + (index % 7) * 0.095);
+      const length = 8 + (index % 5) * 3;
+      const x = Math.cos(angle) * distance;
+      const y = Math.sin(angle) * distance;
+      const tangentX = -Math.sin(angle) * length;
+      const tangentY = Math.cos(angle) * length;
+      streaks.moveTo(x - tangentX, y - tangentY);
+      streaks.quadraticCurveTo(
+        x + Math.cos(angle) * 3,
+        y + Math.sin(angle) * 3,
+        x + tangentX,
+        y + tangentY
+      );
+    }
+    streaks.stroke({ color: 0xffffff, width: 2.5, alpha: 0.8 * opacity });
+  }
+
+  container.rotation = progress * 0.32;
+  container.alpha = opacity;
+}
+
 function spawnCursedFlame(
   aura: PIXI.Container,
   spriteWidth: number,
@@ -1770,6 +1844,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                     coirVisual.sparkColor
                   );
                 }
+              } else if (animConfig?.type === 'WIND_GUST') {
+                drawWindGust(container);
               } else {
                 const sprite = new PIXI.Sprite();
                 sprite.label = 'vfx_sprite';
@@ -1790,7 +1866,14 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             container.y = offsetY + (vfx.position.y / 100) * screenH;
             const responsiveScale = app.screen.height / TD_BASE_HEIGHT;
             const finalScale = zoom * responsiveScale;
-            container.scale.set(finalScale);
+            if (animConfig?.type === 'WIND_GUST') {
+              container.scale.set(
+                (zoom * app.screen.width) / TD_BASE_HEIGHT,
+                finalScale
+              );
+            } else {
+              container.scale.set(finalScale);
+            }
 
             const progress = Math.min(1, vfx.elapsedMs / vfx.durationMs);
 
@@ -1821,6 +1904,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               });
             } else if (animConfig?.type === 'COIR_SNARE') {
               updateCoirSnareImpact(container, progress);
+            } else if (animConfig?.type === 'WIND_GUST') {
+              const radius = (TD_BASE_HEIGHT * (vfx.rangeIndex ?? 20)) / 100;
+              updateWindGust(container, progress, radius);
             } else {
               const sprite = container.getChildByLabel('vfx_sprite') as
                 | PIXI.Sprite

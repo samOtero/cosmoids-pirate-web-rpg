@@ -3,6 +3,7 @@ import { AttackDefinition } from './types';
 
 const ATTACK_COOLDOWNS = {
   NORMAL: 800,
+  QUICK: 400,
   CONTROL: 1600,
 };
 
@@ -97,6 +98,18 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     effects: [{ type: 'STUN', chance: 1, value: 1000 }],
     visualEffectConfigId: 'attack_coir_snare_1',
   },
+  WIND_GUST: {
+    id: 'WIND_GUST',
+    name: 'Wind Gust',
+    type: ElementType.FLYING,
+    category: 'special',
+    power: 0,
+    cooldownMs: ATTACK_COOLDOWNS.CONTROL,
+    rangeIndex: 20,
+    behaviorType: 'INSTANT_AOE',
+    itemPickupLockMs: 2000,
+    visualEffectConfigId: 'attack_wind_gust_1',
+  },
   BUBBLE_BEAM: {
     id: 'BUBBLE_BEAM',
     name: 'Bubble Beam',
@@ -115,6 +128,18 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     category: 'physical',
     power: 40,
     cooldownMs: ATTACK_COOLDOWNS.NORMAL,
+    rangeIndex: 25,
+    behaviorType: 'PROJECTILE',
+    projectileSpeed: 1,
+    isDashAttack: true,
+  },
+  QUICK_ATTACK: {
+    id: 'QUICK_ATTACK',
+    name: 'Quick Attack',
+    type: ElementType.NORMAL,
+    category: 'physical',
+    power: 15,
+    cooldownMs: ATTACK_COOLDOWNS.QUICK,
     rangeIndex: 25,
     behaviorType: 'PROJECTILE',
     projectileSpeed: 1,

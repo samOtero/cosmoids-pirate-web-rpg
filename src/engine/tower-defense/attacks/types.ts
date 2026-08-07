@@ -50,6 +50,8 @@ export interface AttackDefinition {
   spriteUrl?: string; // e.g., a bubble texture
   projectilePattern?: ProjectilePattern;
   projectileVisual?: ProjectileVisual;
+  /** How long a successfully disarmed enemy cannot pick up another item. */
+  itemPickupLockMs?: number;
   behaviorType:
     | 'PROJECTILE'
     | 'INSTANT_AOE'

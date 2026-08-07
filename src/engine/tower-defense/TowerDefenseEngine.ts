@@ -545,6 +545,9 @@ export class TowerDefenseEngine {
         // Find closest enemy that isn't holding anything
         for (const enemy of newEnemies) {
           if (enemy.heldCaptureUnitId) continue;
+          if ((enemy.itemPickupBlockedUntilMs ?? 0) > this.elapsedTimeMs) {
+            continue;
+          }
 
           const dx = enemy.position.x - cu.position.x;
           // Apply aspect ratio properly to dy since screen isn't perfectly square

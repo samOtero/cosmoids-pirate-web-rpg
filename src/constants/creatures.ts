@@ -41,6 +41,7 @@ export const MOUSE_1: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'NIBBLE' },
     { level: 3, attackId: 'STRING_SHOT' },
+    { level: 6, attackId: 'QUICK_ATTACK' },
   ],
 };
 
@@ -64,6 +65,7 @@ export const BIRD_1: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
     { level: 3, attackId: 'PECK' },
+    { level: 5, attackId: 'WIND_GUST' },
     { level: 6, attackId: 'STRING_SHOT' },
   ],
 };

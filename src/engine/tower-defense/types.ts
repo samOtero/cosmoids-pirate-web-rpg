@@ -181,6 +181,10 @@ export interface Enemy extends BaseTDUnit {
   currentWaypointIndex: number;
   pathIndex: number; // Index into the level's `paths` array
   heldCaptureUnitId?: string; // ID of the CaptureUnit they are holding
+  /** Permanent guard: Wind Gust can force this enemy to drop an item only once. */
+  hasBeenWindDisarmed?: boolean;
+  /** While active, this enemy cannot pick up capture units; other enemies still can. */
+  itemPickupBlockedUntilMs?: number;
   turnAroundAtEnd?: boolean;
   isMovingBackward?: boolean;
   uncapturable?: boolean;
@@ -220,4 +224,5 @@ export interface VisualEffect {
   elapsedMs: number;
   facingDirection?: 'up' | 'down' | 'left' | 'right';
   targetId?: string; // If attached to moving unit
+  rangeIndex?: number; // Optional battlefield radius for area effects
 }

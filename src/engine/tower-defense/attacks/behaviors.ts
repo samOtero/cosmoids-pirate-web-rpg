@@ -6,6 +6,17 @@ import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 
 const MAX_PROJECTILES_PER_PATTERN = 12;
 
+function isEnemyInRange(
+  source: Tower,
+  enemyX: number,
+  enemyY: number,
+  range: number
+) {
+  const dx = enemyX - source.position.x;
+  const dy = enemyY - source.position.y;
+  return Math.sqrt(dx * dx + dy * dy) <= range;
+}
+
 export const ProjectileBehavior: AttackBehavior = {
   canExecute(
     engine: TowerDefenseEngine,
@@ -145,7 +156,85 @@ export const InstantMeleeBehavior: AttackBehavior = {
   },
 };
 
+export const InstantAoeBehavior: AttackBehavior = {
+  canExecute(
+    engine: TowerDefenseEngine,
+    source: Tower,
+    attackDef: AttackDefinition
+  ): boolean {
+    return engine.enemies.some(
+      (enemy) =>
+        isEnemyInRange(
+          source,
+          enemy.position.x,
+          enemy.position.y,
+          attackDef.rangeIndex
+        ) &&
+        Boolean(enemy.heldCaptureUnitId) &&
+        !enemy.hasBeenWindDisarmed
+    );
+  },
+
+  execute(
+    engine: TowerDefenseEngine,
+    source: Tower,
+    attackDef: AttackDefinition
+  ): void {
+    const pickupLockMs = attackDef.itemPickupLockMs ?? 2000;
+
+    engine.enemies.forEach((enemy) => {
+      if (
+        !isEnemyInRange(
+          source,
+          enemy.position.x,
+          enemy.position.y,
+          attackDef.rangeIndex
+        ) ||
+        !enemy.heldCaptureUnitId ||
+        enemy.hasBeenWindDisarmed
+      ) {
+        return;
+      }
+
+      const carriedUnit = engine.captureUnits.find(
+        (unit) => unit.id === enemy.heldCaptureUnitId
+      );
+      if (!carriedUnit || carriedUnit.heldByEnemyId !== enemy.id) return;
+
+      carriedUnit.heldByEnemyId = undefined;
+      enemy.heldCaptureUnitId = undefined;
+      enemy.hasBeenWindDisarmed = true;
+      enemy.itemPickupBlockedUntilMs = engine.elapsedTimeMs + pickupLockMs;
+
+      engine.floatingTexts.push({
+        id: `ft_drop_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+        text: 'Dropped!',
+        position: { ...enemy.position },
+        color: 0xf4c76b,
+        scale: 0.85,
+        durationMs: 900,
+        elapsedMs: 0,
+      });
+    });
+
+    if (attackDef.visualEffectConfigId) {
+      const configMap = CREATURE_TD_CONFIGS[attackDef.visualEffectConfigId];
+      const vfxConfig = configMap?.default?.vfxAnimation;
+      engine.visualEffects.push({
+        id: `vfx_${Date.now()}_${Math.random()}`,
+        configId: attackDef.visualEffectConfigId,
+        position: { ...source.position },
+        durationMs: vfxConfig?.durationMs ?? 750,
+        elapsedMs: 0,
+        facingDirection: source.facingDirection,
+        rangeIndex: attackDef.rangeIndex,
+      });
+    }
+  },
+};
+
 export const AttackBehaviorRegistry: Record<string, AttackBehavior> = {
   PROJECTILE: ProjectileBehavior,
   INSTANT_MELEE: InstantMeleeBehavior,
+  INSTANT_AOE: InstantAoeBehavior,
 };

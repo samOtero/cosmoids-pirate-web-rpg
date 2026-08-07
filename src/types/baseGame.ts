@@ -148,6 +148,7 @@ export interface VFXAnimationConfig {
     | 'CUSTOM'
     | 'NIBBLE'
     | 'COIR_SNARE'
+    | 'WIND_GUST'
     | 'KEYFRAME_SPRITES';
   maskRotation?: number; // e.g. Math.PI / 4
   maskSize?: number; // e.g. 200
