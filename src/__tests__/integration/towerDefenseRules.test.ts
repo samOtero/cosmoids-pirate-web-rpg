@@ -28,14 +28,15 @@ describe('Tower defense rules', () => {
     );
 
     expect(mopup).toMatchObject({
-      position: { x: 45, y: 67 },
+      position: { x: 48.5, y: 51.5 },
       isFixed: true,
       receivesExperience: false,
       creature: {
         speciesId: 'mopup',
-        equippedAttacks: ['TACKLE', 'BUBBLE_BEAM'],
+        level: 3,
+        equippedAttacks: ['TACKLE'],
       },
-      selectedAttackIndex: 1,
+      selectedAttackIndex: 0,
     });
     expect(engine.roster).not.toContainEqual(
       expect.objectContaining({ id: 'kip_mopup' })
@@ -43,7 +44,7 @@ describe('Tower defense rules', () => {
 
     expect(engine.removeTower('kip_mopup')).toBe(false);
     expect(engine.placeTower('kip_mopup', 52.12, 67.3)).toBe(false);
-    expect(mopup?.position).toEqual({ x: 45, y: 67 });
+    expect(mopup?.position).toEqual({ x: 48.5, y: 51.5 });
 
     engine.destroy();
   });
