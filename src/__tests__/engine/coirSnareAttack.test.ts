@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 import { STARTER_CRAB } from '@/constants/creatures';
 import { ProjectileBehavior } from '@/engine/tower-defense/attacks/behaviors';
@@ -72,6 +76,7 @@ describe('Coir Snare', () => {
   });
 
   it('binds its target for one second and creates the tightening-rope effect', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
     const engine = new TowerDefenseEngine({
       paths: [
         [

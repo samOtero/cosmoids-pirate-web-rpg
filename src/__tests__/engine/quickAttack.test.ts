@@ -51,17 +51,17 @@ const createEnemy = (): Enemy => ({
 });
 
 describe('Quick Attack', () => {
-  it('is learned by Knotia at level 6', () => {
+  it('is learned by Knotia at level 4', () => {
     expect(
       MOUSE_1.learnableAttacks.find(
         (attack) => attack.attackId === 'QUICK_ATTACK'
       )
-    ).toEqual({ level: 6, attackId: 'QUICK_ATTACK' });
+    ).toEqual({ level: 4, attackId: 'QUICK_ATTACK' });
   });
 
   it('is a weaker Tackle with half the cooldown and the same dash behavior', () => {
     expect(ATTACK_DEFS.QUICK_ATTACK).toMatchObject({
-      name: 'Quick Attack',
+      name: 'Dart',
       type: ElementType.NORMAL,
       category: 'physical',
       power: 15,

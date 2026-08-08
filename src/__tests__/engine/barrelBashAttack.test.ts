@@ -97,7 +97,7 @@ describe('Barrel Bash', () => {
       isDashAttack: true,
       dashTrailType: 'WATER',
       visualEffectConfigId: 'attack_barrel_bash_1',
-      effects: [{ type: 'DRENCHED', chance: 1, value: 4000 }],
+      effects: [{ type: 'DRENCHED', chance: 0.25, value: 4000 }],
     });
   });
 
