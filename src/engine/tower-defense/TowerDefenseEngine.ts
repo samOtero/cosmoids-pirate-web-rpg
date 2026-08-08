@@ -32,7 +32,7 @@ import { TDProgressionManager } from './progression/TDProgressionManager';
 const defaultLevels: Record<string, number> = {
   senticle: 15,
   mouse_1: 3,
-  harlequill: 3,
+  harlequill: 5,
   mopup: 5,
   bug_stage_1: 3,
   bug_stage_2: 8,
@@ -85,6 +85,7 @@ export class TowerDefenseEngine {
     else if (speciesId === 'starter_iguana') defaultAttacks.push('SCRATCH');
     else if (speciesId === 'starter_monkey') defaultAttacks.push('TACKLE');
     else if (speciesId === 'mouse_1') defaultAttacks.push('NIBBLE');
+    else if (speciesId === 'harlequill') defaultAttacks.push('PECK');
     else if (speciesId === 'bettle') defaultAttacks.push('PINCH');
     else defaultAttacks.push('TACKLE'); // Fallback
     return defaultAttacks;
@@ -846,6 +847,7 @@ export class TowerDefenseEngine {
           spawner.group.uncapturable,
           spawner.group.isCursed,
           spawner.group.speedMultiplier,
+          spawner.group.hpMultiplier,
           spawner.group.level
         );
         spawner.spawnsRemaining--;
@@ -885,6 +887,7 @@ export class TowerDefenseEngine {
     uncapturable?: boolean,
     isCursed?: boolean,
     speedMultiplier?: number,
+    hpMultiplier?: number,
     groupLevel?: number
   ) {
     const meta = TD_CREATURE_DEFS[definitionId];
@@ -896,7 +899,8 @@ export class TowerDefenseEngine {
     const enemyLevel = groupLevel ?? meta.baseCreature.level;
     const enemyHp =
       calculateMaxHp(meta.baseCreature.maxHp, enemyLevel) *
-      this.enemyHpMultiplier;
+      this.enemyHpMultiplier *
+      (hpMultiplier ?? 1);
     const enemyAttack = calculateStat(meta.baseCreature.attack, enemyLevel);
     const enemySpecialAttack = calculateStat(
       meta.baseCreature.specialAttack,

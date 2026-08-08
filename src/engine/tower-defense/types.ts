@@ -52,6 +52,8 @@ export interface TDWaveGroup {
   /** Gives spawned enemies the cursed aura and makes them uncapturable. */
   isCursed?: boolean;
   speedMultiplier?: number; // Multiplies the base speed of enemies in this group
+  /** Multiplies battlefield HP for enemies in this group without changing captured creature stats. */
+  hpMultiplier?: number;
 }
 
 export interface TDWave {

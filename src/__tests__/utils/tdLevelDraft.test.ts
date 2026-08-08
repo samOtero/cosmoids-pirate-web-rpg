@@ -158,4 +158,35 @@ describe('TD level drafts', () => {
       'Initial view zoom must be between 0.5 and 1.',
     ]);
   });
+
+  it('rejects non-positive group HP multipliers', () => {
+    const level: TDLevelData = {
+      paths: [
+        [
+          { x: 0, y: 50 },
+          { x: 100, y: 50 },
+        ],
+      ],
+      placementSpots: [],
+      waves: [
+        {
+          id: 'wave_1',
+          groups: [
+            {
+              definitionId: 'mouse_1',
+              count: 1,
+              spawnIntervalMs: 0,
+              delayBeforeGroupMs: 0,
+              pathIndex: 0,
+              hpMultiplier: 0,
+            },
+          ],
+        },
+      ],
+    };
+
+    expect(validateTDLevelDraft(level)).toContain(
+      'Wave 1, group 1 HP multiplier must be greater than 0.'
+    );
+  });
 });

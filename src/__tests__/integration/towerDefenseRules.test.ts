@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
+import { COSMOID_TEMPLATES } from '@/constants/creatures';
 import { FOREST_LEVEL } from '@/constants/tdLevels/forestLevel';
-import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
+import {
+  TD_CREATURE_DEFS,
+  TowerDefenseEngine,
+} from '@/engine/tower-defense/TowerDefenseEngine';
+import {
+  calculateMaxHp,
+  resolvePlayerCreature,
+} from '@/utils/resolvePlayerCreature';
 
 describe('Tower defense rules', () => {
   it('always opens Level 2 with its full bottom-to-top camera tour', () => {
@@ -83,6 +91,57 @@ describe('Tower defense rules', () => {
       uncapturable: true,
     });
     expect(engine.captureEnemy(engine.enemies[0].id)).toBeNull();
+
+    engine.destroy();
+  });
+
+  it('applies group HP multipliers only to enemy battlefield stats', () => {
+    const enemyLevel = 3;
+    const engine = new TowerDefenseEngine({
+      paths: [
+        [
+          { x: 0, y: 50 },
+          { x: 100, y: 50 },
+        ],
+      ],
+      placementSpots: [],
+      enemyHpMultiplier: 2,
+      waves: [
+        {
+          id: 'hp_multiplier_test',
+          groups: [
+            {
+              definitionId: 'mouse_1',
+              count: 1,
+              spawnIntervalMs: 0,
+              delayBeforeGroupMs: 0,
+              pathIndex: 0,
+              level: enemyLevel,
+              hpMultiplier: 3,
+            },
+          ],
+        },
+      ],
+    });
+
+    engine.tick(0, 16);
+
+    const enemy = engine.enemies[0];
+    const normalEnemyHp = calculateMaxHp(
+      TD_CREATURE_DEFS.mouse_1.baseCreature.maxHp,
+      enemyLevel
+    );
+    expect(enemy.maxHp).toBe(normalEnemyHp * 2 * 3);
+    expect(enemy.hp).toBe(enemy.maxHp);
+
+    const captured = engine.captureEnemy(enemy.id);
+    expect(captured).not.toBeNull();
+    const capturedCreature = resolvePlayerCreature(captured!);
+    expect(capturedCreature.maxHp).toBe(
+      calculateMaxHp(COSMOID_TEMPLATES.mouse_1.baseStats.hp, enemyLevel)
+    );
+    expect(capturedCreature.maxHp).not.toBe(enemy.maxHp);
+    expect(capturedCreature.level).toBe(enemyLevel);
 
     engine.destroy();
   });

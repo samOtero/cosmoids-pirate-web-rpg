@@ -139,6 +139,12 @@ export function validateTDLevelDraft(
       ) {
         errors.push(`${groupLabel} speed multiplier must be greater than 0.`);
       }
+      if (
+        group.hpMultiplier !== undefined &&
+        (!Number.isFinite(group.hpMultiplier) || group.hpMultiplier <= 0)
+      ) {
+        errors.push(`${groupLabel} HP multiplier must be greater than 0.`);
+      }
     });
   });
 
