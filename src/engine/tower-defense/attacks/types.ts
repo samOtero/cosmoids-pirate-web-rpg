@@ -3,7 +3,7 @@ import { TowerDefenseEngine } from '../TowerDefenseEngine';
 import { Tower } from '../types';
 
 export interface AttackEffect {
-  type: 'BURN' | 'POISON' | 'STUN' | 'MULTI_HIT' | 'KNOCKBACK';
+  type: 'BURN' | 'POISON' | 'STUN' | 'DRENCHED' | 'MULTI_HIT' | 'KNOCKBACK';
   chance: number; // 0 to 1
   value?: number; // e.g., how many times to multi-hit, or duration of stun
 }
@@ -61,6 +61,7 @@ export interface AttackDefinition {
   effects?: AttackEffect[];
   visualEffectConfigId?: string; // which tdConfig to use for a visual effect
   isDashAttack?: boolean; // whether the base unit itself behaves as the projectile visually
+  dashTrailType?: 'WATER';
 }
 
 export interface AttackInstance {

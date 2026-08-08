@@ -4,6 +4,7 @@ import { AttackDefinition } from './types';
 const ATTACK_COOLDOWNS = {
   NORMAL: 800,
   QUICK: 400,
+  HEAVY: 1000,
   CONTROL: 1600,
 };
 
@@ -77,6 +78,21 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
       innerColor: 0x38bdf8,
       highlightColor: 0xbae6fd,
     },
+  },
+  BARREL_BASH: {
+    id: 'BARREL_BASH',
+    name: 'Barrel Bash',
+    type: ElementType.WATER,
+    category: 'physical',
+    power: 65,
+    cooldownMs: ATTACK_COOLDOWNS.HEAVY,
+    rangeIndex: 25,
+    behaviorType: 'PROJECTILE',
+    projectileSpeed: 1.15,
+    effects: [{ type: 'DRENCHED', chance: 1, value: 4000 }],
+    visualEffectConfigId: 'attack_barrel_bash_1',
+    isDashAttack: true,
+    dashTrailType: 'WATER',
   },
   COIR_SNARE: {
     id: 'COIR_SNARE',

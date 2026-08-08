@@ -373,6 +373,14 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       },
     },
   },
+  attack_barrel_bash_1: {
+    default: {
+      vfxAnimation: {
+        type: 'BARREL_BASH',
+        durationMs: 650,
+      },
+    },
+  },
   attack_wind_gust_1: {
     default: {
       vfxAnimation: {

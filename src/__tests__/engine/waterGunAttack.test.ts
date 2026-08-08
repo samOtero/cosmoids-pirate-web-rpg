@@ -50,12 +50,16 @@ const createEnemy = (): Enemy => ({
 });
 
 describe('Water Gun', () => {
-  it('is learned by Monkeg at level 8', () => {
+  it("remains registered but is no longer in Monkeg's learnset", () => {
+    expect(ATTACK_DEFS.WATER_GUN).toMatchObject({
+      name: 'Water Gun',
+      behaviorType: 'PROJECTILE',
+    });
     expect(
       STARTER_MONKEY.learnableAttacks.find(
         (attack) => attack.attackId === 'WATER_GUN'
       )
-    ).toEqual({ level: 8, attackId: 'WATER_GUN' });
+    ).toBeUndefined();
   });
 
   it('fires a long, tapered stream whose lead segment deals all damage', () => {

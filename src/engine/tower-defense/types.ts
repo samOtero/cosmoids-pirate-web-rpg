@@ -163,7 +163,7 @@ export interface Tower extends BaseTDUnit {
 }
 
 export interface StatusCondition {
-  type: 'BURN' | 'POISON' | 'STUN';
+  type: 'BURN' | 'POISON' | 'STUN' | 'DRENCHED';
   durationMs: number;
   tickDamage?: number;
   lastTickTime?: number;

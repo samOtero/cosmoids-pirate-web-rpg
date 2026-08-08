@@ -3,6 +3,9 @@ import { Tower, Enemy } from '../types';
 import { AttackDefinition } from './types';
 import { ElementType } from '@/types/baseGame';
 
+export const DRENCHED_DURATION_MS = 4000;
+export const DRENCHED_DAMAGE_MULTIPLIER = 1.5;
+
 const NEUTRAL_EFFECTIVENESS: Record<ElementType, number> = {
   [ElementType.NORMAL]: 1,
   [ElementType.FIRE]: 1,
@@ -136,11 +139,21 @@ export class EffectProcessor {
         (TYPE_EFFECTIVENESS[attackDef.type]?.[defenderType] ?? 1.0),
       1.0
     );
+    const isDrenched = target.statusConditions.some(
+      (status) => status.type === 'DRENCHED'
+    );
+    const drenchedMultiplier =
+      isDrenched &&
+      (attackDef.type === ElementType.WATER ||
+        attackDef.type === ElementType.ELECTRIC)
+        ? DRENCHED_DAMAGE_MULTIPLIER
+        : 1;
+    const combinedEffectiveness = effectivenessMultiplier * drenchedMultiplier;
 
     // Add a slight randomization (85% to 100%)
     const randomModifier = (Math.floor(Math.random() * 16) + 85) / 100;
     let finalDamage = Math.floor(
-      baseDamage * stabMultiplier * effectivenessMultiplier * randomModifier
+      baseDamage * stabMultiplier * combinedEffectiveness * randomModifier
     );
 
     // Ensure at least 1 damage
@@ -149,10 +162,10 @@ export class EffectProcessor {
     let textColor = 0xffffff;
     let textScale = 1.0;
 
-    if (effectivenessMultiplier > 1) {
+    if (combinedEffectiveness > 1) {
       textColor = 0xfacc15; // Yellow-ish for super effective
       textScale = 1.4;
-    } else if (effectivenessMultiplier < 1) {
+    } else if (combinedEffectiveness < 1) {
       textColor = 0x9ca3af; // Gray for not very effective
       textScale = 0.75;
     }
@@ -199,6 +212,32 @@ export class EffectProcessor {
                 durationMs: effect.value || 1000,
               });
               break;
+            case 'DRENCHED': {
+              const durationMs = effect.value || DRENCHED_DURATION_MS;
+              const existing = target.statusConditions.find(
+                (status) => status.type === 'DRENCHED'
+              );
+              if (existing) {
+                existing.durationMs = durationMs;
+              } else {
+                target.statusConditions.push({
+                  type: 'DRENCHED',
+                  durationMs,
+                });
+                engine.floatingTexts.push({
+                  id: `ft_drenched_${Date.now()}_${Math.random()
+                    .toString(36)
+                    .substring(7)}`,
+                  text: 'Drenched!',
+                  position: { ...target.position },
+                  color: 0x38bdf8,
+                  scale: 0.8,
+                  durationMs: 900,
+                  elapsedMs: 0,
+                });
+              }
+              break;
+            }
             case 'MULTI_HIT':
               if (hitCount < (effect.value || 2)) {
                 this.applyDamageAndEffects(

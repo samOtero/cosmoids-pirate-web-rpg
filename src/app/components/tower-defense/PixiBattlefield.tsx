@@ -15,6 +15,7 @@ import { TD_BASE_HEIGHT } from '@/constants/game';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import {
   BaseTDUnit,
+  Enemy,
   TDInitialView,
   TDOpeningPan,
 } from '@/engine/tower-defense/types';
@@ -275,6 +276,32 @@ function drawWaterStreamSegment(
   water.fill({ color: highlightColor, alpha: 0.9 });
 }
 
+function drawWaterDashTrail(trail: PIXI.Graphics) {
+  const streaks = [
+    { y: -10, length: 42, width: 5, color: 0x38bdf8 },
+    { y: 0, length: 54, width: 7, color: 0x0284c7 },
+    { y: 11, length: 38, width: 4, color: 0x7dd3fc },
+  ];
+
+  streaks.forEach(({ y, length, width, color }, index) => {
+    trail.moveTo(-7, y);
+    trail.bezierCurveTo(
+      -length * 0.35,
+      y - 5 + index * 2,
+      -length * 0.72,
+      y + 5 - index * 2,
+      -length,
+      y
+    );
+    trail.stroke({ color, width, alpha: 0.78, cap: 'round' });
+  });
+
+  trail.circle(-28, -17, 3.2);
+  trail.circle(-43, 16, 2.4);
+  trail.circle(-18, 19, 2);
+  trail.fill({ color: 0xbae6fd, alpha: 0.85 });
+}
+
 function drawCoirBola(
   container: PIXI.Container,
   shadowColor: number,
@@ -437,6 +464,55 @@ function updateCoirSnareImpact(container: PIXI.Container, progress: number) {
   }
 
   container.alpha = 1 - fade;
+}
+
+function drawBarrelBashImpact(container: PIXI.Container) {
+  const wave = new PIXI.Graphics();
+  wave.label = 'barrel_bash_wave';
+  container.addChild(wave);
+
+  const splash = new PIXI.Graphics();
+  splash.label = 'barrel_bash_splash';
+  container.addChild(splash);
+}
+
+function updateBarrelBashImpact(container: PIXI.Container, progress: number) {
+  const wave = container.getChildByLabel('barrel_bash_wave') as
+    | PIXI.Graphics
+    | undefined;
+  const splash = container.getChildByLabel('barrel_bash_splash') as
+    | PIXI.Graphics
+    | undefined;
+  const burst = Math.min(1, progress / 0.35);
+  const fade = Math.min(1, Math.max(0, (progress - 0.62) / 0.38));
+  const opacity = 1 - fade;
+
+  if (wave) {
+    const radius = 10 + burst * 42;
+    wave.clear();
+    wave.ellipse(0, 5, radius, radius * 0.42);
+    wave.stroke({ color: 0x38bdf8, width: 8, alpha: 0.72 * opacity });
+    wave.ellipse(0, 5, radius * 0.78, radius * 0.31);
+    wave.stroke({ color: 0xbae6fd, width: 3, alpha: 0.9 * opacity });
+  }
+
+  if (splash) {
+    splash.clear();
+    for (let index = 0; index < 12; index += 1) {
+      const angle = -Math.PI * 0.9 + (index / 11) * Math.PI * 1.8;
+      const distance = (18 + (index % 4) * 6) * burst;
+      const x = Math.cos(angle) * distance;
+      const y = Math.sin(angle) * distance - 8 * burst;
+      const size = 2.5 + (index % 3);
+      splash.ellipse(x, y, size, size * 1.7);
+      splash.fill({
+        color: index % 3 === 0 ? 0xbae6fd : 0x0ea5e9,
+        alpha: 0.85 * opacity,
+      });
+    }
+  }
+
+  container.alpha = opacity;
 }
 
 function drawWindGust(container: PIXI.Container) {
@@ -623,6 +699,69 @@ function updateCursedAura(
 
   if (aura.children.length < 14 && Math.random() < Math.min(0.5, delta * 0.3)) {
     spawnCursedFlame(aura, effectWidth, effectHeight);
+  }
+}
+
+type DrenchedDroplet = PIXI.Graphics & {
+  orbitIndex: number;
+};
+
+type DrenchedAura = PIXI.Container & {
+  elapsed: number;
+};
+
+function drawDrenchedDroplet(droplet: PIXI.Graphics) {
+  droplet.moveTo(0, -7);
+  droplet.bezierCurveTo(6, -1, 5, 6, 0, 7);
+  droplet.bezierCurveTo(-5, 6, -6, -1, 0, -7);
+  droplet.fill({ color: 0x0ea5e9, alpha: 0.82 });
+  droplet.ellipse(1.4, -1.8, 1.6, 2.2);
+  droplet.fill({ color: 0xbae6fd, alpha: 0.9 });
+}
+
+function updateDrenchedAura(
+  container: PIXI.Container,
+  enemy: Enemy,
+  delta: number
+) {
+  const isDrenched = enemy.statusConditions.some(
+    (status) => status.type === 'DRENCHED'
+  );
+  let aura = container.getChildByLabel('drenchedAura') as
+    | DrenchedAura
+    | undefined;
+
+  if (!isDrenched) {
+    if (aura) {
+      container.removeChild(aura);
+      aura.destroy({ children: true });
+    }
+    return;
+  }
+
+  if (!aura) {
+    aura = new PIXI.Container() as DrenchedAura;
+    aura.label = 'drenchedAura';
+    aura.elapsed = 0;
+    for (let index = 0; index < 6; index += 1) {
+      const droplet = new PIXI.Graphics() as DrenchedDroplet;
+      droplet.orbitIndex = index;
+      drawDrenchedDroplet(droplet);
+      aura.addChild(droplet);
+    }
+    container.addChild(aura);
+  }
+
+  aura.elapsed += delta;
+  for (const child of aura.children) {
+    const droplet = child as DrenchedDroplet;
+    const phase = aura.elapsed * 0.035 + droplet.orbitIndex * 1.047;
+    const depth = (Math.sin(phase) + 1) / 2;
+    droplet.x = Math.cos(phase) * (25 + depth * 7);
+    droplet.y = -23 + Math.sin(phase) * 13;
+    droplet.alpha = 0.45 + depth * 0.5;
+    droplet.scale.set(0.55 + depth * 0.32);
+    droplet.rotation = Math.sin(phase * 1.7) * 0.16;
   }
 }
 
@@ -1641,6 +1780,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             if (esprite) {
               updateCursedAura(container, enemy, esprite, app.ticker.deltaTime);
             }
+            updateDrenchedAura(container, enemy, app.ticker.deltaTime);
           }
 
           // --- Render Projectiles ---
@@ -1662,6 +1802,13 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 : undefined;
 
               if (def && def.isDashAttack) {
+                if (def.dashTrailType === 'WATER') {
+                  const trail = new PIXI.Graphics();
+                  trail.label = 'dash_trail';
+                  drawWaterDashTrail(trail);
+                  container.addChild(trail);
+                }
+
                 const shadow = new PIXI.Graphics();
                 shadow.label = 'shadow';
                 container.addChild(shadow);
@@ -1764,6 +1911,17 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             }
 
             if (def && def.isDashAttack) {
+              const trail = container.getChildByLabel('dash_trail') as
+                | PIXI.Graphics
+                | undefined;
+              if (trail) {
+                const travelX = proj.target.x - proj.position.x;
+                const travelY = proj.target.y - proj.position.y;
+                trail.rotation = Math.atan2(travelY, travelX);
+                trail.alpha =
+                  0.72 + Math.sin(app.ticker.lastTime * 0.018) * 0.16;
+              }
+
               const psprite = container.getChildByLabel('proj_sprite') as
                 | PIXI.Sprite
                 | undefined;
@@ -1846,6 +2004,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 }
               } else if (animConfig?.type === 'WIND_GUST') {
                 drawWindGust(container);
+              } else if (animConfig?.type === 'BARREL_BASH') {
+                drawBarrelBashImpact(container);
               } else {
                 const sprite = new PIXI.Sprite();
                 sprite.label = 'vfx_sprite';
@@ -1907,6 +2067,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             } else if (animConfig?.type === 'WIND_GUST') {
               const radius = (TD_BASE_HEIGHT * (vfx.rangeIndex ?? 20)) / 100;
               updateWindGust(container, progress, radius);
+            } else if (animConfig?.type === 'BARREL_BASH') {
+              updateBarrelBashImpact(container, progress);
             } else {
               const sprite = container.getChildByLabel('vfx_sprite') as
                 | PIXI.Sprite
