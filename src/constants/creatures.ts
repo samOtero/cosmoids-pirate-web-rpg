@@ -40,8 +40,7 @@ export const MOUSE_1: CosmoidTemplate = {
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'NIBBLE' },
-    { level: 3, attackId: 'STRING_SHOT' },
-    { level: 6, attackId: 'QUICK_ATTACK' },
+    { level: 4, attackId: 'QUICK_ATTACK' },
   ],
 };
 
@@ -63,10 +62,9 @@ export const BIRD_1: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/bird_1_down_1_25.png',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'TACKLE' },
-    { level: 3, attackId: 'PECK' },
+    { level: 1, attackId: 'PECK' },
     { level: 5, attackId: 'WIND_GUST' },
-    { level: 6, attackId: 'STRING_SHOT' },
+    { level: 9, attackId: 'QUICK_ATTACK' },
   ],
 };
 
@@ -278,10 +276,6 @@ export const STARTER_CRAB: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/palmit_down_1.png',
   learnableAttacks: [
     { level: 1, attackId: 'PINCH' },
-    { level: 2, attackId: 'VINE_WHIP' },
-    { level: 2, attackId: 'EMBER' }, // push back attack unlocks for testing in level 1
-    { level: 3, attackId: 'BUBBLE_BEAM' },
-    { level: 4, attackId: 'STRING_SHOT' },
     { level: 6, attackId: 'COIR_SNARE' },
   ],
 };

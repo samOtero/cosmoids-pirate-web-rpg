@@ -278,28 +278,44 @@ function drawWaterStreamSegment(
 
 function drawWaterDashTrail(trail: PIXI.Graphics) {
   const streaks = [
-    { y: -10, length: 42, width: 5, color: 0x38bdf8 },
-    { y: 0, length: 54, width: 7, color: 0x0284c7 },
-    { y: 11, length: 38, width: 4, color: 0x7dd3fc },
+    { y: -16, length: 58, width: 7, color: 0x7dd3fc },
+    { y: -5, length: 76, width: 10, color: 0x0ea5e9 },
+    { y: 7, length: 70, width: 9, color: 0x38bdf8 },
+    { y: 18, length: 52, width: 6, color: 0xbae6fd },
   ];
 
   streaks.forEach(({ y, length, width, color }, index) => {
-    trail.moveTo(-7, y);
-    trail.bezierCurveTo(
-      -length * 0.35,
-      y - 5 + index * 2,
-      -length * 0.72,
-      y + 5 - index * 2,
-      -length,
-      y
-    );
-    trail.stroke({ color, width, alpha: 0.78, cap: 'round' });
+    const drawStreakPath = () => {
+      trail.moveTo(-5, y);
+      trail.bezierCurveTo(
+        -length * 0.35,
+        y - 7 + index * 2,
+        -length * 0.72,
+        y + 7 - index * 2,
+        -length,
+        y
+      );
+    };
+    drawStreakPath();
+    trail.stroke({
+      color: 0x075985,
+      width: width + 6,
+      alpha: 0.72,
+      cap: 'round',
+    });
+    drawStreakPath();
+    trail.stroke({ color, width, alpha: 1, cap: 'round' });
   });
 
-  trail.circle(-28, -17, 3.2);
-  trail.circle(-43, 16, 2.4);
-  trail.circle(-18, 19, 2);
-  trail.fill({ color: 0xbae6fd, alpha: 0.85 });
+  const droplets = [
+    { x: -23, y: -27, r: 4.2 },
+    { x: -42, y: 27, r: 3.8 },
+    { x: -62, y: -22, r: 3.2 },
+    { x: -17, y: 29, r: 3 },
+    { x: -71, y: 13, r: 2.6 },
+  ];
+  droplets.forEach(({ x, y, r }) => trail.circle(x, y, r));
+  trail.fill({ color: 0xd9f7ff, alpha: 1 });
 }
 
 function drawCoirBola(
@@ -703,12 +719,13 @@ function updateCursedAura(
 }
 
 type DrenchedDroplet = PIXI.Graphics & {
-  orbitIndex: number;
+  life: number;
+  maxLife: number;
+  vx: number;
+  vy: number;
 };
 
-type DrenchedAura = PIXI.Container & {
-  elapsed: number;
-};
+type DrenchedAura = PIXI.Container;
 
 function drawDrenchedDroplet(droplet: PIXI.Graphics) {
   droplet.moveTo(0, -7);
@@ -719,9 +736,24 @@ function drawDrenchedDroplet(droplet: PIXI.Graphics) {
   droplet.fill({ color: 0xbae6fd, alpha: 0.9 });
 }
 
+function spawnDrenchedDroplet(aura: DrenchedAura) {
+  const droplet = new PIXI.Graphics() as DrenchedDroplet;
+  droplet.maxLife = 34 + Math.random() * 30;
+  droplet.life = droplet.maxLife;
+  droplet.vx = (Math.random() - 0.5) * 0.18;
+  droplet.vy = 0.42 + Math.random() * 0.55;
+  droplet.x = (Math.random() - 0.5) * 58;
+  droplet.y = -48 + Math.random() * 36;
+  const scale = 0.42 + Math.random() * 0.38;
+  droplet.scale.set(scale);
+  drawDrenchedDroplet(droplet);
+  aura.addChild(droplet);
+}
+
 function updateDrenchedAura(
   container: PIXI.Container,
   enemy: Enemy,
+  sprite: PIXI.Sprite,
   delta: number
 ) {
   const isDrenched = enemy.statusConditions.some(
@@ -739,29 +771,42 @@ function updateDrenchedAura(
     return;
   }
 
+  if ((enemy.damageFlashTimerMs || 0) <= 0) {
+    sprite.tint = 0x67c7f7;
+  }
+
   if (!aura) {
     aura = new PIXI.Container() as DrenchedAura;
     aura.label = 'drenchedAura';
-    aura.elapsed = 0;
     for (let index = 0; index < 6; index += 1) {
-      const droplet = new PIXI.Graphics() as DrenchedDroplet;
-      droplet.orbitIndex = index;
-      drawDrenchedDroplet(droplet);
-      aura.addChild(droplet);
+      spawnDrenchedDroplet(aura);
+      const droplet = aura.children[
+        aura.children.length - 1
+      ] as DrenchedDroplet;
+      droplet.life -= Math.random() * droplet.maxLife * 0.65;
     }
     container.addChild(aura);
   }
 
-  aura.elapsed += delta;
-  for (const child of aura.children) {
+  for (const child of [...aura.children]) {
     const droplet = child as DrenchedDroplet;
-    const phase = aura.elapsed * 0.035 + droplet.orbitIndex * 1.047;
-    const depth = (Math.sin(phase) + 1) / 2;
-    droplet.x = Math.cos(phase) * (25 + depth * 7);
-    droplet.y = -23 + Math.sin(phase) * 13;
-    droplet.alpha = 0.45 + depth * 0.5;
-    droplet.scale.set(0.55 + depth * 0.32);
-    droplet.rotation = Math.sin(phase * 1.7) * 0.16;
+    droplet.life -= delta;
+    if (droplet.life <= 0) {
+      aura.removeChild(droplet);
+      droplet.destroy();
+      continue;
+    }
+    droplet.x += droplet.vx * delta;
+    droplet.y += droplet.vy * delta;
+    const lifeRatio = droplet.life / droplet.maxLife;
+    droplet.alpha = Math.min(1, lifeRatio * 1.8);
+  }
+
+  if (
+    aura.children.length < 10 &&
+    Math.random() < Math.min(0.75, delta * 0.3)
+  ) {
+    spawnDrenchedDroplet(aura);
   }
 }
 
@@ -1779,8 +1824,13 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             updateSparkles(container, enemy, app.ticker.deltaTime);
             if (esprite) {
               updateCursedAura(container, enemy, esprite, app.ticker.deltaTime);
+              updateDrenchedAura(
+                container,
+                enemy,
+                esprite,
+                app.ticker.deltaTime
+              );
             }
-            updateDrenchedAura(container, enemy, app.ticker.deltaTime);
           }
 
           // --- Render Projectiles ---
@@ -1919,7 +1969,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 const travelY = proj.target.y - proj.position.y;
                 trail.rotation = Math.atan2(travelY, travelX);
                 trail.alpha =
-                  0.72 + Math.sin(app.ticker.lastTime * 0.018) * 0.16;
+                  0.92 + Math.sin(app.ticker.lastTime * 0.018) * 0.08;
               }
 
               const psprite = container.getChildByLabel('proj_sprite') as
@@ -1951,6 +2001,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                       if (!isDestroyed) psprite.texture = t;
                     }
                   );
+                  if (def.dashTrailType === 'WATER') {
+                    psprite.tint = 0x7dd3fc;
+                  }
                   shadow.visible = false; // Keep shadow hidden
                 }
               }

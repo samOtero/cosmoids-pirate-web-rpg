@@ -11,7 +11,7 @@ const ATTACK_COOLDOWNS = {
 export const ATTACK_DEFS: Record<string, AttackDefinition> = {
   SCRATCH: {
     id: 'SCRATCH',
-    name: 'Scratch',
+    name: 'Claw',
     type: ElementType.NORMAL,
     category: 'physical',
     power: 40,
@@ -35,7 +35,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
   },
   EMBER: {
     id: 'EMBER',
-    name: 'Ember',
+    name: 'Cinder Spit',
     type: ElementType.FIRE,
     category: 'special',
     power: 35,
@@ -54,7 +54,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
       outerColor: 0xdc2626,
       innerColor: 0xfb4b2b,
     },
-    effects: [{ type: 'BURN', chance: 0.15 }],
+    effects: [{ type: 'BURN', chance: 0.2 }],
   },
   WATER_GUN: {
     id: 'WATER_GUN',
@@ -84,12 +84,12 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     name: 'Barrel Bash',
     type: ElementType.WATER,
     category: 'physical',
-    power: 65,
+    power: 40,
     cooldownMs: ATTACK_COOLDOWNS.HEAVY,
     rangeIndex: 25,
     behaviorType: 'PROJECTILE',
     projectileSpeed: 1.15,
-    effects: [{ type: 'DRENCHED', chance: 1, value: 4000 }],
+    effects: [{ type: 'DRENCHED', chance: 0.25, value: 4000 }],
     visualEffectConfigId: 'attack_barrel_bash_1',
     isDashAttack: true,
     dashTrailType: 'WATER',
@@ -111,7 +111,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
       highlightColor: 0xe7b96c,
       sparkColor: 0x84cc16,
     },
-    effects: [{ type: 'STUN', chance: 1, value: 1000 }],
+    effects: [{ type: 'STUN', chance: 0.25, value: 1000 }],
     visualEffectConfigId: 'attack_coir_snare_1',
   },
   WIND_GUST: {
@@ -139,7 +139,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
   },
   TACKLE: {
     id: 'TACKLE',
-    name: 'Tackle',
+    name: 'Body Rush',
     type: ElementType.NORMAL,
     category: 'physical',
     power: 40,
@@ -151,7 +151,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
   },
   QUICK_ATTACK: {
     id: 'QUICK_ATTACK',
-    name: 'Quick Attack',
+    name: 'Dart',
     type: ElementType.NORMAL,
     category: 'physical',
     power: 15,

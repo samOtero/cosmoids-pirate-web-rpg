@@ -377,7 +377,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
     default: {
       vfxAnimation: {
         type: 'BARREL_BASH',
-        durationMs: 650,
+        durationMs: 400,
       },
     },
   },

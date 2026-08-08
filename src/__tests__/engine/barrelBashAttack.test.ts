@@ -91,7 +91,7 @@ describe('Barrel Bash', () => {
     expect(ATTACK_DEFS.BARREL_BASH).toMatchObject({
       type: ElementType.WATER,
       category: 'physical',
-      power: 65,
+      power: 40,
       cooldownMs: 1000,
       projectileSpeed: 1.15,
       isDashAttack: true,
@@ -124,7 +124,7 @@ describe('Barrel Bash', () => {
       expect.objectContaining({
         configId: 'attack_barrel_bash_1',
         targetId: enemy.id,
-        durationMs: 650,
+        durationMs: 400,
       })
     );
     engine.destroy();
