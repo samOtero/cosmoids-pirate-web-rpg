@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import { COSMOID_TEMPLATES } from '@/constants/creatures';
+import { LEVEL_ORDER, TD_LEVELS } from '@/constants/tdLevels';
 import { FOREST_LEVEL } from '@/constants/tdLevels/forestLevel';
+import { VANE_LEVEL } from '@/constants/tdLevels/vaneLevel';
 import {
   TD_CREATURE_DEFS,
   TowerDefenseEngine,
@@ -10,6 +12,11 @@ import {
   calculateMaxHp,
   resolvePlayerCreature,
 } from '@/utils/resolvePlayerCreature';
+import {
+  DialogContext,
+  StoryProgression,
+  TDLevelContext,
+} from '@/types/baseGame';
 
 describe('Tower defense rules', () => {
   it('always opens Level 2 with its full bottom-to-top camera tour', () => {
@@ -55,6 +62,42 @@ describe('Tower defense rules', () => {
     expect(mopup?.position).toEqual({ x: 48.5, y: 51.5 });
 
     engine.destroy();
+  });
+
+  it("makes Level 3 a Bug Cosmoid attack on Caleb and Kip's boat", () => {
+    const engine = new TowerDefenseEngine(VANE_LEVEL);
+    const enemyDefinitionIds = VANE_LEVEL.waves.flatMap((wave) =>
+      wave.groups.map((group) => group.definitionId)
+    );
+
+    expect(VANE_LEVEL.captureUnits).toEqual([]);
+    expect(engine.hasCaptureUnitsGoal).toBe(false);
+    expect(engine.lives).toBe(10);
+    expect(VANE_LEVEL.environmentUnits).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ tdConfigId: 'rebuilt_boat' }),
+        expect.objectContaining({ tdConfigId: 'caleb_battle' }),
+        expect.objectContaining({ tdConfigId: 'kip_battle' }),
+      ])
+    );
+    expect(new Set(enemyDefinitionIds)).toEqual(
+      new Set(['bug_stage_1', 'bug_stage_2', 'bettle'])
+    );
+
+    engine.destroy();
+  });
+
+  it('unlocks the playable Level 3 intro after completing Level 2', () => {
+    expect(LEVEL_ORDER[2]).toMatchObject({
+      context: TDLevelContext.VANE_LEVEL_3,
+      requiredProgression: StoryProgression.DEFEAT_BUG_STAGE_1,
+    });
+    expect(TD_LEVELS[TDLevelContext.VANE_LEVEL_3].introEvents).toEqual([
+      {
+        type: 'SHOW_DIALOG',
+        payload: { context: DialogContext.LEVEL_3_INTRO },
+      },
+    ]);
   });
 
   it('automatically prevents cursed enemies from being captured', () => {

@@ -21,6 +21,10 @@ export const TD_LEVEL_SAVE_TARGETS: Record<TDLevelContext, TDLevelSaveTarget> =
       fileName: 'forestLevel',
       exportName: 'FOREST_LEVEL',
     },
+    [TDLevelContext.VANE_LEVEL_3]: {
+      fileName: 'vaneLevel',
+      exportName: 'VANE_LEVEL',
+    },
     [TDLevelContext.CHALLENGE_FIRST_LEVEL]: {
       fileName: 'challengeFirstLevel',
       exportName: 'CHALLENGE_FIRST_LEVEL',

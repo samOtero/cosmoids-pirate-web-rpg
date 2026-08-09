@@ -67,6 +67,14 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
   [SpeakerImageKey.KIP_RELIEVED_HAPPY]: '/dialog/kip_relieved_happy.png',
   [SpeakerImageKey.CAPTAIN_VANE_HAUGHTY_NEUTRAL]:
     '/dialog/captain_vane_haughty_neutral.png',
+  [SpeakerImageKey.CAPTAIN_VANE_MOCKING_DISBELIEF]:
+    '/dialog/captain_vane_mocking_disbelief.png',
+  [SpeakerImageKey.CAPTAIN_VANE_COMMANDING_ANGRY]:
+    '/dialog/captain_vane_commanding_angry.png',
+  [SpeakerImageKey.CAPTAIN_VANE_SMUG_AMUSED]:
+    '/dialog/captain_vane_smug_amused.png',
+  [SpeakerImageKey.CAPTAIN_VANE_STUNNED_DEFEAT]:
+    '/dialog/captain_vane_stunned_defeat.png',
   [SpeakerImageKey.RAT_CATCHER_1]: '/dialog/rat_catcher_1.png',
   [SpeakerImageKey.RAT_CATCHER_ANGRY]: '/dialog/rat_catcher_angry_small.png',
   [SpeakerImageKey.RAT_CATCHER_CALM]: '/dialog/rat_catcher_calm.png',

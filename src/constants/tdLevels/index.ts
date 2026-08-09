@@ -6,6 +6,7 @@ import {
 } from '@/types/baseGame';
 import { FIRST_LEVEL } from './firstLevel';
 import { FOREST_LEVEL } from './forestLevel';
+import { VANE_LEVEL } from './vaneLevel';
 import {
   CHALLENGE_FIRST_LEVEL,
   CHALLENGE_FIRST_LEVEL_NO_CAPTURE,
@@ -77,6 +78,32 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
       },
     ],
   },
+  [TDLevelContext.VANE_LEVEL_3]: {
+    levelData: VANE_LEVEL,
+    introEvents: [
+      {
+        type: 'SHOW_DIALOG',
+        payload: {
+          context: DialogContext.LEVEL_3_INTRO,
+        },
+      },
+    ],
+    winEvents: [
+      {
+        type: 'SET_STORY_PROGRESSION',
+        payload: { progression: StoryProgression.DEFEAT_BUG_STAGE_2 },
+        autoProceed: true,
+      },
+      {
+        type: 'GO_TO_LEVEL_SELECT',
+      },
+    ],
+    loseEvents: [
+      {
+        type: 'GO_TO_LEVEL_SELECT',
+      },
+    ],
+  },
   [TDLevelContext.CHALLENGE_FIRST_LEVEL]: {
     levelData: CHALLENGE_FIRST_LEVEL,
     winEvents: [
@@ -126,11 +153,10 @@ export const LEVEL_ORDER: LevelInfo[] = [
     description: 'Protect the supplies needed to escape the island.',
     requiredProgression: StoryProgression.DEFEAT_FIRST_BATTLE,
   },
-  // Placeholder locked levels
   {
-    context: 'LOCKED_3' as TDLevelContext,
-    name: 'More levels coming soon',
-    description: 'TBD.',
+    context: TDLevelContext.VANE_LEVEL_3,
+    name: "Kip's Dream",
+    description: "Defend the repaired boat from Captain Vane's Bug Cosmoids.",
     requiredProgression: StoryProgression.DEFEAT_BUG_STAGE_1,
   },
 ];

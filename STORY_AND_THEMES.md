@@ -37,6 +37,24 @@ Caleb's stated goal is to become **the greatest Cosmoid Captain on the seas**. H
 
 In early goal-focused dialogue, especially Caleb's Level 2 departure, frame his immediate motivation around this dream. Do not bring up Caleb's parents or the Isle of Whispers in the Level 2 introduction; reserve those plot threads for scenes specifically intended to advance the central mystery.
 
+## Early Crew and Rivals
+
+### Kip
+
+Kip is a kind, observant, and timid young artist who begins the story as Captain Vane's unwilling cabin boy. His nervousness comes from living under Vane's ridicule and control, but his attention to small details lets him recognize qualities in Cosmoids that stronger or louder characters overlook. Mopup is his trusted Cosmoid partner.
+
+Kip's dream is to travel every sea and **draw every kind of Cosmoid in the world**. After Caleb defeats Vane, Kip stays with Caleb as the crew's artist and Cosmoid chronicler. He is not the crew's navigator. His illustrated field guide should connect his dream to player progression: capturing or discovering Cosmoids gives him new creatures to study, draw, and describe.
+
+Kip's decisive early character moment is publicly stating his dream in front of Vane, the person who taught him to feel ashamed of it. Caleb can give him the courage to speak, but Kip must make the choice himself.
+
+### Captain Vane
+
+Captain Vane is a woman and the commanding captain of the pirate crew camped on the Level 2 island. She is polished, imposing, proud, and accustomed to treating obedience as proof of her superiority. Her teal, purple, white, and gold uniform, sculpted dark hair, elevated posture, and controlled expressions give her the bearing of someone who expects to dominate a room before a fight begins.
+
+Vane mocks Kip's art and impossible-sounding dream because belittling her subordinates helps preserve her authority. When challenged, her amusement turns to anger and then disbelief; she cannot imagine that Caleb or Kip deserves to defy her.
+
+In Level 3, Vane battles Caleb personally rather than sending her full crew against him. She considers him beneath the need for reinforcements and wants to reassert her control in front of Kip. The emotional structure should center on Kip overcoming his fear, declaring his dream, and choosing to leave with Caleb. The scene may echo the emotional clarity of an early pirate-adventure recruitment encounter, but its dialogue, creature battle, character roles, and resolution should remain specific to Cosmoids.
+
 ## The World
 
 The game takes place during the pirate-and-Cosmoid era, across an enormous ocean filled with varied islands, cultures, habitats, ruins, and trade routes.
