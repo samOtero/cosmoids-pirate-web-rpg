@@ -34,6 +34,9 @@ const TowerDefenseScreen = lazy(
 const ChallengeSelectScreen = lazy(
   () => import('@/app/components/ChallengeSelectScreen')
 );
+const CosmoidCodexScreen = lazy(
+  () => import('@/app/components/CosmoidCodexScreen')
+);
 
 export default function Home() {
   const {
@@ -70,8 +73,6 @@ export default function Home() {
       }
     }
   }, [currentScreen, currentProfile, setScreen]);
-
-
 
   if (currentScreen === Screens.START) {
     return (
@@ -275,7 +276,21 @@ export default function Home() {
           profile={currentProfile}
           onSelectStory={() => setScreen(Screens.LEVEL_SELECT)}
           onSelectChallenge={() => setScreen(Screens.CHALLENGE_SELECT)}
+          onSelectCodex={() => setScreen(Screens.COSMOID_CODEX)}
           onBack={() => setScreen(Screens.PROFILES)}
+        />
+      </Suspense>
+    );
+  }
+
+  if (currentScreen === Screens.COSMOID_CODEX) {
+    if (!currentProfile) return null;
+
+    return (
+      <Suspense fallback={<div>Opening Kip&apos;s Journal...</div>}>
+        <CosmoidCodexScreen
+          profile={currentProfile}
+          onBack={() => setScreen(Screens.MODE_SELECT)}
         />
       </Suspense>
     );

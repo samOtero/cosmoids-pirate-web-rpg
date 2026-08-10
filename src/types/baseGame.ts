@@ -5,6 +5,7 @@ export enum Screens {
   MODE_SELECT = 'MODE_SELECT',
   LEVEL_SELECT = 'LEVEL_SELECT',
   CHALLENGE_SELECT = 'CHALLENGE_SELECT',
+  COSMOID_CODEX = 'COSMOID_CODEX',
   PARTY = 'PARTY',
   TOWER_DEFENSE = 'TOWER_DEFENSE',
 }
@@ -22,6 +23,11 @@ export interface TDLevelConfig {
   introEvents?: GameEvent[];
   winEvents: GameEvent[];
   loseEvents: GameEvent[];
+  /** Kip's Journal entries revealed once this level's completion milestone is reached. */
+  journalCompletion?: {
+    progression: StoryProgressionValue;
+    seenSpeciesIds: string[];
+  };
 }
 
 export enum ElementType {

@@ -15,6 +15,10 @@ import {
 export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
   [TDLevelContext.FIRST_LEVEL]: {
     levelData: FIRST_LEVEL,
+    journalCompletion: {
+      progression: StoryProgression.DEFEAT_FIRST_BATTLE,
+      seenSpeciesIds: [],
+    },
     introEvents: [
       {
         type: 'SHOW_DIALOG',
@@ -46,6 +50,10 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
   },
   [TDLevelContext.FOREST_LEVEL_2]: {
     levelData: FOREST_LEVEL,
+    journalCompletion: {
+      progression: StoryProgression.DEFEAT_BUG_STAGE_1,
+      seenSpeciesIds: ['mouse_1', 'harlequill', 'mopup'],
+    },
     introEvents: [
       {
         type: 'SHOW_DIALOG',
@@ -80,6 +88,10 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
   },
   [TDLevelContext.VANE_LEVEL_3]: {
     levelData: VANE_LEVEL,
+    journalCompletion: {
+      progression: StoryProgression.DEFEAT_BUG_STAGE_2,
+      seenSpeciesIds: ['bug_stage_1', 'bug_stage_2', 'bug_stage_3', 'bettle'],
+    },
     introEvents: [
       {
         type: 'SHOW_DIALOG',
