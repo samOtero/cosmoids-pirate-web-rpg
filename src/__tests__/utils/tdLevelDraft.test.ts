@@ -1,6 +1,7 @@
 import { TDLevelData } from '@/engine/tower-defense/types';
 import { TD_LEVELS } from '@/constants/tdLevels';
 import { TD_CREATURE_DEFS } from '@/engine/tower-defense/TowerDefenseEngine';
+import { ENEMY_ABILITY_DEFS } from '@/engine/tower-defense/enemyAbilities';
 import {
   cloneTDLevelDraft,
   createEmptyTDLevelDraft,
@@ -14,6 +15,7 @@ describe('TD level drafts', () => {
       paths: [[]],
       placementSpots: [],
       captureUnits: [],
+      waveEnemyDefinitions: [],
       waves: [],
     });
   });
@@ -45,13 +47,21 @@ describe('TD level drafts', () => {
           futureEnvironmentField: 'environment metadata',
         },
       ],
+      waveEnemyDefinitions: [
+        {
+          id: 'starter_crab_variant',
+          creatureId: 'starter_crab',
+          level: 1,
+          futureDefinitionField: 'definition metadata',
+        },
+      ],
       waves: [
         {
           id: 'wave_1',
           futureWaveField: 'wave metadata',
           groups: [
             {
-              definitionId: 'starter_crab',
+              enemyDefinitionId: 'starter_crab_variant',
               count: 1,
               spawnIntervalMs: 1000,
               delayBeforeGroupMs: 0,
@@ -84,6 +94,9 @@ describe('TD level drafts', () => {
           position: { x: 70.56, y: 80.44 },
         },
       ],
+      waveEnemyDefinitions: [
+        { futureDefinitionField: 'definition metadata' },
+      ],
       waves: [
         {
           futureWaveField: 'wave metadata',
@@ -98,12 +111,24 @@ describe('TD level drafts', () => {
     const invalidLevel: TDLevelData = {
       paths: [[{ x: 101, y: 20 }]],
       placementSpots: [],
+      waveEnemyDefinitions: [
+        {
+          id: 'broken_enemy',
+          creatureId: 'missing_enemy',
+          level: 0,
+          speedMultiplier: 0,
+          hpMultiplier: 0,
+          defenseMultiplier: 0,
+          specialDefenseMultiplier: 0,
+          abilityId: 'missing_ability',
+        },
+      ],
       waves: [
         {
           id: 'wave_1',
           groups: [
             {
-              definitionId: 'missing_enemy',
+              enemyDefinitionId: 'missing_definition',
               count: 0,
               spawnIntervalMs: -1,
               delayBeforeGroupMs: 0,
@@ -115,11 +140,22 @@ describe('TD level drafts', () => {
     };
 
     expect(
-      validateTDLevelDraft(invalidLevel, new Set(['known_enemy']))
+      validateTDLevelDraft(
+        invalidLevel,
+        new Set(['known_enemy']),
+        new Set(['known_ability'])
+      )
     ).toEqual(
       expect.arrayContaining([
         'Path 1 needs at least two points.',
-        'Wave 1, group 1 references unknown enemy "missing_enemy".',
+        'Enemy definition 1 references unknown creature "missing_enemy".',
+        'Enemy definition 1 level must be a positive integer.',
+        'Enemy definition 1 speed multiplier must be greater than 0.',
+        'Enemy definition 1 HP multiplier must be greater than 0.',
+        'Enemy definition 1 defense multiplier must be greater than 0.',
+        'Enemy definition 1 special defense multiplier must be greater than 0.',
+        'Enemy definition 1 references unknown ability "missing_ability".',
+        'Wave 1, group 1 references unknown enemy definition "missing_definition".',
         'Wave 1, group 1 count must be a positive integer.',
         'Wave 1, group 1 spawn interval cannot be negative.',
         'Wave 1, group 1 references an invalid path.',
@@ -129,10 +165,11 @@ describe('TD level drafts', () => {
 
   it('accepts every currently registered level', () => {
     const creatureIds = new Set(Object.keys(TD_CREATURE_DEFS));
+    const abilityIds = new Set(Object.keys(ENEMY_ABILITY_DEFS));
 
     Object.entries(TD_LEVELS).forEach(([context, config]) => {
       expect(
-        validateTDLevelDraft(config.levelData, creatureIds),
+        validateTDLevelDraft(config.levelData, creatureIds, abilityIds),
         context
       ).toEqual([]);
     });
@@ -147,6 +184,7 @@ describe('TD level drafts', () => {
         ],
       ],
       placementSpots: [],
+      waveEnemyDefinitions: [],
       waves: [],
       backgroundScale: 2,
       initialView: { offsetX: -1, offsetY: 101, zoom: 0.2 },
@@ -159,7 +197,7 @@ describe('TD level drafts', () => {
     ]);
   });
 
-  it('rejects non-positive group HP multipliers', () => {
+  it('rejects non-positive enemy-definition HP multipliers', () => {
     const level: TDLevelData = {
       paths: [
         [
@@ -168,17 +206,24 @@ describe('TD level drafts', () => {
         ],
       ],
       placementSpots: [],
+      waveEnemyDefinitions: [
+        {
+          id: 'invalid_mouse',
+          creatureId: 'mouse_1',
+          level: 3,
+          hpMultiplier: 0,
+        },
+      ],
       waves: [
         {
           id: 'wave_1',
           groups: [
             {
-              definitionId: 'mouse_1',
+              enemyDefinitionId: 'invalid_mouse',
               count: 1,
               spawnIntervalMs: 0,
               delayBeforeGroupMs: 0,
               pathIndex: 0,
-              hpMultiplier: 0,
             },
           ],
         },
@@ -186,7 +231,60 @@ describe('TD level drafts', () => {
     };
 
     expect(validateTDLevelDraft(level)).toContain(
-      'Wave 1, group 1 HP multiplier must be greater than 0.'
+      'Enemy definition 1 HP multiplier must be greater than 0.'
     );
+  });
+
+  it('allows multiple uniquely configured definitions for the same creature', () => {
+    const level: TDLevelData = {
+      paths: [
+        [
+          { x: 0, y: 50 },
+          { x: 100, y: 50 },
+        ],
+      ],
+      placementSpots: [],
+      waveEnemyDefinitions: [
+        {
+          id: 'mouse_scout',
+          creatureId: 'mouse_1',
+          level: 3,
+          speedMultiplier: 2,
+        },
+        {
+          id: 'mouse_tank',
+          creatureId: 'mouse_1',
+          level: 7,
+          hpMultiplier: 4,
+          defenseMultiplier: 2,
+        },
+      ],
+      waves: [
+        {
+          id: 'wave_1',
+          groups: [
+            {
+              enemyDefinitionId: 'mouse_scout',
+              count: 1,
+              spawnIntervalMs: 0,
+              delayBeforeGroupMs: 0,
+              pathIndex: 0,
+            },
+            {
+              enemyDefinitionId: 'mouse_tank',
+              count: 1,
+              spawnIntervalMs: 0,
+              delayBeforeGroupMs: 0,
+              pathIndex: 0,
+              concurrentWithPrevious: true,
+            },
+          ],
+        },
+      ],
+    };
+
+    expect(
+      validateTDLevelDraft(level, new Set(['mouse_1']))
+    ).toEqual([]);
   });
 });

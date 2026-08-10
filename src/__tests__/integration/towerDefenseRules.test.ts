@@ -10,6 +10,7 @@ import {
 } from '@/engine/tower-defense/TowerDefenseEngine';
 import {
   calculateMaxHp,
+  calculateStat,
   resolvePlayerCreature,
 } from '@/utils/resolvePlayerCreature';
 import {
@@ -66,8 +67,16 @@ describe('Tower defense rules', () => {
 
   it("makes Level 3 a Bug Cosmoid attack on Caleb and Kip's boat", () => {
     const engine = new TowerDefenseEngine(VANE_LEVEL);
-    const enemyDefinitionIds = VANE_LEVEL.waves.flatMap((wave) =>
-      wave.groups.map((group) => group.definitionId)
+    const definitionsById = new Map(
+      VANE_LEVEL.waveEnemyDefinitions.map((definition) => [
+        definition.id,
+        definition,
+      ])
+    );
+    const creatureIds = VANE_LEVEL.waves.flatMap((wave) =>
+      wave.groups.map(
+        (group) => definitionsById.get(group.enemyDefinitionId)?.creatureId
+      )
     );
 
     expect(VANE_LEVEL.captureUnits).toEqual([]);
@@ -80,8 +89,8 @@ describe('Tower defense rules', () => {
         expect.objectContaining({ tdConfigId: 'kip_battle' }),
       ])
     );
-    expect(new Set(enemyDefinitionIds)).toEqual(
-      new Set(['bug_stage_1', 'bug_stage_2', 'bettle'])
+    expect(new Set(creatureIds)).toEqual(
+      new Set(['bug_stage_1', 'bug_stage_2', 'bug_stage_3', 'bettle'])
     );
 
     engine.destroy();
@@ -109,12 +118,19 @@ describe('Tower defense rules', () => {
         ],
       ],
       placementSpots: [],
+      waveEnemyDefinitions: [
+        {
+          id: 'cursed_senticle',
+          creatureId: 'senticle',
+          level: 15,
+        },
+      ],
       waves: [
         {
           id: 'cursed_test',
           groups: [
             {
-              definitionId: 'senticle',
+              enemyDefinitionId: 'cursed_senticle',
               count: 1,
               spawnIntervalMs: 0,
               delayBeforeGroupMs: 0,
@@ -138,7 +154,7 @@ describe('Tower defense rules', () => {
     engine.destroy();
   });
 
-  it('applies group HP multipliers only to enemy battlefield stats', () => {
+  it('applies enemy-definition stat multipliers only to battlefield stats', () => {
     const enemyLevel = 3;
     const engine = new TowerDefenseEngine({
       paths: [
@@ -149,18 +165,26 @@ describe('Tower defense rules', () => {
       ],
       placementSpots: [],
       enemyHpMultiplier: 2,
+      waveEnemyDefinitions: [
+        {
+          id: 'armored_mouse',
+          creatureId: 'mouse_1',
+          level: enemyLevel,
+          hpMultiplier: 3,
+          defenseMultiplier: 2.5,
+          specialDefenseMultiplier: 3,
+        },
+      ],
       waves: [
         {
           id: 'hp_multiplier_test',
           groups: [
             {
-              definitionId: 'mouse_1',
+              enemyDefinitionId: 'armored_mouse',
               count: 1,
               spawnIntervalMs: 0,
               delayBeforeGroupMs: 0,
               pathIndex: 0,
-              level: enemyLevel,
-              hpMultiplier: 3,
             },
           ],
         },
@@ -176,6 +200,17 @@ describe('Tower defense rules', () => {
     );
     expect(enemy.maxHp).toBe(normalEnemyHp * 2 * 3);
     expect(enemy.hp).toBe(enemy.maxHp);
+    expect(enemy.currentDefense).toBe(
+      calculateStat(TD_CREATURE_DEFS.mouse_1.baseCreature.defense, enemyLevel) *
+        2.5
+    );
+    expect(enemy.currentSpecialDefense).toBe(
+      calculateStat(
+        TD_CREATURE_DEFS.mouse_1.baseCreature.specialDefense,
+        enemyLevel
+      ) * 3
+    );
+    expect(enemy.waveEnemyDefinitionId).toBe('armored_mouse');
 
     const captured = engine.captureEnemy(enemy.id);
     expect(captured).not.toBeNull();

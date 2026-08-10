@@ -148,22 +148,29 @@ export const FIRST_LEVEL: TDLevelData = {
       tdConfigId: 'coin_1',
     },
   ],
+  waveEnemyDefinitions: [
+    {
+      id: 'dock_mouse',
+      creatureId: 'mouse_1',
+      level: 3,
+      speedMultiplier: 2,
+    },
+  ],
   waves: [
     {
       id: 'wave_1771807082096',
       groups: [
         {
-          definitionId: 'mouse_1',
+          enemyDefinitionId: 'dock_mouse',
           count: 1,
           spawnIntervalMs: 1500,
           delayBeforeGroupMs: 100,
           pathIndex: 0,
           turnAroundAtEnd: true,
           uncapturable: false,
-          speedMultiplier: 2,
         },
         {
-          definitionId: 'mouse_1',
+          enemyDefinitionId: 'dock_mouse',
           count: 2,
           spawnIntervalMs: 1500,
           delayBeforeGroupMs: 3000,
@@ -171,10 +178,9 @@ export const FIRST_LEVEL: TDLevelData = {
           turnAroundAtEnd: true,
           concurrentWithPrevious: false,
           uncapturable: false,
-          speedMultiplier: 2,
         },
         {
-          definitionId: 'mouse_1',
+          enemyDefinitionId: 'dock_mouse',
           count: 3,
           spawnIntervalMs: 1500,
           delayBeforeGroupMs: 3000,
@@ -182,10 +188,9 @@ export const FIRST_LEVEL: TDLevelData = {
           turnAroundAtEnd: true,
           concurrentWithPrevious: false,
           uncapturable: false,
-          speedMultiplier: 2,
         },
         {
-          definitionId: 'mouse_1',
+          enemyDefinitionId: 'dock_mouse',
           count: 5,
           spawnIntervalMs: 1500,
           delayBeforeGroupMs: 3000,
@@ -193,7 +198,6 @@ export const FIRST_LEVEL: TDLevelData = {
           turnAroundAtEnd: true,
           concurrentWithPrevious: false,
           uncapturable: false,
-          speedMultiplier: 2,
         },
       ],
     },

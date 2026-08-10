@@ -5,6 +5,7 @@ export function createEmptyTDLevelDraft(): TDLevelData {
     paths: [[]],
     placementSpots: [],
     captureUnits: [],
+    waveEnemyDefinitions: [],
     waves: [],
   };
 }
@@ -45,7 +46,8 @@ function validatePoint(point: Point, label: string, errors: string[]): void {
 
 export function validateTDLevelDraft(
   levelData: TDLevelData,
-  validCreatureDefinitionIds?: ReadonlySet<string>
+  validCreatureDefinitionIds?: ReadonlySet<string>,
+  validEnemyAbilityIds?: ReadonlySet<string>
 ): string[] {
   const errors: string[] = [];
 
@@ -82,6 +84,60 @@ export function validateTDLevelDraft(
     }
   });
 
+  const enemyDefinitionIds = new Set<string>();
+  levelData.waveEnemyDefinitions.forEach((definition, definitionIndex) => {
+    const definitionLabel = `Enemy definition ${definitionIndex + 1}`;
+    if (!definition.id.trim()) {
+      errors.push(`${definitionLabel} needs an ID.`);
+    } else if (enemyDefinitionIds.has(definition.id)) {
+      errors.push(
+        `${definitionLabel} has the duplicate ID "${definition.id}".`
+      );
+    }
+    enemyDefinitionIds.add(definition.id);
+
+    if (!definition.creatureId.trim()) {
+      errors.push(`${definitionLabel} needs a creature ID.`);
+    } else if (
+      validCreatureDefinitionIds &&
+      !validCreatureDefinitionIds.has(definition.creatureId)
+    ) {
+      errors.push(
+        `${definitionLabel} references unknown creature "${definition.creatureId}".`
+      );
+    }
+    if (!Number.isInteger(definition.level) || definition.level < 1) {
+      errors.push(`${definitionLabel} level must be a positive integer.`);
+    }
+
+    const multipliers = [
+      ['speed', definition.speedMultiplier],
+      ['HP', definition.hpMultiplier],
+      ['defense', definition.defenseMultiplier],
+      ['special defense', definition.specialDefenseMultiplier],
+    ] as const;
+    multipliers.forEach(([name, multiplier]) => {
+      if (
+        multiplier !== undefined &&
+        (!Number.isFinite(multiplier) || multiplier <= 0)
+      ) {
+        errors.push(
+          `${definitionLabel} ${name} multiplier must be greater than 0.`
+        );
+      }
+    });
+
+    if (
+      definition.abilityId &&
+      validEnemyAbilityIds &&
+      !validEnemyAbilityIds.has(definition.abilityId)
+    ) {
+      errors.push(
+        `${definitionLabel} references unknown ability "${definition.abilityId}".`
+      );
+    }
+  });
+
   const waveIds = new Set<string>();
   levelData.waves.forEach((wave, waveIndex) => {
     const waveLabel = `Wave ${waveIndex + 1}`;
@@ -94,14 +150,11 @@ export function validateTDLevelDraft(
 
     wave.groups.forEach((group, groupIndex) => {
       const groupLabel = `${waveLabel}, group ${groupIndex + 1}`;
-      if (!group.definitionId.trim()) {
-        errors.push(`${groupLabel} needs an enemy type.`);
-      } else if (
-        validCreatureDefinitionIds &&
-        !validCreatureDefinitionIds.has(group.definitionId)
-      ) {
+      if (!group.enemyDefinitionId.trim()) {
+        errors.push(`${groupLabel} needs an enemy definition.`);
+      } else if (!enemyDefinitionIds.has(group.enemyDefinitionId)) {
         errors.push(
-          `${groupLabel} references unknown enemy "${group.definitionId}".`
+          `${groupLabel} references unknown enemy definition "${group.enemyDefinitionId}".`
         );
       }
 
@@ -126,24 +179,6 @@ export function validateTDLevelDraft(
         group.pathIndex >= levelData.paths.length
       ) {
         errors.push(`${groupLabel} references an invalid path.`);
-      }
-      if (
-        group.level !== undefined &&
-        (!Number.isInteger(group.level) || group.level < 1)
-      ) {
-        errors.push(`${groupLabel} level must be a positive integer.`);
-      }
-      if (
-        group.speedMultiplier !== undefined &&
-        (!Number.isFinite(group.speedMultiplier) || group.speedMultiplier <= 0)
-      ) {
-        errors.push(`${groupLabel} speed multiplier must be greater than 0.`);
-      }
-      if (
-        group.hpMultiplier !== undefined &&
-        (!Number.isFinite(group.hpMultiplier) || group.hpMultiplier <= 0)
-      ) {
-        errors.push(`${groupLabel} HP multiplier must be greater than 0.`);
       }
     });
   });

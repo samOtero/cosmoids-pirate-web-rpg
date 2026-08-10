@@ -20,6 +20,7 @@ import {
   TDCreatureMetadata,
   TowerTargetingMode,
   TDLevelData,
+  TDWaveEnemyDefinition,
 } from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
 import { AttackBehaviorRegistry } from './attacks/behaviors';
@@ -28,6 +29,11 @@ import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { TDWave, TDWaveGroup, EnvironmentUnit, Point } from './types';
 import { TDEventBus } from './events/TDEventBus';
 import { TDProgressionManager } from './progression/TDProgressionManager';
+import { ENEMY_ABILITY_DEFS } from './enemyAbilities';
+import {
+  applyTimedSpeedBoost,
+  getActiveSpeedMultiplier,
+} from './speedModifiers';
 
 const defaultLevels: Record<string, number> = {
   senticle: 15,
@@ -98,6 +104,7 @@ export class TowerDefenseEngine {
 
   // Wave Management State
   public waves: TDWave[] = [];
+  public waveEnemyDefinitions: Record<string, TDWaveEnemyDefinition> = {};
   public currentWaveIndex: number = 0;
   private activeSpawners: ActiveSpawnerState[] = [];
   private nextGroupIndexToStart: number = 0;
@@ -167,6 +174,12 @@ export class TowerDefenseEngine {
       return snappedPath;
     });
     this.placementSpots = levelData.placementSpots || [];
+    this.waveEnemyDefinitions = Object.fromEntries(
+      (levelData.waveEnemyDefinitions ?? []).map((definition) => [
+        definition.id,
+        definition,
+      ])
+    );
     this.waves = levelData.waves || [];
     this.surviveUntil = levelData.surviveUntil;
     this.enemyHpMultiplier = levelData.enemyHpMultiplier ?? 1;
@@ -368,6 +381,8 @@ export class TowerDefenseEngine {
       }
     });
 
+    this.processEnemyAbilities(newEnemies);
+
     // Update enemies
     newEnemies.forEach((enemy) => {
       if (enemy.damageFlashTimerMs) {
@@ -378,7 +393,8 @@ export class TowerDefenseEngine {
       // but to keep logic equivalent for now we'll just replicate it roughly
       // if 1 frame was originally ~16.6ms, we can normalize deltaMs / 16.6 to apply speed
       const timeScale = deltaMs / 16.666;
-      let moveSpeed = enemy.speed;
+      let moveSpeed =
+        enemy.speed * getActiveSpeedMultiplier(enemy, this.elapsedTimeMs);
 
       // Handle status conditions
       if (enemy.statusConditions.length > 0) {
@@ -839,16 +855,13 @@ export class TowerDefenseEngine {
       const timeSinceLastSpawn = time - spawner.lastSpawnTime;
       if (timeSinceLastSpawn >= spawner.group.spawnIntervalMs) {
         this.spawnEnemyFromDef(
-          spawner.group.definitionId,
+          spawner.group.enemyDefinitionId,
           time,
           newEnemies,
           spawner.group.pathIndex,
           spawner.group.turnAroundAtEnd,
           spawner.group.uncapturable,
-          spawner.group.isCursed,
-          spawner.group.speedMultiplier,
-          spawner.group.hpMultiplier,
-          spawner.group.level
+          spawner.group.isCursed
         );
         spawner.spawnsRemaining--;
         spawner.lastSpawnTime = time;
@@ -879,48 +892,59 @@ export class TowerDefenseEngine {
   }
 
   private spawnEnemyFromDef(
-    definitionId: string,
+    waveEnemyDefinitionId: string,
     time: number,
     newEnemies: Enemy[],
     groupPathIndex: number,
     turnAroundAtEnd?: boolean,
     uncapturable?: boolean,
-    isCursed?: boolean,
-    speedMultiplier?: number,
-    hpMultiplier?: number,
-    groupLevel?: number
+    isCursed?: boolean
   ) {
+    const waveEnemyDefinition =
+      this.waveEnemyDefinitions[waveEnemyDefinitionId];
+    if (!waveEnemyDefinition) return;
+
+    const definitionId = waveEnemyDefinition.creatureId;
     const meta = TD_CREATURE_DEFS[definitionId];
     if (!meta) return;
 
     const pathIndex = groupPathIndex;
     const startPath = this.paths[pathIndex] || [{ x: 0, y: 0 }];
 
-    const enemyLevel = groupLevel ?? meta.baseCreature.level;
+    const enemyLevel = waveEnemyDefinition.level;
     const enemyHp =
       calculateMaxHp(meta.baseCreature.maxHp, enemyLevel) *
       this.enemyHpMultiplier *
-      (hpMultiplier ?? 1);
+      (waveEnemyDefinition.hpMultiplier ?? 1);
     const enemyAttack = calculateStat(meta.baseCreature.attack, enemyLevel);
     const enemySpecialAttack = calculateStat(
       meta.baseCreature.specialAttack,
       enemyLevel
     );
-    const enemyDefense = calculateStat(meta.baseCreature.defense, enemyLevel);
+    const enemyDefense =
+      calculateStat(meta.baseCreature.defense, enemyLevel) *
+      (waveEnemyDefinition.defenseMultiplier ?? 1);
     const enemySpecialDefense = calculateStat(
       meta.baseCreature.specialDefense,
       enemyLevel
-    );
+    ) * (waveEnemyDefinition.specialDefenseMultiplier ?? 1);
 
     const isShiny = false; //TowerDefenseEngine.forceShinySpawns || (Math.random() < 0.5);
+    const abilityDefinitionId = waveEnemyDefinition.abilityId;
+    const abilityDefinition = abilityDefinitionId
+      ? ENEMY_ABILITY_DEFS[abilityDefinitionId]
+      : undefined;
     const newEnemy: Enemy = {
       id: `enemy_${time}_${Math.random().toString(36).substring(7)}`,
       definitionId: definitionId,
+      waveEnemyDefinitionId,
       level: enemyLevel,
       position: { x: startPath[0].x, y: startPath[0].y },
       hp: enemyHp,
       maxHp: enemyHp,
-      speed: (meta.baseCreature.speed / 100) * (speedMultiplier ?? 1),
+      speed:
+        (meta.baseCreature.speed / 100) *
+        (waveEnemyDefinition.speedMultiplier ?? 1),
       currentAttack: enemyAttack,
       currentSpecialAttack: enemySpecialAttack,
       currentDefense: enemyDefense,
@@ -934,6 +958,13 @@ export class TowerDefenseEngine {
       damagedByTowerIds: new Set<string>(),
       isShiny,
       isCursed,
+      abilityRuntime: abilityDefinition
+        ? {
+            definitionId: abilityDefinition.id,
+            nextReadyTimeMs:
+              this.elapsedTimeMs + abilityDefinition.initialCooldownMs,
+          }
+        : undefined,
     };
     newEnemies.push(newEnemy);
 
@@ -944,6 +975,56 @@ export class TowerDefenseEngine {
         enemyDefinitionId: newEnemy.definitionId,
         level: newEnemy.level,
       });
+    }
+  }
+
+  private processEnemyAbilities(enemies: Enemy[]) {
+    for (const enemy of enemies) {
+      const runtime = enemy.abilityRuntime;
+      if (!runtime || this.elapsedTimeMs < runtime.nextReadyTimeMs) continue;
+
+      const ability = ENEMY_ABILITY_DEFS[runtime.definitionId];
+      if (!ability) continue;
+
+      // Tailwind snapshots allies that exist when it is cast. The caster and
+      // enemies that spawn later never inherit this activation's speed boost.
+      const targets = enemies.filter(
+        (target) => target.id !== enemy.id && target.hp > 0
+      );
+      if (targets.length === 0) continue;
+
+      targets.forEach((target) => {
+        applyTimedSpeedBoost(
+          target,
+          ability.speedMultiplier,
+          ability.durationMs,
+          this.elapsedTimeMs
+        );
+      });
+      runtime.nextReadyTimeMs = this.elapsedTimeMs + ability.cooldownMs;
+
+      this.visualEffects.push({
+        id: `vfx_enemy_wind_${Date.now()}_${Math.random()}`,
+        configId: ability.visualEffectConfigId,
+        position: { ...enemy.position },
+        durationMs: 750,
+        elapsedMs: 0,
+        targetId: enemy.id,
+        facingDirection: enemy.facingDirection,
+        rangeIndex: 100,
+      });
+      this.floatingTexts.push({
+        id: `ft_tailwind_${Date.now()}_${Math.random()
+          .toString(36)
+          .substring(7)}`,
+        text: 'Tailwind!',
+        position: { ...enemy.position },
+        color: 0xa7f3d0,
+        scale: 0.9,
+        durationMs: 1000,
+        elapsedMs: 0,
+      });
+
     }
   }
 

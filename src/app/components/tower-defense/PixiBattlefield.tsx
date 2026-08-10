@@ -25,6 +25,7 @@ import {
   resolveTDOpeningPanView,
 } from '@/utils/tdInitialView';
 import { applyTDUnitTransforms } from '@/utils/tdUnitVisuals';
+import { hasActiveSpeedBoost } from '@/engine/tower-defense/speedModifiers';
 
 export const WEAKENED_THRESHOLD = 0.9;
 
@@ -152,6 +153,86 @@ function updateSparkles(
       container.removeChild(sparkleContainer);
       sparkleContainer.destroy({ children: true });
     }
+  }
+}
+
+type SpeedBoostIndicator = PIXI.Container & {
+  elapsed: number;
+};
+
+function drawSpeedChevron(
+  graphics: PIXI.Graphics,
+  centerX: number,
+  color: number
+) {
+  graphics.moveTo(centerX - 4, -5);
+  graphics.lineTo(centerX + 1, 0);
+  graphics.lineTo(centerX - 4, 5);
+  graphics.stroke({ color, width: 2.5, cap: 'round', join: 'round' });
+}
+
+/**
+ * Generic indicator for any active positive movement-speed modifier. It reads
+ * only shared unit state, so attacks and abilities receive it automatically.
+ */
+function updateSpeedBoostIndicator(
+  container: PIXI.Container,
+  unit: BaseTDUnit,
+  configId: string,
+  currentTimeMs: number,
+  delta: number
+) {
+  let indicator = container.getChildByLabel('speedBoostIndicator') as
+    | SpeedBoostIndicator
+    | undefined;
+
+  if (!hasActiveSpeedBoost(unit, currentTimeMs)) {
+    if (indicator) {
+      container.removeChild(indicator);
+      indicator.destroy({ children: true });
+    }
+    return;
+  }
+
+  if (!indicator) {
+    indicator = new PIXI.Container() as SpeedBoostIndicator;
+    indicator.label = 'speedBoostIndicator';
+    indicator.elapsed = 0;
+
+    const badge = new PIXI.Graphics();
+    badge.label = 'speedBoostBadge';
+    badge.circle(0, 0, 11);
+    badge.fill({ color: 0x082f49, alpha: 0.9 });
+    badge.stroke({ color: 0x67e8f9, alpha: 0.95, width: 2 });
+    indicator.addChild(badge);
+
+    const chevrons = new PIXI.Graphics();
+    chevrons.label = 'speedBoostChevrons';
+    drawSpeedChevron(chevrons, -2.5, 0xecfeff);
+    drawSpeedChevron(chevrons, 4, 0x67e8f9);
+    indicator.addChild(chevrons);
+
+    container.addChild(indicator);
+  }
+
+  indicator.elapsed += delta;
+  const tdConfigMap = CREATURE_TD_CONFIGS[configId] || {
+    default: { scale: 1 },
+  };
+  const tdConfig = tdConfigMap[unit.facingDirection] || tdConfigMap.default;
+  const hpOffsetY =
+    tdConfig.healthBarOffsetY ?? tdConfigMap.default?.healthBarOffsetY ?? -40;
+  indicator.position.set(33, hpOffsetY - 13);
+
+  const pulse = 1 + Math.sin(indicator.elapsed * 0.14) * 0.07;
+  indicator.scale.set(pulse);
+  indicator.alpha = 0.88 + Math.sin(indicator.elapsed * 0.1) * 0.12;
+
+  const chevrons = indicator.getChildByLabel(
+    'speedBoostChevrons'
+  ) as PIXI.Graphics | undefined;
+  if (chevrons) {
+    chevrons.x = ((indicator.elapsed * 0.08) % 3) - 1.5;
   }
 }
 
@@ -1571,6 +1652,13 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               true /* hideWhenFull */
             );
             updateSparkles(container, tower, app.ticker.deltaTime);
+            updateSpeedBoostIndicator(
+              container,
+              tower,
+              tower.creature.speciesId,
+              engine.elapsedTimeMs,
+              app.ticker.deltaTime
+            );
 
             const hpBg = container.getChildByLabel('hpBg') as
               | PIXI.Graphics
@@ -1822,6 +1910,13 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
             renderHealthBar(enemy, container, enemy.definitionId);
             updateSparkles(container, enemy, app.ticker.deltaTime);
+            updateSpeedBoostIndicator(
+              container,
+              enemy,
+              enemy.definitionId,
+              engine.elapsedTimeMs,
+              app.ticker.deltaTime
+            );
             if (esprite) {
               updateCursedAura(container, enemy, esprite, app.ticker.deltaTime);
               updateDrenchedAura(

@@ -40,20 +40,31 @@ export interface TDOpeningPan {
 }
 
 export interface TDWaveGroup {
-  definitionId: string; // The enemy ID to spawn
+  /** References a level-scoped TDWaveEnemyDefinition. */
+  enemyDefinitionId: string;
   count: number; // How many to spawn
   spawnIntervalMs: number; // Time between each spawn in this group
   delayBeforeGroupMs: number; // Delay before this group starts (after wave start or previous group ends)
   pathIndex: number; // Which path enemies in this group should take
-  level?: number; // Custom level for enemies in this group
   turnAroundAtEnd?: boolean; // Whether the enemy should return to the start instead of despawning
   concurrentWithPrevious?: boolean; // Whether this group should start its initial delay timer at the same time as the group before it
   uncapturable?: boolean;
   /** Gives spawned enemies the cursed aura and makes them uncapturable. */
   isCursed?: boolean;
-  speedMultiplier?: number; // Multiplies the base speed of enemies in this group
-  /** Multiplies battlefield HP for enemies in this group without changing captured creature stats. */
+}
+
+/** A uniquely configurable enemy variant that wave groups can reuse. */
+export interface TDWaveEnemyDefinition {
+  id: string;
+  creatureId: string;
+  level: number;
+  speedMultiplier?: number;
+  /** Multiplies battlefield stats without changing captured creature stats. */
   hpMultiplier?: number;
+  defenseMultiplier?: number;
+  specialDefenseMultiplier?: number;
+  /** References an enemy-only ability definition. */
+  abilityId?: string;
 }
 
 export interface TDWave {
@@ -70,6 +81,9 @@ export interface BaseTDUnit {
   damageFlashTimerMs?: number;
   isShiny?: boolean;
   isCursed?: boolean;
+  /** Shared timed movement boost state used by abilities, attacks, and UI. */
+  speedBoostMultiplier?: number;
+  speedBoostUntilMs?: number;
 }
 
 export interface EnvironmentUnit extends BaseTDUnit {
@@ -107,6 +121,7 @@ export interface CaptureUnit extends BaseTDUnit {
 export interface TDLevelData {
   paths: Point[][];
   placementSpots: Point[];
+  waveEnemyDefinitions: TDWaveEnemyDefinition[];
   waves: TDWave[];
   surviveUntil?: number; // Win after surviving for this many seconds
   lives?: number; // Default is 3 if not provided, or overridden by captureUnits length
@@ -173,6 +188,8 @@ export interface StatusCondition {
 
 export interface Enemy extends BaseTDUnit {
   definitionId: string;
+  /** The unique level-scoped enemy variant that produced this unit. */
+  waveEnemyDefinitionId?: string;
   level: number; // The level of this specific enemy instance
   speed: number;
   currentAttack: number;
@@ -191,6 +208,11 @@ export interface Enemy extends BaseTDUnit {
   isMovingBackward?: boolean;
   uncapturable?: boolean;
   damagedByTowerIds: Set<string>; // Tracks which towers dealt damage for EXP distribution
+  /** Enemy-only ability state; player attacks use Tower.equippedAttacksRuntime. */
+  abilityRuntime?: {
+    definitionId: string;
+    nextReadyTimeMs: number;
+  };
 }
 
 export interface Projectile {

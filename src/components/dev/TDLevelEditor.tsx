@@ -3,8 +3,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import PixiTDLevelEditor, { PointType } from './PixiTDLevelEditor';
 import { TD_LEVELS } from '@/constants/tdLevels';
-import { TDLevelData, TDWaveGroup } from '@/engine/tower-defense/types';
+import {
+  TDLevelData,
+  TDWaveEnemyDefinition,
+  TDWaveGroup,
+} from '@/engine/tower-defense/types';
 import { TD_CREATURE_DEFS } from '@/engine/tower-defense/TowerDefenseEngine';
+import { ENEMY_ABILITY_DEFS } from '@/engine/tower-defense/enemyAbilities';
 import { TDLevelContext } from '@/types/baseGame';
 import {
   cloneTDLevelDraft,
@@ -31,6 +36,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
   const placementSpots = draft.placementSpots;
   const environmentUnits = draft.environmentUnits ?? [];
   const captureUnits = draft.captureUnits ?? [];
+  const waveEnemyDefinitions = draft.waveEnemyDefinitions;
   const waves = draft.waves;
   const surviveUntil = draft.surviveUntil ?? 0;
   const lives = draft.lives ?? 3;
@@ -204,7 +210,8 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
 
     const validationErrors = validateTDLevelDraft(
       draft,
-      new Set(Object.keys(TD_CREATURE_DEFS))
+      new Set(Object.keys(TD_CREATURE_DEFS)),
+      new Set(Object.keys(ENEMY_ABILITY_DEFS))
     );
     if (validationErrors.length > 0) {
       alert(`Cannot save this level:\n\n${validationErrors.join('\n')}`);
@@ -258,7 +265,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
     setDraft((previousDraft) => {
       const nextWaves = cloneTDLevelDraft(previousDraft).waves;
       nextWaves[waveIndex].groups.push({
-        definitionId: Object.keys(TD_CREATURE_DEFS)[0] || '',
+        enemyDefinitionId: previousDraft.waveEnemyDefinitions[0]?.id ?? '',
         count: 5,
         spawnIntervalMs: 1000,
         delayBeforeGroupMs: 0,
@@ -268,6 +275,64 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
       });
       return { ...previousDraft, waves: nextWaves };
     });
+  };
+
+  const addWaveEnemyDefinition = () => {
+    setDraft((previousDraft) => ({
+      ...previousDraft,
+      waveEnemyDefinitions: [
+        ...previousDraft.waveEnemyDefinitions,
+        {
+          id: `enemy_${Date.now()}`,
+          creatureId: Object.keys(TD_CREATURE_DEFS)[0] ?? '',
+          level: 1,
+          speedMultiplier: 1,
+          hpMultiplier: 1,
+          defenseMultiplier: 1,
+          specialDefenseMultiplier: 1,
+        },
+      ],
+    }));
+  };
+
+  const updateWaveEnemyDefinition = <K extends keyof TDWaveEnemyDefinition>(
+    definitionIndex: number,
+    field: K,
+    value: TDWaveEnemyDefinition[K]
+  ) => {
+    setDraft((previousDraft) => {
+      const nextDefinitions = structuredClone(
+        previousDraft.waveEnemyDefinitions
+      );
+      const previousId = nextDefinitions[definitionIndex].id;
+      nextDefinitions[definitionIndex][field] = value;
+      if (field !== 'id' || typeof value !== 'string') {
+        return { ...previousDraft, waveEnemyDefinitions: nextDefinitions };
+      }
+
+      const nextWaves = structuredClone(previousDraft.waves);
+      nextWaves.forEach((wave) => {
+        wave.groups.forEach((group) => {
+          if (group.enemyDefinitionId === previousId) {
+            group.enemyDefinitionId = value;
+          }
+        });
+      });
+      return {
+        ...previousDraft,
+        waveEnemyDefinitions: nextDefinitions,
+        waves: nextWaves,
+      };
+    });
+  };
+
+  const deleteWaveEnemyDefinition = (definitionIndex: number) => {
+    setDraft((previousDraft) => ({
+      ...previousDraft,
+      waveEnemyDefinitions: previousDraft.waveEnemyDefinitions.filter(
+        (_, index) => index !== definitionIndex
+      ),
+    }));
   };
 
   const updateGroup = <K extends keyof TDWaveGroup>(
@@ -763,6 +828,155 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
 
             {activeSidebarTab === 'WAVES' && (
               <div>
+                <div className="mb-5">
+                  <div className="mb-3 flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-bold text-emerald-400">
+                        Enemy Definitions ({waveEnemyDefinitions.length})
+                      </h3>
+                      <p className="text-xs text-slate-400">
+                        Reusable level-specific variants referenced by wave
+                        groups.
+                      </p>
+                    </div>
+                    <button
+                      onClick={addWaveEnemyDefinition}
+                      className="rounded bg-emerald-700 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-600"
+                    >
+                      + Enemy Definition
+                    </button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {waveEnemyDefinitions.map((definition, definitionIndex) => (
+                      <div
+                        key={`${definition.id}_${definitionIndex}`}
+                        className="relative rounded border border-emerald-800 bg-slate-900 p-3 text-xs"
+                      >
+                        <button
+                          onClick={() =>
+                            deleteWaveEnemyDefinition(definitionIndex)
+                          }
+                          className="absolute top-2 right-2 font-bold text-red-500 hover:text-red-400"
+                        >
+                          X
+                        </button>
+
+                        <div className="grid grid-cols-2 gap-2 pr-5">
+                          <label className="block text-slate-400">
+                            Unique ID
+                            <input
+                              type="text"
+                              value={definition.id}
+                              onChange={(event) =>
+                                updateWaveEnemyDefinition(
+                                  definitionIndex,
+                                  'id',
+                                  event.target.value
+                                )
+                              }
+                              className="mt-1 w-full rounded border border-slate-700 bg-slate-950 p-1 text-white"
+                            />
+                          </label>
+                          <label className="block text-slate-400">
+                            Creature
+                            <select
+                              value={definition.creatureId}
+                              onChange={(event) =>
+                                updateWaveEnemyDefinition(
+                                  definitionIndex,
+                                  'creatureId',
+                                  event.target.value
+                                )
+                              }
+                              className="mt-1 w-full rounded border border-slate-700 bg-slate-950 p-1 text-white"
+                            >
+                              {Object.keys(TD_CREATURE_DEFS).map((creatureId) => (
+                                <option key={creatureId} value={creatureId}>
+                                  {creatureId}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <label className="block text-slate-400">
+                            Level
+                            <input
+                              type="number"
+                              min="1"
+                              value={definition.level}
+                              onChange={(event) =>
+                                updateWaveEnemyDefinition(
+                                  definitionIndex,
+                                  'level',
+                                  parseInt(event.target.value) || 1
+                                )
+                              }
+                              className="mt-1 w-full rounded border border-slate-700 bg-slate-950 p-1 text-white"
+                            />
+                          </label>
+                          {(
+                            [
+                              ['speedMultiplier', 'Speed Multiplier'],
+                              ['hpMultiplier', 'HP Multiplier'],
+                              ['defenseMultiplier', 'Defense Multiplier'],
+                              [
+                                'specialDefenseMultiplier',
+                                'Special Defense Multiplier',
+                              ],
+                            ] as const
+                          ).map(([field, label]) => (
+                            <label key={field} className="block text-slate-400">
+                              {label}
+                              <input
+                                type="number"
+                                min="0.01"
+                                step="0.1"
+                                value={definition[field] ?? 1}
+                                onChange={(event) =>
+                                  updateWaveEnemyDefinition(
+                                    definitionIndex,
+                                    field,
+                                    parseFloat(event.target.value) || 1
+                                  )
+                                }
+                                className="mt-1 w-full rounded border border-slate-700 bg-slate-950 p-1 text-white"
+                              />
+                            </label>
+                          ))}
+                          <label className="col-span-2 block text-slate-400">
+                            Enemy Ability
+                            <select
+                              value={definition.abilityId ?? ''}
+                              onChange={(event) =>
+                                updateWaveEnemyDefinition(
+                                  definitionIndex,
+                                  'abilityId',
+                                  event.target.value || undefined
+                                )
+                              }
+                              className="mt-1 w-full rounded border border-slate-700 bg-slate-950 p-1 text-white"
+                            >
+                              <option value="">None</option>
+                              {Object.keys(ENEMY_ABILITY_DEFS).map(
+                                (abilityId) => (
+                                  <option key={abilityId} value={abilityId}>
+                                    {abilityId}
+                                  </option>
+                                )
+                              )}
+                            </select>
+                          </label>
+                        </div>
+                      </div>
+                    ))}
+                    {waveEnemyDefinitions.length === 0 && (
+                      <p className="rounded border border-dashed border-slate-700 p-3 text-center text-xs text-slate-500 italic">
+                        Add an enemy definition before adding wave groups.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
                 <div className="mb-4 flex items-center justify-between">
                   <h3 className="text-lg font-bold text-cyan-400">
                     Waves ({waves.length})
@@ -787,6 +1001,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
                         <div className="flex gap-2">
                           <button
                             onClick={() => addGroupToWave(wIdx)}
+                            disabled={waveEnemyDefinitions.length === 0}
                             className="rounded bg-slate-700 px-2 py-1 text-xs text-white hover:bg-slate-600"
                           >
                             + Group
@@ -816,24 +1031,27 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
                             <div className="mt-2 grid grid-cols-2 gap-2">
                               <div>
                                 <label className="mb-1 block text-slate-400">
-                                  Enemy Type
+                                  Enemy Definition
                                 </label>
                                 <select
-                                  value={group.definitionId}
+                                  value={group.enemyDefinitionId}
                                   onChange={(e) =>
                                     updateGroup(
                                       wIdx,
                                       gIdx,
-                                      'definitionId',
+                                      'enemyDefinitionId',
                                       e.target.value
                                     )
                                   }
                                   className="w-full rounded border border-slate-700 bg-slate-950 p-1 text-white"
                                 >
-                                  {Object.keys(TD_CREATURE_DEFS).map(
-                                    (defId) => (
-                                      <option key={defId} value={defId}>
-                                        {defId}
+                                  {waveEnemyDefinitions.map(
+                                    (definition) => (
+                                      <option
+                                        key={definition.id}
+                                        value={definition.id}
+                                      >
+                                        {definition.id} ({definition.creatureId})
                                       </option>
                                     )
                                   )}
