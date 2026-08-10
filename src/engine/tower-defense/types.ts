@@ -211,11 +211,15 @@ export interface Enemy extends BaseTDUnit {
   isMovingBackward?: boolean;
   uncapturable?: boolean;
   damagedByTowerIds: Set<string>; // Tracks which towers dealt damage for EXP distribution
+  /** Dev-sandbox guard: hits and status effects render normally without reducing HP. */
+  isInvulnerable?: boolean;
   /** Enemy-only ability state; player attacks use Tower.equippedAttacksRuntime. */
   abilityRuntime?: {
     definitionId: string;
     nextReadyTimeMs: number;
     hasActivated?: boolean;
+    /** When true, only an explicit trigger can activate this ability. */
+    manualOnly?: boolean;
   };
 }
 

@@ -4,7 +4,7 @@ import {
   BUG_STAGE_3,
   COSMOID_TEMPLATES,
 } from '@/constants/creatures';
-import { Creature, PlayerCreature } from '@/types/baseGame';
+import { PlayerCreature } from '@/types/baseGame';
 import {
   calculateMaxHp,
   calculateStat,
@@ -26,7 +26,7 @@ import { ATTACK_DEFS } from './attacks/definitions';
 import { AttackBehaviorRegistry } from './attacks/behaviors';
 import { EffectProcessor } from './attacks/EffectProcessor';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
-import { TDWave, TDWaveGroup, EnvironmentUnit, Point } from './types';
+import { TDWave, TDWaveGroup, Point } from './types';
 import { TDEventBus } from './events/TDEventBus';
 import { TDProgressionManager } from './progression/TDProgressionManager';
 import { ENEMY_ABILITY_DEFS } from './enemyAbilities';
@@ -72,6 +72,16 @@ interface ActiveSpawnerState {
   lastSpawnTime: number;
   delayTimer: number;
   isWaitingForDelay: boolean;
+}
+
+export interface PreviewEnemyConfig {
+  id?: string;
+  creatureId: string;
+  level: number;
+  position: Point;
+  abilityId?: string;
+  isInvulnerable?: boolean;
+  manualAbilityOnly?: boolean;
 }
 
 export class TowerDefenseEngine {
@@ -186,30 +196,26 @@ export class TowerDefenseEngine {
     this.disableCapture = levelData.disableCapture ?? false;
 
     if (levelData.environmentUnits) {
-      this.environmentUnits = levelData.environmentUnits.map(
-        (eu: any, index: number) => ({
-          id: `env_unit_${index}_${Math.random().toString(36).substring(7)}`,
-          tdConfigId: eu.tdConfigId,
-          position: { x: eu.position.x, y: eu.position.y },
-          facingDirection: eu.facingDirection || 'down',
-          hp: 1,
-          maxHp: 1,
-        })
-      );
+      this.environmentUnits = levelData.environmentUnits.map((eu, index) => ({
+        id: `env_unit_${index}_${Math.random().toString(36).substring(7)}`,
+        tdConfigId: eu.tdConfigId,
+        position: { x: eu.position.x, y: eu.position.y },
+        facingDirection: eu.facingDirection || 'down',
+        hp: 1,
+        maxHp: 1,
+      }));
     }
 
     if (levelData.captureUnits && levelData.captureUnits.length > 0) {
       this.hasCaptureUnitsGoal = true;
-      this.captureUnits = levelData.captureUnits.map(
-        (cu: any, index: number) => ({
-          id: `cap_unit_${index}_${Math.random().toString(36).substring(7)}`,
-          tdConfigId: cu.tdConfigId,
-          position: { x: cu.position.x, y: cu.position.y },
-          facingDirection: cu.facingDirection || 'down',
-          hp: 1,
-          maxHp: 1,
-        })
-      );
+      this.captureUnits = levelData.captureUnits.map((cu, index) => ({
+        id: `cap_unit_${index}_${Math.random().toString(36).substring(7)}`,
+        tdConfigId: cu.tdConfigId,
+        position: { x: cu.position.x, y: cu.position.y },
+        facingDirection: 'down',
+        hp: 1,
+        maxHp: 1,
+      }));
       this.lives = this.captureUnits.length;
     } else {
       this.lives = levelData.lives !== undefined ? levelData.lives : 3;
@@ -337,7 +343,6 @@ export class TowerDefenseEngine {
         }
 
         if (unit.currentWaypointIndex < unit.path.length) {
-          const timeScale = deltaMs / 16.666;
           const targetPoint = unit.path[unit.currentWaypointIndex];
           const dx = targetPoint.x - unit.position.x;
           const dy = targetPoint.y - unit.position.y;
@@ -403,7 +408,9 @@ export class TowerDefenseEngine {
             moveSpeed = 0; // cannot move while stunned
           } else if (status.type === 'BURN' || status.type === 'POISON') {
             if (status.tickDamage && time - (status.lastTickTime || 0) > 1000) {
-              enemy.hp -= status.tickDamage;
+              if (!enemy.isInvulnerable) {
+                enemy.hp -= status.tickDamage;
+              }
               enemy.damageFlashTimerMs = 150;
               status.lastTickTime = time;
 
@@ -797,7 +804,7 @@ export class TowerDefenseEngine {
     }
 
     // Always load at least one group
-    let groupToLoad = currentWave.groups[this.nextGroupIndexToStart];
+    const groupToLoad = currentWave.groups[this.nextGroupIndexToStart];
     this.activeSpawners.push({
       group: groupToLoad,
       spawnsRemaining: groupToLoad.count,
@@ -809,7 +816,7 @@ export class TowerDefenseEngine {
 
     // Load any subsequent concurrent groups
     while (this.nextGroupIndexToStart < currentWave.groups.length) {
-      let nextGroup = currentWave.groups[this.nextGroupIndexToStart];
+      const nextGroup = currentWave.groups[this.nextGroupIndexToStart];
       if (nextGroup.concurrentWithPrevious) {
         this.activeSpawners.push({
           group: nextGroup,
@@ -980,55 +987,74 @@ export class TowerDefenseEngine {
   private processEnemyAbilities(enemies: Enemy[]) {
     for (const enemy of enemies) {
       const runtime = enemy.abilityRuntime;
-      if (!runtime || this.elapsedTimeMs < runtime.nextReadyTimeMs) continue;
-
-      const ability = ENEMY_ABILITY_DEFS[runtime.definitionId];
-      if (!ability) continue;
-
-      if (ability.type === 'ALLY_SPEED_BOOST') {
-        // Tailwind snapshots allies that exist when it is cast. The caster and
-        // enemies that spawn later never inherit this activation's speed boost.
-        const targets = enemies.filter(
-          (target) => target.id !== enemy.id && target.hp > 0
-        );
-        if (targets.length === 0) continue;
-
-        targets.forEach((target) => {
-          applyTimedSpeedBoost(
-            target,
-            ability.speedMultiplier,
-            ability.durationMs,
-            this.elapsedTimeMs
-          );
-        });
-        runtime.nextReadyTimeMs = this.elapsedTimeMs + ability.cooldownMs;
-
-        this.visualEffects.push({
-          id: `vfx_enemy_wind_${Date.now()}_${Math.random()}`,
-          configId: ability.visualEffectConfigId,
-          position: { ...enemy.position },
-          durationMs: 750,
-          elapsedMs: 0,
-          targetId: enemy.id,
-          facingDirection: enemy.facingDirection,
-          rangeIndex: 100,
-        });
-        this.floatingTexts.push({
-          id: `ft_tailwind_${Date.now()}_${Math.random()
-            .toString(36)
-            .substring(7)}`,
-          text: 'Tailwind!',
-          position: { ...enemy.position },
-          color: 0xa7f3d0,
-          scale: 0.9,
-          durationMs: 1000,
-          elapsedMs: 0,
-        });
+      if (
+        !runtime ||
+        runtime.manualOnly ||
+        this.elapsedTimeMs < runtime.nextReadyTimeMs
+      ) {
         continue;
       }
 
-      if (runtime.hasActivated) continue;
+      this.activateEnemyAbility(enemy, enemies, false);
+    }
+  }
 
+  private activateEnemyAbility(
+    enemy: Enemy,
+    enemies: Enemy[],
+    isManual: boolean
+  ): boolean {
+    const runtime = enemy.abilityRuntime;
+    if (!runtime) return false;
+
+    const ability = ENEMY_ABILITY_DEFS[runtime.definitionId];
+    if (!ability) return false;
+
+    if (ability.type === 'ALLY_SPEED_BOOST') {
+      // Tailwind snapshots allies that exist when it is cast. The caster and
+      // enemies that spawn later never inherit this activation's speed boost.
+      const targets = enemies.filter(
+        (target) => target.id !== enemy.id && target.hp > 0
+      );
+      if (targets.length === 0) return false;
+
+      targets.forEach((target) => {
+        applyTimedSpeedBoost(
+          target,
+          ability.speedMultiplier,
+          ability.durationMs,
+          this.elapsedTimeMs
+        );
+      });
+      runtime.nextReadyTimeMs = this.elapsedTimeMs + ability.cooldownMs;
+
+      this.visualEffects.push({
+        id: `vfx_enemy_wind_${Date.now()}_${Math.random()}`,
+        configId: ability.visualEffectConfigId,
+        position: { ...enemy.position },
+        durationMs: 750,
+        elapsedMs: 0,
+        targetId: enemy.id,
+        facingDirection: enemy.facingDirection,
+        rangeIndex: 100,
+      });
+      this.floatingTexts.push({
+        id: `ft_tailwind_${Date.now()}_${Math.random()
+          .toString(36)
+          .substring(7)}`,
+        text: 'Tailwind!',
+        position: { ...enemy.position },
+        color: 0xa7f3d0,
+        scale: 0.9,
+        durationMs: 1000,
+        elapsedMs: 0,
+      });
+      return true;
+    }
+
+    if (runtime.hasActivated && !isManual) return false;
+
+    if (!runtime.hasActivated) {
       enemy.currentDefense *= ability.defenseMultiplier;
       enemy.currentSpecialDefense *= ability.specialDefenseMultiplier;
       enemy.defenseBoostMultiplier =
@@ -1037,28 +1063,89 @@ export class TowerDefenseEngine {
         (enemy.specialDefenseBoostMultiplier ?? 1) *
         ability.specialDefenseMultiplier;
       runtime.hasActivated = true;
-
-      this.visualEffects.push({
-        id: `vfx_enemy_harden_${Date.now()}_${Math.random()}`,
-        configId: ability.visualEffectConfigId,
-        position: { ...enemy.position },
-        durationMs: 900,
-        elapsedMs: 0,
-        targetId: enemy.id,
-        facingDirection: enemy.facingDirection,
-      });
-      this.floatingTexts.push({
-        id: `ft_harden_${Date.now()}_${Math.random()
-          .toString(36)
-          .substring(7)}`,
-        text: 'Harden!',
-        position: { ...enemy.position },
-        color: 0xe2e8f0,
-        scale: 0.9,
-        durationMs: 1000,
-        elapsedMs: 0,
-      });
     }
+
+    this.visualEffects.push({
+      id: `vfx_enemy_harden_${Date.now()}_${Math.random()}`,
+      configId: ability.visualEffectConfigId,
+      position: { ...enemy.position },
+      durationMs: 900,
+      elapsedMs: 0,
+      targetId: enemy.id,
+      facingDirection: enemy.facingDirection,
+    });
+    this.floatingTexts.push({
+      id: `ft_harden_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+      text: 'Harden!',
+      position: { ...enemy.position },
+      color: 0xe2e8f0,
+      scale: 0.9,
+      durationMs: 1000,
+      elapsedMs: 0,
+    });
+    return true;
+  }
+
+  /** Activates an enemy's configured ability immediately, ignoring cooldowns. */
+  public triggerEnemyAbility(enemyId: string): boolean {
+    const enemy = this.enemies.find((candidate) => candidate.id === enemyId);
+    if (!enemy) return false;
+    return this.activateEnemyAbility(enemy, this.enemies, true);
+  }
+
+  /** Adds a stationary, directly configured actor for the attack preview tool. */
+  public spawnPreviewEnemy(config: PreviewEnemyConfig): Enemy | null {
+    const template = COSMOID_TEMPLATES[config.creatureId];
+    if (!template) return null;
+
+    const ability = config.abilityId
+      ? ENEMY_ABILITY_DEFS[config.abilityId]
+      : undefined;
+    const maxHp = calculateMaxHp(template.baseStats.hp, config.level);
+    const enemy: Enemy = {
+      id:
+        config.id ??
+        `preview_enemy_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+      definitionId: config.creatureId,
+      level: config.level,
+      position: { ...config.position },
+      hp: maxHp,
+      maxHp,
+      speed: 0,
+      currentAttack: calculateStat(template.baseStats.attack, config.level),
+      currentSpecialAttack: calculateStat(
+        template.baseStats.specialAttack,
+        config.level
+      ),
+      currentDefense: calculateStat(template.baseStats.defense, config.level),
+      currentSpecialDefense: calculateStat(
+        template.baseStats.specialDefense,
+        config.level
+      ),
+      statusConditions: [],
+      currentWaypointIndex: 1,
+      pathIndex: 0,
+      facingDirection: 'left',
+      uncapturable: true,
+      damagedByTowerIds: new Set<string>(),
+      isInvulnerable: config.isInvulnerable,
+      abilityRuntime: ability
+        ? {
+            definitionId: ability.id,
+            nextReadyTimeMs: this.elapsedTimeMs + ability.initialCooldownMs,
+            manualOnly: config.manualAbilityOnly ?? true,
+          }
+        : undefined,
+    };
+
+    this.enemies.push(enemy);
+    return enemy;
+  }
+
+  public removePreviewEnemy(enemyId: string): boolean {
+    const previousCount = this.enemies.length;
+    this.enemies = this.enemies.filter((enemy) => enemy.id !== enemyId);
+    return this.enemies.length !== previousCount;
   }
 
   public captureEnemy(enemyId: string): PlayerCreature | null {

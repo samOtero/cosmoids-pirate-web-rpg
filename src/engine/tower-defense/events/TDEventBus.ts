@@ -8,6 +8,13 @@ export interface TDStatSnapshot {
 
 export type TDEvent =
   | {
+      type: 'ATTACK_DAMAGE_DEALT';
+      towerId: string;
+      targetEnemyId: string;
+      attackDefId: string;
+      damage: number;
+    }
+  | {
       type: 'ENEMY_DIED';
       enemyId: string;
       enemyDefinitionId: string;

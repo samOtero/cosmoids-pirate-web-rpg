@@ -20,6 +20,7 @@ const TowerDefenseScreen = lazy(
 );
 const TDLevelEditor = lazy(() => import('./TDLevelEditor'));
 const TDEffectEditor = lazy(() => import('./TDEffectEditor'));
+const TDAttackPreview = lazy(() => import('./TDAttackPreview'));
 
 type ToolType =
   | 'DIALOG'
@@ -28,6 +29,7 @@ type ToolType =
   | 'TD_LEVEL_EDITOR'
   | 'TD_TOWER_SIZE_EDITOR'
   | 'TD_EFFECT_EDITOR'
+  | 'TD_ATTACK_PREVIEW'
   | null;
 
 export default function DevTools() {
@@ -61,9 +63,9 @@ export default function DevTools() {
   return (
     <>
       {showMenu && !activeTool && (
-        <div className="fixed bottom-4 right-4 z-9999 flex flex-col gap-2">
-          <div className="bg-black/90 text-white p-3 rounded border border-slate-700 shadow-xl">
-            <h3 className="text-xs font-bold uppercase text-slate-400 mb-2">
+        <div className="fixed right-4 bottom-4 z-9999 flex flex-col gap-2">
+          <div className="rounded border border-slate-700 bg-black/90 p-3 text-white shadow-xl">
+            <h3 className="mb-2 text-xs font-bold text-slate-400 uppercase">
               Dev Tools (Ctrl+D)
             </h3>
             <div className="flex flex-col gap-1">
@@ -72,7 +74,7 @@ export default function DevTools() {
                   setActiveTool('DIALOG');
                   setShowMenu(false);
                 }}
-                className="text-sm bg-slate-800 hover:bg-cyan-700 px-3 py-2 rounded text-left"
+                className="rounded bg-slate-800 px-3 py-2 text-left text-sm hover:bg-cyan-700"
               >
                 Dialog Editor
               </button>
@@ -81,7 +83,7 @@ export default function DevTools() {
                   setActiveTool('ANIMATION');
                   setShowMenu(false);
                 }}
-                className="text-sm bg-slate-800 hover:bg-cyan-700 px-3 py-2 rounded text-left"
+                className="rounded bg-slate-800 px-3 py-2 text-left text-sm hover:bg-cyan-700"
               >
                 Animation Editor
               </button>
@@ -91,16 +93,25 @@ export default function DevTools() {
                   setActiveTool('TOWER_DEFENSE');
                   setShowMenu(false);
                 }}
-                className="text-sm bg-slate-800 hover:bg-cyan-700 px-3 py-2 rounded text-left"
+                className="rounded bg-slate-800 px-3 py-2 text-left text-sm hover:bg-cyan-700"
               >
                 Tower Defense Map
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTool('TD_ATTACK_PREVIEW');
+                  setShowMenu(false);
+                }}
+                className="rounded bg-emerald-950 px-3 py-2 text-left text-sm font-bold text-emerald-200 hover:bg-emerald-800"
+              >
+                Attack &amp; Ability Lab
               </button>
               <button
                 onClick={() => {
                   setActiveTool('TD_TOWER_SIZE_EDITOR');
                   setShowMenu(false);
                 }}
-                className="text-sm bg-indigo-900 hover:bg-indigo-700 px-3 py-2 rounded text-left"
+                className="rounded bg-indigo-900 px-3 py-2 text-left text-sm hover:bg-indigo-700"
               >
                 TD Tower Size Editor
               </button>
@@ -109,7 +120,7 @@ export default function DevTools() {
                   setActiveTool('TD_LEVEL_EDITOR');
                   setShowMenu(false);
                 }}
-                className="text-sm bg-slate-800 hover:bg-cyan-700 px-3 py-2 rounded text-left"
+                className="rounded bg-slate-800 px-3 py-2 text-left text-sm hover:bg-cyan-700"
               >
                 TD Level Editor
               </button>
@@ -118,7 +129,7 @@ export default function DevTools() {
                   setActiveTool('TD_EFFECT_EDITOR');
                   setShowMenu(false);
                 }}
-                className="text-sm bg-slate-800 hover:bg-cyan-700 px-3 py-2 rounded text-left"
+                className="rounded bg-slate-800 px-3 py-2 text-left text-sm hover:bg-cyan-700"
               >
                 VFX Effect Editor
               </button>
@@ -140,7 +151,7 @@ export default function DevTools() {
                   overwriteProfileCreatures(level1Starters);
                   setShowMenu(false);
                 }}
-                className="text-sm bg-purple-900 border border-purple-500 hover:bg-purple-700 px-3 py-2 rounded text-left font-bold"
+                className="rounded border border-purple-500 bg-purple-900 px-3 py-2 text-left text-sm font-bold hover:bg-purple-700"
               >
                 Set LVL 1 Starters + Bug
               </button>
@@ -162,14 +173,14 @@ export default function DevTools() {
                   overwriteProfileCreatures(level1Starters);
                   setShowMenu(false);
                 }}
-                className="text-sm bg-amber-950 border border-amber-500 hover:bg-amber-700 px-3 py-2 rounded text-left font-bold text-amber-300 animate-pulse"
+                className="animate-pulse rounded border border-amber-500 bg-amber-950 px-3 py-2 text-left text-sm font-bold text-amber-300 hover:bg-amber-700"
               >
                 Set Shiny Starters + Bug ✨
               </button>
               <button
                 onClick={() => {
                   const thirtyCreatures = Array.from({ length: 30 }).map(
-                    (_, i) => ({
+                    () => ({
                       id: STARTER_CRAB.id,
                       speciesId: STARTER_CRAB.id,
                       level: 10,
@@ -183,7 +194,7 @@ export default function DevTools() {
                   overwriteProfileCreatures(thirtyCreatures);
                   setShowMenu(false);
                 }}
-                className="text-sm bg-purple-900 border border-purple-500 hover:bg-purple-700 px-3 py-2 rounded text-left font-bold"
+                className="rounded border border-purple-500 bg-purple-900 px-3 py-2 text-left text-sm font-bold hover:bg-purple-700"
               >
                 Populate 30 Creatures
               </button>
@@ -226,7 +237,7 @@ export default function DevTools() {
                   ]);
                   setShowMenu(false);
                 }}
-                className="text-sm bg-red-900 border border-red-500 hover:bg-red-700 px-3 py-2 rounded text-left font-bold"
+                className="rounded border border-red-500 bg-red-900 px-3 py-2 text-left text-sm font-bold hover:bg-red-700"
               >
                 Test TD Scripting
               </button>
@@ -236,10 +247,10 @@ export default function DevTools() {
                   TowerDefenseEngine.forceShinySpawns = val;
                   setForceShiny(val);
                 }}
-                className={`text-sm px-3 py-2 rounded text-left font-bold border transition-colors ${
+                className={`rounded border px-3 py-2 text-left text-sm font-bold transition-colors ${
                   forceShiny
-                    ? 'bg-amber-950 border-amber-500 hover:bg-amber-700 text-amber-300'
-                    : 'bg-slate-800 border-slate-700 text-slate-300'
+                    ? 'border-amber-500 bg-amber-950 text-amber-300 hover:bg-amber-700'
+                    : 'border-slate-700 bg-slate-800 text-slate-300'
                 }`}
               >
                 Force Shiny Spawns: {forceShiny ? 'ON ✨' : 'OFF'}
@@ -252,7 +263,7 @@ export default function DevTools() {
       {activeTool && (
         <Suspense
           fallback={
-            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black text-white px-4 py-2 rounded">
+            <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded bg-black px-4 py-2 text-white">
               Loading...
             </div>
           }
@@ -280,6 +291,9 @@ export default function DevTools() {
           )}
           {activeTool === 'TD_EFFECT_EDITOR' && (
             <TDEffectEditor onClose={() => setActiveTool(null)} />
+          )}
+          {activeTool === 'TD_ATTACK_PREVIEW' && (
+            <TDAttackPreview onClose={() => setActiveTool(null)} />
           )}
         </Suspense>
       )}

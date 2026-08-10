@@ -170,11 +170,21 @@ export class EffectProcessor {
       textScale = 0.75;
     }
 
-    target.hp -= finalDamage;
+    if (!target.isInvulnerable) {
+      target.hp -= finalDamage;
+    }
     target.damageFlashTimerMs = 150;
 
     // Track this tower as a participant for EXP distribution
     target.damagedByTowerIds.add(source.id);
+
+    engine.events?.emit({
+      type: 'ATTACK_DAMAGE_DEALT',
+      towerId: source.id,
+      targetEnemyId: target.id,
+      attackDefId: attackDef.id,
+      damage: finalDamage,
+    });
 
     engine.floatingTexts.push({
       id: `ft_dmg_${Date.now()}_${Math.random().toString(36).substring(7)}`,
