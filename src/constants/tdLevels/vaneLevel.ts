@@ -35,6 +35,7 @@ export const VANE_LEVEL: TDLevelData = {
       level: 1,
       speedMultiplier: 1.5,
       hpMultiplier: 1.5,
+      abilityId: 'BETTLE_HARDEN',
     },
   ],
   waves: [

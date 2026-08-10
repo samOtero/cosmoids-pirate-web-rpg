@@ -84,6 +84,9 @@ export interface BaseTDUnit {
   /** Shared timed movement boost state used by abilities, attacks, and UI. */
   speedBoostMultiplier?: number;
   speedBoostUntilMs?: number;
+  /** Persistent positive defense modifiers shown by the battlefield UI. */
+  defenseBoostMultiplier?: number;
+  specialDefenseBoostMultiplier?: number;
 }
 
 export interface EnvironmentUnit extends BaseTDUnit {
@@ -212,6 +215,7 @@ export interface Enemy extends BaseTDUnit {
   abilityRuntime?: {
     definitionId: string;
     nextReadyTimeMs: number;
+    hasActivated?: boolean;
   };
 }
 

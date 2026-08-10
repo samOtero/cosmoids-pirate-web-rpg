@@ -1,11 +1,22 @@
-export interface EnemyAbilityDefinition {
+interface EnemyAbilityDefinitionBase {
   id: string;
   initialCooldownMs: number;
-  cooldownMs: number;
-  durationMs: number;
-  speedMultiplier: number;
   visualEffectConfigId: string;
 }
+
+export type EnemyAbilityDefinition =
+  | (EnemyAbilityDefinitionBase & {
+      type: 'ALLY_SPEED_BOOST';
+      cooldownMs: number;
+      durationMs: number;
+      speedMultiplier: number;
+    })
+  | (EnemyAbilityDefinitionBase & {
+      type: 'SELF_DEFENSE_BOOST';
+      oncePerFight: true;
+      defenseMultiplier: number;
+      specialDefenseMultiplier: number;
+    });
 
 /**
  * Enemy abilities intentionally live outside ATTACK_DEFS. Those definitions
@@ -15,10 +26,20 @@ export interface EnemyAbilityDefinition {
 export const ENEMY_ABILITY_DEFS: Record<string, EnemyAbilityDefinition> = {
   MOTH_TAILWIND: {
     id: 'MOTH_TAILWIND',
+    type: 'ALLY_SPEED_BOOST',
     initialCooldownMs: 7000,
     cooldownMs: 12000,
     durationMs: 4000,
     speedMultiplier: 1.6,
     visualEffectConfigId: 'attack_wind_gust_1',
+  },
+  BETTLE_HARDEN: {
+    id: 'BETTLE_HARDEN',
+    type: 'SELF_DEFENSE_BOOST',
+    initialCooldownMs: 3000,
+    oncePerFight: true,
+    defenseMultiplier: 1.5,
+    specialDefenseMultiplier: 1.5,
+    visualEffectConfigId: 'enemy_harden_1',
   },
 };

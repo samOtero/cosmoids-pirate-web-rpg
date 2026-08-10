@@ -924,10 +924,9 @@ export class TowerDefenseEngine {
     const enemyDefense =
       calculateStat(meta.baseCreature.defense, enemyLevel) *
       (waveEnemyDefinition.defenseMultiplier ?? 1);
-    const enemySpecialDefense = calculateStat(
-      meta.baseCreature.specialDefense,
-      enemyLevel
-    ) * (waveEnemyDefinition.specialDefenseMultiplier ?? 1);
+    const enemySpecialDefense =
+      calculateStat(meta.baseCreature.specialDefense, enemyLevel) *
+      (waveEnemyDefinition.specialDefenseMultiplier ?? 1);
 
     const isShiny = false; //TowerDefenseEngine.forceShinySpawns || (Math.random() < 0.5);
     const abilityDefinitionId = waveEnemyDefinition.abilityId;
@@ -986,45 +985,79 @@ export class TowerDefenseEngine {
       const ability = ENEMY_ABILITY_DEFS[runtime.definitionId];
       if (!ability) continue;
 
-      // Tailwind snapshots allies that exist when it is cast. The caster and
-      // enemies that spawn later never inherit this activation's speed boost.
-      const targets = enemies.filter(
-        (target) => target.id !== enemy.id && target.hp > 0
-      );
-      if (targets.length === 0) continue;
-
-      targets.forEach((target) => {
-        applyTimedSpeedBoost(
-          target,
-          ability.speedMultiplier,
-          ability.durationMs,
-          this.elapsedTimeMs
+      if (ability.type === 'ALLY_SPEED_BOOST') {
+        // Tailwind snapshots allies that exist when it is cast. The caster and
+        // enemies that spawn later never inherit this activation's speed boost.
+        const targets = enemies.filter(
+          (target) => target.id !== enemy.id && target.hp > 0
         );
-      });
-      runtime.nextReadyTimeMs = this.elapsedTimeMs + ability.cooldownMs;
+        if (targets.length === 0) continue;
+
+        targets.forEach((target) => {
+          applyTimedSpeedBoost(
+            target,
+            ability.speedMultiplier,
+            ability.durationMs,
+            this.elapsedTimeMs
+          );
+        });
+        runtime.nextReadyTimeMs = this.elapsedTimeMs + ability.cooldownMs;
+
+        this.visualEffects.push({
+          id: `vfx_enemy_wind_${Date.now()}_${Math.random()}`,
+          configId: ability.visualEffectConfigId,
+          position: { ...enemy.position },
+          durationMs: 750,
+          elapsedMs: 0,
+          targetId: enemy.id,
+          facingDirection: enemy.facingDirection,
+          rangeIndex: 100,
+        });
+        this.floatingTexts.push({
+          id: `ft_tailwind_${Date.now()}_${Math.random()
+            .toString(36)
+            .substring(7)}`,
+          text: 'Tailwind!',
+          position: { ...enemy.position },
+          color: 0xa7f3d0,
+          scale: 0.9,
+          durationMs: 1000,
+          elapsedMs: 0,
+        });
+        continue;
+      }
+
+      if (runtime.hasActivated) continue;
+
+      enemy.currentDefense *= ability.defenseMultiplier;
+      enemy.currentSpecialDefense *= ability.specialDefenseMultiplier;
+      enemy.defenseBoostMultiplier =
+        (enemy.defenseBoostMultiplier ?? 1) * ability.defenseMultiplier;
+      enemy.specialDefenseBoostMultiplier =
+        (enemy.specialDefenseBoostMultiplier ?? 1) *
+        ability.specialDefenseMultiplier;
+      runtime.hasActivated = true;
 
       this.visualEffects.push({
-        id: `vfx_enemy_wind_${Date.now()}_${Math.random()}`,
+        id: `vfx_enemy_harden_${Date.now()}_${Math.random()}`,
         configId: ability.visualEffectConfigId,
         position: { ...enemy.position },
-        durationMs: 750,
+        durationMs: 900,
         elapsedMs: 0,
         targetId: enemy.id,
         facingDirection: enemy.facingDirection,
-        rangeIndex: 100,
       });
       this.floatingTexts.push({
-        id: `ft_tailwind_${Date.now()}_${Math.random()
+        id: `ft_harden_${Date.now()}_${Math.random()
           .toString(36)
           .substring(7)}`,
-        text: 'Tailwind!',
+        text: 'Harden!',
         position: { ...enemy.position },
-        color: 0xa7f3d0,
+        color: 0xe2e8f0,
         scale: 0.9,
         durationMs: 1000,
         elapsedMs: 0,
       });
-
     }
   }
 

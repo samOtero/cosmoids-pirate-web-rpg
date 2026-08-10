@@ -228,11 +228,98 @@ function updateSpeedBoostIndicator(
   indicator.scale.set(pulse);
   indicator.alpha = 0.88 + Math.sin(indicator.elapsed * 0.1) * 0.12;
 
-  const chevrons = indicator.getChildByLabel(
-    'speedBoostChevrons'
-  ) as PIXI.Graphics | undefined;
+  const chevrons = indicator.getChildByLabel('speedBoostChevrons') as
+    | PIXI.Graphics
+    | undefined;
   if (chevrons) {
     chevrons.x = ((indicator.elapsed * 0.08) % 3) - 1.5;
+  }
+}
+
+type DefenseBoostIndicator = PIXI.Container & {
+  elapsed: number;
+};
+
+function drawDefenseShield(graphics: PIXI.Graphics) {
+  graphics.moveTo(0, -6.5);
+  graphics.lineTo(6, -4);
+  graphics.lineTo(5, 2);
+  graphics.quadraticCurveTo(3.5, 6, 0, 8);
+  graphics.quadraticCurveTo(-3.5, 6, -5, 2);
+  graphics.lineTo(-6, -4);
+  graphics.closePath();
+  graphics.fill({ color: 0xf8fafc, alpha: 0.95 });
+  graphics.stroke({ color: 0x64748b, width: 1.5, join: 'round' });
+  graphics.moveTo(0, -4.5);
+  graphics.lineTo(0, 5.5);
+  graphics.stroke({ color: 0x94a3b8, width: 1.5, alpha: 0.95 });
+}
+
+function hasDefenseBoost(unit: BaseTDUnit) {
+  return (
+    (unit.defenseBoostMultiplier ?? 1) > 1 ||
+    (unit.specialDefenseBoostMultiplier ?? 1) > 1
+  );
+}
+
+/** Persistent badge for physical and special defense increases. */
+function updateDefenseBoostIndicator(
+  container: PIXI.Container,
+  unit: BaseTDUnit,
+  configId: string,
+  currentTimeMs: number,
+  delta: number
+) {
+  let indicator = container.getChildByLabel('defenseBoostIndicator') as
+    | DefenseBoostIndicator
+    | undefined;
+
+  if (!hasDefenseBoost(unit)) {
+    if (indicator) {
+      container.removeChild(indicator);
+      indicator.destroy({ children: true });
+    }
+    return;
+  }
+
+  if (!indicator) {
+    indicator = new PIXI.Container() as DefenseBoostIndicator;
+    indicator.label = 'defenseBoostIndicator';
+    indicator.elapsed = 0;
+
+    const badge = new PIXI.Graphics();
+    badge.circle(0, 0, 11);
+    badge.fill({ color: 0x1e293b, alpha: 0.92 });
+    badge.stroke({ color: 0xcbd5e1, alpha: 0.98, width: 2 });
+    indicator.addChild(badge);
+
+    const shield = new PIXI.Graphics();
+    shield.label = 'defenseBoostShield';
+    drawDefenseShield(shield);
+    indicator.addChild(shield);
+
+    container.addChild(indicator);
+  }
+
+  indicator.elapsed += delta;
+  const tdConfigMap = CREATURE_TD_CONFIGS[configId] || {
+    default: { scale: 1 },
+  };
+  const tdConfig = tdConfigMap[unit.facingDirection] || tdConfigMap.default;
+  const hpOffsetY =
+    tdConfig.healthBarOffsetY ?? tdConfigMap.default?.healthBarOffsetY ?? -40;
+  const hasSpeedBadge = hasActiveSpeedBoost(unit, currentTimeMs);
+  indicator.position.set(hasSpeedBadge ? 7 : 33, hpOffsetY - 13);
+
+  const pulse = 1 + Math.sin(indicator.elapsed * 0.1) * 0.045;
+  indicator.scale.set(pulse);
+  indicator.alpha = 0.9 + Math.sin(indicator.elapsed * 0.075) * 0.1;
+
+  const shield = indicator.getChildByLabel('defenseBoostShield') as
+    | PIXI.Graphics
+    | undefined;
+  if (shield) {
+    shield.y = Math.sin(indicator.elapsed * 0.08) * 0.6;
   }
 }
 
@@ -683,6 +770,114 @@ function updateWindGust(
   }
 
   container.rotation = progress * 0.32;
+  container.alpha = opacity;
+}
+
+function drawHarden(container: PIXI.Container) {
+  const overlay = new PIXI.Graphics();
+  overlay.label = 'harden_overlay';
+  container.addChild(overlay);
+
+  const plates = new PIXI.Graphics();
+  plates.label = 'harden_plates';
+  container.addChild(plates);
+
+  const glints = new PIXI.Graphics();
+  glints.label = 'harden_glints';
+  container.addChild(glints);
+}
+
+function updateHarden(container: PIXI.Container, progress: number) {
+  const overlay = container.getChildByLabel('harden_overlay') as
+    | PIXI.Graphics
+    | undefined;
+  const plates = container.getChildByLabel('harden_plates') as
+    | PIXI.Graphics
+    | undefined;
+  const glints = container.getChildByLabel('harden_glints') as
+    | PIXI.Graphics
+    | undefined;
+  const lockIn = 1 - Math.pow(1 - Math.min(1, progress / 0.42), 3);
+  const fade = Math.min(1, Math.max(0, (progress - 0.72) / 0.28));
+  const opacity = 1 - fade;
+  const shellRadius = 50 - lockIn * 10;
+
+  if (overlay) {
+    overlay.clear();
+    overlay.moveTo(0, -46);
+    overlay.lineTo(34, -30);
+    overlay.lineTo(43, 5);
+    overlay.lineTo(24, 36);
+    overlay.lineTo(0, 48);
+    overlay.lineTo(-24, 36);
+    overlay.lineTo(-43, 5);
+    overlay.lineTo(-34, -30);
+    overlay.closePath();
+    overlay.fill({ color: 0x94a3b8, alpha: 0.2 * lockIn * opacity });
+    overlay.stroke({
+      color: 0xf8fafc,
+      width: 2.5,
+      alpha: 0.78 * opacity,
+      join: 'round',
+    });
+  }
+
+  if (plates) {
+    plates.clear();
+    for (let index = 0; index < 8; index += 1) {
+      const angle = -Math.PI / 2 + (index * Math.PI * 2) / 8;
+      const tangentX = -Math.sin(angle);
+      const tangentY = Math.cos(angle);
+      const radialX = Math.cos(angle);
+      const radialY = Math.sin(angle);
+      const radius = shellRadius + (1 - lockIn) * (16 + (index % 2) * 7);
+      const x = radialX * radius;
+      const y = radialY * radius;
+      const halfWidth = 11;
+      const halfDepth = 5.5;
+      plates.moveTo(
+        x - tangentX * halfWidth - radialX * halfDepth,
+        y - tangentY * halfWidth - radialY * halfDepth
+      );
+      plates.lineTo(
+        x + tangentX * halfWidth - radialX * halfDepth,
+        y + tangentY * halfWidth - radialY * halfDepth
+      );
+      plates.lineTo(
+        x + tangentX * (halfWidth - 3) + radialX * halfDepth,
+        y + tangentY * (halfWidth - 3) + radialY * halfDepth
+      );
+      plates.lineTo(
+        x - tangentX * (halfWidth - 3) + radialX * halfDepth,
+        y - tangentY * (halfWidth - 3) + radialY * halfDepth
+      );
+      plates.closePath();
+      plates.fill({
+        color: index % 2 === 0 ? 0x64748b : 0x94a3b8,
+        alpha: 0.9 * opacity,
+      });
+      plates.stroke({ color: 0xe2e8f0, width: 1.5, alpha: 0.9 * opacity });
+    }
+  }
+
+  if (glints) {
+    glints.clear();
+    const glintProgress = Math.min(1, Math.max(0, (progress - 0.25) / 0.35));
+    const glintAlpha = Math.sin(glintProgress * Math.PI) * opacity;
+    const glintX = -30 + glintProgress * 60;
+    const glintY = -30 + glintProgress * 18;
+    glints.moveTo(glintX - 9, glintY);
+    glints.lineTo(glintX + 9, glintY);
+    glints.moveTo(glintX, glintY - 12);
+    glints.lineTo(glintX, glintY + 12);
+    glints.stroke({ color: 0xffffff, width: 3, alpha: glintAlpha });
+  }
+
+  const impactPulse =
+    1 + Math.sin(Math.min(1, progress / 0.5) * Math.PI) * 0.08;
+  overlay?.scale.set(impactPulse);
+  plates?.scale.set(impactPulse);
+  glints?.scale.set(impactPulse);
   container.alpha = opacity;
 }
 
@@ -1659,6 +1854,13 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               engine.elapsedTimeMs,
               app.ticker.deltaTime
             );
+            updateDefenseBoostIndicator(
+              container,
+              tower,
+              tower.creature.speciesId,
+              engine.elapsedTimeMs,
+              app.ticker.deltaTime
+            );
 
             const hpBg = container.getChildByLabel('hpBg') as
               | PIXI.Graphics
@@ -1917,6 +2119,13 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               engine.elapsedTimeMs,
               app.ticker.deltaTime
             );
+            updateDefenseBoostIndicator(
+              container,
+              enemy,
+              enemy.definitionId,
+              engine.elapsedTimeMs,
+              app.ticker.deltaTime
+            );
             if (esprite) {
               updateCursedAura(container, enemy, esprite, app.ticker.deltaTime);
               updateDrenchedAura(
@@ -2152,6 +2361,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 }
               } else if (animConfig?.type === 'WIND_GUST') {
                 drawWindGust(container);
+              } else if (animConfig?.type === 'HARDEN') {
+                drawHarden(container);
               } else if (animConfig?.type === 'BARREL_BASH') {
                 drawBarrelBashImpact(container);
               } else {
@@ -2215,6 +2426,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             } else if (animConfig?.type === 'WIND_GUST') {
               const radius = (TD_BASE_HEIGHT * (vfx.rangeIndex ?? 20)) / 100;
               updateWindGust(container, progress, radius);
+            } else if (animConfig?.type === 'HARDEN') {
+              updateHarden(container, progress);
             } else if (animConfig?.type === 'BARREL_BASH') {
               updateBarrelBashImpact(container, progress);
             } else {

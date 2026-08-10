@@ -421,6 +421,14 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       },
     },
   },
+  enemy_harden_1: {
+    default: {
+      vfxAnimation: {
+        type: 'HARDEN',
+        durationMs: 900,
+      },
+    },
+  },
   attack_nibble_1: {
     default: {
       scale: 0.32,
