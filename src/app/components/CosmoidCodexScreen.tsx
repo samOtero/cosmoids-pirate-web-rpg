@@ -123,12 +123,12 @@ export default function CosmoidCodexScreen({
         </div>
       </header>
 
-      <div className="relative z-10 grid min-h-0 flex-1 grid-cols-[minmax(0,3fr)_minmax(230px,2fr)] gap-3 px-4 pb-4 lg:gap-5 lg:px-6 lg:pb-6">
+      <div className="relative z-10 grid min-h-0 flex-1 grid-cols-[minmax(180px,0.85fr)_minmax(0,3.15fr)] gap-3 px-4 pb-4 lg:grid-cols-[minmax(240px,0.75fr)_minmax(0,3.25fr)] lg:gap-5 lg:px-6 lg:pb-6">
         <section
           aria-label="Kip's journal entries"
-          className="min-h-0 overflow-y-auto rounded-2xl border border-white/10 bg-[#0b2338]/85 p-3 shadow-2xl backdrop-blur-sm lg:p-4"
+          className="min-h-0 overflow-y-auto rounded-2xl border border-white/10 bg-[#0b2338]/85 p-2 shadow-2xl backdrop-blur-sm lg:p-3"
         >
-          <div className="grid grid-cols-3 gap-2 lg:grid-cols-4 lg:gap-3">
+          <div className="grid grid-cols-1 gap-1.5 lg:gap-2">
             {discoveredSpecies.map((entry) => {
               const isCaptured = capturedSpeciesIds.has(entry.id);
               const isSelected = selectedSpeciesId === entry.id;
@@ -143,36 +143,36 @@ export default function CosmoidCodexScreen({
                   type="button"
                   aria-label={`${entry.name}, ${isCaptured ? 'captured' : 'seen'}`}
                   onClick={() => setSelectedSpeciesId(entry.id)}
-                  className={`relative flex min-h-[108px] flex-col items-center justify-center overflow-hidden rounded-xl border p-2 transition-all lg:min-h-[150px] lg:p-3 ${
+                  className={`group flex min-h-14 w-full items-center gap-2 overflow-hidden rounded-xl border p-1.5 text-left transition-all lg:min-h-16 lg:gap-3 lg:p-2 ${
                     isSelected
                       ? 'border-emerald-300 bg-emerald-900/35 shadow-lg shadow-emerald-500/15'
-                      : 'border-white/15 bg-white/[0.045] hover:-translate-y-0.5 hover:border-emerald-400/50 hover:bg-white/[0.075]'
+                      : 'border-white/15 bg-white/[0.045] hover:translate-x-0.5 hover:border-emerald-400/50 hover:bg-white/[0.075]'
                   }`}
                 >
-                  <span className="absolute top-1.5 left-2 font-mono text-[9px] text-sand/35 lg:text-[10px]">
+                  <span className="w-7 shrink-0 text-center font-mono text-[9px] text-sand/35 lg:w-8 lg:text-[10px]">
                     #{String(catalogNumber).padStart(3, '0')}
                   </span>
 
-                  <div className="relative mt-2 h-12 w-12 lg:h-20 lg:w-20">
+                  <div className="relative h-10 w-10 shrink-0 lg:h-12 lg:w-12">
                     <Image
                       src={entry.iconImg || entry.spriteUrl}
                       alt=""
                       fill
-                      sizes="80px"
+                      sizes="48px"
                       className="object-contain drop-shadow-[0_8px_10px_rgba(0,0,0,0.35)]"
                     />
                   </div>
-                  <span className="mt-1 max-w-full truncate text-xs font-extrabold tracking-wide text-sand lg:text-sm">
-                    {entry.name}
-                  </span>
-                  <span
-                    className={`mt-1 rounded-full px-2 py-0.5 text-[8px] font-black tracking-widest uppercase lg:text-[9px] ${
-                      isCaptured
-                        ? 'bg-emerald-400/15 text-emerald-300 ring-1 ring-emerald-400/30'
-                        : 'bg-amber-400/15 text-amber-200 ring-1 ring-amber-400/25'
-                    }`}
-                  >
-                    {isCaptured ? 'Captured' : 'Seen'}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-xs font-extrabold tracking-wide text-sand lg:text-sm">
+                      {entry.name}
+                    </span>
+                    <span
+                      className={`mt-0.5 block text-[8px] font-black tracking-widest uppercase lg:text-[9px] ${
+                        isCaptured ? 'text-emerald-300' : 'text-amber-200'
+                      }`}
+                    >
+                      {isCaptured ? 'Captured' : 'Seen'}
+                    </span>
                   </span>
                 </button>
               );
@@ -210,40 +210,51 @@ export default function CosmoidCodexScreen({
               </div>
 
               <div
-                className={
-                  selectedJournalImg
-                    ? 'relative mx-auto my-3 aspect-square w-full max-w-56 shrink-0 overflow-hidden rounded-xl border border-amber-200/20 bg-[#ead8a9] shadow-lg lg:my-4 lg:max-w-64'
-                    : 'relative mx-auto my-2 h-28 w-28 shrink-0 lg:my-4 lg:h-44 lg:w-44'
-                }
+                className={`mt-3 grid min-h-0 flex-1 items-start gap-4 md:mt-4 ${
+                  selectedIsCaptured
+                    ? 'md:grid-cols-[minmax(240px,1.4fr)_minmax(190px,1fr)]'
+                    : ''
+                }`}
               >
-                {!selectedJournalImg && (
-                  <div className="absolute inset-3 rounded-full bg-emerald-300/10 blur-xl" />
-                )}
-                <Image
-                  src={
-                    selectedJournalImg ||
-                    selectedSpecies.iconImg ||
-                    selectedSpecies.spriteUrl
-                  }
-                  alt={
-                    selectedJournalImg
-                      ? `${selectedSpecies.name} field sketch`
-                      : selectedSpecies.name
-                  }
-                  fill
-                  sizes={selectedJournalImg ? '256px' : '176px'}
-                  priority
+                <div
                   className={
                     selectedJournalImg
-                      ? 'object-contain'
-                      : 'object-contain drop-shadow-[0_14px_16px_rgba(0,0,0,0.45)]'
+                      ? 'relative mx-auto aspect-square w-full max-w-[440px] shrink-0 overflow-hidden rounded-xl border border-amber-200/20 bg-[#ead8a9] shadow-lg'
+                      : 'relative mx-auto aspect-square w-full max-w-72 shrink-0 lg:max-w-96'
                   }
-                />
-              </div>
+                >
+                  {!selectedJournalImg && (
+                    <div className="absolute inset-6 rounded-full bg-emerald-300/10 blur-xl" />
+                  )}
+                  <Image
+                    src={
+                      selectedJournalImg ||
+                      selectedSpecies.iconImg ||
+                      selectedSpecies.spriteUrl
+                    }
+                    alt={
+                      selectedJournalImg
+                        ? `${selectedSpecies.name} field sketch`
+                        : selectedSpecies.name
+                    }
+                    fill
+                    sizes={
+                      selectedJournalImg
+                        ? '(min-width: 1024px) 440px, (min-width: 768px) 360px, 55vw'
+                        : '(min-width: 1024px) 384px, (min-width: 768px) 320px, 50vw'
+                    }
+                    priority
+                    className={
+                      selectedJournalImg
+                        ? 'object-contain'
+                        : 'object-contain drop-shadow-[0_14px_16px_rgba(0,0,0,0.45)]'
+                    }
+                  />
+                </div>
 
-              {selectedIsCaptured ? (
-                <>
-                  <div className="mb-3 grid grid-cols-2 gap-2 rounded-xl border border-emerald-300/10 bg-black/15 p-3 text-center">
+                {selectedIsCaptured ? (
+                  <div className="min-w-0 rounded-xl border border-emerald-300/10 bg-black/15 p-3 lg:p-4">
+                    <div className="mb-4 grid grid-cols-2 gap-2 text-center">
                     <div>
                       <span className="block text-[9px] font-bold tracking-widest text-sand/40 uppercase">
                         Owned
@@ -262,38 +273,39 @@ export default function CosmoidCodexScreen({
                         )}
                       </strong>
                     </div>
-                  </div>
+                    </div>
 
-                  <div>
-                    <h3 className="mb-2 text-[10px] font-black tracking-[0.2em] text-sand/50 uppercase">
+                    <div>
+                      <h3 className="mb-2 text-[10px] font-black tracking-[0.2em] text-sand/50 uppercase">
                       Base Stats
-                    </h3>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
-                      {STAT_LABELS.map(({ key, label }) => (
-                        <div
-                          key={key}
-                          className="flex items-center justify-between border-b border-white/[0.06] py-1 text-xs"
-                        >
-                          <span className="text-sand/50">{label}</span>
-                          <strong className="font-mono text-sand">
-                            {selectedSpecies.baseStats[key]}
-                          </strong>
-                        </div>
-                      ))}
+                      </h3>
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 md:grid-cols-1">
+                        {STAT_LABELS.map(({ key, label }) => (
+                          <div
+                            key={key}
+                            className="flex items-center justify-between border-b border-white/[0.06] py-1.5 text-xs md:text-sm"
+                          >
+                            <span className="text-sand/50">{label}</span>
+                            <strong className="font-mono text-sand">
+                              {selectedSpecies.baseStats[key]}
+                            </strong>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </>
-              ) : (
-                <div className="mt-auto rounded-xl border border-dashed border-amber-300/20 bg-amber-950/15 p-4 text-center">
-                  <p className="text-sm font-bold text-amber-100">
-                    Kip&apos;s notes are unfinished
-                  </p>
-                  <p className="mt-1 text-xs leading-relaxed text-sand/45">
-                    Catch this Cosmoid in a Story battle so Kip can finish the
-                    entry.
-                  </p>
-                </div>
-              )}
+                ) : (
+                  <div className="mx-auto w-full max-w-xl rounded-xl border border-dashed border-amber-300/20 bg-amber-950/15 p-4 text-center">
+                    <p className="text-sm font-bold text-amber-100">
+                      Kip&apos;s notes are unfinished
+                    </p>
+                    <p className="mt-1 text-xs leading-relaxed text-sand/45">
+                      Catch this Cosmoid in a Story battle so Kip can finish the
+                      entry.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             <div className="flex min-h-full flex-col items-center justify-center text-center">
