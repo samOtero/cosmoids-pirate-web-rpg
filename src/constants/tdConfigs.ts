@@ -122,7 +122,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       flipX: false,
     },
     up: {
-      url: '/battles/cosmoids/moth-basic-normal-neutral-skin-1.png',
+      url: '/battles/cosmoids/bug_3_up_1.png',
       scale: 0.11,
       shadowOffsetY: 1,
       offsetY: -56,
@@ -130,7 +130,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowScaleX: 1.95,
     },
     down: {
-      url: '/battles/cosmoids/moth-basic-normal-neutral-skin-1.png',
+      url: '/battles/cosmoids/bug_3_down_1.png',
       scale: 0.11,
       shadowOffsetY: 1,
       offsetY: -56,
