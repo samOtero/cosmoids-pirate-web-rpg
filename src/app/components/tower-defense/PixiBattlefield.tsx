@@ -2381,10 +2381,19 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               vfxSprites.set(vfx.id, container);
             }
 
-            container.x = offsetX + (vfx.position.x / 100) * screenW;
-            container.y = offsetY + (vfx.position.y / 100) * screenH;
             const responsiveScale = app.screen.height / TD_BASE_HEIGHT;
             const finalScale = zoom * responsiveScale;
+            const usesLayerOffsets = animConfig?.type === 'KEYFRAME_SPRITES';
+            const effectOffsetX = usesLayerOffsets ? 0 : (tdConfig.offsetX ?? 0);
+            const effectOffsetY = usesLayerOffsets ? 0 : (tdConfig.offsetY ?? 0);
+            container.x =
+              offsetX +
+              (vfx.position.x / 100) * screenW +
+              effectOffsetX * finalScale;
+            container.y =
+              offsetY +
+              (vfx.position.y / 100) * screenH +
+              effectOffsetY * finalScale;
             if (animConfig?.type === 'WIND_GUST') {
               container.scale.set(
                 (zoom * app.screen.width) / TD_BASE_HEIGHT,

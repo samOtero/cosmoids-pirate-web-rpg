@@ -423,6 +423,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   enemy_harden_1: {
     default: {
+      offsetY: -24,
       vfxAnimation: {
         type: 'HARDEN',
         durationMs: 900,
