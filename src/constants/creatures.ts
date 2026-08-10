@@ -189,6 +189,7 @@ export const BUG_STAGE_1: CosmoidTemplate = {
   id: 'bug_stage_1',
   name: 'Buglet',
   type: ElementType.GRASS,
+  iconImg: '/UI/Icons/buglet_icon.png',
   baseStats: {
     hp: 25,
     attack: 15,
@@ -211,6 +212,7 @@ export const BUG_STAGE_2: CosmoidTemplate = {
   id: 'bug_stage_2',
   name: 'Bugitor',
   type: ElementType.GRASS,
+  iconImg: '/UI/Icons/bugitor_icon.png',
   baseStats: {
     hp: 25,
     attack: 15,
@@ -234,6 +236,7 @@ export const BUG_STAGE_3: CosmoidTemplate = {
   id: 'bug_stage_3',
   name: 'Moth',
   type: ElementType.GRASS,
+  iconImg: '/UI/Icons/moth_icon.png',
   baseStats: {
     hp: 25,
     attack: 15,
