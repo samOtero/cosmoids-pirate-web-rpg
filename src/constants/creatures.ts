@@ -295,6 +295,7 @@ export const STARTER_IGUANA: CosmoidTemplate = {
   baseExperience: 62,
   spriteUrl: '/battles/cosmoids/fueguana_left_1_v3.png',
   iconImg: '/UI/Icons/fueguana_icon.png',
+  journalImg: '/UI/Journal/fueguana_journal.png',
   battleSpriteUrl: '/battles/cosmoids/fueguana_left_1_v3.png',
   movementId: 'lizard',
   learnableAttacks: [
@@ -317,6 +318,7 @@ export const STARTER_MONKEY: CosmoidTemplate = {
   },
   baseExperience: 63,
   iconImg: '/UI/Icons/monkeg_icon.png',
+  journalImg: '/UI/Journal/monkeg_journal.png',
   spriteUrl: '/battles/cosmoids/monkeg_down_1_v2.png',
   battleSpriteUrl: '/battles/cosmoids/monkeg_down_1_v2.png',
   learnableAttacks: [

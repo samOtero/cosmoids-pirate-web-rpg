@@ -17,6 +17,22 @@ const profile: Profile = {
       isShiny: false,
     },
     {
+      id: 'captured-fueguana',
+      speciesId: 'starter_iguana',
+      level: 5,
+      xp: 0,
+      equippedAttacks: ['SCRATCH'],
+      isShiny: false,
+    },
+    {
+      id: 'captured-monkeg',
+      speciesId: 'starter_monkey',
+      level: 5,
+      xp: 0,
+      equippedAttacks: ['TACKLE'],
+      isShiny: false,
+    },
+    {
       id: 'captured-knotia',
       speciesId: 'mouse_1',
       level: 7,
@@ -56,6 +72,20 @@ describe('CosmoidCodexScreen', () => {
         .getByRole('img', { name: 'Palmit field sketch' })
         .getAttribute('src')
     ).toContain(encodeURIComponent('/UI/Journal/palmit_journal.png'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Fueguana, captured' }));
+    expect(
+      screen
+        .getByRole('img', { name: 'Fueguana field sketch' })
+        .getAttribute('src')
+    ).toContain(encodeURIComponent('/UI/Journal/fueguana_journal.png'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Monkeg, captured' }));
+    expect(
+      screen
+        .getByRole('img', { name: 'Monkeg field sketch' })
+        .getAttribute('src')
+    ).toContain(encodeURIComponent('/UI/Journal/monkeg_journal.png'));
 
     fireEvent.click(screen.getByRole('button', { name: 'Harlequill, seen' }));
     expect(screen.getByText("Kip's notes are unfinished")).toBeInTheDocument();
