@@ -2,6 +2,9 @@ import * as PIXI from 'pixi.js';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { BaseTDUnit } from '@/engine/tower-defense/types';
 
+const colorChannel = (color: number, shift: number) =>
+  ((color >> shift) & 0xff) / 255;
+
 export function applyTDUnitTransforms(
   unit: BaseTDUnit,
   sprite: PIXI.Sprite,
@@ -47,6 +50,7 @@ export function applyTDUnitTransforms(
 
   if ((unit.damageFlashTimerMs || 0) > 0) {
     sprite.tint = 0xffffff;
+    const flashColor = unit.damageFlashColor ?? 0xffffff;
     const currentFilters = Array.isArray(sprite.filters)
       ? [...sprite.filters]
       : sprite.filters
@@ -64,7 +68,26 @@ export function applyTDUnitTransforms(
       sprite.filters = currentFilters;
     }
     flashFilter.matrix = [
-      0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0,
+      0,
+      0,
+      0,
+      0,
+      colorChannel(flashColor, 16),
+      0,
+      0,
+      0,
+      0,
+      colorChannel(flashColor, 8),
+      0,
+      0,
+      0,
+      0,
+      colorChannel(flashColor, 0),
+      0,
+      0,
+      0,
+      1,
+      0,
     ];
   } else {
     sprite.tint = 0xffffff;

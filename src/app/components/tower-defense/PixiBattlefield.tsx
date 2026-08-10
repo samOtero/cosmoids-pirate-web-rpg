@@ -933,7 +933,7 @@ function updateCursedAura(
     return;
   }
 
-  // Damage flash remains bright white; the cursed tint returns afterward.
+  // The hit's light elemental flash takes priority; cursed tint returns after.
   if ((unit.damageFlashTimerMs || 0) <= 0) {
     sprite.tint = 0xc084fc;
   }

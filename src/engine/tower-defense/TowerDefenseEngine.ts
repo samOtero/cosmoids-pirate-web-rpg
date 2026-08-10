@@ -4,7 +4,7 @@ import {
   BUG_STAGE_3,
   COSMOID_TEMPLATES,
 } from '@/constants/creatures';
-import { PlayerCreature } from '@/types/baseGame';
+import { ElementType, PlayerCreature } from '@/types/baseGame';
 import {
   calculateMaxHp,
   calculateStat,
@@ -23,6 +23,7 @@ import {
   TDWaveEnemyDefinition,
 } from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
+import { startDamageFlash } from './damageFlash';
 import { AttackBehaviorRegistry } from './attacks/behaviors';
 import { EffectProcessor } from './attacks/EffectProcessor';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
@@ -411,7 +412,10 @@ export class TowerDefenseEngine {
               if (!enemy.isInvulnerable) {
                 enemy.hp -= status.tickDamage;
               }
-              enemy.damageFlashTimerMs = 150;
+              startDamageFlash(
+                enemy,
+                status.type === 'BURN' ? ElementType.FIRE : ElementType.POISON
+              );
               status.lastTickTime = time;
 
               this.floatingTexts.push({
@@ -692,7 +696,7 @@ export class TowerDefenseEngine {
               }
             } else {
               target.hp -= p.damage; // Fallback
-              target.damageFlashTimerMs = 150;
+              startDamageFlash(target, ATTACK_DEFS[p.attackDefinitionId]?.type);
               this.floatingTexts.push({
                 id: `ft_dmg_${time}_${Math.random().toString(36).substring(7)}`,
                 text: Math.ceil(p.damage).toString(),
@@ -704,7 +708,12 @@ export class TowerDefenseEngine {
             }
           } else {
             target.hp -= p.damage;
-            target.damageFlashTimerMs = 150;
+            startDamageFlash(
+              target,
+              p.attackDefinitionId
+                ? ATTACK_DEFS[p.attackDefinitionId]?.type
+                : undefined
+            );
             this.floatingTexts.push({
               id: `ft_dmg_${time}_${Math.random().toString(36).substring(7)}`,
               text: Math.ceil(p.damage).toString(),

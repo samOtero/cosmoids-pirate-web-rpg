@@ -2,6 +2,7 @@ import { TowerDefenseEngine, TD_CREATURE_DEFS } from '../TowerDefenseEngine';
 import { Tower, Enemy } from '../types';
 import { AttackDefinition } from './types';
 import { ElementType } from '@/types/baseGame';
+import { startDamageFlash } from '../damageFlash';
 
 export const DRENCHED_DURATION_MS = 4000;
 export const DRENCHED_DAMAGE_MULTIPLIER = 1.5;
@@ -173,7 +174,7 @@ export class EffectProcessor {
     if (!target.isInvulnerable) {
       target.hp -= finalDamage;
     }
-    target.damageFlashTimerMs = 150;
+    startDamageFlash(target, attackDef.type);
 
     // Track this tower as a participant for EXP distribution
     target.damagedByTowerIds.add(source.id);

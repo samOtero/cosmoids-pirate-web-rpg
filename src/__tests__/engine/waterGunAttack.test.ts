@@ -5,6 +5,8 @@ import { ProjectileBehavior } from '@/engine/tower-defense/attacks/behaviors';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { Enemy, Tower } from '@/engine/tower-defense/types';
+import { DAMAGE_FLASH_COLORS } from '@/engine/tower-defense/damageFlash';
+import { ElementType } from '@/types/baseGame';
 
 const createMonkegTower = (): Tower => ({
   id: 'monkeg_tower',
@@ -97,6 +99,7 @@ describe('Water Gun', () => {
     engine.tick(0, 1000);
 
     expect(enemy.hp).toBe(100 - ATTACK_DEFS.WATER_GUN.power);
+    expect(enemy.damageFlashColor).toBe(DAMAGE_FLASH_COLORS[ElementType.WATER]);
     expect(engine.projectiles).toHaveLength(0);
     engine.destroy();
   });

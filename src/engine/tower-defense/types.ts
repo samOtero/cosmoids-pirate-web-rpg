@@ -79,6 +79,8 @@ export interface BaseTDUnit {
   hp: number;
   maxHp: number;
   damageFlashTimerMs?: number;
+  /** RGB color used by the current hit flash. Defaults to white. */
+  damageFlashColor?: number;
   isShiny?: boolean;
   isCursed?: boolean;
   /** Shared timed movement boost state used by abilities, attacks, and UI. */
