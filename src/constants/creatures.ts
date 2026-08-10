@@ -271,6 +271,7 @@ export const STARTER_CRAB: CosmoidTemplate = {
   },
   baseExperience: 64,
   iconImg: '/UI/Icons/palmit_icon.png',
+  journalImg: '/UI/Journal/palmit_journal.png',
   spriteUrl: '/battles/cosmoids/palmit_down_1.png',
   battleSpriteUrl: '/battles/cosmoids/palmit_down_1.png',
   learnableAttacks: [

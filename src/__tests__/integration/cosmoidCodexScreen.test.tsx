@@ -9,6 +9,14 @@ const profile: Profile = {
   lastPlayed: 0,
   creatures: [
     {
+      id: 'captured-palmit',
+      speciesId: 'starter_crab',
+      level: 5,
+      xp: 0,
+      equippedAttacks: ['PINCH'],
+      isShiny: false,
+    },
+    {
       id: 'captured-knotia',
       speciesId: 'mouse_1',
       level: 7,
@@ -41,6 +49,13 @@ describe('CosmoidCodexScreen', () => {
     expect(
       screen.queryByRole('button', { name: 'Unknown Cosmoid 1' })
     ).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Palmit, captured' }));
+    expect(
+      screen
+        .getByRole('img', { name: 'Palmit field sketch' })
+        .getAttribute('src')
+    ).toContain(encodeURIComponent('/UI/Journal/palmit_journal.png'));
 
     fireEvent.click(screen.getByRole('button', { name: 'Harlequill, seen' }));
     expect(screen.getByText("Kip's notes are unfinished")).toBeInTheDocument();

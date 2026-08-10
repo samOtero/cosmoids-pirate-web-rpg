@@ -231,6 +231,7 @@ export interface CosmoidTemplate {
   baseExperience: number;
   spriteUrl: string;
   iconImg?: string;
+  journalImg?: string;
   battleSpriteUrl?: string;
   battlePosition?: { bottom: number; left: number };
   battleScale?: number;

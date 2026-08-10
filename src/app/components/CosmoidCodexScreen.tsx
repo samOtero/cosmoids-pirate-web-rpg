@@ -67,6 +67,7 @@ export default function CosmoidCodexScreen({
   const selectedNumber = selectedSpecies
     ? species.findIndex((entry) => entry.id === selectedSpecies.id) + 1
     : 0;
+  const selectedJournalImg = selectedSpecies?.journalImg;
 
   return (
     <main className="relative flex h-full w-full flex-col overflow-hidden bg-[#071a2b] text-sand">
@@ -208,15 +209,35 @@ export default function CosmoidCodexScreen({
                 </span>
               </div>
 
-              <div className="relative mx-auto my-2 h-28 w-28 shrink-0 lg:my-4 lg:h-44 lg:w-44">
-                <div className="absolute inset-3 rounded-full bg-emerald-300/10 blur-xl" />
+              <div
+                className={
+                  selectedJournalImg
+                    ? 'relative mx-auto my-3 aspect-square w-full max-w-56 shrink-0 overflow-hidden rounded-xl border border-amber-200/20 bg-[#ead8a9] shadow-lg lg:my-4 lg:max-w-64'
+                    : 'relative mx-auto my-2 h-28 w-28 shrink-0 lg:my-4 lg:h-44 lg:w-44'
+                }
+              >
+                {!selectedJournalImg && (
+                  <div className="absolute inset-3 rounded-full bg-emerald-300/10 blur-xl" />
+                )}
                 <Image
-                  src={selectedSpecies.iconImg || selectedSpecies.spriteUrl}
-                  alt={selectedSpecies.name}
+                  src={
+                    selectedJournalImg ||
+                    selectedSpecies.iconImg ||
+                    selectedSpecies.spriteUrl
+                  }
+                  alt={
+                    selectedJournalImg
+                      ? `${selectedSpecies.name} field sketch`
+                      : selectedSpecies.name
+                  }
                   fill
-                  sizes="176px"
+                  sizes={selectedJournalImg ? '256px' : '176px'}
                   priority
-                  className="object-contain drop-shadow-[0_14px_16px_rgba(0,0,0,0.45)]"
+                  className={
+                    selectedJournalImg
+                      ? 'object-contain'
+                      : 'object-contain drop-shadow-[0_14px_16px_rgba(0,0,0,0.45)]'
+                  }
                 />
               </div>
 
