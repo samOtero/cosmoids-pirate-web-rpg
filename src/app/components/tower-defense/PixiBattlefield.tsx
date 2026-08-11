@@ -25,7 +25,10 @@ import {
   resolveTDOpeningPanView,
 } from '@/utils/tdInitialView';
 import { applyTDUnitTransforms } from '@/utils/tdUnitVisuals';
-import { hasActiveSpeedBoost } from '@/engine/tower-defense/speedModifiers';
+import {
+  hasActiveSpeedBoost,
+  hasActiveSpeedSlow,
+} from '@/engine/tower-defense/speedModifiers';
 
 export const WEAKENED_THRESHOLD = 0.9;
 
@@ -234,6 +237,64 @@ function updateSpeedBoostIndicator(
   if (chevrons) {
     chevrons.x = ((indicator.elapsed * 0.08) % 3) - 1.5;
   }
+}
+
+type SpeedSlowIndicator = PIXI.Container & {
+  elapsed: number;
+};
+
+/** A persistent silk ring that makes String Shot's indefinite slow readable. */
+function updateSpeedSlowIndicator(
+  container: PIXI.Container,
+  unit: BaseTDUnit,
+  currentTimeMs: number,
+  delta: number
+) {
+  let indicator = container.getChildByLabel('speedSlowIndicator') as
+    | SpeedSlowIndicator
+    | undefined;
+
+  if (!hasActiveSpeedSlow(unit, currentTimeMs)) {
+    if (indicator) {
+      container.removeChild(indicator);
+      indicator.destroy({ children: true });
+    }
+    return;
+  }
+
+  if (!indicator) {
+    indicator = new PIXI.Container() as SpeedSlowIndicator;
+    indicator.label = 'speedSlowIndicator';
+    indicator.elapsed = 0;
+    indicator.y = -7;
+
+    const web = new PIXI.Graphics();
+    web.label = 'speedSlowWeb';
+    [
+      { width: 54, height: 13, y: -7 },
+      { width: 60, height: 15, y: 2 },
+      { width: 48, height: 11, y: 11 },
+    ].forEach(({ width, height, y }) => {
+      web.ellipse(0, y, width / 2, height / 2);
+      web.stroke({ color: 0x64748b, width: 4, alpha: 0.7 });
+      web.ellipse(0, y - 1, width / 2, height / 2);
+      web.stroke({ color: 0xf8fafc, width: 2, alpha: 0.95 });
+    });
+    web.moveTo(-25, -7);
+    web.lineTo(-19, 12);
+    web.moveTo(25, -7);
+    web.lineTo(19, 12);
+    web.stroke({ color: 0xbae6fd, width: 1.5, alpha: 0.85 });
+    indicator.addChild(web);
+
+    // Keep the lingering web below UI badges but over the creature sprite.
+    container.addChildAt(indicator, Math.min(2, container.children.length));
+  }
+
+  indicator.elapsed += delta;
+  const pulse = 1 + Math.sin(indicator.elapsed * 0.09) * 0.025;
+  indicator.scale.set(pulse, 1);
+  indicator.alpha = 0.78 + Math.sin(indicator.elapsed * 0.06) * 0.1;
 }
 
 type DefenseBoostIndicator = PIXI.Container & {
@@ -2119,6 +2180,12 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               engine.elapsedTimeMs,
               app.ticker.deltaTime
             );
+            updateSpeedSlowIndicator(
+              container,
+              enemy,
+              engine.elapsedTimeMs,
+              app.ticker.deltaTime
+            );
             updateDefenseBoostIndicator(
               container,
               enemy,
@@ -2198,6 +2265,14 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                   def.projectileVisual.highlightColor,
                   def.projectileVisual.sparkColor
                 );
+              } else if (def?.projectileVisual?.type === 'STRING_COIL') {
+                drawCoirBola(
+                  container,
+                  def.projectileVisual.shadowColor,
+                  def.projectileVisual.fiberColor,
+                  def.projectileVisual.highlightColor,
+                  def.projectileVisual.sparkColor
+                );
               } else {
                 const g = new PIXI.Graphics();
                 g.label = 'proj_graphics';
@@ -2232,7 +2307,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             if (
               def?.projectileVisual?.type === 'FLAME' ||
               def?.projectileVisual?.type === 'WATER_STREAM' ||
-              def?.projectileVisual?.type === 'COIR_BOLA'
+              def?.projectileVisual?.type === 'COIR_BOLA' ||
+              def?.projectileVisual?.type === 'STRING_COIL'
             ) {
               const travelX = proj.target.x - proj.position.x;
               const travelY = proj.target.y - proj.position.y;
@@ -2241,7 +2317,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               container.rotation = 0;
             }
 
-            if (def?.projectileVisual?.type === 'COIR_BOLA') {
+            if (
+              def?.projectileVisual?.type === 'COIR_BOLA' ||
+              def?.projectileVisual?.type === 'STRING_COIL'
+            ) {
               const core = container.getChildByLabel('coir_bola_core') as
                 | PIXI.Container
                 | undefined;
@@ -2359,6 +2438,17 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                     coirVisual.sparkColor
                   );
                 }
+              } else if (animConfig?.type === 'STRING_SHOT') {
+                const stringVisual = ATTACK_DEFS.STRING_SHOT.projectileVisual;
+                if (stringVisual?.type === 'STRING_COIL') {
+                  drawCoirSnareImpact(
+                    container,
+                    stringVisual.shadowColor,
+                    stringVisual.fiberColor,
+                    stringVisual.highlightColor,
+                    stringVisual.sparkColor
+                  );
+                }
               } else if (animConfig?.type === 'WIND_GUST') {
                 drawWindGust(container);
               } else if (animConfig?.type === 'HARDEN') {
@@ -2430,7 +2520,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                   sprite.alpha = values.alpha;
                 }
               });
-            } else if (animConfig?.type === 'COIR_SNARE') {
+            } else if (
+              animConfig?.type === 'COIR_SNARE' ||
+              animConfig?.type === 'STRING_SHOT'
+            ) {
               updateCoirSnareImpact(container, progress);
             } else if (animConfig?.type === 'WIND_GUST') {
               const radius = (TD_BASE_HEIGHT * (vfx.rangeIndex ?? 20)) / 100;

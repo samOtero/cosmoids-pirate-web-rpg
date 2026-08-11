@@ -405,6 +405,14 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       },
     },
   },
+  attack_string_shot_1: {
+    default: {
+      vfxAnimation: {
+        type: 'STRING_SHOT',
+        durationMs: 900,
+      },
+    },
+  },
   attack_barrel_bash_1: {
     default: {
       vfxAnimation: {

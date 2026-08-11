@@ -159,6 +159,7 @@ export interface VFXAnimationConfig {
     | 'CUSTOM'
     | 'NIBBLE'
     | 'COIR_SNARE'
+    | 'STRING_SHOT'
     | 'WIND_GUST'
     | 'HARDEN'
     | 'BARREL_BASH'

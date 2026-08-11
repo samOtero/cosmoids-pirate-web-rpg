@@ -3,7 +3,14 @@ import { TowerDefenseEngine } from '../TowerDefenseEngine';
 import { Tower } from '../types';
 
 export interface AttackEffect {
-  type: 'BURN' | 'POISON' | 'STUN' | 'DRENCHED' | 'MULTI_HIT' | 'KNOCKBACK';
+  type:
+    | 'BURN'
+    | 'POISON'
+    | 'STUN'
+    | 'DRENCHED'
+    | 'SPEED_SLOW'
+    | 'MULTI_HIT'
+    | 'KNOCKBACK';
   chance: number; // 0 to 1
   value?: number; // e.g., how many times to multi-hit, or duration of stun
 }
@@ -32,6 +39,13 @@ export type ProjectileVisual =
     }
   | {
       type: 'COIR_BOLA';
+      shadowColor: number;
+      fiberColor: number;
+      highlightColor: number;
+      sparkColor: number;
+    }
+  | {
+      type: 'STRING_COIL';
       shadowColor: number;
       fiberColor: number;
       highlightColor: number;

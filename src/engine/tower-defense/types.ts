@@ -86,6 +86,8 @@ export interface BaseTDUnit {
   /** Shared timed movement boost state used by abilities, attacks, and UI. */
   speedBoostMultiplier?: number;
   speedBoostUntilMs?: number;
+  /** Persistent movement penalty; cleared when the unit receives a speed boost. */
+  speedSlowMultiplier?: number;
   /** Persistent positive defense modifiers shown by the battlefield UI. */
   defenseBoostMultiplier?: number;
   specialDefenseBoostMultiplier?: number;

@@ -3,6 +3,7 @@ import { Tower, Enemy } from '../types';
 import { AttackDefinition } from './types';
 import { ElementType } from '@/types/baseGame';
 import { startDamageFlash } from '../damageFlash';
+import { applyPersistentSpeedSlow } from '../speedModifiers';
 
 export const DRENCHED_DURATION_MS = 4000;
 export const DRENCHED_DAMAGE_MULTIPLIER = 1.5;
@@ -157,8 +158,9 @@ export class EffectProcessor {
       baseDamage * stabMultiplier * combinedEffectiveness * randomModifier
     );
 
-    // Ensure at least 1 damage
-    finalDamage = Math.max(1, finalDamage);
+    // Status moves resolve their effects without inflicting the formula's
+    // minimum one point of damage.
+    finalDamage = power > 0 ? Math.max(1, finalDamage) : 0;
 
     let textColor = 0xffffff;
     let textScale = 1.0;
@@ -171,31 +173,33 @@ export class EffectProcessor {
       textScale = 0.75;
     }
 
-    if (!target.isInvulnerable) {
-      target.hp -= finalDamage;
+    if (finalDamage > 0) {
+      if (!target.isInvulnerable) {
+        target.hp -= finalDamage;
+      }
+      startDamageFlash(target, attackDef.type);
+
+      // Track this tower as a participant for EXP distribution
+      target.damagedByTowerIds.add(source.id);
+
+      engine.events?.emit({
+        type: 'ATTACK_DAMAGE_DEALT',
+        towerId: source.id,
+        targetEnemyId: target.id,
+        attackDefId: attackDef.id,
+        damage: finalDamage,
+      });
+
+      engine.floatingTexts.push({
+        id: `ft_dmg_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+        text: Math.ceil(finalDamage).toString(),
+        position: { ...target.position },
+        color: textColor,
+        scale: textScale,
+        durationMs: 1000,
+        elapsedMs: 0,
+      });
     }
-    startDamageFlash(target, attackDef.type);
-
-    // Track this tower as a participant for EXP distribution
-    target.damagedByTowerIds.add(source.id);
-
-    engine.events?.emit({
-      type: 'ATTACK_DAMAGE_DEALT',
-      towerId: source.id,
-      targetEnemyId: target.id,
-      attackDefId: attackDef.id,
-      damage: finalDamage,
-    });
-
-    engine.floatingTexts.push({
-      id: `ft_dmg_${Date.now()}_${Math.random().toString(36).substring(7)}`,
-      text: Math.ceil(finalDamage).toString(),
-      position: { ...target.position },
-      color: textColor,
-      scale: textScale,
-      durationMs: 1000,
-      elapsedMs: 0,
-    });
 
     if (attackDef.effects && target.hp > 0) {
       attackDef.effects.forEach((effect) => {
@@ -242,6 +246,27 @@ export class EffectProcessor {
                   text: 'Drenched!',
                   position: { ...target.position },
                   color: 0x38bdf8,
+                  scale: 0.8,
+                  durationMs: 900,
+                  elapsedMs: 0,
+                });
+              }
+              break;
+            }
+            case 'SPEED_SLOW': {
+              const wasApplied = applyPersistentSpeedSlow(
+                target,
+                effect.value ?? 2 / 3,
+                engine.elapsedTimeMs
+              );
+              if (wasApplied) {
+                engine.floatingTexts.push({
+                  id: `ft_slow_${Date.now()}_${Math.random()
+                    .toString(36)
+                    .substring(7)}`,
+                  text: 'Slowed!',
+                  position: { ...target.position },
+                  color: 0xd1d5db,
                   scale: 0.8,
                   durationMs: 900,
                   elapsedMs: 0,
