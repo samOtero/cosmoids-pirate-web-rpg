@@ -40,6 +40,46 @@ const profile: Profile = {
       equippedAttacks: ['NIBBLE'],
       isShiny: false,
     },
+    {
+      id: 'captured-mopup',
+      speciesId: 'mopup',
+      level: 6,
+      xp: 0,
+      equippedAttacks: ['TACKLE'],
+      isShiny: false,
+    },
+    {
+      id: 'captured-buglet',
+      speciesId: 'bug_stage_1',
+      level: 4,
+      xp: 0,
+      equippedAttacks: ['TACKLE'],
+      isShiny: false,
+    },
+    {
+      id: 'captured-bugitor',
+      speciesId: 'bug_stage_2',
+      level: 8,
+      xp: 0,
+      equippedAttacks: ['TACKLE'],
+      isShiny: false,
+    },
+    {
+      id: 'captured-moth',
+      speciesId: 'bug_stage_3',
+      level: 12,
+      xp: 0,
+      equippedAttacks: ['TACKLE'],
+      isShiny: false,
+    },
+    {
+      id: 'captured-bettle',
+      speciesId: 'bettle',
+      level: 10,
+      xp: 0,
+      equippedAttacks: ['PINCH'],
+      isShiny: false,
+    },
   ],
   storageCreatures: [],
   inventory: [],
@@ -88,11 +128,55 @@ describe('CosmoidCodexScreen', () => {
     ).toContain(encodeURIComponent('/UI/Journal/monkeg_journal.png'));
 
     fireEvent.click(screen.getByRole('button', { name: 'Harlequill, seen' }));
+    expect(
+      screen
+        .getByRole('img', { name: 'Harlequill field sketch' })
+        .getAttribute('src')
+    ).toContain(encodeURIComponent('/UI/Journal/harlequill_journal.png'));
     expect(screen.getByText("Kip's notes are unfinished")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Knotia, captured' }));
+    expect(
+      screen
+        .getByRole('img', { name: 'Knotia field sketch' })
+        .getAttribute('src')
+    ).toContain(encodeURIComponent('/UI/Journal/knotia_journal.png'));
     expect(screen.getByText('Base Stats')).toBeInTheDocument();
-    expect(screen.getByText('Highest Level')).toBeInTheDocument();
-    expect(screen.getByText('7')).toBeInTheDocument();
+    expect(screen.getByText('Highest Level').parentElement).toHaveTextContent(
+      '7'
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mopup, captured' }));
+    expect(
+      screen
+        .getByRole('img', { name: 'Mopup field sketch' })
+        .getAttribute('src')
+    ).toContain(encodeURIComponent('/UI/Journal/mopup_journal.png'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Buglet, captured' }));
+    expect(
+      screen
+        .getByRole('img', { name: 'Buglet field sketch' })
+        .getAttribute('src')
+    ).toContain(encodeURIComponent('/UI/Journal/buglet_journal.png'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Bugitor, captured' }));
+    expect(
+      screen
+        .getByRole('img', { name: 'Bugitor field sketch' })
+        .getAttribute('src')
+    ).toContain(encodeURIComponent('/UI/Journal/bugitor_journal.png'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Moth, captured' }));
+    expect(
+      screen.getByRole('img', { name: 'Moth field sketch' }).getAttribute('src')
+    ).toContain(encodeURIComponent('/UI/Journal/moth_journal.png'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Bettle, captured' }));
+    expect(
+      screen
+        .getByRole('img', { name: 'Bettle field sketch' })
+        .getAttribute('src')
+    ).toContain(encodeURIComponent('/UI/Journal/bettle_journal.png'));
   });
 });

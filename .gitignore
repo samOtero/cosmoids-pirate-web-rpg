@@ -20,6 +20,9 @@
 # production
 /build
 
+# generated image concepts and working renders
+/output/
+
 # misc
 .DS_Store
 *.pem
