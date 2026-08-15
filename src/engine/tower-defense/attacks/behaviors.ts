@@ -1,8 +1,12 @@
 import { TowerDefenseEngine, TD_CREATURE_DEFS } from '../TowerDefenseEngine';
-import { Tower } from '../types';
+import { Enemy, Tower } from '../types';
 import { AttackDefinition, AttackBehavior } from './types';
 import { EffectProcessor } from './EffectProcessor';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
+import {
+  hasActiveSpeedBoost,
+  hasActiveSpeedSlow,
+} from '../speedModifiers';
 
 const MAX_PROJECTILES_PER_PATTERN = 12;
 
@@ -17,6 +21,24 @@ function isEnemyInRange(
   return Math.sqrt(dx * dx + dy * dy) <= range;
 }
 
+function isEligibleProjectileTarget(
+  engine: TowerDefenseEngine,
+  enemy: Enemy,
+  attackDef: AttackDefinition
+): boolean {
+  const appliesSpeedSlow = attackDef.effects?.some(
+    (effect) => effect.type === 'SPEED_SLOW'
+  );
+  if (!appliesSpeedSlow) return true;
+
+  // Persistent slows do not stack. A target becomes ineligible only after the
+  // effect lands; multiple String Shots may still be in flight toward it.
+  return (
+    !hasActiveSpeedSlow(enemy, engine.elapsedTimeMs) &&
+    !hasActiveSpeedBoost(enemy, engine.elapsedTimeMs)
+  );
+}
+
 export const ProjectileBehavior: AttackBehavior = {
   canExecute(
     engine: TowerDefenseEngine,
@@ -24,6 +46,12 @@ export const ProjectileBehavior: AttackBehavior = {
     attackDef: AttackDefinition
   ): boolean {
     return engine.enemies.some((enemy) => {
+      if (
+        enemy.hp <= 0 ||
+        !isEligibleProjectileTarget(engine, enemy, attackDef)
+      ) {
+        return false;
+      }
       const dx = enemy.position.x - source.position.x;
       const dy = enemy.position.y - source.position.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
@@ -39,7 +67,8 @@ export const ProjectileBehavior: AttackBehavior = {
     const targetEnemy = engine.getTargetForTower(
       source,
       attackDef.rangeIndex,
-      source.targetingMode || 'first'
+      source.targetingMode || 'first',
+      (enemy) => isEligibleProjectileTarget(engine, enemy, attackDef)
     );
 
     if (targetEnemy) {
@@ -54,6 +83,7 @@ export const ProjectileBehavior: AttackBehavior = {
       } else {
         facingDirection = dy > 0 ? 'down' : 'up';
       }
+      source.facingDirection = facingDirection;
 
       const pattern = attackDef.projectilePattern;
       const projectileCount = pattern

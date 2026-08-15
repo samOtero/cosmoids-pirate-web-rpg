@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { BUG_STAGE_1 } from '@/constants/creatures';
+import { ProjectileBehavior } from '@/engine/tower-defense/attacks/behaviors';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { EffectProcessor } from '@/engine/tower-defense/attacks/EffectProcessor';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
@@ -102,6 +103,57 @@ describe('String Shot', () => {
     expect(engine.floatingTexts).toContainEqual(
       expect.objectContaining({ text: 'Slowed!' })
     );
+    engine.destroy();
+  });
+
+  it('skips enemies after String Shot has slowed them', () => {
+    const engine = new TowerDefenseEngine({
+      paths: [
+        [
+          { x: 0, y: 0 },
+          { x: 100, y: 0 },
+        ],
+      ],
+      placementSpots: [],
+      waves: [],
+    });
+    const source = createBugletTower();
+
+    const frontEnemy = createEnemy();
+    frontEnemy.id = 'front_enemy';
+    frontEnemy.position.x = 20;
+    const backEnemy = createEnemy();
+    backEnemy.id = 'back_enemy';
+    backEnemy.position.x = 10;
+    engine.enemies = [frontEnemy, backEnemy];
+
+    frontEnemy.speedSlowMultiplier = 2 / 3;
+    ProjectileBehavior.execute(
+      engine,
+      source,
+      ATTACK_DEFS.STRING_SHOT
+    );
+
+    expect(engine.projectiles.map((projectile) => projectile.targetId)).toEqual(
+      ['back_enemy']
+    );
+
+    backEnemy.speedSlowMultiplier = 2 / 3;
+    engine.projectiles = [];
+
+    expect(
+      ProjectileBehavior.canExecute(
+        engine,
+        source,
+        ATTACK_DEFS.STRING_SHOT
+      )
+    ).toBe(false);
+    ProjectileBehavior.execute(
+      engine,
+      source,
+      ATTACK_DEFS.STRING_SHOT
+    );
+    expect(engine.projectiles).toEqual([]);
     engine.destroy();
   });
 });

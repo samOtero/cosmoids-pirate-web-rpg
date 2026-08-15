@@ -1373,11 +1373,12 @@ export class TowerDefenseEngine {
   public getTargetForTower(
     tower: Tower,
     range: number,
-    mode: TowerTargetingMode = 'first'
+    mode: TowerTargetingMode = 'first',
+    enemyFilter?: (enemy: Enemy) => boolean
   ): Enemy | null {
     const enemiesInRange: { enemy: Enemy; dist: number }[] = [];
     for (const enemy of this.enemies) {
-      if (enemy.hp <= 0) continue;
+      if (enemy.hp <= 0 || (enemyFilter && !enemyFilter(enemy))) continue;
       const dx = enemy.position.x - tower.position.x;
       const dy = enemy.position.y - tower.position.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
