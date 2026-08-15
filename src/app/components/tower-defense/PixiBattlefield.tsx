@@ -554,24 +554,6 @@ function drawCoirBola(
   highlightColor: number,
   sparkColor: number
 ) {
-  const tailShadow = new PIXI.Graphics();
-  tailShadow.label = 'coir_tail_shadow';
-  tailShadow.moveTo(-5, -2);
-  tailShadow.bezierCurveTo(-11, -8, -17, -7, -23, -2);
-  tailShadow.moveTo(-5, 2);
-  tailShadow.bezierCurveTo(-12, 8, -18, 7, -25, 3);
-  tailShadow.stroke({ color: shadowColor, width: 4, alpha: 0.9 });
-  container.addChild(tailShadow);
-
-  const tails = new PIXI.Graphics();
-  tails.label = 'coir_tails';
-  tails.moveTo(-5, -2);
-  tails.bezierCurveTo(-11, -8, -17, -7, -23, -2);
-  tails.moveTo(-5, 2);
-  tails.bezierCurveTo(-12, 8, -18, 7, -25, 3);
-  tails.stroke({ color: fiberColor, width: 2, alpha: 1 });
-  container.addChild(tails);
-
   const core = new PIXI.Container();
   core.label = 'coir_bola_core';
 
@@ -2324,23 +2306,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               const core = container.getChildByLabel('coir_bola_core') as
                 | PIXI.Container
                 | undefined;
-              const tails = container.getChildByLabel('coir_tails') as
-                | PIXI.Graphics
-                | undefined;
-              const tailShadow = container.getChildByLabel(
-                'coir_tail_shadow'
-              ) as PIXI.Graphics | undefined;
-              const coirContainer = container as PIXI.Container & {
-                coirAge?: number;
-              };
-              coirContainer.coirAge =
-                (coirContainer.coirAge ?? 0) + app.ticker.deltaTime;
               if (core) {
                 core.rotation += 0.3 * app.ticker.deltaTime;
               }
-              const tailWave = 1 + Math.sin(coirContainer.coirAge * 0.3) * 0.12;
-              tails?.scale.set(1, tailWave);
-              tailShadow?.scale.set(1, tailWave);
             }
 
             if (def && def.isDashAttack) {
