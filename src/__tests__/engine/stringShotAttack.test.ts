@@ -84,6 +84,7 @@ describe('String Shot', () => {
     });
     const source = createBugletTower();
     const target = createEnemy();
+    engine.towers = [source];
     const damageEvents: number[] = [];
     engine.events.subscribe((event) => {
       if (event.type === 'ATTACK_DAMAGE_DEALT') damageEvents.push(event.damage);
@@ -97,12 +98,22 @@ describe('String Shot', () => {
     );
 
     expect(target.hp).toBe(target.maxHp);
-    expect(target.damagedByTowerIds.size).toBe(0);
+    expect(target.damagedByTowerIds).toEqual(new Set([source.id]));
     expect(damageEvents).toEqual([]);
     expect(getActiveSpeedMultiplier(target, 1_000_000)).toBeCloseTo(2 / 3);
     expect(engine.floatingTexts).toContainEqual(
       expect.objectContaining({ text: 'Slowed!' })
     );
+
+    engine.events.emit({
+      type: 'ENEMY_DIED',
+      enemyId: target.id,
+      enemyDefinitionId: target.definitionId,
+      enemyLevel: target.level,
+      participantTowerIds: Array.from(target.damagedByTowerIds),
+    });
+
+    expect(source.creature.xp).toBeGreaterThan(0);
     engine.destroy();
   });
 

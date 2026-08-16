@@ -119,6 +119,14 @@ describe('Wind Gust', () => {
     expect(sack.heldByEnemyId).toBeUndefined();
     expect(farCarrier.heldCaptureUnitId).toBe(farCoin.id);
     expect(farCoin.heldByEnemyId).toBe(farCarrier.id);
+    expect(carrierOne.damagedByTowerIds).toEqual(
+      new Set(['harlequill_tower'])
+    );
+    expect(carrierTwo.damagedByTowerIds).toEqual(
+      new Set(['harlequill_tower'])
+    );
+    expect(farCarrier.damagedByTowerIds).toEqual(new Set());
+    expect(unlockedReceiver.damagedByTowerIds).toEqual(new Set());
     expect(carrierOne).toMatchObject({
       hasBeenWindDisarmed: true,
       itemPickupBlockedUntilMs: 2000,

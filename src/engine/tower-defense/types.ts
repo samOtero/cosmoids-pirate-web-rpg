@@ -214,7 +214,9 @@ export interface Enemy extends BaseTDUnit {
   turnAroundAtEnd?: boolean;
   isMovingBackward?: boolean;
   uncapturable?: boolean;
-  damagedByTowerIds: Set<string>; // Tracks which towers dealt damage for EXP distribution
+  // Tracks towers that participated with a successful enemy-targeting attack.
+  // The legacy field name is retained because it is part of the runtime model.
+  damagedByTowerIds: Set<string>;
   /** Dev-sandbox guard: hits and status effects render normally without reducing HP. */
   isInvulnerable?: boolean;
   /** Enemy-only ability state; player attacks use Tower.equippedAttacksRuntime. */

@@ -9,7 +9,7 @@ export const LEVEL_3_INTRO: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.KIP_NERVOUS_NEUTRAL,
+          key: SpeakerImageKey.KIP_PANICKED,
           displayName: 'Kip',
         },
       ],
@@ -51,12 +51,21 @@ export const LEVEL_3_INTRO: DialogConfig = {
           displayName: 'Caleb',
         },
       ],
-      text: 'Tell her, Kip.',
+      text: 'You know what you want, Kip. Tell her what you told me.',
     },
     {
       portraits: [
         {
           key: SpeakerImageKey.KIP_WORRIED,
+          displayName: 'Kip',
+        },
+      ],
+      text: "I... I don't know if I can.",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.KIP_DETERMINED,
           displayName: 'Kip',
         },
       ],
@@ -75,11 +84,11 @@ export const LEVEL_3_INTRO: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.KIP_HOPEFUL_SURPRISED,
+          key: SpeakerImageKey.KIP_DETERMINED,
           displayName: 'Kip',
         },
       ],
-      text: "Maybe I'm scared—but I'm still going!",
+      text: "Then I'll learn. I may be scared, but I won't let that stop me!",
     },
     {
       portraits: [

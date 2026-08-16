@@ -162,6 +162,10 @@ export class EffectProcessor {
     // minimum one point of damage.
     finalDamage = power > 0 ? Math.max(1, finalDamage) : 0;
 
+    // Reaching an enemy with an attack counts as participating in its defeat,
+    // even when the attack is a non-damaging status move.
+    target.damagedByTowerIds.add(source.id);
+
     let textColor = 0xffffff;
     let textScale = 1.0;
 
@@ -178,9 +182,6 @@ export class EffectProcessor {
         target.hp -= finalDamage;
       }
       startDamageFlash(target, attackDef.type);
-
-      // Track this tower as a participant for EXP distribution
-      target.damagedByTowerIds.add(source.id);
 
       engine.events?.emit({
         type: 'ATTACK_DAMAGE_DEALT',

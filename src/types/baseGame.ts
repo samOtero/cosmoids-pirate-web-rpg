@@ -81,6 +81,7 @@ export enum SpeakerImageKey {
   KIP_NERVOUS_NEUTRAL = 'Kip_Nervous_Neutral',
   KIP_PANICKED = 'Kip_Panicked',
   KIP_WORRIED = 'Kip_Worried',
+  KIP_DETERMINED = 'Kip_Determined',
   KIP_HOPEFUL_SURPRISED = 'Kip_Hopeful_Surprised',
   KIP_RELIEVED_HAPPY = 'Kip_Relieved_Happy',
   CAPTAIN_VANE_HAUGHTY_NEUTRAL = 'Captain_Vane_Haughty_Neutral',

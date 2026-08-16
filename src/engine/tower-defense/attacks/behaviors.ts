@@ -235,6 +235,7 @@ export const InstantAoeBehavior: AttackBehavior = {
       enemy.heldCaptureUnitId = undefined;
       enemy.hasBeenWindDisarmed = true;
       enemy.itemPickupBlockedUntilMs = engine.elapsedTimeMs + pickupLockMs;
+      enemy.damagedByTowerIds.add(source.id);
 
       engine.floatingTexts.push({
         id: `ft_drop_${Date.now()}_${Math.random().toString(36).substring(7)}`,
