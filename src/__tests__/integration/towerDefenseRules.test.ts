@@ -109,6 +109,28 @@ describe('Tower defense rules', () => {
     ]);
   });
 
+  it("shows Level 3's endings and unlocks Kip's Journal only after a win", () => {
+    expect(TD_LEVELS[TDLevelContext.VANE_LEVEL_3].winEvents).toEqual([
+      {
+        type: 'SET_STORY_PROGRESSION',
+        payload: { progression: StoryProgression.DEFEAT_BUG_STAGE_2 },
+        autoProceed: true,
+      },
+      {
+        type: 'SHOW_DIALOG',
+        payload: { context: DialogContext.LEVEL_3_WIN },
+      },
+      { type: 'GO_TO_LEVEL_SELECT' },
+    ]);
+    expect(TD_LEVELS[TDLevelContext.VANE_LEVEL_3].loseEvents).toEqual([
+      {
+        type: 'SHOW_DIALOG',
+        payload: { context: DialogContext.LEVEL_3_LOSE },
+      },
+      { type: 'GO_TO_LEVEL_SELECT' },
+    ]);
+  });
+
   it('automatically prevents cursed enemies from being captured', () => {
     const engine = new TowerDefenseEngine({
       paths: [

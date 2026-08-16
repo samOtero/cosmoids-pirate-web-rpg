@@ -107,10 +107,18 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
         autoProceed: true,
       },
       {
+        type: 'SHOW_DIALOG',
+        payload: { context: DialogContext.LEVEL_3_WIN },
+      },
+      {
         type: 'GO_TO_LEVEL_SELECT',
       },
     ],
     loseEvents: [
+      {
+        type: 'SHOW_DIALOG',
+        payload: { context: DialogContext.LEVEL_3_LOSE },
+      },
       {
         type: 'GO_TO_LEVEL_SELECT',
       },

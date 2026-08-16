@@ -3,9 +3,9 @@
 import { Profile, StoryProgression } from '@/types/baseGame';
 import { Button } from '@/app/components/ui/Button';
 
-// Keep the Codex visible while it is being previewed. Setting this to false
-// makes Kip's journal appear only after the player completes Level 3.
-const CODEX_PREVIEW_ENABLED = true;
+// Kip introduces the journal after Level 3, so keep it hidden until that
+// story milestone has been reached.
+const CODEX_PREVIEW_ENABLED = false;
 
 interface ModeSelectScreenProps {
   profile: Profile;
