@@ -590,9 +590,9 @@ export default function TowerDefenseScreen({
                 : creature.level;
               const displayXp = tower ? tower.creature.xp : creature.xp;
 
-              const equippedAttacks = tower
-                ? tower.creature.equippedAttacks
-                : TowerDefenseEngine.getDefaultAttacks(creature.speciesId);
+              const equippedAttacks = TowerDefenseEngine.getEquippedAttacks(
+                tower ? tower.creature : creature
+              );
 
               const activeAttackIndex = tower
                 ? tower.selectedAttackIndex

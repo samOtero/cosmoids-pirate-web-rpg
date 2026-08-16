@@ -108,6 +108,14 @@ export class TowerDefenseEngine {
     return defaultAttacks;
   }
 
+  public static getEquippedAttacks(
+    creature: Pick<PlayerCreature, 'speciesId' | 'equippedAttacks'>
+  ): string[] {
+    return creature.equippedAttacks.length > 0
+      ? creature.equippedAttacks
+      : TowerDefenseEngine.getDefaultAttacks(creature.speciesId);
+  }
+
   public events = new TDEventBus();
   private progression = new TDProgressionManager(this, this.events);
 
@@ -1291,10 +1299,7 @@ export class TowerDefenseEngine {
     );
     const derivedMaxHp = calculateMaxHp(template.baseStats.hp, creature.level);
 
-    const attacks =
-      creature.equippedAttacks.length > 0
-        ? creature.equippedAttacks
-        : TowerDefenseEngine.getDefaultAttacks(creature.speciesId);
+    const attacks = TowerDefenseEngine.getEquippedAttacks(creature);
 
     return {
       id: `tower_${Date.now()}_${Math.random().toString(36).substring(7)}`,
