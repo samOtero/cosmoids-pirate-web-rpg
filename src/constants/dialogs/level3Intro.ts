@@ -11,6 +11,7 @@ export const LEVEL_3_INTRO: DialogConfig = {
         {
           key: SpeakerImageKey.KIP_PANICKED,
           displayName: 'Kip',
+          flipped: true,
         },
       ],
       text: 'C-Captain Vane...',
@@ -20,7 +21,6 @@ export const LEVEL_3_INTRO: DialogConfig = {
         {
           key: SpeakerImageKey.CAPTAIN_VANE_HAUGHTY_NEUTRAL,
           displayName: 'Captain Vane',
-          flipped: true,
         },
       ],
       text: "Step away from that boat, Kip. You're coming with me.",
@@ -32,14 +32,13 @@ export const LEVEL_3_INTRO: DialogConfig = {
           displayName: 'Caleb',
         },
       ],
-      text: "He doesn't want to.",
+      text: "He doesn't want to be part of your crew anymore.",
     },
     {
       portraits: [
         {
           key: SpeakerImageKey.CAPTAIN_VANE_MOCKING_DISBELIEF,
           displayName: 'Captain Vane',
-          flipped: true,
         },
       ],
       text: "Kip doesn't know what he wants. Unless you count filling books with useless drawings.",
@@ -51,44 +50,46 @@ export const LEVEL_3_INTRO: DialogConfig = {
           displayName: 'Caleb',
         },
       ],
-      text: 'You know what you want, Kip. Tell her what you told me.',
+      text: 'Kip, tell her what you told me.',
     },
     {
       portraits: [
         {
           key: SpeakerImageKey.KIP_WORRIED,
           displayName: 'Kip',
+          flipped: true,
         },
       ],
-      text: "I... I don't know if I can.",
+      text: "I... I'm...",
     },
     {
       portraits: [
         {
           key: SpeakerImageKey.KIP_DETERMINED,
           displayName: 'Kip',
+          flipped: true,
         },
       ],
-      text: "I'm leaving! I'm going to sail every sea and draw every Cosmoid in the world!",
+      text: "I'm leaving! I'm going to catalog, study, and draw every kind of Cosmoid in the world!",
     },
     {
       portraits: [
         {
           key: SpeakerImageKey.CAPTAIN_VANE_SMUG_AMUSED,
           displayName: 'Captain Vane',
-          flipped: true,
         },
       ],
-      text: "You? You wouldn't survive a day without me.",
+      text: "You? HA! You wouldn't survive a day without me.",
     },
     {
       portraits: [
         {
           key: SpeakerImageKey.KIP_DETERMINED,
           displayName: 'Kip',
+          flipped: true,
         },
       ],
-      text: "Then I'll learn. I may be scared, but I won't let that stop me!",
+      text: "Then I'll learn. I may be scared, but I won't let that stop me from chasing my dream!",
     },
     {
       portraits: [
@@ -98,11 +99,7 @@ export const LEVEL_3_INTRO: DialogConfig = {
           flipped: true,
         },
       ],
-      text: "Then you won't be needing this miserable little boat.",
-    },
-    {
-      portraits: [{ key: SpeakerImageKey.EMPTY, displayName: '' }],
-      text: 'Vane raises a handful of Capture Coins as Bug Cosmoids swarm from the forest.',
+      text: 'Fine! Have it your way! Consider me your enemy!',
     },
     {
       portraits: [
@@ -112,7 +109,26 @@ export const LEVEL_3_INTRO: DialogConfig = {
           flipped: true,
         },
       ],
-      text: 'Tear their boat apart!',
+      text: 'Beetadel! Tear their boat apart!',
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.BEETADEL_STERN,
+          displayName: 'Beetadel',
+        },
+      ],
+      text: 'Beetadeeeel!',
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.KIP_PANICKED,
+          displayName: 'Kip',
+          flipped: true,
+        },
+      ],
+      text: 'Not Beetadel! His armored shell can withstand almost anything!',
     },
     {
       portraits: [
@@ -121,7 +137,16 @@ export const LEVEL_3_INTRO: DialogConfig = {
           displayName: 'Caleb',
         },
       ],
-      text: "Kip, get the supplies aboard. We'll protect your dream!",
+      text: 'Almost anything? Then we’ll find the exception. Get the supplies aboard, Kip!',
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.CALEB_CONFIDENT_STARTER_OUTFIT,
+          displayName: 'Caleb',
+        },
+      ],
+      text: "I'll protect the boat and your dream!",
     },
   ],
   backgroundImageKey: BackgroundImageKey.LEVEL_2_REPAIRED_BOAT_SUPPLIES,

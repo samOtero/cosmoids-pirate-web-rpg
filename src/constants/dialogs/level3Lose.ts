@@ -11,10 +11,9 @@ export const LEVEL_3_LOSE: DialogConfig = {
         {
           key: SpeakerImageKey.CAPTAIN_VANE_SMUG_AMUSED,
           displayName: 'Captain Vane',
-          flipped: true,
         },
       ],
-      text: 'There. Your grand voyage ends right now.',
+      text: 'There. Your dream ends right now.',
     },
   ],
   backgroundImageKey: BackgroundImageKey.LEVEL_2_REPAIRED_BOAT_SUPPLIES,

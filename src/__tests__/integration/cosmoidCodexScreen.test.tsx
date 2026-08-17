@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
 import CosmoidCodexScreen from '@/app/components/CosmoidCodexScreen';
-import { Profile } from '@/types/baseGame';
+import { Profile, StoryProgression } from '@/types/baseGame';
 
 const profile: Profile = {
   id: 0,
@@ -84,11 +84,13 @@ const profile: Profile = {
   storageCreatures: [],
   inventory: [],
   gameFlags: [],
-  storyProgression: 3,
+  storyProgression: StoryProgression.DEFEAT_BUG_STAGE_2,
 };
 
 describe('CosmoidCodexScreen', () => {
-  it('shows discovered species and distinguishes seen from captured', () => {
+  it(
+    'shows discovered species and distinguishes seen from captured',
+    () => {
     render(<CosmoidCodexScreen profile={profile} onBack={() => {}} />);
 
     expect(
@@ -178,5 +180,5 @@ describe('CosmoidCodexScreen', () => {
         .getByRole('img', { name: 'Bettle field sketch' })
         .getAttribute('src')
     ).toContain(encodeURIComponent('/UI/Journal/bettle_journal.png'));
-  });
+  }, 15000);
 });

@@ -89,6 +89,7 @@ export enum SpeakerImageKey {
   CAPTAIN_VANE_COMMANDING_ANGRY = 'Captain_Vane_Commanding_Angry',
   CAPTAIN_VANE_SMUG_AMUSED = 'Captain_Vane_Smug_Amused',
   CAPTAIN_VANE_STUNNED_DEFEAT = 'Captain_Vane_Stunned_Defeat',
+  BEETADEL_STERN = 'Beetadel_Stern',
   RAT_CATCHER_1 = 'Rat_Catcher_1',
   RAT_CATCHER_ANGRY = 'Rat_Catcher_Angry',
   RAT_CATCHER_CALM = 'Rat_Catcher_Calm',

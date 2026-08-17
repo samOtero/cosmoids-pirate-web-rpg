@@ -76,6 +76,7 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
     '/dialog/captain_vane_smug_amused.png',
   [SpeakerImageKey.CAPTAIN_VANE_STUNNED_DEFEAT]:
     '/dialog/captain_vane_stunned_defeat.png',
+  [SpeakerImageKey.BEETADEL_STERN]: '/dialog/beetadel_stern.png',
   [SpeakerImageKey.RAT_CATCHER_1]: '/dialog/rat_catcher_1.png',
   [SpeakerImageKey.RAT_CATCHER_ANGRY]: '/dialog/rat_catcher_angry_small.png',
   [SpeakerImageKey.RAT_CATCHER_CALM]: '/dialog/rat_catcher_calm.png',
