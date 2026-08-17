@@ -19,11 +19,32 @@ export const LEVEL_3_WIN: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.KIP_PANICKED,
-          displayName: 'Kip',
+          key: SpeakerImageKey.CAPTAIN_VANE_STUNNED_DEFEAT,
+          displayName: 'Captain Vane',
+          flipped: true,
         },
       ],
-      text: 'We need to leave! The other pirates will be here any minute!',
+      text: 'He... he actually defeated me.',
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.KIP_HOPEFUL_SURPRISED,
+          displayName: 'Kip',
+          flipped: true,
+        },
+      ],
+      text: 'Wow! He really is strong!',
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.KIP_PANICKED,
+          displayName: 'Kip',
+          flipped: true,
+        },
+      ],
+      text: 'Umm... Caleb, we need to leave! The other pirates will be here any minute!',
     },
     {
       portraits: [
@@ -32,7 +53,7 @@ export const LEVEL_3_WIN: DialogConfig = {
           displayName: 'Caleb',
         },
       ],
-      text: 'Kip, cast off!',
+      text: "Right! Let's get out of here!",
     },
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: '' }],
@@ -41,30 +62,20 @@ export const LEVEL_3_WIN: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.CAPTAIN_VANE_STUNNED_DEFEAT,
-          displayName: 'Captain Vane',
-          flipped: true,
-        },
-      ],
-      text: 'They... they actually escaped me.',
-    },
-    {
-      portraits: [
-        {
           key: SpeakerImageKey.KIP_RELIEVED_HAPPY,
           displayName: 'Kip',
         },
       ],
-      text: 'I want to keep a journal of every Cosmoid we meet!',
+      text: "I can't wait to fill my journal with every Cosmoids we meet!",
     },
     {
       portraits: [
         {
-          key: SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT,
+          key: SpeakerImageKey.CALEB_CONFIDENT_STARTER_OUTFIT,
           displayName: 'Caleb',
         },
       ],
-      text: "Perfect. Let's give you a world worth drawing.",
+      text: "Then we'd better sail the whole world!",
     },
     {
       id: 'journal-unlock',
