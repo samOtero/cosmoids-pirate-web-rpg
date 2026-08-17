@@ -37,6 +37,8 @@ import {
   STARTER_MONKEY,
 } from '@/constants/creatures';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
+import { createTestProfileFromTemplate } from '@/constants/testProfileTemplates';
+import { isTestProfileOverrideEnabled } from '@/utils/testProfileAccess';
 
 interface GameState {
   currentScreen: Screens;
@@ -52,6 +54,7 @@ interface GameState {
   createProfile: (slotId: number) => void;
   deleteProfile: (slotId: number) => void;
   selectProfile: (slotId: number) => void;
+  applyTestProfileTemplate: (templateId: string) => void;
   addCreatureToProfile: (
     slotId: number,
     creature: PlayerCreature,
@@ -393,6 +396,30 @@ export const useGameStore = create<GameState>()(
             false,
             'deleteProfile'
           ),
+        applyTestProfileTemplate: (templateId: string) => {
+          const hostname =
+            typeof window === 'undefined'
+              ? undefined
+              : window.location.hostname;
+          if (!isTestProfileOverrideEnabled(hostname)) return;
+
+          const profile = createTestProfileFromTemplate(templateId);
+          set(
+            (state) => {
+              const newProfiles = [...state.profiles];
+              newProfiles[2] = profile;
+              return {
+                profiles: newProfiles,
+                currentProfileId:
+                  state.currentProfileId === 2 ? null : state.currentProfileId,
+                eventQueue: [],
+                currentTdLevel: null,
+              };
+            },
+            false,
+            'applyTestProfileTemplate'
+          );
+        },
         selectProfile: (slotId: number) => {
           set(
             (state) => {

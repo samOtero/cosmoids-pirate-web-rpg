@@ -1,5 +1,9 @@
+'use client';
+
+import { useState } from 'react';
 import { Profile } from '@/types/baseGame';
 import { LEVEL_ORDER } from '@/constants/tdLevels';
+import { TestProfileTemplateOption } from '@/constants/testProfileTemplates';
 import { resolvePlayerCreature } from '@/utils/resolvePlayerCreature';
 import Panel from '@/app/components/ui/Panel';
 import { Button } from '@/app/components/ui/Button';
@@ -9,6 +13,8 @@ interface ProfileScreenProps {
   onSelect: (slotId: number) => void;
   onCreate: (slotId: number) => void;
   onDelete: (slotId: number) => void;
+  testProfileTemplates?: TestProfileTemplateOption[];
+  onApplyTestTemplate?: (templateId: string) => void;
 }
 
 export default function ProfileScreen({
@@ -16,12 +22,38 @@ export default function ProfileScreen({
   onSelect,
   onCreate,
   onDelete,
+  testProfileTemplates,
+  onApplyTestTemplate,
 }: ProfileScreenProps) {
+  const [showTestTemplates, setShowTestTemplates] = useState(false);
+  const [selectedTemplateId, setSelectedTemplateId] = useState(
+    testProfileTemplates?.[0]?.id ?? ''
+  );
+  const canUseTestTemplates = Boolean(
+    testProfileTemplates?.length && onApplyTestTemplate
+  );
+  const selectedTemplate =
+    testProfileTemplates?.find(
+      (template) => template.id === selectedTemplateId
+    ) ?? testProfileTemplates?.[0];
+  const activeTemplateId = selectedTemplate?.id ?? '';
+
   return (
-    <div className="flex h-full flex-col items-center justify-center p-2 lg:p-4">
-      <h2 className="mb-4 border-b-2 border-wood pb-2 text-xl font-bold tracking-widest text-sand uppercase lg:mb-8 lg:text-3xl">
-        Select Save File
-      </h2>
+    <div className="flex h-full flex-col items-center justify-center overflow-y-auto p-2 lg:p-4">
+      <div className="mb-4 flex w-full max-w-4xl items-center justify-between gap-3 lg:mb-8">
+        <h2 className="border-b-2 border-wood pb-2 text-xl font-bold tracking-widest text-sand uppercase lg:text-3xl">
+          Select Save File
+        </h2>
+        {canUseTestTemplates && (
+          <Button
+            variant="secondary"
+            className="shrink-0 px-3 py-2 text-xs lg:px-5"
+            onClick={() => setShowTestTemplates(true)}
+          >
+            🧪 Profile 3 Templates
+          </Button>
+        )}
+      </div>
 
       <div className="grid w-full max-w-4xl grid-cols-3 gap-4 lg:gap-6">
         {[0, 1, 2].map((slotId) => {
@@ -57,11 +89,14 @@ export default function ProfileScreen({
                     {profile.name}
                   </h3>
                   <p className="text-xs text-sand/70">
-                    Level {LEVEL_ORDER.filter(
-                      (level) =>
-                        level.requiredProgression === undefined ||
-                        profile.storyProgression >= level.requiredProgression
-                    ).length}
+                    Level{' '}
+                    {
+                      LEVEL_ORDER.filter(
+                        (level) =>
+                          level.requiredProgression === undefined ||
+                          profile.storyProgression >= level.requiredProgression
+                      ).length
+                    }
                   </p>
                   <p className="text-xs text-sand/50">
                     Last Played:{' '}
@@ -103,6 +138,92 @@ export default function ProfileScreen({
           );
         })}
       </div>
+
+      {showTestTemplates && canUseTestTemplates && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-3 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="test-profile-title"
+          onClick={() => setShowTestTemplates(false)}
+        >
+          <Panel className="w-full max-w-md">
+            <div onClick={(event) => event.stopPropagation()}>
+              <p className="text-xs font-bold tracking-[0.2em] text-cyan-400 uppercase">
+                Test tools
+              </p>
+              <h3
+                id="test-profile-title"
+                className="mt-1 text-xl font-bold text-sand"
+              >
+                Replace Profile 3
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-sand/65">
+                Choose a ready-to-play save. Anything currently in the third
+                slot will be overwritten.
+              </p>
+
+              <label
+                htmlFor="test-profile-template"
+                className="mt-4 block text-xs font-bold tracking-wider text-sand/80 uppercase"
+              >
+                Template
+              </label>
+              <select
+                id="test-profile-template"
+                value={activeTemplateId}
+                onChange={(event) => setSelectedTemplateId(event.target.value)}
+                className="mt-2 min-h-12 w-full rounded-lg border-2 border-cyan-700 bg-ocean-dark px-3 text-base font-bold text-sand outline-none focus:border-cyan-400"
+              >
+                {testProfileTemplates?.map((template) => (
+                  <option key={template.id} value={template.id}>
+                    {template.label}
+                  </option>
+                ))}
+              </select>
+
+              {selectedTemplate && (
+                <div className="mt-3 flex items-center gap-3 rounded-lg border border-white/10 bg-black/20 p-3">
+                  <img
+                    src={selectedTemplate.starterIcon}
+                    alt=""
+                    className="h-12 w-12 rounded-full bg-blue-950 object-contain p-1"
+                  />
+                  <div>
+                    <p className="font-bold text-cyan-300">
+                      Ready for Level {selectedTemplate.level}
+                    </p>
+                    <p className="text-xs text-sand/60">
+                      {selectedTemplate.starterName} · Creature level{' '}
+                      {selectedTemplate.creatureLevel}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-5 flex justify-end gap-3">
+                <Button
+                  variant="secondary"
+                  className="px-4 text-xs"
+                  onClick={() => setShowTestTemplates(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="px-4 text-xs"
+                  disabled={!activeTemplateId}
+                  onClick={() => {
+                    onApplyTestTemplate?.(activeTemplateId);
+                    setShowTestTemplates(false);
+                  }}
+                >
+                  Replace Profile 3
+                </Button>
+              </div>
+            </div>
+          </Panel>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 'use client';
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useSyncExternalStore } from 'react';
 
 import { useGameStore } from '@/store/gameStore';
 import {
@@ -17,6 +17,8 @@ import {
   resolvePlayerCreatures,
 } from '@/utils/resolvePlayerCreature';
 import { resolveDialog } from '@/utils/dialogResolver';
+import { TEST_PROFILE_TEMPLATE_OPTIONS } from '@/constants/testProfileTemplates';
+import { isTestProfileOverrideEnabled } from '@/utils/testProfileAccess';
 
 const StartScreen = lazy(() => import('@/app/components/startScreen'));
 const ProfileScreen = lazy(() => import('@/app/components/profileScreen'));
@@ -38,6 +40,12 @@ const CosmoidCodexScreen = lazy(
   () => import('@/app/components/CosmoidCodexScreen')
 );
 
+const subscribeToHostname = () => () => {};
+const getClientTestProfileOverrideEnabled = () =>
+  isTestProfileOverrideEnabled(window.location.hostname);
+const getServerTestProfileOverrideEnabled = () =>
+  isTestProfileOverrideEnabled();
+
 export default function Home() {
   const {
     currentScreen,
@@ -47,6 +55,7 @@ export default function Home() {
     createProfile,
     deleteProfile,
     selectProfile,
+    applyTestProfileTemplate,
     dialogContext,
     dialogContextData,
     eventQueue,
@@ -61,6 +70,12 @@ export default function Home() {
     clearQueue,
     markJournalOpened,
   } = useGameStore();
+
+  const testProfileOverrideEnabled = useSyncExternalStore(
+    subscribeToHostname,
+    getClientTestProfileOverrideEnabled,
+    getServerTestProfileOverrideEnabled
+  );
 
   // Deduced state
   const currentProfile =
@@ -93,6 +108,14 @@ export default function Home() {
           onSelect={selectProfile}
           onCreate={createProfile}
           onDelete={deleteProfile}
+          testProfileTemplates={
+            testProfileOverrideEnabled
+              ? TEST_PROFILE_TEMPLATE_OPTIONS
+              : undefined
+          }
+          onApplyTestTemplate={
+            testProfileOverrideEnabled ? applyTestProfileTemplate : undefined
+          }
         />
       </Suspense>
     );
