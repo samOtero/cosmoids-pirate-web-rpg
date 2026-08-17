@@ -228,17 +228,17 @@ export default function DialogContent({
     const presentation = currentLine.presentation!;
 
     return (
-      <div className="relative flex h-full items-center justify-center overflow-hidden p-4 select-none sm:p-8">
+      <div className="relative flex h-full items-center justify-center overflow-hidden p-3 select-none lg:p-8">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(52,211,153,0.2),transparent_62%)]" />
-        <div className="relative w-full max-w-2xl animate-[fadeIn_0.35s_ease-out] overflow-hidden rounded-3xl border-2 border-emerald-300/70 bg-gradient-to-b from-emerald-950/95 via-teal-950/95 to-ocean-dark/95 px-5 py-6 text-center shadow-2xl shadow-emerald-500/20 sm:px-10 sm:py-9 lg:px-14 lg:py-12">
+        <div className="relative max-h-[calc(100dvh-1.5rem)] w-full max-w-xl animate-[fadeIn_0.35s_ease-out] overflow-y-auto rounded-2xl border-2 border-emerald-300/70 bg-gradient-to-b from-emerald-950/95 via-teal-950/95 to-ocean-dark/95 px-5 py-5 text-center shadow-2xl shadow-emerald-500/20 lg:max-w-2xl lg:overflow-hidden lg:rounded-3xl lg:px-14 lg:py-12">
           <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-white/10 ring-inset" />
           <div className="pointer-events-none absolute -top-24 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-emerald-300/20 blur-3xl" />
 
-          <div className="relative mx-auto mb-4 flex h-20 w-20 animate-[pulse_2s_ease-in-out_infinite] items-center justify-center rounded-full border-2 border-emerald-300/60 bg-emerald-400/15 text-emerald-100 shadow-lg shadow-emerald-400/20 sm:h-24 sm:w-24">
+          <div className="relative mx-auto mb-3 flex h-16 w-16 animate-[pulse_2s_ease-in-out_infinite] items-center justify-center rounded-full border-2 border-emerald-300/60 bg-emerald-400/15 text-emerald-100 shadow-lg shadow-emerald-400/20 lg:mb-4 lg:h-24 lg:w-24">
             <svg
               aria-hidden="true"
               viewBox="0 0 64 64"
-              className="h-12 w-12 sm:h-14 sm:w-14"
+              className="h-10 w-10 lg:h-14 lg:w-14"
               fill="none"
             >
               <path
@@ -262,17 +262,17 @@ export default function DialogContent({
             </svg>
           </div>
 
-          <p className="relative text-xs font-black tracking-[0.28em] text-emerald-300 uppercase sm:text-sm">
+          <p className="relative text-[0.65rem] font-black tracking-[0.24em] text-emerald-300 uppercase lg:text-sm lg:tracking-[0.28em]">
             {presentation.eyebrow ?? 'Feature Unlocked'}
           </p>
-          <h1 className="relative mt-2 text-3xl font-black tracking-wide text-sand sm:text-4xl lg:text-5xl">
+          <h1 className="relative mt-1.5 text-2xl font-black tracking-wide text-sand lg:mt-2 lg:text-5xl">
             {presentation.title}
           </h1>
-          <p className="relative mx-auto mt-4 max-w-xl text-base leading-relaxed text-emerald-50/90 sm:text-lg lg:text-xl">
+          <p className="relative mx-auto mt-2.5 max-w-xl text-sm leading-snug text-emerald-50/90 lg:mt-4 lg:text-xl lg:leading-relaxed">
             {displayedText}
           </p>
           {presentation.hint && (
-            <p className="relative mt-2 text-sm font-semibold text-emerald-300/80 sm:text-base">
+            <p className="relative mt-1.5 text-xs font-semibold text-emerald-300/80 lg:mt-2 lg:text-base">
               {presentation.hint}
             </p>
           )}
@@ -280,7 +280,7 @@ export default function DialogContent({
           <button
             type="button"
             onClick={handleAdvance}
-            className="relative mt-6 rounded-lg border border-emerald-200/70 bg-emerald-500 px-8 py-3 text-base font-black tracking-widest text-emerald-950 uppercase shadow-lg shadow-emerald-950/40 transition-all hover:-translate-y-0.5 hover:bg-emerald-300 active:translate-y-0 sm:text-lg"
+            className="relative mt-4 rounded-lg border border-emerald-200/70 bg-emerald-500 px-7 py-2 text-sm font-black tracking-widest text-emerald-950 uppercase shadow-lg shadow-emerald-950/40 transition-all hover:-translate-y-0.5 hover:bg-emerald-300 active:translate-y-0 lg:mt-6 lg:px-8 lg:py-3 lg:text-lg"
           >
             Got it!
           </button>
