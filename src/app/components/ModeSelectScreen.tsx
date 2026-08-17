@@ -25,6 +25,7 @@ export default function ModeSelectScreen({
   const showCodex =
     CODEX_PREVIEW_ENABLED ||
     profile.storyProgression >= StoryProgression.DEFEAT_BUG_STAGE_2;
+  const showJournalNewBadge = showCodex && !profile.journalOpened;
 
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden bg-[#0a1628]">
@@ -142,6 +143,15 @@ export default function ModeSelectScreen({
               onClick={onSelectCodex}
               className="group relative flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-emerald-500/40 bg-gradient-to-br from-emerald-900/40 via-teal-900/30 to-cyan-900/40 p-3 transition-all duration-300 ease-out hover:-translate-y-2 hover:border-emerald-400 hover:shadow-2xl hover:shadow-emerald-500/20 active:translate-y-0 lg:min-h-[220px] lg:gap-4 lg:p-7"
             >
+              {showJournalNewBadge && (
+                <div
+                  role="status"
+                  aria-label="Kip's Journal is new"
+                  className="absolute top-3 right-3 z-20 animate-pulse rounded-full border border-emerald-100/80 bg-emerald-400 px-2.5 py-1 text-[10px] font-black tracking-[0.18em] text-emerald-950 uppercase shadow-lg shadow-emerald-500/30 lg:top-4 lg:right-4 lg:text-xs"
+                >
+                  New
+                </div>
+              )}
               <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/15 text-2xl ring-2 ring-emerald-400/30 transition-all duration-300 group-hover:bg-emerald-500/25 group-hover:ring-emerald-400/60 lg:h-20 lg:w-20 lg:text-4xl">
@@ -161,7 +171,9 @@ export default function ModeSelectScreen({
                 Read →
               </div>
 
-              <div className="pointer-events-none absolute inset-0 animate-pulse rounded-2xl border-2 border-emerald-400/20" />
+              <div
+                className={`pointer-events-none absolute inset-0 rounded-2xl border-2 border-emerald-400/20 ${showJournalNewBadge ? 'animate-pulse border-emerald-300/60' : ''}`}
+              />
             </button>
           )}
         </div>

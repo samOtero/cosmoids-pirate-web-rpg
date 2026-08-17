@@ -88,9 +88,7 @@ const profile: Profile = {
 };
 
 describe('CosmoidCodexScreen', () => {
-  it(
-    'shows discovered species and distinguishes seen from captured',
-    () => {
+  it('shows discovered species and distinguishes seen from captured', () => {
     render(<CosmoidCodexScreen profile={profile} onBack={() => {}} />);
 
     expect(
@@ -114,6 +112,10 @@ describe('CosmoidCodexScreen', () => {
         .getByRole('img', { name: 'Palmit field sketch' })
         .getAttribute('src')
     ).toContain(encodeURIComponent('/UI/Journal/palmit_journal.png'));
+    expect(screen.getByText("Kip's Notes")).toBeInTheDocument();
+    expect(
+      screen.getByText(/freshwater crab that uses a hollow coconut/i)
+    ).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Fueguana, captured' }));
     expect(
@@ -136,6 +138,7 @@ describe('CosmoidCodexScreen', () => {
         .getAttribute('src')
     ).toContain(encodeURIComponent('/UI/Journal/harlequill_journal.png'));
     expect(screen.getByText("Kip's notes are unfinished")).toBeInTheDocument();
+    expect(screen.queryByText(/aerial comedy/i)).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Knotia, captured' }));
     expect(
@@ -174,10 +177,10 @@ describe('CosmoidCodexScreen', () => {
       screen.getByRole('img', { name: 'Moth field sketch' }).getAttribute('src')
     ).toContain(encodeURIComponent('/UI/Journal/moth_journal.png'));
 
-    fireEvent.click(screen.getByRole('button', { name: 'Bettle, captured' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Beetadel, captured' }));
     expect(
       screen
-        .getByRole('img', { name: 'Bettle field sketch' })
+        .getByRole('img', { name: 'Beetadel field sketch' })
         .getAttribute('src')
     ).toContain(encodeURIComponent('/UI/Journal/bettle_journal.png'));
   }, 15000);

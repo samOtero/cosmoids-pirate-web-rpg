@@ -36,6 +36,8 @@ export const MOUSE_1: CosmoidTemplate = {
   baseExperience: 51,
   iconImg: '/UI/Icons/mouse_1_icon.png',
   journalImg: '/UI/Journal/knotia_journal.png',
+  journalEntry:
+    'While gnawing on mooring lines, it somehow twists them into incredibly complex knots. Even seasoned sailors struggle to untie its work.',
   spriteUrl: '/battles/cosmoids/mouse_1_down_1_25.png',
   battleSpriteUrl: '/battles/cosmoids/mouse_1_down_1_25.png',
   movementId: 'lizard',
@@ -60,6 +62,8 @@ export const BIRD_1: CosmoidTemplate = {
   baseExperience: 50,
   iconImg: '/UI/Icons/bird_1_icon.png',
   journalImg: '/UI/Journal/harlequill_journal.png',
+  journalEntry:
+    'It brings cheer to coastal towns with loops, tumbles, and other aerial comedy. The bells on its feathers make every performance impossible to ignore.',
   spriteUrl: '/battles/cosmoids/bird_1_down_1_25.png',
   battleSpriteUrl: '/battles/cosmoids/bird_1_down_1_25.png',
   movementId: 'lizard',
@@ -85,6 +89,8 @@ export const MOPUP: CosmoidTemplate = {
   baseExperience: 62,
   iconImg: '/UI/Icons/mopup_icon.png',
   journalImg: '/UI/Journal/mopup_journal.png',
+  journalEntry:
+    'This playful Cosmoid loves sliding across wet decks. Its highly absorbent coat soaks up seawater, leaving every plank cleaner after playtime.',
   spriteUrl: '/battles/cosmoids/mopup_down.png',
   battleSpriteUrl: '/battles/cosmoids/mopup_left.png',
   movementId: 'lizard',
@@ -165,7 +171,7 @@ export const ZAPYBARA: CosmoidTemplate = {
 
 export const BETTLE: CosmoidTemplate = {
   id: 'bettle',
-  name: 'Bettle',
+  name: 'Beetadel',
   type: ElementType.BUG,
   secondaryType: ElementType.STEEL,
   baseStats: {
@@ -179,6 +185,8 @@ export const BETTLE: CosmoidTemplate = {
   baseExperience: 68,
   iconImg: '/UI/Icons/bettle_icon.png',
   journalImg: '/UI/Journal/bettle_journal.png',
+  journalEntry:
+    'It allows rivals one free strike against its ironclad back. If the blow leaves no mark, Beetadel drums its mandibles in triumph.',
   spriteUrl: '/battles/cosmoids/bettle_down.png',
   battleSpriteUrl: '/battles/cosmoids/bettle_left.png',
   movementId: 'lizard',
@@ -195,6 +203,8 @@ export const BUG_STAGE_1: CosmoidTemplate = {
   type: ElementType.GRASS,
   iconImg: '/UI/Icons/buglet_icon.png',
   journalImg: '/UI/Journal/buglet_journal.png',
+  journalEntry:
+    'It disguises itself as a scrap of stitched sailcloth, then quietly eats the real sails around it. Sailors rarely spot one until the wind stops helping.',
   baseStats: {
     hp: 25,
     attack: 15,
@@ -219,6 +229,8 @@ export const BUG_STAGE_2: CosmoidTemplate = {
   type: ElementType.GRASS,
   iconImg: '/UI/Icons/bugitor_icon.png',
   journalImg: '/UI/Journal/bugitor_journal.png',
+  journalEntry:
+    'It spins coconut-husk thread into a knot so tight that hurricane winds cannot tear it from a mast. No sailor has ever managed to untie one.',
   baseStats: {
     hp: 25,
     attack: 15,
@@ -244,6 +256,8 @@ export const BUG_STAGE_3: CosmoidTemplate = {
   type: ElementType.GRASS,
   iconImg: '/UI/Icons/moth_icon.png',
   journalImg: '/UI/Journal/moth_journal.png',
+  journalEntry:
+    'Its enormous sail-like wings catch and command the wind. A single powerful flap can generate enough force to move a ship.',
   baseStats: {
     hp: 25,
     attack: 15,
@@ -279,6 +293,8 @@ export const STARTER_CRAB: CosmoidTemplate = {
   baseExperience: 64,
   iconImg: '/UI/Icons/palmit_icon.png',
   journalImg: '/UI/Journal/palmit_journal.png',
+  journalEntry:
+    'A freshwater crab that uses a hollow coconut as a boat. Its shell keeps the salty sea away while it drifts between islands.',
   spriteUrl: '/battles/cosmoids/palmit_down_1.png',
   battleSpriteUrl: '/battles/cosmoids/palmit_down_1.png',
   learnableAttacks: [
@@ -303,6 +319,8 @@ export const STARTER_IGUANA: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/fueguana_left_1_v3.png',
   iconImg: '/UI/Icons/fueguana_icon.png',
   journalImg: '/UI/Journal/fueguana_journal.png',
+  journalEntry:
+    'It sneaks aboard pirate ships to devour gunpowder and set the decks ablaze. If grabbed by the tail, it leaves behind a surprise that explodes moments later!',
   battleSpriteUrl: '/battles/cosmoids/fueguana_left_1_v3.png',
   movementId: 'lizard',
   learnableAttacks: [
@@ -326,6 +344,8 @@ export const STARTER_MONKEY: CosmoidTemplate = {
   baseExperience: 63,
   iconImg: '/UI/Icons/monkeg_icon.png',
   journalImg: '/UI/Journal/monkeg_journal.png',
+  journalEntry:
+    'A shy Cosmoid that hides inside barrels to travel unseen. Its long tail trails in the water like a rudder, steering it safely across the sea.',
   spriteUrl: '/battles/cosmoids/monkeg_down_1_v2.png',
   battleSpriteUrl: '/battles/cosmoids/monkeg_down_1_v2.png',
   learnableAttacks: [

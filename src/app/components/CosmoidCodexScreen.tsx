@@ -255,29 +255,40 @@ export default function CosmoidCodexScreen({
                 {selectedIsCaptured ? (
                   <div className="min-w-0 rounded-xl border border-emerald-300/10 bg-black/15 p-3 lg:p-4">
                     <div className="mb-4 grid grid-cols-2 gap-2 text-center">
-                    <div>
-                      <span className="block text-[9px] font-bold tracking-widest text-sand/40 uppercase">
-                        Owned
-                      </span>
-                      <strong className="text-lg text-emerald-200">
-                        {selectedOwned.length}
-                      </strong>
+                      <div>
+                        <span className="block text-[9px] font-bold tracking-widest text-sand/40 uppercase">
+                          Owned
+                        </span>
+                        <strong className="text-lg text-emerald-200">
+                          {selectedOwned.length}
+                        </strong>
+                      </div>
+                      <div>
+                        <span className="block text-[9px] font-bold tracking-widest text-sand/40 uppercase">
+                          Highest Level
+                        </span>
+                        <strong className="text-lg text-emerald-200">
+                          {Math.max(
+                            ...selectedOwned.map((creature) => creature.level)
+                          )}
+                        </strong>
+                      </div>
                     </div>
-                    <div>
-                      <span className="block text-[9px] font-bold tracking-widest text-sand/40 uppercase">
-                        Highest Level
-                      </span>
-                      <strong className="text-lg text-emerald-200">
-                        {Math.max(
-                          ...selectedOwned.map((creature) => creature.level)
-                        )}
-                      </strong>
-                    </div>
-                    </div>
+
+                    {selectedSpecies.journalEntry && (
+                      <div className="mb-4 border-y border-amber-200/10 py-3">
+                        <h3 className="mb-1.5 text-[10px] font-black tracking-[0.2em] text-amber-100/55 uppercase">
+                          Kip&apos;s Notes
+                        </h3>
+                        <p className="text-sm leading-relaxed text-sand/75">
+                          {selectedSpecies.journalEntry}
+                        </p>
+                      </div>
+                    )}
 
                     <div>
                       <h3 className="mb-2 text-[10px] font-black tracking-[0.2em] text-sand/50 uppercase">
-                      Base Stats
+                        Base Stats
                       </h3>
                       <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 md:grid-cols-1">
                         {STAT_LABELS.map(({ key, label }) => (

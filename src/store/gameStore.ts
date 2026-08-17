@@ -67,6 +67,8 @@ interface GameState {
   ) => void;
   // Progression
   setStoryProgression: (progression: number) => void;
+  markJournalUnlockShown: () => void;
+  markJournalOpened: () => void;
   setGameFlag: (flag: GameFlagValue) => void;
   removeGameFlag: (flag: GameFlagValue) => void;
   // TD Config
@@ -359,6 +361,8 @@ export const useGameStore = create<GameState>()(
                 inventory: [],
                 gameFlags: [],
                 storyProgression: 0,
+                journalUnlockShown: false,
+                journalOpened: false,
                 version: CURRENT_PROFILE_VERSION,
               };
               return {
@@ -418,6 +422,8 @@ export const useGameStore = create<GameState>()(
                   inventory: [],
                   gameFlags: [],
                   storyProgression: 0,
+                  journalUnlockShown: false,
+                  journalOpened: false,
                   version: CURRENT_PROFILE_VERSION,
                 };
                 return {
@@ -471,7 +477,10 @@ export const useGameStore = create<GameState>()(
                 const profile = newProfiles[slotId]!;
                 const newCreatureInstance: PlayerCreature = {
                   ...creature,
-                  id: creature.id && creature.id !== creature.speciesId ? creature.id : crypto.randomUUID(),
+                  id:
+                    creature.id && creature.id !== creature.speciesId
+                      ? creature.id
+                      : crypto.randomUUID(),
                 };
                 // Add to party if under 6 and not forced to storage, otherwise to storage
                 if (profile.creatures.length < 6 && !forceStorage) {
@@ -671,6 +680,42 @@ export const useGameStore = create<GameState>()(
             false,
             'setStoryProgression'
           ),
+        markJournalOpened: () =>
+          set(
+            (state) => {
+              const profileId = state.currentProfileId;
+              if (profileId === null || !state.profiles[profileId])
+                return state;
+              const profile = state.profiles[profileId]!;
+              if (profile.journalOpened) return state;
+              const newProfiles = [...state.profiles];
+              newProfiles[profileId] = {
+                ...profile,
+                journalOpened: true,
+              };
+              return { profiles: newProfiles };
+            },
+            false,
+            'markJournalOpened'
+          ),
+        markJournalUnlockShown: () =>
+          set(
+            (state) => {
+              const profileId = state.currentProfileId;
+              if (profileId === null || !state.profiles[profileId])
+                return state;
+              const profile = state.profiles[profileId]!;
+              if (profile.journalUnlockShown) return state;
+              const newProfiles = [...state.profiles];
+              newProfiles[profileId] = {
+                ...profile,
+                journalUnlockShown: true,
+              };
+              return { profiles: newProfiles };
+            },
+            false,
+            'markJournalUnlockShown'
+          ),
         setGameFlag: (flag: GameFlagValue) =>
           set(
             (state) => {
@@ -733,10 +778,21 @@ export const useGameStore = create<GameState>()(
                 inventory: [],
                 gameFlags: [],
                 storyProgression: 0,
+                journalUnlockShown: false,
+                journalOpened: false,
                 version: CURRENT_PROFILE_VERSION,
               };
             }
-            return profile;
+            return {
+              ...profile,
+              // Older current-version saves predate these UI acknowledgement
+              // fields. Completed Level 3 profiles have already earned the
+              // Journal, so do not replay its first-win card for them.
+              journalUnlockShown:
+                profile.journalUnlockShown ??
+                profile.storyProgression >= StoryProgression.DEFEAT_BUG_STAGE_2,
+              journalOpened: profile.journalOpened ?? false,
+            };
           });
           state.profiles = migratedProfiles;
         },
@@ -747,6 +803,10 @@ export const useGameStore = create<GameState>()(
 
 if (process.env.NODE_ENV === 'development') {
   if (typeof window !== 'undefined') {
-    (window as any).__GAME_STORE__ = useGameStore;
+    (
+      window as typeof window & {
+        __GAME_STORE__?: typeof useGameStore;
+      }
+    ).__GAME_STORE__ = useGameStore;
   }
 }

@@ -59,6 +59,7 @@ export default function Home() {
     reorderCreatures,
     currentTdLevel,
     clearQueue,
+    markJournalOpened,
   } = useGameStore();
 
   // Deduced state
@@ -276,7 +277,10 @@ export default function Home() {
           profile={currentProfile}
           onSelectStory={() => setScreen(Screens.LEVEL_SELECT)}
           onSelectChallenge={() => setScreen(Screens.CHALLENGE_SELECT)}
-          onSelectCodex={() => setScreen(Screens.COSMOID_CODEX)}
+          onSelectCodex={() => {
+            markJournalOpened();
+            setScreen(Screens.COSMOID_CODEX);
+          }}
           onBack={() => setScreen(Screens.PROFILES)}
         />
       </Suspense>

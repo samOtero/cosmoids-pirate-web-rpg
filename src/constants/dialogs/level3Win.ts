@@ -67,8 +67,16 @@ export const LEVEL_3_WIN: DialogConfig = {
       text: "Perfect. Let's give you a world worth drawing.",
     },
     {
+      id: 'journal-unlock',
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: '' }],
-      text: "Kip's Journal unlocked! New entries appear as you discover and capture Cosmoids.",
+      text: 'Kip records the Cosmoids you encounter and capture.',
+      presentation: {
+        type: 'feature-unlock',
+        eyebrow: 'New Feature Unlocked',
+        title: "Kip's Journal",
+        hint: 'Find it under Choose Mode.',
+        showOnce: true,
+      },
     },
   ],
   backgroundImageKey: BackgroundImageKey.LEVEL_2_REPAIRED_BOAT_SUPPLIES,

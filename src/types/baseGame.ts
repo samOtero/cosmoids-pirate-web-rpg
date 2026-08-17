@@ -235,6 +235,8 @@ export interface CosmoidTemplate {
   spriteUrl: string;
   iconImg?: string;
   journalImg?: string;
+  /** Kip's field note, revealed in the journal after this species is captured. */
+  journalEntry?: string;
   battleSpriteUrl?: string;
   battlePosition?: { bottom: number; left: number };
   battleScale?: number;
@@ -290,6 +292,10 @@ export interface Profile {
   inventory: Item[];
   gameFlags: GameFlagValue[]; // Persistent flags set by events (e.g. GameFlag.STARTER_PALMIT)
   storyProgression: number;
+  /** Set after the one-time Kip's Journal unlock card is acknowledged. */
+  journalUnlockShown?: boolean;
+  /** Set after the player opens Kip's Journal for the first time. */
+  journalOpened?: boolean;
   version?: number;
 }
 
@@ -335,6 +341,14 @@ export interface DialogButton {
 
 export type DialogLayout = 'default' | 'battle-left' | 'battle-right';
 
+export interface FeatureUnlockPresentation {
+  type: 'feature-unlock';
+  title: string;
+  eyebrow?: string;
+  hint?: string;
+  showOnce?: boolean;
+}
+
 export interface DialogLine {
   id?: string; // Optional unique identifier for jumping to this line
   portraits: DialogPortrait[];
@@ -342,6 +356,8 @@ export interface DialogLine {
   backgroundImageKey?: BackgroundImageKey;
   buttons?: DialogButton[]; // Optional buttons for this line
   layout?: DialogLayout;
+  /** Renders important system rewards separately from ordinary narration. */
+  presentation?: FeatureUnlockPresentation;
 }
 
 export enum DialogContext {

@@ -49,6 +49,19 @@ export default function DialogContent({
   const [isTyping, setIsTyping] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Get current starter name from store based on game flags (immune to party re-ordering/storage moves)
+  const { profiles, currentProfileId, markJournalUnlockShown } = useGameStore();
+  const currentProfile =
+    currentProfileId !== null ? profiles[currentProfileId] : null;
+  // Freeze this value for the lifetime of the dialog. When a first-time card
+  // records itself as shown, it should remain visible until acknowledged.
+  const [journalUnlockWasShownAtStart] = useState(
+    currentProfile?.journalUnlockShown ?? false
+  );
+  const visibleSequence = sequence.filter(
+    (line) => !line.presentation?.showOnce || !journalUnlockWasShownAtStart
+  );
+
   // Validate line IDs on mount and when sequence changes
   useEffect(() => {
     validateLineIds(sequence, dialogName);
@@ -70,16 +83,21 @@ export default function DialogContent({
     }
   }, [sequence, initialLineIndex]);
 
-  const currentLine = sequence[lineIndex];
+  const currentLine = visibleSequence[lineIndex];
+  const isFeatureUnlock = currentLine?.presentation?.type === 'feature-unlock';
 
   useEffect(() => {
     onLineChange?.(lineIndex);
   }, [lineIndex, onLineChange]);
 
-  // Get current starter name from store based on game flags (immune to party re-ordering/storage moves)
-  const { profiles, currentProfileId } = useGameStore();
-  const currentProfile =
-    currentProfileId !== null ? profiles[currentProfileId] : null;
+  useEffect(() => {
+    if (
+      currentLine?.presentation?.showOnce &&
+      !currentProfile?.journalUnlockShown
+    ) {
+      markJournalUnlockShown();
+    }
+  }, [currentLine, currentProfile?.journalUnlockShown, markJournalUnlockShown]);
 
   let starterName = 'your Cosmoid';
   if (currentProfile?.gameFlags) {
@@ -98,8 +116,9 @@ export default function DialogContent({
 
     const textToType = currentLine.text.replace(/{StarterName}/g, starterName);
 
-    // If typing is disabled, show full text immediately
-    if (!enableTyping) {
+    // Unlock cards are system rewards, so reveal them immediately rather than
+    // making them resemble ordinary typewritten narration.
+    if (!enableTyping || isFeatureUnlock) {
       setDisplayedText(textToType);
       setIsTyping(false);
       return;
@@ -122,7 +141,7 @@ export default function DialogContent({
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [currentLine, lineIndex, enableTyping, starterName]); // Re-run when line changes or starterName changes
+  }, [currentLine, lineIndex, enableTyping, starterName, isFeatureUnlock]); // Re-run when line changes or starterName changes
 
   const handleGlobalClick = () => {
     if (isTyping) {
@@ -144,7 +163,7 @@ export default function DialogContent({
     // Only allow advancing if there are no buttons
     if (!hasButtons()) {
       // Next line
-      if (lineIndex < sequence.length - 1) {
+      if (lineIndex < visibleSequence.length - 1) {
         setLineIndex((prev) => prev + 1);
       } else {
         onContinue();
@@ -153,7 +172,7 @@ export default function DialogContent({
   };
 
   const jumpToLine = (lineId: string) => {
-    const targetIndex = findLineIndexById(sequence, lineId, dialogName);
+    const targetIndex = findLineIndexById(visibleSequence, lineId, dialogName);
     setLineIndex(targetIndex);
     setDisplayedText('');
     setIsTyping(false);
@@ -166,8 +185,8 @@ export default function DialogContent({
   const handleSkip = () => {
     // Find next line with an ID
     let nextIdIndex = -1;
-    for (let i = lineIndex + 1; i < sequence.length; i++) {
-      if (sequence[i].id) {
+    for (let i = lineIndex + 1; i < visibleSequence.length; i++) {
+      if (visibleSequence[i].id) {
         nextIdIndex = i;
         break;
       }
@@ -204,6 +223,71 @@ export default function DialogContent({
   };
 
   if (!currentLine) return null;
+
+  if (isFeatureUnlock) {
+    const presentation = currentLine.presentation!;
+
+    return (
+      <div className="relative flex h-full items-center justify-center overflow-hidden p-4 select-none sm:p-8">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(52,211,153,0.2),transparent_62%)]" />
+        <div className="relative w-full max-w-2xl animate-[fadeIn_0.35s_ease-out] overflow-hidden rounded-3xl border-2 border-emerald-300/70 bg-gradient-to-b from-emerald-950/95 via-teal-950/95 to-ocean-dark/95 px-5 py-6 text-center shadow-2xl shadow-emerald-500/20 sm:px-10 sm:py-9 lg:px-14 lg:py-12">
+          <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-white/10 ring-inset" />
+          <div className="pointer-events-none absolute -top-24 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-emerald-300/20 blur-3xl" />
+
+          <div className="relative mx-auto mb-4 flex h-20 w-20 animate-[pulse_2s_ease-in-out_infinite] items-center justify-center rounded-full border-2 border-emerald-300/60 bg-emerald-400/15 text-emerald-100 shadow-lg shadow-emerald-400/20 sm:h-24 sm:w-24">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 64 64"
+              className="h-12 w-12 sm:h-14 sm:w-14"
+              fill="none"
+            >
+              <path
+                d="M10 13.5c8.7-2.2 16.1-.5 22 5.1v35.2c-5.9-5.6-13.3-7.3-22-5.1V13.5Z"
+                className="fill-emerald-200/20 stroke-emerald-100"
+                strokeWidth="3"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M54 13.5c-8.7-2.2-16.1-.5-22 5.1v35.2c5.9-5.6 13.3-7.3 22-5.1V13.5Z"
+                className="fill-cyan-200/20 stroke-emerald-100"
+                strokeWidth="3"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M17 23c3.7-.3 6.7.4 9 2M17 31c3.7-.3 6.7.4 9 2M47 23c-3.7-.3-6.7.4-9 2M47 31c-3.7-.3-6.7.4-9 2"
+                className="stroke-emerald-200"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
+
+          <p className="relative text-xs font-black tracking-[0.28em] text-emerald-300 uppercase sm:text-sm">
+            {presentation.eyebrow ?? 'Feature Unlocked'}
+          </p>
+          <h1 className="relative mt-2 text-3xl font-black tracking-wide text-sand sm:text-4xl lg:text-5xl">
+            {presentation.title}
+          </h1>
+          <p className="relative mx-auto mt-4 max-w-xl text-base leading-relaxed text-emerald-50/90 sm:text-lg lg:text-xl">
+            {displayedText}
+          </p>
+          {presentation.hint && (
+            <p className="relative mt-2 text-sm font-semibold text-emerald-300/80 sm:text-base">
+              {presentation.hint}
+            </p>
+          )}
+
+          <button
+            type="button"
+            onClick={handleAdvance}
+            className="relative mt-6 rounded-lg border border-emerald-200/70 bg-emerald-500 px-8 py-3 text-base font-black tracking-widest text-emerald-950 uppercase shadow-lg shadow-emerald-950/40 transition-all hover:-translate-y-0.5 hover:bg-emerald-300 active:translate-y-0 sm:text-lg"
+          >
+            Got it!
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const layout = currentLine.layout || 'default';
   const isDefaultLayout = layout === 'default';

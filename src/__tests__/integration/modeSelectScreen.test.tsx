@@ -44,5 +44,23 @@ describe('ModeSelectScreen', () => {
     expect(
       screen.getByRole('heading', { name: "Kip's Journal" })
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole('status', { name: "Kip's Journal is new" })
+    ).toBeInTheDocument();
+
+    rerender(
+      <ModeSelectScreen
+        profile={{
+          ...profile,
+          storyProgression: StoryProgression.DEFEAT_BUG_STAGE_2,
+          journalOpened: true,
+        }}
+        {...callbacks}
+      />
+    );
+
+    expect(
+      screen.queryByRole('status', { name: "Kip's Journal is new" })
+    ).not.toBeInTheDocument();
   });
 });
