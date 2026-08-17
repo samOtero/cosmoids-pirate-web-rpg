@@ -216,40 +216,59 @@ export default function CosmoidCodexScreen({
                     : ''
                 }`}
               >
-                <div
-                  className={
-                    selectedJournalImg
-                      ? 'relative mx-auto aspect-square w-full max-w-[440px] shrink-0 overflow-hidden rounded-xl border border-amber-200/20 bg-[#ead8a9] shadow-lg'
-                      : 'relative mx-auto aspect-square w-full max-w-72 shrink-0 lg:max-w-96'
-                  }
-                >
-                  {!selectedJournalImg && (
-                    <div className="absolute inset-6 rounded-full bg-emerald-300/10 blur-xl" />
-                  )}
-                  <Image
-                    src={
-                      selectedJournalImg ||
-                      selectedSpecies.iconImg ||
-                      selectedSpecies.spriteUrl
-                    }
-                    alt={
-                      selectedJournalImg
-                        ? `${selectedSpecies.name} field sketch`
-                        : selectedSpecies.name
-                    }
-                    fill
-                    sizes={
-                      selectedJournalImg
-                        ? '(min-width: 1024px) 440px, (min-width: 768px) 360px, 55vw'
-                        : '(min-width: 1024px) 384px, (min-width: 768px) 320px, 50vw'
-                    }
-                    priority
+                <div className="mx-auto flex w-full max-w-[440px] flex-col gap-3">
+                  <div
                     className={
                       selectedJournalImg
-                        ? 'object-contain'
-                        : 'object-contain drop-shadow-[0_14px_16px_rgba(0,0,0,0.45)]'
+                        ? 'relative aspect-square w-full shrink-0 overflow-hidden rounded-xl border border-amber-200/20 bg-[#ead8a9] shadow-lg'
+                        : 'relative mx-auto aspect-square w-full max-w-72 shrink-0 lg:max-w-96'
                     }
-                  />
+                  >
+                    {!selectedJournalImg && (
+                      <div className="absolute inset-6 rounded-full bg-emerald-300/10 blur-xl" />
+                    )}
+                    <Image
+                      src={
+                        selectedJournalImg ||
+                        selectedSpecies.iconImg ||
+                        selectedSpecies.spriteUrl
+                      }
+                      alt={
+                        selectedJournalImg
+                          ? `${selectedSpecies.name} field sketch`
+                          : selectedSpecies.name
+                      }
+                      fill
+                      sizes={
+                        selectedJournalImg
+                          ? '(min-width: 1024px) 440px, (min-width: 768px) 360px, 55vw'
+                          : '(min-width: 1024px) 384px, (min-width: 768px) 320px, 50vw'
+                      }
+                      priority
+                      className={
+                        selectedJournalImg
+                          ? 'object-contain'
+                          : 'object-contain drop-shadow-[0_14px_16px_rgba(0,0,0,0.45)]'
+                      }
+                    />
+                  </div>
+
+                  {selectedIsCaptured && selectedSpecies.journalEntry && (
+                    <div
+                      className="relative overflow-hidden rounded-xl border border-[#b88a4a]/70 bg-[#ead6a3] px-4 py-3 text-[#4a321f] shadow-[inset_0_0_22px_rgba(119,78,31,0.2),0_8px_18px_rgba(0,0,0,0.2)]"
+                      style={{
+                        backgroundImage:
+                          'radial-gradient(circle at 15% 18%, rgba(255,255,255,0.22), transparent 30%), radial-gradient(circle at 84% 78%, rgba(116,73,25,0.12), transparent 36%)',
+                      }}
+                    >
+                      <h3 className="mb-1.5 text-[10px] font-black tracking-[0.2em] text-[#76502d] uppercase">
+                        Kip&apos;s Notes
+                      </h3>
+                      <p className="text-sm leading-relaxed text-[#4a321f]">
+                        {selectedSpecies.journalEntry}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {selectedIsCaptured ? (
@@ -274,17 +293,6 @@ export default function CosmoidCodexScreen({
                         </strong>
                       </div>
                     </div>
-
-                    {selectedSpecies.journalEntry && (
-                      <div className="mb-4 border-y border-amber-200/10 py-3">
-                        <h3 className="mb-1.5 text-[10px] font-black tracking-[0.2em] text-amber-100/55 uppercase">
-                          Kip&apos;s Notes
-                        </h3>
-                        <p className="text-sm leading-relaxed text-sand/75">
-                          {selectedSpecies.journalEntry}
-                        </p>
-                      </div>
-                    )}
 
                     <div>
                       <h3 className="mb-2 text-[10px] font-black tracking-[0.2em] text-sand/50 uppercase">
