@@ -60,7 +60,7 @@ const createAlly = (): Enemy => ({
 });
 
 describe('Moth Tailwind enemy ability', () => {
-  it('keeps the speed-buffing version enemy-only and places its caster in level three', () => {
+  it('keeps the speed-buffing version enemy-only and out of the focused Level 3 encounter', () => {
     expect(ENEMY_ABILITY_DEFS.MOTH_TAILWIND).toMatchObject({
       initialCooldownMs: 7000,
       cooldownMs: 12000,
@@ -73,20 +73,11 @@ describe('Moth Tailwind enemy ability', () => {
         (attack) => attack.attackId === 'MOTH_TAILWIND'
       )
     ).toBe(false);
-    expect(VANE_LEVEL.waveEnemyDefinitions).toContainEqual(
-      expect.objectContaining({
-        id: 'vane_tailwind_moth',
-        creatureId: 'bug_stage_3',
-        abilityId: 'MOTH_TAILWIND',
-      })
-    );
     expect(
-      VANE_LEVEL.waves.some((wave) =>
-        wave.groups.some(
-          (group) => group.enemyDefinitionId === 'vane_tailwind_moth'
-        )
+      VANE_LEVEL.waveEnemyDefinitions.some(
+        (definition) => definition.abilityId === 'MOTH_TAILWIND'
       )
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it('only speeds allies present when it casts, excluding itself and later spawns', () => {

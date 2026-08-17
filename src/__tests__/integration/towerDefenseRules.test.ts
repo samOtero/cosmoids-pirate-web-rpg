@@ -89,9 +89,50 @@ describe('Tower defense rules', () => {
         expect.objectContaining({ tdConfigId: 'kip_battle' }),
       ])
     );
-    expect(new Set(creatureIds)).toEqual(
-      new Set(['bug_stage_1', 'bug_stage_2', 'bug_stage_3', 'bettle'])
+    expect(new Set(creatureIds)).toEqual(new Set(['bug_stage_1', 'bettle']));
+
+    const beetadelGroups = VANE_LEVEL.waves.flatMap((wave) =>
+      wave.groups.filter(
+        (group) => group.enemyDefinitionId === 'vane_bettle_guard'
+      )
     );
+    expect(beetadelGroups).toEqual([
+      expect.objectContaining({ count: 1, uncapturable: true }),
+    ]);
+
+    engine.destroy();
+  });
+
+  it("prevents Vane's owned Beetadel from being captured", () => {
+    const beetadelGroup = VANE_LEVEL.waves
+      .flatMap((wave) => wave.groups)
+      .find((group) => group.enemyDefinitionId === 'vane_bettle_guard');
+    expect(beetadelGroup).toBeDefined();
+
+    const engine = new TowerDefenseEngine({
+      ...VANE_LEVEL,
+      waves: [
+        {
+          id: 'owned_beetadel_test',
+          groups: [
+            {
+              ...beetadelGroup!,
+              spawnIntervalMs: 1,
+              delayBeforeGroupMs: 0,
+            },
+          ],
+        },
+      ],
+    });
+
+    engine.tick(1, 1);
+
+    expect(engine.enemies).toHaveLength(1);
+    expect(engine.enemies[0]).toMatchObject({
+      definitionId: 'bettle',
+      uncapturable: true,
+    });
+    expect(engine.captureEnemy(engine.enemies[0].id)).toBeNull();
 
     engine.destroy();
   });
@@ -122,6 +163,9 @@ describe('Tower defense rules', () => {
       },
       { type: 'GO_TO_LEVEL_SELECT' },
     ]);
+    expect(
+      TD_LEVELS[TDLevelContext.VANE_LEVEL_3].journalCompletion?.seenSpeciesIds
+    ).toEqual(['bug_stage_1', 'bettle']);
     expect(TD_LEVELS[TDLevelContext.VANE_LEVEL_3].loseEvents).toEqual([
       {
         type: 'SHOW_DIALOG',

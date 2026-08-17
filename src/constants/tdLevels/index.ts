@@ -90,7 +90,7 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
     levelData: VANE_LEVEL,
     journalCompletion: {
       progression: StoryProgression.DEFEAT_BUG_STAGE_2,
-      seenSpeciesIds: ['bug_stage_1', 'bug_stage_2', 'bug_stage_3', 'bettle'],
+      seenSpeciesIds: ['bug_stage_1', 'bettle'],
     },
     introEvents: [
       {

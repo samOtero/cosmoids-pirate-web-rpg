@@ -53,8 +53,6 @@ describe("Kip's Journal derivation", () => {
       'harlequill',
       'mopup',
       'bug_stage_1',
-      'bug_stage_2',
-      'bug_stage_3',
       'bettle',
     ]);
   });
