@@ -179,6 +179,12 @@ export const LEVEL_ORDER: LevelInfo[] = [
     description: "Defend the repaired boat from Captain Vane's Bug Cosmoids.",
     requiredProgression: StoryProgression.DEFEAT_BUG_STAGE_1,
   },
+  {
+    context: 'LOCKED_4' as TDLevelContext,
+    name: 'Coming soon',
+    description: 'More story adventures are on the way.',
+    requiredProgression: StoryProgression.DEFEAT_BUG_STAGE_2,
+  },
 ];
 
 /** Ordered list of challenge levels for the Challenge Select screen. */
