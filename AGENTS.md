@@ -22,11 +22,16 @@
 
 ## Human dialogue portrait direction
 
+- Treat every request for a human dialogue portrait or portrait expression set as requiring this section's generation and acceptance checks, even when the user does not repeat them.
 - Default to a three-quarter portrait view, with the head and torso facing the same direction.
 - For screen-right poses, place the sternum or costume centerline right of the canvas center. The screen-left shoulder should appear nearer and larger, while the screen-right shoulder should appear smaller and recede.
+- Do not accept a portrait where the face turns three-quarter over a frontal or oppositely turned torso. The nose, chin, sternum or costume centerline, and shoulder-depth perspective must all describe the same turn.
 - Keep the character's chin level and eyes on a neutral, forward conversational eyeline. Do not have characters look downward unless the scene explicitly provides a reason.
 - Use head angle, facial expression, eyelids, eyebrows, and posture to communicate whatever emotion or attitude the scene requires, including confidence, haughtiness, fear, anger, amusement, or defeat.
 - Use Caleb's existing dialogue portraits as the primary reference for framing, three-quarter orientation, and conversational eyeline.
+- For a new character expression set, generate and inspect one neutral pose-lock portrait before creating variants. Reject and correct any head/torso mismatch at this stage; do not use a failed pose as the identity reference for later expressions.
+- Derive expression variants from the approved neutral pose-lock. Preserve the head direction, torso direction, near/far shoulder relationship, costume centerline, crop, scale, and eyeline; change only the expression and the smallest natural posture adjustment needed for that emotion.
+- Before accepting each portrait, explicitly inspect the head/torso alignment, near/far shoulder sizes, sternum placement, level chin, forward eyeline, safe crop, identity consistency, and background alpha. Regenerate a portrait that fails any of these checks before producing or accepting the rest of the set.
 - Export human dialogue portraits as transparent 650x650 RGBA PNGs unless an existing asset integration intentionally requires different dimensions.
 
 ## Story and dialogue direction

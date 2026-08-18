@@ -66,6 +66,14 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
   [SpeakerImageKey.KIP_DETERMINED]: '/dialog/kip_determined.png',
   [SpeakerImageKey.KIP_HOPEFUL_SURPRISED]: '/dialog/kip_hopeful_surprised.png',
   [SpeakerImageKey.KIP_RELIEVED_HAPPY]: '/dialog/kip_relieved_happy.png',
+  [SpeakerImageKey.MARIBEL_NEUTRAL_WARY]: '/dialog/maribel_neutral_wary.png',
+  [SpeakerImageKey.MARIBEL_WORRIED]: '/dialog/maribel_worried.png',
+  [SpeakerImageKey.MARIBEL_STARTLED]: '/dialog/maribel_startled.png',
+  [SpeakerImageKey.MARIBEL_DETERMINED]: '/dialog/maribel_determined.png',
+  [SpeakerImageKey.MARIBEL_ANGRY_DEFENSIVE]:
+    '/dialog/maribel_angry_defensive.png',
+  [SpeakerImageKey.MARIBEL_RELIEVED_HAPPY]:
+    '/dialog/maribel_relieved_happy.png',
   [SpeakerImageKey.CAPTAIN_VANE_HAUGHTY_NEUTRAL]:
     '/dialog/captain_vane_haughty_neutral.png',
   [SpeakerImageKey.CAPTAIN_VANE_MOCKING_DISBELIEF]:

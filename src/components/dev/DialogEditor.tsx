@@ -45,6 +45,7 @@ const getDisplayNameForKey = (key: string): string => {
   if (key.startsWith('Lance')) return 'Lance';
   if (key.startsWith('Grandpa')) return 'Grandpa';
   if (key.startsWith('Caleb')) return 'Caleb';
+  if (key.startsWith('Maribel')) return 'Mari';
   if (key.startsWith('Hookaw')) return 'Scuttles';
   if (key.startsWith('Pirate_Grunt_Joe')) return 'Grunt Pirate Joe';
   if (key.startsWith('Eel_Senticle')) return 'Senticle';
