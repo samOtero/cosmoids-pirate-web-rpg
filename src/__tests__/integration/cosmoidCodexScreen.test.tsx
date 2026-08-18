@@ -158,23 +158,23 @@ describe('CosmoidCodexScreen', () => {
         .getAttribute('src')
     ).toContain(encodeURIComponent('/UI/Journal/mopup_journal.png'));
 
-    fireEvent.click(screen.getByRole('button', { name: 'Buglet, captured' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Sailkworm, captured' }));
     expect(
       screen
-        .getByRole('img', { name: 'Buglet field sketch' })
+        .getByRole('img', { name: 'Sailkworm field sketch' })
         .getAttribute('src')
     ).toContain(encodeURIComponent('/UI/Journal/buglet_journal.png'));
 
-    fireEvent.click(screen.getByRole('button', { name: 'Bugitor, captured' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Cocoonot, captured' }));
     expect(
       screen
-        .getByRole('img', { name: 'Bugitor field sketch' })
+        .getByRole('img', { name: 'Cocoonot field sketch' })
         .getAttribute('src')
     ).toContain(encodeURIComponent('/UI/Journal/bugitor_journal.png'));
 
-    fireEvent.click(screen.getByRole('button', { name: 'Moth, captured' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Mainscale, captured' }));
     expect(
-      screen.getByRole('img', { name: 'Moth field sketch' }).getAttribute('src')
+      screen.getByRole('img', { name: 'Mainscale field sketch' }).getAttribute('src')
     ).toContain(encodeURIComponent('/UI/Journal/moth_journal.png'));
 
     fireEvent.click(screen.getByRole('button', { name: 'Beetadel, captured' }));

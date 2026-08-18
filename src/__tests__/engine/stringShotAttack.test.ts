@@ -53,7 +53,7 @@ const createEnemy = (): Enemy => ({
 });
 
 describe('String Shot', () => {
-  it('is available to Buglet at level 1 as a guaranteed status move', () => {
+  it('is available to Sailkworm at level 1 as a guaranteed status move', () => {
     expect(BUG_STAGE_1.learnableAttacks).toContainEqual({
       level: 1,
       attackId: 'STRING_SHOT',

@@ -199,7 +199,7 @@ export const BETTLE: CosmoidTemplate = {
 
 export const BUG_STAGE_1: CosmoidTemplate = {
   id: 'bug_stage_1',
-  name: 'Buglet',
+  name: 'Sailkworm',
   type: ElementType.GRASS,
   iconImg: '/UI/Icons/buglet_icon.png',
   journalImg: '/UI/Journal/buglet_journal.png',
@@ -225,7 +225,7 @@ export const BUG_STAGE_1: CosmoidTemplate = {
 
 export const BUG_STAGE_2: CosmoidTemplate = {
   id: 'bug_stage_2',
-  name: 'Bugitor',
+  name: 'Cocoonot',
   type: ElementType.GRASS,
   iconImg: '/UI/Icons/bugitor_icon.png',
   journalImg: '/UI/Journal/bugitor_journal.png',
@@ -252,7 +252,7 @@ export const BUG_STAGE_2: CosmoidTemplate = {
 
 export const BUG_STAGE_3: CosmoidTemplate = {
   id: 'bug_stage_3',
-  name: 'Moth',
+  name: 'Mainscale',
   type: ElementType.GRASS,
   iconImg: '/UI/Icons/moth_icon.png',
   journalImg: '/UI/Journal/moth_journal.png',
