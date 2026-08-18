@@ -37,5 +37,7 @@
 ## Story and dialogue direction
 
 - Treat `STORY_AND_THEMES.md` as the source of truth for the premise, tone, lore, factions, themes, human character art direction, and dialogue-writing rules.
-- Keep ordinary story parts no longer than Part 1 unless a major turning point genuinely requires additional dialogue.
+- Keep every ordinary story introduction or story part, including drafts written only in chat, within five to ten player-advanced dialogue panels or sequence entries. Five is a concise target for a simple beat; ten is the enforced ordinary maximum. Narration and action text count when the player must advance them.
+- Count the panels before presenting or implementing the draft. Do not evade the range by splitting one beat into several short panels; move secondary explanation, jokes, and worldbuilding into gameplay or a later scene.
+- Exceed ten panels only for a major turning point that genuinely requires it, and explicitly identify the exception when proposing it.
 - Preserve character motivation, flaws, and conflict while keeping individual dialogue beats concise and appropriate for an all-ages adventure.

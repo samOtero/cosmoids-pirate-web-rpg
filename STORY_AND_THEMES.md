@@ -140,7 +140,10 @@ Dialogue should keep players emotionally invested without drowning them in text.
 - Split necessary explanations across action, reactions, battles, and later scenes instead of delivering the entire answer at once.
 - Avoid repeating information the player just saw or already learned.
 - Start scenes late, once something interesting is happening, and end them once the scene's purpose has landed.
-- Treat **Part 1 as the normal upper limit for a story part's total dialogue**. Exceed it only for a major turning point that genuinely needs more room.
+- Keep an ordinary story introduction or story part within **five to ten player-advanced dialogue panels or sequence entries total**. Five is a concise target for a simple beat; ten is the enforced ordinary maximum. This range applies equally to brainstorming drafts written in chat and dialogue implemented in the game.
+- Count narration or action text as a panel when the player must advance through it. Do not evade the cap by splitting one beat across several short panels.
+- Exceed ten panels only for a major turning point that genuinely needs more room. When proposing an exception, identify it explicitly and keep the scene as short as that turning point allows.
+- Before presenting or implementing an ordinary introduction, count its panels and revise it into the five-to-ten range. Move secondary explanation, jokes, and worldbuilding into exploration, gameplay, or a later scene.
 
 ### Character and Emotion
 
