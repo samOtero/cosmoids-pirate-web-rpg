@@ -58,6 +58,7 @@ export const LEVEL_3_WIN: DialogConfig = {
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: '' }],
       text: "The boat catches the wind and clears the reef before Vane's crew reaches the shore.",
+      backgroundImageKey: BackgroundImageKey.LEVEL_3_SAILING_AWAY,
     },
     {
       portraits: [
@@ -67,6 +68,7 @@ export const LEVEL_3_WIN: DialogConfig = {
         },
       ],
       text: "I can't wait to fill my journal with every Cosmoids we meet!",
+      backgroundImageKey: BackgroundImageKey.LEVEL_3_SAILING_AWAY,
     },
     {
       portraits: [
@@ -76,11 +78,13 @@ export const LEVEL_3_WIN: DialogConfig = {
         },
       ],
       text: "Then we'd better sail the whole world!",
+      backgroundImageKey: BackgroundImageKey.LEVEL_3_SAILING_AWAY,
     },
     {
       id: 'journal-unlock',
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: '' }],
       text: 'Kip records the Cosmoids you encounter and capture.',
+      backgroundImageKey: BackgroundImageKey.LEVEL_3_SAILING_AWAY,
       presentation: {
         type: 'feature-unlock',
         eyebrow: 'New Feature Unlocked',

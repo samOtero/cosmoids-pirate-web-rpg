@@ -107,5 +107,7 @@ export const BACKGROUND_IMAGES: Record<BackgroundImageKey, string> = {
     '/bg_level_2_shipwreck_beach.png',
   [BackgroundImageKey.LEVEL_2_REPAIRED_BOAT_SUPPLIES]:
     '/bg_level_2_repaired_boat_supplies.png',
+  [BackgroundImageKey.LEVEL_3_SAILING_AWAY]:
+    '/bg_level_3_sailing_away.png',
   [BackgroundImageKey.DEFAULT]: '/bg_caleb_house_1.png',
 };

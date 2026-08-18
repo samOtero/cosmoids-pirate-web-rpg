@@ -114,6 +114,7 @@ export enum BackgroundImageKey {
   LEVEL_2_WAVE_IMPACT = 'Level_2_Wave_Impact',
   LEVEL_2_SHIPWRECK_BEACH = 'Level_2_Shipwreck_Beach',
   LEVEL_2_REPAIRED_BOAT_SUPPLIES = 'Level_2_Repaired_Boat_Supplies',
+  LEVEL_3_SAILING_AWAY = 'Level_3_Sailing_Away',
   DEFAULT = 'default',
 }
 
