@@ -19,7 +19,7 @@ export default function ChallengeSelectScreen({
   const [hoverLevel, setHoverLevel] = useState<number | null>(null);
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-[#1a0a28]">
+    <div className="relative flex h-full min-h-0 w-full flex-col overflow-hidden bg-[#1a0a28]">
       {/* Animated background gradient — purple/gold theme for challenge */}
       <div
         className="absolute inset-0 opacity-40"
@@ -40,7 +40,7 @@ export default function ChallengeSelectScreen({
       />
 
       {/* Header */}
-      <div className="relative z-10 flex items-center justify-between px-6 pt-6 pb-4">
+      <div className="relative z-10 flex shrink-0 items-center justify-between px-6 pt-6 pb-4">
         <div>
           <h1 className="text-2xl font-bold tracking-wider text-amber-200 uppercase lg:text-3xl">
             🏆 Challenge Mode
@@ -54,9 +54,13 @@ export default function ChallengeSelectScreen({
         </div>
       </div>
 
-      {/* Challenge Level Grid */}
-      <div className="relative z-10 flex-1 overflow-y-auto px-6 pb-24">
-        <div className="mx-auto mt-4 grid max-w-5xl grid-cols-2 gap-4 lg:grid-cols-5">
+      {/* Horizontal challenge carousel on mobile; grid on desktop */}
+      <div
+        role="region"
+        aria-label="Challenge levels"
+        className="relative z-10 min-h-0 flex-1 touch-pan-x snap-x snap-proximity overflow-x-auto overflow-y-hidden overscroll-x-contain px-6 pb-24 lg:touch-pan-y lg:snap-none lg:overflow-x-hidden lg:overflow-y-auto lg:overscroll-y-contain"
+      >
+        <div className="mt-4 flex w-max items-stretch gap-4 lg:mx-auto lg:grid lg:w-full lg:max-w-5xl lg:grid-cols-5">
           {CHALLENGE_LEVEL_ORDER.map((level, idx) => {
             const levelNum = idx + 1;
             const isUnlocked =
@@ -69,7 +73,7 @@ export default function ChallengeSelectScreen({
               <button
                 key={level.context}
                 id={`challenge-level-${levelNum}`}
-                className={`group relative flex min-h-[140px] flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all duration-300 ease-out ${
+                className={`group relative flex min-h-[168px] w-48 shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all duration-300 ease-out sm:min-h-[180px] sm:w-56 lg:min-h-[140px] lg:w-auto ${
                   isUnlocked && hasTdConfig
                     ? 'cursor-pointer border-amber-500/50 bg-gradient-to-br from-purple-900/50 to-amber-900/40 hover:border-amber-400 hover:shadow-lg hover:shadow-amber-500/25'
                     : 'cursor-not-allowed border-gray-700/40 bg-gradient-to-br from-gray-900/40 to-gray-800/30 opacity-50'

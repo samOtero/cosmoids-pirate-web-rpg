@@ -10,7 +10,6 @@ import {
 } from '@/types/baseGame';
 import { LEVEL_ORDER, TD_LEVELS } from '@/constants/tdLevels';
 import { COSMOID_TEMPLATES } from '@/constants/creatures';
-import Panel from '@/app/components/ui/Panel';
 import { Button } from '@/app/components/ui/Button';
 import { resolveDialog } from '@/utils/dialogResolver';
 import DialogContent from '@/app/components/ui/DialogContent';
@@ -85,7 +84,7 @@ export default function LevelSelectScreen({
 
   return (
     <>
-      <div className="relative h-full w-full overflow-hidden bg-[#0a1628]">
+      <div className="relative flex h-full min-h-0 w-full flex-col overflow-hidden bg-[#0a1628]">
         {/* Animated background gradient */}
         <div
           className="absolute inset-0 opacity-40"
@@ -106,7 +105,7 @@ export default function LevelSelectScreen({
         />
 
         {/* Header */}
-        <div className="relative z-10 flex items-center justify-between px-6 pt-6 pb-4">
+        <div className="relative z-10 flex shrink-0 items-center justify-between px-6 pt-6 pb-4">
           <div>
             <h1 className="text-2xl font-bold tracking-wider text-sand uppercase lg:text-3xl">
               Select Level
@@ -122,9 +121,13 @@ export default function LevelSelectScreen({
           </div>
         </div>
 
-        {/* Level Grid */}
-        <div className="relative z-10 flex-1 overflow-y-auto px-6 pb-24">
-          <div className="mx-auto mt-4 grid max-w-5xl grid-cols-2 gap-4 lg:grid-cols-5">
+        {/* Horizontal level carousel on mobile; grid on desktop */}
+        <div
+          role="region"
+          aria-label="Story levels"
+          className="relative z-10 min-h-0 flex-1 touch-pan-x snap-x snap-proximity overflow-x-auto overflow-y-hidden overscroll-x-contain px-6 pb-24 lg:touch-pan-y lg:snap-none lg:overflow-x-hidden lg:overflow-y-auto lg:overscroll-y-contain"
+        >
+          <div className="mt-4 flex w-max items-stretch gap-4 lg:mx-auto lg:grid lg:w-full lg:max-w-5xl lg:grid-cols-5">
             {LEVEL_ORDER.map((level, idx) => {
               const levelNum = idx + 1;
               const isUnlocked =
@@ -144,7 +147,7 @@ export default function LevelSelectScreen({
                 <button
                   key={level.context}
                   id={`level-${levelNum}`}
-                  className={`group relative flex min-h-[140px] flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all duration-300 ease-out ${
+                  className={`group relative flex min-h-[168px] w-48 shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 transition-all duration-300 ease-out sm:min-h-[180px] sm:w-56 lg:min-h-[140px] lg:w-auto ${
                     completed
                       ? 'border-emerald-500/60 bg-gradient-to-br from-emerald-900/60 to-emerald-800/40 hover:border-emerald-400 hover:shadow-lg hover:shadow-emerald-500/20'
                       : isUnlocked && hasTdConfig

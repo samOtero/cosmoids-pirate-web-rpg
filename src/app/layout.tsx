@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} h-screen w-screen bg-[#0d2b45] text-[#f4e4b] antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} h-dvh w-screen overflow-hidden bg-[#0d2b45] text-[#f4e4b] antialiased`}
       >
         {children}
         <AnimationProvider />
