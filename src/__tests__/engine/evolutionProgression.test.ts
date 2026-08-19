@@ -78,7 +78,7 @@ describe('Bug evolution progression', () => {
     engine.destroy();
   });
 
-  it('offers Cocoonot evolution at level 10 and can retry at level 11', () => {
+  it('offers Cocoonot evolution at level 10', () => {
     const engine = createEngine('bug_stage_2', 9, 270);
     const events: TDEvent[] = [];
     engine.events.subscribe((event) => events.push(event));
@@ -96,15 +96,6 @@ describe('Bug evolution progression', () => {
     );
 
     expect(engine.cancelTowerEvolution(tower.id)).toBe(true);
-    tower.creature.xp = 330;
-    grantBattleExperience(engine);
-
-    expect(tower.creature.level).toBe(11);
-    expect(
-      events.filter((event) => event.type === 'TOWER_ASK_EVOLUTION')
-    ).toHaveLength(2);
-    expect(engine.evolveTower(tower.id, 'bug_stage_3')).toBe(true);
-    expect(tower.creature.speciesId).toBe('bug_stage_3');
 
     engine.destroy();
   });

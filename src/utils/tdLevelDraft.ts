@@ -109,6 +109,12 @@ export function validateTDLevelDraft(
     if (!Number.isInteger(definition.level) || definition.level < 1) {
       errors.push(`${definitionLabel} level must be a positive integer.`);
     }
+    if (
+      definition.goalDamage !== undefined &&
+      (!Number.isInteger(definition.goalDamage) || definition.goalDamage < 1)
+    ) {
+      errors.push(`${definitionLabel} goal damage must be a positive integer.`);
+    }
 
     const multipliers = [
       ['speed', definition.speedMultiplier],

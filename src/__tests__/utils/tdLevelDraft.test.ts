@@ -287,4 +287,26 @@ describe('TD level drafts', () => {
       validateTDLevelDraft(level, new Set(['mouse_1']))
     ).toEqual([]);
   });
+
+  it('rejects invalid enemy goal damage', () => {
+    const level = createEmptyTDLevelDraft();
+    level.paths = [
+      [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+      ],
+    ];
+    level.waveEnemyDefinitions = [
+      {
+        id: 'invalid_goal_damage',
+        creatureId: 'mouse_1',
+        level: 3,
+        goalDamage: 0,
+      },
+    ];
+
+    expect(validateTDLevelDraft(level)).toContain(
+      'Enemy definition 1 goal damage must be a positive integer.'
+    );
+  });
 });

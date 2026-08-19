@@ -539,7 +539,10 @@ export class TowerDefenseEngine {
             livesToLose++;
           }
         } else {
-          livesToLose++;
+          livesToLose +=
+            (e.waveEnemyDefinitionId
+              ? this.waveEnemyDefinitions[e.waveEnemyDefinitionId]?.goalDamage
+              : undefined) ?? 1;
         }
       });
 

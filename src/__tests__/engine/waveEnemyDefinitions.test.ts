@@ -91,4 +91,44 @@ describe('wave enemy definitions', () => {
 
     engine.destroy();
   });
+
+  it('applies configured goal damage when an enemy reaches the end', () => {
+    const engine = new TowerDefenseEngine({
+      paths: [
+        [
+          { x: 0, y: 0 },
+          { x: 0.01, y: 0 },
+        ],
+      ],
+      placementSpots: [],
+      lives: 10,
+      waveEnemyDefinitions: [
+        {
+          id: 'boat_breaker',
+          creatureId: 'mouse_1',
+          level: 3,
+          goalDamage: 10,
+        },
+      ],
+      waves: [
+        {
+          id: 'goal_damage_wave',
+          groups: [
+            {
+              enemyDefinitionId: 'boat_breaker',
+              count: 1,
+              spawnIntervalMs: 0,
+              delayBeforeGroupMs: 0,
+              pathIndex: 0,
+            },
+          ],
+        },
+      ],
+    });
+
+    engine.tick(0, 16);
+
+    expect(engine.lives).toBe(0);
+    engine.destroy();
+  });
 });

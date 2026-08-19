@@ -91,6 +91,9 @@ describe('Tower defense rules', () => {
       ])
     );
     expect(new Set(creatureIds)).toEqual(new Set(['bug_stage_1', 'bettle']));
+    expect(definitionsById.get('vane_bettle_guard')).toEqual(
+      expect.objectContaining({ goalDamage: 10 })
+    );
 
     const beetadelGroups = VANE_LEVEL.waves.flatMap((wave) =>
       wave.groups.filter(

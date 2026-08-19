@@ -59,6 +59,8 @@ export interface TDWaveEnemyDefinition {
   creatureId: string;
   level: number;
   speedMultiplier?: number;
+  /** Lives removed when this enemy reaches a non-capture goal. Defaults to 1. */
+  goalDamage?: number;
   /** Multiplies battlefield stats without changing captured creature stats. */
   hpMultiplier?: number;
   defenseMultiplier?: number;
