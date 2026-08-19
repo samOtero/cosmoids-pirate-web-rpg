@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   BUG_STAGE_1,
   BUG_STAGE_2,
+  BUG_STAGE_3,
 } from '@/constants/creatures';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { TDEvent } from '@/engine/tower-defense/events/TDEventBus';
@@ -96,6 +97,43 @@ describe('Bug evolution progression', () => {
     );
 
     expect(engine.cancelTowerEvolution(tower.id)).toBe(true);
+
+    engine.destroy();
+  });
+
+  it('teaches Mainscale its level-10 attack only after evolution', () => {
+    const engine = createEngine('bug_stage_2', 9, 270);
+    const events: TDEvent[] = [];
+    engine.events.subscribe((event) => events.push(event));
+
+    grantBattleExperience(engine);
+
+    const tower = engine.towers[0];
+    expect(tower.creature.level).toBe(10);
+    expect(tower.creature.equippedAttacks).not.toContain('SAILCUTTER');
+    expect(events.some((event) => event.type === 'TOWER_LEARNED_ATTACK')).toBe(
+      false
+    );
+
+    expect(engine.evolveTower(tower.id, 'bug_stage_3')).toBe(true);
+
+    expect(tower.creature.speciesId).toBe(BUG_STAGE_3.id);
+    expect(tower.creature.equippedAttacks).toContain('SAILCUTTER');
+    expect(tower.equippedAttacksRuntime).toContainEqual({
+      definitionId: 'SAILCUTTER',
+      lastFiredTime: 0,
+    });
+
+    const evolutionEventIndex = events.findIndex(
+      (event) => event.type === 'TOWER_EVOLVED'
+    );
+    const learnedEventIndex = events.findIndex(
+      (event) =>
+        event.type === 'TOWER_LEARNED_ATTACK' &&
+        event.attackDefId === 'SAILCUTTER'
+    );
+    expect(evolutionEventIndex).toBeGreaterThanOrEqual(0);
+    expect(learnedEventIndex).toBeGreaterThan(evolutionEventIndex);
 
     engine.destroy();
   });

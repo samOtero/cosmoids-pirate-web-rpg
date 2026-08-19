@@ -505,6 +505,55 @@ function drawWaterStreamSegment(
   water.fill({ color: highlightColor, alpha: 0.9 });
 }
 
+function drawSailcutterBlade(
+  blade: PIXI.Graphics,
+  shadowColor: number,
+  windColor: number,
+  highlightColor: number
+) {
+  blade.moveTo(-5, -33);
+  blade.bezierCurveTo(15, -24, 23, -7, 19, 8);
+  blade.bezierCurveTo(15, 22, 5, 30, -7, 34);
+  blade.bezierCurveTo(6, 18, 10, 5, 8, -7);
+  blade.bezierCurveTo(6, -18, 1, -27, -5, -33);
+  blade.closePath();
+  blade.fill({ color: windColor, alpha: 0.96 });
+  blade.stroke({ color: shadowColor, width: 2.5, alpha: 0.76, join: 'round' });
+
+  blade.moveTo(-1, -28);
+  blade.bezierCurveTo(11, -19, 16, -4, 12, 9);
+  blade.bezierCurveTo(9, 20, 3, 27, -3, 31);
+  blade.stroke({
+    color: highlightColor,
+    width: 2.4,
+    alpha: 0.95,
+    cap: 'round',
+  });
+}
+
+function drawSailcutterProjectile(
+  container: PIXI.Container,
+  shadowColor: number,
+  windColor: number,
+  highlightColor: number
+) {
+  const upperBlade = new PIXI.Graphics();
+  upperBlade.label = 'sailcutter_upper_blade';
+  drawSailcutterBlade(upperBlade, shadowColor, windColor, highlightColor);
+  upperBlade.position.set(-6, -3);
+  upperBlade.rotation = -0.09;
+  upperBlade.scale.set(0.88);
+  upperBlade.alpha = 0.82;
+  container.addChild(upperBlade);
+
+  const lowerBlade = new PIXI.Graphics();
+  lowerBlade.label = 'sailcutter_lower_blade';
+  drawSailcutterBlade(lowerBlade, shadowColor, windColor, highlightColor);
+  lowerBlade.position.set(6, 3);
+  lowerBlade.rotation = 0.09;
+  container.addChild(lowerBlade);
+}
+
 function drawWaterDashTrail(trail: PIXI.Graphics) {
   const streaks = [
     { y: -16, length: 58, width: 7, color: 0x7dd3fc },
@@ -2255,6 +2304,13 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                   def.projectileVisual.highlightColor,
                   def.projectileVisual.sparkColor
                 );
+              } else if (def?.projectileVisual?.type === 'SAILCUTTER') {
+                drawSailcutterProjectile(
+                  container,
+                  def.projectileVisual.shadowColor,
+                  def.projectileVisual.windColor,
+                  def.projectileVisual.highlightColor
+                );
               } else {
                 const g = new PIXI.Graphics();
                 g.label = 'proj_graphics';
@@ -2290,7 +2346,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               def?.projectileVisual?.type === 'FLAME' ||
               def?.projectileVisual?.type === 'WATER_STREAM' ||
               def?.projectileVisual?.type === 'COIR_BOLA' ||
-              def?.projectileVisual?.type === 'STRING_COIL'
+              def?.projectileVisual?.type === 'STRING_COIL' ||
+              def?.projectileVisual?.type === 'SAILCUTTER'
             ) {
               const travelX = proj.target.x - proj.position.x;
               const travelY = proj.target.y - proj.position.y;

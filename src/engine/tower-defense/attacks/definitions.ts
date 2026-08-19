@@ -126,6 +126,23 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     itemPickupLockMs: 2000,
     visualEffectConfigId: 'attack_wind_gust_1',
   },
+  SAILCUTTER: {
+    id: 'SAILCUTTER',
+    name: 'Sailcutter',
+    type: ElementType.FLYING,
+    category: 'special',
+    power: 50,
+    cooldownMs: ATTACK_COOLDOWNS.NORMAL,
+    rangeIndex: 30,
+    behaviorType: 'PROJECTILE',
+    projectileSpeed: 1.45,
+    projectileVisual: {
+      type: 'SAILCUTTER',
+      shadowColor: 0x50758a,
+      windColor: 0xbcecff,
+      highlightColor: 0xffffff,
+    },
+  },
   BUBBLE_BEAM: {
     id: 'BUBBLE_BEAM',
     name: 'Bubble Beam',

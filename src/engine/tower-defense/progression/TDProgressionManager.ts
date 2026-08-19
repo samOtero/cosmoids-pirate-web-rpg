@@ -96,6 +96,11 @@ export class TDProgressionManager {
     }
 
     const oldDefinitionId = tower.creature.speciesId;
+    const evolutionLevel = COSMOID_TEMPLATES[
+      oldDefinitionId
+    ]?.evolutionNodes?.find(
+      (node) => node.evolutionDefId === evolutionDefId
+    )?.level;
     tower.creature.speciesId = evolutionDefId;
     tower.currentAttack = calculateStat(
       newTemplate.baseStats.attack,
@@ -128,6 +133,12 @@ export class TDProgressionManager {
       oldDefinitionId,
       newDefinitionId: evolutionDefId,
     });
+
+    // Evolution-threshold attacks belong to the evolved species, so process
+    // them only after the species swap and evolution event have completed.
+    if (evolutionLevel !== undefined) {
+      this.processLevelUpAttacks(tower, evolutionLevel);
+    }
 
     // A delayed first-stage evolution may already qualify for the next stage.
     this.requestEligibleEvolution(tower);

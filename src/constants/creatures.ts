@@ -207,10 +207,10 @@ export const BUG_STAGE_1: CosmoidTemplate = {
     'It disguises itself as a scrap of stitched sailcloth, then quietly eats the real sails around it.',
   baseStats: {
     hp: 25,
-    attack: 15,
-    defense: 20,
-    specialAttack: 10,
-    specialDefense: 15,
+    attack: 30,
+    defense: 35,
+    specialAttack: 20,
+    specialDefense: 20,
     speed: 10,
   },
   baseExperience: 53,
@@ -233,11 +233,11 @@ export const BUG_STAGE_2: CosmoidTemplate = {
   journalEntry:
     'It spins coconut-husk thread into a knot so tight that hurricane winds cannot tear it from a mast. No sailor has ever managed to untie one.',
   baseStats: {
-    hp: 25,
-    attack: 15,
-    defense: 20,
-    specialAttack: 12,
-    specialDefense: 18,
+    hp: 50,
+    attack: 35,
+    defense: 55,
+    specialAttack: 25,
+    specialDefense: 25,
     speed: 10,
   },
   baseExperience: 85,
@@ -261,12 +261,12 @@ export const BUG_STAGE_3: CosmoidTemplate = {
   journalEntry:
     'Its enormous sail-like wings catch and command the wind. A single powerful flap can generate enough force to move a ship.',
   baseStats: {
-    hp: 25,
-    attack: 15,
-    defense: 20,
-    specialAttack: 20,
-    specialDefense: 20,
-    speed: 10,
+    hp: 60,
+    attack: 45,
+    defense: 70,
+    specialAttack: 90,
+    specialDefense: 50,
+    speed: 20,
   },
   baseExperience: 140,
   spriteUrl: '/bug-2-basic-normal-neutral-skin-1.png',
@@ -276,6 +276,7 @@ export const BUG_STAGE_3: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
     { level: 1, attackId: 'STRING_SHOT' },
+    { level: 10, attackId: 'SAILCUTTER' },
   ],
 };
 

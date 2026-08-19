@@ -50,6 +50,12 @@ export type ProjectileVisual =
       fiberColor: number;
       highlightColor: number;
       sparkColor: number;
+    }
+  | {
+      type: 'SAILCUTTER';
+      shadowColor: number;
+      windColor: number;
+      highlightColor: number;
     };
 
 export interface AttackDefinition {
