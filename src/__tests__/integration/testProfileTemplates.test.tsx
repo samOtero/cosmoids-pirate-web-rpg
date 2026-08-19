@@ -19,8 +19,8 @@ describe('test profile templates', () => {
     resetStore();
   });
 
-  it('provides every Level 1-3 and starter combination', () => {
-    expect(TEST_PROFILE_TEMPLATE_OPTIONS).toHaveLength(9);
+  it('provides every Level 1-4 and starter combination', () => {
+    expect(TEST_PROFILE_TEMPLATE_OPTIONS).toHaveLength(12);
 
     expect(
       TEST_PROFILE_TEMPLATE_OPTIONS.map((template) => [
@@ -37,6 +37,9 @@ describe('test profile templates', () => {
       [3, 'starter_crab'],
       [3, 'starter_iguana'],
       [3, 'starter_monkey'],
+      [4, 'starter_crab'],
+      [4, 'starter_iguana'],
+      [4, 'starter_monkey'],
     ]);
   });
 
@@ -82,6 +85,19 @@ describe('test profile templates', () => {
     expect(
       level2Profile.creatures.map((creature) => creature.speciesId)
     ).toEqual(['starter_crab', 'mouse_1']);
+  });
+
+  it('builds a Level 4 party after the Level 3 milestone', () => {
+    const profile = createTestProfileFromTemplate('level-4-starter_iguana');
+
+    expect(profile).toMatchObject({
+      name: 'Test L4 · Fueguana',
+      storyProgression: StoryProgression.DEFEAT_BUG_STAGE_2,
+      journalUnlockShown: true,
+    });
+    expect(
+      profile.creatures.map((creature) => creature.speciesId)
+    ).toEqual(['starter_iguana', 'mouse_1', 'harlequill', 'bug_stage_1']);
   });
 
   it('replaces only profile 3 through the store action', () => {

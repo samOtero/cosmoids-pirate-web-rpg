@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { COSMOID_TEMPLATES } from '@/constants/creatures';
 import { LEVEL_ORDER, TD_LEVELS } from '@/constants/tdLevels';
 import { FOREST_LEVEL } from '@/constants/tdLevels/forestLevel';
+import { LEVEL_4 } from '@/constants/tdLevels/level4';
 import { VANE_LEVEL } from '@/constants/tdLevels/vaneLevel';
 import {
   TD_CREATURE_DEFS,
@@ -186,6 +187,38 @@ describe('Tower defense rules', () => {
       },
       { type: 'GO_TO_LEVEL_SELECT' },
     ]);
+  });
+
+  it('sets up Level 4 with the Level 3 battlefield and no story dialogs', () => {
+    expect(LEVEL_4.paths).toEqual(VANE_LEVEL.paths);
+    expect(LEVEL_4.backgroundUrl).toBe(VANE_LEVEL.backgroundUrl);
+    expect(LEVEL_ORDER[3]).toMatchObject({
+      context: TDLevelContext.LEVEL_4,
+      requiredProgression: StoryProgression.DEFEAT_BUG_STAGE_2,
+    });
+    expect(TD_LEVELS[TDLevelContext.LEVEL_4]).toMatchObject({
+      levelData: LEVEL_4,
+      winEvents: [
+        {
+          type: 'SET_STORY_PROGRESSION',
+          payload: { progression: StoryProgression.DEFEAT_LEVEL_4 },
+          autoProceed: true,
+        },
+        { type: 'GO_TO_LEVEL_SELECT' },
+      ],
+      loseEvents: [{ type: 'GO_TO_LEVEL_SELECT' }],
+    });
+    expect(TD_LEVELS[TDLevelContext.LEVEL_4].introEvents).toBeUndefined();
+    expect(
+      TD_LEVELS[TDLevelContext.LEVEL_4].winEvents.some(
+        (event) => event.type === 'SHOW_DIALOG'
+      )
+    ).toBe(false);
+    expect(
+      TD_LEVELS[TDLevelContext.LEVEL_4].loseEvents.some(
+        (event) => event.type === 'SHOW_DIALOG'
+      )
+    ).toBe(false);
   });
 
   it('automatically prevents cursed enemies from being captured', () => {

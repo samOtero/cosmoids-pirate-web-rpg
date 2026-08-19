@@ -9,6 +9,7 @@ import { CURRENT_PROFILE_VERSION } from '@/constants/game';
 import {
   COSMOID_TEMPLATES,
   BIRD_1,
+  BUG_STAGE_1,
   MOUSE_1,
   STARTER_CRAB,
   STARTER_IGUANA,
@@ -31,6 +32,11 @@ const TEST_LEVELS = [
     level: 3,
     storyProgression: StoryProgression.DEFEAT_BUG_STAGE_1,
     creatureLevel: 10,
+  },
+  {
+    level: 4,
+    storyProgression: StoryProgression.DEFEAT_BUG_STAGE_2,
+    creatureLevel: 12,
   },
 ] as const;
 
@@ -61,6 +67,11 @@ const PRIOR_LEVEL_CATCHES: Record<
   3: [
     { speciesId: MOUSE_1.id, level: 3 },
     { speciesId: BIRD_1.id, level: 5 },
+  ],
+  4: [
+    { speciesId: MOUSE_1.id, level: 3 },
+    { speciesId: BIRD_1.id, level: 5 },
+    { speciesId: BUG_STAGE_1.id, level: 5 },
   ],
 };
 
@@ -163,7 +174,8 @@ export function createTestProfileFromTemplate(
     inventory: [],
     gameFlags: [template.starterFlag],
     storyProgression: template.storyProgression,
-    journalUnlockShown: false,
+    journalUnlockShown:
+      template.storyProgression >= StoryProgression.DEFEAT_BUG_STAGE_2,
     journalOpened: false,
     version: CURRENT_PROFILE_VERSION,
   };

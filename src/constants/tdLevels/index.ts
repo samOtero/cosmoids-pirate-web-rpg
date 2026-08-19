@@ -6,6 +6,7 @@ import {
 } from '@/types/baseGame';
 import { FIRST_LEVEL } from './firstLevel';
 import { FOREST_LEVEL } from './forestLevel';
+import { LEVEL_4 } from './level4';
 import { VANE_LEVEL } from './vaneLevel';
 import {
   CHALLENGE_FIRST_LEVEL,
@@ -124,6 +125,24 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
       },
     ],
   },
+  [TDLevelContext.LEVEL_4]: {
+    levelData: LEVEL_4,
+    winEvents: [
+      {
+        type: 'SET_STORY_PROGRESSION',
+        payload: { progression: StoryProgression.DEFEAT_LEVEL_4 },
+        autoProceed: true,
+      },
+      {
+        type: 'GO_TO_LEVEL_SELECT',
+      },
+    ],
+    loseEvents: [
+      {
+        type: 'GO_TO_LEVEL_SELECT',
+      },
+    ],
+  },
   [TDLevelContext.CHALLENGE_FIRST_LEVEL]: {
     levelData: CHALLENGE_FIRST_LEVEL,
     winEvents: [
@@ -180,10 +199,16 @@ export const LEVEL_ORDER: LevelInfo[] = [
     requiredProgression: StoryProgression.DEFEAT_BUG_STAGE_1,
   },
   {
-    context: 'LOCKED_4' as TDLevelContext,
+    context: TDLevelContext.LEVEL_4,
+    name: 'Level 4',
+    description: 'Continue the adventure beyond Captain Vane.',
+    requiredProgression: StoryProgression.DEFEAT_BUG_STAGE_2,
+  },
+  {
+    context: 'LOCKED_5' as TDLevelContext,
     name: 'Coming soon',
     description: 'More story adventures are on the way.',
-    requiredProgression: StoryProgression.DEFEAT_BUG_STAGE_2,
+    requiredProgression: StoryProgression.DEFEAT_LEVEL_4,
   },
 ];
 
