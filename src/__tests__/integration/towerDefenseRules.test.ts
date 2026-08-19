@@ -27,6 +27,15 @@ describe('Tower defense rules', () => {
     });
   });
 
+  it('keeps separate path backgrounds for Levels 2 and 3', () => {
+    expect(FOREST_LEVEL.backgroundUrl).toBe(
+      '/battles/bg/bg_coastal_island_battle_path_v2.png'
+    );
+    expect(VANE_LEVEL.backgroundUrl).toBe(
+      '/battles/bg/bg_coastal_island_battle_path_level_3.png'
+    );
+  });
+
   it('derives one life from each capture objective', () => {
     const engine = new TowerDefenseEngine(FOREST_LEVEL);
 

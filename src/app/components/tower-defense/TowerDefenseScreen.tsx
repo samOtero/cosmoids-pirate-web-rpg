@@ -159,6 +159,7 @@ export default function TowerDefenseScreen({
     'cameraPan' | 'ready' | 'go' | 'none'
   >(levelData.openingPan ? 'cameraPan' : 'ready');
   const [outroState, setOutroState] = useState<'none' | 'win' | 'lose'>('none');
+  const isOutroReady = outroState !== 'none' && modalQueue.length === 0;
 
   const saveTowerProgress = () => {
     if (isPremadeLevel) return; // Challenge mode: don't persist progress
@@ -183,6 +184,10 @@ export default function TowerDefenseScreen({
   }, [introState]);
 
   useEffect(() => {
+    // Progression decisions raised by the final enemy must finish before the
+    // battle result is shown or handed back to the story event queue.
+    if (!isOutroReady) return;
+
     if (outroState === 'win') {
       const t = setTimeout(() => {
         if (onWin) onWin();
@@ -195,7 +200,7 @@ export default function TowerDefenseScreen({
       }, 3000);
       return () => clearTimeout(t);
     }
-  }, [outroState, onWin, onLose]);
+  }, [isOutroReady, outroState, onWin, onLose]);
 
   useEffect(() => {
     if (isPlaying && !hasStarted) {
@@ -512,7 +517,7 @@ export default function TowerDefenseScreen({
         </div>
       )}
 
-      {outroState !== 'none' && (
+      {isOutroReady && (
         <div className="pointer-events-none fixed inset-0 z-10000 flex items-center justify-center bg-black/80 transition-opacity duration-1000">
           {outroState === 'win' ? (
             <div className="animate-bounce bg-linear-to-br from-green-400 to-blue-500 bg-clip-text pr-8 pb-4 text-7xl font-black text-transparent uppercase italic drop-shadow-[0_0_25px_rgba(0,255,128,0.8)] md:text-9xl">
