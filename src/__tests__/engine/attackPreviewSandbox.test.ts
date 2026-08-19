@@ -117,7 +117,7 @@ describe('attack preview sandbox hooks', () => {
 
     expect(engine.triggerEnemyAbility(target!.id)).toBe(true);
     const boostedDefense = target!.currentDefense;
-    expect(boostedDefense).toBeCloseTo(baseDefense * 1.5);
+    expect(boostedDefense).toBeCloseTo(baseDefense * 2);
 
     expect(engine.triggerEnemyAbility(target!.id)).toBe(true);
     expect(target!.currentDefense).toBe(boostedDefense);

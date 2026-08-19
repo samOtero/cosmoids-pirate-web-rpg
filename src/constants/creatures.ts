@@ -37,7 +37,7 @@ export const MOUSE_1: CosmoidTemplate = {
   iconImg: '/UI/Icons/mouse_1_icon.png',
   journalImg: '/UI/Journal/knotia_journal.png',
   journalEntry:
-    'While gnawing on mooring lines, it somehow twists them into incredibly complex knots. Even seasoned sailors struggle to untie its work.',
+    'While gnawing on mooring lines, it somehow twists them into incredibly complex knots. Even seasoned sailors study its knot making abilities.',
   spriteUrl: '/battles/cosmoids/mouse_1_down_1_25.png',
   battleSpriteUrl: '/battles/cosmoids/mouse_1_down_1_25.png',
   movementId: 'lizard',
@@ -204,7 +204,7 @@ export const BUG_STAGE_1: CosmoidTemplate = {
   iconImg: '/UI/Icons/buglet_icon.png',
   journalImg: '/UI/Journal/buglet_journal.png',
   journalEntry:
-    'It disguises itself as a scrap of stitched sailcloth, then quietly eats the real sails around it. Sailors rarely spot one until the wind stops helping.',
+    'It disguises itself as a scrap of stitched sailcloth, then quietly eats the real sails around it.',
   baseStats: {
     hp: 25,
     attack: 15,
@@ -221,6 +221,7 @@ export const BUG_STAGE_1: CosmoidTemplate = {
     { level: 1, attackId: 'TACKLE' },
     { level: 1, attackId: 'STRING_SHOT' },
   ],
+  evolutionNodes: [{ level: 7, evolutionDefId: 'bug_stage_2' }],
 };
 
 export const BUG_STAGE_2: CosmoidTemplate = {
@@ -248,6 +249,7 @@ export const BUG_STAGE_2: CosmoidTemplate = {
     { level: 1, attackId: 'TACKLE' }, // Replace Bug Bite with TACKLE since BUG_BITE is not in ATTACK_DEFS
     { level: 1, attackId: 'STRING_SHOT' },
   ],
+  evolutionNodes: [{ level: 10, evolutionDefId: 'bug_stage_3' }],
 };
 
 export const BUG_STAGE_3: CosmoidTemplate = {
@@ -320,7 +322,7 @@ export const STARTER_IGUANA: CosmoidTemplate = {
   iconImg: '/UI/Icons/fueguana_icon.png',
   journalImg: '/UI/Journal/fueguana_journal.png',
   journalEntry:
-    'It sneaks aboard pirate ships to devour gunpowder and set the decks ablaze. If grabbed by the tail, it leaves behind a surprise that explodes moments later!',
+    'It sneaks aboard pirate ships to devour gunpowder and set the decks ablaze. If grabbed by the tail, it leaves it behind as a surprise that explodes moments later!',
   battleSpriteUrl: '/battles/cosmoids/fueguana_left_1_v3.png',
   movementId: 'lizard',
   learnableAttacks: [

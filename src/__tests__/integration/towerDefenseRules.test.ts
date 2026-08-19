@@ -87,6 +87,7 @@ describe('Tower defense rules', () => {
         expect.objectContaining({ tdConfigId: 'rebuilt_boat' }),
         expect.objectContaining({ tdConfigId: 'caleb_battle' }),
         expect.objectContaining({ tdConfigId: 'kip_battle' }),
+        expect.objectContaining({ tdConfigId: 'captain_vane_battle' }),
       ])
     );
     expect(new Set(creatureIds)).toEqual(new Set(['bug_stage_1', 'bettle']));

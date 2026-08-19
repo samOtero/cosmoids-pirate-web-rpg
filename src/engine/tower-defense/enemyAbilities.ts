@@ -36,10 +36,10 @@ export const ENEMY_ABILITY_DEFS: Record<string, EnemyAbilityDefinition> = {
   BETTLE_HARDEN: {
     id: 'BETTLE_HARDEN',
     type: 'SELF_DEFENSE_BOOST',
-    initialCooldownMs: 3000,
+    initialCooldownMs: 12000,
     oncePerFight: true,
-    defenseMultiplier: 1.5,
-    specialDefenseMultiplier: 1.5,
+    defenseMultiplier: 2,
+    specialDefenseMultiplier: 2,
     visualEffectConfigId: 'enemy_harden_1',
   },
 };

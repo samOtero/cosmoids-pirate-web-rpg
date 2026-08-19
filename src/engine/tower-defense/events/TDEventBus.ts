@@ -49,6 +49,12 @@ export type TDEvent =
       oldDefinitionId: string;
       newDefinitionId: string;
     }
+  | {
+      type: 'TOWER_ASK_EVOLUTION';
+      towerId: string;
+      oldDefinitionId: string;
+      newDefinitionId: string;
+    }
   | { type: 'TOWER_LEARNED_ATTACK'; towerId: string; attackDefId: string }
   | {
       type: 'TOWER_ASK_REPLACE_ATTACK';

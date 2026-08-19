@@ -7,20 +7,32 @@ import { FOREST_LEVEL } from './forestLevel';
  */
 export const VANE_LEVEL: TDLevelData = {
   ...FOREST_LEVEL,
+  environmentUnits: [
+    ...(FOREST_LEVEL.environmentUnits ?? []),
+    {
+      position: {
+        x: 89,
+        y: 45,
+      },
+      tdConfigId: 'captain_vane_battle',
+      facingDirection: 'left',
+    },
+  ],
   captureUnits: [],
   waveEnemyDefinitions: [
     {
       id: 'vane_buglet',
       creatureId: 'bug_stage_1',
-      level: 3,
-      speedMultiplier: 2,
+      level: 5,
+      speedMultiplier: 1.5,
+      hpMultiplier: 4,
     },
     {
       id: 'vane_bettle_guard',
       creatureId: 'bettle',
-      level: 1,
-      speedMultiplier: 1.5,
-      hpMultiplier: 1.5,
+      level: 12,
+      speedMultiplier: 0.35,
+      hpMultiplier: 15,
       abilityId: 'BETTLE_HARDEN',
     },
   ],
@@ -34,6 +46,14 @@ export const VANE_LEVEL: TDLevelData = {
           spawnIntervalMs: 1400,
           delayBeforeGroupMs: 100,
           pathIndex: 0,
+        },
+        {
+          enemyDefinitionId: 'vane_bettle_guard',
+          count: 1,
+          spawnIntervalMs: 1000,
+          delayBeforeGroupMs: 100,
+          pathIndex: 0,
+          uncapturable: true,
         },
         {
           enemyDefinitionId: 'vane_buglet',
@@ -67,14 +87,6 @@ export const VANE_LEVEL: TDLevelData = {
     {
       id: 'wave_3',
       groups: [
-        {
-          enemyDefinitionId: 'vane_bettle_guard',
-          count: 1,
-          spawnIntervalMs: 1000,
-          delayBeforeGroupMs: 100,
-          pathIndex: 0,
-          uncapturable: true,
-        },
         {
           enemyDefinitionId: 'vane_buglet',
           count: 8,

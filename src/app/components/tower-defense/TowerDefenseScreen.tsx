@@ -37,19 +37,26 @@ type QueuedModal =
   | {
       type: 'SHINY_APPEARED';
       speciesId: string;
+    }
+  | {
+      type: 'ASK_EVOLUTION';
+      towerId: string;
+      oldDefinitionId: string;
+      newDefinitionId: string;
     };
 
 const sortModalQueue = (queue: QueuedModal[]): QueuedModal[] => {
   const typePriority = {
     SHINY_APPEARED: -1,
     CAPTURED_CREATURE: 0,
-    LEARNED_ATTACK: 1,
-    ASK_REPLACE_ATTACK: 2,
+    ASK_EVOLUTION: 1,
+    LEARNED_ATTACK: 2,
+    ASK_REPLACE_ATTACK: 3,
   };
   return [...queue].sort((a, b) => {
     if (a.type !== b.type) {
-      const prioA = typePriority[a.type] || 99;
-      const prioB = typePriority[b.type] || 99;
+      const prioA = typePriority[a.type] ?? 99;
+      const prioB = typePriority[b.type] ?? 99;
       return prioA - prioB;
     }
     const idA =
@@ -227,6 +234,17 @@ export default function TowerDefenseScreen({
           break;
         case 'TOWER_LEVELED_UP':
           setUiUpdateToggle((prev) => !prev);
+          break;
+        case 'TOWER_ASK_EVOLUTION':
+          setModalQueue((prev) => {
+            const added: QueuedModal = {
+              type: 'ASK_EVOLUTION',
+              towerId: event.towerId,
+              oldDefinitionId: event.oldDefinitionId,
+              newDefinitionId: event.newDefinitionId,
+            };
+            return sortModalQueue([...prev, added]);
+          });
           break;
         case 'TOWER_LEARNED_ATTACK':
           setModalQueue((prev) => {
@@ -840,6 +858,88 @@ export default function TowerDefenseScreen({
                   >
                     Awesome!
                   </button>
+                </div>
+              </div>
+            );
+          }
+
+          if (activeModal.type === 'ASK_EVOLUTION') {
+            const current = resolveSpeciesVisuals(activeModal.oldDefinitionId);
+            const evolution = resolveSpeciesVisuals(activeModal.newDefinitionId);
+
+            const acceptEvolution = () => {
+              const evolved = engineRef.current.evolveTower(
+                activeModal.towerId,
+                activeModal.newDefinitionId
+              );
+              if (evolved) saveTowerProgress();
+              setUiUpdateToggle((prev) => !prev);
+              closeActiveModal();
+            };
+
+            const cancelEvolution = () => {
+              engineRef.current.cancelTowerEvolution(activeModal.towerId);
+              closeActiveModal();
+            };
+
+            return (
+              <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/85 p-3">
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="evolution-title"
+                  className="w-full max-w-md rounded-2xl border-2 border-emerald-400 bg-slate-900 p-5 text-center shadow-[0_0_35px_rgba(52,211,153,0.35)]"
+                >
+                  <h3
+                    id="evolution-title"
+                    className="text-2xl font-black text-emerald-300"
+                  >
+                    Evolution!
+                  </h3>
+                  <p className="mt-2 text-sm text-slate-200 sm:text-base">
+                    {current.name} is ready to evolve into {evolution.name}.
+                  </p>
+                  <div className="my-5 flex items-center justify-center gap-4">
+                    {[current, evolution].map((creature, index) => (
+                      <React.Fragment key={creature.name}>
+                        {index === 1 && (
+                          <span className="text-2xl text-emerald-300" aria-hidden="true">
+                            →
+                          </span>
+                        )}
+                        <div className="flex flex-col items-center gap-1">
+                          <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-emerald-500/40 bg-slate-800 p-2">
+                            {creature.spriteUrl && (
+                              <Image
+                                src={creature.spriteUrl}
+                                alt={creature.name}
+                                width={72}
+                                height={72}
+                                className="h-full w-full object-contain"
+                              />
+                            )}
+                          </div>
+                          <span className="text-xs font-bold text-white sm:text-sm">
+                            {creature.name}
+                          </span>
+                        </div>
+                      </React.Fragment>
+                    ))}
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      className="flex-1 rounded-lg bg-slate-600 px-4 py-2 font-bold text-white hover:bg-slate-500"
+                      onClick={cancelEvolution}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="flex-1 rounded-lg bg-emerald-600 px-4 py-2 font-bold text-white hover:bg-emerald-500"
+                      onClick={acceptEvolution}
+                    >
+                      Evolve!
+                    </button>
+                  </div>
                 </div>
               </div>
             );

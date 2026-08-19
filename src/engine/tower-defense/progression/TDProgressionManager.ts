@@ -2,12 +2,13 @@ import { TowerDefenseEngine } from '../TowerDefenseEngine';
 import { TDEventBus, TDEvent } from '../events/TDEventBus';
 import { calculateMaxHp, calculateStat } from '@/utils/resolvePlayerCreature';
 import { COSMOID_TEMPLATES } from '@/constants/creatures';
-
-const MAX_LEVEL = 10;
+import { MAX_COSMOID_LEVEL } from '@/constants/game';
+import type { Tower } from '../types';
 
 export class TDProgressionManager {
   private engine: TowerDefenseEngine;
   private unsubscribe: () => void;
+  private pendingEvolutions = new Map<string, string>();
 
   constructor(engine: TowerDefenseEngine, eventBus: TDEventBus) {
     this.engine = engine;
@@ -28,7 +29,7 @@ export class TDProgressionManager {
     }
   }
 
-  private processLevelUpProgression(tower: any, newLevel: number) {
+  private processLevelUpAttacks(tower: Tower, newLevel: number) {
     const template = COSMOID_TEMPLATES[tower.creature.speciesId];
     if (!template) return;
 
@@ -60,51 +61,77 @@ export class TDProgressionManager {
       });
     }
 
-    if (template.evolutionNodes) {
-      template.evolutionNodes.forEach((node) => {
-        if (node.level === newLevel) {
-          const oldDef = tower.creature.speciesId;
-          tower.creature.speciesId = node.evolutionDefId;
+  }
 
-          const newTemplate = COSMOID_TEMPLATES[tower.creature.speciesId];
-          if (newTemplate) {
-            tower.creature.type = newTemplate.type;
-            tower.creature.secondaryType = newTemplate.secondaryType;
-            tower.currentAttack = calculateStat(
-              newTemplate.baseStats.attack,
-              tower.creature.level
-            );
-            tower.currentSpecialAttack = calculateStat(
-              newTemplate.baseStats.specialAttack,
-              tower.creature.level
-            );
-            tower.currentDefense = calculateStat(
-              newTemplate.baseStats.defense,
-              tower.creature.level
-            );
-            tower.currentSpecialDefense = calculateStat(
-              newTemplate.baseStats.specialDefense,
-              tower.creature.level
-            );
+  private requestEligibleEvolution(tower: Tower) {
+    if (this.pendingEvolutions.has(tower.id)) return;
 
-            // Recalculate HP and restore to full on evolution
-            const newMaxHp = calculateMaxHp(
-              newTemplate.baseStats.hp,
-              tower.creature.level
-            );
-            tower.maxHp = newMaxHp;
-            tower.hp = newMaxHp;
+    const template = COSMOID_TEMPLATES[tower.creature.speciesId];
+    const node = template?.evolutionNodes
+      ?.filter((candidate) => candidate.level <= tower.creature.level)
+      .sort((a, b) => b.level - a.level)[0];
+    if (!node || !COSMOID_TEMPLATES[node.evolutionDefId]) return;
 
-            this.engine.events.emit({
-              type: 'TOWER_EVOLVED',
-              towerId: tower.id,
-              oldDefinitionId: oldDef,
-              newDefinitionId: tower.creature.speciesId,
-            });
-          }
-        }
-      });
+    this.pendingEvolutions.set(tower.id, node.evolutionDefId);
+    this.engine.events.emit({
+      type: 'TOWER_ASK_EVOLUTION',
+      towerId: tower.id,
+      oldDefinitionId: tower.creature.speciesId,
+      newDefinitionId: node.evolutionDefId,
+    });
+  }
+
+  public cancelEvolution(towerId: string): boolean {
+    return this.pendingEvolutions.delete(towerId);
+  }
+
+  public evolveTower(towerId: string, evolutionDefId: string): boolean {
+    if (this.pendingEvolutions.get(towerId) !== evolutionDefId) return false;
+
+    const tower = this.engine.towers.find((candidate) => candidate.id === towerId);
+    const newTemplate = COSMOID_TEMPLATES[evolutionDefId];
+    if (!tower || !newTemplate) {
+      this.pendingEvolutions.delete(towerId);
+      return false;
     }
+
+    const oldDefinitionId = tower.creature.speciesId;
+    tower.creature.speciesId = evolutionDefId;
+    tower.currentAttack = calculateStat(
+      newTemplate.baseStats.attack,
+      tower.creature.level
+    );
+    tower.currentSpecialAttack = calculateStat(
+      newTemplate.baseStats.specialAttack,
+      tower.creature.level
+    );
+    tower.currentDefense = calculateStat(
+      newTemplate.baseStats.defense,
+      tower.creature.level
+    );
+    tower.currentSpecialDefense = calculateStat(
+      newTemplate.baseStats.specialDefense,
+      tower.creature.level
+    );
+
+    const newMaxHp = calculateMaxHp(
+      newTemplate.baseStats.hp,
+      tower.creature.level
+    );
+    tower.maxHp = newMaxHp;
+    tower.hp = newMaxHp;
+    this.pendingEvolutions.delete(towerId);
+
+    this.engine.events.emit({
+      type: 'TOWER_EVOLVED',
+      towerId: tower.id,
+      oldDefinitionId,
+      newDefinitionId: evolutionDefId,
+    });
+
+    // A delayed first-stage evolution may already qualify for the next stage.
+    this.requestEligibleEvolution(tower);
+    return true;
   }
 
   private distributeExperience(
@@ -165,7 +192,7 @@ export class TDProgressionManager {
       };
 
       // Process multiple level-ups if enough XP was gained
-      while (tower.creature.level < MAX_LEVEL) {
+      while (tower.creature.level < MAX_COSMOID_LEVEL) {
         const nextLevel = tower.creature.level + 1;
         const requiredXp = nextLevel ** 3 - tower.creature.level ** 3;
 
@@ -205,8 +232,7 @@ export class TDProgressionManager {
           tower.hp = newMaxHp;
         }
 
-        // Process move-learning and evolution for this intermediate level-up step
-        this.processLevelUpProgression(tower, tower.creature.level);
+        this.processLevelUpAttacks(tower, tower.creature.level);
       }
 
       // If we actually leveled up, emit a SINGLE event!
@@ -236,6 +262,10 @@ export class TDProgressionManager {
             specialDefense: tower.currentSpecialDefense,
           },
         });
+
+        // Evolution is a player choice. A canceled choice is reconsidered only
+        // after this creature completes another level-up.
+        this.requestEligibleEvolution(tower);
       }
     }
   }

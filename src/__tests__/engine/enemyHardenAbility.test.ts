@@ -43,10 +43,10 @@ describe('Bettle Harden enemy ability', () => {
   it('is an enemy-only, one-use ability assigned to the Level 3 Bettle', () => {
     expect(ENEMY_ABILITY_DEFS.BETTLE_HARDEN).toMatchObject({
       type: 'SELF_DEFENSE_BOOST',
-      initialCooldownMs: 3000,
+      initialCooldownMs: 12000,
       oncePerFight: true,
-      defenseMultiplier: 1.5,
-      specialDefenseMultiplier: 1.5,
+      defenseMultiplier: 2,
+      specialDefenseMultiplier: 2,
       visualEffectConfigId: 'enemy_harden_1',
     });
     expect(ATTACK_DEFS.BETTLE_HARDEN).toBeUndefined();
@@ -74,22 +74,22 @@ describe('Bettle Harden enemy ability', () => {
     const bettle = engine.enemies[0];
     expect(bettle.abilityRuntime).toEqual({
       definitionId: 'BETTLE_HARDEN',
-      nextReadyTimeMs: 3001,
+      nextReadyTimeMs: 12001,
     });
     const startingDefense = bettle.currentDefense;
     const startingSpecialDefense = bettle.currentSpecialDefense;
 
-    engine.tick(3000, 2999);
+    engine.tick(12000, 11999);
     expect(bettle.currentDefense).toBe(startingDefense);
     expect(bettle.currentSpecialDefense).toBe(startingSpecialDefense);
 
-    engine.tick(3001, 1);
-    expect(bettle.currentDefense).toBeCloseTo(startingDefense * 1.5);
+    engine.tick(12001, 1);
+    expect(bettle.currentDefense).toBeCloseTo(startingDefense * 2);
     expect(bettle.currentSpecialDefense).toBeCloseTo(
-      startingSpecialDefense * 1.5
+      startingSpecialDefense * 2
     );
-    expect(bettle.defenseBoostMultiplier).toBe(1.5);
-    expect(bettle.specialDefenseBoostMultiplier).toBe(1.5);
+    expect(bettle.defenseBoostMultiplier).toBe(2);
+    expect(bettle.specialDefenseBoostMultiplier).toBe(2);
     expect(bettle.abilityRuntime?.hasActivated).toBe(true);
     expect(engine.visualEffects).toContainEqual(
       expect.objectContaining({
@@ -101,12 +101,12 @@ describe('Bettle Harden enemy ability', () => {
       expect.objectContaining({ text: 'Harden!' })
     );
 
-    engine.tick(12000, 8999);
-    expect(bettle.currentDefense).toBeCloseTo(startingDefense * 1.5);
+    engine.tick(24000, 11999);
+    expect(bettle.currentDefense).toBeCloseTo(startingDefense * 2);
     expect(bettle.currentSpecialDefense).toBeCloseTo(
-      startingSpecialDefense * 1.5
+      startingSpecialDefense * 2
     );
-    expect(bettle.defenseBoostMultiplier).toBe(1.5);
+    expect(bettle.defenseBoostMultiplier).toBe(2);
 
     engine.destroy();
   });

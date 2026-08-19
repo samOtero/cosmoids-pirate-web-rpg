@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Creature, ElementType } from "@/types/baseGame";
+import { MAX_COSMOID_LEVEL } from '@/constants/game';
 import { COSMOID_TEMPLATES } from "@/constants/creatures";
 import { ATTACK_DEFS } from "@/engine/tower-defense/attacks/definitions";
 import { Button } from "@/app/components/ui/Button";
@@ -32,7 +33,7 @@ export default function CreatureDetailsScreen({
   if (!template) return null;
 
   // Calculate XP threshold for current level
-  const maxLevel = 10;
+  const maxLevel = MAX_COSMOID_LEVEL;
   const isMaxLevel = creature.level >= maxLevel;
   const xpNeeded = isMaxLevel
     ? 0

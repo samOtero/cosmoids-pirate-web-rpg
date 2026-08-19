@@ -104,6 +104,8 @@ export class TowerDefenseEngine {
     else if (speciesId === 'mouse_1') defaultAttacks.push('NIBBLE');
     else if (speciesId === 'harlequill') defaultAttacks.push('PECK');
     else if (speciesId === 'bettle') defaultAttacks.push('PINCH');
+    else if (speciesId === 'bug_stage_1')
+      defaultAttacks.push('TACKLE', 'STRING_SHOT');
     else defaultAttacks.push('TACKLE'); // Fallback
     return defaultAttacks;
   }
@@ -1517,6 +1519,14 @@ export class TowerDefenseEngine {
         attackDefId: newAttackDefId,
       });
     }
+  }
+
+  public evolveTower(towerId: string, evolutionDefId: string): boolean {
+    return this.progression.evolveTower(towerId, evolutionDefId);
+  }
+
+  public cancelTowerEvolution(towerId: string): boolean {
+    return this.progression.cancelEvolution(towerId);
   }
 
   // Scripted Event Architecture
