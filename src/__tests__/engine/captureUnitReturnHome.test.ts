@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { Enemy, TDLevelData } from '@/engine/tower-defense/types';
+import { getCaptureUnitVisualState } from '@/utils/captureUnitVisualState';
 
 const createLevel = (delayMs = 0): TDLevelData => ({
   paths: [
@@ -51,13 +52,25 @@ describe('returning capture objectives', () => {
     objective.position = { ...carrier.position };
     objective.heldByEnemyId = carrier.id;
 
+    expect(getCaptureUnitVisualState(objective, engine.elapsedTimeMs)).toBe(
+      'carried'
+    );
     expect(engine.dropCaptureUnit(carrier)).toBe(objective);
+    expect(getCaptureUnitVisualState(objective, engine.elapsedTimeMs)).toBe(
+      'idle'
+    );
     engine.tick(400, 400);
     expect(objective.position).toEqual({ x: 0, y: 0 });
+    expect(getCaptureUnitVisualState(objective, engine.elapsedTimeMs)).toBe(
+      'idle'
+    );
 
     engine.tick(500, 100);
     expect(objective.position).toEqual({ x: 1, y: 0 });
     expect(objective.facingDirection).toBe('right');
+    expect(getCaptureUnitVisualState(objective, engine.elapsedTimeMs)).toBe(
+      'right'
+    );
 
     engine.tick(1400, 900);
     expect(objective.position).toEqual({ x: 10, y: 0 });
@@ -69,6 +82,9 @@ describe('returning capture objectives', () => {
     engine.tick(2500, 1000);
     expect(objective.position).toEqual(objective.homePosition);
     expect(objective.returnHomeAvailableAtMs).toBeUndefined();
+    expect(getCaptureUnitVisualState(objective, engine.elapsedTimeMs)).toBe(
+      'idle'
+    );
 
     engine.destroy();
   });

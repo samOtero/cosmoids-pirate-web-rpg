@@ -201,7 +201,9 @@ describe('Tower defense rules', () => {
       }),
     ]);
     expect(CREATURE_TD_CONFIGS.maribel_capture).toMatchObject({
-      default: { url: '/battles/characters/maribel_down_1.png' },
+      default: { url: '/battles/characters/maribel_idle_1.png' },
+      idle: { url: '/battles/characters/maribel_idle_1.png' },
+      carried: { url: '/battles/characters/maribel_carried_1.png' },
       left: { url: '/battles/characters/maribel_left_1.png' },
       right: {
         url: '/battles/characters/maribel_left_1.png',

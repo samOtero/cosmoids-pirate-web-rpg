@@ -25,6 +25,7 @@ import {
   resolveTDOpeningPanView,
 } from '@/utils/tdInitialView';
 import { applyTDUnitTransforms } from '@/utils/tdUnitVisuals';
+import { getCaptureUnitVisualState } from '@/utils/captureUnitVisualState';
 import {
   hasActiveSpeedBoost,
   hasActiveSpeedSlow,
@@ -1820,7 +1821,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 undefined,
                 (t) => {
                   if (!isDestroyed) sprite.texture = t;
-                }
+                },
+                getCaptureUnitVisualState(capUnit, engine.elapsedTimeMs)
               );
             }
             renderHealthBar(

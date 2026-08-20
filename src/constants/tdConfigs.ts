@@ -261,7 +261,23 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   maribel_capture: {
     default: {
-      url: '/battles/characters/maribel_down_1.png',
+      url: '/battles/characters/maribel_idle_1.png',
+      scale: 0.2,
+      offsetY: -72,
+      shadowScaleX: 2.2,
+      shadowScaleY: 0.65,
+      shadowOffsetY: 2,
+    },
+    idle: {
+      url: '/battles/characters/maribel_idle_1.png',
+      scale: 0.2,
+      offsetY: -72,
+      shadowScaleX: 2.2,
+      shadowScaleY: 0.65,
+      shadowOffsetY: 2,
+    },
+    carried: {
+      url: '/battles/characters/maribel_carried_1.png',
       scale: 0.2,
       offsetY: -72,
       shadowScaleX: 2.2,

@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
+import { UnitVisuals } from '@/types/baseGame';
 import { BaseTDUnit } from '@/engine/tower-defense/types';
 
 const colorChannel = (color: number, shift: number) =>
@@ -11,12 +12,14 @@ export function applyTDUnitTransforms(
   shadow: PIXI.Graphics,
   configId: string,
   fallbackUrl?: string,
-  onImageLoaded?: (texture: PIXI.Texture) => void
+  onImageLoaded?: (texture: PIXI.Texture) => void,
+  visualState?: keyof UnitVisuals
 ) {
-  const tdConfigMap = CREATURE_TD_CONFIGS[configId] || {
+  const tdConfigMap: UnitVisuals = CREATURE_TD_CONFIGS[configId] || {
     default: { scale: 1 },
   };
-  const tdConfig = tdConfigMap[unit.facingDirection] || tdConfigMap.default;
+  const tdConfig =
+    tdConfigMap[visualState ?? unit.facingDirection] || tdConfigMap.default;
 
   const baseScale = tdConfig.scale ?? 1;
   sprite.scale.x = tdConfig.flipX ? -baseScale : baseScale;

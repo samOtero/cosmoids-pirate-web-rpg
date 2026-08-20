@@ -204,6 +204,8 @@ export interface UnitVisuals {
   down?: UnitSpriteConfig;
   left?: UnitSpriteConfig;
   right?: UnitSpriteConfig;
+  idle?: UnitSpriteConfig;
+  carried?: UnitSpriteConfig;
 }
 
 export interface Item {
