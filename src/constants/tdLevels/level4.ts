@@ -3,15 +3,15 @@ import { VANE_LEVEL } from './vaneLevel';
 
 /**
  * Level 4 currently reuses the Level 3 battlefield while introducing a
- * self-returning capture objective. Enemies carry the map back toward their
- * spawn; whenever it is dropped, it slowly follows the route home.
+ * self-returning capture objective. Enemies carry Mari back toward their
+ * spawn; whenever she is dropped, she follows the route home.
  */
 export const LEVEL_4: TDLevelData = {
   ...VANE_LEVEL,
   captureUnits: [
     {
       position: { ...VANE_LEVEL.paths[0][VANE_LEVEL.paths[0].length - 1] },
-      tdConfigId: 'map_1',
+      tdConfigId: 'maribel_capture',
       returnHome: {
         pathIndex: 0,
         speed: 2,

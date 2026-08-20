@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { COSMOID_TEMPLATES } from '@/constants/creatures';
+import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { LEVEL_ORDER, TD_LEVELS } from '@/constants/tdLevels';
 import { FOREST_LEVEL } from '@/constants/tdLevels/forestLevel';
 import { LEVEL_4 } from '@/constants/tdLevels/level4';
@@ -194,11 +195,21 @@ describe('Tower defense rules', () => {
     expect(LEVEL_4.backgroundUrl).toBe(VANE_LEVEL.backgroundUrl);
     expect(LEVEL_4.captureUnits).toEqual([
       expect.objectContaining({
-        tdConfigId: 'map_1',
+        tdConfigId: 'maribel_capture',
         position: VANE_LEVEL.paths[0][VANE_LEVEL.paths[0].length - 1],
         returnHome: { pathIndex: 0, speed: 2, delayMs: 500 },
       }),
     ]);
+    expect(CREATURE_TD_CONFIGS.maribel_capture).toMatchObject({
+      default: { url: '/battles/characters/maribel_down_1.png' },
+      left: { url: '/battles/characters/maribel_left_1.png' },
+      right: {
+        url: '/battles/characters/maribel_left_1.png',
+        flipX: true,
+      },
+      up: { url: '/battles/characters/maribel_up_1.png' },
+      down: { url: '/battles/characters/maribel_down_1.png' },
+    });
     expect(
       LEVEL_4.waves.every((wave) =>
         wave.groups.every((group) => group.turnAroundAtEnd)
