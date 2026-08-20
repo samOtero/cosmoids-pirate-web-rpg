@@ -1,27 +1,19 @@
 'use client';
 
-import { Button } from './ui/Button';
+import FullscreenLauncher from './FullscreenLauncher';
 
 export default function StartScreen({ onStart }: { onStart: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center h-full gap-6 lg:gap-8 animate-fade-in p-4">
+    <div className="animate-fade-in flex h-full flex-col items-center justify-center gap-6 p-4 lg:gap-8">
       <div className="text-center">
-        <h1 className="text-6xl lg:text-8xl font-black text-transparent bg-clip-text bg-linear-to-b from-cyan-300 to-blue-600 drop-shadow-lg tracking-widest">
+        <h1 className="bg-linear-to-b from-cyan-300 to-blue-600 bg-clip-text text-6xl font-black tracking-widest text-transparent drop-shadow-lg lg:text-8xl">
           COSMOIDS TD
         </h1>
-        <h2 className="text-4xl lg:text-6xl font-black text-wood-light tracking-widest mt-1 uppercase">
+        <h2 className="mt-1 text-4xl font-black tracking-widest text-wood-light uppercase lg:text-6xl">
           The Grand Voyage
         </h2>
       </div>
-      <div>
-        <Button
-          variant="wood"
-          onClick={onStart}
-          className="text-xl px-12 py-4 mt-8"
-        >
-          Press Start
-        </Button>
-      </div>
+      <FullscreenLauncher onStart={onStart} />
       <p className="text-sm text-cyan-800">v1.0.0 • React • Gemini AI</p>
     </div>
   );

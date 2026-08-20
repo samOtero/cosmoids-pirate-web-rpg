@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import DevTools from '@/components/dev/DevTools';
@@ -19,6 +19,22 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'Cosmoids Pirate RPG',
   description: 'A creature collection RPG set in the Pirate era!',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Cosmoids',
+  },
+  icons: {
+    apple: '/icons/cosmoids-180.png',
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#0d2b45',
 };
 
 export default function RootLayout({
