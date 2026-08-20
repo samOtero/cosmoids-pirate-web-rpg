@@ -189,9 +189,25 @@ describe('Tower defense rules', () => {
     ]);
   });
 
-  it('sets up Level 4 with the Level 3 battlefield and no story dialogs', () => {
+  it('sets up Level 4 with a self-returning objective and no story dialogs', () => {
     expect(LEVEL_4.paths).toEqual(VANE_LEVEL.paths);
     expect(LEVEL_4.backgroundUrl).toBe(VANE_LEVEL.backgroundUrl);
+    expect(LEVEL_4.captureUnits).toEqual([
+      expect.objectContaining({
+        tdConfigId: 'map_1',
+        position: VANE_LEVEL.paths[0][VANE_LEVEL.paths[0].length - 1],
+        returnHome: { pathIndex: 0, speed: 2, delayMs: 500 },
+      }),
+    ]);
+    expect(
+      LEVEL_4.waves.every((wave) =>
+        wave.groups.every((group) => group.turnAroundAtEnd)
+      )
+    ).toBe(true);
+    const level4Engine = new TowerDefenseEngine(LEVEL_4);
+    expect(level4Engine.hasCaptureUnitsGoal).toBe(true);
+    expect(level4Engine.lives).toBe(1);
+    level4Engine.destroy();
     expect(LEVEL_ORDER[3]).toMatchObject({
       context: TDLevelContext.LEVEL_4,
       requiredProgression: StoryProgression.DEFEAT_BUG_STAGE_2,

@@ -76,6 +76,34 @@ export function validateTDLevelDraft(
     if (!unit.tdConfigId.trim()) {
       errors.push(`Capture unit ${index + 1} needs a TD config ID.`);
     }
+    if (unit.returnHome) {
+      if (
+        !Number.isInteger(unit.returnHome.pathIndex) ||
+        unit.returnHome.pathIndex < 0 ||
+        unit.returnHome.pathIndex >= levelData.paths.length
+      ) {
+        errors.push(
+          `Capture unit ${index + 1} return-home behavior references an invalid path.`
+        );
+      }
+      if (
+        !Number.isFinite(unit.returnHome.speed) ||
+        unit.returnHome.speed <= 0
+      ) {
+        errors.push(
+          `Capture unit ${index + 1} return-home speed must be greater than 0.`
+        );
+      }
+      if (
+        unit.returnHome.delayMs !== undefined &&
+        (!Number.isFinite(unit.returnHome.delayMs) ||
+          unit.returnHome.delayMs < 0)
+      ) {
+        errors.push(
+          `Capture unit ${index + 1} return-home delay cannot be negative.`
+        );
+      }
+    }
   });
   levelData.environmentUnits?.forEach((unit, index) => {
     validatePoint(unit.position, `Environment unit ${index + 1}`, errors);

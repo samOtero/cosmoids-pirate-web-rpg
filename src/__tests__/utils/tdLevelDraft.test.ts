@@ -175,6 +175,33 @@ describe('TD level drafts', () => {
     });
   });
 
+  it('validates return-home capture objective settings', () => {
+    const level: TDLevelData = {
+      paths: [
+        [
+          { x: 0, y: 50 },
+          { x: 100, y: 50 },
+        ],
+      ],
+      placementSpots: [],
+      captureUnits: [
+        {
+          tdConfigId: 'map_1',
+          position: { x: 100, y: 50 },
+          returnHome: { pathIndex: 2, speed: 0, delayMs: -1 },
+        },
+      ],
+      waveEnemyDefinitions: [],
+      waves: [],
+    };
+
+    expect(validateTDLevelDraft(level)).toEqual([
+      'Capture unit 1 return-home behavior references an invalid path.',
+      'Capture unit 1 return-home speed must be greater than 0.',
+      'Capture unit 1 return-home delay cannot be negative.',
+    ]);
+  });
+
   it('validates the optional initial view against the background scale', () => {
     const level: TDLevelData = {
       paths: [

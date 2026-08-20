@@ -4,6 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import PixiTDLevelEditor, { PointType } from './PixiTDLevelEditor';
 import { TD_LEVELS } from '@/constants/tdLevels';
 import {
+  CaptureUnitReturnHomeConfig,
   TDLevelData,
   TDWaveEnemyDefinition,
   TDWaveGroup,
@@ -20,6 +21,16 @@ import {
 import { resolveTDInitialView } from '@/utils/tdInitialView';
 
 type EditorSidebarTab = 'LEVEL' | 'MAP' | 'WAVES';
+
+const CAPTURE_RETURN_FIELDS: Array<{
+  label: string;
+  field: keyof CaptureUnitReturnHomeConfig;
+  step: number;
+}> = [
+  { label: 'Path', field: 'pathIndex', step: 1 },
+  { label: 'Speed', field: 'speed', step: 0.1 },
+  { label: 'Delay ms', field: 'delayMs', step: 100 },
+];
 
 export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
   const [selectedLevelKey, setSelectedLevelKey] = useState<string | null>(null);
@@ -770,33 +781,102 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
                     </h3>
                     <div className="space-y-2 rounded border border-purple-800 bg-slate-900 p-3">
                       {captureUnits.map((unit, index) => (
-                        <label
+                        <div
                           key={index}
-                          className="block text-xs text-slate-300"
+                          className="space-y-2 border-b border-slate-800 pb-3 text-xs text-slate-300 last:border-b-0 last:pb-0"
                         >
-                          <span className="mb-1 block">Unit {index + 1}</span>
-                          <input
-                            type="text"
-                            className="w-full rounded border border-slate-700 bg-slate-950 p-2 text-white"
-                            value={unit.tdConfigId}
-                            onChange={(e) => {
-                              setDraft((previousDraft) => {
-                                const nextUnits = [
-                                  ...(previousDraft.captureUnits ?? []),
-                                ];
-                                nextUnits[index] = {
-                                  ...nextUnits[index],
-                                  tdConfigId: e.target.value,
-                                };
-                                return {
-                                  ...previousDraft,
-                                  captureUnits: nextUnits,
-                                };
-                              });
-                            }}
-                            placeholder="tdConfigId"
-                          />
-                        </label>
+                          <label className="block">
+                            <span className="mb-1 block">Unit {index + 1}</span>
+                            <input
+                              type="text"
+                              className="w-full rounded border border-slate-700 bg-slate-950 p-2 text-white"
+                              value={unit.tdConfigId}
+                              onChange={(e) => {
+                                setDraft((previousDraft) => {
+                                  const nextUnits = [
+                                    ...(previousDraft.captureUnits ?? []),
+                                  ];
+                                  nextUnits[index] = {
+                                    ...nextUnits[index],
+                                    tdConfigId: e.target.value,
+                                  };
+                                  return {
+                                    ...previousDraft,
+                                    captureUnits: nextUnits,
+                                  };
+                                });
+                              }}
+                              placeholder="tdConfigId"
+                            />
+                          </label>
+                          <label className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={Boolean(unit.returnHome)}
+                              onChange={(event) => {
+                                setDraft((previousDraft) => {
+                                  const nextUnits = [
+                                    ...(previousDraft.captureUnits ?? []),
+                                  ];
+                                  nextUnits[index] = {
+                                    ...nextUnits[index],
+                                    returnHome: event.target.checked
+                                      ? { pathIndex: 0, speed: 2, delayMs: 500 }
+                                      : undefined,
+                                  };
+                                  return {
+                                    ...previousDraft,
+                                    captureUnits: nextUnits,
+                                  };
+                                });
+                              }}
+                            />
+                            Return home when dropped
+                          </label>
+                          {unit.returnHome && (
+                            <div className="grid grid-cols-3 gap-2">
+                              {CAPTURE_RETURN_FIELDS.map(
+                                ({ label, field, step }) => (
+                                  <label key={field} className="block">
+                                    <span className="mb-1 block">{label}</span>
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      step={step}
+                                      className="w-full rounded border border-slate-700 bg-slate-950 p-2 text-white"
+                                      value={unit.returnHome?.[field] ?? 0}
+                                      onChange={(event) => {
+                                        setDraft((previousDraft) => {
+                                          const nextUnits = [
+                                            ...(previousDraft.captureUnits ??
+                                              []),
+                                          ];
+                                          const currentUnit = nextUnits[index];
+                                          if (!currentUnit.returnHome) {
+                                            return previousDraft;
+                                          }
+                                          nextUnits[index] = {
+                                            ...currentUnit,
+                                            returnHome: {
+                                              ...currentUnit.returnHome,
+                                              [field]: Number(
+                                                event.target.value
+                                              ),
+                                            },
+                                          };
+                                          return {
+                                            ...previousDraft,
+                                            captureUnits: nextUnits,
+                                          };
+                                        });
+                                      }}
+                                    />
+                                  </label>
+                                )
+                              )}
+                            </div>
+                          )}
+                        </div>
                       ))}
                     </div>
                   </section>

@@ -60,6 +60,7 @@ function armWindGustTarget(engine: TowerDefenseEngine) {
       id: itemId,
       tdConfigId: 'coin_1',
       position: { ...target.position },
+      homePosition: { ...target.position },
       facingDirection: 'left',
       hp: 1,
       maxHp: 1,

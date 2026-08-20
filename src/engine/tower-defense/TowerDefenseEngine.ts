@@ -36,6 +36,101 @@ import {
   getActiveSpeedMultiplier,
 } from './speedModifiers';
 
+interface PathProjection {
+  progress: number;
+  distanceSq: number;
+}
+
+function getPathSegmentLength(
+  start: Point,
+  end: Point,
+  aspectRatio: number
+): number {
+  const safeAspectRatio = Math.max(aspectRatio, Number.EPSILON);
+  return Math.hypot(end.x - start.x, (end.y - start.y) / safeAspectRatio);
+}
+
+function projectPointOntoPath(
+  point: Point,
+  path: Point[],
+  aspectRatio: number
+): PathProjection | undefined {
+  if (path.length < 2) return undefined;
+
+  const safeAspectRatio = Math.max(aspectRatio, Number.EPSILON);
+  const scaledPoint = { x: point.x, y: point.y / safeAspectRatio };
+  let cumulativeProgress = 0;
+  let closest: PathProjection | undefined;
+
+  for (let index = 1; index < path.length; index++) {
+    const start = {
+      x: path[index - 1].x,
+      y: path[index - 1].y / safeAspectRatio,
+    };
+    const end = {
+      x: path[index].x,
+      y: path[index].y / safeAspectRatio,
+    };
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const segmentLengthSq = dx * dx + dy * dy;
+    const segmentLength = Math.sqrt(segmentLengthSq);
+
+    if (segmentLengthSq === 0) continue;
+
+    const projectionAmount = Math.max(
+      0,
+      Math.min(
+        1,
+        ((scaledPoint.x - start.x) * dx + (scaledPoint.y - start.y) * dy) /
+          segmentLengthSq
+      )
+    );
+    const projectedX = start.x + dx * projectionAmount;
+    const projectedY = start.y + dy * projectionAmount;
+    const distanceSq =
+      (scaledPoint.x - projectedX) ** 2 + (scaledPoint.y - projectedY) ** 2;
+
+    if (!closest || distanceSq < closest.distanceSq) {
+      closest = {
+        progress: cumulativeProgress + segmentLength * projectionAmount,
+        distanceSq,
+      };
+    }
+
+    cumulativeProgress += segmentLength;
+  }
+
+  return closest;
+}
+
+function getPointAtPathProgress(
+  path: Point[],
+  progress: number,
+  aspectRatio: number
+): Point {
+  let remainingProgress = Math.max(0, progress);
+
+  for (let index = 1; index < path.length; index++) {
+    const start = path[index - 1];
+    const end = path[index];
+    const segmentLength = getPathSegmentLength(start, end, aspectRatio);
+
+    if (segmentLength === 0) continue;
+    if (remainingProgress <= segmentLength) {
+      const amount = remainingProgress / segmentLength;
+      return {
+        x: start.x + (end.x - start.x) * amount,
+        y: start.y + (end.y - start.y) * amount,
+      };
+    }
+
+    remainingProgress -= segmentLength;
+  }
+
+  return { ...path[path.length - 1] };
+}
+
 const defaultLevels: Record<string, number> = {
   senticle: 15,
   mouse_1: 3,
@@ -223,6 +318,8 @@ export class TowerDefenseEngine {
         id: `cap_unit_${index}_${Math.random().toString(36).substring(7)}`,
         tdConfigId: cu.tdConfigId,
         position: { x: cu.position.x, y: cu.position.y },
+        homePosition: { x: cu.position.x, y: cu.position.y },
+        returnHome: cu.returnHome ? { ...cu.returnHome } : undefined,
         facingDirection: 'down',
         hp: 1,
         maxHp: 1,
@@ -583,6 +680,8 @@ export class TowerDefenseEngine {
     // 1. Pick up unheld items
     for (const cu of this.captureUnits) {
       if (!cu.heldByEnemyId) {
+        this.updateCaptureUnitReturnHome(cu, deltaMs);
+
         // Find closest enemy that isn't holding anything
         for (const enemy of newEnemies) {
           if (enemy.heldCaptureUnitId) continue;
@@ -602,6 +701,7 @@ export class TowerDefenseEngine {
             // within ~20 units
             cu.heldByEnemyId = enemy.id;
             enemy.heldCaptureUnitId = cu.id;
+            cu.returnHomeAvailableAtMs = undefined;
 
             if (enemy.turnAroundAtEnd && !enemy.isMovingBackward) {
               enemy.isMovingBackward = true;
@@ -620,6 +720,7 @@ export class TowerDefenseEngine {
         if (carrier) {
           cu.position.x = carrier.position.x;
           cu.position.y = carrier.position.y;
+          cu.returnHomeAvailableAtMs = undefined;
         }
       }
     }
@@ -768,15 +869,7 @@ export class TowerDefenseEngine {
 
       // Drop capture units when an enemy dies
       deadEnemies.forEach((e) => {
-        if (e.heldCaptureUnitId) {
-          const droppedUnit = this.captureUnits.find(
-            (cu) => cu.id === e.heldCaptureUnitId
-          );
-          if (droppedUnit) {
-            droppedUnit.heldByEnemyId = undefined;
-            // The unit drops exactly where the enemy died (which was already set in the update loop)
-          }
-        }
+        this.dropCaptureUnit(e);
       });
     }
     newEnemies = newEnemies.filter((e) => e.hp > 0);
@@ -1180,14 +1273,7 @@ export class TowerDefenseEngine {
     this.enemies.splice(enemyIndex, 1);
 
     // Drop any held capture unit
-    if (enemy.heldCaptureUnitId) {
-      const droppedUnit = this.captureUnits.find(
-        (cu) => cu.id === enemy.heldCaptureUnitId
-      );
-      if (droppedUnit) {
-        droppedUnit.heldByEnemyId = undefined;
-      }
-    }
+    this.dropCaptureUnit(enemy);
 
     const capturedLevel = enemy.level;
 
@@ -1216,6 +1302,93 @@ export class TowerDefenseEngine {
     }
 
     return captured;
+  }
+
+  public dropCaptureUnit(enemy: Enemy): CaptureUnit | undefined {
+    if (!enemy.heldCaptureUnitId) return undefined;
+
+    const droppedUnit = this.captureUnits.find(
+      (cu) => cu.id === enemy.heldCaptureUnitId
+    );
+    if (!droppedUnit || droppedUnit.heldByEnemyId !== enemy.id) {
+      return undefined;
+    }
+
+    droppedUnit.heldByEnemyId = undefined;
+    droppedUnit.returnHomeAvailableAtMs =
+      this.elapsedTimeMs + (droppedUnit.returnHome?.delayMs ?? 0);
+    enemy.heldCaptureUnitId = undefined;
+    return droppedUnit;
+  }
+
+  private updateCaptureUnitReturnHome(
+    captureUnit: CaptureUnit,
+    deltaMs: number
+  ): void {
+    const returnHome = captureUnit.returnHome;
+    if (!returnHome) return;
+
+    const homeDx = captureUnit.homePosition.x - captureUnit.position.x;
+    const homeDy = captureUnit.homePosition.y - captureUnit.position.y;
+    if (Math.abs(homeDx) < 0.0001 && Math.abs(homeDy) < 0.0001) {
+      captureUnit.position = { ...captureUnit.homePosition };
+      captureUnit.returnHomeAvailableAtMs = undefined;
+      return;
+    }
+
+    if (captureUnit.returnHomeAvailableAtMs === undefined) {
+      captureUnit.returnHomeAvailableAtMs =
+        this.elapsedTimeMs + (returnHome.delayMs ?? 0);
+    }
+    if (this.elapsedTimeMs < captureUnit.returnHomeAvailableAtMs) return;
+
+    const path = this.paths[returnHome.pathIndex];
+    if (!path || path.length < 2) return;
+
+    const currentProjection = projectPointOntoPath(
+      captureUnit.position,
+      path,
+      this.aspectRatio
+    );
+    const homeProjection = projectPointOntoPath(
+      captureUnit.homePosition,
+      path,
+      this.aspectRatio
+    );
+    if (!currentProjection || !homeProjection) return;
+
+    const remainingProgress =
+      homeProjection.progress - currentProjection.progress;
+    const frameDistance = returnHome.speed * (deltaMs / 1000);
+    const movementDirection = Math.sign(remainingProgress);
+    let targetProgress: number;
+
+    if (Math.abs(remainingProgress) <= frameDistance) {
+      targetProgress = homeProjection.progress;
+      captureUnit.position = { ...captureUnit.homePosition };
+      captureUnit.returnHomeAvailableAtMs = undefined;
+    } else {
+      targetProgress =
+        currentProjection.progress + movementDirection * frameDistance;
+      captureUnit.position = getPointAtPathProgress(
+        path,
+        targetProgress,
+        this.aspectRatio
+      );
+    }
+
+    const facingSample = getPointAtPathProgress(
+      path,
+      targetProgress - movementDirection * Math.min(frameDistance, 0.001),
+      this.aspectRatio
+    );
+    const dx = captureUnit.position.x - facingSample.x;
+    const dy = captureUnit.position.y - facingSample.y;
+    if (Math.abs(dx) > Math.abs(dy)) {
+      captureUnit.facingDirection = dx > 0 ? 'right' : 'left';
+    } else if (Math.abs(dy) > 0.0001) {
+      captureUnit.facingDirection = dy > 0 ? 'down' : 'up';
+    }
   }
 
   public removeTower(creatureId: string) {

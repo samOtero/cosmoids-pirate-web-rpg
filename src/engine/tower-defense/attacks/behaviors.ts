@@ -231,8 +231,7 @@ export const InstantAoeBehavior: AttackBehavior = {
       );
       if (!carriedUnit || carriedUnit.heldByEnemyId !== enemy.id) return;
 
-      carriedUnit.heldByEnemyId = undefined;
-      enemy.heldCaptureUnitId = undefined;
+      engine.dropCaptureUnit(enemy);
       enemy.hasBeenWindDisarmed = true;
       enemy.itemPickupBlockedUntilMs = engine.elapsedTimeMs + pickupLockMs;
       enemy.damagedByTowerIds.add(source.id);

@@ -122,9 +122,27 @@ export type TDAction =
       unitId: string;
     };
 
+export interface CaptureUnitReturnHomeConfig {
+  /** Enemy path the unattended objective follows back to its starting spot. */
+  pathIndex: number;
+  /** Movement speed in battlefield percentage units per second. */
+  speed: number;
+  /** Optional pause after being dropped before the objective starts returning. */
+  delayMs?: number;
+}
+
+export interface CaptureUnitDefinition {
+  tdConfigId: string;
+  position: Point;
+  returnHome?: CaptureUnitReturnHomeConfig;
+}
+
 export interface CaptureUnit extends BaseTDUnit {
   tdConfigId: string;
   heldByEnemyId?: string;
+  homePosition: Point;
+  returnHome?: CaptureUnitReturnHomeConfig;
+  returnHomeAvailableAtMs?: number;
 }
 
 export interface TDLevelData {
@@ -145,7 +163,7 @@ export interface TDLevelData {
     position: Point;
     facingDirection?: 'up' | 'down' | 'left' | 'right';
   }[];
-  captureUnits?: { tdConfigId: string; position: Point }[];
+  captureUnits?: CaptureUnitDefinition[];
   /** Allied towers that begin on the battlefield without joining the player's roster. */
   startingTowers?: {
     creature: PlayerCreature;

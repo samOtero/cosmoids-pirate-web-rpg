@@ -74,6 +74,7 @@ const createCaptureUnit = (
   id,
   tdConfigId: id.startsWith('coin') ? 'coin_1' : 'food_supplies',
   position: { x, y: 0 },
+  homePosition: { x, y: 0 },
   facingDirection: 'down',
   hp: 1,
   maxHp: 1,
