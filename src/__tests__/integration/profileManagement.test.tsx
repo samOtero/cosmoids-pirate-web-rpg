@@ -10,6 +10,7 @@ describe('Profile Management Integration', () => {
   const mockOnSelect = vi.fn();
   const mockOnCreate = vi.fn();
   const mockOnDelete = vi.fn();
+  const mockOnBack = vi.fn();
 
   beforeEach(() => {
     resetStore();
@@ -26,6 +27,7 @@ describe('Profile Management Integration', () => {
           onSelect={mockOnSelect}
           onCreate={mockOnCreate}
           onDelete={mockOnDelete}
+          onBack={mockOnBack}
         />
       );
 
@@ -58,6 +60,7 @@ describe('Profile Management Integration', () => {
           onSelect={mockOnSelect}
           onCreate={mockOnCreate}
           onDelete={mockOnDelete}
+          onBack={mockOnBack}
         />
       );
 
@@ -87,6 +90,7 @@ describe('Profile Management Integration', () => {
           onSelect={mockOnSelect}
           onCreate={mockOnCreate}
           onDelete={mockOnDelete}
+          onBack={mockOnBack}
         />
       );
 
@@ -120,6 +124,7 @@ describe('Profile Management Integration', () => {
           onSelect={mockOnSelect}
           onCreate={mockOnCreate}
           onDelete={mockOnDelete}
+          onBack={mockOnBack}
         />
       );
 
@@ -153,6 +158,7 @@ describe('Profile Management Integration', () => {
           onSelect={mockOnSelect}
           onCreate={mockOnCreate}
           onDelete={mockOnDelete}
+          onBack={mockOnBack}
         />
       );
 
@@ -258,11 +264,30 @@ describe('Profile Management Integration', () => {
           onSelect={mockOnSelect}
           onCreate={mockOnCreate}
           onDelete={mockOnDelete}
+          onBack={mockOnBack}
         />
       );
 
       const emptySlots = screen.getAllByText('Empty Slot');
       expect(emptySlots).toHaveLength(3);
     });
+  });
+
+  it('returns to the title screen when Back is clicked', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <ProfileScreen
+        profiles={[null, null, null]}
+        onSelect={mockOnSelect}
+        onCreate={mockOnCreate}
+        onDelete={mockOnDelete}
+        onBack={mockOnBack}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Back' }));
+
+    expect(mockOnBack).toHaveBeenCalledOnce();
   });
 });

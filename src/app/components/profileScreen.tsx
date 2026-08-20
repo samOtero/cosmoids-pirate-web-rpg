@@ -13,6 +13,7 @@ interface ProfileScreenProps {
   onSelect: (slotId: number) => void;
   onCreate: (slotId: number) => void;
   onDelete: (slotId: number) => void;
+  onBack: () => void;
   testProfileTemplates?: TestProfileTemplateOption[];
   onApplyTestTemplate?: (templateId: string) => void;
 }
@@ -22,6 +23,7 @@ export default function ProfileScreen({
   onSelect,
   onCreate,
   onDelete,
+  onBack,
   testProfileTemplates,
   onApplyTestTemplate,
 }: ProfileScreenProps) {
@@ -44,15 +46,20 @@ export default function ProfileScreen({
         <h2 className="border-b-2 border-wood pb-2 text-xl font-bold tracking-widest text-sand uppercase lg:text-3xl">
           Select Save File
         </h2>
-        {canUseTestTemplates && (
-          <Button
-            variant="secondary"
-            className="shrink-0 px-3 py-2 text-xs lg:px-5"
-            onClick={() => setShowTestTemplates(true)}
-          >
-            🧪 Profile 3 Templates
+        <div className="flex items-center gap-2">
+          {canUseTestTemplates && (
+            <Button
+              variant="secondary"
+              className="shrink-0 px-3 py-2 text-xs lg:px-5"
+              onClick={() => setShowTestTemplates(true)}
+            >
+              🧪 Profile 3 Templates
+            </Button>
+          )}
+          <Button variant="wood" onClick={onBack}>
+            Back
           </Button>
-        )}
+        </div>
       </div>
 
       <div className="grid w-full max-w-4xl grid-cols-3 gap-4 lg:gap-6">

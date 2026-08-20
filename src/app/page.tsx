@@ -108,6 +108,7 @@ export default function Home() {
           onSelect={selectProfile}
           onCreate={createProfile}
           onDelete={deleteProfile}
+          onBack={() => setScreen(Screens.START)}
           testProfileTemplates={
             testProfileOverrideEnabled
               ? TEST_PROFILE_TEMPLATE_OPTIONS

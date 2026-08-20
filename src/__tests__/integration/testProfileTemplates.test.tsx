@@ -137,6 +137,7 @@ describe('test profile templates', () => {
       onSelect: vi.fn(),
       onCreate: vi.fn(),
       onDelete: vi.fn(),
+      onBack: vi.fn(),
     };
     const { rerender } = render(<ProfileScreen {...commonProps} />);
 
