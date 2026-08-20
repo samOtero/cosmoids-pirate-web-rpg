@@ -169,6 +169,56 @@ export const ZAPYBARA: CosmoidTemplate = {
   ],
 };
 
+export const SONARION: CosmoidTemplate = {
+  id: 'sonarion',
+  name: 'Sonarion',
+  type: ElementType.NORMAL,
+  secondaryType: ElementType.ELECTRIC,
+  baseStats: {
+    hp: 38,
+    attack: 52,
+    defense: 34,
+    specialAttack: 42,
+    specialDefense: 40,
+    speed: 78,
+  },
+  baseExperience: 58,
+  iconImg: '/UI/Icons/sonarion_icon.png',
+  spriteUrl: '/battles/cosmoids/sonarion_down.png',
+  battleSpriteUrl: '/battles/cosmoids/sonarion_left.png',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'NIBBLE' },
+    { level: 4, attackId: 'QUICK_ATTACK' },
+  ],
+  evolutionNodes: [{ level: 8, evolutionDefId: 'resonarion' }],
+};
+
+export const RESONARION: CosmoidTemplate = {
+  id: 'resonarion',
+  name: 'Resonarion',
+  type: ElementType.NORMAL,
+  secondaryType: ElementType.ELECTRIC,
+  baseStats: {
+    hp: 68,
+    attack: 78,
+    defense: 62,
+    specialAttack: 58,
+    specialDefense: 64,
+    speed: 72,
+  },
+  baseExperience: 90,
+  iconImg: '/UI/Icons/resonarion_icon.png',
+  spriteUrl: '/battles/cosmoids/resonarion_down.png',
+  battleSpriteUrl: '/battles/cosmoids/resonarion_left.png',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'NIBBLE' },
+    { level: 4, attackId: 'QUICK_ATTACK' },
+    { level: 8, attackId: 'TACKLE' },
+  ],
+};
+
 export const BETTLE: CosmoidTemplate = {
   id: 'bettle',
   name: 'Beetadel',
@@ -372,5 +422,7 @@ export const COSMOID_TEMPLATES: Record<string, CosmoidTemplate> = {
   [CAFFIQUI.id]: CAFFIQUI,
   [SNOUTASCO.id]: SNOUTASCO,
   [ZAPYBARA.id]: ZAPYBARA,
+  [SONARION.id]: SONARION,
+  [RESONARION.id]: RESONARION,
   [BETTLE.id]: BETTLE,
 };

@@ -59,6 +59,8 @@ export interface TDWaveEnemyDefinition {
   creatureId: string;
   level: number;
   speedMultiplier?: number;
+  /** Whether this enemy can pick up a capture objective. Defaults to true. */
+  canCarryCaptureUnits?: boolean;
   /** Lives removed when this enemy reaches a non-capture goal. Defaults to 1. */
   goalDamage?: number;
   /** Multiplies battlefield stats without changing captured creature stats. */
@@ -131,10 +133,24 @@ export interface CaptureUnitReturnHomeConfig {
   delayMs?: number;
 }
 
+export interface CaptureUnitWaveRelocation {
+  /** Zero-based wave index that must be cleared before this movement begins. */
+  afterWaveIndex: number;
+  /** Orthogonal route followed from the current defense point to the next one. */
+  path: Point[];
+  /** Movement speed in battlefield percentage units per second. */
+  speed: number;
+}
+
+export interface CaptureUnitRelocationState extends CaptureUnitWaveRelocation {
+  currentWaypointIndex: number;
+}
+
 export interface CaptureUnitDefinition {
   tdConfigId: string;
   position: Point;
   returnHome?: CaptureUnitReturnHomeConfig;
+  waveRelocations?: CaptureUnitWaveRelocation[];
 }
 
 export interface CaptureUnit extends BaseTDUnit {
@@ -143,6 +159,8 @@ export interface CaptureUnit extends BaseTDUnit {
   homePosition: Point;
   returnHome?: CaptureUnitReturnHomeConfig;
   returnHomeAvailableAtMs?: number;
+  waveRelocations?: CaptureUnitWaveRelocation[];
+  activeRelocation?: CaptureUnitRelocationState;
 }
 
 export interface TDLevelData {

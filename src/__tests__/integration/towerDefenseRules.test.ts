@@ -190,14 +190,19 @@ describe('Tower defense rules', () => {
     ]);
   });
 
-  it('sets up Level 4 with a self-returning objective and no story dialogs', () => {
-    expect(LEVEL_4.paths).toEqual(VANE_LEVEL.paths);
-    expect(LEVEL_4.backgroundUrl).toBe(VANE_LEVEL.backgroundUrl);
+  it('sets up Level 4 with a staged market objective and no story dialogs', () => {
+    expect(LEVEL_4.paths).toHaveLength(6);
+    expect(LEVEL_4.backgroundUrl).toBe('/battles/bg/bg_market_level_4.png');
+    expect(LEVEL_4.backgroundScale).toBe(3);
     expect(LEVEL_4.captureUnits).toEqual([
       expect.objectContaining({
         tdConfigId: 'maribel_capture',
-        position: VANE_LEVEL.paths[0][VANE_LEVEL.paths[0].length - 1],
+        position: LEVEL_4.paths[0][LEVEL_4.paths[0].length - 1],
         returnHome: { pathIndex: 0, speed: 2, delayMs: 500 },
+        waveRelocations: [
+          expect.objectContaining({ afterWaveIndex: 0 }),
+          expect.objectContaining({ afterWaveIndex: 1 }),
+        ],
       }),
     ]);
     expect(CREATURE_TD_CONFIGS.maribel_capture).toMatchObject({
@@ -217,6 +222,24 @@ describe('Tower defense rules', () => {
         wave.groups.every((group) => group.turnAroundAtEnd)
       )
     ).toBe(true);
+    expect(LEVEL_4.waveEnemyDefinitions).toEqual([
+      expect.objectContaining({
+        id: 'ironbell_sonarion',
+        creatureId: 'sonarion',
+        canCarryCaptureUnits: false,
+      }),
+      expect.objectContaining({
+        id: 'ironbell_resonarion',
+        creatureId: 'resonarion',
+      }),
+    ]);
+    expect(
+      LEVEL_4.waves.flatMap((wave) =>
+        wave.groups.map((group) => group.enemyDefinitionId)
+      )
+    ).toEqual(
+      expect.arrayContaining(['ironbell_sonarion', 'ironbell_resonarion'])
+    );
     const level4Engine = new TowerDefenseEngine(LEVEL_4);
     expect(level4Engine.hasCaptureUnitsGoal).toBe(true);
     expect(level4Engine.lives).toBe(1);
@@ -227,6 +250,10 @@ describe('Tower defense rules', () => {
     });
     expect(TD_LEVELS[TDLevelContext.LEVEL_4]).toMatchObject({
       levelData: LEVEL_4,
+      journalCompletion: {
+        progression: StoryProgression.DEFEAT_LEVEL_4,
+        seenSpeciesIds: ['sonarion', 'resonarion'],
+      },
       winEvents: [
         {
           type: 'SET_STORY_PROGRESSION',

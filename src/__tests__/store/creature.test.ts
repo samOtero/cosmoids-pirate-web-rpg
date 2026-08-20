@@ -20,7 +20,7 @@ describe('Creature Store Logic', () => {
       speciesId: STARTER_CRAB.id,
       level: 1,
       xp: 0,
-      equippedAttacks: STARTER_CRAB.learnableAttacks.map(a => a.attackId),
+      equippedAttacks: STARTER_CRAB.learnableAttacks.map((a) => a.attackId),
       isShiny: false,
     });
 
@@ -50,7 +50,7 @@ describe('Creature Store Logic', () => {
       speciesId: STARTER_CRAB.id,
       level: 1,
       xp: 0,
-      equippedAttacks: STARTER_CRAB.learnableAttacks.map(a => a.attackId),
+      equippedAttacks: STARTER_CRAB.learnableAttacks.map((a) => a.attackId),
       isShiny: false,
     });
     store.addCreatureToProfile(profileId, {
@@ -58,11 +58,11 @@ describe('Creature Store Logic', () => {
       speciesId: STARTER_IGUANA.id,
       level: 1,
       xp: 0,
-      equippedAttacks: STARTER_IGUANA.learnableAttacks.map(a => a.attackId),
+      equippedAttacks: STARTER_IGUANA.learnableAttacks.map((a) => a.attackId),
       isShiny: false,
     });
 
-    let profileBefore = useGameStore.getState().profiles[0]!;
+    const profileBefore = useGameStore.getState().profiles[0]!;
     const added1 = profileBefore.creatures.find(
       (c) => c.speciesId === STARTER_CRAB.id
     )!;
@@ -84,6 +84,41 @@ describe('Creature Store Logic', () => {
     expect(c2?.level).toBe(8);
   });
 
+  it('should retain every captured form after multi-stage evolution', () => {
+    const store = useGameStore.getState();
+    const profileId = 0;
+
+    store.addCreatureToProfile(profileId, {
+      id: 'evolving-bug',
+      speciesId: 'bug_stage_1',
+      level: 6,
+      xp: 0,
+      equippedAttacks: ['TACKLE'],
+      isShiny: false,
+    });
+
+    let profile = useGameStore.getState().profiles[profileId]!;
+    const evolvingBug = profile.creatures[0];
+    expect(profile.capturedSpeciesIds).toEqual(['bug_stage_1']);
+
+    store.updateCreatures([
+      { ...evolvingBug, speciesId: 'bug_stage_2', level: 7 },
+    ]);
+    profile = useGameStore.getState().profiles[profileId]!;
+    expect(profile.capturedSpeciesIds).toEqual(['bug_stage_1', 'bug_stage_2']);
+
+    store.updateCreatures([
+      { ...profile.creatures[0], speciesId: 'bug_stage_3', level: 10 },
+    ]);
+    profile = useGameStore.getState().profiles[profileId]!;
+    expect(profile.creatures[0].speciesId).toBe('bug_stage_3');
+    expect(profile.capturedSpeciesIds).toEqual([
+      'bug_stage_1',
+      'bug_stage_2',
+      'bug_stage_3',
+    ]);
+  });
+
   it('should reorder creatures and clamp out-of-bounds target index', () => {
     const store = useGameStore.getState();
     const profileId = 0;
@@ -94,7 +129,7 @@ describe('Creature Store Logic', () => {
       speciesId: STARTER_CRAB.id,
       level: 1,
       xp: 0,
-      equippedAttacks: STARTER_CRAB.learnableAttacks.map(a => a.attackId),
+      equippedAttacks: STARTER_CRAB.learnableAttacks.map((a) => a.attackId),
       isShiny: false,
     });
     store.addCreatureToProfile(profileId, {
@@ -102,7 +137,7 @@ describe('Creature Store Logic', () => {
       speciesId: STARTER_IGUANA.id,
       level: 1,
       xp: 0,
-      equippedAttacks: STARTER_IGUANA.learnableAttacks.map(a => a.attackId),
+      equippedAttacks: STARTER_IGUANA.learnableAttacks.map((a) => a.attackId),
       isShiny: false,
     });
     store.addCreatureToProfile(profileId, {
@@ -144,7 +179,12 @@ describe('Creature Store Logic', () => {
 
   it('should not add captured creature to active roster if roster has 6 or more creatures', () => {
     const levelData = {
-      paths: [[{ x: 0, y: 0 }, { x: 10, y: 10 }]],
+      paths: [
+        [
+          { x: 0, y: 0 },
+          { x: 10, y: 10 },
+        ],
+      ],
       placementSpots: [],
     };
     const playerCreatures = Array.from({ length: 6 }, (_, i) => ({
@@ -186,13 +226,19 @@ describe('Creature Store Logic', () => {
     expect(captured?.speciesId).toBe('starter_iguana');
     // Roster should still be 6, and not have the newly captured creature!
     expect(engine.roster.length).toBe(6);
-    expect(engine.roster.some((c) => c.speciesId === 'starter_iguana')).toBe(false);
-
+    expect(engine.roster.some((c) => c.speciesId === 'starter_iguana')).toBe(
+      false
+    );
   });
 
   it('should add captured creature to active roster if roster has less than 6 creatures', () => {
     const levelData = {
-      paths: [[{ x: 0, y: 0 }, { x: 10, y: 10 }]],
+      paths: [
+        [
+          { x: 0, y: 0 },
+          { x: 10, y: 10 },
+        ],
+      ],
       placementSpots: [],
     };
     const playerCreatures = Array.from({ length: 5 }, (_, i) => ({
@@ -234,8 +280,9 @@ describe('Creature Store Logic', () => {
     expect(captured?.speciesId).toBe('starter_iguana');
     // Roster should now be 6, and contain the newly captured creature!
     expect(engine.roster.length).toBe(6);
-    expect(engine.roster.some((c) => c.speciesId === 'starter_iguana')).toBe(true);
-
+    expect(engine.roster.some((c) => c.speciesId === 'starter_iguana')).toBe(
+      true
+    );
   });
 
   it('should add creature directly to storage when forceStorage is true', () => {
@@ -243,14 +290,18 @@ describe('Creature Store Logic', () => {
     const profileId = 0;
 
     // Act: Add PlayerCreature with forceStorage = true
-    store.addCreatureToProfile(profileId, {
-      id: STARTER_CRAB.id,
-      speciesId: STARTER_CRAB.id,
-      level: 1,
-      xp: 0,
-      equippedAttacks: STARTER_CRAB.learnableAttacks.map(a => a.attackId),
-      isShiny: false,
-    }, true);
+    store.addCreatureToProfile(
+      profileId,
+      {
+        id: STARTER_CRAB.id,
+        speciesId: STARTER_CRAB.id,
+        level: 1,
+        xp: 0,
+        equippedAttacks: STARTER_CRAB.learnableAttacks.map((a) => a.attackId),
+        isShiny: false,
+      },
+      true
+    );
 
     // Assert
     const profile = useGameStore.getState().profiles[0]!;
@@ -261,7 +312,12 @@ describe('Creature Store Logic', () => {
 
   it('should retain isShiny status on enemy when captured', () => {
     const levelData = {
-      paths: [[{ x: 0, y: 0 }, { x: 10, y: 10 }]],
+      paths: [
+        [
+          { x: 0, y: 0 },
+          { x: 10, y: 10 },
+        ],
+      ],
       placementSpots: [],
     };
     const playerCreatures = Array.from({ length: 2 }, (_, i) => ({
@@ -301,7 +357,9 @@ describe('Creature Store Logic', () => {
     expect(captured).not.toBeNull();
     expect(captured?.isShiny).toBe(true);
     expect(engine.roster.length).toBe(3);
-    expect(engine.roster.find((c) => c.id === captured?.id)?.isShiny).toBe(true);
+    expect(engine.roster.find((c) => c.id === captured?.id)?.isShiny).toBe(
+      true
+    );
   });
 
   it('should preserve captured creature ID and successfully update its level and xp on level end', () => {
@@ -325,7 +383,12 @@ describe('Creature Store Logic', () => {
     const profileStarter = profile.creatures[0];
 
     const levelData = {
-      paths: [[{ x: 0, y: 0 }, { x: 10, y: 10 }]],
+      paths: [
+        [
+          { x: 0, y: 0 },
+          { x: 10, y: 10 },
+        ],
+      ],
       placementSpots: [],
     };
 
@@ -357,7 +420,9 @@ describe('Creature Store Logic', () => {
     const captured = engine.captureEnemy('enemy_to_catch');
     expect(captured).not.toBeNull();
     // Assert UUID format
-    expect(captured?.id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+    expect(captured?.id).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    );
 
     // 4. Simulate the UI adding the captured creature to the profile
     store.addCreatureToProfile(profileId, captured!);

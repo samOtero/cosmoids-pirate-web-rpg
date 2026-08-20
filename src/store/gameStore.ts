@@ -5,13 +5,11 @@ import {
   Profile,
   DialogContext,
   DialogContextData,
-  Creature,
   CosmoidTemplate,
   PlayerCreature,
   AddCreatureToProfileEventPayload,
   GameFlagValue,
   TDLevelConfig,
-  TDLevelContext,
 } from '@/types/baseGame';
 import { MAX_PROFILES, CURRENT_PROFILE_VERSION } from '@/constants/game';
 import { ITEMS } from '@/constants/items';
@@ -26,7 +24,6 @@ import {
   GameFlag,
   GainItemEventPayload,
   ReorderCreaturesEventPayload,
-  ExecuteTDActionEventPayload,
   GoToTowerDefenseEventPayload,
 } from '@/types/baseGame';
 import { TD_LEVELS } from '@/constants/tdLevels';
@@ -39,6 +36,20 @@ import {
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { createTestProfileFromTemplate } from '@/constants/testProfileTemplates';
 import { isTestProfileOverrideEnabled } from '@/utils/testProfileAccess';
+
+function mergeCapturedSpeciesIds(
+  profile: Profile,
+  speciesIds: Iterable<string> = []
+): string[] {
+  return Array.from(
+    new Set([
+      ...(profile.capturedSpeciesIds ?? []),
+      ...profile.creatures.map((creature) => creature.speciesId),
+      ...profile.storageCreatures.map((creature) => creature.speciesId),
+      ...speciesIds,
+    ])
+  );
+}
 
 interface GameState {
   currentScreen: Screens;
@@ -361,6 +372,7 @@ export const useGameStore = create<GameState>()(
                 lastPlayed: Date.now(),
                 creatures: [],
                 storageCreatures: [],
+                capturedSpeciesIds: [],
                 inventory: [],
                 gameFlags: [],
                 storyProgression: 0,
@@ -446,6 +458,7 @@ export const useGameStore = create<GameState>()(
                   lastPlayed: Date.now(),
                   creatures: [],
                   storageCreatures: [],
+                  capturedSpeciesIds: [],
                   inventory: [],
                   gameFlags: [],
                   storyProgression: 0,
@@ -464,6 +477,7 @@ export const useGameStore = create<GameState>()(
               newProfiles[slotId] = {
                 ...profile,
                 lastPlayed: Date.now(),
+                capturedSpeciesIds: mergeCapturedSpeciesIds(profile),
               };
 
               let initialEvents: GameEvent[] = [];
@@ -514,6 +528,9 @@ export const useGameStore = create<GameState>()(
                   newProfiles[slotId] = {
                     ...profile,
                     creatures: [...profile.creatures, newCreatureInstance],
+                    capturedSpeciesIds: mergeCapturedSpeciesIds(profile, [
+                      creature.speciesId,
+                    ]),
                   };
                 } else {
                   newProfiles[slotId] = {
@@ -522,6 +539,9 @@ export const useGameStore = create<GameState>()(
                       ...profile.storageCreatures,
                       newCreatureInstance,
                     ],
+                    capturedSpeciesIds: mergeCapturedSpeciesIds(profile, [
+                      creature.speciesId,
+                    ]),
                   };
                 }
               }
@@ -538,6 +558,7 @@ export const useGameStore = create<GameState>()(
                 return state;
               const profile = state.profiles[profileId]!;
               const newCreatures = [...profile.creatures];
+              const updatedSpeciesIds: string[] = [];
 
               let hasUpdates = false;
               creatures.forEach((updatedCreature) => {
@@ -546,6 +567,7 @@ export const useGameStore = create<GameState>()(
                 );
                 if (partyIndex !== -1) {
                   newCreatures[partyIndex] = updatedCreature;
+                  updatedSpeciesIds.push(updatedCreature.speciesId);
                   hasUpdates = true;
                 }
               });
@@ -556,6 +578,10 @@ export const useGameStore = create<GameState>()(
               newProfiles[profileId] = {
                 ...profile,
                 creatures: newCreatures,
+                capturedSpeciesIds: mergeCapturedSpeciesIds(
+                  profile,
+                  updatedSpeciesIds
+                ),
               };
               return { profiles: newProfiles };
             },
@@ -577,6 +603,10 @@ export const useGameStore = create<GameState>()(
                   id: crypto.randomUUID(),
                   isShiny: c.isShiny ?? false,
                 })),
+                capturedSpeciesIds: mergeCapturedSpeciesIds(
+                  newProfiles[profileId]!,
+                  creatures.map((creature) => creature.speciesId)
+                ),
               };
               return { profiles: newProfiles };
             },
@@ -802,6 +832,7 @@ export const useGameStore = create<GameState>()(
                 lastPlayed: Date.now(),
                 creatures: [],
                 storageCreatures: [],
+                capturedSpeciesIds: [],
                 inventory: [],
                 gameFlags: [],
                 storyProgression: 0,
@@ -819,6 +850,7 @@ export const useGameStore = create<GameState>()(
                 profile.journalUnlockShown ??
                 profile.storyProgression >= StoryProgression.DEFEAT_BUG_STAGE_2,
               journalOpened: profile.journalOpened ?? false,
+              capturedSpeciesIds: mergeCapturedSpeciesIds(profile),
             };
           });
           state.profiles = migratedProfiles;

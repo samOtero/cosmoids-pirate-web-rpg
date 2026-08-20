@@ -127,6 +127,10 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
   },
   [TDLevelContext.LEVEL_4]: {
     levelData: LEVEL_4,
+    journalCompletion: {
+      progression: StoryProgression.DEFEAT_LEVEL_4,
+      seenSpeciesIds: ['sonarion', 'resonarion'],
+    },
     winEvents: [
       {
         type: 'SET_STORY_PROGRESSION',

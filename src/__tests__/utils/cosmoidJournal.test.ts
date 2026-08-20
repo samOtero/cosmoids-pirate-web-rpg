@@ -48,16 +48,10 @@ describe("Kip's Journal derivation", () => {
           })
         )
       )
-    ).toEqual([
-      'mouse_1',
-      'harlequill',
-      'mopup',
-      'bug_stage_1',
-      'bettle',
-    ]);
+    ).toEqual(['mouse_1', 'harlequill', 'mopup', 'bug_stage_1', 'bettle']);
   });
 
-  it('tracks only the exact species owned without inferring evolution history', () => {
+  it('does not invent evolution history for a legacy profile', () => {
     const profile = createProfile({
       creatures: [
         {
@@ -73,5 +67,27 @@ describe("Kip's Journal derivation", () => {
 
     expect(Array.from(getCapturedSpeciesIds(profile))).toEqual(['bug_stage_2']);
     expect(getJournalSeenSpeciesIds(profile).has('bug_stage_1')).toBe(false);
+  });
+
+  it('retains captured forms that are no longer currently owned', () => {
+    const profile = createProfile({
+      creatures: [
+        {
+          id: 'evolved-bug',
+          speciesId: 'bug_stage_3',
+          level: 10,
+          xp: 0,
+          equippedAttacks: ['TACKLE'],
+          isShiny: false,
+        },
+      ],
+      capturedSpeciesIds: ['bug_stage_1', 'bug_stage_2', 'bug_stage_3'],
+    });
+
+    expect(Array.from(getCapturedSpeciesIds(profile))).toEqual([
+      'bug_stage_1',
+      'bug_stage_2',
+      'bug_stage_3',
+    ]);
   });
 });

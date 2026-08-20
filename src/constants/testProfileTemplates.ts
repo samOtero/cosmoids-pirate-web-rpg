@@ -151,6 +151,10 @@ export function createTestProfileFromTemplate(
   }
 
   const priorLevelCatches = PRIOR_LEVEL_CATCHES[template.level] ?? [];
+  const capturedSpeciesIds = [
+    template.starterSpeciesId,
+    ...priorLevelCatches.map((catchDefinition) => catchDefinition.speciesId),
+  ];
 
   return {
     id: 2,
@@ -171,6 +175,7 @@ export function createTestProfileFromTemplate(
       ),
     ],
     storageCreatures: [],
+    capturedSpeciesIds,
     inventory: [],
     gameFlags: [template.starterFlag],
     storyProgression: template.storyProgression,

@@ -224,6 +224,8 @@ export class TowerDefenseEngine {
   public currentWaveIndex: number = 0;
   private activeSpawners: ActiveSpawnerState[] = [];
   private nextGroupIndexToStart: number = 0;
+  private startedRelocationWaveIndexes = new Set<number>();
+  private completedRelocationWaveIndexes = new Set<number>();
   public hasFinishedAllWaves: boolean = false;
   private lastSpawnTime: number = 0;
 
@@ -320,6 +322,10 @@ export class TowerDefenseEngine {
         position: { x: cu.position.x, y: cu.position.y },
         homePosition: { x: cu.position.x, y: cu.position.y },
         returnHome: cu.returnHome ? { ...cu.returnHome } : undefined,
+        waveRelocations: cu.waveRelocations?.map((relocation) => ({
+          ...relocation,
+          path: relocation.path.map((point) => ({ ...point })),
+        })),
         facingDirection: 'down',
         hp: 1,
         maxHp: 1,
@@ -680,11 +686,21 @@ export class TowerDefenseEngine {
     // 1. Pick up unheld items
     for (const cu of this.captureUnits) {
       if (!cu.heldByEnemyId) {
-        this.updateCaptureUnitReturnHome(cu, deltaMs);
+        if (cu.activeRelocation) {
+          this.updateCaptureUnitRelocation(cu, deltaMs);
+        } else {
+          this.updateCaptureUnitReturnHome(cu, deltaMs);
+        }
+
+        if (cu.activeRelocation) continue;
 
         // Find closest enemy that isn't holding anything
         for (const enemy of newEnemies) {
           if (enemy.heldCaptureUnitId) continue;
+          const enemyDefinition = enemy.waveEnemyDefinitionId
+            ? this.waveEnemyDefinitions[enemy.waveEnemyDefinitionId]
+            : undefined;
+          if (enemyDefinition?.canCarryCaptureUnits === false) continue;
           if ((enemy.itemPickupBlockedUntilMs ?? 0) > this.elapsedTimeMs) {
             continue;
           }
@@ -996,6 +1012,8 @@ export class TowerDefenseEngine {
   }
 
   private advanceToNextWave() {
+    if (this.shouldWaitForCaptureUnitRelocation()) return;
+
     this.currentWaveIndex++;
     this.nextGroupIndexToStart = 0;
     this.activeSpawners = [];
@@ -1315,10 +1333,100 @@ export class TowerDefenseEngine {
     }
 
     droppedUnit.heldByEnemyId = undefined;
+    if (droppedUnit.returnHome) {
+      droppedUnit.returnHome.pathIndex = enemy.pathIndex;
+    }
     droppedUnit.returnHomeAvailableAtMs =
       this.elapsedTimeMs + (droppedUnit.returnHome?.delayMs ?? 0);
     enemy.heldCaptureUnitId = undefined;
     return droppedUnit;
+  }
+
+  private shouldWaitForCaptureUnitRelocation(): boolean {
+    const waveIndex = this.currentWaveIndex;
+    const relocations = this.captureUnits.flatMap((captureUnit) =>
+      (captureUnit.waveRelocations ?? [])
+        .filter((relocation) => relocation.afterWaveIndex === waveIndex)
+        .map((relocation) => ({ captureUnit, relocation }))
+    );
+
+    if (relocations.length === 0) return false;
+    if (this.completedRelocationWaveIndexes.has(waveIndex)) return false;
+
+    // A staged objective only moves after the current attackers are gone.
+    if (this.enemies.length > 0) return true;
+
+    if (!this.startedRelocationWaveIndexes.has(waveIndex)) {
+      for (const { captureUnit, relocation } of relocations) {
+        const path = relocation.path.map((point) => ({ ...point }));
+        path[0] = { ...captureUnit.position };
+        captureUnit.activeRelocation = {
+          ...relocation,
+          path,
+          currentWaypointIndex: 1,
+        };
+        captureUnit.returnHomeAvailableAtMs = undefined;
+      }
+      this.startedRelocationWaveIndexes.add(waveIndex);
+      return true;
+    }
+
+    if (relocations.some(({ captureUnit }) => captureUnit.activeRelocation)) {
+      return true;
+    }
+
+    this.completedRelocationWaveIndexes.add(waveIndex);
+    return false;
+  }
+
+  private updateCaptureUnitRelocation(
+    captureUnit: CaptureUnit,
+    deltaMs: number
+  ): void {
+    const relocation = captureUnit.activeRelocation;
+    if (!relocation) return;
+
+    const targetPoint = relocation.path[relocation.currentWaypointIndex];
+    if (!targetPoint) {
+      const destination = relocation.path[relocation.path.length - 1];
+      captureUnit.position = { ...destination };
+      captureUnit.homePosition = { ...destination };
+      captureUnit.activeRelocation = undefined;
+      captureUnit.returnHomeAvailableAtMs = undefined;
+      return;
+    }
+
+    const dx = targetPoint.x - captureUnit.position.x;
+    const dy = targetPoint.y - captureUnit.position.y;
+    const frameDistance = relocation.speed * (deltaMs / 1000);
+    const isHorizontal = Math.abs(dx) > Math.abs(dy);
+
+    if (isHorizontal) {
+      if (Math.abs(dx) <= frameDistance) {
+        captureUnit.position = { ...targetPoint };
+        relocation.currentWaypointIndex++;
+      } else {
+        captureUnit.position.x += Math.sign(dx) * frameDistance;
+        captureUnit.facingDirection = dx > 0 ? 'right' : 'left';
+      }
+    } else {
+      const moveDistance = frameDistance * this.aspectRatio;
+      if (Math.abs(dy) <= moveDistance) {
+        captureUnit.position = { ...targetPoint };
+        relocation.currentWaypointIndex++;
+      } else {
+        captureUnit.position.y += Math.sign(dy) * moveDistance;
+        captureUnit.facingDirection = dy > 0 ? 'down' : 'up';
+      }
+    }
+
+    if (relocation.currentWaypointIndex >= relocation.path.length) {
+      const destination = relocation.path[relocation.path.length - 1];
+      captureUnit.position = { ...destination };
+      captureUnit.homePosition = { ...destination };
+      captureUnit.activeRelocation = undefined;
+      captureUnit.returnHomeAvailableAtMs = undefined;
+    }
   }
 
   private updateCaptureUnitReturnHome(

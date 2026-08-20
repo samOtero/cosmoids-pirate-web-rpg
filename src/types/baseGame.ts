@@ -300,6 +300,8 @@ export interface Profile {
   lastPlayed: number; // Timestamp
   creatures: PlayerCreature[]; // Active party (max 6)
   storageCreatures: PlayerCreature[]; // Storage box creatures (independent from party)
+  /** Species this profile has captured or obtained, including evolved-away forms. */
+  capturedSpeciesIds?: string[];
   inventory: Item[];
   gameFlags: GameFlagValue[]; // Persistent flags set by events (e.g. GameFlag.STARTER_PALMIT)
   storyProgression: number;

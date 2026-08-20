@@ -133,4 +133,41 @@ describe('returning capture objectives', () => {
     expect(objective.position).toEqual({ x: 0, y: 0 });
     engine.destroy();
   });
+
+  it('allows a level to reserve capture-unit carrying for larger enemies', () => {
+    const level = createLevel();
+    level.waveEnemyDefinitions = [
+      {
+        id: 'juvenile_tracker',
+        creatureId: 'mouse_1',
+        level: 3,
+        canCarryCaptureUnits: false,
+      },
+      {
+        id: 'adult_carrier',
+        creatureId: 'mouse_1',
+        level: 3,
+      },
+    ];
+    const engine = new TowerDefenseEngine(level);
+    const objective = engine.captureUnits[0];
+    const juvenile = createCarrier('');
+    juvenile.id = 'juvenile';
+    juvenile.heldCaptureUnitId = undefined;
+    juvenile.waveEnemyDefinitionId = 'juvenile_tracker';
+    juvenile.position = { ...objective.position };
+    const adult = createCarrier('');
+    adult.id = 'adult';
+    adult.heldCaptureUnitId = undefined;
+    adult.waveEnemyDefinitionId = 'adult_carrier';
+    adult.position = { ...objective.position };
+    engine.enemies = [juvenile, adult];
+
+    engine.tick(100, 100);
+
+    expect(juvenile.heldCaptureUnitId).toBeUndefined();
+    expect(adult.heldCaptureUnitId).toBe(objective.id);
+    expect(objective.heldByEnemyId).toBe(adult.id);
+    engine.destroy();
+  });
 });

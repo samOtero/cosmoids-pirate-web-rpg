@@ -4,6 +4,8 @@ import {
   BUG_STAGE_1,
   BUG_STAGE_2,
   BUG_STAGE_3,
+  RESONARION,
+  SONARION,
 } from '@/constants/creatures';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { TDEvent } from '@/engine/tower-defense/events/TDEventBus';
@@ -136,5 +138,15 @@ describe('Bug evolution progression', () => {
     expect(learnedEventIndex).toBeGreaterThan(evolutionEventIndex);
 
     engine.destroy();
+  });
+});
+
+describe('Sonarion evolution progression', () => {
+  it('evolves into Resonarion at level 8 with the same dual typing', () => {
+    expect(SONARION.evolutionNodes).toEqual([
+      { level: 8, evolutionDefId: 'resonarion' },
+    ]);
+    expect(RESONARION.type).toBe(SONARION.type);
+    expect(RESONARION.secondaryType).toBe(SONARION.secondaryType);
   });
 });

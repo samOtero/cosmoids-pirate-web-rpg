@@ -32,6 +32,11 @@ export function prepareTDLevelDraftForSave(
   savedLevel.paths.forEach((path) => path.forEach(roundPoint));
   savedLevel.placementSpots.forEach(roundPoint);
   savedLevel.captureUnits?.forEach((unit) => roundPoint(unit.position));
+  savedLevel.captureUnits?.forEach((unit) =>
+    unit.waveRelocations?.forEach((relocation) =>
+      relocation.path.forEach(roundPoint)
+    )
+  );
   savedLevel.environmentUnits?.forEach((unit) => roundPoint(unit.position));
 
   return savedLevel;
@@ -104,6 +109,29 @@ export function validateTDLevelDraft(
         );
       }
     }
+    unit.waveRelocations?.forEach((relocation, relocationIndex) => {
+      const relocationLabel = `Capture unit ${index + 1}, relocation ${relocationIndex + 1}`;
+      if (
+        !Number.isInteger(relocation.afterWaveIndex) ||
+        relocation.afterWaveIndex < 0 ||
+        relocation.afterWaveIndex >= levelData.waves.length - 1
+      ) {
+        errors.push(`${relocationLabel} must follow a non-final wave.`);
+      }
+      if (relocation.path.length < 2) {
+        errors.push(`${relocationLabel} needs at least two path points.`);
+      }
+      relocation.path.forEach((point, pointIndex) =>
+        validatePoint(
+          point,
+          `${relocationLabel}, point ${pointIndex + 1}`,
+          errors
+        )
+      );
+      if (!Number.isFinite(relocation.speed) || relocation.speed <= 0) {
+        errors.push(`${relocationLabel} speed must be greater than 0.`);
+      }
+    });
   });
   levelData.environmentUnits?.forEach((unit, index) => {
     validatePoint(unit.position, `Environment unit ${index + 1}`, errors);

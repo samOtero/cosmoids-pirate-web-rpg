@@ -11,6 +11,8 @@ export function getCaptureUnitVisualState(
 ): CaptureUnitVisualState {
   if (captureUnit.heldByEnemyId) return 'carried';
 
+  if (captureUnit.activeRelocation) return captureUnit.facingDirection;
+
   const isReturningHome =
     captureUnit.returnHome !== undefined &&
     captureUnit.returnHomeAvailableAtMs !== undefined &&

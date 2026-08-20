@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "id": "sonarion",
+  "name": "Sonarion",
+  "element": "NORMAL",
+  "secondaryElement": "ELECTRIC",
+  "addedAt": "2026-08-20",
+  "sourceImage": "exec-b22f2298-d4f8-4a2d-99e5-07f8a9df1d41.png",
+  "baseStats": {
+    "hp": 38,
+    "attack": 52,
+    "defense": 34,
+    "specialAttack": 42,
+    "specialDefense": 40,
+    "speed": 78
+  },
+  "baseExperience": 58,
+  "movementId": "lizard",
+  "learnableAttacks": [
+    { "level": 1, "attackId": "NIBBLE" },
+    { "level": 4, "attackId": "QUICK_ATTACK" }
+  ],
+  "evolutionNodes": [{ "level": 8, "evolutionDefId": "resonarion" }],
+  "assets": {
+    "icon": {
+      "url": "/UI/Icons/sonarion_icon.png",
+      "width": 160,
+      "height": 160
+    },
+    "left": {
+      "url": "/battles/cosmoids/sonarion_left.png",
+      "width": 300,
+      "height": 200
+    },
+    "up": {
+      "url": "/battles/cosmoids/sonarion_up.png",
+      "width": 160,
+      "height": 220
+    },
+    "down": {
+      "url": "/battles/cosmoids/sonarion_down.png",
+      "width": 160,
+      "height": 220
+    }
+  },
+  "storyPlacement": {
+    "context": "LEVEL_4",
+    "capturable": true,
+    "canCarryCaptureUnits": false,
+    "waves": [
+      { "waveId": "wave_1", "count": 3, "level": 5 },
+      { "waveId": "wave_2", "count": 6, "level": 5 },
+      { "waveId": "wave_3", "count": 13, "level": 5 }
+    ]
+  }
+}

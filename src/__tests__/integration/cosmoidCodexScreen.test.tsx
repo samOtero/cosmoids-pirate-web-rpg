@@ -158,7 +158,9 @@ describe('CosmoidCodexScreen', () => {
         .getAttribute('src')
     ).toContain(encodeURIComponent('/UI/Journal/mopup_journal.png'));
 
-    fireEvent.click(screen.getByRole('button', { name: 'Sailkworm, captured' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Sailkworm, captured' })
+    );
     expect(
       screen
         .getByRole('img', { name: 'Sailkworm field sketch' })
@@ -172,9 +174,13 @@ describe('CosmoidCodexScreen', () => {
         .getAttribute('src')
     ).toContain(encodeURIComponent('/UI/Journal/bugitor_journal.png'));
 
-    fireEvent.click(screen.getByRole('button', { name: 'Mainscale, captured' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Mainscale, captured' })
+    );
     expect(
-      screen.getByRole('img', { name: 'Mainscale field sketch' }).getAttribute('src')
+      screen
+        .getByRole('img', { name: 'Mainscale field sketch' })
+        .getAttribute('src')
     ).toContain(encodeURIComponent('/UI/Journal/moth_journal.png'));
 
     fireEvent.click(screen.getByRole('button', { name: 'Beetadel, captured' }));
@@ -184,4 +190,33 @@ describe('CosmoidCodexScreen', () => {
         .getAttribute('src')
     ).toContain(encodeURIComponent('/UI/Journal/bettle_journal.png'));
   }, 15000);
+
+  it('shows evolved-away forms as captured without invalid owned stats', () => {
+    const evolvedProfile: Profile = {
+      ...profile,
+      creatures: profile.creatures
+        .filter((creature) => !creature.speciesId.startsWith('bug_stage_'))
+        .concat({
+          id: 'evolved-bug',
+          speciesId: 'bug_stage_3',
+          level: 10,
+          xp: 0,
+          equippedAttacks: ['TACKLE'],
+          isShiny: false,
+        }),
+      capturedSpeciesIds: ['bug_stage_1', 'bug_stage_2', 'bug_stage_3'],
+    };
+
+    render(<CosmoidCodexScreen profile={evolvedProfile} onBack={() => {}} />);
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Sailkworm, captured' })
+    );
+    expect(screen.getByText("Kip's Notes")).toBeInTheDocument();
+    expect(screen.getByText('Owned').parentElement).toHaveTextContent('0');
+    expect(screen.queryByText('-Infinity')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cocoonot, captured' }));
+    expect(screen.getByText("Kip's Notes")).toBeInTheDocument();
+  });
 });

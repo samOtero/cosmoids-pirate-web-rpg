@@ -63,7 +63,9 @@ export default function CosmoidCodexScreen({
         (creature) => creature.speciesId === selectedSpecies.id
       )
     : [];
-  const selectedIsCaptured = selectedOwned.length > 0;
+  const selectedIsCaptured = selectedSpecies
+    ? capturedSpeciesIds.has(selectedSpecies.id)
+    : false;
   const selectedNumber = selectedSpecies
     ? species.findIndex((entry) => entry.id === selectedSpecies.id) + 1
     : 0;
@@ -287,9 +289,13 @@ export default function CosmoidCodexScreen({
                           Highest Level
                         </span>
                         <strong className="text-lg text-emerald-200">
-                          {Math.max(
-                            ...selectedOwned.map((creature) => creature.level)
-                          )}
+                          {selectedOwned.length > 0
+                            ? Math.max(
+                                ...selectedOwned.map(
+                                  (creature) => creature.level
+                                )
+                              )
+                            : '\u2014'}
                         </strong>
                       </div>
                     </div>

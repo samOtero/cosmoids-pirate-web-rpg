@@ -1,13 +1,13 @@
 import { TD_LEVELS } from '@/constants/tdLevels';
 import { Profile } from '@/types/baseGame';
 
-/** Exact species the player currently owns; evolutions do not imply earlier forms. */
+/** Species the player has captured, plus current ownership for legacy saves. */
 export function getCapturedSpeciesIds(profile: Profile): Set<string> {
-  return new Set(
-    [...profile.creatures, ...profile.storageCreatures].map(
-      (creature) => creature.speciesId
-    )
-  );
+  return new Set([
+    ...(profile.capturedSpeciesIds ?? []),
+    ...profile.creatures.map((creature) => creature.speciesId),
+    ...profile.storageCreatures.map((creature) => creature.speciesId),
+  ]);
 }
 
 /** Species Kip has documented through completed levels, plus exact captures. */
