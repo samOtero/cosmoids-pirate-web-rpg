@@ -392,17 +392,22 @@ export default function DialogContent({
             imgHeight = 384;
           }
 
+          const viewportWidthCap = (imgWidth / imgHeight) * 40;
+          const portraitWidth = `min(${imgWidth}px, ${viewportWidthCap}vh)`;
+
           return (
             <div
               key={`${p.key}-${i}`}
-              className="flex transform flex-col items-center brightness-110 transition-all duration-500"
+              className="flex min-w-0 transform flex-col items-center brightness-110 transition-all duration-500"
+              style={{ width: portraitWidth }}
             >
               <Image
                 src={getPortrait(p.key)}
                 alt={p.displayName}
                 width={imgWidth}
                 height={imgHeight}
-                className={`h-full max-h-[40vh] w-auto rounded-lg border-4 border-wood bg-black object-cover shadow-2xl transition-all duration-300 ${p.flipped ? 'scale-x-[-1]' : ''}`}
+                className={`h-auto max-h-[40vh] w-full rounded-lg border-4 border-wood bg-black object-cover shadow-2xl transition-all duration-300 ${p.flipped ? 'scale-x-[-1]' : ''}`}
+                style={{ aspectRatio: `${imgWidth} / ${imgHeight}` }}
                 unoptimized
                 draggable={false}
               />

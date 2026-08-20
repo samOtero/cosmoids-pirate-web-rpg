@@ -89,4 +89,61 @@ describe('DialogContent Flipped Portrait Rendering', () => {
     expect(img).toBeInTheDocument();
     expect(img.className).not.toContain('scale-x-[-1]');
   });
+
+  it('uses explicit responsive dimensions for standard portraits', () => {
+    const sequence: DialogLine[] = [
+      {
+        text: 'Hello responsive portrait!',
+        portraits: [
+          {
+            key: SpeakerImageKey.GUIDE,
+            displayName: 'Responsive Guide',
+          },
+        ],
+      },
+    ];
+
+    render(
+      <DialogContent
+        sequence={sequence}
+        onContinue={mockOnContinue}
+        onDialogAction={mockOnDialogAction}
+      />
+    );
+
+    const img = screen.getByAltText('Responsive Guide');
+    expect(img).toHaveClass('h-auto', 'w-full');
+    expect(img).not.toHaveClass('h-full', 'w-auto');
+    expect(img).toHaveStyle({ aspectRatio: '512 / 512' });
+    expect(img.parentElement).toHaveStyle({ width: 'min(512px, 40vh)' });
+  });
+
+  it('preserves the wider aspect ratio with an explicit responsive width', () => {
+    const sequence: DialogLine[] = [
+      {
+        text: 'Hello wide portrait!',
+        portraits: [
+          {
+            key: SpeakerImageKey.GUIDE,
+            displayName: 'Wide Guide',
+            portraitWidth: 'wide',
+          },
+        ],
+      },
+    ];
+
+    render(
+      <DialogContent
+        sequence={sequence}
+        onContinue={mockOnContinue}
+        onDialogAction={mockOnDialogAction}
+      />
+    );
+
+    const wideImg = screen.getByAltText('Wide Guide');
+    expect(wideImg).toHaveStyle({ aspectRatio: '448 / 320' });
+    expect(wideImg.parentElement).toHaveStyle({
+      width: 'min(448px, 56vh)',
+    });
+  });
 });
