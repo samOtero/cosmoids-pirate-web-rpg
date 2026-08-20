@@ -46,6 +46,9 @@ describe('Level 4 market map', () => {
     expect(
       mari?.waveRelocations?.map((relocation) => relocation.path.at(-1))
     ).toEqual(destinations.slice(1));
+    expect(
+      mari?.waveRelocations?.map((relocation) => relocation.path.at(0))
+    ).toEqual(destinations.slice(0, -1));
   });
 
   it('uses the dedicated painted market background', () => {

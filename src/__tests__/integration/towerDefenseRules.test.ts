@@ -194,6 +194,15 @@ describe('Tower defense rules', () => {
     expect(LEVEL_4.paths).toHaveLength(6);
     expect(LEVEL_4.backgroundUrl).toBe('/battles/bg/bg_market_level_4.png');
     expect(LEVEL_4.backgroundScale).toBe(3);
+    expect(LEVEL_4.resonantEvolution).toEqual({
+      sourceCreatureId: 'sonarion',
+      evolvedEnemyDefinitionId: 'ironbell_resonarion',
+      requiredCount: 3,
+      radius: 11,
+      gatherWaitDurationMs: 4000,
+      channelDurationMs: 2200,
+      recoveryDurationMs: 900,
+    });
     expect(LEVEL_4.captureUnits).toEqual([
       expect.objectContaining({
         tdConfigId: 'maribel_capture',

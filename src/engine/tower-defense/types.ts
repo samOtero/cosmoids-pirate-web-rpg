@@ -76,6 +76,20 @@ export interface TDWave {
   groups: TDWaveGroup[];
 }
 
+/**
+ * Allows a group of lesser enemies near a capture objective to channel one
+ * member into a configured evolved enemy variant.
+ */
+export interface TDResonantEvolutionConfig {
+  sourceCreatureId: string;
+  evolvedEnemyDefinitionId: string;
+  requiredCount: number;
+  radius: number;
+  gatherWaitDurationMs: number;
+  channelDurationMs: number;
+  recoveryDurationMs: number;
+}
+
 export interface BaseTDUnit {
   id: string;
   position: Point;
@@ -182,6 +196,7 @@ export interface TDLevelData {
     facingDirection?: 'up' | 'down' | 'left' | 'right';
   }[];
   captureUnits?: CaptureUnitDefinition[];
+  resonantEvolution?: TDResonantEvolutionConfig;
   /** Allied towers that begin on the battlefield without joining the player's roster. */
   startingTowers?: {
     creature: PlayerCreature;
@@ -257,6 +272,22 @@ export interface Enemy extends BaseTDUnit {
   damagedByTowerIds: Set<string>;
   /** Dev-sandbox guard: hits and status effects render normally without reducing HP. */
   isInvulnerable?: boolean;
+  /** Runtime state for an interruptible group evolution channel. */
+  resonantEvolutionState?: {
+    groupId: string;
+    captureUnitId: string;
+    role: 'evolving' | 'helper';
+    startedAtMs: number;
+    durationMs: number;
+  };
+  /** Spent helpers may retreat but cannot contribute to another channel. */
+  resonantEvolutionSpent?: boolean;
+  /** Lesser enemies briefly wait by the objective for enough allies to arrive. */
+  resonantEvolutionWaitingUntilMs?: number;
+  /** Newly evolved enemies pause briefly before moving or taking the objective. */
+  resonantEvolutionRecoveryUntilMs?: number;
+  /** Keeps the evolved enemy beside its intended objective until pickup is resolved. */
+  resonantEvolutionTargetCaptureUnitId?: string;
   /** Enemy-only ability state; player attacks use Tower.equippedAttacksRuntime. */
   abilityRuntime?: {
     definitionId: string;

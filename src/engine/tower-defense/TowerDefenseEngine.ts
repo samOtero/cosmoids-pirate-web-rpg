@@ -20,6 +20,7 @@ import {
   TDCreatureMetadata,
   TowerTargetingMode,
   TDLevelData,
+  TDResonantEvolutionConfig,
   TDWaveEnemyDefinition,
 } from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
@@ -236,6 +237,7 @@ export class TowerDefenseEngine {
   public elapsedTimeMs: number = 0;
   public enemyHpMultiplier: number = 1;
   public disableCapture: boolean = false;
+  public resonantEvolution?: TDResonantEvolutionConfig;
 
   public aspectRatio: number = 1;
 
@@ -302,6 +304,7 @@ export class TowerDefenseEngine {
     this.surviveUntil = levelData.surviveUntil;
     this.enemyHpMultiplier = levelData.enemyHpMultiplier ?? 1;
     this.disableCapture = levelData.disableCapture ?? false;
+    this.resonantEvolution = levelData.resonantEvolution;
 
     if (levelData.environmentUnits) {
       this.environmentUnits = levelData.environmentUnits.map((eu, index) => ({
@@ -514,6 +517,32 @@ export class TowerDefenseEngine {
       const timeScale = deltaMs / 16.666;
       let moveSpeed =
         enemy.speed * getActiveSpeedMultiplier(enemy, this.elapsedTimeMs);
+      const resonantTarget = enemy.resonantEvolutionTargetCaptureUnitId
+        ? this.captureUnits.find(
+            (captureUnit) =>
+              captureUnit.id === enemy.resonantEvolutionTargetCaptureUnitId
+          )
+        : undefined;
+      if (
+        resonantTarget?.heldByEnemyId &&
+        resonantTarget.heldByEnemyId !== enemy.id
+      ) {
+        enemy.resonantEvolutionTargetCaptureUnitId = undefined;
+      }
+      const isAwaitingResonantPickup = Boolean(
+        enemy.resonantEvolutionTargetCaptureUnitId &&
+        resonantTarget &&
+        !resonantTarget.heldByEnemyId
+      );
+
+      if (
+        enemy.resonantEvolutionState ||
+        (enemy.resonantEvolutionWaitingUntilMs ?? 0) > this.elapsedTimeMs ||
+        (enemy.resonantEvolutionRecoveryUntilMs ?? 0) > this.elapsedTimeMs ||
+        isAwaitingResonantPickup
+      ) {
+        moveSpeed = 0;
+      }
 
       // Handle status conditions
       if (enemy.statusConditions.length > 0) {
@@ -623,6 +652,8 @@ export class TowerDefenseEngine {
       }
     });
 
+    this.processResonantEvolution(newEnemies);
+
     // Enemy reached end
     const reachedEnd = newEnemies.filter((e) => {
       const activePath = this.paths[e.pathIndex] || [];
@@ -717,6 +748,7 @@ export class TowerDefenseEngine {
             // within ~20 units
             cu.heldByEnemyId = enemy.id;
             enemy.heldCaptureUnitId = cu.id;
+            enemy.resonantEvolutionTargetCaptureUnitId = undefined;
             cu.returnHomeAvailableAtMs = undefined;
 
             if (enemy.turnAroundAtEnd && !enemy.isMovingBackward) {
@@ -922,6 +954,227 @@ export class TowerDefenseEngine {
     this.enemies = newEnemies;
     this.projectiles = activeProjectiles;
     this.towers = newTowers;
+  }
+
+  private getCaptureDistanceSq(enemy: Enemy, captureUnit: CaptureUnit) {
+    const dx = enemy.position.x - captureUnit.position.x;
+    const dy = (enemy.position.y - captureUnit.position.y) * this.aspectRatio;
+    return dx * dx + dy * dy;
+  }
+
+  private clearResonantEvolutionGroup(enemies: Enemy[], groupId: string) {
+    enemies.forEach((enemy) => {
+      if (enemy.resonantEvolutionState?.groupId === groupId) {
+        enemy.resonantEvolutionState = undefined;
+      }
+    });
+  }
+
+  private applyEvolvedEnemyDefinition(
+    enemy: Enemy,
+    evolvedEnemyDefinitionId: string
+  ): boolean {
+    const definition = this.waveEnemyDefinitions[evolvedEnemyDefinitionId];
+    if (!definition) return false;
+
+    const meta = TD_CREATURE_DEFS[definition.creatureId];
+    if (!meta) return false;
+
+    const level = definition.level;
+    const maxHp =
+      calculateMaxHp(meta.baseCreature.maxHp, level) *
+      this.enemyHpMultiplier *
+      (definition.hpMultiplier ?? 1);
+    const ability = definition.abilityId
+      ? ENEMY_ABILITY_DEFS[definition.abilityId]
+      : undefined;
+
+    enemy.definitionId = definition.creatureId;
+    enemy.waveEnemyDefinitionId = definition.id;
+    enemy.level = level;
+    enemy.hp = maxHp;
+    enemy.maxHp = maxHp;
+    enemy.speed =
+      (meta.baseCreature.speed / 100) * (definition.speedMultiplier ?? 1);
+    enemy.currentAttack = calculateStat(meta.baseCreature.attack, level);
+    enemy.currentSpecialAttack = calculateStat(
+      meta.baseCreature.specialAttack,
+      level
+    );
+    enemy.currentDefense =
+      calculateStat(meta.baseCreature.defense, level) *
+      (definition.defenseMultiplier ?? 1);
+    enemy.currentSpecialDefense =
+      calculateStat(meta.baseCreature.specialDefense, level) *
+      (definition.specialDefenseMultiplier ?? 1);
+    enemy.speedBoostMultiplier = undefined;
+    enemy.speedBoostUntilMs = undefined;
+    enemy.speedSlowMultiplier = undefined;
+    enemy.defenseBoostMultiplier = undefined;
+    enemy.specialDefenseBoostMultiplier = undefined;
+    enemy.abilityRuntime = ability
+      ? {
+          definitionId: ability.id,
+          nextReadyTimeMs: this.elapsedTimeMs + ability.initialCooldownMs,
+        }
+      : undefined;
+    return true;
+  }
+
+  private processResonantEvolution(enemies: Enemy[]) {
+    const config = this.resonantEvolution;
+    if (!config || config.requiredCount < 2) return;
+
+    const activeGroupIds = new Set(
+      enemies
+        .map((enemy) => enemy.resonantEvolutionState?.groupId)
+        .filter((groupId): groupId is string => Boolean(groupId))
+    );
+
+    for (const groupId of activeGroupIds) {
+      const participants = enemies.filter(
+        (enemy) => enemy.resonantEvolutionState?.groupId === groupId
+      );
+      const state = participants[0]?.resonantEvolutionState;
+      const captureUnit = state
+        ? this.captureUnits.find(
+            (candidate) => candidate.id === state.captureUnitId
+          )
+        : undefined;
+      const radiusSq = config.radius * config.radius;
+      const interrupted =
+        !state ||
+        participants.length !== config.requiredCount ||
+        !captureUnit ||
+        Boolean(captureUnit.heldByEnemyId) ||
+        participants.some(
+          (enemy) =>
+            enemy.hp <= 0 ||
+            this.getCaptureDistanceSq(enemy, captureUnit) > radiusSq
+        );
+
+      if (interrupted) {
+        this.clearResonantEvolutionGroup(enemies, groupId);
+        continue;
+      }
+
+      if (this.elapsedTimeMs - state.startedAtMs < state.durationMs) continue;
+
+      const evolvingEnemy = participants.find(
+        (enemy) => enemy.resonantEvolutionState?.role === 'evolving'
+      );
+      if (!evolvingEnemy) {
+        this.clearResonantEvolutionGroup(enemies, groupId);
+        continue;
+      }
+
+      for (const participant of participants) {
+        participant.resonantEvolutionState = undefined;
+        participant.resonantEvolutionWaitingUntilMs = undefined;
+        if (participant !== evolvingEnemy) {
+          participant.resonantEvolutionSpent = true;
+        }
+      }
+
+      if (
+        !this.applyEvolvedEnemyDefinition(
+          evolvingEnemy,
+          config.evolvedEnemyDefinitionId
+        )
+      ) {
+        continue;
+      }
+
+      evolvingEnemy.resonantEvolutionRecoveryUntilMs =
+        this.elapsedTimeMs + config.recoveryDurationMs;
+      evolvingEnemy.resonantEvolutionTargetCaptureUnitId = captureUnit.id;
+      evolvingEnemy.itemPickupBlockedUntilMs =
+        evolvingEnemy.resonantEvolutionRecoveryUntilMs;
+      this.floatingTexts.push({
+        id: `ft_resonant_evolution_${this.elapsedTimeMs}_${evolvingEnemy.id}`,
+        text: 'Resonant Evolution!',
+        position: { ...evolvingEnemy.position },
+        color: 0x67e8f9,
+        scale: 1,
+        durationMs: 1300,
+        elapsedMs: 0,
+      });
+    }
+
+    const radiusSq = config.radius * config.radius;
+    for (const captureUnit of this.captureUnits) {
+      if (captureUnit.heldByEnemyId || captureUnit.activeRelocation) continue;
+
+      enemies.forEach((enemy) => {
+        if (
+          enemy.definitionId !== config.sourceCreatureId ||
+          enemy.resonantEvolutionState ||
+          enemy.resonantEvolutionSpent
+        ) {
+          return;
+        }
+
+        if (
+          enemy.resonantEvolutionWaitingUntilMs !== undefined &&
+          enemy.resonantEvolutionWaitingUntilMs <= this.elapsedTimeMs
+        ) {
+          enemy.resonantEvolutionWaitingUntilMs = undefined;
+          enemy.resonantEvolutionSpent = true;
+          return;
+        }
+
+        if (
+          enemy.resonantEvolutionWaitingUntilMs === undefined &&
+          this.getCaptureDistanceSq(enemy, captureUnit) <= radiusSq
+        ) {
+          enemy.resonantEvolutionWaitingUntilMs =
+            this.elapsedTimeMs + config.gatherWaitDurationMs;
+        }
+      });
+
+      const eligible = enemies
+        .filter(
+          (enemy) =>
+            enemy.hp > 0 &&
+            enemy.definitionId === config.sourceCreatureId &&
+            !enemy.resonantEvolutionState &&
+            !enemy.resonantEvolutionSpent &&
+            !enemy.heldCaptureUnitId &&
+            (enemy.resonantEvolutionWaitingUntilMs ?? 0) > this.elapsedTimeMs &&
+            this.getCaptureDistanceSq(enemy, captureUnit) <= radiusSq
+        )
+        .sort(
+          (a, b) =>
+            this.getCaptureDistanceSq(a, captureUnit) -
+            this.getCaptureDistanceSq(b, captureUnit)
+        );
+
+      if (eligible.length < config.requiredCount) continue;
+
+      const participants = eligible.slice(0, config.requiredCount);
+      const evolvingEnemy = participants[0];
+      const groupId = `resonant_${this.elapsedTimeMs}_${Math.random()
+        .toString(36)
+        .substring(7)}`;
+      participants.forEach((enemy) => {
+        enemy.resonantEvolutionState = {
+          groupId,
+          captureUnitId: captureUnit.id,
+          role: enemy === evolvingEnemy ? 'evolving' : 'helper',
+          startedAtMs: this.elapsedTimeMs,
+          durationMs: config.channelDurationMs,
+        };
+      });
+      this.floatingTexts.push({
+        id: `ft_resonating_${this.elapsedTimeMs}_${evolvingEnemy.id}`,
+        text: 'Resonating!',
+        position: { ...evolvingEnemy.position },
+        color: 0xfacc15,
+        scale: 0.9,
+        durationMs: 900,
+        elapsedMs: 0,
+      });
+    }
   }
 
   private loadNextSpawners() {
@@ -1359,11 +1612,15 @@ export class TowerDefenseEngine {
     if (!this.startedRelocationWaveIndexes.has(waveIndex)) {
       for (const { captureUnit, relocation } of relocations) {
         const path = relocation.path.map((point) => ({ ...point }));
-        path[0] = { ...captureUnit.position };
+        const firstWaypoint = path[0];
+        const isAtFirstWaypoint =
+          firstWaypoint !== undefined &&
+          Math.abs(captureUnit.position.x - firstWaypoint.x) < 0.0001 &&
+          Math.abs(captureUnit.position.y - firstWaypoint.y) < 0.0001;
         captureUnit.activeRelocation = {
           ...relocation,
           path,
-          currentWaypointIndex: 1,
+          currentWaypointIndex: isAtFirstWaypoint ? 1 : 0,
         };
         captureUnit.returnHomeAvailableAtMs = undefined;
       }

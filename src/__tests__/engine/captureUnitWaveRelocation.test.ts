@@ -96,4 +96,27 @@ describe('between-wave capture objective relocation', () => {
 
     engine.destroy();
   });
+
+  it('returns a displaced objective to its prior spot before moving onward', () => {
+    const engine = new TowerDefenseEngine(createLevel());
+
+    engine.tick(0, 16);
+    const mari = engine.captureUnits[0];
+    mari.position = { x: -5, y: 20 };
+    engine.enemies = [];
+
+    engine.tick(16, 16);
+    expect(mari.activeRelocation?.currentWaypointIndex).toBe(0);
+
+    engine.tick(1016, 1000);
+    expect(mari.position).toEqual({ x: 0, y: 10 });
+    expect(mari.activeRelocation?.currentWaypointIndex).toBe(1);
+
+    engine.tick(2016, 1000);
+    expect(mari.position).toEqual({ x: 10, y: 10 });
+    expect(mari.homePosition).toEqual({ x: 10, y: 10 });
+    expect(mari.activeRelocation).toBeUndefined();
+
+    engine.destroy();
+  });
 });

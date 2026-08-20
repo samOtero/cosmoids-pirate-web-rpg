@@ -385,6 +385,85 @@ function updateDefenseBoostIndicator(
   }
 }
 
+type ResonantEvolutionIndicator = PIXI.Container & {
+  elapsed: number;
+};
+
+function updateResonantEvolutionIndicator(
+  container: PIXI.Container,
+  enemy: Enemy,
+  currentTimeMs: number,
+  delta: number
+) {
+  const state = enemy.resonantEvolutionState;
+  const isWaiting =
+    (enemy.resonantEvolutionWaitingUntilMs ?? 0) > currentTimeMs;
+  const isRecovering =
+    (enemy.resonantEvolutionRecoveryUntilMs ?? 0) > currentTimeMs;
+  let indicator = container.getChildByLabel('resonantEvolutionIndicator') as
+    | ResonantEvolutionIndicator
+    | undefined;
+
+  if (!state && !isWaiting && !isRecovering) {
+    if (indicator) {
+      container.removeChild(indicator);
+      indicator.destroy({ children: true });
+    }
+    return;
+  }
+
+  if (!indicator) {
+    indicator = new PIXI.Container() as ResonantEvolutionIndicator;
+    indicator.label = 'resonantEvolutionIndicator';
+    indicator.elapsed = 0;
+    const rings = new PIXI.Graphics();
+    rings.label = 'resonantEvolutionRings';
+    indicator.addChild(rings);
+    container.addChildAt(indicator, Math.min(1, container.children.length));
+  }
+
+  indicator.elapsed += delta;
+  const rings = indicator.getChildByLabel('resonantEvolutionRings') as
+    | PIXI.Graphics
+    | undefined;
+  if (!rings) return;
+
+  const isEvolving = state?.role === 'evolving';
+  const progress = state
+    ? Math.max(
+        0,
+        Math.min(1, (currentTimeMs - state.startedAtMs) / state.durationMs)
+      )
+    : 1;
+  const pulse = Math.sin(indicator.elapsed * 0.12);
+  const primaryColor = isEvolving || isRecovering ? 0xfacc15 : 0x67e8f9;
+
+  rings.clear();
+  const ringCount = isWaiting && !state ? 2 : 3;
+  for (let index = 0; index < ringCount; index++) {
+    const radius = 20 + index * 7 + pulse * (1.5 + index * 0.4);
+    rings.circle(0, 0, radius);
+    rings.stroke({
+      color: index === 1 ? 0x67e8f9 : primaryColor,
+      alpha: 0.28 + index * 0.12,
+      width: isEvolving ? 2.5 : 1.8,
+    });
+  }
+  if (state || isRecovering) {
+    rings.arc(0, 0, 38, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * progress);
+    rings.stroke({
+      color: primaryColor,
+      alpha: 0.95,
+      width: isEvolving || isRecovering ? 4 : 2.5,
+      cap: 'round',
+    });
+  }
+  indicator.rotation = isEvolving
+    ? indicator.elapsed * 0.003
+    : -indicator.elapsed * 0.002;
+  indicator.alpha = isRecovering ? 1 : 0.78 + progress * 0.22;
+}
+
 type CursedFlame = PIXI.Graphics & {
   age: number;
   life: number;
@@ -1544,6 +1623,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         const floatingTextSprites = new Map<string, PIXI.Text>();
         const spotGraphics = new PIXI.Graphics();
         const invalidSpotGraphics = new PIXI.Graphics();
+        const resonantEvolutionGraphics = new PIXI.Graphics();
 
         let draggingNode: PIXI.Container | null = null;
         let draggingTowerCreatureId: string | null = null;
@@ -1981,6 +2061,14 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           // --- Render Placement Spots & Capture Hover ---
           spotGraphics.clear();
           invalidSpotGraphics.clear();
+          resonantEvolutionGraphics.clear();
+
+          if (!resonantEvolutionGraphics.parent) {
+            app.stage.addChildAt(
+              resonantEvolutionGraphics,
+              Math.min(1, app.stage.children.length)
+            );
+          }
 
           app.stage.addChild(spotGraphics); // Ensure it's on the stage
           app.stage.addChild(invalidSpotGraphics);
@@ -2151,6 +2239,34 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           }
 
           // --- Render Enemies ---
+          const resonantGroups = new Map<string, Enemy[]>();
+          engine.enemies.forEach((enemy) => {
+            const groupId = enemy.resonantEvolutionState?.groupId;
+            if (!groupId) return;
+            const group = resonantGroups.get(groupId) ?? [];
+            group.push(enemy);
+            resonantGroups.set(groupId, group);
+          });
+          resonantGroups.forEach((participants) => {
+            if (participants.length < 2) return;
+            const points = participants.map((enemy) => ({
+              x: offsetX + (enemy.position.x / 100) * screenW,
+              y: offsetY + (enemy.position.y / 100) * screenH,
+            }));
+            points.forEach((point, index) => {
+              const next = points[(index + 1) % points.length];
+              resonantEvolutionGraphics.moveTo(point.x, point.y);
+              resonantEvolutionGraphics.lineTo(next.x, next.y);
+            });
+            resonantEvolutionGraphics.stroke({
+              color: 0x67e8f9,
+              alpha: 0.72,
+              width: Math.max(2, 3 * zoom),
+              cap: 'round',
+              join: 'round',
+            });
+          });
+
           const currentEnemyIds = new Set(engine.enemies.map((e) => e.id));
           for (const [id, sprite] of enemySprites.entries()) {
             if (!currentEnemyIds.has(id)) {
@@ -2223,6 +2339,12 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               container,
               enemy,
               enemy.definitionId,
+              engine.elapsedTimeMs,
+              app.ticker.deltaTime
+            );
+            updateResonantEvolutionIndicator(
+              container,
+              enemy,
               engine.elapsedTimeMs,
               app.ticker.deltaTime
             );
@@ -2501,8 +2623,12 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             const responsiveScale = app.screen.height / TD_BASE_HEIGHT;
             const finalScale = zoom * responsiveScale;
             const usesLayerOffsets = animConfig?.type === 'KEYFRAME_SPRITES';
-            const effectOffsetX = usesLayerOffsets ? 0 : (tdConfig.offsetX ?? 0);
-            const effectOffsetY = usesLayerOffsets ? 0 : (tdConfig.offsetY ?? 0);
+            const effectOffsetX = usesLayerOffsets
+              ? 0
+              : (tdConfig.offsetX ?? 0);
+            const effectOffsetY = usesLayerOffsets
+              ? 0
+              : (tdConfig.offsetY ?? 0);
             container.x =
               offsetX +
               (vfx.position.x / 100) * screenW +

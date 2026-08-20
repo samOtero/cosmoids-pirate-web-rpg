@@ -119,6 +119,15 @@ export const LEVEL_4: TDLevelData = {
       ],
     },
   ],
+  resonantEvolution: {
+    sourceCreatureId: 'sonarion',
+    evolvedEnemyDefinitionId: 'ironbell_resonarion',
+    requiredCount: 3,
+    radius: 11,
+    gatherWaitDurationMs: 4000,
+    channelDurationMs: 2200,
+    recoveryDurationMs: 900,
+  },
   waveEnemyDefinitions: [
     {
       id: 'ironbell_sonarion',
