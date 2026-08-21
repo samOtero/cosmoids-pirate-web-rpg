@@ -16,6 +16,17 @@ export type EnemyAbilityDefinition =
       oncePerFight: true;
       defenseMultiplier: number;
       specialDefenseMultiplier: number;
+    })
+  | (EnemyAbilityDefinitionBase & {
+      type: 'PROXIMITY_HOWL_SPEED_STACK';
+      cooldownMs: number;
+      triggerCaptureUnitTdConfigId: string;
+      triggerRadius: number;
+      targetCreatureId: string;
+      maxActivations: number;
+      speedIncreasePerActivation: number;
+      maxSpeedMultiplier: number;
+      retreatSpeedMultiplier: number;
     });
 
 /**
@@ -41,5 +52,19 @@ export const ENEMY_ABILITY_DEFS: Record<string, EnemyAbilityDefinition> = {
     defenseMultiplier: 2,
     specialDefenseMultiplier: 2,
     visualEffectConfigId: 'enemy_harden_1',
+  },
+  SONARION_HOWL: {
+    id: 'SONARION_HOWL',
+    type: 'PROXIMITY_HOWL_SPEED_STACK',
+    initialCooldownMs: 0,
+    cooldownMs: 1400,
+    triggerCaptureUnitTdConfigId: 'maribel_capture',
+    triggerRadius: 11,
+    targetCreatureId: 'resonarion',
+    maxActivations: 3,
+    speedIncreasePerActivation: 0.05,
+    maxSpeedMultiplier: 5,
+    retreatSpeedMultiplier: 0.1,
+    visualEffectConfigId: 'enemy_sonarion_howl_1',
   },
 };

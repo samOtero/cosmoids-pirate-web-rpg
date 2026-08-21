@@ -4,11 +4,31 @@ export function getActiveSpeedMultiplier(
   unit: BaseTDUnit,
   currentTimeMs: number
 ): number {
+  const persistentBoost = Math.max(1, unit.persistentSpeedBoostMultiplier ?? 1);
   if ((unit.speedBoostUntilMs ?? 0) > currentTimeMs) {
-    return Math.max(1, unit.speedBoostMultiplier ?? 1);
+    return persistentBoost * Math.max(1, unit.speedBoostMultiplier ?? 1);
   }
 
-  return Math.min(1, Math.max(0.01, unit.speedSlowMultiplier ?? 1));
+  return (
+    persistentBoost * Math.min(1, Math.max(0.01, unit.speedSlowMultiplier ?? 1))
+  );
+}
+
+/** Adds percentage points to a unit-owned speed multiplier and returns it. */
+export function applyStackingPersistentSpeedBoost(
+  unit: BaseTDUnit,
+  increase: number,
+  maxMultiplier: number
+): number {
+  const previousMultiplier = Math.max(
+    1,
+    unit.persistentSpeedBoostMultiplier ?? 1
+  );
+  unit.persistentSpeedBoostMultiplier = Math.min(
+    Math.max(1, maxMultiplier),
+    previousMultiplier + Math.max(0, increase)
+  );
+  return unit.persistentSpeedBoostMultiplier;
 }
 
 export function hasActiveSpeedBoost(
@@ -27,14 +47,18 @@ export function hasActiveSpeedSlow(
 
 /**
  * Applies a movement penalty with no timer. Repeated slows keep the stronger
- * penalty, while an already-active speed boost prevents the slow from landing.
+ * penalty, while an active timed boost prevents the slow from landing. Unit-
+ * owned stacking boosts remain independently counterable by slows.
  */
 export function applyPersistentSpeedSlow(
   unit: BaseTDUnit,
   multiplier: number,
   currentTimeMs: number
 ): boolean {
-  if (hasActiveSpeedBoost(unit, currentTimeMs)) return false;
+  const hasActiveTimedBoost =
+    (unit.speedBoostUntilMs ?? 0) > currentTimeMs &&
+    (unit.speedBoostMultiplier ?? 1) > 1;
+  if (hasActiveTimedBoost) return false;
 
   const nextMultiplier = Math.min(1, Math.max(0.01, multiplier));
   const previousMultiplier = unit.speedSlowMultiplier ?? 1;

@@ -84,7 +84,14 @@ export interface TDResonantEvolutionConfig {
   sourceCreatureId: string;
   evolvedEnemyDefinitionId: string;
   requiredCount: number;
+  /** Distance from the capture unit at which the first chain member can anchor. */
   radius: number;
+  /** Distance at which later members can link to an existing chain member. */
+  linkRadius?: number;
+  /** Minimum distance between participants so their sprites remain readable. */
+  minimumSpacing?: number;
+  /** Prevents a linked chain from extending too far from its capture unit. */
+  maxDistanceFromCaptureUnit?: number;
   gatherWaitDurationMs: number;
   channelDurationMs: number;
   recoveryDurationMs: number;
@@ -104,6 +111,8 @@ export interface BaseTDUnit {
   /** Shared timed movement boost state used by abilities, attacks, and UI. */
   speedBoostMultiplier?: number;
   speedBoostUntilMs?: number;
+  /** Additively stacked, untimed movement boost owned by this unit instance. */
+  persistentSpeedBoostMultiplier?: number;
   /** Persistent movement penalty; cleared when the unit receives a speed boost. */
   speedSlowMultiplier?: number;
   /** Persistent positive defense modifiers shown by the battlefield UI. */
@@ -163,6 +172,8 @@ export interface CaptureUnitRelocationState extends CaptureUnitWaveRelocation {
 export interface CaptureUnitDefinition {
   tdConfigId: string;
   position: Point;
+  /** Multiplies an enemy's final movement speed while it carries this unit. */
+  carrierSpeedMultiplier?: number;
   returnHome?: CaptureUnitReturnHomeConfig;
   waveRelocations?: CaptureUnitWaveRelocation[];
 }
@@ -171,6 +182,7 @@ export interface CaptureUnit extends BaseTDUnit {
   tdConfigId: string;
   heldByEnemyId?: string;
   homePosition: Point;
+  carrierSpeedMultiplier?: number;
   returnHome?: CaptureUnitReturnHomeConfig;
   returnHomeAvailableAtMs?: number;
   waveRelocations?: CaptureUnitWaveRelocation[];
@@ -277,13 +289,14 @@ export interface Enemy extends BaseTDUnit {
     groupId: string;
     captureUnitId: string;
     role: 'evolving' | 'helper';
+    phase: 'forming' | 'channeling';
+    /** Omitted when this member is linked directly to the capture unit. */
+    linkTargetEnemyId?: string;
     startedAtMs: number;
     durationMs: number;
   };
   /** Spent helpers may retreat but cannot contribute to another channel. */
   resonantEvolutionSpent?: boolean;
-  /** Lesser enemies briefly wait by the objective for enough allies to arrive. */
-  resonantEvolutionWaitingUntilMs?: number;
   /** Newly evolved enemies pause briefly before moving or taking the objective. */
   resonantEvolutionRecoveryUntilMs?: number;
   /** Keeps the evolved enemy beside its intended objective until pickup is resolved. */
@@ -293,6 +306,8 @@ export interface Enemy extends BaseTDUnit {
     definitionId: string;
     nextReadyTimeMs: number;
     hasActivated?: boolean;
+    activationCount?: number;
+    despawnRequested?: boolean;
     /** When true, only an explicit trigger can activate this ability. */
     manualOnly?: boolean;
   };

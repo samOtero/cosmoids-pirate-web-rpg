@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   applyPersistentSpeedSlow,
+  applyStackingPersistentSpeedBoost,
   applyTimedSpeedBoost,
   getActiveSpeedMultiplier,
   hasActiveSpeedBoost,
@@ -64,5 +65,18 @@ describe('shared speed modifiers', () => {
 
     expect(applyPersistentSpeedSlow(unit, 2 / 3, 2000)).toBe(false);
     expect(unit.speedSlowMultiplier).toBeUndefined();
+  });
+
+  it('stacks an untimed unit-owned boost without exceeding its cap', () => {
+    const unit = createUnit();
+
+    expect(applyStackingPersistentSpeedBoost(unit, 0.05, 5)).toBe(1.05);
+    expect(applyStackingPersistentSpeedBoost(unit, 0.05, 5)).toBe(1.1);
+    unit.persistentSpeedBoostMultiplier = 4.98;
+    expect(applyStackingPersistentSpeedBoost(unit, 0.05, 5)).toBe(5);
+    expect(getActiveSpeedMultiplier(unit, 1_000_000)).toBe(5);
+
+    expect(applyPersistentSpeedSlow(unit, 0.5, 1_000_000)).toBe(true);
+    expect(getActiveSpeedMultiplier(unit, 1_000_000)).toBe(2.5);
   });
 });

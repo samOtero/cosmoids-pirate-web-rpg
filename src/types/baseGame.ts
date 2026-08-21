@@ -172,6 +172,7 @@ export interface VFXAnimationConfig {
     | 'COIR_SNARE'
     | 'STRING_SHOT'
     | 'WIND_GUST'
+    | 'HOWL'
     | 'HARDEN'
     | 'BARREL_BASH'
     | 'KEYFRAME_SPRITES';

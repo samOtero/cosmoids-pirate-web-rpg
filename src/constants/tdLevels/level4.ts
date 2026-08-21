@@ -1,9 +1,4 @@
 import { TDLevelData } from '@/engine/tower-defense/types';
-import { VANE_LEVEL } from './vaneLevel';
-
-const MARKET_POSITION_WEST = { x: 26.8, y: 50 };
-const MARKET_POSITION_CENTER = { x: 47, y: 50 };
-const MARKET_POSITION_EAST = { x: 70.6, y: 50 };
 
 /**
  * Level 4 stays inside one navy-controlled market block. Mari advances to a
@@ -12,94 +7,256 @@ const MARKET_POSITION_EAST = { x: 70.6, y: 50 };
  */
 export const LEVEL_4: TDLevelData = {
   paths: [
-    // 1: simple northwest approach to the western market position.
     [
-      { x: 11.8, y: -3 },
-      { x: 11.8, y: 29 },
-      { x: 26.8, y: 29 },
-      MARKET_POSITION_WEST,
+      {
+        x: 11.8,
+        y: -3,
+      },
+      {
+        x: 11.8,
+        y: 29,
+      },
+      {
+        x: 26.8,
+        y: 29,
+      },
+      {
+        x: 26.8,
+        y: 50,
+      },
     ],
-    // 2: simple southwest approach sharing the western defense pocket.
     [
-      { x: 11.2, y: 103 },
-      { x: 16.5, y: 103 },
-      { x: 16.5, y: 82 },
-      { x: 26.8, y: 82 },
-      MARKET_POSITION_WEST,
+      {
+        x: 11.2,
+        y: 103,
+      },
+      {
+        x: 16.5,
+        y: 103,
+      },
+      {
+        x: 16.5,
+        y: 82,
+      },
+      {
+        x: 26.8,
+        y: 82,
+      },
+      {
+        x: 26.8,
+        y: 50,
+      },
     ],
-    // 3: northern switchback around the fountain market stalls.
     [
-      { x: 46, y: -3 },
-      { x: 46, y: 16 },
-      { x: 40, y: 16 },
-      { x: 40, y: 31 },
-      { x: 55, y: 31 },
-      { x: 55, y: 50 },
-      MARKET_POSITION_CENTER,
+      {
+        x: 46,
+        y: -3,
+      },
+      {
+        x: 46,
+        y: 16,
+      },
+      {
+        x: 40,
+        y: 16,
+      },
+      {
+        x: 40,
+        y: 31,
+      },
+      {
+        x: 55,
+        y: 31,
+      },
+      {
+        x: 55,
+        y: 50,
+      },
+      {
+        x: 47,
+        y: 50,
+      },
     ],
-    // 4: southern switchback that only briefly crosses earlier coverage.
     [
-      { x: 47, y: 103 },
-      { x: 47, y: 83 },
-      { x: 52, y: 83 },
-      { x: 52, y: 72 },
-      { x: 47, y: 72 },
-      MARKET_POSITION_CENTER,
+      {
+        x: 47,
+        y: 103,
+      },
+      {
+        x: 47,
+        y: 83,
+      },
+      {
+        x: 52,
+        y: 83,
+      },
+      {
+        x: 52,
+        y: 72,
+      },
+      {
+        x: 47,
+        y: 72,
+      },
+      {
+        x: 47,
+        y: 50,
+      },
     ],
-    // 5: short upper loading-yard route with limited shared coverage.
     [
-      { x: 86.5, y: -3 },
-      { x: 86.5, y: 20 },
-      { x: 83.5, y: 20 },
-      { x: 83.5, y: 27 },
-      { x: 70.6, y: 27 },
-      MARKET_POSITION_EAST,
+      {
+        x: 86.5,
+        y: -3,
+      },
+      {
+        x: 86.5,
+        y: 20,
+      },
+      {
+        x: 83.5,
+        y: 20,
+      },
+      {
+        x: 83.5,
+        y: 27,
+      },
+      {
+        x: 70.6,
+        y: 27,
+      },
+      {
+        x: 70.6,
+        y: 50,
+      },
     ],
-    // 6: long lower loading-yard switchback that converges at the last turn.
     [
-      { x: 89.6, y: 103 },
-      { x: 89.6, y: 80 },
-      { x: 83.5, y: 80 },
-      { x: 83.5, y: 72 },
-      { x: 74, y: 72 },
-      { x: 74, y: 63 },
-      { x: 78, y: 63 },
-      { x: 78, y: 57 },
-      { x: 70.6, y: 57 },
-      MARKET_POSITION_EAST,
+      {
+        x: 89.6,
+        y: 103,
+      },
+      {
+        x: 89.6,
+        y: 80,
+      },
+      {
+        x: 83.5,
+        y: 80,
+      },
+      {
+        x: 83.5,
+        y: 72,
+      },
+      {
+        x: 74,
+        y: 72,
+      },
+      {
+        x: 74,
+        y: 63,
+      },
+      {
+        x: 78,
+        y: 63,
+      },
+      {
+        x: 78,
+        y: 57,
+      },
+      {
+        x: 70.6,
+        y: 57,
+      },
+      {
+        x: 70.6,
+        y: 50,
+      },
     ],
   ],
   placementSpots: [
-    { x: 28, y: 24 },
-    { x: 38, y: 23 },
-    { x: 88, y: 25 },
-    { x: 28, y: 42 },
-    { x: 38, y: 39 },
-    { x: 70, y: 41 },
-    { x: 24, y: 57 },
-    { x: 25, y: 74 },
-    { x: 88, y: 78 },
+    {
+      x: 28,
+      y: 24,
+    },
+    {
+      x: 38,
+      y: 23,
+    },
+    {
+      x: 88,
+      y: 25,
+    },
+    {
+      x: 28,
+      y: 42,
+    },
+    {
+      x: 38,
+      y: 39,
+    },
+    {
+      x: 70,
+      y: 41,
+    },
+    {
+      x: 24,
+      y: 57,
+    },
+    {
+      x: 25,
+      y: 74,
+    },
+    {
+      x: 88,
+      y: 78,
+    },
   ],
   environmentUnits: [
     {
-      position: { x: 31, y: 53 },
+      position: {
+        x: 19.36,
+        y: 53.39,
+      },
       tdConfigId: 'caleb_battle',
       facingDirection: 'right',
     },
     {
-      position: { x: 34, y: 54 },
+      position: {
+        x: 39.41,
+        y: 39.09,
+      },
       tdConfigId: 'kip_battle',
       facingDirection: 'right',
     },
   ],
-  startingTowers: VANE_LEVEL.startingTowers?.map((tower) => ({
-    ...tower,
-    position: { x: 40, y: 55 },
-  })),
+  startingTowers: [
+    {
+      creature: {
+        id: 'kip_mopup',
+        speciesId: 'mopup',
+        level: 5,
+        xp: 0,
+        equippedAttacks: ['TACKLE'],
+        activeAttackIndex: 0,
+        targetingMode: 'first',
+        isShiny: false,
+      },
+      position: {
+        x: 40,
+        y: 55,
+      },
+      facingDirection: 'right',
+      isFixed: true,
+      receivesExperience: false,
+    },
+  ],
   captureUnits: [
     {
-      position: MARKET_POSITION_WEST,
+      position: {
+        x: 26.8,
+        y: 50,
+      },
       tdConfigId: 'maribel_capture',
+      carrierSpeedMultiplier: 0.5,
       returnHome: {
         pathIndex: 0,
         speed: 2,
@@ -108,26 +265,35 @@ export const LEVEL_4: TDLevelData = {
       waveRelocations: [
         {
           afterWaveIndex: 0,
-          path: [MARKET_POSITION_WEST, MARKET_POSITION_CENTER],
+          path: [
+            {
+              x: 26.8,
+              y: 50,
+            },
+            {
+              x: 47,
+              y: 50,
+            },
+          ],
           speed: 7,
         },
         {
           afterWaveIndex: 1,
-          path: [MARKET_POSITION_CENTER, MARKET_POSITION_EAST],
+          path: [
+            {
+              x: 47,
+              y: 50,
+            },
+            {
+              x: 70.6,
+              y: 50,
+            },
+          ],
           speed: 7,
         },
       ],
     },
   ],
-  resonantEvolution: {
-    sourceCreatureId: 'sonarion',
-    evolvedEnemyDefinitionId: 'ironbell_resonarion',
-    requiredCount: 3,
-    radius: 11,
-    gatherWaitDurationMs: 4000,
-    channelDurationMs: 2200,
-    recoveryDurationMs: 900,
-  },
   waveEnemyDefinitions: [
     {
       id: 'ironbell_sonarion',
@@ -136,6 +302,7 @@ export const LEVEL_4: TDLevelData = {
       speedMultiplier: 1.7,
       hpMultiplier: 2,
       canCarryCaptureUnits: false,
+      abilityId: 'SONARION_HOWL',
     },
     {
       id: 'ironbell_resonarion',

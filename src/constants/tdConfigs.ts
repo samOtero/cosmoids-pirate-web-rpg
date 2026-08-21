@@ -499,6 +499,14 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       },
     },
   },
+  enemy_sonarion_howl_1: {
+    default: {
+      vfxAnimation: {
+        type: 'HOWL',
+        durationMs: 700,
+      },
+    },
+  },
   enemy_harden_1: {
     default: {
       offsetY: -24,

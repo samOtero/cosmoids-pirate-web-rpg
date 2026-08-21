@@ -396,15 +396,13 @@ function updateResonantEvolutionIndicator(
   delta: number
 ) {
   const state = enemy.resonantEvolutionState;
-  const isWaiting =
-    (enemy.resonantEvolutionWaitingUntilMs ?? 0) > currentTimeMs;
   const isRecovering =
     (enemy.resonantEvolutionRecoveryUntilMs ?? 0) > currentTimeMs;
   let indicator = container.getChildByLabel('resonantEvolutionIndicator') as
     | ResonantEvolutionIndicator
     | undefined;
 
-  if (!state && !isWaiting && !isRecovering) {
+  if (!state && !isRecovering) {
     if (indicator) {
       container.removeChild(indicator);
       indicator.destroy({ children: true });
@@ -428,7 +426,8 @@ function updateResonantEvolutionIndicator(
     | undefined;
   if (!rings) return;
 
-  const isEvolving = state?.role === 'evolving';
+  const isChanneling = state?.phase === 'channeling';
+  const isEvolving = isChanneling && state?.role === 'evolving';
   const progress = state
     ? Math.max(
         0,
@@ -439,7 +438,7 @@ function updateResonantEvolutionIndicator(
   const primaryColor = isEvolving || isRecovering ? 0xfacc15 : 0x67e8f9;
 
   rings.clear();
-  const ringCount = isWaiting && !state ? 2 : 3;
+  const ringCount = state?.phase === 'forming' ? 2 : 3;
   for (let index = 0; index < ringCount; index++) {
     const radius = 20 + index * 7 + pulse * (1.5 + index * 0.4);
     rings.circle(0, 0, radius);
@@ -883,6 +882,63 @@ function drawWindGust(container: PIXI.Container) {
   const streaks = new PIXI.Graphics();
   streaks.label = 'wind_gust_streaks';
   container.addChild(streaks);
+}
+
+function drawHowl(container: PIXI.Container) {
+  const rings = new PIXI.Graphics();
+  rings.label = 'howl_rings';
+  container.addChild(rings);
+
+  const accents = new PIXI.Graphics();
+  accents.label = 'howl_accents';
+  container.addChild(accents);
+}
+
+function updateHowl(
+  container: PIXI.Container,
+  progress: number,
+  maxRadius: number
+) {
+  const rings = container.getChildByLabel('howl_rings') as
+    | PIXI.Graphics
+    | undefined;
+  const accents = container.getChildByLabel('howl_accents') as
+    | PIXI.Graphics
+    | undefined;
+  const expansion = 1 - Math.pow(1 - progress, 2.6);
+  const fade = 1 - Math.max(0, (progress - 0.68) / 0.32);
+  const radius = Math.max(3, maxRadius * expansion);
+
+  if (rings) {
+    rings.clear();
+    for (let index = 0; index < 3; index += 1) {
+      const ringRadius = radius * (0.56 + index * 0.2);
+      rings.circle(0, 0, ringRadius);
+      rings.stroke({
+        color: index === 1 ? 0xfacc15 : 0x67e8f9,
+        width: 4 - index * 0.7,
+        alpha: fade * (0.9 - index * 0.16),
+      });
+    }
+  }
+
+  if (accents) {
+    accents.clear();
+    for (let index = 0; index < 10; index += 1) {
+      const angle = index * 2.399 + progress * 0.8;
+      const innerRadius = radius * 0.72;
+      const outerRadius = innerRadius + 8 + (index % 3) * 4;
+      accents.moveTo(
+        Math.cos(angle) * innerRadius,
+        Math.sin(angle) * innerRadius
+      );
+      accents.lineTo(
+        Math.cos(angle) * outerRadius,
+        Math.sin(angle) * outerRadius
+      );
+    }
+    accents.stroke({ color: 0xfef08a, width: 3, alpha: fade * 0.75 });
+  }
 }
 
 function updateWindGust(
@@ -2239,29 +2295,33 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           }
 
           // --- Render Enemies ---
-          const resonantGroups = new Map<string, Enemy[]>();
           engine.enemies.forEach((enemy) => {
-            const groupId = enemy.resonantEvolutionState?.groupId;
-            if (!groupId) return;
-            const group = resonantGroups.get(groupId) ?? [];
-            group.push(enemy);
-            resonantGroups.set(groupId, group);
-          });
-          resonantGroups.forEach((participants) => {
-            if (participants.length < 2) return;
-            const points = participants.map((enemy) => ({
-              x: offsetX + (enemy.position.x / 100) * screenW,
-              y: offsetY + (enemy.position.y / 100) * screenH,
-            }));
-            points.forEach((point, index) => {
-              const next = points[(index + 1) % points.length];
-              resonantEvolutionGraphics.moveTo(point.x, point.y);
-              resonantEvolutionGraphics.lineTo(next.x, next.y);
-            });
+            const state = enemy.resonantEvolutionState;
+            if (!state) return;
+            const linkTarget = state.linkTargetEnemyId
+              ? engine.enemies.find(
+                  (candidate) => candidate.id === state.linkTargetEnemyId
+                )
+              : engine.captureUnits.find(
+                  (captureUnit) => captureUnit.id === state.captureUnitId
+                );
+            if (!linkTarget) return;
+
+            resonantEvolutionGraphics.moveTo(
+              offsetX + (enemy.position.x / 100) * screenW,
+              offsetY + (enemy.position.y / 100) * screenH
+            );
+            resonantEvolutionGraphics.lineTo(
+              offsetX + (linkTarget.position.x / 100) * screenW,
+              offsetY + (linkTarget.position.y / 100) * screenH
+            );
             resonantEvolutionGraphics.stroke({
               color: 0x67e8f9,
-              alpha: 0.72,
-              width: Math.max(2, 3 * zoom),
+              alpha: state.phase === 'channeling' ? 0.9 : 0.58,
+              width: Math.max(
+                2,
+                (state.phase === 'channeling' ? 4 : 2.5) * zoom
+              ),
               cap: 'round',
               join: 'round',
             });
@@ -2600,6 +2660,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 }
               } else if (animConfig?.type === 'WIND_GUST') {
                 drawWindGust(container);
+              } else if (animConfig?.type === 'HOWL') {
+                drawHowl(container);
               } else if (animConfig?.type === 'HARDEN') {
                 drawHarden(container);
               } else if (animConfig?.type === 'BARREL_BASH') {
@@ -2637,7 +2699,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               offsetY +
               (vfx.position.y / 100) * screenH +
               effectOffsetY * finalScale;
-            if (animConfig?.type === 'WIND_GUST') {
+            if (
+              animConfig?.type === 'WIND_GUST' ||
+              animConfig?.type === 'HOWL'
+            ) {
               container.scale.set(
                 (zoom * app.screen.width) / TD_BASE_HEIGHT,
                 finalScale
@@ -2681,6 +2746,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             } else if (animConfig?.type === 'WIND_GUST') {
               const radius = (TD_BASE_HEIGHT * (vfx.rangeIndex ?? 20)) / 100;
               updateWindGust(container, progress, radius);
+            } else if (animConfig?.type === 'HOWL') {
+              const radius = (TD_BASE_HEIGHT * (vfx.rangeIndex ?? 11)) / 100;
+              updateHowl(container, progress, radius);
             } else if (animConfig?.type === 'HARDEN') {
               updateHarden(container, progress);
             } else if (animConfig?.type === 'BARREL_BASH') {
