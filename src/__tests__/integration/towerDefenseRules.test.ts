@@ -190,7 +190,7 @@ describe('Tower defense rules', () => {
     ]);
   });
 
-  it('sets up Level 4 with a staged market objective and no story dialogs', () => {
+  it('sets up Level 4 with its intro and staged market objective', () => {
     expect(LEVEL_4.paths).toHaveLength(6);
     expect(LEVEL_4.backgroundUrl).toBe('/battles/bg/bg_market_level_4.png');
     expect(LEVEL_4.backgroundScale).toBe(3);
@@ -267,7 +267,12 @@ describe('Tower defense rules', () => {
       ],
       loseEvents: [{ type: 'GO_TO_LEVEL_SELECT' }],
     });
-    expect(TD_LEVELS[TDLevelContext.LEVEL_4].introEvents).toBeUndefined();
+    expect(TD_LEVELS[TDLevelContext.LEVEL_4].introEvents).toEqual([
+      {
+        type: 'SHOW_DIALOG',
+        payload: { context: DialogContext.LEVEL_4_INTRO },
+      },
+    ]);
     expect(
       TD_LEVELS[TDLevelContext.LEVEL_4].winEvents.some(
         (event) => event.type === 'SHOW_DIALOG'

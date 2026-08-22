@@ -131,6 +131,14 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
       progression: StoryProgression.DEFEAT_LEVEL_4,
       seenSpeciesIds: ['sonarion', 'resonarion'],
     },
+    introEvents: [
+      {
+        type: 'SHOW_DIALOG',
+        payload: {
+          context: DialogContext.LEVEL_4_INTRO,
+        },
+      },
+    ],
     winEvents: [
       {
         type: 'SET_STORY_PROGRESSION',

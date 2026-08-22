@@ -122,6 +122,9 @@ export enum BackgroundImageKey {
   LEVEL_2_SHIPWRECK_BEACH = 'Level_2_Shipwreck_Beach',
   LEVEL_2_REPAIRED_BOAT_SUPPLIES = 'Level_2_Repaired_Boat_Supplies',
   LEVEL_3_SAILING_AWAY = 'Level_3_Sailing_Away',
+  LEVEL_4_VANE_CHASE = 'Level_4_Vane_Chase',
+  LEVEL_4_IRONBELL_HARBOR = 'Level_4_Ironbell_Harbor',
+  LEVEL_4_IRONBELL_MARKET = 'Level_4_Ironbell_Market',
   DEFAULT = 'default',
 }
 
@@ -388,6 +391,7 @@ export enum DialogContext {
   LEVEL_3_INTRO = 'LEVEL_3_INTRO',
   LEVEL_3_WIN = 'LEVEL_3_WIN',
   LEVEL_3_LOSE = 'LEVEL_3_LOSE',
+  LEVEL_4_INTRO = 'LEVEL_4_INTRO',
   STARTER_BATTLE_LOSE = 'STARTER_BATTLE_LOSE',
   NEW_PLAYER_WELCOME_DIALOG_PART_2 = 'NEW_PLAYER_WELCOME_DIALOG_PART_2',
   GAME_INTRO_AFTER_STARTER = 'GAME_INTRO_AFTER_STARTER',
