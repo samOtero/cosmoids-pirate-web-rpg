@@ -49,6 +49,24 @@ describe("Kip's Journal derivation", () => {
         )
       )
     ).toEqual(['mouse_1', 'harlequill', 'mopup', 'bug_stage_1', 'bettle']);
+
+    expect(
+      Array.from(
+        getJournalSeenSpeciesIds(
+          createProfile({
+            storyProgression: StoryProgression.DEFEAT_LEVEL_4,
+          })
+        )
+      )
+    ).toEqual([
+      'mouse_1',
+      'harlequill',
+      'mopup',
+      'bug_stage_1',
+      'bettle',
+      'sonarion',
+      'resonarion',
+    ]);
   });
 
   it('does not invent evolution history for a legacy profile', () => {

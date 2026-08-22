@@ -219,4 +219,32 @@ describe('CosmoidCodexScreen', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Cocoonot, captured' }));
     expect(screen.getByText("Kip's Notes")).toBeInTheDocument();
   });
+
+  it('shows the Level 4 pack journal artwork and notes after capture', () => {
+    const level4Profile: Profile = {
+      ...profile,
+      storyProgression: StoryProgression.DEFEAT_LEVEL_4,
+      capturedSpeciesIds: ['sonarion', 'resonarion'],
+    };
+
+    render(<CosmoidCodexScreen profile={level4Profile} onBack={() => {}} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Sonarion, captured' }));
+    expect(
+      screen
+        .getByRole('img', { name: 'Sonarion field sketch' })
+        .getAttribute('src')
+    ).toContain(encodeURIComponent('/UI/Journal/sonarion_journal.png'));
+    expect(screen.getByText(/no one dares chase them/i)).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Resonarion, captured' })
+    );
+    expect(
+      screen
+        .getByRole('img', { name: 'Resonarion field sketch' })
+        .getAttribute('src')
+    ).toContain(encodeURIComponent('/UI/Journal/resonarion_journal.png'));
+    expect(screen.getByText(/golden static races/i)).toBeInTheDocument();
+  });
 });

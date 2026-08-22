@@ -11,6 +11,8 @@ const CURRENT_JOURNAL_SPECIES_IDS = [
   'bug_stage_2',
   'bug_stage_3',
   'bettle',
+  'sonarion',
+  'resonarion',
 ] as const;
 
 describe("Kip's journal entries", () => {
