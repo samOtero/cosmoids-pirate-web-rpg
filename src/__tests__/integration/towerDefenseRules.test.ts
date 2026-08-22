@@ -263,9 +263,19 @@ describe('Tower defense rules', () => {
           payload: { progression: StoryProgression.DEFEAT_LEVEL_4 },
           autoProceed: true,
         },
+        {
+          type: 'SHOW_DIALOG',
+          payload: { context: DialogContext.LEVEL_4_WIN },
+        },
         { type: 'GO_TO_LEVEL_SELECT' },
       ],
-      loseEvents: [{ type: 'GO_TO_LEVEL_SELECT' }],
+      loseEvents: [
+        {
+          type: 'SHOW_DIALOG',
+          payload: { context: DialogContext.LEVEL_4_LOSE },
+        },
+        { type: 'GO_TO_LEVEL_SELECT' },
+      ],
     });
     expect(TD_LEVELS[TDLevelContext.LEVEL_4].introEvents).toEqual([
       {
@@ -277,12 +287,12 @@ describe('Tower defense rules', () => {
       TD_LEVELS[TDLevelContext.LEVEL_4].winEvents.some(
         (event) => event.type === 'SHOW_DIALOG'
       )
-    ).toBe(false);
+    ).toBe(true);
     expect(
       TD_LEVELS[TDLevelContext.LEVEL_4].loseEvents.some(
         (event) => event.type === 'SHOW_DIALOG'
       )
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it('automatically prevents cursed enemies from being captured', () => {
