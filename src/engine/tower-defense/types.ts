@@ -113,6 +113,8 @@ export interface BaseTDUnit {
   speedBoostUntilMs?: number;
   /** Additively stacked, untimed movement boost owned by this unit instance. */
   persistentSpeedBoostMultiplier?: number;
+  /** Number of visible stacks contributing to the persistent speed boost. */
+  persistentSpeedBoostStackCount?: number;
   /** Persistent movement penalty; cleared when the unit receives a speed boost. */
   speedSlowMultiplier?: number;
   /** Persistent positive defense modifiers shown by the battlefield UI. */

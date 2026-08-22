@@ -162,6 +162,14 @@ function updateSparkles(
 
 type SpeedBoostIndicator = PIXI.Container & {
   elapsed: number;
+  displayedStackCount: number;
+  stackPulseElapsed: number;
+};
+
+type PersistentSpeedStackAura = PIXI.Container & {
+  elapsed: number;
+  displayedStackCount: number;
+  stackPulseElapsed: number;
 };
 
 function drawSpeedChevron(
@@ -202,6 +210,8 @@ function updateSpeedBoostIndicator(
     indicator = new PIXI.Container() as SpeedBoostIndicator;
     indicator.label = 'speedBoostIndicator';
     indicator.elapsed = 0;
+    indicator.displayedStackCount = 0;
+    indicator.stackPulseElapsed = 999;
 
     const badge = new PIXI.Graphics();
     badge.label = 'speedBoostBadge';
@@ -216,21 +226,64 @@ function updateSpeedBoostIndicator(
     drawSpeedChevron(chevrons, 4, 0x67e8f9);
     indicator.addChild(chevrons);
 
+    const stackBadge = new PIXI.Graphics();
+    stackBadge.label = 'speedBoostStackBadge';
+    stackBadge.roundRect(8, -9, 26, 18, 9);
+    stackBadge.fill({ color: 0x164e63, alpha: 0.96 });
+    stackBadge.stroke({ color: 0xfacc15, alpha: 0.98, width: 1.5 });
+    stackBadge.visible = false;
+    indicator.addChild(stackBadge);
+
+    const stackText = new PIXI.Text({
+      text: '',
+      style: {
+        fontFamily: 'Arial, sans-serif',
+        fontSize: 11,
+        fontWeight: 'bold',
+        fill: 0xfef9c3,
+        stroke: { color: 0x082f49, width: 2 },
+      },
+    });
+    stackText.label = 'speedBoostStackText';
+    stackText.anchor.set(0.5);
+    stackText.position.set(21, 0);
+    stackText.visible = false;
+    indicator.addChild(stackText);
+
     container.addChild(indicator);
   }
 
   indicator.elapsed += delta;
+  indicator.stackPulseElapsed += delta;
+  const stackCount = unit.persistentSpeedBoostStackCount ?? 0;
+  if (indicator.displayedStackCount !== stackCount) {
+    indicator.displayedStackCount = stackCount;
+    indicator.stackPulseElapsed = 0;
+  }
   const tdConfigMap = CREATURE_TD_CONFIGS[configId] || {
     default: { scale: 1 },
   };
   const tdConfig = tdConfigMap[unit.facingDirection] || tdConfigMap.default;
   const hpOffsetY =
     tdConfig.healthBarOffsetY ?? tdConfigMap.default?.healthBarOffsetY ?? -40;
-  indicator.position.set(33, hpOffsetY - 13);
+  indicator.position.set(stackCount > 0 ? 20 : 33, hpOffsetY - 13);
 
   const pulse = 1 + Math.sin(indicator.elapsed * 0.14) * 0.07;
-  indicator.scale.set(pulse);
+  const stackArrivalPulse = Math.max(0, 1 - indicator.stackPulseElapsed / 18);
+  indicator.scale.set(pulse + stackArrivalPulse * 0.28);
   indicator.alpha = 0.88 + Math.sin(indicator.elapsed * 0.1) * 0.12;
+
+  const stackBadge = indicator.getChildByLabel('speedBoostStackBadge') as
+    | PIXI.Graphics
+    | undefined;
+  const stackText = indicator.getChildByLabel('speedBoostStackText') as
+    | PIXI.Text
+    | undefined;
+  if (stackBadge) stackBadge.visible = stackCount > 0;
+  if (stackText) {
+    stackText.visible = stackCount > 0;
+    stackText.text = stackCount > 0 ? `×${stackCount}` : '';
+  }
 
   const chevrons = indicator.getChildByLabel('speedBoostChevrons') as
     | PIXI.Graphics
@@ -238,6 +291,74 @@ function updateSpeedBoostIndicator(
   if (chevrons) {
     chevrons.x = ((indicator.elapsed * 0.08) % 3) - 1.5;
   }
+}
+
+/**
+ * Persistent howl-stack treatment: each received stack adds a separate
+ * counter-rotating energy orbit around the boosted unit.
+ */
+function updatePersistentSpeedStackAura(
+  container: PIXI.Container,
+  unit: BaseTDUnit,
+  delta: number
+) {
+  const stackCount = unit.persistentSpeedBoostStackCount ?? 0;
+  let aura = container.getChildByLabel('persistentSpeedStackAura') as
+    | PersistentSpeedStackAura
+    | undefined;
+
+  if (stackCount <= 0) {
+    if (aura) {
+      container.removeChild(aura);
+      aura.destroy({ children: true });
+    }
+    return;
+  }
+
+  if (!aura) {
+    aura = new PIXI.Container() as PersistentSpeedStackAura;
+    aura.label = 'persistentSpeedStackAura';
+    aura.elapsed = 0;
+    aura.displayedStackCount = 0;
+    aura.stackPulseElapsed = 999;
+    aura.y = 5;
+    // Place the buildup over the shadow but behind the creature artwork.
+    container.addChildAt(aura, Math.min(1, container.children.length));
+  }
+
+  aura.elapsed += delta;
+  aura.stackPulseElapsed += delta;
+
+  if (aura.displayedStackCount !== stackCount) {
+    aura.removeChildren().forEach((child) => child.destroy());
+    for (let index = 0; index < stackCount; index += 1) {
+      const ring = new PIXI.Graphics();
+      ring.label = `persistentSpeedStackRing${index}`;
+      const radiusX = 28 + index * 6;
+      const radiusY = 10 + index * 2;
+      ring.ellipse(0, 0, radiusX, radiusY);
+      ring.stroke({
+        color: index % 2 === 0 ? 0x67e8f9 : 0xfacc15,
+        width: 2.4,
+        alpha: 0.76,
+      });
+      ring.circle(radiusX, 0, 3.2);
+      ring.fill({ color: 0xfef9c3, alpha: 0.96 });
+      aura.addChild(ring);
+    }
+    aura.displayedStackCount = stackCount;
+    aura.stackPulseElapsed = 0;
+  }
+
+  const arrivalPulse = Math.max(0, 1 - aura.stackPulseElapsed / 22);
+  const idlePulse = 1 + Math.sin(aura.elapsed * 0.075) * 0.035;
+  aura.scale.set(idlePulse + arrivalPulse * 0.24);
+  aura.alpha = 0.62 + Math.sin(aura.elapsed * 0.08) * 0.12;
+
+  aura.children.forEach((child, index) => {
+    child.rotation =
+      aura!.elapsed * (index % 2 === 0 ? 0.012 : -0.009) + index * 0.7;
+  });
 }
 
 type SpeedSlowIndicator = PIXI.Container & {
@@ -2084,6 +2205,11 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               engine.elapsedTimeMs,
               app.ticker.deltaTime
             );
+            updatePersistentSpeedStackAura(
+              container,
+              tower,
+              app.ticker.deltaTime
+            );
             updateDefenseBoostIndicator(
               container,
               tower,
@@ -2387,6 +2513,11 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               enemy,
               enemy.definitionId,
               engine.elapsedTimeMs,
+              app.ticker.deltaTime
+            );
+            updatePersistentSpeedStackAura(
+              container,
+              enemy,
               app.ticker.deltaTime
             );
             updateSpeedSlowIndicator(

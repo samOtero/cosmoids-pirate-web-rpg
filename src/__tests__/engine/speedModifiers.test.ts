@@ -71,9 +71,14 @@ describe('shared speed modifiers', () => {
     const unit = createUnit();
 
     expect(applyStackingPersistentSpeedBoost(unit, 0.05, 5)).toBe(1.05);
+    expect(unit.persistentSpeedBoostStackCount).toBe(1);
     expect(applyStackingPersistentSpeedBoost(unit, 0.05, 5)).toBe(1.1);
+    expect(unit.persistentSpeedBoostStackCount).toBe(2);
     unit.persistentSpeedBoostMultiplier = 4.98;
     expect(applyStackingPersistentSpeedBoost(unit, 0.05, 5)).toBe(5);
+    expect(unit.persistentSpeedBoostStackCount).toBe(3);
+    expect(applyStackingPersistentSpeedBoost(unit, 0.05, 5)).toBe(5);
+    expect(unit.persistentSpeedBoostStackCount).toBe(3);
     expect(getActiveSpeedMultiplier(unit, 1_000_000)).toBe(5);
 
     expect(applyPersistentSpeedSlow(unit, 0.5, 1_000_000)).toBe(true);

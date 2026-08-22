@@ -28,6 +28,10 @@ export function applyStackingPersistentSpeedBoost(
     Math.max(1, maxMultiplier),
     previousMultiplier + Math.max(0, increase)
   );
+  if (unit.persistentSpeedBoostMultiplier > previousMultiplier) {
+    unit.persistentSpeedBoostStackCount =
+      (unit.persistentSpeedBoostStackCount ?? 0) + 1;
+  }
   return unit.persistentSpeedBoostMultiplier;
 }
 
