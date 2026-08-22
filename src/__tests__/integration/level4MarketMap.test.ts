@@ -2,6 +2,38 @@ import { describe, expect, it } from 'vitest';
 
 import { LEVEL_4 } from '@/constants/tdLevels/level4';
 
+const distanceToSegment = (
+  point: { x: number; y: number },
+  start: { x: number; y: number },
+  end: { x: number; y: number }
+) => {
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  const lengthSquared = dx * dx + dy * dy;
+  const projection = Math.max(
+    0,
+    Math.min(
+      1,
+      ((point.x - start.x) * dx + (point.y - start.y) * dy) / lengthSquared
+    )
+  );
+
+  return Math.hypot(
+    point.x - (start.x + projection * dx),
+    point.y - (start.y + projection * dy)
+  );
+};
+
+const distanceToPath = (
+  point: { x: number; y: number },
+  path: { x: number; y: number }[]
+) =>
+  Math.min(
+    ...path
+      .slice(1)
+      .map((end, index) => distanceToSegment(point, path[index], end))
+  );
+
 describe('Level 4 market map', () => {
   it('uses six strictly orthogonal paths in escalating wave pairs', () => {
     expect(LEVEL_4.paths).toHaveLength(6);
@@ -49,6 +81,16 @@ describe('Level 4 market map', () => {
     expect(
       mari?.waveRelocations?.map((relocation) => relocation.path.at(0))
     ).toEqual(destinations.slice(0, -1));
+  });
+
+  it('provides at least three nearby tower spots for every path', () => {
+    LEVEL_4.paths.forEach((path) => {
+      const nearbySpots = LEVEL_4.placementSpots.filter(
+        (spot) => distanceToPath(spot, path) <= 10
+      );
+
+      expect(nearbySpots.length).toBeGreaterThanOrEqual(3);
+    });
   });
 
   it('uses the dedicated painted market background', () => {

@@ -85,6 +85,14 @@ describe('Sonarion Howl enemy ability', () => {
     engine.tick(0, 16);
     expect(original.persistentSpeedBoostMultiplier).toBe(1.05);
     expect(sonarion.abilityRuntime?.activationCount).toBe(1);
+    expect(
+      engine.floatingTexts.every((text) => !/howl|speed/i.test(text.text))
+    ).toBe(true);
+    expect(engine.visualEffects).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ configId: 'enemy_sonarion_howl_1' }),
+      ])
+    );
 
     const lateArrival = addEnemy(engine, 'late', 'resonarion', 30);
     expect(lateArrival.persistentSpeedBoostMultiplier).toBeUndefined();

@@ -209,6 +209,30 @@ export const LEVEL_4: TDLevelData = {
       x: 88,
       y: 78,
     },
+    {
+      x: 58,
+      y: 40,
+    },
+    {
+      x: 37,
+      y: 68,
+    },
+    {
+      x: 57,
+      y: 62,
+    },
+    {
+      x: 40,
+      y: 84,
+    },
+    {
+      x: 80,
+      y: 37,
+    },
+    {
+      x: 79,
+      y: 68,
+    },
   ],
   environmentUnits: [
     {

@@ -1572,20 +1572,11 @@ export class TowerDefenseEngine {
           target.hp > 0 && target.definitionId === ability.targetCreatureId
       );
       targets.forEach((target) => {
-        const speedMultiplier = applyStackingPersistentSpeedBoost(
+        applyStackingPersistentSpeedBoost(
           target,
           ability.speedIncreasePerActivation,
           ability.maxSpeedMultiplier
         );
-        this.floatingTexts.push({
-          id: `ft_howl_speed_${this.elapsedTimeMs}_${target.id}`,
-          text: `Speed ${Math.round(speedMultiplier * 100)}%`,
-          position: { ...target.position },
-          color: 0x67e8f9,
-          scale: 0.8,
-          durationMs: 900,
-          elapsedMs: 0,
-        });
       });
 
       this.visualEffects.push({
@@ -1597,15 +1588,6 @@ export class TowerDefenseEngine {
         targetId: enemy.id,
         facingDirection: enemy.facingDirection,
         rangeIndex: ability.triggerRadius,
-      });
-      this.floatingTexts.push({
-        id: `ft_howl_${this.elapsedTimeMs}_${enemy.id}`,
-        text: 'Howl!',
-        position: { ...enemy.position },
-        color: 0xfacc15,
-        scale: 0.9,
-        durationMs: 900,
-        elapsedMs: 0,
       });
 
       if (activationCount >= ability.maxActivations) {
