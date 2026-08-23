@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { LEVEL_4 } from '@/constants/tdLevels/level4';
+import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 
 const distanceToSegment = (
   point: { x: number; y: number },
@@ -81,6 +82,43 @@ describe('Level 4 market map', () => {
     expect(
       mari?.waveRelocations?.map((relocation) => relocation.path.at(0))
     ).toEqual(destinations.slice(0, -1));
+  });
+
+  it('starts Tigrevel beside Mari as a fixed guest defender', () => {
+    const tigrevel = LEVEL_4.startingTowers?.find(
+      (tower) => tower.creature.speciesId === 'tigrevel'
+    );
+
+    expect(tigrevel).toMatchObject({
+      position: { x: 32, y: 55 },
+      facingDirection: 'left',
+      isFixed: true,
+      receivesExperience: false,
+      creature: {
+        id: 'ironbell_tigrevel',
+        level: 8,
+        equippedAttacks: ['SCRATCH', 'QUICK_ATTACK'],
+      },
+    });
+
+    const engine = new TowerDefenseEngine(LEVEL_4);
+    const runtimeTigrevel = engine.towers.find(
+      (tower) => tower.creature.id === 'ironbell_tigrevel'
+    );
+
+    expect(runtimeTigrevel).toMatchObject({
+      position: { x: 32, y: 55 },
+      facingDirection: 'left',
+      isFixed: true,
+      selectedAttackIndex: 0,
+      creature: {
+        speciesId: 'tigrevel',
+        level: 8,
+        equippedAttacks: ['SCRATCH', 'QUICK_ATTACK'],
+      },
+    });
+    expect(engine.removeTower('ironbell_tigrevel')).toBe(false);
+    engine.destroy();
   });
 
   it('provides at least three nearby tower spots for every path', () => {

@@ -225,6 +225,31 @@ export const RESONARION: CosmoidTemplate = {
   ],
 };
 
+export const TIGREVEL: CosmoidTemplate = {
+  id: 'tigrevel',
+  name: 'Tigrevel',
+  type: ElementType.WATER,
+  secondaryType: ElementType.STEEL,
+  baseStats: {
+    hp: 72,
+    attack: 82,
+    defense: 76,
+    specialAttack: 38,
+    specialDefense: 62,
+    speed: 58,
+  },
+  baseExperience: 78,
+  iconImg: '/UI/Icons/tigrevel_icon.png',
+  spriteUrl: '/battles/cosmoids/tigrevel_down.png',
+  battleSpriteUrl: '/battles/cosmoids/tigrevel_left.png',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'SCRATCH' },
+    { level: 4, attackId: 'NIBBLE' },
+    { level: 7, attackId: 'QUICK_ATTACK' },
+  ],
+};
+
 export const BETTLE: CosmoidTemplate = {
   id: 'bettle',
   name: 'Beetadel',
@@ -430,5 +455,6 @@ export const COSMOID_TEMPLATES: Record<string, CosmoidTemplate> = {
   [ZAPYBARA.id]: ZAPYBARA,
   [SONARION.id]: SONARION,
   [RESONARION.id]: RESONARION,
+  [TIGREVEL.id]: TIGREVEL,
   [BETTLE.id]: BETTLE,
 };

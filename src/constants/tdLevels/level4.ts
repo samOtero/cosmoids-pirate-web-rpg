@@ -255,6 +255,25 @@ export const LEVEL_4: TDLevelData = {
   startingTowers: [
     {
       creature: {
+        id: 'ironbell_tigrevel',
+        speciesId: 'tigrevel',
+        level: 8,
+        xp: 0,
+        equippedAttacks: ['SCRATCH', 'QUICK_ATTACK'],
+        activeAttackIndex: 0,
+        targetingMode: 'first',
+        isShiny: false,
+      },
+      position: {
+        x: 32,
+        y: 55,
+      },
+      facingDirection: 'left',
+      isFixed: true,
+      receivesExperience: false,
+    },
+    {
+      creature: {
         id: 'kip_mopup',
         speciesId: 'mopup',
         level: 5,
