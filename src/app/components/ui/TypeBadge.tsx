@@ -10,6 +10,7 @@ const TYPE_COLORS: Record<ElementType, string> = {
   [ElementType.FIRE]: 'bg-orange-600',
   [ElementType.GRASS]: 'bg-green-600',
   [ElementType.BUG]: 'bg-lime-700',
+  [ElementType.ROCK]: 'bg-stone-700',
   [ElementType.STEEL]: 'bg-slate-600',
   [ElementType.POISON]: 'bg-purple-600',
   [ElementType.ELECTRIC]: 'bg-yellow-500',

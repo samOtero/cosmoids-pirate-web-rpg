@@ -228,8 +228,7 @@ export const RESONARION: CosmoidTemplate = {
 export const TIGREVEL: CosmoidTemplate = {
   id: 'tigrevel',
   name: 'Tigrevel',
-  type: ElementType.WATER,
-  secondaryType: ElementType.STEEL,
+  type: ElementType.ROCK,
   baseStats: {
     hp: 72,
     attack: 82,
@@ -240,6 +239,9 @@ export const TIGREVEL: CosmoidTemplate = {
   },
   baseExperience: 78,
   iconImg: '/UI/Icons/tigrevel_icon.png',
+  journalImg: '/UI/Journal/tigrevel_journal.png',
+  journalEntry:
+    'Deep in the eastern jungles, it sharpens its claws on stone. A focused swipe can split a boulder clean in half.',
   spriteUrl: '/battles/cosmoids/tigrevel_down.png',
   battleSpriteUrl: '/battles/cosmoids/tigrevel_left.png',
   movementId: 'lizard',

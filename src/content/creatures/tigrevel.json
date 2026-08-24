@@ -2,8 +2,7 @@
   "schemaVersion": 1,
   "id": "tigrevel",
   "name": "Tigrevel",
-  "element": "WATER",
-  "secondaryElement": "STEEL",
+  "element": "ROCK",
   "addedAt": "2026-08-22",
   "sourceImage": "exec-4d0494c1-2950-41cc-bb97-c2817d837739.png",
   "baseStats": {

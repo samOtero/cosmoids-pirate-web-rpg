@@ -36,6 +36,7 @@ export enum ElementType {
   FIRE = 'Fire',
   GRASS = 'Grass',
   BUG = 'Bug',
+  ROCK = 'Rock',
   STEEL = 'Steel',
   POISON = 'Poison',
   ELECTRIC = 'Electric',

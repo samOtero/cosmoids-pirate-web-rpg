@@ -13,6 +13,7 @@ const CURRENT_JOURNAL_SPECIES_IDS = [
   'bettle',
   'sonarion',
   'resonarion',
+  'tigrevel',
 ] as const;
 
 describe("Kip's journal entries", () => {

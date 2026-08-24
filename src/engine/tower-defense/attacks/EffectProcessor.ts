@@ -14,6 +14,7 @@ const NEUTRAL_EFFECTIVENESS: Record<ElementType, number> = {
   [ElementType.WATER]: 1,
   [ElementType.GRASS]: 1,
   [ElementType.BUG]: 1,
+  [ElementType.ROCK]: 1,
   [ElementType.STEEL]: 1,
   [ElementType.POISON]: 1,
   [ElementType.ELECTRIC]: 1,
@@ -23,6 +24,7 @@ const NEUTRAL_EFFECTIVENESS: Record<ElementType, number> = {
 const TYPE_EFFECTIVENESS: Record<ElementType, Record<ElementType, number>> = {
   [ElementType.NORMAL]: {
     ...NEUTRAL_EFFECTIVENESS,
+    [ElementType.ROCK]: 0.5,
     [ElementType.STEEL]: 0.5,
   },
   [ElementType.FIRE]: {
@@ -31,6 +33,7 @@ const TYPE_EFFECTIVENESS: Record<ElementType, Record<ElementType, number>> = {
     [ElementType.WATER]: 0.5,
     [ElementType.GRASS]: 2,
     [ElementType.BUG]: 2,
+    [ElementType.ROCK]: 0.5,
     [ElementType.STEEL]: 2,
   },
   [ElementType.WATER]: {
@@ -38,12 +41,14 @@ const TYPE_EFFECTIVENESS: Record<ElementType, Record<ElementType, number>> = {
     [ElementType.FIRE]: 2,
     [ElementType.WATER]: 0.5,
     [ElementType.GRASS]: 0.5,
+    [ElementType.ROCK]: 2,
   },
   [ElementType.GRASS]: {
     ...NEUTRAL_EFFECTIVENESS,
     [ElementType.FIRE]: 0.5,
     [ElementType.WATER]: 2,
     [ElementType.GRASS]: 0.5,
+    [ElementType.ROCK]: 2,
     [ElementType.BUG]: 0.5,
     [ElementType.STEEL]: 0.5,
     [ElementType.POISON]: 0.5,
@@ -60,12 +65,14 @@ const TYPE_EFFECTIVENESS: Record<ElementType, Record<ElementType, number>> = {
     ...NEUTRAL_EFFECTIVENESS,
     [ElementType.GRASS]: 2,
     [ElementType.BUG]: 2,
+    [ElementType.ROCK]: 0.5,
     [ElementType.STEEL]: 0.5,
     [ElementType.ELECTRIC]: 0.5,
   },
   [ElementType.POISON]: {
     ...NEUTRAL_EFFECTIVENESS,
     [ElementType.GRASS]: 1,
+    [ElementType.ROCK]: 0.5,
     [ElementType.POISON]: 0.5,
     [ElementType.STEEL]: 0,
   },
@@ -81,7 +88,15 @@ const TYPE_EFFECTIVENESS: Record<ElementType, Record<ElementType, number>> = {
     ...NEUTRAL_EFFECTIVENESS,
     [ElementType.FIRE]: 0.5,
     [ElementType.WATER]: 0.5,
+    [ElementType.ROCK]: 2,
     [ElementType.ELECTRIC]: 0.5,
+    [ElementType.STEEL]: 0.5,
+  },
+  [ElementType.ROCK]: {
+    ...NEUTRAL_EFFECTIVENESS,
+    [ElementType.FIRE]: 2,
+    [ElementType.BUG]: 2,
+    [ElementType.FLYING]: 2,
     [ElementType.STEEL]: 0.5,
   },
 };

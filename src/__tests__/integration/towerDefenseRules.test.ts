@@ -255,7 +255,7 @@ describe('Tower defense rules', () => {
       levelData: LEVEL_4,
       journalCompletion: {
         progression: StoryProgression.DEFEAT_LEVEL_4,
-        seenSpeciesIds: ['sonarion', 'resonarion'],
+        seenSpeciesIds: ['sonarion', 'resonarion', 'tigrevel'],
       },
       winEvents: [
         {
