@@ -126,6 +126,7 @@ export enum BackgroundImageKey {
   LEVEL_4_VANE_CHASE = 'Level_4_Vane_Chase',
   LEVEL_4_IRONBELL_HARBOR = 'Level_4_Ironbell_Harbor',
   LEVEL_4_IRONBELL_MARKET = 'Level_4_Ironbell_Market',
+  LEVEL_4_IRONBELL_CELL = 'Level_4_Ironbell_Cell',
   DEFAULT = 'default',
 }
 

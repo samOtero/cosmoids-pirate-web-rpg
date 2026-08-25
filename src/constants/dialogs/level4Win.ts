@@ -33,7 +33,7 @@ export const LEVEL_4_WIN: DialogConfig = {
           flipped: true,
         },
       ],
-      text: 'Yes. The Navy captured a tiger-shark Cosmoid and imprisoned it beneath Ironbell.',
+      text: 'The Navy is keeping a wild Cosmoid beneath Ironbell. They call it too dangerous to release.',
     },
     {
       portraits: [
@@ -52,7 +52,17 @@ export const LEVEL_4_WIN: DialogConfig = {
           displayName: 'Caleb',
         },
       ],
-      text: "Then let's make sure it gets every bite.",
+      text: 'Then lead the way.',
+    },
+    {
+      portraits: [{ key: SpeakerImageKey.EMPTY, displayName: '' }],
+      text: 'Far below the market, an iron bowl scrapes across stone.',
+      backgroundImageKey: BackgroundImageKey.LEVEL_4_IRONBELL_CELL,
+    },
+    {
+      portraits: [{ key: SpeakerImageKey.EMPTY, displayName: '' }],
+      text: 'Behind the bars, a striped head rises. Golden eyes fix on the approaching footsteps.',
+      backgroundImageKey: BackgroundImageKey.LEVEL_4_IRONBELL_CELL,
     },
   ],
   backgroundImageKey: BackgroundImageKey.LEVEL_4_IRONBELL_MARKET,
