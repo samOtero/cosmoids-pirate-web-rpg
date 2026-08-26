@@ -631,6 +631,48 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       offsetY: -5,
     },
   },
+  attack_chomp_1: {
+    default: {
+      scale: 0.4,
+      offsetY: -20,
+      vfxAnimation: {
+        type: 'KEYFRAME_SPRITES',
+        durationMs: 600,
+        // One wide windup and forceful snap, then a clamped shake and release.
+        // Keep the jaw centers apart at contact so the incisor tips meet.
+        layers: [
+          {
+            url: '/battles/attacks/nibble_top_teeth.png',
+            keyframes: [
+              { progress: 0, y: -38, scaleX: 0.9, alpha: 0 },
+              { progress: 0.16, y: -46, alpha: 1 },
+              { progress: 0.28, y: -16, scaleX: 1.12, scaleY: 0.9 },
+              { progress: 0.36, x: 3, y: -16, scaleX: 1.08, scaleY: 0.94 },
+              { progress: 0.44, x: -3, y: -16, scaleX: 1.08, scaleY: 0.94 },
+              { progress: 0.52, x: 2, y: -16, scaleX: 1.08, scaleY: 0.94 },
+              { progress: 0.64, y: -16 },
+              { progress: 0.72, y: -16 },
+              { progress: 1, y: -24, scaleX: 0.9, scaleY: 0.9, alpha: 0 },
+            ],
+          },
+          {
+            url: '/battles/attacks/nibble_bottom_teeth.png',
+            keyframes: [
+              { progress: 0, y: 28, scaleX: 0.9, alpha: 0 },
+              { progress: 0.16, y: 34, alpha: 1 },
+              { progress: 0.28, y: 14, scaleX: 1.12, scaleY: 0.9 },
+              { progress: 0.36, x: 3, y: 14, scaleX: 1.08, scaleY: 0.94 },
+              { progress: 0.44, x: -3, y: 14, scaleX: 1.08, scaleY: 0.94 },
+              { progress: 0.52, x: 2, y: 14, scaleX: 1.08, scaleY: 0.94 },
+              { progress: 0.64, y: 14 },
+              { progress: 0.72, y: 14 },
+              { progress: 1, y: 22, scaleX: 0.9, scaleY: 0.9, alpha: 0 },
+            ],
+          },
+        ],
+      },
+    },
+  },
   mouse_1: {
     default: {
       url: '/battles/cosmoids/mouse_1_left_1_25.png',
