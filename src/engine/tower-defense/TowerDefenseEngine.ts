@@ -27,6 +27,7 @@ import { ATTACK_DEFS } from './attacks/definitions';
 import { startDamageFlash } from './damageFlash';
 import { AttackBehaviorRegistry } from './attacks/behaviors';
 import { EffectProcessor } from './attacks/EffectProcessor';
+import { getAttackSpeedMultiplier } from './attackSpeedModifiers';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { TDWave, TDWaveGroup, Point } from './types';
 import { TDEventBus } from './events/TDEventBus';
@@ -810,8 +811,12 @@ export class TowerDefenseEngine {
       const attackDef = ATTACK_DEFS[attackInstance.definitionId];
       if (!attackDef) return;
 
-      const isReady =
-        time - attackInstance.lastFiredTime > attackDef.cooldownMs;
+      const isSupport = attackDef.behaviorType === 'SUPPORT_AURA';
+      const isReady = isSupport
+        ? this.elapsedTimeMs >= (attackInstance.readyAtMs ?? 0)
+        : time - attackInstance.lastFiredTime >
+          attackDef.cooldownMs /
+            getAttackSpeedMultiplier(tower, this.elapsedTimeMs);
 
       if (isReady) {
         const targetEnemy = this.getTargetForTower(
@@ -835,6 +840,11 @@ export class TowerDefenseEngine {
         if (behavior && behavior.canExecute(this, tower, attackDef)) {
           behavior.execute(this, tower, attackDef);
           attackInstance.lastFiredTime = time;
+          if (isSupport) {
+            // Stored on the move, not the selected slot or buff: swapping cannot reset it.
+            attackInstance.readyAtMs =
+              this.elapsedTimeMs + attackDef.cooldownMs;
+          }
         }
       }
     });

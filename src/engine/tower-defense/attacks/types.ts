@@ -27,6 +27,12 @@ export interface ProjectilePattern {
 
 export type ProjectileVisual =
   | {
+      type: 'STATIC_YIP' | 'SPARK';
+      outerColor: number;
+      innerColor: number;
+      highlightColor: number;
+    }
+  | {
       type: 'FLAME';
       outerColor: number;
       innerColor: number;
@@ -72,6 +78,10 @@ export interface AttackDefinition {
   projectileVisual?: ProjectileVisual;
   /** How long a successfully disarmed enemy cannot pick up another item. */
   itemPickupLockMs?: number;
+  supportBuff?: {
+    attackSpeedMultiplier: number;
+    durationMs: number;
+  };
   behaviorType:
     | 'PROJECTILE'
     | 'INSTANT_AOE'
@@ -80,6 +90,8 @@ export interface AttackDefinition {
     | 'INSTANT_MELEE';
   effects?: AttackEffect[];
   visualEffectConfigId?: string; // which tdConfig to use for a visual effect
+  /** A short, cosmetic effect attached to the caster when a projectile fires. */
+  launchVisualEffectConfigId?: string;
   isDashAttack?: boolean; // whether the base unit itself behaves as the projectile visually
   dashTrailType?: 'WATER';
 }
@@ -87,6 +99,8 @@ export interface AttackDefinition {
 export interface AttackInstance {
   definitionId: string;
   lastFiredTime: number;
+  /** Simulation-clock cooldown for support moves; undefined means ready. */
+  readyAtMs?: number;
 }
 
 export interface AttackBehavior {

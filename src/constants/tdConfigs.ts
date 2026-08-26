@@ -468,6 +468,28 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       offsetY: -19,
     },
   },
+  attack_spark_launch_1: {
+    default: {
+      vfxAnimation: { type: 'SPARK_LAUNCH', durationMs: 160 },
+    },
+  },
+  attack_spark_1: {
+    default: {
+      offsetY: -24,
+      vfxAnimation: { type: 'SPARK', durationMs: 240 },
+    },
+  },
+  attack_static_yip_launch_1: {
+    default: {
+      vfxAnimation: { type: 'STATIC_YIP_LAUNCH', durationMs: 160 },
+    },
+  },
+  attack_static_yip_1: {
+    default: {
+      offsetY: -24,
+      vfxAnimation: { type: 'STATIC_YIP', durationMs: 240 },
+    },
+  },
   attack_coir_snare_1: {
     default: {
       vfxAnimation: {
@@ -498,6 +520,11 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
         type: 'WIND_GUST',
         durationMs: 750,
       },
+    },
+  },
+  attack_rally_howl_1: {
+    default: {
+      vfxAnimation: { type: 'RALLY_HOWL', durationMs: 800 },
     },
   },
   enemy_sonarion_howl_1: {

@@ -194,6 +194,8 @@ export const SONARION: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'NIBBLE' },
     { level: 4, attackId: 'QUICK_ATTACK' },
+    { level: 10, attackId: 'STATIC_YIP' },
+    { level: 14, attackId: 'RALLY_HOWL' },
   ],
   evolutionNodes: [{ level: 26, evolutionDefId: 'resonarion' }],
 };
@@ -223,6 +225,8 @@ export const RESONARION: CosmoidTemplate = {
     { level: 1, attackId: 'NIBBLE' },
     { level: 4, attackId: 'QUICK_ATTACK' },
     { level: 8, attackId: 'TACKLE' },
+    { level: 10, attackId: 'STATIC_YIP' },
+    { level: 14, attackId: 'RALLY_HOWL' },
   ],
 };
 

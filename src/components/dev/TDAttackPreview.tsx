@@ -77,19 +77,22 @@ function armWindGustTarget(engine: TowerDefenseEngine) {
 function createEngine(
   towerCreatureId: string,
   towerLevel: number,
-  towerAttackId: string,
   targetCreatureId: string,
   targetLevel: number,
   targetAbilityId: string,
-  additionalEnemies: EnemyPreviewConfig[]
+  additionalEnemies: EnemyPreviewConfig[],
+  showNearbyAlly: boolean
 ) {
   const towerCreature = {
     id: 'attack-preview-tower',
     speciesId: towerCreatureId,
     level: towerLevel,
     xp: 0,
-    equippedAttacks: [towerAttackId],
-    activeAttackIndex: 0,
+    // Sandbox loadout: selecting a move uses production swapping, not a new battle.
+    equippedAttacks: attackOptions.map((attack) => attack.id),
+    activeAttackIndex: attackOptions.findIndex(
+      (attack) => attack.id === 'EMBER'
+    ),
     targetingMode: 'closest',
     isShiny: false,
   };
@@ -108,10 +111,26 @@ function createEngine(
       backgroundUrl: FIRST_LEVEL.backgroundUrl,
       backgroundScale: FIRST_LEVEL.backgroundScale,
     },
-    [towerCreature]
+    [
+      towerCreature,
+      ...(showNearbyAlly
+        ? [
+            {
+              id: 'attack-preview-ally',
+              speciesId: 'starter_crab',
+              level: towerLevel,
+              xp: 0,
+              equippedAttacks: ['VINE_WHIP'],
+              activeAttackIndex: 0,
+              isShiny: false,
+            },
+          ]
+        : []),
+    ]
   );
 
   engine.placeTower(towerCreature.id, 42, 50);
+  if (showNearbyAlly) engine.placeTower('attack-preview-ally', 52, 39);
   engine.spawnPreviewEnemy({
     id: PRIMARY_TARGET_ID,
     creatureId: targetCreatureId,
@@ -133,10 +152,6 @@ function createEngine(
       isInvulnerable: true,
     });
   });
-
-  if (towerAttackId === 'WIND_GUST') {
-    armWindGustTarget(engine);
-  }
 
   return engine;
 }
@@ -169,6 +184,7 @@ export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
   const [towerCreatureId, setTowerCreatureId] = useState('starter_iguana');
   const [towerLevel, setTowerLevel] = useState(10);
   const [towerAttackId, setTowerAttackId] = useState('EMBER');
+  const [showNearbyAlly, setShowNearbyAlly] = useState(false);
   const [targetCreatureId, setTargetCreatureId] = useState('mouse_1');
   const [targetLevel, setTargetLevel] = useState(10);
   const [targetAbilityId, setTargetAbilityId] = useState('');
@@ -184,20 +200,20 @@ export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
       createEngine(
         towerCreatureId,
         towerLevel,
-        towerAttackId,
         targetCreatureId,
         targetLevel,
         targetAbilityId,
-        additionalEnemies
+        additionalEnemies,
+        showNearbyAlly
       ),
     [
       towerCreatureId,
       towerLevel,
-      towerAttackId,
       targetCreatureId,
       targetLevel,
       targetAbilityId,
       additionalEnemies,
+      showNearbyAlly,
     ]
   );
   const [damageSample, setDamageSample] = useState<
@@ -209,6 +225,14 @@ export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
       : { last: 0, total: 0, hits: 0 };
 
   useEffect(() => () => engine.destroy(), [engine]);
+
+  useEffect(() => {
+    engine.setTowerAttack(
+      'attack-preview-tower',
+      attackOptions.findIndex((attack) => attack.id === towerAttackId)
+    );
+    if (towerAttackId === 'WIND_GUST') armWindGustTarget(engine);
+  }, [engine, towerAttackId]);
 
   useEffect(() => {
     return engine.events.subscribe((event) => {
@@ -357,6 +381,28 @@ export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
               <Stat label="Class" value={activeAttack.category} />
               <Stat label="CD" value={`${activeAttack.cooldownMs}ms`} />
             </div>
+            {activeAttack.supportBuff && (
+              <p className="mt-2 text-xs text-amber-200">
+                +
+                {Math.round(
+                  (activeAttack.supportBuff.attackSpeedMultiplier - 1) * 100
+                )}
+                % attack speed for {activeAttack.supportBuff.durationMs / 1000}
+                s. Buffs self and nearby allies.
+              </p>
+            )}
+            <label className="mt-3 flex items-center gap-2 text-xs text-slate-300">
+              <input
+                type="checkbox"
+                checked={showNearbyAlly}
+                onChange={(event) => setShowNearbyAlly(event.target.checked)}
+              />
+              Show nearby ally
+            </label>
+            <p className="mt-2 text-[11px] text-slate-400">
+              Attack swaps keep buffs and cooldowns. Changing actors resets the
+              preview.
+            </p>
           </section>
 
           <section className="mb-3 rounded-lg border border-emerald-900 bg-slate-800/80 p-3">

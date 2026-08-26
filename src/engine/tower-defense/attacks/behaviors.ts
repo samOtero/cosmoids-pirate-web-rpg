@@ -3,10 +3,8 @@ import { Enemy, Tower } from '../types';
 import { AttackDefinition, AttackBehavior } from './types';
 import { EffectProcessor } from './EffectProcessor';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
-import {
-  hasActiveSpeedBoost,
-  hasActiveSpeedSlow,
-} from '../speedModifiers';
+import { hasActiveSpeedBoost, hasActiveSpeedSlow } from '../speedModifiers';
+import { applyAttackSpeedBuff } from '../attackSpeedModifiers';
 
 const MAX_PROJECTILES_PER_PATTERN = 12;
 
@@ -85,6 +83,21 @@ export const ProjectileBehavior: AttackBehavior = {
       }
       source.facingDirection = facingDirection;
 
+      if (attackDef.launchVisualEffectConfigId) {
+        const configId = attackDef.launchVisualEffectConfigId;
+        engine.visualEffects.push({
+          id: `vfx_launch_${Date.now()}_${Math.random()}`,
+          configId,
+          position: { ...source.position },
+          durationMs:
+            CREATURE_TD_CONFIGS[configId]?.default?.vfxAnimation?.durationMs ??
+            160,
+          elapsedMs: 0,
+          targetId: source.id,
+          facingDirection,
+        });
+      }
+
       const pattern = attackDef.projectilePattern;
       const projectileCount = pattern
         ? Math.min(
@@ -106,6 +119,8 @@ export const ProjectileBehavior: AttackBehavior = {
             x: source.position.x - directionX * spacing,
             y: source.position.y - directionY * spacing,
           },
+          origin: { ...source.position },
+          launchFacingDirection: facingDirection,
           speed: attackDef.projectileSpeed || 1,
           damage: attackDef.power,
           dealsDamage: pattern?.damageMode !== 'FIRST_ONLY' || index === 0,
@@ -263,8 +278,56 @@ export const InstantAoeBehavior: AttackBehavior = {
   },
 };
 
+export const SupportAuraBehavior: AttackBehavior = {
+  canExecute(engine, source, attackDef) {
+    // Open with the howl as soon as enemies arrive, without wasting it between waves.
+    return (
+      source.hp > 0 &&
+      Boolean(attackDef.supportBuff) &&
+      engine.enemies.some((enemy) => enemy.hp > 0)
+    );
+  },
+  execute(engine, source, attackDef) {
+    const buff = attackDef.supportBuff;
+    if (!buff || source.hp <= 0) return;
+    for (const ally of engine.towers) {
+      if (
+        ally.hp <= 0 ||
+        !isEnemyInRange(
+          source,
+          ally.position.x,
+          ally.position.y,
+          attackDef.rangeIndex
+        )
+      )
+        continue;
+      applyAttackSpeedBuff(
+        ally,
+        buff.attackSpeedMultiplier,
+        buff.durationMs,
+        engine.elapsedTimeMs
+      );
+    }
+    if (attackDef.visualEffectConfigId) {
+      const configId = attackDef.visualEffectConfigId;
+      engine.visualEffects.push({
+        id: `vfx_rally_${source.id}_${engine.elapsedTimeMs}_${Math.random()}`,
+        configId,
+        position: { ...source.position },
+        durationMs:
+          CREATURE_TD_CONFIGS[configId]?.default?.vfxAnimation?.durationMs ??
+          800,
+        elapsedMs: 0,
+        facingDirection: source.facingDirection,
+        rangeIndex: attackDef.rangeIndex,
+      });
+    }
+  },
+};
+
 export const AttackBehaviorRegistry: Record<string, AttackBehavior> = {
   PROJECTILE: ProjectileBehavior,
   INSTANT_MELEE: InstantMeleeBehavior,
   INSTANT_AOE: InstantAoeBehavior,
+  SUPPORT_AURA: SupportAuraBehavior,
 };

@@ -178,8 +178,13 @@ export interface VFXAnimationConfig {
     | 'STRING_SHOT'
     | 'WIND_GUST'
     | 'HOWL'
+    | 'RALLY_HOWL'
     | 'HARDEN'
     | 'BARREL_BASH'
+    | 'STATIC_YIP'
+    | 'STATIC_YIP_LAUNCH'
+    | 'SPARK'
+    | 'SPARK_LAUNCH'
     | 'KEYFRAME_SPRITES';
   maskRotation?: number; // e.g. Math.PI / 4
   maskSize?: number; // e.g. 200

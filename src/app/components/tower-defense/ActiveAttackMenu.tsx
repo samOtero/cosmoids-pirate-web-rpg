@@ -80,6 +80,11 @@ export function ActiveAttackMenu({
                     CD: {def.cooldownMs / 1000}s
                   </span>
                 </div>
+                {def.supportBuff && (
+                  <span className="mt-1 text-[8px] lg:text-xs text-amber-200">
+                    +{Math.round((def.supportBuff.attackSpeedMultiplier - 1) * 100)}% attack speed · {def.supportBuff.durationMs / 1000}s
+                  </span>
+                )}
                 {isSelected && (
                   <span className="mt-1 lg:mt-2 text-[8px] lg:text-[10px] font-bold text-black bg-cyan-400 px-1.5 lg:px-2 py-0.5 rounded-full uppercase">
                     Active

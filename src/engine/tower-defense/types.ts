@@ -1,4 +1,5 @@
 import { Creature, PlayerCreature } from '@/types/baseGame';
+import type { AttackInstance } from './attacks/types';
 
 export interface TDEvolutionNode {
   level: number;
@@ -243,10 +244,13 @@ export interface Tower extends BaseTDUnit {
   currentSpecialAttack: number;
   currentDefense: number;
   currentSpecialDefense: number;
-  equippedAttacksRuntime: Array<{
-    definitionId: string;
-    lastFiredTime: number;
-  }>;
+  equippedAttacksRuntime: AttackInstance[];
+  /** Attack cadence only; deliberately independent of movement speed effects. */
+  attackSpeedBuff?: {
+    multiplier: number;
+    appliedAtMs: number;
+    expiresAtMs: number;
+  };
   selectedAttackIndex: number;
   targetingMode?: TowerTargetingMode;
   isFixed?: boolean;
@@ -321,6 +325,9 @@ export interface Projectile {
   sourceId: string;
   targetId: string;
   position: Point;
+  /** Original caster position and direction, used by mouth-anchored visuals. */
+  origin?: Point;
+  launchFacingDirection?: 'up' | 'down' | 'left' | 'right';
   speed: number;
   damage: number;
   /** Defaults to true. False marks a follow-up projectile as visual-only. */

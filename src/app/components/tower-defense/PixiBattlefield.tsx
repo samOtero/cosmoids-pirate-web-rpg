@@ -26,6 +26,17 @@ import {
 } from '@/utils/tdInitialView';
 import { applyTDUnitTransforms } from '@/utils/tdUnitVisuals';
 import { getCaptureUnitVisualState } from '@/utils/captureUnitVisualState';
+import { drawRallyHowlRings, updateRallyIndicator } from './rallyHowlVisuals';
+import {
+  drawSparkImpact,
+  drawSparkLaunch,
+  drawSparkProjectile,
+  drawStaticYipImpact,
+  drawStaticYipLaunch,
+  drawStaticYipProjectile,
+  getElectricAttackFlightProgress,
+  getElectricAttackSockets,
+} from './electricAttackVisuals';
 import {
   hasActiveSpeedBoost,
   hasActiveSpeedSlow,
@@ -2199,6 +2210,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               true /* hideWhenFull */
             );
             updateSparkles(container, tower, app.ticker.deltaTime);
+            updateRallyIndicator(container, tower, engine.elapsedTimeMs);
             updateSpeedBoostIndicator(
               container,
               tower,
@@ -2585,6 +2597,16 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 psprite.label = 'proj_sprite';
                 psprite.anchor.set(0.5);
                 container.addChild(psprite);
+              } else if (
+                def?.projectileVisual?.type === 'STATIC_YIP' ||
+                def?.projectileVisual?.type === 'SPARK'
+              ) {
+                const bolt = new PIXI.Graphics();
+                bolt.label = 'proj_graphics';
+                if (def.projectileVisual.type === 'SPARK') {
+                  drawSparkProjectile(bolt, def.projectileVisual);
+                }
+                container.addChild(bolt);
               } else if (def?.projectileVisual?.type === 'FLAME') {
                 const flame = new PIXI.Graphics();
                 flame.label = 'proj_graphics';
@@ -2659,6 +2681,48 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               : undefined;
 
             if (
+              def?.projectileVisual?.type === 'STATIC_YIP' ||
+              def?.projectileVisual?.type === 'SPARK'
+            ) {
+              if (def.projectileVisual.type === 'STATIC_YIP') {
+                drawStaticYipProjectile(
+                  container.getChildByLabel('proj_graphics') as PIXI.Graphics,
+                  def.projectileVisual,
+                  engine.elapsedTimeMs
+                );
+              }
+              const sourceTower = engine.towers.find(
+                (tower) => tower.id === proj.sourceId
+              );
+              const sourceSprite = towerSprites
+                .get(`${proj.sourceId}_${sourceTower?.creature.id}`)
+                ?.getChildByLabel('tower_sprite') as PIXI.Sprite | undefined;
+              const mouth = sourceSprite
+                ? getElectricAttackSockets(
+                    sourceSprite,
+                    proj.launchFacingDirection ?? 'right'
+                  ).mouth
+                : { x: 0, y: -30 };
+              const progress = getElectricAttackFlightProgress(
+                proj.origin ?? proj.position,
+                proj.position,
+                proj.target
+              );
+              // Interpolate only the rendered offset: damage/range stay in world units.
+              const impactY = -24;
+              container.x += mouth.x * (1 - progress) * finalScale;
+              container.y +=
+                (mouth.y * (1 - progress) + impactY * progress) * finalScale;
+              const targetX = offsetX + (proj.target.x / 100) * screenW;
+              const targetY =
+                offsetY +
+                (proj.target.y / 100) * screenH +
+                impactY * finalScale;
+              container.rotation = Math.atan2(
+                targetY - container.y,
+                targetX - container.x
+              );
+            } else if (
               def?.projectileVisual?.type === 'FLAME' ||
               def?.projectileVisual?.type === 'WATER_STREAM' ||
               def?.projectileVisual?.type === 'COIR_BOLA' ||
@@ -2768,6 +2832,15 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                     if (!isDestroyed) sprite.texture = t;
                   });
                 });
+              } else if (
+                animConfig?.type === 'STATIC_YIP' ||
+                animConfig?.type === 'STATIC_YIP_LAUNCH' ||
+                animConfig?.type === 'SPARK' ||
+                animConfig?.type === 'SPARK_LAUNCH'
+              ) {
+                const sparks = new PIXI.Graphics();
+                sparks.label = 'electric_attack_vfx';
+                container.addChild(sparks);
               } else if (animConfig?.type === 'COIR_SNARE') {
                 const coirVisual = ATTACK_DEFS.COIR_SNARE.projectileVisual;
                 if (coirVisual?.type === 'COIR_BOLA') {
@@ -2790,6 +2863,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                     stringVisual.sparkColor
                   );
                 }
+              } else if (animConfig?.type === 'RALLY_HOWL') {
+                const rings = new PIXI.Graphics();
+                rings.label = 'rally_howl_rings';
+                container.addChild(rings);
               } else if (animConfig?.type === 'WIND_GUST') {
                 drawWindGust(container);
               } else if (animConfig?.type === 'HOWL') {
@@ -2833,7 +2910,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               effectOffsetY * finalScale;
             if (
               animConfig?.type === 'WIND_GUST' ||
-              animConfig?.type === 'HOWL'
+              animConfig?.type === 'HOWL' ||
+              animConfig?.type === 'RALLY_HOWL'
             ) {
               container.scale.set(
                 (zoom * app.screen.width) / TD_BASE_HEIGHT,
@@ -2871,10 +2949,69 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 }
               });
             } else if (
+              animConfig?.type === 'STATIC_YIP' ||
+              animConfig?.type === 'STATIC_YIP_LAUNCH' ||
+              animConfig?.type === 'SPARK' ||
+              animConfig?.type === 'SPARK_LAUNCH'
+            ) {
+              const sparks = container.getChildByLabel(
+                'electric_attack_vfx'
+              ) as PIXI.Graphics;
+              const isSpark =
+                animConfig.type === 'SPARK' ||
+                animConfig.type === 'SPARK_LAUNCH';
+              const palette =
+                ATTACK_DEFS[isSpark ? 'SPARK' : 'STATIC_YIP'].projectileVisual;
+              if (palette?.type === 'STATIC_YIP' || palette?.type === 'SPARK') {
+                if (
+                  animConfig.type === 'STATIC_YIP_LAUNCH' ||
+                  animConfig.type === 'SPARK_LAUNCH'
+                ) {
+                  const sourceTower = engine.towers.find(
+                    (tower) => tower.id === vfx.targetId
+                  );
+                  const sourceSprite = vfx.targetId
+                    ? (towerSprites
+                        .get(`${vfx.targetId}_${sourceTower?.creature.id}`)
+                        ?.getChildByLabel('tower_sprite') as
+                        | PIXI.Sprite
+                        | undefined)
+                    : undefined;
+                  if (sourceSprite) {
+                    const facing = vfx.facingDirection ?? 'right';
+                    const sockets = getElectricAttackSockets(
+                      sourceSprite,
+                      facing
+                    );
+                    if (isSpark) {
+                      drawSparkLaunch(sparks, palette, sockets, progress);
+                    } else {
+                      drawStaticYipLaunch(
+                        sparks,
+                        palette,
+                        sockets,
+                        progress,
+                        facing
+                      );
+                    }
+                  }
+                } else if (isSpark) {
+                  drawSparkImpact(sparks, palette, progress);
+                } else {
+                  drawStaticYipImpact(sparks, palette, progress);
+                }
+              }
+            } else if (
               animConfig?.type === 'COIR_SNARE' ||
               animConfig?.type === 'STRING_SHOT'
             ) {
               updateCoirSnareImpact(container, progress);
+            } else if (animConfig?.type === 'RALLY_HOWL') {
+              drawRallyHowlRings(
+                container.getChildByLabel('rally_howl_rings') as PIXI.Graphics,
+                progress,
+                (TD_BASE_HEIGHT * (vfx.rangeIndex ?? 20)) / 100
+              );
             } else if (animConfig?.type === 'WIND_GUST') {
               const radius = (TD_BASE_HEIGHT * (vfx.rangeIndex ?? 20)) / 100;
               updateWindGust(container, progress, radius);
