@@ -171,7 +171,7 @@ export const ZAPYBARA: CosmoidTemplate = {
 
 export const SONARION: CosmoidTemplate = {
   id: 'sonarion',
-  name: 'Sonarion',
+  name: 'Razcall',
   type: ElementType.NORMAL,
   secondaryType: ElementType.ELECTRIC,
   baseStats: {
@@ -186,7 +186,7 @@ export const SONARION: CosmoidTemplate = {
   iconImg: '/UI/Icons/sonarion_icon.png',
   journalImg: '/UI/Journal/sonarion_journal.png',
   journalEntry:
-    "Ironbell's Sonarion know no one dares chase them. They mimic market bells, snatch unattended meals, then loose a two-toned howl for Resonarion when cornered.",
+    "Ironbell's Razcall know no one dares chase them. They mimic market bells, snatch unattended meals, then loose a two-toned howl for Razound when cornered.",
   spriteUrl: '/battles/cosmoids/sonarion_down.png',
   battleSpriteUrl: '/battles/cosmoids/sonarion_left.png',
   movementId: 'lizard',
@@ -199,7 +199,7 @@ export const SONARION: CosmoidTemplate = {
 
 export const RESONARION: CosmoidTemplate = {
   id: 'resonarion',
-  name: 'Resonarion',
+  name: 'Razound',
   type: ElementType.NORMAL,
   secondaryType: ElementType.ELECTRIC,
   baseStats: {
@@ -214,7 +214,7 @@ export const RESONARION: CosmoidTemplate = {
   iconImg: '/UI/Icons/resonarion_icon.png',
   journalImg: '/UI/Journal/resonarion_journal.png',
   journalEntry:
-    "At a Sonarion's two-toned call, golden static races through its enlarged neck ruff and heavy tail tuft. Once charged, it barrels through the market to the rescue.",
+    "At a Razcall's two-toned call, golden static races through its enlarged neck ruff and heavy tail tuft. Once charged, it barrels through the market to the rescue.",
   spriteUrl: '/battles/cosmoids/resonarion_down.png',
   battleSpriteUrl: '/battles/cosmoids/resonarion_left.png',
   movementId: 'lizard',

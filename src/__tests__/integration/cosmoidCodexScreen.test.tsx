@@ -229,22 +229,22 @@ describe('CosmoidCodexScreen', () => {
 
     render(<CosmoidCodexScreen profile={level4Profile} onBack={() => {}} />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Sonarion, captured' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Razcall, captured' }));
     expect(
       screen
-        .getByRole('img', { name: 'Sonarion field sketch' })
+        .getByRole('img', { name: 'Razcall field sketch' })
         .getAttribute('src')
     ).toContain(encodeURIComponent('/UI/Journal/sonarion_journal.png'));
-    expect(screen.getByText(/no one dares chase them/i)).toBeInTheDocument();
+    expect(screen.getByText(/howl for Razound when cornered/i)).toBeInTheDocument();
 
     fireEvent.click(
-      screen.getByRole('button', { name: 'Resonarion, captured' })
+      screen.getByRole('button', { name: 'Razound, captured' })
     );
     expect(
       screen
-        .getByRole('img', { name: 'Resonarion field sketch' })
+        .getByRole('img', { name: 'Razound field sketch' })
         .getAttribute('src')
     ).toContain(encodeURIComponent('/UI/Journal/resonarion_journal.png'));
-    expect(screen.getByText(/golden static races/i)).toBeInTheDocument();
+    expect(screen.getByText(/At a Razcall's two-toned call/i)).toBeInTheDocument();
   });
 });
