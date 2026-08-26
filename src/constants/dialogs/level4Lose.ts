@@ -10,7 +10,7 @@ export const LEVEL_4_LOSE: DialogConfig = {
       portraits: [
         {
           key: SpeakerImageKey.MARIBEL_WORRIED,
-          displayName: 'Mari',
+          displayName: '???',
           flipped: true,
         },
       ],

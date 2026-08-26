@@ -10,11 +10,30 @@ export const LEVEL_4_WIN: DialogConfig = {
       portraits: [
         {
           key: SpeakerImageKey.MARIBEL_RELIEVED_HAPPY,
+          displayName: '???',
+          flipped: true,
+        },
+      ],
+      text: "Thank you! I'm Mari. I couldn't have made it without you.",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.KIP_WORRIED,
+          displayName: 'Kip',
+        },
+      ],
+      text: "I'm Kip. Are you hurt?",
+    },
+    {
+      portraits: [
+        {
+          key: SpeakerImageKey.MARIBEL_RELIEVED_HAPPY,
           displayName: 'Mari',
           flipped: true,
         },
       ],
-      text: 'We made it! And the food is still safe.',
+      text: "I'm fine! And look, the food's still safe!",
     },
     {
       portraits: [
@@ -23,7 +42,7 @@ export const LEVEL_4_WIN: DialogConfig = {
           displayName: 'Caleb',
         },
       ],
-      text: 'Food? That was your important mission?',
+      text: "Food?! That's what you were protecting? Who's it for?",
     },
     {
       portraits: [
@@ -33,7 +52,7 @@ export const LEVEL_4_WIN: DialogConfig = {
           flipped: true,
         },
       ],
-      text: 'The Navy is keeping a wild Cosmoid beneath Ironbell. They call it too dangerous to release.',
+      text: "A wild Cosmoid. The Navy keeps it locked beneath Ironbell. They say it's too dangerous to release.",
     },
     {
       portraits: [
@@ -43,7 +62,7 @@ export const LEVEL_4_WIN: DialogConfig = {
           flipped: true,
         },
       ],
-      text: "It can't hunt inside that cell, so I bring it every meal.",
+      text: 'They stopped feeding it, so I bring it every meal.',
     },
     {
       portraits: [
@@ -52,7 +71,7 @@ export const LEVEL_4_WIN: DialogConfig = {
           displayName: 'Caleb',
         },
       ],
-      text: 'Then lead the way.',
+      text: 'Dangerous or not, they can’t just let it starve! Lead the way!',
     },
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: '' }],
