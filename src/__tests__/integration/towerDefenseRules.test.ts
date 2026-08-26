@@ -190,6 +190,44 @@ describe('Tower defense rules', () => {
     ]);
   });
 
+  it.each(LEVEL_4.waves)(
+    'blocks Razound capture but allows Razcall capture in Ironbell wave $id',
+    (wave) => {
+      const engine = new TowerDefenseEngine({
+        ...LEVEL_4,
+        startingTowers: [],
+        waves: [
+          {
+            ...wave,
+            groups: wave.groups.map((group) => ({
+              ...group,
+              count: 1,
+              spawnIntervalMs: 1,
+              delayBeforeGroupMs: 0,
+              concurrentWithPrevious: true,
+            })),
+          },
+        ],
+      });
+
+      engine.tick(1, 1);
+
+      expect(engine.enemies).toHaveLength(wave.groups.length);
+      for (const enemy of [...engine.enemies]) {
+        if (enemy.definitionId === 'resonarion') {
+          expect(engine.captureEnemy(enemy.id)).toBeNull();
+          expect(engine.enemies).toContain(enemy);
+        } else {
+          expect(engine.captureEnemy(enemy.id)).toMatchObject({
+            speciesId: 'sonarion',
+          });
+        }
+      }
+
+      engine.destroy();
+    }
+  );
+
   it('sets up Level 4 with its intro and staged market objective', () => {
     expect(LEVEL_4.paths).toHaveLength(6);
     expect(LEVEL_4.backgroundUrl).toBe('/battles/bg/bg_market_level_4.png');

@@ -7,12 +7,12 @@
   "addedAt": "2026-08-20",
   "sourceImage": "exec-d15c8551-e187-43d9-8a48-bf96bda8edc7.png",
   "baseStats": {
-    "hp": 38,
-    "attack": 52,
-    "defense": 34,
-    "specialAttack": 42,
+    "hp": 40,
+    "attack": 45,
+    "defense": 40,
+    "specialAttack": 65,
     "specialDefense": 40,
-    "speed": 78
+    "speed": 65
   },
   "baseExperience": 58,
   "movementId": "lizard",
@@ -20,7 +20,7 @@
     { "level": 1, "attackId": "NIBBLE" },
     { "level": 4, "attackId": "QUICK_ATTACK" }
   ],
-  "evolutionNodes": [{ "level": 8, "evolutionDefId": "resonarion" }],
+  "evolutionNodes": [{ "level": 26, "evolutionDefId": "resonarion" }],
   "assets": {
     "icon": {
       "url": "/UI/Icons/sonarion_icon.png",

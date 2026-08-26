@@ -220,8 +220,9 @@ export const LEVEL_ORDER: LevelInfo[] = [
   },
   {
     context: TDLevelContext.LEVEL_4,
-    name: 'Level 4',
-    description: 'Continue the adventure beyond Captain Vane.',
+    name: 'Special Delivery',
+    description:
+      'Help a girl and her precious cargo get safely through Ironbell’s market.',
     requiredProgression: StoryProgression.DEFEAT_BUG_STAGE_2,
   },
   {

@@ -45,7 +45,7 @@
   },
   "storyPlacement": {
     "context": "LEVEL_4",
-    "capturable": true,
+    "capturable": false,
     "canCarryCaptureUnits": true,
     "waves": [
       { "waveId": "wave_1", "count": 1, "level": 8 },

@@ -379,6 +379,7 @@ export const LEVEL_4: TDLevelData = {
         {
           enemyDefinitionId: 'ironbell_resonarion',
           count: 1,
+          uncapturable: true,
           spawnIntervalMs: 1500,
           delayBeforeGroupMs: 3200,
           pathIndex: 0,
@@ -410,6 +411,7 @@ export const LEVEL_4: TDLevelData = {
         {
           enemyDefinitionId: 'ironbell_resonarion',
           count: 2,
+          uncapturable: true,
           spawnIntervalMs: 1800,
           delayBeforeGroupMs: 4000,
           pathIndex: 3,
@@ -441,6 +443,7 @@ export const LEVEL_4: TDLevelData = {
         {
           enemyDefinitionId: 'ironbell_resonarion',
           count: 2,
+          uncapturable: true,
           spawnIntervalMs: 1600,
           delayBeforeGroupMs: 3000,
           pathIndex: 4,
@@ -450,6 +453,7 @@ export const LEVEL_4: TDLevelData = {
         {
           enemyDefinitionId: 'ironbell_resonarion',
           count: 2,
+          uncapturable: true,
           spawnIntervalMs: 1600,
           delayBeforeGroupMs: 5200,
           pathIndex: 5,

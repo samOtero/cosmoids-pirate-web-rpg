@@ -141,12 +141,30 @@ describe('Bug evolution progression', () => {
   });
 });
 
-describe('Sonarion evolution progression', () => {
-  it('evolves into Resonarion at level 8 with the same dual typing', () => {
+describe('Razcall evolution progression', () => {
+  it('requires level 26 to evolve into Razound with the same dual typing', () => {
     expect(SONARION.evolutionNodes).toEqual([
-      { level: 8, evolutionDefId: 'resonarion' },
+      { level: 26, evolutionDefId: 'resonarion' },
     ]);
     expect(RESONARION.type).toBe(SONARION.type);
     expect(RESONARION.secondaryType).toBe(SONARION.secondaryType);
+  });
+
+  it('no longer offers evolution when Razcall reaches level 8', () => {
+    const engine = createEngine('sonarion', 7, 168);
+    const events: TDEvent[] = [];
+    engine.events.subscribe((event) => events.push(event));
+
+    grantBattleExperience(engine);
+
+    const tower = engine.towers[0];
+    expect(tower.creature.level).toBe(8);
+    expect(events.some((event) => event.type === 'TOWER_ASK_EVOLUTION')).toBe(
+      false
+    );
+    expect(engine.evolveTower(tower.id, 'resonarion')).toBe(false);
+    expect(tower.creature.speciesId).toBe('sonarion');
+
+    engine.destroy();
   });
 });
