@@ -177,6 +177,104 @@ describe('Creature Store Logic', () => {
     ]);
   });
 
+  it('should swap occupied party and storage slots without changing roster sizes', () => {
+    const store = useGameStore.getState();
+    const profileId = 0;
+    const partyIds = Array.from({ length: 6 }, (_, index) => `party-${index}`);
+    const storageIds = ['storage-0', 'storage-1'];
+
+    partyIds.forEach((id) => {
+      store.addCreatureToProfile(profileId, {
+        id,
+        speciesId: STARTER_CRAB.id,
+        level: 1,
+        xp: 0,
+        equippedAttacks: [],
+        isShiny: false,
+      });
+    });
+    storageIds.forEach((id) => {
+      store.addCreatureToProfile(
+        profileId,
+        {
+          id,
+          speciesId: STARTER_IGUANA.id,
+          level: 1,
+          xp: 0,
+          equippedAttacks: [],
+          isShiny: false,
+        },
+        true
+      );
+    });
+
+    // Storage slot 1 uses global index 7; exchange it with party slot 2.
+    store.reorderCreatures(7, 2);
+
+    const profile = useGameStore.getState().profiles[profileId]!;
+    expect(profile.creatures.map((creature) => creature.id)).toEqual([
+      'party-0',
+      'party-1',
+      'storage-1',
+      'party-3',
+      'party-4',
+      'party-5',
+    ]);
+    expect(profile.storageCreatures.map((creature) => creature.id)).toEqual([
+      'storage-0',
+      'party-2',
+    ]);
+    expect(profile.creatures).toHaveLength(6);
+    expect(profile.storageCreatures).toHaveLength(2);
+  });
+
+  it('should move legacy party overflow to storage without losing creatures', () => {
+    const overflowParty = Array.from({ length: 8 }, (_, index) => ({
+      id: `legacy-party-${index}`,
+      speciesId: STARTER_CRAB.id,
+      level: 1,
+      xp: 0,
+      equippedAttacks: [],
+      isShiny: false,
+    }));
+    const existingStorage = {
+      id: 'existing-storage',
+      speciesId: STARTER_IGUANA.id,
+      level: 1,
+      xp: 0,
+      equippedAttacks: [],
+      isShiny: false,
+    };
+
+    useGameStore.setState((state) => {
+      const profiles = [...state.profiles];
+      profiles[0] = {
+        ...profiles[0]!,
+        creatures: overflowParty,
+        storageCreatures: [existingStorage],
+      };
+      return { profiles };
+    });
+
+    // Selecting a current-version profile applies the same repair used during
+    // persisted-state rehydration.
+    useGameStore.getState().selectProfile(0);
+
+    const profile = useGameStore.getState().profiles[0]!;
+    expect(profile.creatures.map((creature) => creature.id)).toEqual(
+      overflowParty.slice(0, 6).map((creature) => creature.id)
+    );
+    expect(profile.storageCreatures.map((creature) => creature.id)).toEqual([
+      'existing-storage',
+      'legacy-party-6',
+      'legacy-party-7',
+    ]);
+    expect([
+      ...profile.creatures,
+      ...profile.storageCreatures,
+    ]).toHaveLength(9);
+  });
+
   it('should not add captured creature to active roster if roster has 6 or more creatures', () => {
     const levelData = {
       paths: [

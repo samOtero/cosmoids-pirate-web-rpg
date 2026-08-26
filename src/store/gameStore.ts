@@ -11,7 +11,11 @@ import {
   GameFlagValue,
   TDLevelConfig,
 } from '@/types/baseGame';
-import { MAX_PROFILES, CURRENT_PROFILE_VERSION } from '@/constants/game';
+import {
+  MAX_PROFILES,
+  CURRENT_PROFILE_VERSION,
+  MAX_PARTY_SIZE,
+} from '@/constants/game';
 import { ITEMS } from '@/constants/items';
 import {
   GameEvent,
@@ -49,6 +53,24 @@ function mergeCapturedSpeciesIds(
       ...speciesIds,
     ])
   );
+}
+
+/**
+ * Repairs profiles created by older party-management behavior without losing
+ * any creatures. The first six remain active and overflow is appended to the
+ * existing storage box in its original order.
+ */
+export function enforcePartySize(profile: Profile): Profile {
+  if (profile.creatures.length <= MAX_PARTY_SIZE) return profile;
+
+  return {
+    ...profile,
+    creatures: profile.creatures.slice(0, MAX_PARTY_SIZE),
+    storageCreatures: [
+      ...profile.storageCreatures,
+      ...profile.creatures.slice(MAX_PARTY_SIZE),
+    ],
+  };
 }
 
 interface GameState {
@@ -473,11 +495,14 @@ export const useGameStore = create<GameState>()(
                 };
               }
 
+              const normalizedProfile = enforcePartySize(profile);
+
               // Update last played time
               newProfiles[slotId] = {
-                ...profile,
+                ...normalizedProfile,
                 lastPlayed: Date.now(),
-                capturedSpeciesIds: mergeCapturedSpeciesIds(profile),
+                capturedSpeciesIds:
+                  mergeCapturedSpeciesIds(normalizedProfile),
               };
 
               let initialEvents: GameEvent[] = [];
@@ -515,7 +540,7 @@ export const useGameStore = create<GameState>()(
                 return state;
               const newProfiles = [...state.profiles];
               if (newProfiles[slotId]) {
-                const profile = newProfiles[slotId]!;
+                const profile = enforcePartySize(newProfiles[slotId]!);
                 const newCreatureInstance: PlayerCreature = {
                   ...creature,
                   id:
@@ -523,8 +548,11 @@ export const useGameStore = create<GameState>()(
                       ? creature.id
                       : crypto.randomUUID(),
                 };
-                // Add to party if under 6 and not forced to storage, otherwise to storage
-                if (profile.creatures.length < 6 && !forceStorage) {
+                // Add to party if it has room and is not forced to storage.
+                if (
+                  profile.creatures.length < MAX_PARTY_SIZE &&
+                  !forceStorage
+                ) {
                   newProfiles[slotId] = {
                     ...profile,
                     creatures: [...profile.creatures, newCreatureInstance],
@@ -556,7 +584,7 @@ export const useGameStore = create<GameState>()(
               const profileId = state.currentProfileId;
               if (profileId === null || !state.profiles[profileId])
                 return state;
-              const profile = state.profiles[profileId]!;
+              const profile = enforcePartySize(state.profiles[profileId]!);
               const newCreatures = [...profile.creatures];
               const updatedSpeciesIds: string[] = [];
 
@@ -596,15 +624,21 @@ export const useGameStore = create<GameState>()(
                 return state;
 
               const newProfiles = [...state.profiles];
-              newProfiles[profileId] = {
-                ...newProfiles[profileId]!,
-                creatures: creatures.map((c) => ({
+              const profile = enforcePartySize(newProfiles[profileId]!);
+              const newCreatures = creatures.map((c) => ({
                   ...c,
                   id: crypto.randomUUID(),
                   isShiny: c.isShiny ?? false,
-                })),
+                }));
+              newProfiles[profileId] = {
+                ...profile,
+                creatures: newCreatures.slice(0, MAX_PARTY_SIZE),
+                storageCreatures: [
+                  ...profile.storageCreatures,
+                  ...newCreatures.slice(MAX_PARTY_SIZE),
+                ],
                 capturedSpeciesIds: mergeCapturedSpeciesIds(
-                  newProfiles[profileId]!,
+                  profile,
                   creatures.map((creature) => creature.speciesId)
                 ),
               };
@@ -620,16 +654,19 @@ export const useGameStore = create<GameState>()(
               if (profileId === null || !state.profiles[profileId])
                 return state;
 
-              const profile = state.profiles[profileId]!;
+              const profile = enforcePartySize(state.profiles[profileId]!);
               const newParty = [...profile.creatures];
               const newStorage = [...profile.storageCreatures];
 
               // Determine which array+local-index the global index maps to
               const resolve = (globalIdx: number) => {
-                if (globalIdx < 6) {
+                if (globalIdx < MAX_PARTY_SIZE) {
                   return { arr: 'party' as const, localIdx: globalIdx };
                 }
-                return { arr: 'storage' as const, localIdx: globalIdx - 6 };
+                return {
+                  arr: 'storage' as const,
+                  localIdx: globalIdx - MAX_PARTY_SIZE,
+                };
               };
 
               const src = resolve(startIndex);
@@ -642,16 +679,28 @@ export const useGameStore = create<GameState>()(
                 return state;
               }
 
-              // Remove from source
-              const [removed] = srcArr.splice(src.localIdx, 1);
-
-              // Insert into destination
               const dstArr = dst.arr === 'party' ? newParty : newStorage;
-              const clampedDstIdx = Math.max(
-                0,
-                Math.min(dst.localIdx, dstArr.length)
-              );
-              dstArr.splice(clampedDstIdx, 0, removed);
+
+              if (
+                src.arr !== dst.arr &&
+                dst.localIdx >= 0 &&
+                dst.localIdx < dstArr.length
+              ) {
+                // Crossing between party and storage onto an occupied slot is
+                // a true exchange; neither list shifts or changes length.
+                const destinationCreature = dstArr[dst.localIdx];
+                dstArr[dst.localIdx] = srcArr[src.localIdx];
+                srcArr[src.localIdx] = destinationCreature;
+              } else {
+                // Empty cross-list slots and same-list reordering retain the
+                // existing remove-and-insert behavior.
+                const [removed] = srcArr.splice(src.localIdx, 1);
+                const clampedDstIdx = Math.max(
+                  0,
+                  Math.min(dst.localIdx, dstArr.length)
+                );
+                dstArr.splice(clampedDstIdx, 0, removed);
+              }
 
               const newProfiles = [...state.profiles];
               newProfiles[profileId] = {
@@ -841,7 +890,7 @@ export const useGameStore = create<GameState>()(
                 version: CURRENT_PROFILE_VERSION,
               };
             }
-            return {
+            const migratedProfile = {
               ...profile,
               // Older current-version saves predate these UI acknowledgement
               // fields. Completed Level 3 profiles have already earned the
@@ -852,6 +901,7 @@ export const useGameStore = create<GameState>()(
               journalOpened: profile.journalOpened ?? false,
               capturedSpeciesIds: mergeCapturedSpeciesIds(profile),
             };
+            return enforcePartySize(migratedProfile);
           });
           state.profiles = migratedProfiles;
         },

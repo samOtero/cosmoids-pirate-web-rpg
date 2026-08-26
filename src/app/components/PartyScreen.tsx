@@ -2,7 +2,7 @@ import { Creature } from '@/types/baseGame';
 import { useState, useEffect, useRef } from 'react';
 import Panel from '@/app/components/ui/Panel';
 import { Button } from '@/app/components/ui/Button';
-import { BACKGROUND_IMAGES } from '@/constants/game';
+import { MAX_PARTY_SIZE } from '@/constants/game';
 import CreatureDetailsScreen from '@/app/components/CreatureDetailsScreen';
 
 interface PartyScreenProps {
@@ -130,9 +130,9 @@ export default function PartyScreen({
         e.target.releasePointerCapture(e.pointerId);
       }
       
-      const resolvedCreature = clickedIdx < 6 
+      const resolvedCreature = clickedIdx < MAX_PARTY_SIZE
         ? activeTeam[clickedIdx] 
-        : storageCreatures[clickedIdx - 6];
+        : storageCreatures[clickedIdx - MAX_PARTY_SIZE];
       
       if (resolvedCreature) {
         setSelectedCreatureIndex(clickedIdx);
@@ -194,7 +194,7 @@ export default function PartyScreen({
     for (let i = 0; i < creaturesPerPage; i++) {
       const creatureIndex = startIndex + i;
       const creature = storageCreatures[creatureIndex];
-      const absoluteIndex = 6 + creatureIndex; // Offset by active team
+      const absoluteIndex = MAX_PARTY_SIZE + creatureIndex;
 
       slots.push(
         <div
@@ -283,7 +283,7 @@ export default function PartyScreen({
             </div>
           )}
           <div className="flex flex-nowrap justify-center gap-6">
-            {Array.from({ length: 6 }).map((_, i) => {
+            {Array.from({ length: MAX_PARTY_SIZE }).map((_, i) => {
               const creature = activeTeam[i];
               return (
                 <div
@@ -397,9 +397,11 @@ export default function PartyScreen({
       {(() => {
         const selectedCreature =
           selectedCreatureIndex !== null
-            ? selectedCreatureIndex < 6
+            ? selectedCreatureIndex < MAX_PARTY_SIZE
               ? activeTeam[selectedCreatureIndex]
-              : storageCreatures[selectedCreatureIndex - 6]
+              : storageCreatures[
+                  selectedCreatureIndex - MAX_PARTY_SIZE
+                ]
             : null;
 
         if (!selectedCreature) return null;
@@ -435,7 +437,7 @@ export default function PartyScreen({
               <div className="space-y-1 font-mono text-[10px] leading-relaxed text-sand md:text-xs lg:space-y-2 lg:text-lg">
                 <div>
                   <span className="font-bold text-cyan-400">1.</span> Drag a
-                  Cosmoid from your &quot;Storage&quot; and drop 'em onto your
+                  Cosmoid from your &quot;Storage&quot; and drop &apos;em onto your
                   &quot;Current Team&quot;.
                 </div>
                 <div>

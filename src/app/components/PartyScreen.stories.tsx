@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { useState } from 'react';
 import PartyScreen from './PartyScreen';
+import { MAX_PARTY_SIZE } from '@/constants/game';
 import { Creature, CosmoidTemplate } from '@/types/baseGame';
 import {
   STARTER_IGUANA,
@@ -66,10 +67,13 @@ function PartyScreenStoryWrapper({
     const newStorage = [...storage];
 
     const resolve = (globalIdx: number) => {
-      if (globalIdx < 6) {
+      if (globalIdx < MAX_PARTY_SIZE) {
         return { arr: 'party' as const, localIdx: globalIdx };
       }
-      return { arr: 'storage' as const, localIdx: globalIdx - 6 };
+      return {
+        arr: 'storage' as const,
+        localIdx: globalIdx - MAX_PARTY_SIZE,
+      };
     };
 
     const src = resolve(startIndex);
@@ -78,11 +82,20 @@ function PartyScreenStoryWrapper({
     const srcArr = src.arr === 'party' ? newParty : newStorage;
     if (src.localIdx < 0 || src.localIdx >= srcArr.length) return;
 
-    const [removed] = srcArr.splice(src.localIdx, 1);
-
     const dstArr = dst.arr === 'party' ? newParty : newStorage;
-    const clampedDstIdx = Math.max(0, Math.min(dst.localIdx, dstArr.length));
-    dstArr.splice(clampedDstIdx, 0, removed);
+    if (
+      src.arr !== dst.arr &&
+      dst.localIdx >= 0 &&
+      dst.localIdx < dstArr.length
+    ) {
+      const destinationCreature = dstArr[dst.localIdx];
+      dstArr[dst.localIdx] = srcArr[src.localIdx];
+      srcArr[src.localIdx] = destinationCreature;
+    } else {
+      const [removed] = srcArr.splice(src.localIdx, 1);
+      const clampedDstIdx = Math.max(0, Math.min(dst.localIdx, dstArr.length));
+      dstArr.splice(clampedDstIdx, 0, removed);
+    }
 
     setParty(newParty);
     setStorage(newStorage);
