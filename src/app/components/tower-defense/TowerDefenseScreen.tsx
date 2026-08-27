@@ -156,8 +156,14 @@ export default function TowerDefenseScreen({
 
   const [hasStarted, setHasStarted] = useState(false);
   const [introState, setIntroState] = useState<
-    'cameraPan' | 'ready' | 'go' | 'none'
-  >(levelData.openingPan ? 'cameraPan' : 'ready');
+    'cameraPan' | 'message' | 'ready' | 'go' | 'none'
+  >(
+    levelData.openingPan
+      ? 'cameraPan'
+      : levelData.introMessage
+        ? 'message'
+        : 'ready'
+  );
   const [outroState, setOutroState] = useState<'none' | 'win' | 'lose'>('none');
   const isOutroReady = outroState !== 'none' && modalQueue.length === 0;
 
@@ -171,7 +177,10 @@ export default function TowerDefenseScreen({
   };
 
   useEffect(() => {
-    if (introState === 'ready') {
+    if (introState === 'message') {
+      const t = setTimeout(() => setIntroState('ready'), 1000);
+      return () => clearTimeout(t);
+    } else if (introState === 'ready') {
       const t = setTimeout(() => setIntroState('go'), 1000);
       return () => clearTimeout(t);
     } else if (introState === 'go') {
@@ -510,10 +519,16 @@ export default function TowerDefenseScreen({
         }
       }}
     >
-      {(introState === 'ready' || introState === 'go') && (
+      {(introState === 'message' ||
+        introState === 'ready' ||
+        introState === 'go') && (
         <div className="pointer-events-none fixed inset-0 z-10000 flex items-center justify-center bg-black/60">
-          <div className="animate-bounce bg-linear-to-br from-yellow-300 to-red-500 bg-clip-text pr-8 pb-4 text-7xl font-black text-transparent uppercase italic drop-shadow-[0_0_25px_rgba(255,165,0,0.8)] md:text-9xl">
-            {introState === 'ready' ? 'Ready!' : 'GO!'}
+          <div className="bg-linear-to-br from-yellow-300 to-red-500 bg-clip-text px-6 pb-4 text-center text-6xl font-black text-transparent uppercase italic drop-shadow-[0_0_25px_rgba(255,165,0,0.8)] md:text-9xl">
+            {introState === 'message'
+              ? levelData.introMessage
+              : introState === 'ready'
+                ? 'Ready!'
+                : 'GO!'}
           </div>
         </div>
       )}
@@ -525,7 +540,7 @@ export default function TowerDefenseScreen({
               You Win!
             </div>
           ) : (
-            <div className="animate-pulse pr-8 pb-4 text-7xl font-black tracking-widest text-red-600 uppercase drop-shadow-[0_0_35px_rgba(255,0,0,1)] md:text-9xl">
+            <div className="pr-8 pb-4 text-7xl font-black tracking-widest text-red-600 uppercase drop-shadow-[0_0_35px_rgba(255,0,0,1)] md:text-9xl">
               Defeat!
             </div>
           )}
@@ -581,7 +596,11 @@ export default function TowerDefenseScreen({
         hideUi={introState === 'cameraPan'}
         onOpeningPanComplete={() => {
           setIntroState((current) =>
-            current === 'cameraPan' ? 'ready' : current
+            current === 'cameraPan'
+              ? levelData.introMessage
+                ? 'message'
+                : 'ready'
+              : current
           );
         }}
         onMapDrop={handleMapDrop}

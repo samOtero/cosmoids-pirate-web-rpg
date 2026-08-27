@@ -205,6 +205,8 @@ export interface TDLevelData {
   backgroundScale?: number; // If > 1, background is taller than viewport and can be scrolled
   initialView?: TDInitialView;
   openingPan?: TDOpeningPan;
+  /** Optional message shown once before the Ready/Go countdown. */
+  introMessage?: string;
   environmentUnits?: {
     tdConfigId: string;
     position: Point;

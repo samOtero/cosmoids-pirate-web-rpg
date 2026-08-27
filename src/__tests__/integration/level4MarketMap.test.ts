@@ -84,40 +84,45 @@ describe('Level 4 market map', () => {
     ).toEqual(destinations.slice(0, -1));
   });
 
-  it('starts Tigrevel beside Mari as a fixed guest defender', () => {
+  it('starts Kip’s Mopup beside Mari as a fixed defender without Tigrevel', () => {
     const tigrevel = LEVEL_4.startingTowers?.find(
       (tower) => tower.creature.speciesId === 'tigrevel'
     );
+    expect(tigrevel).toBeUndefined();
 
-    expect(tigrevel).toMatchObject({
-      position: { x: 32, y: 55 },
-      facingDirection: 'left',
+    const mopup = LEVEL_4.startingTowers?.find(
+      (tower) => tower.creature.speciesId === 'mopup'
+    );
+
+    expect(mopup).toMatchObject({
+      position: { x: 40, y: 55 },
+      facingDirection: 'right',
       isFixed: true,
       receivesExperience: false,
       creature: {
-        id: 'ironbell_tigrevel',
-        level: 8,
-        equippedAttacks: ['SCRATCH', 'QUICK_ATTACK'],
+        id: 'kip_mopup',
+        level: 5,
+        equippedAttacks: ['TACKLE'],
       },
     });
 
     const engine = new TowerDefenseEngine(LEVEL_4);
-    const runtimeTigrevel = engine.towers.find(
-      (tower) => tower.creature.id === 'ironbell_tigrevel'
+    const runtimeMopup = engine.towers.find(
+      (tower) => tower.creature.id === 'kip_mopup'
     );
 
-    expect(runtimeTigrevel).toMatchObject({
-      position: { x: 32, y: 55 },
-      facingDirection: 'left',
+    expect(runtimeMopup).toMatchObject({
+      position: { x: 40, y: 55 },
+      facingDirection: 'right',
       isFixed: true,
       selectedAttackIndex: 0,
       creature: {
-        speciesId: 'tigrevel',
-        level: 8,
-        equippedAttacks: ['SCRATCH', 'QUICK_ATTACK'],
+        speciesId: 'mopup',
+        level: 5,
+        equippedAttacks: ['TACKLE'],
       },
     });
-    expect(engine.removeTower('ironbell_tigrevel')).toBe(false);
+    expect(engine.removeTower('kip_mopup')).toBe(false);
     engine.destroy();
   });
 
@@ -131,13 +136,19 @@ describe('Level 4 market map', () => {
     });
   });
 
-  it('uses the dedicated painted market background', () => {
+  it('uses the dedicated painted market background and tours it bottom-right to top-left', () => {
     expect(LEVEL_4.backgroundUrl).toBe('/battles/bg/bg_market_level_4.png');
     expect(LEVEL_4.backgroundScale).toBe(3);
     expect(LEVEL_4.initialView).toEqual({
       offsetX: 0,
-      offsetY: 50,
-      zoom: 0.72,
+      offsetY: 0,
+      zoom: 0.62,
     });
+    expect(LEVEL_4.openingPan).toEqual({
+      fromOffsetX: 100,
+      fromOffsetY: 100,
+      durationMs: 2000,
+    });
+    expect(LEVEL_4.introMessage).toBe('Protect the girl!');
   });
 });

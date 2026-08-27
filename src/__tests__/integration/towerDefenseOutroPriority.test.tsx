@@ -130,6 +130,31 @@ describe('tower-defense outro priority', () => {
     expect(onWin).toHaveBeenCalledOnce();
   });
 
+  it('shows an optional level message before the static Ready/Go countdown', () => {
+    render(
+      <TowerDefenseScreen
+        levelData={{
+          paths: [],
+          placementSpots: [],
+          waveEnemyDefinitions: [],
+          waves: [],
+          introMessage: 'Protect the girl!',
+        }}
+        onClose={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText('Protect the girl!')).not.toHaveClass(
+      'animate-bounce'
+    );
+
+    act(() => vi.advanceTimersByTime(1000));
+    expect(screen.getByText('Ready!')).not.toHaveClass('animate-bounce');
+
+    act(() => vi.advanceTimersByTime(1000));
+    expect(screen.getByText('GO!')).not.toHaveClass('animate-bounce');
+  });
+
   it('waits for a progression modal before showing and completing the lose outro', () => {
     const onLose = vi.fn();
     engineHarness.outcome = 'lose';
@@ -155,7 +180,10 @@ describe('tower-defense outro priority', () => {
     expect(onLose).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole('button', { name: 'Later' }));
-    expect(screen.getByText('Defeat!')).toBeInTheDocument();
+    expect(screen.getByText('Defeat!')).not.toHaveClass(
+      'animate-bounce',
+      'animate-pulse'
+    );
 
     act(() => vi.advanceTimersByTime(3000));
     expect(onLose).toHaveBeenCalledOnce();

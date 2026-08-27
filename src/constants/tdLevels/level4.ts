@@ -174,64 +174,84 @@ export const LEVEL_4: TDLevelData = {
   ],
   placementSpots: [
     {
-      x: 28,
-      y: 24,
+      x: 16.64,
+      y: 22.91,
     },
     {
-      x: 38,
-      y: 23,
+      x: 23.36,
+      y: 40.18,
     },
     {
-      x: 88,
-      y: 25,
+      x: 87.13,
+      y: 24.58,
     },
     {
-      x: 28,
-      y: 42,
+      x: 29.75,
+      y: 24.34,
     },
     {
-      x: 38,
-      y: 39,
+      x: 50.03,
+      y: 13.79,
     },
     {
-      x: 70,
-      y: 41,
+      x: 74.6,
+      y: 33.23,
     },
     {
-      x: 24,
-      y: 57,
+      x: 22.5,
+      y: 58.79,
     },
     {
-      x: 25,
-      y: 74,
+      x: 21.48,
+      y: 75.69,
     },
     {
-      x: 88,
-      y: 78,
+      x: 87.22,
+      y: 72.63,
     },
     {
-      x: 58,
-      y: 40,
+      x: 36.36,
+      y: 19.76,
     },
     {
-      x: 37,
-      y: 68,
+      x: 12.1,
+      y: 84.62,
     },
     {
-      x: 57,
-      y: 62,
+      x: 52.16,
+      y: 59.16,
     },
     {
-      x: 40,
-      y: 84,
+      x: 29.91,
+      y: 70.96,
     },
     {
-      x: 80,
-      y: 37,
+      x: 77.5,
+      y: 22.31,
     },
     {
-      x: 79,
-      y: 68,
+      x: 78.46,
+      y: 67.82,
+    },
+    {
+      x: 53.64,
+      y: 25.36,
+    },
+    {
+      x: 46.98,
+      y: 77.49,
+    },
+    {
+      x: 55.68,
+      y: 73.6,
+    },
+    {
+      x: 51.54,
+      y: 36.24,
+    },
+    {
+      x: 70.62,
+      y: 66.89,
     },
   ],
   environmentUnits: [
@@ -245,33 +265,14 @@ export const LEVEL_4: TDLevelData = {
     },
     {
       position: {
-        x: 39.41,
-        y: 39.09,
+        x: 38.06,
+        y: 48.23,
       },
       tdConfigId: 'kip_battle',
       facingDirection: 'right',
     },
   ],
   startingTowers: [
-    {
-      creature: {
-        id: 'ironbell_tigrevel',
-        speciesId: 'tigrevel',
-        level: 8,
-        xp: 0,
-        equippedAttacks: ['SCRATCH', 'QUICK_ATTACK'],
-        activeAttackIndex: 0,
-        targetingMode: 'first',
-        isShiny: false,
-      },
-      position: {
-        x: 32,
-        y: 55,
-      },
-      facingDirection: 'left',
-      isFixed: true,
-      receivesExperience: false,
-    },
     {
       creature: {
         id: 'kip_mopup',
@@ -468,7 +469,13 @@ export const LEVEL_4: TDLevelData = {
   backgroundScale: 3,
   initialView: {
     offsetX: 0,
-    offsetY: 50,
-    zoom: 0.72,
+    offsetY: 0,
+    zoom: 0.62,
   },
+  openingPan: {
+    fromOffsetX: 100,
+    fromOffsetY: 100,
+    durationMs: 2000,
+  },
+  introMessage: 'Protect the girl!',
 };

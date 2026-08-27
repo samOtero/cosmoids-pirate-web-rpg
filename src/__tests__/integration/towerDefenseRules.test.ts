@@ -29,6 +29,19 @@ describe('Tower defense rules', () => {
     });
   });
 
+  it('opens Level 4 zoomed out with a bottom-right-to-top-left camera tour', () => {
+    expect(LEVEL_4.initialView).toEqual({
+      offsetX: 0,
+      offsetY: 0,
+      zoom: 0.62,
+    });
+    expect(LEVEL_4.openingPan).toEqual({
+      fromOffsetX: 100,
+      fromOffsetY: 100,
+      durationMs: 2000,
+    });
+  });
+
   it('keeps separate path backgrounds for Levels 2 and 3', () => {
     expect(FOREST_LEVEL.backgroundUrl).toBe(
       '/battles/bg/bg_coastal_island_battle_path_v2.png'
