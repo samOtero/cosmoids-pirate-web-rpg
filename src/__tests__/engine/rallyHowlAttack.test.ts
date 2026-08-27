@@ -46,8 +46,8 @@ function createEngine(withTarget = true, level = 14) {
   for (const [id, x, y] of [
     ['caster', 40, 50],
     ['near', 50, 50],
-    ['boundary', 40, 70],
-    ['far', 40, 70.01],
+    ['boundary', 40, 90],
+    ['far', 40, 90.01],
     ['dead', 45, 50],
   ] as const) {
     engine.placeTower(id, x, y);
@@ -78,7 +78,7 @@ describe('Rally Howl', () => {
       power: 0,
       behaviorType: 'SUPPORT_AURA',
       cooldownMs: 12000,
-      rangeIndex: 20,
+      rangeIndex: 40,
       supportBuff: { attackSpeedMultiplier: 1.2, durationMs: 5000 },
     });
   });
@@ -104,7 +104,7 @@ describe('Rally Howl', () => {
     expect(engine.visualEffects).toHaveLength(1);
     expect(engine.visualEffects[0]).toMatchObject({
       configId: 'attack_rally_howl_1',
-      rangeIndex: 20,
+      rangeIndex: 40,
       durationMs: 800,
     });
   });

@@ -70,14 +70,18 @@ function projectDirectionToSafeEdge(
   };
 }
 
+export const DEFAULT_MIN_INDICATOR_DISTANCE = 160;
+
 /** Groups off-screen enemies into stable directional sectors and projects one
- * indicator per sector onto a HUD-safe viewport edge. */
+ * indicator per sector onto a HUD-safe viewport edge. Indicators closer than
+ * minDistance along the screen edge are merged together. */
 export function buildTDOffscreenIndicators(
   markers: TDOffscreenEnemyMarker[],
   width: number,
   height: number,
   insets: TDEdgeInsets = DEFAULT_EDGE_INSETS,
-  sectorCount: number = 16
+  sectorCount: number = 4,
+  minDistance: number = DEFAULT_MIN_INDICATOR_DISTANCE
 ): TDOffscreenIndicator[] {
   if (width <= 0 || height <= 0 || sectorCount <= 0) return [];
 
@@ -113,15 +117,92 @@ export function buildTDOffscreenIndicators(
     groups.set(sector, group);
   }
 
-  return [...groups.entries()].map(([sector, group]) => {
-    const angle = Math.atan2(group.directionY, group.directionX);
-    const position = projectDirectionToSafeEdge(angle, width, height, insets);
-    return {
-      id: `sector_${sector}`,
-      ...position,
-      angle,
-      count: group.count,
-      hasObjectiveCarrier: group.hasObjectiveCarrier,
-    };
-  });
+  interface SectorIndicatorCandidate {
+    sectors: number[];
+    directionX: number;
+    directionY: number;
+    count: number;
+    hasObjectiveCarrier: boolean;
+    x: number;
+    y: number;
+    angle: number;
+  }
+
+  const rawIndicators: SectorIndicatorCandidate[] = [...groups.entries()].map(
+    ([sector, group]) => {
+      const angle = Math.atan2(group.directionY, group.directionX);
+      const position = projectDirectionToSafeEdge(angle, width, height, insets);
+      return {
+        sectors: [sector],
+        directionX: group.directionX,
+        directionY: group.directionY,
+        count: group.count,
+        hasObjectiveCarrier: group.hasObjectiveCarrier,
+        angle,
+        ...position,
+      };
+    }
+  );
+
+  if (minDistance <= 0 || rawIndicators.length <= 1) {
+    return rawIndicators.map((ind) => ({
+      id: `sector_${ind.sectors.join('_')}`,
+      x: ind.x,
+      y: ind.y,
+      angle: ind.angle,
+      count: ind.count,
+      hasObjectiveCarrier: ind.hasObjectiveCarrier,
+    }));
+  }
+
+  // Iteratively merge candidates whose projected screen positions are within minDistance
+  let list = rawIndicators;
+  let merged = true;
+  while (merged) {
+    merged = false;
+    for (let i = 0; i < list.length; i++) {
+      for (let j = i + 1; j < list.length; j++) {
+        const a = list[i];
+        const b = list[j];
+        const dist = Math.hypot(a.x - b.x, a.y - b.y);
+        if (dist < minDistance) {
+          const dirX = a.directionX + b.directionX;
+          const dirY = a.directionY + b.directionY;
+          const angle = Math.atan2(dirY, dirX);
+          const position = projectDirectionToSafeEdge(
+            angle,
+            width,
+            height,
+            insets
+          );
+          const combinedSectors = [...a.sectors, ...b.sectors].sort(
+            (s1, s2) => s1 - s2
+          );
+          const combined: SectorIndicatorCandidate = {
+            sectors: combinedSectors,
+            directionX: dirX,
+            directionY: dirY,
+            count: a.count + b.count,
+            hasObjectiveCarrier: a.hasObjectiveCarrier || b.hasObjectiveCarrier,
+            angle,
+            ...position,
+          };
+          list.splice(j, 1);
+          list.splice(i, 1, combined);
+          merged = true;
+          break;
+        }
+      }
+      if (merged) break;
+    }
+  }
+
+  return list.map((ind) => ({
+    id: `sector_${ind.sectors.join('_')}`,
+    x: ind.x,
+    y: ind.y,
+    angle: ind.angle,
+    count: ind.count,
+    hasObjectiveCarrier: ind.hasObjectiveCarrier,
+  }));
 }

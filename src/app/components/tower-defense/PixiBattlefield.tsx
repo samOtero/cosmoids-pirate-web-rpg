@@ -2661,20 +2661,6 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               graphics.label = 'indicator_graphics';
               container.addChild(graphics);
 
-              const countText = new PIXI.Text({
-                text: '',
-                style: {
-                  fontFamily: 'monospace',
-                  fontSize: 12,
-                  fontWeight: 'bold',
-                  fill: 0xffffff,
-                  stroke: { color: 0x000000, width: 2 },
-                },
-              });
-              countText.label = 'indicator_count';
-              countText.anchor.set(0.5);
-              container.addChild(countText);
-
               app.stage.addChild(container);
               offscreenEnemyIndicatorSprites.set(indicator.id, container);
             }
@@ -2682,9 +2668,6 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             const graphics = container.getChildByLabel(
               'indicator_graphics'
             ) as PIXI.Graphics;
-            const countText = container.getChildByLabel(
-              'indicator_count'
-            ) as PIXI.Text;
             const directionX = Math.cos(indicator.angle);
             const directionY = Math.sin(indicator.angle);
             const tangentX = -directionY;
@@ -2709,16 +2692,6 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               -directionY * 7 - tangentY * 7,
             ]);
             graphics.fill({ color, alpha: 1 });
-
-            countText.visible = indicator.count > 1;
-            countText.text = `×${indicator.count}`;
-            countText.x = 14;
-            countText.y = -14;
-            if (countText.visible) {
-              graphics.circle(countText.x, countText.y, 10);
-              graphics.fill({ color: 0x020617, alpha: 0.96 });
-              graphics.stroke({ color, alpha: 1, width: 2 });
-            }
 
             container.x = indicator.x;
             container.y = indicator.y;

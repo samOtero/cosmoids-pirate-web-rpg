@@ -89,7 +89,7 @@ describe('Wind Gust', () => {
     expect(ATTACK_DEFS.WIND_GUST).toMatchObject({
       type: ElementType.FLYING,
       power: 0,
-      rangeIndex: 20,
+      rangeIndex: 40,
       behaviorType: 'INSTANT_AOE',
       itemPickupLockMs: 2000,
       visualEffectConfigId: 'attack_wind_gust_1',
@@ -100,11 +100,11 @@ describe('Wind Gust', () => {
     const engine = new TowerDefenseEngine(levelData);
     const carrierOne = createEnemy('carrier_one', 10, 'coin_one');
     const carrierTwo = createEnemy('carrier_two', 18, 'sack_one');
-    const farCarrier = createEnemy('far_carrier', 40, 'coin_far');
+    const farCarrier = createEnemy('far_carrier', 50, 'coin_far');
     const unlockedReceiver = createEnemy('receiver', 10);
     const coin = createCaptureUnit('coin_one', 10, carrierOne.id);
     const sack = createCaptureUnit('sack_one', 18, carrierTwo.id);
-    const farCoin = createCaptureUnit('coin_far', 40, farCarrier.id);
+    const farCoin = createCaptureUnit('coin_far', 50, farCarrier.id);
     engine.enemies = [carrierOne, carrierTwo, farCarrier, unlockedReceiver];
     engine.captureUnits = [coin, sack, farCoin];
 
@@ -141,7 +141,7 @@ describe('Wind Gust', () => {
       expect.objectContaining({
         configId: 'attack_wind_gust_1',
         position: { x: 0, y: 0 },
-        rangeIndex: 20,
+        rangeIndex: 40,
       })
     );
 

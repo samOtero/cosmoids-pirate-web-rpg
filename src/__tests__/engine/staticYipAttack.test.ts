@@ -64,7 +64,7 @@ describe('Static Yip', () => {
       category: 'special',
       power: 40,
       cooldownMs: 800,
-      rangeIndex: 25,
+      rangeIndex: 40,
       projectileSpeed: 1.6,
       behaviorType: 'PROJECTILE',
       projectileVisual: { type: 'STATIC_YIP' },
@@ -147,7 +147,7 @@ describe('Static Yip', () => {
       category: 'special',
       power: 40,
       cooldownMs: 800,
-      rangeIndex: 25,
+      rangeIndex: 40,
       projectileSpeed: 1.6,
       projectileVisual: { type: 'SPARK' },
       launchVisualEffectConfigId: 'attack_spark_launch_1',
@@ -170,7 +170,7 @@ describe('Static Yip', () => {
 
   it('does not flash or launch without a live in-range target', () => {
     const engine = createEngine();
-    engine.enemies[0].position.x = 80;
+    engine.enemies[0].position.x = 85;
     expect(
       ProjectileBehavior.canExecute(
         engine,
