@@ -27,6 +27,7 @@ import {
 import { applyTDUnitTransforms } from '@/utils/tdUnitVisuals';
 import { getCaptureUnitVisualState } from '@/utils/captureUnitVisualState';
 import { getTDRangePreviewRadius } from '@/utils/tdAttackRangePreview';
+import { buildTDOffscreenIndicators } from '@/utils/tdOffscreenIndicators';
 import { drawRallyHowlRings, updateRallyIndicator } from './rallyHowlVisuals';
 import {
   drawSparkImpact,
@@ -1817,6 +1818,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         const projectileSprites = new Map<string, PIXI.Container>();
         const vfxSprites = new Map<string, PIXI.Container>();
         const floatingTextSprites = new Map<string, PIXI.Text>();
+        const offscreenEnemyIndicatorSprites = new Map<
+          string,
+          PIXI.Container
+        >();
         const spotGraphics = new PIXI.Graphics();
         const invalidSpotGraphics = new PIXI.Graphics();
         const resonantEvolutionGraphics = new PIXI.Graphics();
@@ -2614,6 +2619,105 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 app.ticker.deltaTime
               );
             }
+          }
+
+          // --- Render clustered off-screen enemy indicators ---
+          const offscreenIndicators = hideUi
+            ? []
+            : buildTDOffscreenIndicators(
+                engine.enemies
+                  .filter((enemy) => enemy.hp > 0)
+                  .map((enemy) => ({
+                    id: enemy.id,
+                    x: offsetX + (enemy.position.x / 100) * screenW,
+                    y: offsetY + (enemy.position.y / 100) * screenH,
+                    isObjectiveCarrier: Boolean(enemy.heldCaptureUnitId),
+                  })),
+                app.screen.width,
+                app.screen.height
+              );
+          const currentIndicatorIds = new Set(
+            offscreenIndicators.map((indicator) => indicator.id)
+          );
+          for (const [id, container] of offscreenEnemyIndicatorSprites) {
+            if (!currentIndicatorIds.has(id)) {
+              app.stage.removeChild(container);
+              container.destroy({ children: true });
+              offscreenEnemyIndicatorSprites.delete(id);
+            }
+          }
+          for (const indicator of offscreenIndicators) {
+            let container = offscreenEnemyIndicatorSprites.get(indicator.id);
+            if (!container) {
+              container = new PIXI.Container();
+              container.eventMode = 'none';
+
+              const graphics = new PIXI.Graphics();
+              graphics.label = 'indicator_graphics';
+              container.addChild(graphics);
+
+              const countText = new PIXI.Text({
+                text: '',
+                style: {
+                  fontFamily: 'monospace',
+                  fontSize: 12,
+                  fontWeight: 'bold',
+                  fill: 0xffffff,
+                  stroke: { color: 0x000000, width: 2 },
+                },
+              });
+              countText.label = 'indicator_count';
+              countText.anchor.set(0.5);
+              container.addChild(countText);
+
+              app.stage.addChild(container);
+              offscreenEnemyIndicatorSprites.set(indicator.id, container);
+            }
+
+            const graphics = container.getChildByLabel(
+              'indicator_graphics'
+            ) as PIXI.Graphics;
+            const countText = container.getChildByLabel(
+              'indicator_count'
+            ) as PIXI.Text;
+            const directionX = Math.cos(indicator.angle);
+            const directionY = Math.sin(indicator.angle);
+            const tangentX = -directionY;
+            const tangentY = directionX;
+            const color = indicator.hasObjectiveCarrier ? 0xef4444 : 0xf97316;
+            const pulse =
+              1 +
+              (indicator.hasObjectiveCarrier
+                ? Math.sin(engine.elapsedTimeMs / 140) * 0.12
+                : 0);
+
+            graphics.clear();
+            graphics.circle(0, 0, 18 * pulse);
+            graphics.fill({ color: 0x0f172a, alpha: 0.86 });
+            graphics.stroke({ color, alpha: 1, width: 3 });
+            graphics.poly([
+              directionX * 12,
+              directionY * 12,
+              -directionX * 7 + tangentX * 7,
+              -directionY * 7 + tangentY * 7,
+              -directionX * 7 - tangentX * 7,
+              -directionY * 7 - tangentY * 7,
+            ]);
+            graphics.fill({ color, alpha: 1 });
+
+            countText.visible = indicator.count > 1;
+            countText.text = `×${indicator.count}`;
+            countText.x = 14;
+            countText.y = -14;
+            if (countText.visible) {
+              graphics.circle(countText.x, countText.y, 10);
+              graphics.fill({ color: 0x020617, alpha: 0.96 });
+              graphics.stroke({ color, alpha: 1, width: 2 });
+            }
+
+            container.x = indicator.x;
+            container.y = indicator.y;
+            app.stage.setChildIndex(container, app.stage.children.length - 1);
           }
 
           // --- Render Projectiles ---
