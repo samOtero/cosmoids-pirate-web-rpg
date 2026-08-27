@@ -54,7 +54,7 @@ describe('Level 4 market map', () => {
     expect(
       LEVEL_4.waves.map((wave) => [
         ...new Set(wave.groups.map((group) => group.pathIndex)),
-      ])
+      ].sort((a, b) => a - b))
     ).toEqual([
       [0, 1],
       [2, 3],
@@ -123,6 +123,96 @@ describe('Level 4 market map', () => {
       },
     });
     expect(engine.removeTower('kip_mopup')).toBe(false);
+    engine.destroy();
+  });
+
+  it('teaches the Razcall buff with delayed groups behind a durable Razound', () => {
+    expect(LEVEL_4.waveEnemyDefinitions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'ironbell_resonarion',
+          level: 18,
+          speedMultiplier: 0.45,
+          hpMultiplier: 10,
+        }),
+      ])
+    );
+
+    expect(LEVEL_4.waves[0].groups).toEqual([
+      expect.objectContaining({
+        enemyDefinitionId: 'ironbell_resonarion',
+        count: 1,
+        pathIndex: 1,
+        delayBeforeGroupMs: 100,
+      }),
+      expect.objectContaining({
+        enemyDefinitionId: 'ironbell_sonarion',
+        count: 3,
+        pathIndex: 0,
+        delayBeforeGroupMs: 3500,
+        concurrentWithPrevious: true,
+      }),
+    ]);
+
+    expect(LEVEL_4.waves[1].groups).toEqual([
+      expect.objectContaining({
+        enemyDefinitionId: 'ironbell_resonarion',
+        count: 1,
+        pathIndex: 3,
+        delayBeforeGroupMs: 100,
+      }),
+      expect.objectContaining({
+        enemyDefinitionId: 'ironbell_sonarion',
+        count: 3,
+        pathIndex: 2,
+        delayBeforeGroupMs: 3500,
+        concurrentWithPrevious: true,
+      }),
+      expect.objectContaining({
+        enemyDefinitionId: 'ironbell_sonarion',
+        count: 3,
+        pathIndex: 2,
+        delayBeforeGroupMs: 6000,
+        concurrentWithPrevious: true,
+      }),
+    ]);
+  });
+
+  it('gives the first Razound a head start before Razcalls reach Mari and buff it', () => {
+    const engine = new TowerDefenseEngine({
+      ...LEVEL_4,
+      startingTowers: [],
+      waves: [LEVEL_4.waves[0]],
+    });
+    let elapsedMs = 0;
+
+    // Load the wave and advance through the Razound-only opening window.
+    engine.tick(elapsedMs, 16);
+    for (let index = 0; index < 30; index += 1) {
+      elapsedMs += 100;
+      engine.tick(elapsedMs, 100);
+    }
+
+    expect(
+      engine.enemies.filter((enemy) => enemy.definitionId === 'resonarion')
+    ).toHaveLength(1);
+    expect(
+      engine.enemies.filter((enemy) => enemy.definitionId === 'sonarion')
+    ).toHaveLength(0);
+
+    for (let index = 0; index < 100; index += 1) {
+      elapsedMs += 100;
+      engine.tick(elapsedMs, 100);
+      const razound = engine.enemies.find(
+        (enemy) => enemy.definitionId === 'resonarion'
+      );
+      if ((razound?.persistentSpeedBoostMultiplier ?? 1) > 1) break;
+    }
+
+    expect(
+      engine.enemies.find((enemy) => enemy.definitionId === 'resonarion')
+        ?.persistentSpeedBoostMultiplier
+    ).toBeGreaterThan(1);
     engine.destroy();
   });
 

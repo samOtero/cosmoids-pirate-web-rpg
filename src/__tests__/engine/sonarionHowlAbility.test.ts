@@ -17,7 +17,7 @@ const createLevel = (): TDLevelData => ({
     {
       tdConfigId: 'maribel_capture',
       position: { x: 50, y: 50 },
-      carrierSpeedMultiplier: 0.5,
+      carrierSpeedMultiplier: 0.9,
     },
   ],
   waveEnemyDefinitions: [
@@ -144,7 +144,7 @@ describe('Sonarion Howl enemy ability', () => {
     engine.destroy();
   });
 
-  it('applies Mari slowdown after a fully stacked howl multiplier', () => {
+  it('applies Mari’s ten-percent slowdown after a fully stacked howl multiplier', () => {
     const engine = new TowerDefenseEngine(createLevel());
     const carrier = addEnemy(engine, 'carrier', 'resonarion', 0);
     const mari = engine.captureUnits[0];
@@ -156,7 +156,7 @@ describe('Sonarion Howl enemy ability', () => {
 
     engine.tick(0, 16);
 
-    expect(carrier.position.x).toBeCloseTo((1 * 5 * 0.5 * 16) / 16.666, 5);
+    expect(carrier.position.x).toBeCloseTo((1 * 5 * 0.9 * 16) / 16.666, 5);
 
     engine.destroy();
   });

@@ -249,7 +249,7 @@ describe('Tower defense rules', () => {
     expect(LEVEL_4.captureUnits).toEqual([
       expect.objectContaining({
         tdConfigId: 'maribel_capture',
-        carrierSpeedMultiplier: 0.5,
+        carrierSpeedMultiplier: 0.9,
         position: LEVEL_4.paths[0][LEVEL_4.paths[0].length - 1],
         returnHome: { pathIndex: 0, speed: 2, delayMs: 500 },
         waveRelocations: [
@@ -279,14 +279,29 @@ describe('Tower defense rules', () => {
       expect.objectContaining({
         id: 'ironbell_sonarion',
         creatureId: 'sonarion',
+        level: 8,
         canCarryCaptureUnits: false,
         abilityId: 'SONARION_HOWL',
       }),
       expect.objectContaining({
         id: 'ironbell_resonarion',
         creatureId: 'resonarion',
+        level: 18,
+        speedMultiplier: VANE_LEVEL.waveEnemyDefinitions?.find(
+          (definition) => definition.id === 'vane_bettle_guard'
+        )?.speedMultiplier,
+        hpMultiplier: 10,
       }),
     ]);
+    const level3BettleHpMultiplier = VANE_LEVEL.waveEnemyDefinitions?.find(
+      (definition) => definition.id === 'vane_bettle_guard'
+    )?.hpMultiplier;
+    const level4RazoundHpMultiplier = LEVEL_4.waveEnemyDefinitions?.find(
+      (definition) => definition.id === 'ironbell_resonarion'
+    )?.hpMultiplier;
+    expect(level4RazoundHpMultiplier).toBeLessThan(
+      level3BettleHpMultiplier ?? Infinity
+    );
     expect(
       LEVEL_4.waves.flatMap((wave) =>
         wave.groups.map((group) => group.enemyDefinitionId)
