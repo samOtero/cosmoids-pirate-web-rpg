@@ -242,9 +242,10 @@ export class TowerDefenseEngine {
   public resonantEvolution?: TDResonantEvolutionConfig;
 
   public aspectRatio: number = 1;
+  public backgroundScale: number = 1;
 
   public setAspectRatio(ratio: number) {
-    this.aspectRatio = ratio;
+    this.aspectRatio = Math.max(ratio, Number.EPSILON);
   }
 
   // Loaded at initialization
@@ -307,6 +308,7 @@ export class TowerDefenseEngine {
     this.enemyHpMultiplier = levelData.enemyHpMultiplier ?? 1;
     this.disableCapture = levelData.disableCapture ?? false;
     this.resonantEvolution = levelData.resonantEvolution;
+    this.backgroundScale = Math.max(1, levelData.backgroundScale ?? 1);
 
     if (levelData.environmentUnits) {
       this.environmentUnits = levelData.environmentUnits.map((eu, index) => ({
@@ -2137,9 +2139,7 @@ export class TowerDefenseEngine {
     const enemiesInRange: { enemy: Enemy; dist: number }[] = [];
     for (const enemy of this.enemies) {
       if (enemy.hp <= 0 || (enemyFilter && !enemyFilter(enemy))) continue;
-      const dx = enemy.position.x - tower.position.x;
-      const dy = enemy.position.y - tower.position.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+      const dist = this.getAttackDistance(tower.position, enemy.position);
       if (dist <= range) {
         enemiesInRange.push({ enemy, dist });
       }
@@ -2233,6 +2233,25 @@ export class TowerDefenseEngine {
       }
     }
     return target;
+  }
+
+  /**
+   * Distance in attack-range units, normalized to viewport height. This makes
+   * the boundary circular on screen and independent of the level map size.
+   */
+  public getAttackDistance(a: Point, b: Point): number {
+    const dx =
+      (a.x - b.x) * this.aspectRatio * this.backgroundScale;
+    const dy = (a.y - b.y) * this.backgroundScale;
+    return Math.hypot(dx, dy);
+  }
+
+  public isPositionInAttackRange(
+    source: Point,
+    target: Point,
+    range: number
+  ): boolean {
+    return this.getAttackDistance(source, target) <= range;
   }
 
   public setTowerTargetingMode(creatureId: string, mode: TowerTargetingMode) {

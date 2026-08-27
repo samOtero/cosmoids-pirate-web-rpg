@@ -8,17 +8,6 @@ import { applyAttackSpeedBuff } from '../attackSpeedModifiers';
 
 const MAX_PROJECTILES_PER_PATTERN = 12;
 
-function isEnemyInRange(
-  source: Tower,
-  enemyX: number,
-  enemyY: number,
-  range: number
-) {
-  const dx = enemyX - source.position.x;
-  const dy = enemyY - source.position.y;
-  return Math.sqrt(dx * dx + dy * dy) <= range;
-}
-
 function isEligibleProjectileTarget(
   engine: TowerDefenseEngine,
   enemy: Enemy,
@@ -50,10 +39,11 @@ export const ProjectileBehavior: AttackBehavior = {
       ) {
         return false;
       }
-      const dx = enemy.position.x - source.position.x;
-      const dy = enemy.position.y - source.position.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      return dist <= attackDef.rangeIndex;
+      return engine.isPositionInAttackRange(
+        source.position,
+        enemy.position,
+        attackDef.rangeIndex
+      );
     });
   },
 
@@ -140,10 +130,11 @@ export const InstantMeleeBehavior: AttackBehavior = {
     attackDef: AttackDefinition
   ): boolean {
     return engine.enemies.some((enemy) => {
-      const dx = enemy.position.x - source.position.x;
-      const dy = enemy.position.y - source.position.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      return dist <= attackDef.rangeIndex;
+      return engine.isPositionInAttackRange(
+        source.position,
+        enemy.position,
+        attackDef.rangeIndex
+      );
     });
   },
 
@@ -209,10 +200,9 @@ export const InstantAoeBehavior: AttackBehavior = {
   ): boolean {
     return engine.enemies.some(
       (enemy) =>
-        isEnemyInRange(
-          source,
-          enemy.position.x,
-          enemy.position.y,
+        engine.isPositionInAttackRange(
+          source.position,
+          enemy.position,
           attackDef.rangeIndex
         ) &&
         Boolean(enemy.heldCaptureUnitId) &&
@@ -229,10 +219,9 @@ export const InstantAoeBehavior: AttackBehavior = {
 
     engine.enemies.forEach((enemy) => {
       if (
-        !isEnemyInRange(
-          source,
-          enemy.position.x,
-          enemy.position.y,
+        !engine.isPositionInAttackRange(
+          source.position,
+          enemy.position,
           attackDef.rangeIndex
         ) ||
         !enemy.heldCaptureUnitId ||
@@ -293,10 +282,9 @@ export const SupportAuraBehavior: AttackBehavior = {
     for (const ally of engine.towers) {
       if (
         ally.hp <= 0 ||
-        !isEnemyInRange(
-          source,
-          ally.position.x,
-          ally.position.y,
+        !engine.isPositionInAttackRange(
+          source.position,
+          ally.position,
           attackDef.rangeIndex
         )
       )

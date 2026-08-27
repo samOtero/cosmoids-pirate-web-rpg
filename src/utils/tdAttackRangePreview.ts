@@ -1,20 +1,12 @@
-export interface TDRangePreviewRadii {
-  x: number;
-  y: number;
-}
-
 /**
- * Convert an attack range expressed in normalized battlefield units into the
- * rendered radii that represent the same targeting boundary on screen.
+ * Convert a range expressed as a percentage of the base viewport height into
+ * its rendered radius. Background size is deliberately excluded so the same
+ * attack has the same world-space reach on every level.
  */
-export function getTDRangePreviewRadii(
+export function getTDRangePreviewRadius(
   rangeIndex: number,
-  battlefieldWidth: number,
-  battlefieldHeight: number
-): TDRangePreviewRadii {
-  const normalizedRange = Math.max(0, rangeIndex) / 100;
-  return {
-    x: battlefieldWidth * normalizedRange,
-    y: battlefieldHeight * normalizedRange,
-  };
+  viewportHeight: number,
+  zoom: number
+): number {
+  return viewportHeight * zoom * (Math.max(0, rangeIndex) / 100);
 }

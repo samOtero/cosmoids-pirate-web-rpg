@@ -26,7 +26,7 @@ import {
 } from '@/utils/tdInitialView';
 import { applyTDUnitTransforms } from '@/utils/tdUnitVisuals';
 import { getCaptureUnitVisualState } from '@/utils/captureUnitVisualState';
-import { getTDRangePreviewRadii } from '@/utils/tdAttackRangePreview';
+import { getTDRangePreviewRadius } from '@/utils/tdAttackRangePreview';
 import { drawRallyHowlRings, updateRallyIndicator } from './rallyHowlVisuals';
 import {
   drawSparkImpact,
@@ -2184,17 +2184,12 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                   : undefined;
                 rCircle.clear();
                 if (rangeIndex !== undefined && finalScale > 0) {
-                  const radii = getTDRangePreviewRadii(
+                  const radius = getTDRangePreviewRadius(
                     rangeIndex,
-                    screenW,
-                    screenH
+                    viewportH,
+                    zoom
                   );
-                  rCircle.ellipse(
-                    0,
-                    0,
-                    radii.x / finalScale,
-                    radii.y / finalScale
-                  );
+                  rCircle.circle(0, 0, radius / finalScale);
                   rCircle.fill({ color: 0x22d3ee, alpha: 0.05 });
                   rCircle.stroke({
                     color: 0x22d3ee,
@@ -2398,12 +2393,12 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 : undefined;
 
               if (rangeIndex !== undefined) {
-                const radii = getTDRangePreviewRadii(
+                const radius = getTDRangePreviewRadius(
                   rangeIndex,
-                  screenW,
-                  screenH
+                  viewportH,
+                  zoom
                 );
-                spotGraphics.ellipse(pxX, pxY, radii.x, radii.y);
+                spotGraphics.circle(pxX, pxY, radius);
                 spotGraphics.fill({ color: 0x22d3ee, alpha: 0.05 });
                 spotGraphics.stroke({
                   color: 0x22d3ee,
@@ -2966,18 +2961,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               offsetY +
               (vfx.position.y / 100) * screenH +
               effectOffsetY * finalScale;
-            if (
-              animConfig?.type === 'WIND_GUST' ||
-              animConfig?.type === 'HOWL' ||
-              animConfig?.type === 'RALLY_HOWL'
-            ) {
-              container.scale.set(
-                (zoom * app.screen.width) / TD_BASE_HEIGHT,
-                finalScale
-              );
-            } else {
-              container.scale.set(finalScale);
-            }
+            container.scale.set(finalScale);
 
             const progress = Math.min(1, vfx.elapsedMs / vfx.durationMs);
 

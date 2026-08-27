@@ -83,6 +83,38 @@ describe('Tower Targeting Modes', () => {
     expect(target?.id).toBe('enemy_1');
   });
 
+  it('uses a circular screen-space range on wide battlefields', () => {
+    const engine = new TowerDefenseEngine(levelData, []);
+    engine.setAspectRatio(2);
+    const tower = createMockTower(50, 50, 'closest');
+    const horizontallyOutside = createMockEnemy(
+      'horizontal',
+      56,
+      50,
+      50,
+      100
+    );
+    const verticallyInside = createMockEnemy('vertical', 50, 60, 50, 100);
+    engine.enemies = [horizontallyOutside, verticallyInside];
+
+    expect(engine.getTargetForTower(tower, 10, 'closest')?.id).toBe(
+      'vertical'
+    );
+  });
+
+  it('keeps the same physical range on scaled level backgrounds', () => {
+    const engine = new TowerDefenseEngine(
+      { ...levelData, backgroundScale: 3 },
+      []
+    );
+    const tower = createMockTower(50, 50, 'closest');
+    const outsideScaledRange = createMockEnemy('outside', 54, 50, 50, 100);
+    const insideScaledRange = createMockEnemy('inside', 53, 50, 50, 100);
+    engine.enemies = [outsideScaledRange, insideScaledRange];
+
+    expect(engine.getTargetForTower(tower, 10, 'closest')?.id).toBe('inside');
+  });
+
   it('should target the furthest enemy along path in first mode', () => {
     const engine = new TowerDefenseEngine(levelData, []);
     const tower = createMockTower(5, 0, 'first');
