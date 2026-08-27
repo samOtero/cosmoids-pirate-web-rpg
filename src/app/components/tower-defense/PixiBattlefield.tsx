@@ -1518,6 +1518,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
     const onDragStateChangeRef = useRef(onDragStateChange);
     const onOpeningPanCompleteRef = useRef(onOpeningPanComplete);
     const getDragStateRef = useRef(getDragState);
+    const hideUiRef = useRef(hideUi);
     const dragPosRef = useRef<{ x: number; y: number } | null>(null);
     const draggingCaptureDeviceRef = useRef<boolean>(false);
     const externalDraggingTowerIdRef = useRef<string | null>(null);
@@ -1640,6 +1641,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
     useEffect(() => {
       getDragStateRef.current = getDragState;
     }, [getDragState]);
+
+    useEffect(() => {
+      hideUiRef.current = hideUi;
+    }, [hideUi]);
 
     useEffect(() => {
       onMapRemoveRef.current = onMapRemove;
@@ -2622,7 +2627,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           }
 
           // --- Render clustered off-screen enemy indicators ---
-          const offscreenIndicators = hideUi
+          const offscreenIndicators = hideUiRef.current
             ? []
             : buildTDOffscreenIndicators(
                 engine.enemies
