@@ -460,7 +460,8 @@ export default function TowerDefenseScreen({
             pixiRef.current.handleExternalMove(
               e.clientX,
               e.clientY,
-              globalDrag.type
+              globalDrag.type,
+              globalDrag.type === 'tower' ? globalDrag.id : undefined
             );
           }
         }

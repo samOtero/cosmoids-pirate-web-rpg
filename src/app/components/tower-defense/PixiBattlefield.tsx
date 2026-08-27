@@ -26,6 +26,7 @@ import {
 } from '@/utils/tdInitialView';
 import { applyTDUnitTransforms } from '@/utils/tdUnitVisuals';
 import { getCaptureUnitVisualState } from '@/utils/captureUnitVisualState';
+import { getTDRangePreviewRadii } from '@/utils/tdAttackRangePreview';
 import { drawRallyHowlRings, updateRallyIndicator } from './rallyHowlVisuals';
 import {
   drawSparkImpact,
@@ -1478,7 +1479,8 @@ export interface PixiBattlefieldRef {
   handleExternalMove: (
     clientX: number,
     clientY: number,
-    type: 'tower' | 'capture'
+    type: 'tower' | 'capture',
+    towerCreatureId?: string
   ) => void;
   handleExternalLeave: () => void;
   handleExternalDrop: (
@@ -1517,6 +1519,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
     const getDragStateRef = useRef(getDragState);
     const dragPosRef = useRef<{ x: number; y: number } | null>(null);
     const draggingCaptureDeviceRef = useRef<boolean>(false);
+    const externalDraggingTowerIdRef = useRef<string | null>(null);
     const bgBoundsRef = useRef<{
       x: number;
       y: number;
@@ -1537,9 +1540,11 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
     ); // Same value changed by the in-game +/- controls.
 
     useImperativeHandle(ref, () => ({
-      handleExternalMove: (clientX, clientY, type) => {
+      handleExternalMove: (clientX, clientY, type, towerCreatureId) => {
         if (isOpeningPanActiveRef.current) return;
         draggingCaptureDeviceRef.current = type === 'capture';
+        externalDraggingTowerIdRef.current =
+          type === 'tower' ? towerCreatureId ?? null : null;
         const bgBounds = bgBoundsRef.current;
         if (bgBounds && bgBounds.width > 0 && containerRef.current) {
           const rect = containerRef.current.getBoundingClientRect();
@@ -1553,11 +1558,13 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
       handleExternalLeave: () => {
         dragPosRef.current = null;
         draggingCaptureDeviceRef.current = false;
+        externalDraggingTowerIdRef.current = null;
       },
       handleExternalDrop: (clientX, clientY, towerIdStr, isCaptureDevice) => {
         if (isOpeningPanActiveRef.current) return;
         dragPosRef.current = null;
         draggingCaptureDeviceRef.current = false;
+        externalDraggingTowerIdRef.current = null;
 
         const bgBounds = bgBoundsRef.current;
         if (!bgBounds || bgBounds.width === 0 || !containerRef.current) return;
@@ -2151,27 +2158,51 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
               const rangeCircle = new PIXI.Graphics();
               rangeCircle.label = 'rangeCircle';
-              const radius = TD_BASE_HEIGHT * 0.4; // dynamically scales to viewportH * 0.4
-              rangeCircle.circle(0, 0, radius);
-              rangeCircle.fill({ color: 0x22d3ee, alpha: 0.05 });
-              rangeCircle.stroke({ color: 0x22d3ee, alpha: 0.3, width: 1 });
-
               container.addChild(rangeCircle);
 
               app.stage.addChild(container);
               towerSprites.set(cacheKey, container);
             }
+            const responsiveScale = app.screen.height / TD_BASE_HEIGHT;
+            const finalScale = zoom * responsiveScale;
             if (draggingTowerCreatureId !== tower.creature.id) {
               container.x = offsetX + (tower.position.x / 100) * screenW;
               container.y = offsetY + (tower.position.y / 100) * screenH;
-              const responsiveScale = app.screen.height / TD_BASE_HEIGHT;
-              const finalScale = zoom * responsiveScale;
               container.scale.set(finalScale);
             }
 
-            const rCircle = container.getChildByLabel('rangeCircle');
+            const rCircle = container.getChildByLabel('rangeCircle') as
+              | PIXI.Graphics
+              | undefined;
             if (rCircle) {
               rCircle.visible = draggingTowerCreatureId === tower.creature.id;
+              if (rCircle.visible) {
+                const attackInstance =
+                  tower.equippedAttacksRuntime[tower.selectedAttackIndex];
+                const rangeIndex = attackInstance
+                  ? ATTACK_DEFS[attackInstance.definitionId]?.rangeIndex
+                  : undefined;
+                rCircle.clear();
+                if (rangeIndex !== undefined && finalScale > 0) {
+                  const radii = getTDRangePreviewRadii(
+                    rangeIndex,
+                    screenW,
+                    screenH
+                  );
+                  rCircle.ellipse(
+                    0,
+                    0,
+                    radii.x / finalScale,
+                    radii.y / finalScale
+                  );
+                  rCircle.fill({ color: 0x22d3ee, alpha: 0.05 });
+                  rCircle.stroke({
+                    color: 0x22d3ee,
+                    alpha: 0.3,
+                    width: 1,
+                  });
+                }
+              }
             }
 
             const tsprite = container.getChildByLabel('tower_sprite') as
@@ -2349,10 +2380,37 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             if (draggingTowerCreatureId === null && dragPosRef.current) {
               const pxX = offsetX + (dragPosRef.current.x / 100) * screenW;
               const pxY = offsetY + (dragPosRef.current.y / 100) * screenH;
-              const radius = viewportH * 0.15 * zoom;
-              spotGraphics.circle(pxX, pxY, radius);
-              spotGraphics.fill({ color: 0x22d3ee, alpha: 0.05 });
-              spotGraphics.stroke({ color: 0x22d3ee, alpha: 0.3, width: 1 });
+              const creatureId = externalDraggingTowerIdRef.current;
+              const creature = creatureId
+                ? engine.roster.find((candidate) => candidate.id === creatureId)
+                : undefined;
+              const equippedAttacks = creature
+                ? TowerDefenseEngine.getEquippedAttacks(creature)
+                : [];
+              const selectedAttackIndex = creature
+                ? (engine.playerSelectedAttacks[creature.id] ??
+                  creature.activeAttackIndex ??
+                  0)
+                : 0;
+              const attackId = equippedAttacks[selectedAttackIndex];
+              const rangeIndex = attackId
+                ? ATTACK_DEFS[attackId]?.rangeIndex
+                : undefined;
+
+              if (rangeIndex !== undefined) {
+                const radii = getTDRangePreviewRadii(
+                  rangeIndex,
+                  screenW,
+                  screenH
+                );
+                spotGraphics.ellipse(pxX, pxY, radii.x, radii.y);
+                spotGraphics.fill({ color: 0x22d3ee, alpha: 0.05 });
+                spotGraphics.stroke({
+                  color: 0x22d3ee,
+                  alpha: 0.3,
+                  width: 1,
+                });
+              }
             }
 
             engine.placementSpots.forEach((spot) => {
