@@ -15,6 +15,7 @@ export enum TDLevelContext {
   FOREST_LEVEL_2 = 'FOREST_LEVEL_2',
   VANE_LEVEL_3 = 'VANE_LEVEL_3',
   LEVEL_4 = 'LEVEL_4',
+  LEVEL_5 = 'LEVEL_5',
   CHALLENGE_FIRST_LEVEL = 'CHALLENGE_FIRST_LEVEL',
   CHALLENGE_FIRST_LEVEL_NO_CAPTURE = 'CHALLENGE_FIRST_LEVEL_NO_CAPTURE',
 }
@@ -127,6 +128,12 @@ export enum BackgroundImageKey {
   LEVEL_4_IRONBELL_HARBOR = 'Level_4_Ironbell_Harbor',
   LEVEL_4_IRONBELL_MARKET = 'Level_4_Ironbell_Market',
   LEVEL_4_IRONBELL_CELL = 'Level_4_Ironbell_Cell',
+  LEVEL_5_IRONBELL_UNDERCROFT = 'Level_5_Ironbell_Undercroft',
+  LEVEL_5_MEMORY_BEACH = 'Level_5_Memory_Beach',
+  LEVEL_5_MEMORY_RAZHOUND_ATTACK = 'Level_5_Memory_Razhound_Attack',
+  LEVEL_5_MEMORY_TIGREVEL_RESCUE = 'Level_5_Memory_Tigrevel_Rescue',
+  LEVEL_5_MEMORY_NAVY_CAPTURE = 'Level_5_Memory_Navy_Capture',
+  LEVEL_5_TIGREVEL_CELL = 'Level_5_Tigrevel_Cell',
   DEFAULT = 'default',
 }
 
@@ -147,6 +154,7 @@ export const StoryProgression = {
   DEFEAT_BUG_STAGE_1: 3,
   DEFEAT_BUG_STAGE_2: 4,
   DEFEAT_LEVEL_4: 5,
+  DEFEAT_LEVEL_5: 6,
 } as const;
 
 export type StoryProgressionValue =
@@ -401,6 +409,7 @@ export enum DialogContext {
   LEVEL_4_INTRO = 'LEVEL_4_INTRO',
   LEVEL_4_WIN = 'LEVEL_4_WIN',
   LEVEL_4_LOSE = 'LEVEL_4_LOSE',
+  LEVEL_5_INTRO = 'LEVEL_5_INTRO',
   STARTER_BATTLE_LOSE = 'STARTER_BATTLE_LOSE',
   NEW_PLAYER_WELCOME_DIALOG_PART_2 = 'NEW_PLAYER_WELCOME_DIALOG_PART_2',
   GAME_INTRO_AFTER_STARTER = 'GAME_INTRO_AFTER_STARTER',

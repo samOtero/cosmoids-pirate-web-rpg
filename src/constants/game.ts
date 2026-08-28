@@ -122,7 +122,16 @@ export const BACKGROUND_IMAGES: Record<BackgroundImageKey, string> = {
     '/bg_level_4_ironbell_harbor.png',
   [BackgroundImageKey.LEVEL_4_IRONBELL_MARKET]:
     '/bg_level_4_ironbell_market.png',
-  [BackgroundImageKey.LEVEL_4_IRONBELL_CELL]:
-    '/bg_level_4_ironbell_cell.png',
+  [BackgroundImageKey.LEVEL_4_IRONBELL_CELL]: '/bg_level_4_ironbell_cell.png',
+  [BackgroundImageKey.LEVEL_5_IRONBELL_UNDERCROFT]:
+    '/bg_level_5_ironbell_undercroft.png',
+  [BackgroundImageKey.LEVEL_5_MEMORY_BEACH]: '/bg_level_5_memory_beach.png',
+  [BackgroundImageKey.LEVEL_5_MEMORY_RAZHOUND_ATTACK]:
+    '/bg_level_5_memory_razhound_attack.png',
+  [BackgroundImageKey.LEVEL_5_MEMORY_TIGREVEL_RESCUE]:
+    '/bg_level_5_memory_tigrevel_rescue.png',
+  [BackgroundImageKey.LEVEL_5_MEMORY_NAVY_CAPTURE]:
+    '/bg_level_5_memory_navy_capture.png',
+  [BackgroundImageKey.LEVEL_5_TIGREVEL_CELL]: '/bg_level_4_ironbell_cell.png',
   [BackgroundImageKey.DEFAULT]: '/bg_caleb_house_1.png',
 };

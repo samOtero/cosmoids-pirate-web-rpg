@@ -7,6 +7,7 @@ import {
 import { FIRST_LEVEL } from './firstLevel';
 import { FOREST_LEVEL } from './forestLevel';
 import { LEVEL_4 } from './level4';
+import { LEVEL_5 } from './level5';
 import { VANE_LEVEL } from './vaneLevel';
 import {
   CHALLENGE_FIRST_LEVEL,
@@ -163,6 +164,36 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
       },
     ],
   },
+  [TDLevelContext.LEVEL_5]: {
+    levelData: LEVEL_5,
+    journalCompletion: {
+      progression: StoryProgression.DEFEAT_LEVEL_5,
+      seenSpeciesIds: ['tigrevel'],
+    },
+    introEvents: [
+      {
+        type: 'SHOW_DIALOG',
+        payload: {
+          context: DialogContext.LEVEL_5_INTRO,
+        },
+      },
+    ],
+    winEvents: [
+      {
+        type: 'SET_STORY_PROGRESSION',
+        payload: { progression: StoryProgression.DEFEAT_LEVEL_5 },
+        autoProceed: true,
+      },
+      {
+        type: 'GO_TO_LEVEL_SELECT',
+      },
+    ],
+    loseEvents: [
+      {
+        type: 'GO_TO_LEVEL_SELECT',
+      },
+    ],
+  },
   [TDLevelContext.CHALLENGE_FIRST_LEVEL]: {
     levelData: CHALLENGE_FIRST_LEVEL,
     winEvents: [
@@ -226,10 +257,16 @@ export const LEVEL_ORDER: LevelInfo[] = [
     requiredProgression: StoryProgression.DEFEAT_BUG_STAGE_2,
   },
   {
-    context: 'LOCKED_5' as TDLevelContext,
+    context: TDLevelContext.LEVEL_5,
+    name: 'The Caged Claw',
+    description: "Find the prisoner hidden beneath Ironbell's fortress.",
+    requiredProgression: StoryProgression.DEFEAT_LEVEL_4,
+  },
+  {
+    context: 'LOCKED_6' as TDLevelContext,
     name: 'Coming soon',
     description: 'More story adventures are on the way.',
-    requiredProgression: StoryProgression.DEFEAT_LEVEL_4,
+    requiredProgression: StoryProgression.DEFEAT_LEVEL_5,
   },
 ];
 
