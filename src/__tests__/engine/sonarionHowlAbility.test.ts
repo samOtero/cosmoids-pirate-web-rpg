@@ -74,7 +74,7 @@ describe('Sonarion Howl enemy ability', () => {
     const original = addEnemy(engine, 'original', 'resonarion', 20);
 
     engine.tick(0, 16);
-    expect(original.persistentSpeedBoostMultiplier).toBe(1.05);
+    expect(original.persistentSpeedBoostMultiplier).toBe(1.5);
     expect(original.persistentSpeedBoostStackCount).toBe(1);
     expect(sonarion.abilityRuntime?.activationCount).toBe(1);
     expect(
@@ -94,16 +94,16 @@ describe('Sonarion Howl enemy ability', () => {
     sonarion.position.x = 20;
     engine.captureUnits[0].position.x = 80;
     engine.tick(1400, 1400);
-    expect(original.persistentSpeedBoostMultiplier).toBe(1.1);
+    expect(original.persistentSpeedBoostMultiplier).toBe(2);
     expect(original.persistentSpeedBoostStackCount).toBe(2);
-    expect(lateArrival.persistentSpeedBoostMultiplier).toBe(1.05);
+    expect(lateArrival.persistentSpeedBoostMultiplier).toBe(1.5);
     expect(lateArrival.persistentSpeedBoostStackCount).toBe(1);
     expect(sonarion.abilityRuntime?.activationCount).toBe(2);
 
     engine.tick(2800, 1400);
-    expect(original.persistentSpeedBoostMultiplier).toBeCloseTo(1.15);
+    expect(original.persistentSpeedBoostMultiplier).toBeCloseTo(2.5);
     expect(original.persistentSpeedBoostStackCount).toBe(3);
-    expect(lateArrival.persistentSpeedBoostMultiplier).toBe(1.1);
+    expect(lateArrival.persistentSpeedBoostMultiplier).toBe(2);
     expect(lateArrival.persistentSpeedBoostStackCount).toBe(2);
     expect(engine.enemies.some((enemy) => enemy.id === sonarion.id)).toBe(
       false
@@ -130,7 +130,7 @@ describe('Sonarion Howl enemy ability', () => {
     sonarion.position.x = 45;
     engine.tick(16, 16);
     expect(sonarion.abilityRuntime?.activationCount).toBe(1);
-    expect(resonarion.persistentSpeedBoostMultiplier).toBe(1.05);
+    expect(resonarion.persistentSpeedBoostMultiplier).toBe(1.5);
 
     engine.destroy();
   });
