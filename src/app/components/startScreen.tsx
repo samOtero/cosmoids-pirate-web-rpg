@@ -14,7 +14,7 @@ export default function StartScreen({ onStart }: { onStart: () => void }) {
         </h2>
       </div>
       <FullscreenLauncher onStart={onStart} />
-      <p className="text-sm text-cyan-800">v1.0.0 • React • Gemini AI</p>
+      <p className="text-sm text-cyan-800">v1.0.1 • By Samuel Otero</p>
     </div>
   );
 }

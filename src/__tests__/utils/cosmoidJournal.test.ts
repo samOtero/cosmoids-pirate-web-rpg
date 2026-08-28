@@ -66,7 +66,6 @@ describe("Kip's Journal derivation", () => {
       'bettle',
       'sonarion',
       'resonarion',
-      'tigrevel',
     ]);
   });
 

@@ -4,26 +4,23 @@ import { LEVEL_4 } from '@/constants/tdLevels/level4';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 
 describe('Level 4 market map', () => {
-  it('moves Mari between the three paired path destinations', () => {
+  it('moves Mari across the three staged market positions', () => {
     const mari = LEVEL_4.captureUnits?.[0];
     expect(mari).toBeDefined();
 
-    const destinations = [
-      LEVEL_4.paths[0].at(-1),
-      LEVEL_4.paths[2].at(-1),
-      LEVEL_4.paths[4].at(-1),
+    const positions = [
+      { x: 26.8, y: 50 },
+      { x: 47, y: 50 },
+      { x: 70.6, y: 50 },
     ];
 
-    expect(LEVEL_4.paths[1].at(-1)).toEqual(destinations[0]);
-    expect(LEVEL_4.paths[3].at(-1)).toEqual(destinations[1]);
-    expect(LEVEL_4.paths[5].at(-1)).toEqual(destinations[2]);
-    expect(mari?.position).toEqual(destinations[0]);
+    expect(mari?.position).toEqual(positions[0]);
     expect(
       mari?.waveRelocations?.map((relocation) => relocation.path.at(-1))
-    ).toEqual(destinations.slice(1));
+    ).toEqual(positions.slice(1));
     expect(
       mari?.waveRelocations?.map((relocation) => relocation.path.at(0))
-    ).toEqual(destinations.slice(0, -1));
+    ).toEqual(positions.slice(0, -1));
   });
 
   it('starts Kip’s Mopup beside Mari as a fixed defender without Tigrevel', () => {
@@ -43,7 +40,7 @@ describe('Level 4 market map', () => {
       receivesExperience: false,
       creature: {
         id: 'kip_mopup',
-        level: 5,
+        level: 8,
         equippedAttacks: ['TACKLE'],
       },
     });
@@ -60,7 +57,7 @@ describe('Level 4 market map', () => {
       selectedAttackIndex: 0,
       creature: {
         speciesId: 'mopup',
-        level: 5,
+        level: 8,
         equippedAttacks: ['TACKLE'],
       },
     });

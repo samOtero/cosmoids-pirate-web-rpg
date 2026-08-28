@@ -250,11 +250,25 @@ describe('Tower defense rules', () => {
       expect.objectContaining({
         tdConfigId: 'maribel_capture',
         carrierSpeedMultiplier: 0.9,
-        position: LEVEL_4.paths[0][LEVEL_4.paths[0].length - 1],
+        position: { x: 26.8, y: 50 },
         returnHome: { pathIndex: 0, speed: 2, delayMs: 500 },
         waveRelocations: [
-          expect.objectContaining({ afterWaveIndex: 0 }),
-          expect.objectContaining({ afterWaveIndex: 1 }),
+          expect.objectContaining({
+            afterWaveIndex: 0,
+            path: [
+              { x: 26.8, y: 50 },
+              { x: 47, y: 50 },
+            ],
+            speed: 7,
+          }),
+          expect.objectContaining({
+            afterWaveIndex: 1,
+            path: [
+              { x: 47, y: 50 },
+              { x: 70.6, y: 50 },
+            ],
+            speed: 7,
+          }),
         ],
       }),
     ]);
@@ -321,7 +335,7 @@ describe('Tower defense rules', () => {
       levelData: LEVEL_4,
       journalCompletion: {
         progression: StoryProgression.DEFEAT_LEVEL_4,
-        seenSpeciesIds: ['sonarion', 'resonarion', 'tigrevel'],
+        seenSpeciesIds: ['sonarion', 'resonarion'],
       },
       winEvents: [
         {
