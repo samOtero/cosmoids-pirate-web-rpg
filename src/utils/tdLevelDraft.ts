@@ -198,6 +198,17 @@ export function validateTDLevelDraft(
         `${definitionLabel} references unknown ability "${definition.abilityId}".`
       );
     }
+
+    if (
+      definition.weakenedThreshold !== undefined &&
+      (!Number.isFinite(definition.weakenedThreshold) ||
+        definition.weakenedThreshold <= 0 ||
+        definition.weakenedThreshold > 1)
+    ) {
+      errors.push(
+        `${definitionLabel} weakened threshold must be greater than 0 and at most 1.`
+      );
+    }
   });
 
   const waveIds = new Set<string>();

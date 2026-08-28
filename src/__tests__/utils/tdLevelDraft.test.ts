@@ -336,4 +336,48 @@ describe('TD level drafts', () => {
       'Enemy definition 1 goal damage must be a positive integer.'
     );
   });
+
+  it('validates enemy weakened threshold', () => {
+    const level = createEmptyTDLevelDraft();
+    level.paths = [
+      [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+      ],
+    ];
+    level.waveEnemyDefinitions = [
+      {
+        id: 'invalid_weakened_threshold',
+        creatureId: 'mouse_1',
+        level: 3,
+        weakenedThreshold: 1.5,
+      },
+      {
+        id: 'zero_weakened_threshold',
+        creatureId: 'mouse_1',
+        level: 3,
+        weakenedThreshold: 0,
+      },
+    ];
+
+    const errors = validateTDLevelDraft(level);
+    expect(errors).toContain(
+      'Enemy definition 1 weakened threshold must be greater than 0 and at most 1.'
+    );
+    expect(errors).toContain(
+      'Enemy definition 2 weakened threshold must be greater than 0 and at most 1.'
+    );
+
+    level.waveEnemyDefinitions = [
+      {
+        id: 'valid_weakened_threshold',
+        creatureId: 'mouse_1',
+        level: 3,
+        weakenedThreshold: 0.5,
+      },
+    ];
+    expect(validateTDLevelDraft(level)).not.toContain(
+      'Enemy definition 1 weakened threshold must be greater than 0 and at most 1.'
+    );
+  });
 });

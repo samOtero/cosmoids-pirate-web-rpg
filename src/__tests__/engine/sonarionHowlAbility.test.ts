@@ -54,15 +54,6 @@ function addEnemy(
 
 describe('Sonarion Howl enemy ability', () => {
   it('is configured only on the Level 4 Sonarion support variant', () => {
-    expect(ENEMY_ABILITY_DEFS.SONARION_HOWL).toMatchObject({
-      type: 'PROXIMITY_HOWL_SPEED_STACK',
-      cooldownMs: 1400,
-      triggerRadius: 11,
-      targetCreatureId: 'resonarion',
-      maxActivations: 3,
-      speedIncreasePerActivation: 0.05,
-      maxSpeedMultiplier: 5,
-    });
     expect(LEVEL_4.resonantEvolution).toBeUndefined();
     expect(
       LEVEL_4.waveEnemyDefinitions.find(

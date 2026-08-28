@@ -523,7 +523,7 @@ export default function TowerDefenseScreen({
         introState === 'ready' ||
         introState === 'go') && (
         <div className="pointer-events-none fixed inset-0 z-10000 flex items-center justify-center bg-black/60">
-          <div className="bg-linear-to-br from-yellow-300 to-red-500 bg-clip-text px-6 pb-4 text-center text-6xl font-black text-transparent uppercase italic drop-shadow-[0_0_25px_rgba(255,165,0,0.8)] md:text-9xl">
+          <div className="bg-linear-to-br from-yellow-300 to-red-500 bg-clip-text px-6 pb-4 text-center text-6xl font-black text-transparent uppercase italic drop-shadow-[0_0_25px_rgba(255,165,0,0.8)] lg:text-9xl">
             {introState === 'message'
               ? levelData.introMessage
               : introState === 'ready'
@@ -548,14 +548,26 @@ export default function TowerDefenseScreen({
       )}
 
       <div
-        className={`flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-cyan-800 bg-slate-800 p-2 lg:p-4 ${
+        className={`flex shrink-0 items-center justify-between gap-2 border-b border-cyan-800 bg-slate-800 p-2 lg:p-4 ${
           introState === 'cameraPan' ? 'invisible' : ''
         }`}
       >
-        <h2 className="hidden text-lg font-bold text-cyan-400 lg:block lg:text-xl">
-          Tower Defense
-        </h2>
-        <div className="flex w-full items-center justify-between gap-2 text-white lg:w-auto lg:justify-end lg:gap-4">
+        {levelData.introMessage ? (
+          <h2 className="truncate text-sm font-bold text-cyan-400 lg:text-xl">
+            {levelData.introMessage}
+          </h2>
+        ) : (
+          <h2 className="hidden text-lg font-bold text-cyan-400 lg:block lg:text-xl">
+            Tower Defense
+          </h2>
+        )}
+        <div
+          className={`flex items-center gap-2 text-white lg:w-auto lg:justify-end lg:gap-4 ${
+            levelData.introMessage
+              ? 'shrink-0 justify-end'
+              : 'w-full justify-between'
+          }`}
+        >
           {engineRef.current.surviveUntil &&
             engineRef.current.surviveUntil > 0 &&
             hasStarted && (
@@ -565,7 +577,11 @@ export default function TowerDefenseScreen({
                 s
               </span>
             )}
-          <span className="flex-1 rounded border border-red-900/50 bg-slate-900 px-2 py-1 text-center font-mono text-sm text-red-400 shadow-inner lg:flex-none lg:px-3 lg:py-1 lg:text-base">
+          <span
+            className={`rounded border border-red-900/50 bg-slate-900 px-2 py-1 text-center font-mono text-sm text-red-400 shadow-inner lg:flex-none lg:px-3 lg:py-1 lg:text-base ${
+              levelData.introMessage ? 'flex-none' : 'flex-1'
+            }`}
+          >
             Lives: {uiLives}
           </span>
           <button
@@ -890,7 +906,9 @@ export default function TowerDefenseScreen({
 
           if (activeModal.type === 'ASK_EVOLUTION') {
             const current = resolveSpeciesVisuals(activeModal.oldDefinitionId);
-            const evolution = resolveSpeciesVisuals(activeModal.newDefinitionId);
+            const evolution = resolveSpeciesVisuals(
+              activeModal.newDefinitionId
+            );
 
             const acceptEvolution = () => {
               const evolved = engineRef.current.evolveTower(
@@ -928,7 +946,10 @@ export default function TowerDefenseScreen({
                     {[current, evolution].map((creature, index) => (
                       <React.Fragment key={creature.name}>
                         {index === 1 && (
-                          <span className="text-2xl text-emerald-300" aria-hidden="true">
+                          <span
+                            className="text-2xl text-emerald-300"
+                            aria-hidden="true"
+                          >
                             →
                           </span>
                         )}

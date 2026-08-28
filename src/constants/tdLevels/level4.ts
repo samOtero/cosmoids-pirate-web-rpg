@@ -9,8 +9,8 @@ export const LEVEL_4: TDLevelData = {
   paths: [
     [
       {
-        x: 11.8,
-        y: -3,
+        x: 11.78,
+        y: -0.16,
       },
       {
         x: 11.8,
@@ -23,28 +23,40 @@ export const LEVEL_4: TDLevelData = {
       {
         x: 26.8,
         y: 50,
+      },
+      {
+        x: 70.42,
+        y: 50.34,
       },
     ],
     [
       {
-        x: 11.2,
-        y: 103,
+        x: 10.11,
+        y: 99.75,
       },
       {
-        x: 16.5,
-        y: 103,
+        x: 10.11,
+        y: 91.65,
       },
       {
-        x: 16.5,
-        y: 82,
+        x: 16.16,
+        y: 91.59,
       },
       {
-        x: 26.8,
-        y: 82,
+        x: 16.13,
+        y: 82.3,
       },
       {
-        x: 26.8,
-        y: 50,
+        x: 26.85,
+        y: 82.35,
+      },
+      {
+        x: 26.78,
+        y: 49.84,
+      },
+      {
+        x: 70.81,
+        y: 49.85,
       },
     ],
     [
@@ -73,8 +85,12 @@ export const LEVEL_4: TDLevelData = {
         y: 50,
       },
       {
-        x: 47,
-        y: 50,
+        x: 26.78,
+        y: 49.94,
+      },
+      {
+        x: 70.31,
+        y: 50.23,
       },
     ],
     [
@@ -87,30 +103,34 @@ export const LEVEL_4: TDLevelData = {
         y: 83,
       },
       {
-        x: 52,
-        y: 83,
-      },
-      {
-        x: 52,
-        y: 72,
-      },
-      {
         x: 47,
-        y: 72,
+        y: 70.81,
       },
       {
-        x: 47,
-        y: 50,
+        x: 49.22,
+        y: 70.76,
+      },
+      {
+        x: 49.07,
+        y: 49.99,
+      },
+      {
+        x: 26.78,
+        y: 49.94,
+      },
+      {
+        x: 70.42,
+        y: 50.07,
       },
     ],
     [
       {
-        x: 86.5,
-        y: -3,
+        x: 87.34,
+        y: 8.9,
       },
       {
-        x: 86.5,
-        y: 20,
+        x: 87.34,
+        y: 19.93,
       },
       {
         x: 83.5,
@@ -125,8 +145,12 @@ export const LEVEL_4: TDLevelData = {
         y: 27,
       },
       {
-        x: 70.6,
-        y: 50,
+        x: 70.52,
+        y: 51.19,
+      },
+      {
+        x: 27.04,
+        y: 51.14,
       },
     ],
     [
@@ -159,16 +183,16 @@ export const LEVEL_4: TDLevelData = {
         y: 63,
       },
       {
-        x: 78,
-        y: 57,
+        x: 77.99,
+        y: 55.28,
       },
       {
-        x: 70.6,
-        y: 57,
+        x: 70.49,
+        y: 51.69,
       },
       {
-        x: 70.6,
-        y: 50,
+        x: 26.75,
+        y: 50.12,
       },
     ],
   ],
@@ -206,8 +230,8 @@ export const LEVEL_4: TDLevelData = {
       y: 75.69,
     },
     {
-      x: 87.22,
-      y: 72.63,
+      x: 87.63,
+      y: 73.44,
     },
     {
       x: 36.36,
@@ -218,8 +242,8 @@ export const LEVEL_4: TDLevelData = {
       y: 84.62,
     },
     {
-      x: 52.16,
-      y: 59.16,
+      x: 45.16,
+      y: 60.59,
     },
     {
       x: 29.91,
@@ -238,12 +262,12 @@ export const LEVEL_4: TDLevelData = {
       y: 25.36,
     },
     {
-      x: 46.98,
-      y: 77.49,
+      x: 42.84,
+      y: 79.29,
     },
     {
-      x: 55.68,
-      y: 73.6,
+      x: 51.24,
+      y: 75.98,
     },
     {
       x: 51.54,
@@ -252,6 +276,18 @@ export const LEVEL_4: TDLevelData = {
     {
       x: 70.62,
       y: 66.89,
+    },
+    {
+      x: 54.91,
+      y: 55.07,
+    },
+    {
+      x: 33.7,
+      y: 55.99,
+    },
+    {
+      x: 65.89,
+      y: 44.36,
     },
   ],
   environmentUnits: [
@@ -277,7 +313,7 @@ export const LEVEL_4: TDLevelData = {
       creature: {
         id: 'kip_mopup',
         speciesId: 'mopup',
-        level: 5,
+        level: 8,
         xp: 0,
         equippedAttacks: ['TACKLE'],
         activeAttackIndex: 0,
@@ -347,6 +383,7 @@ export const LEVEL_4: TDLevelData = {
       hpMultiplier: 2,
       canCarryCaptureUnits: false,
       abilityId: 'SONARION_HOWL',
+      weakenedThreshold: 0.4,
     },
     {
       id: 'ironbell_resonarion',
@@ -366,17 +403,27 @@ export const LEVEL_4: TDLevelData = {
           uncapturable: true,
           spawnIntervalMs: 1500,
           delayBeforeGroupMs: 100,
-          pathIndex: 1,
+          pathIndex: 0,
           turnAroundAtEnd: true,
+        },
+        {
+          enemyDefinitionId: 'ironbell_resonarion',
+          count: 1,
+          uncapturable: true,
+          spawnIntervalMs: 1400,
+          delayBeforeGroupMs: 4500,
+          pathIndex: 2,
+          turnAroundAtEnd: true,
+          concurrentWithPrevious: false,
         },
         {
           enemyDefinitionId: 'ironbell_sonarion',
           count: 3,
           spawnIntervalMs: 1400,
-          delayBeforeGroupMs: 3500,
-          pathIndex: 0,
+          delayBeforeGroupMs: 12500,
+          pathIndex: 4,
           turnAroundAtEnd: true,
-          concurrentWithPrevious: true,
+          concurrentWithPrevious: false,
         },
       ],
     },
@@ -389,24 +436,24 @@ export const LEVEL_4: TDLevelData = {
           uncapturable: true,
           spawnIntervalMs: 1500,
           delayBeforeGroupMs: 100,
-          pathIndex: 3,
+          pathIndex: 2,
           turnAroundAtEnd: true,
         },
         {
           enemyDefinitionId: 'ironbell_sonarion',
-          count: 3,
+          count: 5,
           spawnIntervalMs: 1400,
-          delayBeforeGroupMs: 3500,
-          pathIndex: 2,
+          delayBeforeGroupMs: 5500,
+          pathIndex: 0,
           turnAroundAtEnd: true,
           concurrentWithPrevious: true,
         },
         {
           enemyDefinitionId: 'ironbell_sonarion',
-          count: 3,
+          count: 5,
           spawnIntervalMs: 1400,
-          delayBeforeGroupMs: 6000,
-          pathIndex: 2,
+          delayBeforeGroupMs: 8000,
+          pathIndex: 4,
           turnAroundAtEnd: true,
           concurrentWithPrevious: true,
         },
@@ -416,41 +463,59 @@ export const LEVEL_4: TDLevelData = {
       id: 'market_loading_yard',
       groups: [
         {
+          enemyDefinitionId: 'ironbell_resonarion',
+          count: 2,
+          uncapturable: true,
+          spawnIntervalMs: 4000,
+          delayBeforeGroupMs: 3000,
+          pathIndex: 0,
+          turnAroundAtEnd: true,
+          concurrentWithPrevious: false,
+        },
+        {
+          enemyDefinitionId: 'ironbell_resonarion',
+          count: 2,
+          uncapturable: true,
+          spawnIntervalMs: 4000,
+          delayBeforeGroupMs: 3200,
+          pathIndex: 2,
+          turnAroundAtEnd: true,
+          concurrentWithPrevious: false,
+        },
+        {
           enemyDefinitionId: 'ironbell_sonarion',
           count: 8,
           spawnIntervalMs: 850,
           delayBeforeGroupMs: 250,
-          pathIndex: 4,
+          pathIndex: 0,
           turnAroundAtEnd: true,
         },
         {
           enemyDefinitionId: 'ironbell_sonarion',
           count: 8,
           spawnIntervalMs: 850,
-          delayBeforeGroupMs: 650,
-          pathIndex: 5,
+          delayBeforeGroupMs: 1000,
+          pathIndex: 0,
           turnAroundAtEnd: true,
-          concurrentWithPrevious: true,
+          concurrentWithPrevious: false,
         },
         {
-          enemyDefinitionId: 'ironbell_resonarion',
-          count: 2,
-          uncapturable: true,
-          spawnIntervalMs: 1600,
-          delayBeforeGroupMs: 3000,
-          pathIndex: 4,
+          enemyDefinitionId: 'ironbell_sonarion',
+          count: 8,
+          spawnIntervalMs: 850,
+          delayBeforeGroupMs: 1050,
+          pathIndex: 2,
           turnAroundAtEnd: true,
-          concurrentWithPrevious: true,
+          concurrentWithPrevious: false,
         },
         {
-          enemyDefinitionId: 'ironbell_resonarion',
-          count: 2,
-          uncapturable: true,
-          spawnIntervalMs: 1600,
-          delayBeforeGroupMs: 5200,
-          pathIndex: 5,
+          enemyDefinitionId: 'ironbell_sonarion',
+          count: 8,
+          spawnIntervalMs: 850,
+          delayBeforeGroupMs: 1050,
+          pathIndex: 2,
           turnAroundAtEnd: true,
-          concurrentWithPrevious: true,
+          concurrentWithPrevious: false,
         },
       ],
     },
@@ -470,3 +535,4 @@ export const LEVEL_4: TDLevelData = {
   },
   introMessage: 'Protect the girl!',
 };
+

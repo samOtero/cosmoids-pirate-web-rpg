@@ -46,6 +46,15 @@ import {
 
 export const WEAKENED_THRESHOLD = 0.9;
 
+export function isUnitWeakened(
+  unit: Pick<BaseTDUnit, 'hp' | 'maxHp' | 'isShiny' | 'weakenedThreshold'>
+): boolean {
+  if (unit.isShiny) return true;
+  const hpRatio = unit.maxHp > 0 ? unit.hp / unit.maxHp : 1;
+  const threshold = unit.weakenedThreshold ?? WEAKENED_THRESHOLD;
+  return hpRatio <= threshold;
+}
+
 export function renderHealthBar(
   unit: BaseTDUnit,
   container: PIXI.Container,
@@ -80,7 +89,7 @@ export function renderHealthBar(
 
   // Draw foreground
   const hpRatio = unit.maxHp > 0 ? unit.hp / unit.maxHp : 1;
-  const isWeakened = unit.isShiny || hpRatio <= WEAKENED_THRESHOLD;
+  const isWeakened = isUnitWeakened(unit);
   const isUncapturable = (unit as any).uncapturable;
 
   if (hideWhenFull && hpRatio >= 1 && !unit.isShiny) {
@@ -1591,8 +1600,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             if (distSq <= CAPTURE_DIST_SQ && distSq < minSqDist) {
               minSqDist = distSq;
               targetedEnemyId = enemy.id;
-              isWeakened =
-                enemy.isShiny || enemy.hp / enemy.maxHp <= WEAKENED_THRESHOLD;
+              isWeakened = isUnitWeakened(enemy);
             }
           });
 
@@ -2329,9 +2337,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 if (distSq <= CAPTURE_DIST_SQ && distSq < minSqDist) {
                   minSqDist = distSq;
                   targetedEnemyId = enemy.id;
-                  isWeakened =
-                    enemy.isShiny ||
-                    enemy.hp / enemy.maxHp <= WEAKENED_THRESHOLD;
+                  isWeakened = isUnitWeakened(enemy);
                 }
               });
 

@@ -1023,7 +1023,28 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
                               />
                             </label>
                           ))}
-                          <label className="col-span-2 block text-slate-400">
+                          <label className="block text-slate-400">
+                            Weakened Threshold
+                            <input
+                              type="number"
+                              min="0.01"
+                              max="1"
+                              step="0.05"
+                              placeholder="0.9"
+                              value={definition.weakenedThreshold ?? ''}
+                              onChange={(event) =>
+                                updateWaveEnemyDefinition(
+                                  definitionIndex,
+                                  'weakenedThreshold',
+                                  event.target.value === ''
+                                    ? undefined
+                                    : parseFloat(event.target.value) || undefined
+                                )
+                              }
+                              className="mt-1 w-full rounded border border-slate-700 bg-slate-950 p-1 text-white"
+                            />
+                          </label>
+                          <label className="block text-slate-400">
                             Enemy Ability
                             <select
                               value={definition.abilityId ?? ''}

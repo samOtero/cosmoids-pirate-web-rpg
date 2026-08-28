@@ -1031,6 +1031,7 @@ export class TowerDefenseEngine {
 
     enemy.definitionId = definition.creatureId;
     enemy.waveEnemyDefinitionId = definition.id;
+    enemy.weakenedThreshold = definition.weakenedThreshold;
     enemy.level = level;
     enemy.hp = maxHp;
     enemy.maxHp = maxHp;
@@ -1510,6 +1511,7 @@ export class TowerDefenseEngine {
       damagedByTowerIds: new Set<string>(),
       isShiny,
       isCursed,
+      weakenedThreshold: waveEnemyDefinition.weakenedThreshold,
       abilityRuntime: abilityDefinition
         ? {
             definitionId: abilityDefinition.id,

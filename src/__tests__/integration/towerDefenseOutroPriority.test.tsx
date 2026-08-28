@@ -144,15 +144,56 @@ describe('tower-defense outro priority', () => {
       />
     );
 
-    expect(screen.getByText('Protect the girl!')).not.toHaveClass(
-      'animate-bounce'
-    );
+    expect(screen.getByRole('heading', { level: 2, name: 'Protect the girl!' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Protect the girl!' })).not.toHaveClass('hidden');
+
+    const messageOverlay = screen.getAllByText('Protect the girl!')[0];
+    expect(messageOverlay).not.toHaveClass('animate-bounce');
 
     act(() => vi.advanceTimersByTime(1000));
     expect(screen.getByText('Ready!')).not.toHaveClass('animate-bounce');
 
     act(() => vi.advanceTimersByTime(1000));
     expect(screen.getByText('GO!')).not.toHaveClass('animate-bounce');
+  });
+
+  it('renders Tower Defense in header (hidden on mobile) when no introMessage is provided', () => {
+    render(
+      <TowerDefenseScreen
+        levelData={{
+          paths: [],
+          placementSpots: [],
+          waveEnemyDefinitions: [],
+          waves: [],
+        }}
+        onClose={vi.fn()}
+      />
+    );
+
+    const heading = screen.getByRole('heading', { level: 2, name: 'Tower Defense' });
+    expect(heading).toBeInTheDocument();
+    expect(heading).toHaveClass('hidden');
+    expect(heading).toHaveClass('lg:block');
+  });
+
+  it('renders introMessage in header (visible on mobile and desktop) when provided', () => {
+    render(
+      <TowerDefenseScreen
+        levelData={{
+          paths: [],
+          placementSpots: [],
+          waveEnemyDefinitions: [],
+          waves: [],
+          introMessage: 'Protect the girl!',
+        }}
+        onClose={vi.fn()}
+      />
+    );
+
+    const heading = screen.getByRole('heading', { level: 2, name: 'Protect the girl!' });
+    expect(heading).toBeInTheDocument();
+    expect(heading).not.toHaveClass('hidden');
+    expect(screen.queryByRole('heading', { level: 2, name: 'Tower Defense' })).not.toBeInTheDocument();
   });
 
   it('waits for a progression modal before showing and completing the lose outro', () => {

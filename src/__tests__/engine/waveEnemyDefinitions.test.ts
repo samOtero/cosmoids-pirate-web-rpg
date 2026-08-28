@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { isUnitWeakened } from '@/app/components/tower-defense/PixiBattlefield';
 import {
   TD_CREATURE_DEFS,
   TowerDefenseEngine,
@@ -129,6 +130,91 @@ describe('wave enemy definitions', () => {
     engine.tick(0, 16);
 
     expect(engine.lives).toBe(0);
+    engine.destroy();
+  });
+
+  it('allows overriding the weakened threshold per enemy definition', () => {
+    const engine = new TowerDefenseEngine({
+      paths: [
+        [
+          { x: 0, y: 0 },
+          { x: 1000, y: 0 },
+        ],
+      ],
+      placementSpots: [],
+      waveEnemyDefinitions: [
+        {
+          id: 'standard_mouse',
+          creatureId: 'mouse_1',
+          level: 5,
+        },
+        {
+          id: 'boss_mouse',
+          creatureId: 'mouse_1',
+          level: 5,
+          weakenedThreshold: 0.3,
+        },
+      ],
+      waves: [
+        {
+          id: 'threshold_wave',
+          groups: [
+            {
+              enemyDefinitionId: 'standard_mouse',
+              count: 1,
+              spawnIntervalMs: 0,
+              delayBeforeGroupMs: 0,
+              pathIndex: 0,
+            },
+            {
+              enemyDefinitionId: 'boss_mouse',
+              count: 1,
+              spawnIntervalMs: 0,
+              delayBeforeGroupMs: 0,
+              pathIndex: 0,
+              concurrentWithPrevious: true,
+            },
+          ],
+        },
+      ],
+    });
+
+    engine.tick(0, 16);
+
+    const standardEnemy = engine.enemies.find(
+      (e) => e.waveEnemyDefinitionId === 'standard_mouse'
+    );
+    const bossEnemy = engine.enemies.find(
+      (e) => e.waveEnemyDefinitionId === 'boss_mouse'
+    );
+
+    expect(standardEnemy).toBeDefined();
+    expect(bossEnemy).toBeDefined();
+
+    expect(standardEnemy?.weakenedThreshold).toBeUndefined();
+    expect(bossEnemy?.weakenedThreshold).toBe(0.3);
+
+    // Test standard enemy: weakened at 80% HP (default threshold is 0.9)
+    if (standardEnemy) {
+      standardEnemy.hp = standardEnemy.maxHp * 0.8;
+      expect(isUnitWeakened(standardEnemy)).toBe(true);
+
+      standardEnemy.hp = standardEnemy.maxHp * 0.95;
+      expect(isUnitWeakened(standardEnemy)).toBe(false);
+    }
+
+    // Test boss enemy: NOT weakened at 50% HP, weakened at 30% HP (custom threshold 0.3)
+    if (bossEnemy) {
+      bossEnemy.hp = bossEnemy.maxHp * 0.5;
+      expect(isUnitWeakened(bossEnemy)).toBe(false);
+
+      bossEnemy.hp = bossEnemy.maxHp * 0.3;
+      expect(isUnitWeakened(bossEnemy)).toBe(true);
+
+      bossEnemy.hp = bossEnemy.maxHp * 0.2;
+      expect(isUnitWeakened(bossEnemy)).toBe(true);
+    }
+
     engine.destroy();
   });
 });

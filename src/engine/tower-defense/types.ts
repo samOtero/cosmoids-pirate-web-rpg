@@ -70,6 +70,8 @@ export interface TDWaveEnemyDefinition {
   specialDefenseMultiplier?: number;
   /** References an enemy-only ability definition. */
   abilityId?: string;
+  /** HP ratio (0 to 1) at or below which this enemy is considered weakened for capture. Defaults to 0.9. */
+  weakenedThreshold?: number;
 }
 
 export interface TDWave {
@@ -109,6 +111,8 @@ export interface BaseTDUnit {
   damageFlashColor?: number;
   isShiny?: boolean;
   isCursed?: boolean;
+  /** HP ratio (0 to 1) at or below which this unit is considered weakened. Defaults to 0.9. */
+  weakenedThreshold?: number;
   /** Shared timed movement boost state used by abilities, attacks, and UI. */
   speedBoostMultiplier?: number;
   speedBoostUntilMs?: number;
