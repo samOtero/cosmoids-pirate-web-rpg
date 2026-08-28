@@ -15,4 +15,6 @@ export * from './dialogs/level4Intro';
 export * from './dialogs/level4Win';
 export * from './dialogs/level4Lose';
 export * from './dialogs/level5Intro';
+export * from './dialogs/level5Win';
+export * from './dialogs/level5Lose';
 export * from './dialogs/foundBerry';

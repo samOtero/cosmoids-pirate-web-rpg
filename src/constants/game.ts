@@ -76,6 +76,10 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
     '/dialog/maribel_angry_defensive.png',
   [SpeakerImageKey.MARIBEL_RELIEVED_HAPPY]:
     '/dialog/maribel_relieved_happy.png',
+  [SpeakerImageKey.TIGREVEL]: '/UI/Icons/tigrevel_icon.png',
+  [SpeakerImageKey.NAVY_GUARD_ALERT]: '/dialog/navy_guard_alert.png',
+  [SpeakerImageKey.NAVY_COMMANDER_NEUTRAL]:
+    '/dialog/navy_commander_neutral.png',
   [SpeakerImageKey.CAPTAIN_VANE_HAUGHTY_NEUTRAL]:
     '/dialog/captain_vane_haughty_neutral.png',
   [SpeakerImageKey.CAPTAIN_VANE_MOCKING_DISBELIEF]:
@@ -132,6 +136,10 @@ export const BACKGROUND_IMAGES: Record<BackgroundImageKey, string> = {
     '/bg_level_5_memory_tigrevel_rescue.png',
   [BackgroundImageKey.LEVEL_5_MEMORY_NAVY_CAPTURE]:
     '/bg_level_5_memory_navy_capture.png',
-  [BackgroundImageKey.LEVEL_5_TIGREVEL_CELL]: '/bg_level_4_ironbell_cell.png',
+  [BackgroundImageKey.LEVEL_5_TIGREVEL_CELL]: '/bg_level_5_tigrevel_cell.png',
+  [BackgroundImageKey.LEVEL_5_TIGREVEL_FREED]:
+    '/bg_level_5_tigrevel_freed.png',
+  [BackgroundImageKey.LEVEL_5_TIGREVEL_PROTECTS_KIDS]:
+    '/bg_level_5_tigrevel_protects_kids.png',
   [BackgroundImageKey.DEFAULT]: '/bg_caleb_house_1.png',
 };

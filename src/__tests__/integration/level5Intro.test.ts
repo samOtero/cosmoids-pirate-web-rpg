@@ -1,13 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
 import { LEVEL_5_INTRO } from '@/constants/dialogs/level5Intro';
-import { BACKGROUND_IMAGES } from '@/constants/game';
+import { LEVEL_5_LOSE } from '@/constants/dialogs/level5Lose';
+import { LEVEL_5_WIN } from '@/constants/dialogs/level5Win';
+import { BACKGROUND_IMAGES, SPEAKER_IMAGES } from '@/constants/game';
 import { LEVEL_5 } from '@/constants/tdLevels/level5';
 import { LEVEL_ORDER, TD_LEVELS } from '@/constants/tdLevels';
 import {
   BackgroundImageKey,
   DialogContext,
   StoryProgression,
+  SpeakerImageKey,
   TDLevelContext,
 } from '@/types/baseGame';
 
@@ -22,6 +25,15 @@ describe('Level 5 intro and placeholder level', () => {
     );
     expect(LEVEL_5_INTRO.sequence.at(-1)?.text).toMatch(
       /step away from that prisoner/i
+    );
+    expect(LEVEL_5_INTRO.sequence.at(-1)?.portraits).toEqual([
+      {
+        key: SpeakerImageKey.NAVY_GUARD_ALERT,
+        displayName: 'Navy Guard',
+      },
+    ]);
+    expect(SPEAKER_IMAGES[SpeakerImageKey.NAVY_GUARD_ALERT]).toBe(
+      '/dialog/navy_guard_alert.png'
     );
   });
 
@@ -56,7 +68,7 @@ describe('Level 5 intro and placeholder level', () => {
       [BackgroundImageKey.LEVEL_5_MEMORY_NAVY_CAPTURE]:
         '/bg_level_5_memory_navy_capture.png',
       [BackgroundImageKey.LEVEL_5_TIGREVEL_CELL]:
-        '/bg_level_4_ironbell_cell.png',
+        '/bg_level_5_tigrevel_cell.png',
     });
   });
 
@@ -78,5 +90,91 @@ describe('Level 5 intro and placeholder level', () => {
         seenSpeciesIds: ['tigrevel'],
       },
     });
+  });
+
+  it('ends the breakout with Tigrevel choosing to protect the children and the commander blocking the escape', () => {
+    expect(LEVEL_5_WIN.sequence).toHaveLength(7);
+    expect(LEVEL_5_WIN.backgroundImageKey).toBe(
+      BackgroundImageKey.LEVEL_5_TIGREVEL_FREED
+    );
+    expect(
+      LEVEL_5_WIN.sequence.map(
+        (line) => line.backgroundImageKey ?? LEVEL_5_WIN.backgroundImageKey
+      )
+    ).toEqual([
+      BackgroundImageKey.LEVEL_5_TIGREVEL_FREED,
+      BackgroundImageKey.LEVEL_5_TIGREVEL_FREED,
+      BackgroundImageKey.LEVEL_5_TIGREVEL_FREED,
+      BackgroundImageKey.LEVEL_5_TIGREVEL_PROTECTS_KIDS,
+      BackgroundImageKey.LEVEL_5_TIGREVEL_PROTECTS_KIDS,
+      BackgroundImageKey.LEVEL_5_TIGREVEL_PROTECTS_KIDS,
+      BackgroundImageKey.LEVEL_5_TIGREVEL_PROTECTS_KIDS,
+    ]);
+    expect(BACKGROUND_IMAGES).toMatchObject({
+      [BackgroundImageKey.LEVEL_5_TIGREVEL_FREED]:
+        '/bg_level_5_tigrevel_freed.png',
+      [BackgroundImageKey.LEVEL_5_TIGREVEL_PROTECTS_KIDS]:
+        '/bg_level_5_tigrevel_protects_kids.png',
+    });
+
+    const text = LEVEL_5_WIN.sequence.map((line) => line.text).join(' ');
+    expect(text).toMatch(/get out before more Navy officers come/i);
+    expect(text).toMatch(/staying to protect us/i);
+    expect(text).not.toMatch(/Capture Coin/i);
+
+    expect(LEVEL_5_WIN.sequence.at(-1)).toEqual({
+      portraits: [
+        {
+          key: SpeakerImageKey.NAVY_COMMANDER_NEUTRAL,
+          displayName: 'Navy Commander',
+          flipped: true,
+        },
+      ],
+      text: 'Touching. But no one leaves my fortress without my order.',
+      backgroundImageKey: BackgroundImageKey.LEVEL_5_TIGREVEL_PROTECTS_KIDS,
+    });
+    expect(SPEAKER_IMAGES[SpeakerImageKey.TIGREVEL]).toBe(
+      '/UI/Icons/tigrevel_icon.png'
+    );
+    expect(SPEAKER_IMAGES[SpeakerImageKey.NAVY_COMMANDER_NEUTRAL]).toBe(
+      '/dialog/navy_commander_neutral.png'
+    );
+    expect(TD_LEVELS[TDLevelContext.LEVEL_5].winEvents).toEqual([
+      {
+        type: 'SET_STORY_PROGRESSION',
+        payload: { progression: StoryProgression.DEFEAT_LEVEL_5 },
+        autoProceed: true,
+      },
+      {
+        type: 'SHOW_DIALOG',
+        payload: { context: DialogContext.LEVEL_5_WIN },
+      },
+      { type: 'GO_TO_LEVEL_SELECT' },
+    ]);
+  });
+
+  it('uses Mari’s single apology over the intact cell after a loss', () => {
+    expect(LEVEL_5_LOSE).toEqual({
+      sequence: [
+        {
+          portraits: [
+            {
+              key: SpeakerImageKey.MARIBEL_WORRIED,
+              displayName: 'Mari',
+              flipped: true,
+            },
+          ],
+          text: "I'm sorry, Tigrevel... we weren't strong enough to set you free.",
+        },
+      ],
+      backgroundImageKey: BackgroundImageKey.LEVEL_5_TIGREVEL_CELL,
+    });
+    expect(TD_LEVELS[TDLevelContext.LEVEL_5].loseEvents).toEqual([
+      {
+        type: 'SHOW_DIALOG',
+        payload: { context: DialogContext.LEVEL_5_LOSE },
+      },
+      { type: 'GO_TO_LEVEL_SELECT' },
+    ]);
   });
 });

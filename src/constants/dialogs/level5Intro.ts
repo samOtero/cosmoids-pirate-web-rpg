@@ -93,8 +93,8 @@ export const LEVEL_5_INTRO: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.EMPTY,
-          displayName: 'Navy Officer',
+          key: SpeakerImageKey.NAVY_GUARD_ALERT,
+          displayName: 'Navy Guard',
         },
       ],
       text: "Who's down there? Step away from that prisoner!",

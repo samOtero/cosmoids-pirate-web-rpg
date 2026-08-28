@@ -93,6 +93,9 @@ export enum SpeakerImageKey {
   MARIBEL_DETERMINED = 'Maribel_Determined',
   MARIBEL_ANGRY_DEFENSIVE = 'Maribel_Angry_Defensive',
   MARIBEL_RELIEVED_HAPPY = 'Maribel_Relieved_Happy',
+  TIGREVEL = 'Tigrevel',
+  NAVY_GUARD_ALERT = 'Navy_Guard_Alert',
+  NAVY_COMMANDER_NEUTRAL = 'Navy_Commander_Neutral',
   CAPTAIN_VANE_HAUGHTY_NEUTRAL = 'Captain_Vane_Haughty_Neutral',
   CAPTAIN_VANE_MOCKING_DISBELIEF = 'Captain_Vane_Mocking_Disbelief',
   CAPTAIN_VANE_COMMANDING_ANGRY = 'Captain_Vane_Commanding_Angry',
@@ -134,6 +137,8 @@ export enum BackgroundImageKey {
   LEVEL_5_MEMORY_TIGREVEL_RESCUE = 'Level_5_Memory_Tigrevel_Rescue',
   LEVEL_5_MEMORY_NAVY_CAPTURE = 'Level_5_Memory_Navy_Capture',
   LEVEL_5_TIGREVEL_CELL = 'Level_5_Tigrevel_Cell',
+  LEVEL_5_TIGREVEL_FREED = 'Level_5_Tigrevel_Freed',
+  LEVEL_5_TIGREVEL_PROTECTS_KIDS = 'Level_5_Tigrevel_Protects_Kids',
   DEFAULT = 'default',
 }
 
@@ -410,6 +415,8 @@ export enum DialogContext {
   LEVEL_4_WIN = 'LEVEL_4_WIN',
   LEVEL_4_LOSE = 'LEVEL_4_LOSE',
   LEVEL_5_INTRO = 'LEVEL_5_INTRO',
+  LEVEL_5_WIN = 'LEVEL_5_WIN',
+  LEVEL_5_LOSE = 'LEVEL_5_LOSE',
   STARTER_BATTLE_LOSE = 'STARTER_BATTLE_LOSE',
   NEW_PLAYER_WELCOME_DIALOG_PART_2 = 'NEW_PLAYER_WELCOME_DIALOG_PART_2',
   GAME_INTRO_AFTER_STARTER = 'GAME_INTRO_AFTER_STARTER',
