@@ -90,6 +90,26 @@ describe('Level 5 intro and placeholder level', () => {
         seenSpeciesIds: ['tigrevel'],
       },
     });
+    expect(LEVEL_5.backgroundUrl).toBe(
+      '/battles/bg/bg_level_5_ironbell_prison.png'
+    );
+    expect(LEVEL_5.backgroundScale).toBe(1);
+    expect(LEVEL_5.paths).toHaveLength(3);
+    expect(LEVEL_5.paths.map((path) => path[0])).toEqual([
+      { x: 17.5, y: 103 },
+      { x: 50, y: 103 },
+      { x: 82.5, y: 103 },
+    ]);
+    expect(LEVEL_5.paths.map((path) => path.at(-1))).toEqual([
+      { x: 50, y: 17 },
+      { x: 50, y: 17 },
+      { x: 50, y: 17 },
+    ]);
+    expect(
+      LEVEL_5.waves.flatMap((wave) =>
+        wave.groups.map((group) => group.pathIndex)
+      )
+    ).toEqual([0, 1, 2]);
   });
 
   it('ends the breakout with Tigrevel choosing to protect the children and the commander blocking the escape', () => {

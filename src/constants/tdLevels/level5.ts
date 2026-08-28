@@ -1,40 +1,70 @@
 import { TDLevelData } from '@/engine/tower-defense/types';
 
 /**
- * Temporary playable shell for Level 5. The final battle will be a breakout:
- * Caleb, Kip, and Mari must avoid capture while the party breaks Tigrevel's
- * prison bars. For now, this keeps the story flow playable while that bespoke
- * objective is developed.
+ * Level 5 takes place in Ironbell's flooded prison block. Three approaches
+ * converge on Tigrevel's cell while the optional side-cell mechanics and the
+ * final prison-break objective are developed.
  */
 export const LEVEL_5: TDLevelData = {
   paths: [
     [
-      { x: 102, y: 54 },
-      { x: 72, y: 54 },
-      { x: 48, y: 54 },
-      { x: -2, y: 54 },
+      { x: 17.5, y: 103 },
+      { x: 17.5, y: 84 },
+      { x: 21.5, y: 74 },
+      { x: 20.5, y: 64 },
+      { x: 20, y: 53 },
+      { x: 21, y: 43 },
+      { x: 26, y: 32 },
+      { x: 34, y: 23 },
+      { x: 42, y: 19 },
+      { x: 50, y: 17 },
+    ],
+    [
+      { x: 50, y: 103 },
+      { x: 50, y: 83 },
+      { x: 50, y: 65 },
+      { x: 50, y: 50 },
+      { x: 50, y: 33 },
+      { x: 50, y: 17 },
+    ],
+    [
+      { x: 82.5, y: 103 },
+      { x: 82.5, y: 84 },
+      { x: 78.5, y: 74 },
+      { x: 79.5, y: 64 },
+      { x: 80, y: 53 },
+      { x: 79, y: 43 },
+      { x: 74, y: 32 },
+      { x: 66, y: 23 },
+      { x: 58, y: 19 },
+      { x: 50, y: 17 },
     ],
   ],
   placementSpots: [
-    { x: 82, y: 38 },
-    { x: 66, y: 70 },
-    { x: 52, y: 37 },
-    { x: 38, y: 70 },
-    { x: 24, y: 38 },
+    { x: 13, y: 84 },
+    { x: 27, y: 84 },
+    { x: 42, y: 84 },
+    { x: 58, y: 84 },
+    { x: 73, y: 84 },
+    { x: 87, y: 84 },
+    { x: 45, y: 45 },
+    { x: 55, y: 45 },
+    { x: 25, y: 18 },
+    { x: 75, y: 18 },
   ],
   environmentUnits: [
     {
-      position: { x: 18, y: 63 },
+      position: { x: 44, y: 21 },
       tdConfigId: 'caleb_battle',
       facingDirection: 'right',
     },
     {
-      position: { x: 25, y: 63 },
+      position: { x: 50, y: 22 },
       tdConfigId: 'kip_battle',
       facingDirection: 'right',
     },
     {
-      position: { x: 32, y: 63 },
+      position: { x: 56, y: 21 },
       tdConfigId: 'maribel_capture',
       facingDirection: 'right',
     },
@@ -53,10 +83,28 @@ export const LEVEL_5: TDLevelData = {
       groups: [
         {
           enemyDefinitionId: 'level_5_placeholder_patrol',
-          count: 3,
+          count: 1,
           spawnIntervalMs: 1200,
           delayBeforeGroupMs: 250,
           pathIndex: 0,
+          uncapturable: true,
+        },
+        {
+          enemyDefinitionId: 'level_5_placeholder_patrol',
+          count: 1,
+          spawnIntervalMs: 1200,
+          delayBeforeGroupMs: 500,
+          pathIndex: 1,
+          concurrentWithPrevious: true,
+          uncapturable: true,
+        },
+        {
+          enemyDefinitionId: 'level_5_placeholder_patrol',
+          count: 1,
+          spawnIntervalMs: 1200,
+          delayBeforeGroupMs: 750,
+          pathIndex: 2,
+          concurrentWithPrevious: true,
           uncapturable: true,
         },
       ],
@@ -65,13 +113,12 @@ export const LEVEL_5: TDLevelData = {
   lives: 3,
   disableCapture: true,
   enemyHpMultiplier: 1,
-  backgroundUrl: '/battles/bg/bg_market_level_4.png',
+  backgroundUrl: '/battles/bg/bg_level_5_ironbell_prison.png',
   backgroundScale: 3,
   initialView: {
-    offsetX: 0,
-    offsetY: 50,
-    zoom: 0.72,
+    offsetX: 50,
+    offsetY: 0,
+    zoom: 0.4,
   },
-  introMessage:
-    'Placeholder battle: the prison-break objective is coming next.',
+  introMessage: "Defend all three approaches to Tigrevel's cell!",
 };
