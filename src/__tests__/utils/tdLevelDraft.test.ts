@@ -1,3 +1,4 @@
+import { ElementType } from '@/types/baseGame';
 import { TDLevelData } from '@/engine/tower-defense/types';
 import { TD_LEVELS } from '@/constants/tdLevels';
 import { TD_CREATURE_DEFS } from '@/engine/tower-defense/TowerDefenseEngine';
@@ -94,9 +95,7 @@ describe('TD level drafts', () => {
           position: { x: 70.56, y: 80.44 },
         },
       ],
-      waveEnemyDefinitions: [
-        { futureDefinitionField: 'definition metadata' },
-      ],
+      waveEnemyDefinitions: [{ futureDefinitionField: 'definition metadata' }],
       waves: [
         {
           futureWaveField: 'wave metadata',
@@ -105,6 +104,113 @@ describe('TD level drafts', () => {
       ],
     });
     expect(futureLevel.paths[0][0].x).toBe(10.126);
+  });
+
+  it('rounds editable structure placement and visual layout values', () => {
+    const level = createEmptyTDLevelDraft();
+    level.waveEnemyDefinitions.push({
+      id: 'cell_gate',
+      level: 1,
+      structure: {
+        tdConfigId: 'cell_gate',
+        displayName: 'CELL GATE',
+        elementTypes: [ElementType.STEEL],
+        maxHp: 20,
+        defense: 5,
+        specialDefense: 5,
+        position: { x: 5.678, y: 65.432 },
+        visualLayout: {
+          standing: {
+            offsetX: 8.126,
+            offsetY: -139.555,
+            width: 260.126,
+            height: 430.555,
+            rotationDegrees: 1.126,
+            skewXDegrees: -2.555,
+            skewYDegrees: 3.444,
+          },
+          rubble: {
+            offsetX: 8.126,
+            offsetY: -24.555,
+            width: 260.126,
+            height: 174.555,
+            rotationDegrees: -1.126,
+            skewXDegrees: 2.555,
+            skewYDegrees: -3.444,
+          },
+          labelOffsetY: -380.126,
+          healthBarOffsetY: -363.555,
+        },
+      },
+    });
+
+    const saved = prepareTDLevelDraftForSave(level);
+    expect(saved.waveEnemyDefinitions[0].structure).toMatchObject({
+      position: { x: 5.68, y: 65.43 },
+      visualLayout: {
+        standing: {
+          offsetX: 8.13,
+          offsetY: -139.56,
+          width: 260.13,
+          height: 430.56,
+          rotationDegrees: 1.13,
+          skewXDegrees: -2.56,
+          skewYDegrees: 3.44,
+        },
+        rubble: {
+          offsetX: 8.13,
+          offsetY: -24.55,
+          width: 260.13,
+          height: 174.56,
+          rotationDegrees: -1.13,
+          skewXDegrees: 2.56,
+          skewYDegrees: -3.44,
+        },
+        labelOffsetY: -380.13,
+        healthBarOffsetY: -363.56,
+      },
+    });
+  });
+
+  it('rejects invalid structure visual layout values', () => {
+    const level = createEmptyTDLevelDraft();
+    level.waveEnemyDefinitions.push({
+      id: 'cell_gate',
+      level: 1,
+      structure: {
+        tdConfigId: 'cell_gate',
+        displayName: 'CELL GATE',
+        elementTypes: [ElementType.STEEL],
+        maxHp: 20,
+        defense: 5,
+        specialDefense: 5,
+        position: { x: Number.NaN, y: 65 },
+        visualLayout: {
+          standing: {
+            offsetX: Number.NaN,
+            offsetY: 0,
+            width: -1,
+            height: 100,
+            rotationDegrees: Number.NaN,
+          },
+          rubble: { offsetX: 0, offsetY: 0, width: 100, height: 0 },
+          labelOffsetY: Number.NaN,
+          healthBarOffsetY: Number.POSITIVE_INFINITY,
+        },
+      },
+    });
+
+    expect(validateTDLevelDraft(level)).toEqual(
+      expect.arrayContaining([
+        'Enemy definition 1 structure position must have finite x and y coordinates.',
+        'Enemy definition 1 structure standing offsets must be finite.',
+        'Enemy definition 1 structure standing size must be greater than 0.',
+        'Enemy definition 1 structure standing rotation and skew must be finite.',
+        'Enemy definition 1 structure rubble size must be greater than 0.',
+        'Enemy definition 1 structure label offset must be finite.',
+        'Enemy definition 1 structure health bar offset must be finite.',
+      ])
+    );
   });
 
   it('reports structural problems before a level is saved', () => {
@@ -310,9 +416,7 @@ describe('TD level drafts', () => {
       ],
     };
 
-    expect(
-      validateTDLevelDraft(level, new Set(['mouse_1']))
-    ).toEqual([]);
+    expect(validateTDLevelDraft(level, new Set(['mouse_1']))).toEqual([]);
   });
 
   it('rejects invalid enemy goal damage', () => {

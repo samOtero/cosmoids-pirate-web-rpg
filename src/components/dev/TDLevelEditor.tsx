@@ -1,11 +1,15 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import PixiTDLevelEditor, { PointType } from './PixiTDLevelEditor';
+import PixiTDLevelEditor, {
+  PointType,
+  TDLevelEditorStructure,
+} from './PixiTDLevelEditor';
 import { TD_LEVELS } from '@/constants/tdLevels';
 import {
   CaptureUnitReturnHomeConfig,
   TDLevelData,
+  TDStructureVisualLayout,
   TDWaveEnemyDefinition,
   TDWaveGroup,
 } from '@/engine/tower-defense/types';
@@ -19,6 +23,10 @@ import {
   validateTDLevelDraft,
 } from '@/utils/tdLevelDraft';
 import { resolveTDInitialView } from '@/utils/tdInitialView';
+import {
+  PrisonGatePreviewState,
+  resolvePrisonGateVisualLayout,
+} from '@/utils/tdStructureVisuals';
 
 type EditorSidebarTab = 'LEVEL' | 'MAP' | 'WAVES';
 
@@ -32,6 +40,16 @@ const CAPTURE_RETURN_FIELDS: Array<{
   { label: 'Delay ms', field: 'delayMs', step: 100 },
 ];
 
+const STRUCTURE_SPRITE_FIELDS = [
+  { field: 'offsetX', label: 'Visual X', step: 1 },
+  { field: 'offsetY', label: 'Visual Y', step: 1 },
+  { field: 'width', label: 'Width', step: 1 },
+  { field: 'height', label: 'Height', step: 1 },
+  { field: 'rotationDegrees', label: 'Rotation °', step: 0.5 },
+  { field: 'skewXDegrees', label: 'Skew X °', step: 0.5 },
+  { field: 'skewYDegrees', label: 'Skew Y °', step: 0.5 },
+] as const;
+
 export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
   const [selectedLevelKey, setSelectedLevelKey] = useState<string | null>(null);
   const [draft, setDraft] = useState<TDLevelData>(createEmptyTDLevelDraft);
@@ -42,6 +60,11 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
   const [newLevelName, setNewLevelName] = useState('');
   const [activeSidebarTab, setActiveSidebarTab] =
     useState<EditorSidebarTab>('MAP');
+  const [selectedStructureIndex, setSelectedStructureIndex] = useState<
+    number | null
+  >(null);
+  const [structurePreviewState, setStructurePreviewState] =
+    useState<PrisonGatePreviewState>('intact');
 
   const paths = draft.paths;
   const placementSpots = draft.placementSpots;
@@ -61,6 +84,51 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
     ...unit.position,
     tdConfigId: unit.tdConfigId,
   }));
+
+  const editableStructures = useMemo<TDLevelEditorStructure[]>(() => {
+    return draft.waveEnemyDefinitions.flatMap((definition, definitionIndex) => {
+      const structure = definition.structure;
+      if (structure?.visualStyle !== 'prison-gate') return [];
+
+      let position = structure.position;
+      if (!position) {
+        const group = draft.waves
+          .flatMap((wave) => wave.groups)
+          .find((candidate) => candidate.enemyDefinitionId === definition.id);
+        position = group ? draft.paths[group.pathIndex]?.[0] : { x: 50, y: 50 };
+      }
+
+      return [
+        {
+          definitionIndex,
+          id: definition.id,
+          displayName: structure.displayName,
+          position: { ...position },
+          visualLayout: structure.visualLayout,
+        },
+      ];
+    });
+  }, [draft.paths, draft.waveEnemyDefinitions, draft.waves]);
+
+  const selectedStructure = editableStructures.find(
+    (structure) => structure.definitionIndex === selectedStructureIndex
+  );
+  const selectedStructureLayout = selectedStructure
+    ? resolvePrisonGateVisualLayout(selectedStructure.visualLayout)
+    : null;
+
+  useEffect(() => {
+    if (
+      editableStructures.length > 0 &&
+      !editableStructures.some(
+        (structure) => structure.definitionIndex === selectedStructureIndex
+      )
+    ) {
+      setSelectedStructureIndex(editableStructures[0].definitionIndex);
+    } else if (editableStructures.length === 0) {
+      setSelectedStructureIndex(null);
+    }
+  }, [editableStructures, selectedStructureIndex]);
 
   const availableLevels = useMemo(() => {
     return Object.entries(TD_LEVELS).map(
@@ -84,6 +152,8 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
       setActivePathIndex(0);
     }
     setSelectedLevelKey(key);
+    setSelectedStructureIndex(null);
+    setStructurePreviewState('intact');
   };
 
   const handleCreateNew = () => {
@@ -134,7 +204,40 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
         };
         return { ...previousDraft, environmentUnits: nextUnits };
       });
+    } else if (type === 'STRUCTURE') {
+      setDraft((previousDraft) => {
+        const definitions = structuredClone(previousDraft.waveEnemyDefinitions);
+        const definition = definitions[index];
+        if (!definition?.structure) return previousDraft;
+        definition.structure.position = { x, y };
+
+        const objectiveAllies = previousDraft.objectiveAllies?.map((ally) =>
+          ally.gateDefinitionId === definition.id
+            ? { ...ally, lockedPosition: { x, y } }
+            : ally
+        );
+        return {
+          ...previousDraft,
+          waveEnemyDefinitions: definitions,
+          objectiveAllies,
+        };
+      });
     }
+  };
+
+  const updateStructureVisualLayout = (
+    definitionIndex: number,
+    updater: (layout: TDStructureVisualLayout) => TDStructureVisualLayout
+  ) => {
+    setDraft((previousDraft) => {
+      const definitions = structuredClone(previousDraft.waveEnemyDefinitions);
+      const definition = definitions[definitionIndex];
+      if (!definition?.structure) return previousDraft;
+      definition.structure.visualLayout = updater(
+        resolvePrisonGateVisualLayout(definition.structure.visualLayout)
+      );
+      return { ...previousDraft, waveEnemyDefinitions: definitions };
+    });
   };
 
   const handlePointDelete = (type: PointType, index: number) => {
@@ -464,6 +567,10 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
           placementSpots={placementSpots}
           captureUnits={captureUnitPoints}
           environmentUnits={environmentUnits}
+          structures={editableStructures}
+          selectedStructureIndex={selectedStructureIndex}
+          structurePreviewState={structurePreviewState}
+          onStructureSelect={setSelectedStructureIndex}
           deleteMode={deleteMode}
           onPointMove={handlePointMove}
           onPointDelete={handlePointDelete}
@@ -774,6 +881,165 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
                   </div>
                 </section>
 
+                {editableStructures.length > 0 && (
+                  <section>
+                    <h3 className="mb-3 text-sm font-bold tracking-wide text-cyan-400 uppercase">
+                      Structure Visuals
+                    </h3>
+                    <div className="space-y-4 rounded border border-cyan-800 bg-slate-900 p-3">
+                      <div className="grid grid-cols-1 gap-2">
+                        {editableStructures.map((structure) => (
+                          <button
+                            key={structure.id}
+                            onClick={() =>
+                              setSelectedStructureIndex(
+                                structure.definitionIndex
+                              )
+                            }
+                            className={
+                              selectedStructureIndex ===
+                              structure.definitionIndex
+                                ? 'rounded bg-cyan-700 px-3 py-2 text-left text-sm font-bold text-white'
+                                : 'rounded bg-slate-800 px-3 py-2 text-left text-sm text-slate-300 hover:bg-slate-700'
+                            }
+                          >
+                            {structure.displayName}
+                            <span className="ml-2 font-mono text-xs text-cyan-200/70">
+                              {structure.position.x.toFixed(2)},{' '}
+                              {structure.position.y.toFixed(2)}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+
+                      {selectedStructure && selectedStructureLayout && (
+                        <>
+                          <p className="text-xs text-cyan-100/70">
+                            Drag the gate on the map to change its world
+                            position. The controls below adjust its local sprite
+                            registration at the runtime camera scale.
+                          </p>
+
+                          <div>
+                            <div className="mb-2 text-xs font-bold tracking-wide text-slate-400 uppercase">
+                              Preview State
+                            </div>
+                            <div className="grid grid-cols-4 gap-1">
+                              {(
+                                [
+                                  'intact',
+                                  'damaged',
+                                  'critical',
+                                  'rubble',
+                                ] as const
+                              ).map((state) => (
+                                <button
+                                  key={state}
+                                  onClick={() =>
+                                    setStructurePreviewState(state)
+                                  }
+                                  className={
+                                    structurePreviewState === state
+                                      ? 'rounded bg-cyan-700 px-1 py-2 text-[10px] font-bold text-white uppercase'
+                                      : 'rounded bg-slate-800 px-1 py-2 text-[10px] text-slate-400 uppercase hover:bg-slate-700'
+                                  }
+                                >
+                                  {state}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div>
+                            <div className="mb-2 text-xs font-bold tracking-wide text-slate-400 uppercase">
+                              {structurePreviewState === 'rubble'
+                                ? 'Rubble Transform'
+                                : 'Standing Transform'}
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              {STRUCTURE_SPRITE_FIELDS.map(
+                                ({ field, label, step }) => {
+                                  const section =
+                                    structurePreviewState === 'rubble'
+                                      ? 'rubble'
+                                      : 'standing';
+                                  return (
+                                    <label key={field} className="block">
+                                      <span className="mb-1 block text-xs text-slate-400">
+                                        {label}
+                                      </span>
+                                      <input
+                                        type="number"
+                                        step={step}
+                                        min={
+                                          field === 'width' ||
+                                          field === 'height'
+                                            ? 1
+                                            : undefined
+                                        }
+                                        value={
+                                          selectedStructureLayout[section][
+                                            field
+                                          ] ?? 0
+                                        }
+                                        onChange={(event) =>
+                                          updateStructureVisualLayout(
+                                            selectedStructure.definitionIndex,
+                                            (layout) => ({
+                                              ...layout,
+                                              [section]: {
+                                                ...layout[section],
+                                                [field]: Number(
+                                                  event.target.value
+                                                ),
+                                              },
+                                            })
+                                          )
+                                        }
+                                        className="w-full rounded border border-slate-700 bg-slate-950 p-2 font-mono text-xs text-white"
+                                      />
+                                    </label>
+                                  );
+                                }
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2">
+                            {(
+                              [
+                                ['labelOffsetY', 'Label Y'],
+                                ['healthBarOffsetY', 'Health Bar Y'],
+                              ] as const
+                            ).map(([field, label]) => (
+                              <label key={field} className="block">
+                                <span className="mb-1 block text-xs text-slate-400">
+                                  {label}
+                                </span>
+                                <input
+                                  type="number"
+                                  step="1"
+                                  value={selectedStructureLayout[field]}
+                                  onChange={(event) =>
+                                    updateStructureVisualLayout(
+                                      selectedStructure.definitionIndex,
+                                      (layout) => ({
+                                        ...layout,
+                                        [field]: Number(event.target.value),
+                                      })
+                                    )
+                                  }
+                                  className="w-full rounded border border-slate-700 bg-slate-950 p-2 font-mono text-xs text-white"
+                                />
+                              </label>
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </section>
+                )}
+
                 {captureUnits.length > 0 && (
                   <section>
                     <h3 className="mb-3 text-sm font-bold tracking-wide text-purple-400 uppercase">
@@ -971,11 +1237,13 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
                               }
                               className="mt-1 w-full rounded border border-slate-700 bg-slate-950 p-1 text-white"
                             >
-                              {Object.keys(TD_CREATURE_DEFS).map((creatureId) => (
-                                <option key={creatureId} value={creatureId}>
-                                  {creatureId}
-                                </option>
-                              ))}
+                              {Object.keys(TD_CREATURE_DEFS).map(
+                                (creatureId) => (
+                                  <option key={creatureId} value={creatureId}>
+                                    {creatureId}
+                                  </option>
+                                )
+                              )}
                             </select>
                           </label>
                           <label className="block text-slate-400">
@@ -1038,7 +1306,8 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
                                   'weakenedThreshold',
                                   event.target.value === ''
                                     ? undefined
-                                    : parseFloat(event.target.value) || undefined
+                                    : parseFloat(event.target.value) ||
+                                        undefined
                                 )
                               }
                               className="mt-1 w-full rounded border border-slate-700 bg-slate-950 p-1 text-white"
@@ -1146,18 +1415,15 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
                                   }
                                   className="w-full rounded border border-slate-700 bg-slate-950 p-1 text-white"
                                 >
-                                  {waveEnemyDefinitions.map(
-                                    (definition) => (
-                                      <option
-                                        key={definition.id}
-                                        value={definition.id}
-                                      >
-                                        {definition.id} ({
-                                          definition.creatureId ?? 'structure'
-                                        })
-                                      </option>
-                                    )
-                                  )}
+                                  {waveEnemyDefinitions.map((definition) => (
+                                    <option
+                                      key={definition.id}
+                                      value={definition.id}
+                                    >
+                                      {definition.id} (
+                                      {definition.creatureId ?? 'structure'})
+                                    </option>
+                                  ))}
                                 </select>
                               </div>
                               <div>

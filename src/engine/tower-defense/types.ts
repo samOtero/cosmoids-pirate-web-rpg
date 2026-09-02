@@ -77,19 +77,68 @@ export interface TDWaveEnemyDefinition {
    * Optional stationary structure that participates in the normal enemy
    * targeting pipeline without masquerading as a capturable Cosmoid.
    */
-  structure?: {
-    tdConfigId: string;
-    displayName: string;
-    elementTypes: ElementType[];
-    maxHp: number;
-    defense: number;
-    specialDefense: number;
-    /** Structures are status-immune by default. */
-    immuneToStatusEffects?: boolean;
-    /** Structures award no money by default. */
-    moneyReward?: number;
-    /** Immediately wins the battle when this structure is destroyed. */
-    winsLevelOnDestroy?: boolean;
+  structure?: TDStructureDefinition;
+}
+
+export interface TDStructureSpriteLayout {
+  offsetX: number;
+  offsetY: number;
+  width: number;
+  height: number;
+  rotationDegrees?: number;
+  skewXDegrees?: number;
+  skewYDegrees?: number;
+}
+
+export interface TDStructureVisualLayout {
+  standing: TDStructureSpriteLayout;
+  rubble: TDStructureSpriteLayout;
+  labelOffsetY: number;
+  healthBarOffsetY: number;
+}
+
+export interface TDStructureDefinition {
+  tdConfigId: string;
+  displayName: string;
+  elementTypes: ElementType[];
+  maxHp: number;
+  defense: number;
+  specialDefense: number;
+  /** Structures are status-immune by default. */
+  immuneToStatusEffects?: boolean;
+  /** Structures award no money by default. */
+  moneyReward?: number;
+  /** Immediately wins the battle when this structure is destroyed. */
+  winsLevelOnDestroy?: boolean;
+  /** Semantic role used by objective UI and destruction hooks. */
+  role?: 'victory-gate' | 'prisoner-gate';
+  /** Optional renderer for a structure that is not painted into the map. */
+  visualStyle?: 'prison-gate';
+  /** Optional fixed map position. Falls back to the wave group's path start. */
+  position?: Point;
+  /** Per-level visual registration used by runtime and the TD level editor. */
+  visualLayout?: TDStructureVisualLayout;
+}
+
+export interface TDObjectiveAllyDefinition {
+  id: string;
+  creatureId: string;
+  displayName: string;
+  /** Destroying this structure releases the ally. */
+  gateDefinitionId: string;
+  lockedPosition: Point;
+  releasePath: Point[];
+  moveSpeed: number;
+  targetStructureDefinitionId: string;
+  behavior: {
+    type: 'BRAMFRIT_CHARGE';
+    chargeStart: Point;
+    strikePosition: Point;
+    damage: number;
+    bowDurationMs: number;
+    windupDurationMs: number;
+    recoveryDurationMs: number;
+    chargeSpeed: number;
   };
 }
 
@@ -237,6 +286,8 @@ export interface TDLevelData {
   }[];
   captureUnits?: CaptureUnitDefinition[];
   resonantEvolution?: TDResonantEvolutionConfig;
+  /** Captives that become autonomous objective allies when their gate breaks. */
+  objectiveAllies?: TDObjectiveAllyDefinition[];
   /** Allied towers that begin on the battlefield without joining the player's roster. */
   startingTowers?: {
     creature: PlayerCreature;
@@ -300,6 +351,9 @@ export interface Enemy extends BaseTDUnit {
   immuneToStatusEffects?: boolean;
   moneyReward?: number;
   winsLevelOnDestroy?: boolean;
+  structureRole?: 'victory-gate' | 'prisoner-gate';
+  structureVisualStyle?: 'prison-gate';
+  structureVisualLayout?: TDStructureVisualLayout;
   /** Guards death/reward events when several attacks land in the same tick. */
   defeatEventEmitted?: boolean;
   /** The unique level-scoped enemy variant that produced this unit. */
@@ -353,6 +407,37 @@ export interface Enemy extends BaseTDUnit {
     /** When true, only an explicit trigger can activate this ability. */
     manualOnly?: boolean;
   };
+}
+
+export interface ObjectiveAlly extends BaseTDUnit {
+  definitionId: string;
+  tdConfigId: string;
+  displayName: string;
+  gateDefinitionId: string;
+  targetStructureDefinitionId: string;
+  phase:
+    | 'locked'
+    | 'traveling'
+    | 'bowing'
+    | 'retreating'
+    | 'windup'
+    | 'charging'
+    | 'recovering';
+  path: Point[];
+  currentWaypointIndex: number;
+  moveSpeed: number;
+  behavior: TDObjectiveAllyDefinition['behavior'];
+  phaseStartedAtMs: number;
+  impactCount: number;
+}
+
+export interface DestroyedStructureVisual {
+  id: string;
+  tdConfigId?: string;
+  position: Point;
+  visualStyle?: 'prison-gate';
+  visualLayout?: TDStructureVisualLayout;
+  destroyedAtMs: number;
 }
 
 export interface Projectile {

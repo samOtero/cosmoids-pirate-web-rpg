@@ -629,6 +629,10 @@ export default function TowerDefenseScreen({
         onMapDrop={handleMapDrop}
         onMapRemove={handleMapRemove}
         onEnemyCaptured={handleEnemyCaptured}
+        onStructureFocused={(structureId) => {
+          engineRef.current.toggleFocusedStructure(structureId);
+          setUiUpdateToggle((previous) => !previous);
+        }}
         onDragStateChange={(isDragging) => {
           dragStateRef.current = isDragging ? 'tower' : false;
         }}

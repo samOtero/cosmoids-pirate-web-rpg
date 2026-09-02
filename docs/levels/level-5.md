@@ -9,7 +9,7 @@
 - **Primary objective:** Break the main cell bars and free Tigrevel before the crew is overwhelmed.
 - **Core gameplay idea:** Three enemy approaches converge on a visible Steel-type gate at the top center of the map. The player can eventually open connected side cells to release captive Cosmoids that join the effort to destroy the gate.
 - **Story purpose:** Reveal Tigrevel, show the Navy using fear to justify cruelty, and establish that partnership is a choice rather than ownership.
-- **Current status:** Story dialogue, backgrounds, three-path draft map, targetable gate structure, and destruction victory are implemented. Enemy waves and allied side-prisoner mechanics remain placeholders or concepts.
+- **Current status:** Story dialogue, layered battlefield background, three-path draft map, targetable main gate, destruction victory, the Bramfrit rescue vertical slice, and shared breakable gates for all four established prisoners are implemented. Enemy waves and the remaining prisoner ally behaviors remain placeholders or concepts.
 
 ## Thematic Purpose
 
@@ -127,7 +127,7 @@ Destroying the target emits the shared `STRUCTURE_DESTROYED` event with `winsLev
 
 ### Current direction
 
-The player should be able to attack and break optional side-cell gates. A freed prisoner becomes an allied autonomous unit, travels toward Tigrevel's cell, and contributes directly to breaking the main gate.
+The player can attack and break optional side-cell gates. Bramfrit, Sepippet, Parlet, and Corrogoon now share the same painted gate damage and rubble images while retaining per-cell position, scale, rotation, and skew controls in the TD Level Editor. Bramfrit remains the first complete rescue example: destroying its gate releases it as an invulnerable allied objective unit that follows an authored route toward Tigrevel's cell and repeatedly performs its formal retreat-and-charge ritual against the main gate.
 
 Every prisoner should help with the same objective in a visibly different way. No single creature should be the only valid solution. The level may be balanced to be very difficult without freeing prisoners, but whether opening cells is a formal requirement or a powerful optional strategy remains undecided.
 
@@ -167,22 +167,26 @@ The broader prisoner roster has explored Poison, Dark, Water, Rock, Ground, and 
 
 - The icon, left-facing, upward-facing, and downward-facing game assets are complete.
 - Bramfrit is registered as a Fire-type Cosmoid with a dated creature manifest.
-- Its Level 5 prisoner definition is registered but intentionally excluded from enemy waves.
-- Opening its optional cell and running its allied three-step charge remain future gameplay work.
+- Its Level 5 prisoner definition remains excluded from enemy waves because the captive is represented by the objective-ally system.
+- Its lower-left side-cell gate is implemented as a selectable Steel structure with painted transparent PNG states for intact, bent, heavily damaged, and persistent broken-rubble visuals.
+- Destroying the side gate releases Bramfrit once, clears gate focus, shows a release callout, and sends Bramfrit along a fixed route toward the main cell.
+- At the main gate, Bramfrit bows, retreats, visibly winds up, charges, and deals repeated 38-damage structure impacts. Its impacts can trigger the normal destruction victory.
 
 ### Corrogoon implementation status
 
 - The icon, left-facing, upward-facing, and downward-facing game assets are complete.
 - Corrogoon is registered as a Poison/Ground Cosmoid with a dated creature manifest.
 - Its Level 5 prisoner definition is registered but intentionally excluded from enemy waves.
-- Opening its optional cell, allied navigation, abrasive spray, and the **Scoured** gate effect remain future gameplay work.
+- Its optional lower-right cell gate is implemented with the shared damage-state images.
+- Allied navigation, abrasive spray, and the **Scoured** gate effect remain future gameplay work.
 
 ### Parlet implementation status
 
 - The icon, left-facing, upward-facing, and downward-facing game assets are complete.
 - Parlet is registered as a Water-type Cosmoid with a dated creature manifest.
 - Its Level 5 prisoner definition is registered but intentionally excluded from enemy waves.
-- Its optional-cell location, release behavior, and contribution to the escape remain future gameplay work.
+- Its optional right-side cell gate is implemented with the shared damage-state images.
+- Its release behavior and contribution to the escape remain future gameplay work.
 
 ### Superseded or deferred guard idea
 
@@ -228,21 +232,21 @@ The placeholder patrols validate lane geometry, tower targeting, structure targe
 
 ## Implementation Reference
 
-| Area                                                  | Primary file                                              | Status                 |
-| ----------------------------------------------------- | --------------------------------------------------------- | ---------------------- |
-| Level registration                                    | `src/constants/tdLevels/index.ts`                         | Implemented            |
-| Battlefield layout and placeholder wave               | `src/constants/tdLevels/level5.ts`                        | Draft implemented      |
-| Intro dialogue                                        | `src/constants/dialogs/level5Intro.ts`                    | Implemented            |
-| Victory dialogue                                      | `src/constants/dialogs/level5Win.ts`                      | Implemented            |
-| Defeat dialogue                                       | `src/constants/dialogs/level5Lose.ts`                     | Implemented            |
-| Gate structure definition                             | `src/constants/tdLevels/level5.ts`                        | Implemented            |
-| Structure spawning and destruction event              | `src/engine/tower-defense/TowerDefenseEngine.ts`          | Implemented            |
-| Green structure health bar and label                  | `src/app/components/tower-defense/PixiBattlefield.tsx`    | Implemented            |
-| Immediate destruction victory                         | `src/app/components/tower-defense/TowerDefenseScreen.tsx` | Implemented and tested |
-| Optional side-cell gates                              | —                                                         | Not implemented        |
-| Freed-prisoner allied behavior                        | —                                                         | Not implemented        |
-| Final waves and balance                               | —                                                         | Not designed           |
-| Gate destruction animation or persistent broken state | —                                                         | Not implemented        |
+| Area                                                  | Primary file                                              | Status                                  |
+| ----------------------------------------------------- | --------------------------------------------------------- | --------------------------------------- |
+| Level registration                                    | `src/constants/tdLevels/index.ts`                         | Implemented                             |
+| Battlefield layout and placeholder wave               | `src/constants/tdLevels/level5.ts`                        | Draft implemented                       |
+| Intro dialogue                                        | `src/constants/dialogs/level5Intro.ts`                    | Implemented                             |
+| Victory dialogue                                      | `src/constants/dialogs/level5Win.ts`                      | Implemented                             |
+| Defeat dialogue                                       | `src/constants/dialogs/level5Lose.ts`                     | Implemented                             |
+| Gate structure definition                             | `src/constants/tdLevels/level5.ts`                        | Implemented                             |
+| Structure spawning and destruction event              | `src/engine/tower-defense/TowerDefenseEngine.ts`          | Implemented                             |
+| Green structure health bar and label                  | `src/app/components/tower-defense/PixiBattlefield.tsx`    | Implemented                             |
+| Immediate destruction victory                         | `src/app/components/tower-defense/TowerDefenseScreen.tsx` | Implemented and tested                  |
+| Optional side-cell gates                              | `src/constants/tdLevels/level5.ts`                        | Four shared-image gates implemented     |
+| Freed-prisoner allied behavior                        | `src/engine/tower-defense/TowerDefenseEngine.ts`          | Bramfrit slice implemented              |
+| Final waves and balance                               | —                                                         | Not designed                            |
+| Gate destruction animation or persistent broken state | `src/app/components/tower-defense/PixiBattlefield.tsx`    | Side-gate stages and rubble implemented |
 
 ## Confirmed Decisions
 
@@ -255,20 +259,21 @@ The placeholder patrols validate lane geometry, tower targeting, structure targe
 - Side cells connect to the path network.
 - The player, not the guard, should release allied prisoners.
 - Every freed prisoner contributes to breaking Tigrevel's gate.
+- A tapped structure becomes the focused target for towers that have it in range.
+- Freed objective allies are invulnerable, non-capturable, and ignored by enemies in the initial implementation.
 - Tigrevel chooses to remain with and protect the children after being freed.
 - The Navy commander arrives at the end as the cliffhanger.
 
 ## Open Decisions
 
 - Decide whether freeing side prisoners is formally required or simply makes an otherwise difficult gate practical.
-- Define how the player targets side-cell gates and how those structures interact with ordinary enemy-targeting priority.
 - Decide whether side gates have different typings, defenses, or health values.
-- Define allied prisoner pathfinding, invulnerability or health, target selection, and behavior when enemies block the route.
+- Decide whether later prisoners reuse authored routes and invulnerability or introduce more general allied navigation and danger.
 - Select the remaining prisoner creatures and give each a unique gate contribution.
 - Replace the placeholder Sonarions with final Navy-controlled enemies and waves.
 - Decide whether enemies primarily threaten player lives, delay the breach, attack allied prisoners, or combine those pressures.
 - Balance the main gate after prisoner contributions exist; the current 260 HP and defenses are provisional.
-- Create gate damage stages, destruction effects, audio, and a persistent destroyed-cell visual if needed.
+- Create matching damage stages for the main gate and remaining cells, plus destruction effects and audio.
 - Determine how Tigrevel's voluntary, uncaptured companionship is represented in the roster and later battles.
 - Decide when Mari stays behind and how that farewell is shown.
 - Decide where the commander's confrontation occurs and whether it becomes Level 6, an overworld sequence, or another encounter.

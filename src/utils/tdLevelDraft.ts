@@ -38,6 +38,30 @@ export function prepareTDLevelDraftForSave(
     )
   );
   savedLevel.environmentUnits?.forEach((unit) => roundPoint(unit.position));
+  savedLevel.waveEnemyDefinitions.forEach((definition) => {
+    const structure = definition.structure;
+    if (!structure) return;
+    if (structure.position) roundPoint(structure.position);
+    const layout = structure.visualLayout;
+    if (!layout) return;
+    for (const sprite of [layout.standing, layout.rubble]) {
+      sprite.offsetX = Number(sprite.offsetX.toFixed(2));
+      sprite.offsetY = Number(sprite.offsetY.toFixed(2));
+      sprite.width = Number(sprite.width.toFixed(2));
+      sprite.height = Number(sprite.height.toFixed(2));
+      for (const field of [
+        'rotationDegrees',
+        'skewXDegrees',
+        'skewYDegrees',
+      ] as const) {
+        if (sprite[field] !== undefined) {
+          sprite[field] = Number(sprite[field].toFixed(2));
+        }
+      }
+    }
+    layout.labelOffsetY = Number(layout.labelOffsetY.toFixed(2));
+    layout.healthBarOffsetY = Number(layout.healthBarOffsetY.toFixed(2));
+  });
 
   return savedLevel;
 }
@@ -153,6 +177,7 @@ export function validateTDLevelDraft(
     enemyDefinitionIds.add(definition.id);
 
     if (definition.structure) {
+      const structure = definition.structure;
       if (!definition.structure.tdConfigId.trim()) {
         errors.push(`${definitionLabel} structure needs a TD config ID.`);
       }
@@ -174,6 +199,60 @@ export function validateTDLevelDraft(
           );
         }
       });
+      if (structure.position) {
+        validatePoint(
+          structure.position,
+          `${definitionLabel} structure position`,
+          errors
+        );
+      }
+      if (structure.visualLayout) {
+        const layout = structure.visualLayout;
+        for (const [name, sprite] of [
+          ['standing', layout.standing],
+          ['rubble', layout.rubble],
+        ] as const) {
+          if (
+            !Number.isFinite(sprite.offsetX) ||
+            !Number.isFinite(sprite.offsetY)
+          ) {
+            errors.push(
+              `${definitionLabel} structure ${name} offsets must be finite.`
+            );
+          }
+          if (
+            [
+              sprite.rotationDegrees,
+              sprite.skewXDegrees,
+              sprite.skewYDegrees,
+            ].some((value) => value !== undefined && !Number.isFinite(value))
+          ) {
+            errors.push(
+              `${definitionLabel} structure ${name} rotation and skew must be finite.`
+            );
+          }
+          if (
+            !Number.isFinite(sprite.width) ||
+            !Number.isFinite(sprite.height) ||
+            sprite.width <= 0 ||
+            sprite.height <= 0
+          ) {
+            errors.push(
+              `${definitionLabel} structure ${name} size must be greater than 0.`
+            );
+          }
+        }
+        if (!Number.isFinite(layout.labelOffsetY)) {
+          errors.push(
+            `${definitionLabel} structure label offset must be finite.`
+          );
+        }
+        if (!Number.isFinite(layout.healthBarOffsetY)) {
+          errors.push(
+            `${definitionLabel} structure health bar offset must be finite.`
+          );
+        }
+      }
     } else if (!definition.creatureId?.trim()) {
       errors.push(`${definitionLabel} needs a creature ID.`);
     } else if (

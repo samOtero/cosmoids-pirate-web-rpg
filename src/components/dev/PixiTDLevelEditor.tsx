@@ -1,6 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import * as PIXI from 'pixi.js';
-import { TDInitialView } from '@/engine/tower-defense/types';
+import {
+  TDInitialView,
+  TDStructureSpriteLayout,
+  TDStructureVisualLayout,
+} from '@/engine/tower-defense/types';
 import { TD_BASE_HEIGHT } from '@/constants/game';
 import { resolveTDInitialView } from '@/utils/tdInitialView';
 import { applyTDUnitTransforms } from '@/utils/tdUnitVisuals';
@@ -8,8 +12,50 @@ import {
   clampTDLevelEditorScroll,
   getTDLevelEditorScrollLimits,
 } from '@/utils/tdLevelEditorViewport';
+import {
+  PRISON_GATE_TEXTURES,
+  PrisonGatePreviewState,
+  resolvePrisonGateVisualLayout,
+} from '@/utils/tdStructureVisuals';
 
-export type PointType = 'PATH' | 'PLACEMENT' | 'CAPTURE' | 'ENVIRONMENT';
+export type PointType =
+  | 'PATH'
+  | 'PLACEMENT'
+  | 'CAPTURE'
+  | 'ENVIRONMENT'
+  | 'STRUCTURE';
+
+export interface TDLevelEditorStructure {
+  definitionIndex: number;
+  id: string;
+  displayName: string;
+  position: { x: number; y: number };
+  visualLayout?: TDStructureVisualLayout;
+}
+
+type UrlTrackedSprite = PIXI.Sprite & { currentUrl?: string };
+
+function updateEditorStructureSprite(
+  sprite: UrlTrackedSprite,
+  url: string,
+  layout: TDStructureSpriteLayout
+) {
+  if (sprite.currentUrl !== url) {
+    sprite.currentUrl = url;
+    void PIXI.Assets.load(url).then((texture) => {
+      if (sprite.currentUrl === url) sprite.texture = texture as PIXI.Texture;
+    });
+  }
+  sprite.anchor.set(0.5);
+  sprite.position.set(layout.offsetX, layout.offsetY);
+  sprite.width = layout.width;
+  sprite.height = layout.height;
+  sprite.rotation = ((layout.rotationDegrees ?? 0) * Math.PI) / 180;
+  sprite.skew.set(
+    ((layout.skewXDegrees ?? 0) * Math.PI) / 180,
+    ((layout.skewYDegrees ?? 0) * Math.PI) / 180
+  );
+}
 
 interface PixiTDLevelEditorProps {
   paths: { x: number; y: number }[][];
@@ -21,6 +67,10 @@ interface PixiTDLevelEditorProps {
     tdConfigId: string;
     facingDirection?: 'up' | 'down' | 'left' | 'right';
   }[];
+  structures: TDLevelEditorStructure[];
+  selectedStructureIndex: number | null;
+  structurePreviewState: PrisonGatePreviewState;
+  onStructureSelect: (definitionIndex: number) => void;
   deleteMode: boolean;
   onPointMove: (type: PointType, index: number, x: number, y: number) => void;
   onPointDelete: (type: PointType, index: number) => void;
@@ -35,6 +85,10 @@ export default function PixiTDLevelEditor({
   placementSpots,
   captureUnits,
   environmentUnits,
+  structures,
+  selectedStructureIndex,
+  structurePreviewState,
+  onStructureSelect,
   deleteMode,
   onPointMove,
   onPointDelete,
@@ -51,6 +105,10 @@ export default function PixiTDLevelEditor({
   const placementSpotsRef = useRef(placementSpots);
   const captureUnitsRef = useRef(captureUnits);
   const environmentUnitsRef = useRef(environmentUnits);
+  const structuresRef = useRef(structures);
+  const selectedStructureIndexRef = useRef(selectedStructureIndex);
+  const structurePreviewStateRef = useRef(structurePreviewState);
+  const onStructureSelectRef = useRef(onStructureSelect);
   const backgroundUrlRef = useRef(backgroundUrl);
   const backgroundScaleRef = useRef(backgroundScale);
   const initialViewRef = useRef(initialView);
@@ -101,6 +159,18 @@ export default function PixiTDLevelEditor({
   useEffect(() => {
     environmentUnitsRef.current = environmentUnits;
   }, [environmentUnits]);
+  useEffect(() => {
+    structuresRef.current = structures;
+  }, [structures]);
+  useEffect(() => {
+    selectedStructureIndexRef.current = selectedStructureIndex;
+  }, [selectedStructureIndex]);
+  useEffect(() => {
+    structurePreviewStateRef.current = structurePreviewState;
+  }, [structurePreviewState]);
+  useEffect(() => {
+    onStructureSelectRef.current = onStructureSelect;
+  }, [onStructureSelect]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -117,6 +187,7 @@ export default function PixiTDLevelEditor({
     const placementNodes = new Map<number, PIXI.Container>();
     const captureNodes = new Map<number, PIXI.Container>();
     const environmentNodes = new Map<number, PIXI.Container>();
+    const structureNodes = new Map<number, PIXI.Container>();
 
     let bgBounds = { x: 0, y: 0, width: 0, height: 0 };
 
@@ -447,6 +518,53 @@ export default function PixiTDLevelEditor({
         return container;
       };
 
+      const createDraggableStructure = (structure: TDLevelEditorStructure) => {
+        const container = new PIXI.Container();
+        container.eventMode = 'static';
+        container.cursor = 'grab';
+
+        const visual = new PIXI.Container();
+        visual.label = 'structure_visual';
+
+        const gate = new PIXI.Sprite() as UrlTrackedSprite;
+        gate.label = 'structure_gate';
+        visual.addChild(gate);
+
+        const selection = new PIXI.Graphics();
+        selection.label = 'structure_selection';
+        visual.addChild(selection);
+        container.addChild(visual);
+
+        const label = new PIXI.Text({
+          text: structure.displayName,
+          style: new PIXI.TextStyle({
+            fontFamily: 'Arial',
+            fontSize: 14,
+            fill: 0xffffff,
+            fontWeight: 'bold',
+            stroke: { color: 0x000000, width: 3 },
+          }),
+        });
+        label.label = 'structure_label';
+        label.anchor.set(0.5);
+        container.addChild(label);
+
+        container.on('pointerdown', (event: PIXI.FederatedPointerEvent) => {
+          event.stopPropagation();
+          onStructureSelectRef.current(structure.definitionIndex);
+          draggingNode = container;
+          draggingInfo = {
+            type: 'STRUCTURE',
+            index: structure.definitionIndex,
+          };
+          container.cursor = 'grabbing';
+          app.stage.setChildIndex(container, app.stage.children.length - 1);
+        });
+
+        app.stage.addChild(container);
+        return container;
+      };
+
       app.ticker.add(() => {
         // Re-evaluate bg layout each tick to pick up scale changes
         updateBgLayout();
@@ -473,6 +591,7 @@ export default function PixiTDLevelEditor({
         const currentPlacementSpots = placementSpotsRef.current;
         const currentCaptureUnits = captureUnitsRef.current;
         const currentEnvironmentUnits = environmentUnitsRef.current;
+        const currentStructures = structuresRef.current;
 
         // Draw Path lines
         pathGraphics.clear();
@@ -666,6 +785,93 @@ export default function PixiTDLevelEditor({
 
           const label = node.getChildByLabel('environment_label') as PIXI.Text;
           label.text = `E${i}`;
+        });
+
+        const activeStructureKeys = new Set(
+          currentStructures.map((structure) => structure.definitionIndex)
+        );
+        for (const [key, node] of structureNodes.entries()) {
+          if (!activeStructureKeys.has(key)) {
+            app.stage.removeChild(node);
+            node.destroy({ children: true });
+            structureNodes.delete(key);
+          }
+        }
+
+        currentStructures.forEach((structure) => {
+          let node = structureNodes.get(structure.definitionIndex);
+          if (!node) {
+            node = createDraggableStructure(structure);
+            structureNodes.set(structure.definitionIndex, node);
+          }
+
+          node.x = bgBounds.x + (structure.position.x / 100) * bgBounds.width;
+          node.y = bgBounds.y + (structure.position.y / 100) * bgBounds.height;
+          node.cursor = draggingNode === node ? 'grabbing' : 'grab';
+
+          const layout = resolvePrisonGateVisualLayout(structure.visualLayout);
+          const previewState = structurePreviewStateRef.current;
+          const spriteLayout =
+            previewState === 'rubble' ? layout.rubble : layout.standing;
+          const visualScale =
+            resolveTDInitialView(
+              backgroundScaleRef.current,
+              initialViewRef.current
+            ).zoom *
+            (app.screen.height / TD_BASE_HEIGHT);
+          const visual = node.getChildByLabel(
+            'structure_visual'
+          ) as PIXI.Container;
+          visual.scale.set(visualScale);
+
+          const gate = visual.getChildByLabel(
+            'structure_gate'
+          ) as UrlTrackedSprite;
+          updateEditorStructureSprite(
+            gate,
+            PRISON_GATE_TEXTURES[previewState],
+            spriteLayout
+          );
+
+          const selection = visual.getChildByLabel(
+            'structure_selection'
+          ) as PIXI.Graphics;
+          selection.clear();
+          selection.position.set(spriteLayout.offsetX, spriteLayout.offsetY);
+          selection.rotation =
+            ((spriteLayout.rotationDegrees ?? 0) * Math.PI) / 180;
+          selection.skew.set(
+            ((spriteLayout.skewXDegrees ?? 0) * Math.PI) / 180,
+            ((spriteLayout.skewYDegrees ?? 0) * Math.PI) / 180
+          );
+          if (selectedStructureIndexRef.current === structure.definitionIndex) {
+            selection.roundRect(
+              -spriteLayout.width / 2 - 5,
+              -spriteLayout.height / 2 - 5,
+              spriteLayout.width + 10,
+              spriteLayout.height + 10,
+              12
+            );
+            selection.stroke({ color: 0x22d3ee, width: 4, alpha: 0.95 });
+          }
+
+          node.hitArea = new PIXI.Rectangle(
+            (spriteLayout.offsetX - spriteLayout.width / 2 - 8) * visualScale,
+            (spriteLayout.offsetY - spriteLayout.height / 2 - 8) * visualScale,
+            (spriteLayout.width + 16) * visualScale,
+            (spriteLayout.height + 16) * visualScale
+          );
+
+          const label = node.getChildByLabel('structure_label') as PIXI.Text;
+          label.text = structure.displayName;
+          label.position.set(
+            layout.standing.offsetX * visualScale,
+            layout.labelOffsetY * visualScale
+          );
+          label.style.fill =
+            selectedStructureIndexRef.current === structure.definitionIndex
+              ? 0x67e8f9
+              : 0xffffff;
         });
       });
     };

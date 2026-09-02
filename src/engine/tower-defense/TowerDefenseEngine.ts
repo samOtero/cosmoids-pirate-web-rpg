@@ -20,8 +20,11 @@ import {
   TDCreatureMetadata,
   TowerTargetingMode,
   TDLevelData,
+  TDObjectiveAllyDefinition,
   TDResonantEvolutionConfig,
   TDWaveEnemyDefinition,
+  ObjectiveAlly,
+  DestroyedStructureVisual,
 } from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
 import { startDamageFlash } from './damageFlash';
@@ -190,6 +193,9 @@ export class TowerDefenseEngine {
   public projectiles: Projectile[] = [];
   public visualEffects: VisualEffect[] = [];
   public floatingTexts: FloatingText[] = [];
+  public objectiveAllies: ObjectiveAlly[] = [];
+  public destroyedStructureVisuals: DestroyedStructureVisual[] = [];
+  public focusedStructureId: string | null = null;
 
   public money: number = 100;
   public lives: number = 3;
@@ -310,6 +316,28 @@ export class TowerDefenseEngine {
     this.disableCapture = levelData.disableCapture ?? false;
     this.resonantEvolution = levelData.resonantEvolution;
     this.backgroundScale = Math.max(1, levelData.backgroundScale ?? 1);
+
+    this.objectiveAllies = (levelData.objectiveAllies ?? []).map(
+      (ally: TDObjectiveAllyDefinition) => ({
+        id: `objective_ally_${ally.id}`,
+        definitionId: ally.creatureId,
+        tdConfigId: ally.creatureId,
+        displayName: ally.displayName,
+        gateDefinitionId: ally.gateDefinitionId,
+        targetStructureDefinitionId: ally.targetStructureDefinitionId,
+        position: { ...ally.lockedPosition },
+        facingDirection: 'down',
+        hp: 1,
+        maxHp: 1,
+        phase: 'locked',
+        path: ally.releasePath.map((point) => ({ ...point })),
+        currentWaypointIndex: 0,
+        moveSpeed: ally.moveSpeed,
+        behavior: structuredClone(ally.behavior),
+        phaseStartedAtMs: 0,
+        impactCount: 0,
+      })
+    );
 
     if (levelData.environmentUnits) {
       this.environmentUnits = levelData.environmentUnits.map((eu, index) => ({
@@ -941,6 +969,8 @@ export class TowerDefenseEngine {
       }
     });
 
+    this.processObjectiveAllies(newEnemies, deltaMs);
+
     // Filter dead enemies and collect money
     const deadEnemies = newEnemies.filter((e) => e.hp <= 0);
     if (deadEnemies.length > 0) {
@@ -1507,9 +1537,16 @@ export class TowerDefenseEngine {
         structure?.immuneToStatusEffects ?? Boolean(structure),
       moneyReward: structure?.moneyReward,
       winsLevelOnDestroy: structure?.winsLevelOnDestroy,
+      structureRole: structure?.role,
+      structureVisualStyle: structure?.visualStyle,
+      structureVisualLayout: structure?.visualLayout
+        ? structuredClone(structure.visualLayout)
+        : undefined,
       waveEnemyDefinitionId,
       level: enemyLevel,
-      position: { x: startPath[0].x, y: startPath[0].y },
+      position: structure?.position
+        ? { ...structure.position }
+        : { x: startPath[0].x, y: startPath[0].y },
       hp: enemyHp,
       maxHp: enemyHp,
       speed: structure
@@ -2167,6 +2204,14 @@ export class TowerDefenseEngine {
 
     if (enemiesInRange.length === 0) return null;
 
+    const focusedStructure = this.focusedStructureId
+      ? enemiesInRange.find(
+          ({ enemy }) =>
+            enemy.id === this.focusedStructureId && enemy.kind === 'structure'
+        )?.enemy
+      : undefined;
+    if (focusedStructure) return focusedStructure;
+
     // Active creature threats take precedence. The stationary objective is a
     // fallback target whenever no moving enemy is in this tower's range.
     const creatureTargets = enemiesInRange.filter(
@@ -2271,14 +2316,7 @@ export class TowerDefenseEngine {
     const participantTowerIds = Array.from(target.damagedByTowerIds);
 
     if (target.kind === 'structure') {
-      const winsLevel = target.winsLevelOnDestroy === true;
-      if (winsLevel) this.hasDestroyedVictoryStructure = true;
-      this.events.emit({
-        type: 'STRUCTURE_DESTROYED',
-        structureId: target.definitionId,
-        participantTowerIds,
-        winsLevel,
-      });
+      this.handleStructureDestroyed(target, participantTowerIds);
       return;
     }
 
@@ -2289,6 +2327,188 @@ export class TowerDefenseEngine {
       enemyLevel: target.level,
       participantTowerIds,
     });
+  }
+
+  public toggleFocusedStructure(structureId: string): void {
+    const target = this.enemies.find(
+      (enemy) =>
+        enemy.id === structureId && enemy.kind === 'structure' && enemy.hp > 0
+    );
+    if (!target) return;
+    this.focusedStructureId =
+      this.focusedStructureId === structureId ? null : structureId;
+  }
+
+  private handleStructureDestroyed(
+    target: Enemy,
+    participantTowerIds: string[]
+  ): void {
+    const winsLevel = target.winsLevelOnDestroy === true;
+    if (winsLevel) this.hasDestroyedVictoryStructure = true;
+    if (this.focusedStructureId === target.id) this.focusedStructureId = null;
+
+    this.destroyedStructureVisuals.push({
+      id: `destroyed_${target.id}`,
+      tdConfigId: target.tdConfigId,
+      position: { ...target.position },
+      visualStyle: target.structureVisualStyle,
+      visualLayout: target.structureVisualLayout
+        ? structuredClone(target.structureVisualLayout)
+        : undefined,
+      destroyedAtMs: this.elapsedTimeMs,
+    });
+
+    const releasedAlly = this.objectiveAllies.find(
+      (ally) =>
+        ally.gateDefinitionId === target.definitionId && ally.phase === 'locked'
+    );
+    if (releasedAlly) {
+      releasedAlly.phase = 'traveling';
+      releasedAlly.phaseStartedAtMs = this.elapsedTimeMs;
+      releasedAlly.currentWaypointIndex = 0;
+      this.floatingTexts.push({
+        id: `ft_freed_${releasedAlly.id}`,
+        text: `${releasedAlly.displayName.toUpperCase()} FREED!`,
+        position: { ...releasedAlly.position },
+        color: 0x5eead4,
+        scale: 1.25,
+        durationMs: 1800,
+        elapsedMs: 0,
+      });
+    }
+
+    this.events.emit({
+      type: 'STRUCTURE_DESTROYED',
+      structureId: target.definitionId,
+      participantTowerIds,
+      winsLevel,
+    });
+  }
+
+  private moveObjectiveAllyTowards(
+    ally: ObjectiveAlly,
+    target: Point,
+    speed: number,
+    deltaMs: number
+  ): boolean {
+    const dx = target.x - ally.position.x;
+    const dy = target.y - ally.position.y;
+    const frameDistance = speed * (deltaMs / 1000);
+    const isHorizontal = Math.abs(dx) > Math.abs(dy);
+
+    if (isHorizontal) {
+      if (Math.abs(dx) <= frameDistance) {
+        ally.position = { ...target };
+        return true;
+      }
+      ally.position.x += Math.sign(dx) * frameDistance;
+      ally.facingDirection = dx > 0 ? 'right' : 'left';
+      return false;
+    }
+
+    const verticalDistance = frameDistance * this.aspectRatio;
+    if (Math.abs(dy) <= verticalDistance) {
+      ally.position = { ...target };
+      return true;
+    }
+    ally.position.y += Math.sign(dy) * verticalDistance;
+    ally.facingDirection = dy > 0 ? 'down' : 'up';
+    return false;
+  }
+
+  private processObjectiveAllies(enemies: Enemy[], deltaMs: number): void {
+    for (const ally of this.objectiveAllies) {
+      if (ally.phase === 'locked') continue;
+
+      if (ally.phase === 'traveling') {
+        const waypoint = ally.path[ally.currentWaypointIndex];
+        if (!waypoint) {
+          ally.phase = 'bowing';
+          ally.phaseStartedAtMs = this.elapsedTimeMs;
+          continue;
+        }
+        if (
+          this.moveObjectiveAllyTowards(ally, waypoint, ally.moveSpeed, deltaMs)
+        ) {
+          ally.currentWaypointIndex++;
+        }
+        continue;
+      }
+
+      const targetStructure = enemies.find(
+        (enemy) =>
+          enemy.definitionId === ally.targetStructureDefinitionId &&
+          enemy.kind === 'structure' &&
+          enemy.hp > 0
+      );
+      if (!targetStructure) continue;
+
+      const elapsedInPhase = this.elapsedTimeMs - ally.phaseStartedAtMs;
+      if (ally.phase === 'bowing') {
+        ally.facingDirection = 'right';
+        if (elapsedInPhase >= ally.behavior.bowDurationMs) {
+          ally.phase = 'retreating';
+          ally.phaseStartedAtMs = this.elapsedTimeMs;
+        }
+      } else if (ally.phase === 'retreating') {
+        if (
+          this.moveObjectiveAllyTowards(
+            ally,
+            ally.behavior.chargeStart,
+            ally.moveSpeed,
+            deltaMs
+          )
+        ) {
+          ally.phase = 'windup';
+          ally.phaseStartedAtMs = this.elapsedTimeMs;
+          ally.facingDirection = 'right';
+        }
+      } else if (ally.phase === 'windup') {
+        ally.facingDirection = 'right';
+        if (elapsedInPhase >= ally.behavior.windupDurationMs) {
+          ally.phase = 'charging';
+          ally.phaseStartedAtMs = this.elapsedTimeMs;
+        }
+      } else if (ally.phase === 'charging') {
+        if (
+          this.moveObjectiveAllyTowards(
+            ally,
+            ally.behavior.strikePosition,
+            ally.behavior.chargeSpeed,
+            deltaMs
+          )
+        ) {
+          const damage = Math.min(ally.behavior.damage, targetStructure.hp);
+          targetStructure.hp -= damage;
+          startDamageFlash(targetStructure, ElementType.FIRE);
+          ally.impactCount++;
+          this.floatingTexts.push({
+            id: `ft_bramfrit_${this.elapsedTimeMs}_${ally.impactCount}`,
+            text: Math.ceil(damage).toString(),
+            position: { ...targetStructure.position },
+            color: 0xfb923c,
+            scale: 1.35,
+            durationMs: 1000,
+            elapsedMs: 0,
+          });
+          if (targetStructure.hp <= 0 && !targetStructure.defeatEventEmitted) {
+            targetStructure.defeatEventEmitted = true;
+            this.handleStructureDestroyed(
+              targetStructure,
+              Array.from(targetStructure.damagedByTowerIds)
+            );
+          }
+          ally.phase = 'recovering';
+          ally.phaseStartedAtMs = this.elapsedTimeMs;
+        }
+      } else if (
+        ally.phase === 'recovering' &&
+        elapsedInPhase >= ally.behavior.recoveryDurationMs
+      ) {
+        ally.phase = 'bowing';
+        ally.phaseStartedAtMs = this.elapsedTimeMs;
+      }
+    }
   }
 
   /**

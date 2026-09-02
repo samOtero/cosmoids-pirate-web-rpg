@@ -15,9 +15,12 @@ import { TD_BASE_HEIGHT } from '@/constants/game';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import {
   BaseTDUnit,
+  DestroyedStructureVisual,
   Enemy,
+  ObjectiveAlly,
   TDInitialView,
   TDOpeningPan,
+  TDStructureSpriteLayout,
 } from '@/engine/tower-defense/types';
 import { interpolateKeyframes } from '@/utils/animationUtils';
 import {
@@ -28,6 +31,10 @@ import { applyTDUnitTransforms } from '@/utils/tdUnitVisuals';
 import { getCaptureUnitVisualState } from '@/utils/captureUnitVisualState';
 import { getTDRangePreviewRadius } from '@/utils/tdAttackRangePreview';
 import { buildTDOffscreenIndicators } from '@/utils/tdOffscreenIndicators';
+import {
+  PRISON_GATE_TEXTURES,
+  resolvePrisonGateVisualLayout,
+} from '@/utils/tdStructureVisuals';
 import { drawRallyHowlRings, updateRallyIndicator } from './rallyHowlVisuals';
 import {
   drawSparkImpact,
@@ -59,14 +66,18 @@ export function renderHealthBar(
   unit: BaseTDUnit,
   container: PIXI.Container,
   configId: string,
-  hideWhenFull: boolean = false
+  hideWhenFull: boolean = false,
+  offsetYOverride?: number
 ) {
   const tdConfigMap = CREATURE_TD_CONFIGS[configId] || {
     default: { scale: 1 },
   };
   const tdConfig = tdConfigMap[unit.facingDirection] || tdConfigMap.default;
   const hpOffsetY =
-    tdConfig.healthBarOffsetY ?? tdConfigMap.default?.healthBarOffsetY ?? -40; // Default offset
+    offsetYOverride ??
+    tdConfig.healthBarOffsetY ??
+    tdConfigMap.default?.healthBarOffsetY ??
+    -40; // Default offset
 
   let hpBg = container.getChildByLabel('hpBg') as PIXI.Graphics | undefined;
   let hpFg = container.getChildByLabel('hpFg') as PIXI.Graphics | undefined;
@@ -1481,11 +1492,136 @@ const TYPE_COLORS: Record<ElementType, number> = {
   [ElementType.FLYING]: 0x38bdf8,
 };
 
-function updateStructureLabel(container: PIXI.Container, enemy: Enemy) {
-  const previousTarget = container.getChildByLabel('structureTarget');
-  if (previousTarget) {
-    container.removeChild(previousTarget);
-    previousTarget.destroy();
+type UrlTrackedSprite = PIXI.Sprite & { currentUrl?: string };
+
+function updatePrisonGateTexture(
+  sprite: UrlTrackedSprite,
+  url: string,
+  layout: TDStructureSpriteLayout
+) {
+  if (sprite.currentUrl !== url) {
+    sprite.currentUrl = url;
+    void PIXI.Assets.load(url).then((texture) => {
+      if (sprite.currentUrl === url) sprite.texture = texture as PIXI.Texture;
+    });
+  }
+
+  // All four PNGs share a common canvas so their silhouettes stay registered.
+  sprite.anchor.set(0.5);
+  sprite.position.set(layout.offsetX, layout.offsetY);
+  sprite.width = layout.width;
+  sprite.height = layout.height;
+  sprite.rotation = ((layout.rotationDegrees ?? 0) * Math.PI) / 180;
+  sprite.skew.set(
+    ((layout.skewXDegrees ?? 0) * Math.PI) / 180,
+    ((layout.skewYDegrees ?? 0) * Math.PI) / 180
+  );
+}
+
+function updatePrisonGateVisual(container: PIXI.Container, enemy: Enemy) {
+  let gate = container.getChildByLabel('prisonGate') as
+    | UrlTrackedSprite
+    | undefined;
+  if (!gate) {
+    gate = new PIXI.Sprite() as UrlTrackedSprite;
+    gate.label = 'prisonGate';
+    container.addChild(gate);
+  }
+
+  const hpRatio = enemy.maxHp > 0 ? enemy.hp / enemy.maxHp : 0;
+  const textureUrl =
+    hpRatio <= 0.33
+      ? PRISON_GATE_TEXTURES.critical
+      : hpRatio <= 0.66
+        ? PRISON_GATE_TEXTURES.damaged
+        : PRISON_GATE_TEXTURES.intact;
+  const layout = resolvePrisonGateVisualLayout(enemy.structureVisualLayout);
+  updatePrisonGateTexture(gate, textureUrl, layout.standing);
+
+  if ((enemy.damageFlashTimerMs ?? 0) > 0) gate.alpha = 0.55;
+  else gate.alpha = 1;
+}
+
+function updateDestroyedPrisonGate(
+  sprite: UrlTrackedSprite,
+  remnant: DestroyedStructureVisual,
+  elapsedTimeMs: number
+) {
+  const layout = resolvePrisonGateVisualLayout(remnant.visualLayout);
+  updatePrisonGateTexture(sprite, PRISON_GATE_TEXTURES.rubble, layout.rubble);
+  const ageMs = Math.max(0, elapsedTimeMs - remnant.destroyedAtMs);
+  sprite.alpha = Math.min(1, ageMs / 180);
+}
+
+function updateObjectiveAllyVisual(
+  container: PIXI.Container,
+  ally: ObjectiveAlly,
+  elapsedTimeMs: number
+) {
+  const sprite = container.getChildByLabel('objectiveAllySprite') as
+    | PIXI.Sprite
+    | undefined;
+  const marker = container.getChildByLabel('objectiveAllyMarker') as
+    | PIXI.Graphics
+    | undefined;
+  const action = container.getChildByLabel('objectiveAllyAction') as
+    | PIXI.Graphics
+    | undefined;
+  if (!sprite || !marker || !action) return;
+
+  marker.clear();
+  action.clear();
+  sprite.rotation = 0;
+
+  if (ally.phase !== 'locked') {
+    marker.ellipse(0, 7, 34, 13);
+    marker.fill({ color: 0x14b8a6, alpha: 0.16 });
+    marker.stroke({ color: 0x5eead4, width: 3, alpha: 0.9 });
+  }
+
+  const phaseTime = elapsedTimeMs - ally.phaseStartedAtMs;
+  if (ally.phase === 'bowing') {
+    sprite.rotation = Math.sin(Math.min(1, phaseTime / 325) * Math.PI) * 0.08;
+  } else if (ally.phase === 'windup') {
+    const pulse = 1 + 0.15 * Math.sin(phaseTime / 70);
+    action.circle(-1, -4, 26 * pulse);
+    action.stroke({ color: 0xfb923c, width: 4, alpha: 0.75 });
+    sprite.x += Math.sin(phaseTime / 35) * 2;
+  } else if (ally.phase === 'charging') {
+    for (const y of [-22, -9, 4]) {
+      action.moveTo(-72, y);
+      action.lineTo(-30, y + 5);
+      action.stroke({ color: 0xfbbf24, width: 4, alpha: 0.75 });
+    }
+  }
+}
+
+function updateStructureLabel(
+  container: PIXI.Container,
+  enemy: Enemy,
+  isFocused: boolean
+) {
+  let target = container.getChildByLabel('structureTarget') as
+    | PIXI.Graphics
+    | undefined;
+  if (!target) {
+    target = new PIXI.Graphics();
+    target.label = 'structureTarget';
+    container.addChild(target);
+  }
+  target.clear();
+  if (isFocused) {
+    const isPrisonGate = enemy.structureVisualStyle === 'prison-gate';
+    const layout = resolvePrisonGateVisualLayout(enemy.structureVisualLayout);
+    const standing = layout.standing;
+    target.roundRect(
+      isPrisonGate ? standing.offsetX - standing.width / 2 - 4 : -52,
+      isPrisonGate ? standing.offsetY - standing.height / 2 - 4 : -101,
+      isPrisonGate ? standing.width + 8 : 104,
+      isPrisonGate ? standing.height + 8 : 113,
+      12
+    );
+    target.stroke({ color: 0xfacc15, width: 4, alpha: 0.95 });
   }
   let label = container.getChildByLabel('structureLabel') as
     | PIXI.Text
@@ -1503,11 +1639,22 @@ function updateStructureLabel(container: PIXI.Container, enemy: Enemy) {
     });
     label.label = 'structureLabel';
     label.anchor.set(0.5);
-    label.position.set(0, -82);
     container.addChild(label);
   }
 
+  const prisonGateLayout = resolvePrisonGateVisualLayout(
+    enemy.structureVisualLayout
+  );
+  label.position.set(
+    enemy.structureVisualStyle === 'prison-gate'
+      ? prisonGateLayout.standing.offsetX
+      : 0,
+    enemy.structureVisualStyle === 'prison-gate'
+      ? prisonGateLayout.labelOffsetY
+      : -82
+  );
   label.text = `${enemy.displayName ?? 'STRUCTURE'}  •  STEEL`;
+  label.style.fill = isFocused ? 0xfde047 : 0xe2e8f0;
 }
 
 interface PixiBattlefieldProps {
@@ -1515,6 +1662,7 @@ interface PixiBattlefieldProps {
   onMapDrop: (defId: string, x: number, y: number) => void;
   onMapRemove: (defId: string) => void;
   onEnemyCaptured?: (enemyId: string) => void;
+  onStructureFocused?: (structureId: string) => void;
   onDragStateChange?: (isDragging: boolean) => void;
   getDragState?: () => 'tower' | 'capture' | false;
   backgroundUrl?: string;
@@ -1548,6 +1696,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
       onMapDrop,
       onMapRemove,
       onEnemyCaptured,
+      onStructureFocused,
       onDragStateChange,
       getDragState,
       backgroundUrl,
@@ -1564,6 +1713,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
     const onMapDropRef = useRef(onMapDrop);
     const onMapRemoveRef = useRef(onMapRemove);
     const onEnemyCapturedRef = useRef(onEnemyCaptured);
+    const onStructureFocusedRef = useRef(onStructureFocused);
     const onDragStateChangeRef = useRef(onDragStateChange);
     const onOpeningPanCompleteRef = useRef(onOpeningPanComplete);
     const getDragStateRef = useRef(getDragState);
@@ -1707,6 +1857,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
     }, [onEnemyCaptured]);
 
     useEffect(() => {
+      onStructureFocusedRef.current = onStructureFocused;
+    }, [onStructureFocused]);
+
+    useEffect(() => {
       onOpeningPanCompleteRef.current = onOpeningPanComplete;
     }, [onOpeningPanComplete]);
 
@@ -1846,6 +2000,23 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         // --- Scroll drag on background ---
         if (scale > 1) {
           bgSprite.on('pointerdown', (e: PIXI.FederatedPointerEvent) => {
+            if (bgBounds.width > 0 && bgBounds.height > 0) {
+              const worldX = ((e.global.x - bgBounds.x) / bgBounds.width) * 100;
+              const worldY =
+                ((e.global.y - bgBounds.y) / bgBounds.height) * 100;
+              const clickedStructure = engine.enemies.find(
+                (enemy) =>
+                  enemy.kind === 'structure' &&
+                  enemy.hp > 0 &&
+                  Math.abs(enemy.position.x - worldX) <= 5 &&
+                  Math.abs(enemy.position.y - worldY) <= 8
+              );
+              if (clickedStructure) {
+                onStructureFocusedRef.current?.(clickedStructure.id);
+                return;
+              }
+            }
+
             // Only start scroll if not dragging a tower or capture device
             if (
               isOpeningPanActiveRef.current ||
@@ -1867,6 +2038,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         const towerSprites = new Map<string, PIXI.Container>();
         const enemySprites = new Map<string, PIXI.Container>();
         const environmentUnitSprites = new Map<string, PIXI.Container>();
+        const objectiveAllySprites = new Map<string, PIXI.Container>();
+        const destroyedStructureSprites = new Map<string, PIXI.Container>();
         const captureUnitSprites = new Map<string, PIXI.Container>();
         const projectileSprites = new Map<string, PIXI.Container>();
         const vfxSprites = new Map<string, PIXI.Container>();
@@ -2084,6 +2257,102 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               envUnit.tdConfigId,
               true /* hideWhenFull */
             );
+          }
+
+          // --- Render objective allies (captives and released helpers) ---
+          const currentObjectiveAllyIds = new Set(
+            engine.objectiveAllies.map((ally) => ally.id)
+          );
+          for (const [id, container] of objectiveAllySprites) {
+            if (!currentObjectiveAllyIds.has(id)) {
+              app.stage.removeChild(container);
+              container.destroy({ children: true });
+              objectiveAllySprites.delete(id);
+            }
+          }
+
+          for (const ally of engine.objectiveAllies) {
+            let container = objectiveAllySprites.get(ally.id);
+            if (!container) {
+              container = new PIXI.Container();
+              container.eventMode = 'none';
+
+              const marker = new PIXI.Graphics();
+              marker.label = 'objectiveAllyMarker';
+              container.addChild(marker);
+
+              const shadow = new PIXI.Graphics();
+              shadow.label = 'shadow';
+              container.addChild(shadow);
+
+              const sprite = new PIXI.Sprite();
+              sprite.label = 'objectiveAllySprite';
+              sprite.anchor.set(0.5);
+              container.addChild(sprite);
+
+              const action = new PIXI.Graphics();
+              action.label = 'objectiveAllyAction';
+              container.addChild(action);
+
+              app.stage.addChild(container);
+              objectiveAllySprites.set(ally.id, container);
+            }
+
+            container.x = offsetX + (ally.position.x / 100) * screenW;
+            container.y = offsetY + (ally.position.y / 100) * screenH;
+            const responsiveScale = app.screen.height / TD_BASE_HEIGHT;
+            container.scale.set(zoom * responsiveScale);
+
+            const sprite = container.getChildByLabel(
+              'objectiveAllySprite'
+            ) as PIXI.Sprite;
+            const shadow = container.getChildByLabel('shadow') as PIXI.Graphics;
+            applyTDUnitTransforms(
+              ally,
+              sprite,
+              shadow,
+              ally.tdConfigId,
+              TD_CREATURE_DEFS[ally.definitionId]?.baseCreature.battleSpriteUrl,
+              (texture) => {
+                if (!isDestroyed) sprite.texture = texture;
+              }
+            );
+            updateObjectiveAllyVisual(container, ally, engine.elapsedTimeMs);
+          }
+
+          // Persistent rubble is separate from dead targetable structures.
+          const currentRemnantIds = new Set(
+            engine.destroyedStructureVisuals
+              .filter((remnant) => remnant.visualStyle === 'prison-gate')
+              .map((remnant) => remnant.id)
+          );
+          for (const [id, container] of destroyedStructureSprites) {
+            if (!currentRemnantIds.has(id)) {
+              app.stage.removeChild(container);
+              container.destroy({ children: true });
+              destroyedStructureSprites.delete(id);
+            }
+          }
+          for (const remnant of engine.destroyedStructureVisuals) {
+            if (remnant.visualStyle !== 'prison-gate') continue;
+            let container = destroyedStructureSprites.get(remnant.id);
+            if (!container) {
+              container = new PIXI.Container();
+              container.eventMode = 'none';
+              const sprite = new PIXI.Sprite() as UrlTrackedSprite;
+              sprite.label = 'destroyedPrisonGate';
+              container.addChild(sprite);
+              app.stage.addChild(container);
+              destroyedStructureSprites.set(remnant.id, container);
+            }
+            container.x = offsetX + (remnant.position.x / 100) * screenW;
+            container.y = offsetY + (remnant.position.y / 100) * screenH;
+            const responsiveScale = app.screen.height / TD_BASE_HEIGHT;
+            container.scale.set(zoom * responsiveScale);
+            const sprite = container.getChildByLabel(
+              'destroyedPrisonGate'
+            ) as UrlTrackedSprite;
+            updateDestroyedPrisonGate(sprite, remnant, engine.elapsedTimeMs);
           }
 
           // --- Render Capture Units ---
@@ -2588,6 +2857,36 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             if (!container) {
               container = new PIXI.Container();
 
+              if (enemy.kind === 'structure') {
+                container.eventMode = 'static';
+                container.cursor = 'pointer';
+                if (enemy.structureVisualStyle === 'prison-gate') {
+                  const layout = resolvePrisonGateVisualLayout(
+                    enemy.structureVisualLayout
+                  );
+                  const standing = layout.standing;
+                  const top = Math.min(
+                    standing.offsetY - standing.height / 2,
+                    layout.labelOffsetY
+                  );
+                  container.hitArea = new PIXI.Rectangle(
+                    standing.offsetX - standing.width / 2 - 8,
+                    top - 16,
+                    standing.width + 16,
+                    standing.offsetY + standing.height / 2 - top + 32
+                  );
+                } else {
+                  container.hitArea = new PIXI.Rectangle(-58, -112, 116, 130);
+                }
+                container.on(
+                  'pointerdown',
+                  (event: PIXI.FederatedPointerEvent) => {
+                    event.stopPropagation();
+                    onStructureFocusedRef.current?.(enemy.id);
+                  }
+                );
+              }
+
               const shadow = new PIXI.Graphics();
               shadow.label = 'shadow';
               container.addChild(shadow);
@@ -2616,7 +2915,14 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             if (enemy.kind === 'structure') {
               if (esprite) esprite.visible = false;
               if (shadow) shadow.visible = false;
-              updateStructureLabel(container, enemy);
+              if (enemy.structureVisualStyle === 'prison-gate') {
+                updatePrisonGateVisual(container, enemy);
+              }
+              updateStructureLabel(
+                container,
+                enemy,
+                engine.focusedStructureId === enemy.id
+              );
             } else if (esprite && shadow) {
               esprite.visible = true;
               shadow.visible = true;
@@ -2637,7 +2943,13 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             renderHealthBar(
               enemy,
               container,
-              enemy.tdConfigId ?? enemy.definitionId
+              enemy.tdConfigId ?? enemy.definitionId,
+              false,
+              enemy.kind === 'structure' &&
+                enemy.structureVisualStyle === 'prison-gate'
+                ? resolvePrisonGateVisualLayout(enemy.structureVisualLayout)
+                    .healthBarOffsetY
+                : undefined
             );
             if (enemy.kind !== 'structure') {
               updateSparkles(container, enemy, app.ticker.deltaTime);
