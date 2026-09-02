@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "id": "marophis",
+  "name": "Marophis",
+  "element": "POISON",
+  "secondaryElement": "WATER",
+  "addedAt": "2026-09-01",
+  "sourceImage": "marophis-concept.png",
+  "baseStats": {
+    "hp": 64,
+    "attack": 46,
+    "defense": 50,
+    "specialAttack": 74,
+    "specialDefense": 82,
+    "speed": 40
+  },
+  "baseExperience": 74,
+  "movementId": "lizard",
+  "learnableAttacks": [
+    {
+      "level": 1,
+      "attackId": "NIBBLE"
+    },
+    {
+      "level": 4,
+      "attackId": "WATER_GUN"
+    },
+    {
+      "level": 7,
+      "attackId": "BUBBLE_BEAM"
+    }
+  ],
+  "assets": {
+    "icon": {
+      "url": "/UI/Icons/marophis_icon.png",
+      "width": 160,
+      "height": 160
+    },
+    "left": {
+      "url": "/battles/cosmoids/marophis_left.png",
+      "width": 420,
+      "height": 220
+    },
+    "up": {
+      "url": "/battles/cosmoids/marophis_up.png",
+      "width": 220,
+      "height": 300
+    },
+    "down": {
+      "url": "/battles/cosmoids/marophis_down.png",
+      "width": 220,
+      "height": 300
+    }
+  },
+  "storyPlacement": {
+    "context": "LEVEL_5",
+    "capturePolicy": "capturable",
+    "waves": [
+      {
+        "waveId": "level_5_placeholder_wave",
+        "count": 1,
+        "level": 8
+      }
+    ]
+  }
+}

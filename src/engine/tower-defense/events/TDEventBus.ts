@@ -22,6 +22,12 @@ export type TDEvent =
       participantTowerIds: string[];
     }
   | {
+      type: 'STRUCTURE_DESTROYED';
+      structureId: string;
+      participantTowerIds: string[];
+      winsLevel: boolean;
+    }
+  | {
       type: 'ENEMY_CAPTURED';
       enemyId: string;
       enemyDefinitionId: string;

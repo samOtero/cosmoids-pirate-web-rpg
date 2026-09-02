@@ -1,6 +1,6 @@
 ---
 name: explore-cosmoid-directions
-description: Explore six distinct, high-level creative directions for a future Cosmoid from a required creature anchor and theme, character, relationship, institution, emotional arc, story premise, or other narrative context. Use before detailed creature design when the user wants to discover what the creature should mean, compare symbolic or thematic interpretations, combine promising directions, or turn a character-inspired idea into an original creature-design brief. Do not generate finished Cosmoid concepts or images; after the user selects a direction and typing, hand the brief to design-cosmoid-concepts.
+description: Explore six distinct, high-level creative directions for a future Cosmoid from a required creature anchor and theme, character, relationship, institution, emotional arc, story premise, or other narrative context. Present the first slate as fast one-sentence pitches, then explain only the ideas the user wants to inspect. Use before detailed creature design when the user wants to discover what the creature should mean, compare symbolic or thematic interpretations, combine promising directions, or turn a character-inspired idea into an original creature-design brief. Do not generate finished Cosmoid concepts or images; after the user selects a direction and typing, hand the brief to design-cosmoid-concepts.
 ---
 
 # Explore Cosmoid Directions
@@ -47,7 +47,7 @@ Make every direction preserve the creature anchor and answer a different themati
 - tone, such as sincere, comic, tragic, uncanny, or aspirational;
 - likely battle role or type expression.
 
-For each direction, use these exact fields:
+Before answering, prepare a compact support record for every direction using these fields. Retain this information in working context, but do not show it in the first response:
 
 - **Direction:** A short evocative title that describes the idea, not a creature name.
 - **Concept Logic:** A compact chain in the form `theme fact + creature meaning + metaphor or mechanism -> original creature premise`.
@@ -55,6 +55,8 @@ For each direction, use these exact fields:
 - **Creature Expression:** Two or three sentences describing how anatomy, behavior, ecology, material, movement, or evolution could express the idea without locking a final design.
 - **Type Opportunities:** One to three plausible single or dual typings with one short reason each. Treat them as options unless the user already supplied an exact type.
 - **Design Risk:** The main cliché, over-literal reading, franchise resemblance, or visual trap to avoid.
+
+The visible first-response pitch must compress the most important parts of that record into one natural sentence. It should tell the user both what the creature is about and what makes the premise interesting; do not merely state a motif, visual feature, or source reference.
 
 Keep every chain causal. A reference that only changes palette, markings, costume, or accessories is not a direction. Translate institutions and occupations into ecology and behavior; translate objects into anatomy, material, growth, secretions, or locomotion. Preserve emotional meaning through the transformation.
 
@@ -70,19 +72,44 @@ Use the user's mop-dog example as a reasoning pattern: `naval association + form
 
 ## Format the slate
 
-Begin with a compact **Core Tension** statement of no more than two sentences. Then number the six directions `1` through `6` and use the exact fields above.
+Optimize the first response for rapid scanning:
+
+- Begin with an optional **Core Tension** statement of no more than one sentence; omit it when it would only repeat the request.
+- Number the directions `1` through `6`.
+- Give each direction exactly one self-contained pitch sentence, normally 20 to 45 words.
+- A short evocative bold label may precede the sentence, but the user must not need the label to understand the pitch.
+- Include the creature premise, its defining mechanism or behavior, and the interesting tension or consequence in that sentence.
+- If exact typing was supplied, keep it implicit unless mentioning it materially clarifies the hook.
+- Do not show the support-record fields, research explanation, design risks, or type analysis until requested.
+- When factual citations are needed, attach a compact link without interrupting the sentence's readability; do not add a research essay beneath the slate.
 
 Do not rank the directions or silently choose a winner. End with:
 
 ```text
-Choose a direction, combine two, or ask to replace or shift any of them. Once the creative spine and typing are set, I can pass it into detailed Cosmoid design.
+Pick a number for the full explanation, combine two, or tell me what to replace.
 ```
+
+## Explain a direction on request
+
+Treat the latest numbered slate and its prepared support records as task state. When the user asks why a pitch works, requests details, or says `Explain 3`, expand only the requested direction unless they explicitly ask to compare several. Use the prepared facts and causal logic rather than inventing a different premise after selection.
+
+For an explanation, show:
+
+- **Pitch:** The original one-sentence pitch.
+- **Concept Logic:** The causal chain behind it.
+- **What Makes It Interesting:** The emotional, narrative, ecological, or gameplay payoff.
+- **Creature Expression:** The most promising anatomy, behavior, ecology, material, movement, or evolution territories without finalizing a design.
+- **Type Expression:** How the supplied or prospective typing supports the idea without overwhelming it.
+- **Design Risk:** The main trap to avoid.
+
+Keep this explanation concise and scoped to the requested number. Asking for an explanation does not mean the user has selected that direction for development.
 
 ## Develop the selected direction
 
 Treat the latest numbered slate as task state.
 
-- `Develop 3`: deepen only direction 3 into a handoff brief.
+- `Explain 3`: reveal the prepared reasoning for direction 3 without treating it as selected.
+- `Develop 3`: treat direction 3 as selected and deepen it into a handoff brief.
 - `Combine 2 + 5`: synthesize their strongest compatible meanings into one spine; do not merely list both.
 - `Replace 4: <feedback>`: replace only direction 4 and preserve the other numbers.
 - `Shift 1 toward <feedback>`: revise the thesis and consequences of direction 1 without prematurely finishing the design.

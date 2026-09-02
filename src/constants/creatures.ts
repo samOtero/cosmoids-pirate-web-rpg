@@ -257,6 +257,168 @@ export const TIGREVEL: CosmoidTemplate = {
   ],
 };
 
+export const BRAMFRIT: CosmoidTemplate = {
+  id: 'bramfrit',
+  name: 'Bramfrit',
+  type: ElementType.FIRE,
+  baseStats: {
+    hp: 76,
+    attack: 84,
+    defense: 74,
+    specialAttack: 48,
+    specialDefense: 58,
+    speed: 28,
+  },
+  baseExperience: 76,
+  iconImg: '/UI/Icons/bramfrit_icon.png',
+  journalImg: '/UI/Journal/bramfrit_journal.png',
+  journalEntry:
+    'A fiery spirit burns beneath its dense fleece. Before charging a wall, it bows, retreats exactly three paces, and waits as if expecting the obstacle to answer.',
+  spriteUrl: '/battles/cosmoids/bramfrit_down.png',
+  battleSpriteUrl: '/battles/cosmoids/bramfrit_left.png',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'TACKLE' },
+    { level: 4, attackId: 'EMBER' },
+  ],
+};
+
+export const SEPIPPET: CosmoidTemplate = {
+  id: 'sepippet',
+  name: 'Sepippet',
+  type: ElementType.DARK,
+  baseStats: {
+    hp: 52,
+    attack: 66,
+    defense: 48,
+    specialAttack: 72,
+    specialDefense: 70,
+    speed: 68,
+  },
+  baseExperience: 75,
+  iconImg: '/UI/Icons/sepippet_icon.png',
+  journalImg: '/UI/Journal/sepippet_journal.png',
+  journalEntry:
+    'Its mantle projects convincing silhouettes while its ribbonlike arms slip through narrow gaps. It often ruins the illusion by waving proudly before the trick is finished.',
+  spriteUrl: '/battles/cosmoids/sepippet_down.png',
+  battleSpriteUrl: '/battles/cosmoids/sepippet_left.png',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'TACKLE' },
+    { level: 4, attackId: 'QUICK_ATTACK' },
+  ],
+};
+
+export const PARLET: CosmoidTemplate = {
+  id: 'parlet',
+  name: 'Parlet',
+  type: ElementType.WATER,
+  baseStats: {
+    hp: 62,
+    attack: 44,
+    defense: 66,
+    specialAttack: 72,
+    specialDefense: 68,
+    speed: 46,
+  },
+  baseExperience: 72,
+  iconImg: '/UI/Icons/parlet_icon.png',
+  journalImg: '/UI/Journal/parlet_journal.png',
+  journalEntry:
+    'It rearranges the colors across its broad scales like a living palette. The moment it notices one imperfect patch, it starts the entire design again.',
+  spriteUrl: '/battles/cosmoids/parlet_down.png',
+  battleSpriteUrl: '/battles/cosmoids/parlet_left.png',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'TACKLE' },
+    { level: 4, attackId: 'WATER_GUN' },
+  ],
+};
+
+export const CORROGOON: CosmoidTemplate = {
+  id: 'corrogoon',
+  name: 'Corrogoon',
+  type: ElementType.POISON,
+  secondaryType: ElementType.GROUND,
+  baseStats: {
+    hp: 78,
+    attack: 72,
+    defense: 82,
+    specialAttack: 62,
+    specialDefense: 64,
+    speed: 24,
+  },
+  baseExperience: 78,
+  iconImg: '/UI/Icons/corrogoon_icon.png',
+  journalImg: '/UI/Journal/corrogoon_journal.png',
+  journalEntry:
+    'It gathers mineral grit with its shovel-like pedipalps, saturates it with acidic spray, and lashes the abrasive mixture from its tail fan.',
+  spriteUrl: '/battles/cosmoids/corrogoon_down.png',
+  battleSpriteUrl: '/battles/cosmoids/corrogoon_left.png',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'PINCH' },
+    { level: 4, attackId: 'TACKLE' },
+    { level: 7, attackId: 'NIBBLE' },
+  ],
+};
+
+export const BUFFLORA: CosmoidTemplate = {
+  id: 'bufflora',
+  name: 'Bufflora',
+  type: ElementType.POISON,
+  secondaryType: ElementType.GRASS,
+  baseStats: {
+    hp: 48,
+    attack: 52,
+    defense: 40,
+    specialAttack: 68,
+    specialDefense: 56,
+    speed: 76,
+  },
+  baseExperience: 70,
+  iconImg: '/UI/Icons/bufflora_icon.png',
+  journalImg: '/UI/Journal/bufflora_journal.png',
+  journalEntry:
+    'Nicknamed cave flowers, they sleep in damp caverns by day and emerge after dark to drink from blossoms. They especially favor poisonous species avoided by other pollinators.',
+  spriteUrl: '/battles/cosmoids/bufflora_down.png',
+  battleSpriteUrl: '/battles/cosmoids/bufflora_left.png',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'TACKLE' },
+    { level: 4, attackId: 'VINE_WHIP' },
+    { level: 7, attackId: 'WIND_GUST' },
+  ],
+};
+
+export const MAROPHIS: CosmoidTemplate = {
+  id: 'marophis',
+  name: 'Marophis',
+  type: ElementType.POISON,
+  secondaryType: ElementType.WATER,
+  baseStats: {
+    hp: 64,
+    attack: 46,
+    defense: 50,
+    specialAttack: 74,
+    specialDefense: 82,
+    speed: 40,
+  },
+  baseExperience: 74,
+  iconImg: '/UI/Icons/marophis_icon.png',
+  journalImg: '/UI/Journal/marophis_journal.png',
+  journalEntry:
+    'It waits deep underwater in a loose hook-shaped coil. A precise body feint startles prey toward its mouth while the colors across its crown slowly cool as its stored breath runs low.',
+  spriteUrl: '/battles/cosmoids/marophis_down.png',
+  battleSpriteUrl: '/battles/cosmoids/marophis_left.png',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'NIBBLE' },
+    { level: 4, attackId: 'WATER_GUN' },
+    { level: 7, attackId: 'BUBBLE_BEAM' },
+  ],
+};
+
 export const BETTLE: CosmoidTemplate = {
   id: 'bettle',
   name: 'Beetadel',
@@ -463,5 +625,11 @@ export const COSMOID_TEMPLATES: Record<string, CosmoidTemplate> = {
   [SONARION.id]: SONARION,
   [RESONARION.id]: RESONARION,
   [TIGREVEL.id]: TIGREVEL,
+  [BRAMFRIT.id]: BRAMFRIT,
+  [SEPIPPET.id]: SEPIPPET,
+  [PARLET.id]: PARLET,
+  [CORROGOON.id]: CORROGOON,
+  [BUFFLORA.id]: BUFFLORA,
+  [MAROPHIS.id]: MAROPHIS,
   [BETTLE.id]: BETTLE,
 };

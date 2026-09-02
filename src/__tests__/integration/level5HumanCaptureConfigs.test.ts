@@ -1,0 +1,135 @@
+import { describe, expect, it } from 'vitest';
+
+import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
+import { LEVEL_5 } from '@/constants/tdLevels/level5';
+import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
+
+describe('Level 5 human capture visuals', () => {
+  it('uses capture-specific configs for Caleb, Kip, and Mari', () => {
+    expect(LEVEL_5.environmentUnits).toBeUndefined();
+    expect(LEVEL_5.captureUnits?.map((unit) => unit.tdConfigId)).toEqual([
+      'caleb_capture',
+      'kip_capture',
+      'maribel_capture',
+    ]);
+
+    const engine = new TowerDefenseEngine(LEVEL_5);
+    expect(engine.hasCaptureUnitsGoal).toBe(true);
+    expect(engine.captureUnits).toHaveLength(3);
+    expect(engine.lives).toBe(3);
+    engine.destroy();
+  });
+
+  it('allows each patrol to pick up a child and retreat', () => {
+    const patrolGroups = LEVEL_5.waves.flatMap((wave) =>
+      wave.groups.filter(
+        (group) => group.enemyDefinitionId === 'level_5_placeholder_patrol'
+      )
+    );
+
+    expect(patrolGroups).toHaveLength(3);
+    expect(patrolGroups.every((group) => group.turnAroundAtEnd)).toBe(true);
+    expect(
+      LEVEL_5.waveEnemyDefinitions.find(
+        (definition) => definition.id === 'level_5_placeholder_patrol'
+      )?.canCarryCaptureUnits
+    ).not.toBe(false);
+
+    const engine = new TowerDefenseEngine({
+      ...LEVEL_5,
+      waveEnemyDefinitions: LEVEL_5.waveEnemyDefinitions.filter(
+        (definition) => definition.id === 'level_5_placeholder_patrol'
+      ),
+      waves: [
+        {
+          id: 'level_5_capture_test',
+          groups: patrolGroups.map((group) => ({
+            ...group,
+            spawnIntervalMs: 0,
+            delayBeforeGroupMs: 0,
+            concurrentWithPrevious: true,
+          })),
+        },
+      ],
+    });
+    const carriedConfigIds = new Set<string>();
+
+    for (let tick = 0; tick < 30 && carriedConfigIds.size < 3; tick++) {
+      engine.tick(tick * 1000, 1000);
+      engine.captureUnits.forEach((unit) => {
+        if (unit.heldByEnemyId) carriedConfigIds.add(unit.tdConfigId);
+      });
+    }
+
+    expect(carriedConfigIds).toEqual(
+      new Set(['caleb_capture', 'kip_capture', 'maribel_capture'])
+    );
+    expect(
+      engine.enemies.filter((enemy) => enemy.isMovingBackward)
+    ).toHaveLength(3);
+    engine.destroy();
+  });
+
+  it.each([
+    [
+      'caleb_capture',
+      '/battles/characters/caleb_battle.png',
+      '/battles/characters/caleb_carried_1.png',
+      '/battles/characters/caleb_left_1.png',
+      '/battles/characters/caleb_up_1.png',
+      '/battles/characters/caleb_down_1.png',
+    ],
+    [
+      'kip_capture',
+      '/battles/characters/kip_battle.png',
+      '/battles/characters/kip_carried_1.png',
+      '/battles/characters/kip_left_1.png',
+      '/battles/characters/kip_up_1.png',
+      '/battles/characters/kip_down_1.png',
+    ],
+  ] as const)(
+    '%s has distinct idle, carried, and directional states',
+    (configId, idleUrl, carriedUrl, leftUrl, upUrl, downUrl) => {
+      expect(CREATURE_TD_CONFIGS[configId]).toMatchObject({
+        default: { url: idleUrl },
+        idle: { url: idleUrl },
+        carried: {
+          url: carriedUrl,
+          offsetY: 0,
+          shadowScaleX: 0,
+          shadowScaleY: 0,
+        },
+        left: { url: leftUrl },
+        right: { url: leftUrl, flipX: true },
+        up: { url: upUrl },
+        down: { url: downUrl },
+      });
+    }
+  );
+
+  it('does not change the shared battle configs', () => {
+    expect(CREATURE_TD_CONFIGS.caleb_battle).toEqual({
+      default: {
+        url: '/battles/characters/caleb_battle.png',
+        scale: 0.68,
+        shadowScaleX: 3.05,
+        shadowOffsetY: -32,
+        offsetY: -95,
+        healthBarOffsetY: -5,
+        shadowScaleY: 0.7,
+      },
+    });
+    expect(CREATURE_TD_CONFIGS.kip_battle).toEqual({
+      default: {
+        url: '/battles/characters/kip_battle.png',
+        scale: 0.13,
+        shadowScaleX: 2.8,
+        shadowScaleY: 0.7,
+        shadowOffsetX: -3,
+        shadowOffsetY: -19,
+        offsetY: -87,
+        healthBarOffsetY: -5,
+      },
+    });
+  });
+});

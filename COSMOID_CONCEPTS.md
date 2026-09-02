@@ -2,7 +2,7 @@
 
 This document is the working reference for Cosmoid creature concepts currently under consideration. Details are exploratory unless they have already been implemented in the game; names, typings, lore, and evolution paths may change.
 
-Last consolidated: July 31, 2026
+Last consolidated: August 30, 2026
 
 ## Developed Concepts
 
@@ -81,6 +81,40 @@ Last consolidated: July 31, 2026
 ## Concept Backlog
 
 These are earlier-stage seeds and alternate directions that have not yet been consolidated into complete families.
+
+### Corrogoon — The Corrosive Excavator
+
+- **Typing:** Poison/Ground
+- **Core concept:** A vinegaroon-inspired prisoner whose acidic secretion carries corrosion-promoting microbes. It saturates loose grit with the secretion and lashes the abrasive slurry from its fan-shaped tail to help break Tigrevel's steel gate in Level 5.
+- **Name concept:** Corrosion or corrode + vinegaroon, connecting its animal basis to its metal-scouring behavior.
+- **Status:** Creature assets, Poison/Ground typing, registry entry, and manifest implemented; Level 5 captive-ally behavior remains planned.
+- **Dedicated record and concept art:** [`docs/cosmoids/corrogoon.md`](./docs/cosmoids/corrogoon.md)
+
+### Bramfrit — The Courtly Battering Ram
+
+- **Typing:** Fire
+- **Core concept:** A proud bighorn-ram prisoner whose squared spiral horns align into one heated battering face. It bows, retreats exactly three paces, scratches a glowing starting line, and waits for a gate to accept its formal challenge before charging.
+- **Name concept:** Battering ram + ifrit, expressing a siege creature animated by a fiery spirit.
+- **Status:** Creature assets, registry entry, and manifest implemented; Level 5 captive-ally behavior remains planned.
+- **Dedicated record and concept art:** [`docs/cosmoids/bramfrit.md`](./docs/cosmoids/bramfrit.md)
+
+### Sepippet — The Shadow-Stage Infiltrator
+
+- **Typing:** Dark
+- **Core concept:** A theatrical cuttlefish prisoner whose chromatophore mantle projects false Navy guards while its broad arms flatten into articulated shadows, slip through the gate's seams, and remove its internal locking pieces.
+- **Character hook:** An accomplished illusionist that desperately wants to appear mysterious, but one excitable arm always waves at the audience and reveals the trick.
+- **Name concept:** _Sepia_ + _puppet_, connecting its cuttlefish biology to its shadow-puppet performances.
+- **Status:** Creature assets, registry entry, Dark typing, and manifest implemented; Level 5 captive-ally behavior remains planned.
+- **Dedicated record and concept art:** [`docs/cosmoids/sepippet.md`](./docs/cosmoids/sepippet.md)
+
+### Parlet — The Restless Reef Artist
+
+- **Typing:** Water
+- **Core concept:** A proud parrotfish whose broad overlapping scales rearrange their colors into living mosaic patterns. Every finished design lasts only until Parlet notices one imperfect patch and starts revising it again.
+- **Character hook:** A gifted artist that is physically incapable of deciding its own work is finished.
+- **Name concept:** _Parrotfish_ + _palette_, connecting its animal basis with the living colors across its body.
+- **Status:** Creature assets, registry entry, Water typing, and manifest implemented; Level 5 captive-ally behavior remains planned.
+- **Dedicated record and concept art:** [`docs/cosmoids/parlet.md`](./docs/cosmoids/parlet.md)
 
 ### Water Sloth
 

@@ -9,16 +9,8 @@
 
 ## Kip's journal sketch direction
 
-- Use `public/UI/Journal/palmit_journal.png` as the primary composition, medium, parchment, and finish reference for future journal artwork.
-- Use each Cosmoid's shipped in-game sprites and icon as species-design references only. Preserve its recognizable anatomy, proportions, markings, palette, and signature props, but do not copy a battle sprite's exact pose.
-- Show the creature in a candid, animal-like behavior in a natural habitat that suits it, as though Kip observed and sketched it in the wild. Favor curiosity and personality over a battle stance or formal character-sheet pose.
-- Render the page as an expressive naturalist field sketch: sepia or dark-brown ink with varied line weight, loose exploratory marks, light cross-hatching, faint graphite underdrawing, and restrained translucent watercolor washes. Keep the creature readable as polished 2D game art rather than pixel art, photorealism, or a fully painted scene.
-- Make one full-body observational sketch the clear focal point. Small supporting studies of a distinctive limb, feature, track, tool, or behavior are optional, but they must remain secondary and should not make the page feel like a rigid scientific diagram.
-- Keep the habitat vignette sparse and understated. Use only enough plants, stones, ground texture, or other environmental details to communicate where the observation occurred.
-- Use a clean, stylized parchment page with a softly irregular hand-inked boundary, gently rounded or wavy corners, subtle painted mottling, and flat edge shading. Avoid photorealistic torn fibers, burnt edges, curled corners, holes, deep creases, visible paper thickness, and realistic cast shadows.
-- Do not generate labels, letters, fake handwriting, gibberish notes, UI frames, logos, or watermarks in the artwork. Add readable journal text separately in the game UI.
-- Keep important features inside a generous safe margin and ensure the main creature remains readable when the square image is displayed at approximately 256 px in the selected journal entry.
-- Export final journal artwork as a square PNG at no less than 1024x1024. Save it as `public/UI/Journal/<species>_journal.png`, set that species' optional `journalImg` field, and leave its icon and battle sprites unchanged.
+- For any new, replacement, or missing Cosmoid journal image, use `.agents/skills/create-cosmoid-journal-art/SKILL.md` for the complete concept, approval, generation, inspection, and integration workflow.
+- Read `docs/art/JOURNAL_ART_DIRECTION.md` completely before proposing or generating journal art. Treat it as the visual and export source of truth.
 
 ## Human dialogue portrait direction
 

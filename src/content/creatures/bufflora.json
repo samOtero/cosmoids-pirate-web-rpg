@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "id": "bufflora",
+  "name": "Bufflora",
+  "element": "POISON",
+  "secondaryElement": "GRASS",
+  "addedAt": "2026-08-31",
+  "sourceImage": "bufflora-concept.png",
+  "baseStats": {
+    "hp": 48,
+    "attack": 52,
+    "defense": 40,
+    "specialAttack": 68,
+    "specialDefense": 56,
+    "speed": 76
+  },
+  "baseExperience": 70,
+  "movementId": "lizard",
+  "learnableAttacks": [
+    {
+      "level": 1,
+      "attackId": "TACKLE"
+    },
+    {
+      "level": 4,
+      "attackId": "VINE_WHIP"
+    },
+    {
+      "level": 7,
+      "attackId": "WIND_GUST"
+    }
+  ],
+  "assets": {
+    "icon": {
+      "url": "/UI/Icons/bufflora_icon.png",
+      "width": 160,
+      "height": 160
+    },
+    "left": {
+      "url": "/battles/cosmoids/bufflora_left.png",
+      "width": 360,
+      "height": 240
+    },
+    "up": {
+      "url": "/battles/cosmoids/bufflora_up.png",
+      "width": 220,
+      "height": 300
+    },
+    "down": {
+      "url": "/battles/cosmoids/bufflora_down.png",
+      "width": 220,
+      "height": 300
+    }
+  },
+  "storyPlacement": {
+    "context": "LEVEL_5",
+    "capturePolicy": "capturable",
+    "waves": [
+      {
+        "waveId": "level_5_placeholder_wave",
+        "count": 2,
+        "level": 8
+      }
+    ]
+  }
+}

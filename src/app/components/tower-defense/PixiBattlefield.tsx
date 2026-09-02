@@ -81,17 +81,19 @@ export function renderHealthBar(
     container.addChild(hpFg);
   }
 
+  const hpRatio = unit.maxHp > 0 ? unit.hp / unit.maxHp : 1;
+  const isWeakened = isUnitWeakened(unit);
+  const isUncapturable = (unit as Partial<Enemy>).uncapturable;
+  const isStructure = (unit as Enemy).kind === 'structure';
+  const healthBarWidth = isStructure ? 128 : 64;
+
   // Draw background
   hpBg.clear();
-  hpBg.rect(-33, hpOffsetY - 1, 66, 6);
+  hpBg.rect(-healthBarWidth / 2 - 1, hpOffsetY - 1, healthBarWidth + 2, 6);
   hpBg.fill({ color: 0x000000 });
   hpBg.stroke({ color: 0x111111, width: 1 });
 
   // Draw foreground
-  const hpRatio = unit.maxHp > 0 ? unit.hp / unit.maxHp : 1;
-  const isWeakened = isUnitWeakened(unit);
-  const isUncapturable = (unit as any).uncapturable;
-
   if (hideWhenFull && hpRatio >= 1 && !unit.isShiny) {
     hpBg.visible = false;
     hpFg.visible = false;
@@ -99,8 +101,15 @@ export function renderHealthBar(
     hpBg.visible = true;
     hpFg.visible = true;
     hpFg.clear();
-    hpFg.rect(-32, hpOffsetY, 64 * Math.max(0, hpRatio), 4);
-    if (isUncapturable) {
+    hpFg.rect(
+      -healthBarWidth / 2,
+      hpOffsetY,
+      healthBarWidth * Math.max(0, hpRatio),
+      4
+    );
+    if (isStructure) {
+      hpFg.fill({ color: 0x22c55e }); // Structures stay green at every HP level
+    } else if (isUncapturable) {
       hpFg.fill({ color: 0x3b82f6 }); // Blue
     } else {
       hpFg.fill({ color: isWeakened ? 0xff0000 : 0x22c55e });
@@ -1463,12 +1472,43 @@ const TYPE_COLORS: Record<ElementType, number> = {
   [ElementType.GRASS]: 0x22c55e,
   [ElementType.BUG]: 0x65a30d,
   [ElementType.ROCK]: 0x8b6f47,
+  [ElementType.GROUND]: 0xa16207,
   [ElementType.STEEL]: 0x64748b,
   [ElementType.POISON]: 0xa855f7,
+  [ElementType.DARK]: 0x312e81,
   [ElementType.ELECTRIC]: 0xeab308,
   [ElementType.NORMAL]: 0xa3a3a3,
   [ElementType.FLYING]: 0x38bdf8,
 };
+
+function updateStructureLabel(container: PIXI.Container, enemy: Enemy) {
+  const previousTarget = container.getChildByLabel('structureTarget');
+  if (previousTarget) {
+    container.removeChild(previousTarget);
+    previousTarget.destroy();
+  }
+  let label = container.getChildByLabel('structureLabel') as
+    | PIXI.Text
+    | undefined;
+  if (!label) {
+    label = new PIXI.Text({
+      text: '',
+      style: {
+        fontFamily: 'Arial, sans-serif',
+        fontSize: 18,
+        fontWeight: 'bold',
+        fill: 0xe2e8f0,
+        stroke: { color: 0x0f172a, width: 3 },
+      },
+    });
+    label.label = 'structureLabel';
+    label.anchor.set(0.5);
+    label.position.set(0, -82);
+    container.addChild(label);
+  }
+
+  label.text = `${enemy.displayName ?? 'STRUCTURE'}  •  STEEL`;
+}
 
 interface PixiBattlefieldProps {
   engine: TowerDefenseEngine;
@@ -1555,7 +1595,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         if (isOpeningPanActiveRef.current) return;
         draggingCaptureDeviceRef.current = type === 'capture';
         externalDraggingTowerIdRef.current =
-          type === 'tower' ? towerCreatureId ?? null : null;
+          type === 'tower' ? (towerCreatureId ?? null) : null;
         const bgBounds = bgBoundsRef.current;
         if (bgBounds && bgBounds.width > 0 && containerRef.current) {
           const rect = containerRef.current.getBoundingClientRect();
@@ -2573,7 +2613,13 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               | PIXI.Graphics
               | undefined;
 
-            if (esprite && shadow) {
+            if (enemy.kind === 'structure') {
+              if (esprite) esprite.visible = false;
+              if (shadow) shadow.visible = false;
+              updateStructureLabel(container, enemy);
+            } else if (esprite && shadow) {
+              esprite.visible = true;
+              shadow.visible = true;
               const baseCreature =
                 TD_CREATURE_DEFS[enemy.definitionId].baseCreature;
               applyTDUnitTransforms(
@@ -2588,47 +2634,58 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               );
             }
 
-            renderHealthBar(enemy, container, enemy.definitionId);
-            updateSparkles(container, enemy, app.ticker.deltaTime);
-            updateSpeedBoostIndicator(
-              container,
+            renderHealthBar(
               enemy,
-              enemy.definitionId,
-              engine.elapsedTimeMs,
-              app.ticker.deltaTime
-            );
-            updatePersistentSpeedStackAura(
               container,
-              enemy,
-              app.ticker.deltaTime
+              enemy.tdConfigId ?? enemy.definitionId
             );
-            updateSpeedSlowIndicator(
-              container,
-              enemy,
-              engine.elapsedTimeMs,
-              app.ticker.deltaTime
-            );
-            updateDefenseBoostIndicator(
-              container,
-              enemy,
-              enemy.definitionId,
-              engine.elapsedTimeMs,
-              app.ticker.deltaTime
-            );
-            updateResonantEvolutionIndicator(
-              container,
-              enemy,
-              engine.elapsedTimeMs,
-              app.ticker.deltaTime
-            );
-            if (esprite) {
-              updateCursedAura(container, enemy, esprite, app.ticker.deltaTime);
-              updateDrenchedAura(
+            if (enemy.kind !== 'structure') {
+              updateSparkles(container, enemy, app.ticker.deltaTime);
+              updateSpeedBoostIndicator(
                 container,
                 enemy,
-                esprite,
+                enemy.definitionId,
+                engine.elapsedTimeMs,
                 app.ticker.deltaTime
               );
+              updatePersistentSpeedStackAura(
+                container,
+                enemy,
+                app.ticker.deltaTime
+              );
+              updateSpeedSlowIndicator(
+                container,
+                enemy,
+                engine.elapsedTimeMs,
+                app.ticker.deltaTime
+              );
+              updateDefenseBoostIndicator(
+                container,
+                enemy,
+                enemy.definitionId,
+                engine.elapsedTimeMs,
+                app.ticker.deltaTime
+              );
+              updateResonantEvolutionIndicator(
+                container,
+                enemy,
+                engine.elapsedTimeMs,
+                app.ticker.deltaTime
+              );
+              if (esprite) {
+                updateCursedAura(
+                  container,
+                  enemy,
+                  esprite,
+                  app.ticker.deltaTime
+                );
+                updateDrenchedAura(
+                  container,
+                  enemy,
+                  esprite,
+                  app.ticker.deltaTime
+                );
+              }
             }
           }
 

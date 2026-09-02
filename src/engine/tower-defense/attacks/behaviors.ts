@@ -1,4 +1,4 @@
-import { TowerDefenseEngine, TD_CREATURE_DEFS } from '../TowerDefenseEngine';
+import { TowerDefenseEngine } from '../TowerDefenseEngine';
 import { Enemy, Tower } from '../types';
 import { AttackDefinition, AttackBehavior } from './types';
 import { EffectProcessor } from './EffectProcessor';
@@ -162,16 +162,7 @@ export const InstantMeleeBehavior: AttackBehavior = {
 
       // Check for death
       if (enemyTarget.hp <= 0) {
-        // Record the killing blow tower as a participant
-        enemyTarget.damagedByTowerIds.add(source.id);
-        const meta = TD_CREATURE_DEFS[enemyTarget.definitionId];
-        engine.events.emit({
-          type: 'ENEMY_DIED',
-          enemyId: enemyTarget.id,
-          enemyDefinitionId: enemyTarget.definitionId,
-          enemyLevel: meta ? meta.baseCreature.level : 1,
-          participantTowerIds: Array.from(enemyTarget.damagedByTowerIds),
-        });
+        engine.emitEnemyDefeated(enemyTarget, source);
       }
 
       // Add visual effect if configured

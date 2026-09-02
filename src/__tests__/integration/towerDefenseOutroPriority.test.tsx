@@ -5,7 +5,7 @@ import TowerDefenseScreen from '@/app/components/tower-defense/TowerDefenseScree
 
 const engineHarness = vi.hoisted(() => ({
   instance: null as null | { events: { emit: (event: unknown) => void } },
-  outcome: 'win' as 'win' | 'lose',
+  outcome: 'win' as 'win' | 'lose' | 'destruction-objective',
 }));
 
 vi.mock('@/app/components/tower-defense/PixiBattlefield', () => ({
@@ -40,6 +40,7 @@ vi.mock('@/engine/tower-defense/TowerDefenseEngine', () => {
     elapsedTimeMs = 0;
     surviveUntil = undefined;
     hasFinishedAllWaves = false;
+    hasDestroyedVictoryStructure = false;
     enemies: unknown[] = [{}];
     roster: unknown[] = [];
     towers: unknown[] = [];
@@ -62,6 +63,8 @@ vi.mock('@/engine/tower-defense/TowerDefenseEngine', () => {
       });
       if (engineHarness.outcome === 'lose') {
         this.lives = 0;
+      } else if (engineHarness.outcome === 'destruction-objective') {
+        this.hasDestroyedVictoryStructure = true;
       } else {
         this.enemies = [];
         this.hasFinishedAllWaves = true;
@@ -128,6 +131,30 @@ describe('tower-defense outro priority', () => {
     expect(onWin).not.toHaveBeenCalled();
     act(() => vi.advanceTimersByTime(1));
     expect(onWin).toHaveBeenCalledOnce();
+  });
+
+  it('wins from a destroyed victory structure while other enemies remain', () => {
+    engineHarness.outcome = 'destruction-objective';
+
+    render(
+      <TowerDefenseScreen
+        levelData={{ paths: [], placementSpots: [] } as any}
+        onClose={vi.fn()}
+      />
+    );
+
+    act(() => vi.advanceTimersByTime(1000));
+    act(() => vi.advanceTimersByTime(1000));
+    act(() => scheduledFrame?.(16));
+    act(() => scheduledFrame?.(32));
+
+    expect(engineHarness.instance).toMatchObject({
+      hasDestroyedVictoryStructure: true,
+      hasFinishedAllWaves: false,
+      enemies: [{}],
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Later' }));
+    expect(screen.getByText('You Win!')).toBeInTheDocument();
   });
 
   it('shows an optional level message before the static Ready/Go countdown', () => {

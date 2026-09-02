@@ -375,7 +375,14 @@ export default function TowerDefenseScreen({
         engineRef.current.enemies.length === 0 &&
         engineRef.current.lives > 0;
 
-      if ((surviveWin || normalWin) && !hasEndedRef.current) {
+      const destructionObjectiveWin =
+        engineRef.current.hasDestroyedVictoryStructure &&
+        engineRef.current.lives > 0;
+
+      if (
+        (surviveWin || normalWin || destructionObjectiveWin) &&
+        !hasEndedRef.current
+      ) {
         hasEndedRef.current = true;
         setIsPlaying(false);
         saveTowerProgress();

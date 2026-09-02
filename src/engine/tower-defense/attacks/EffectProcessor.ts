@@ -15,8 +15,10 @@ const NEUTRAL_EFFECTIVENESS: Record<ElementType, number> = {
   [ElementType.GRASS]: 1,
   [ElementType.BUG]: 1,
   [ElementType.ROCK]: 1,
+  [ElementType.GROUND]: 1,
   [ElementType.STEEL]: 1,
   [ElementType.POISON]: 1,
+  [ElementType.DARK]: 1,
   [ElementType.ELECTRIC]: 1,
   [ElementType.FLYING]: 1,
 };
@@ -42,6 +44,7 @@ const TYPE_EFFECTIVENESS: Record<ElementType, Record<ElementType, number>> = {
     [ElementType.WATER]: 0.5,
     [ElementType.GRASS]: 0.5,
     [ElementType.ROCK]: 2,
+    [ElementType.GROUND]: 2,
   },
   [ElementType.GRASS]: {
     ...NEUTRAL_EFFECTIVENESS,
@@ -49,6 +52,7 @@ const TYPE_EFFECTIVENESS: Record<ElementType, Record<ElementType, number>> = {
     [ElementType.WATER]: 2,
     [ElementType.GRASS]: 0.5,
     [ElementType.ROCK]: 2,
+    [ElementType.GROUND]: 2,
     [ElementType.BUG]: 0.5,
     [ElementType.STEEL]: 0.5,
     [ElementType.POISON]: 0.5,
@@ -60,6 +64,7 @@ const TYPE_EFFECTIVENESS: Record<ElementType, Record<ElementType, number>> = {
     [ElementType.GRASS]: 0.5,
     [ElementType.ELECTRIC]: 0.5,
     [ElementType.FLYING]: 2,
+    [ElementType.GROUND]: 0,
   },
   [ElementType.FLYING]: {
     ...NEUTRAL_EFFECTIVENESS,
@@ -75,11 +80,13 @@ const TYPE_EFFECTIVENESS: Record<ElementType, Record<ElementType, number>> = {
     [ElementType.ROCK]: 0.5,
     [ElementType.POISON]: 0.5,
     [ElementType.STEEL]: 0,
+    [ElementType.GROUND]: 0.5,
   },
   [ElementType.BUG]: {
     ...NEUTRAL_EFFECTIVENESS,
     [ElementType.FIRE]: 0.5,
     [ElementType.GRASS]: 2,
+    [ElementType.DARK]: 2,
     [ElementType.POISON]: 0.5,
     [ElementType.FLYING]: 0.5,
     [ElementType.STEEL]: 0.5,
@@ -98,6 +105,23 @@ const TYPE_EFFECTIVENESS: Record<ElementType, Record<ElementType, number>> = {
     [ElementType.BUG]: 2,
     [ElementType.FLYING]: 2,
     [ElementType.STEEL]: 0.5,
+    [ElementType.GROUND]: 0.5,
+  },
+  [ElementType.GROUND]: {
+    ...NEUTRAL_EFFECTIVENESS,
+    [ElementType.FIRE]: 2,
+    [ElementType.GRASS]: 0.5,
+    [ElementType.BUG]: 0.5,
+    [ElementType.ROCK]: 2,
+    [ElementType.GROUND]: 1,
+    [ElementType.STEEL]: 2,
+    [ElementType.POISON]: 2,
+    [ElementType.ELECTRIC]: 2,
+    [ElementType.FLYING]: 0,
+  },
+  [ElementType.DARK]: {
+    ...NEUTRAL_EFFECTIVENESS,
+    [ElementType.DARK]: 0.5,
   },
 };
 export class EffectProcessor {
@@ -123,12 +147,15 @@ export class EffectProcessor {
 
     // Get Defender Type
     const defenderMeta = TD_CREATURE_DEFS[target.definitionId];
-    const defenderTypes = defenderMeta
-      ? [
-          defenderMeta.baseCreature.type,
-          defenderMeta.baseCreature.secondaryType,
-        ].filter((type): type is ElementType => type !== undefined)
-      : [ElementType.NORMAL];
+    const defenderTypes =
+      target.elementTypes && target.elementTypes.length > 0
+        ? target.elementTypes
+        : defenderMeta
+          ? [
+              defenderMeta.baseCreature.type,
+              defenderMeta.baseCreature.secondaryType,
+            ].filter((type): type is ElementType => type !== undefined)
+          : [ElementType.NORMAL];
 
     // Get Attacker Type
     const attackerMeta = TD_CREATURE_DEFS[source.creature.speciesId];
@@ -175,7 +202,12 @@ export class EffectProcessor {
 
     // Status moves resolve their effects without inflicting the formula's
     // minimum one point of damage.
-    finalDamage = power > 0 ? Math.max(1, finalDamage) : 0;
+    finalDamage =
+      power > 0
+        ? effectivenessMultiplier === 0
+          ? 0
+          : Math.max(1, finalDamage)
+        : 0;
 
     // Reaching an enemy with an attack counts as participating in its defeat,
     // even when the attack is a non-damaging status move.
@@ -217,7 +249,7 @@ export class EffectProcessor {
       });
     }
 
-    if (attackDef.effects && target.hp > 0) {
+    if (attackDef.effects && target.hp > 0 && !target.immuneToStatusEffects) {
       attackDef.effects.forEach((effect) => {
         if (Math.random() <= effect.chance) {
           switch (effect.type) {

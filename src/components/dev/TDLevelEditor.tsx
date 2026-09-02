@@ -961,7 +961,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
                           <label className="block text-slate-400">
                             Creature
                             <select
-                              value={definition.creatureId}
+                              value={definition.creatureId ?? ''}
                               onChange={(event) =>
                                 updateWaveEnemyDefinition(
                                   definitionIndex,
@@ -1152,7 +1152,9 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
                                         key={definition.id}
                                         value={definition.id}
                                       >
-                                        {definition.id} ({definition.creatureId})
+                                        {definition.id} ({
+                                          definition.creatureId ?? 'structure'
+                                        })
                                       </option>
                                     )
                                   )}

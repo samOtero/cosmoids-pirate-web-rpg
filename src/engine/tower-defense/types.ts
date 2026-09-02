@@ -1,4 +1,4 @@
-import { Creature, PlayerCreature } from '@/types/baseGame';
+import { Creature, ElementType, PlayerCreature } from '@/types/baseGame';
 import type { AttackInstance } from './attacks/types';
 
 export interface TDEvolutionNode {
@@ -57,7 +57,8 @@ export interface TDWaveGroup {
 /** A uniquely configurable enemy variant that wave groups can reuse. */
 export interface TDWaveEnemyDefinition {
   id: string;
-  creatureId: string;
+  /** Creature-backed enemies use a registered Cosmoid definition. */
+  creatureId?: string;
   level: number;
   speedMultiplier?: number;
   /** Whether this enemy can pick up a capture objective. Defaults to true. */
@@ -72,6 +73,24 @@ export interface TDWaveEnemyDefinition {
   abilityId?: string;
   /** HP ratio (0 to 1) at or below which this enemy is considered weakened for capture. Defaults to 0.9. */
   weakenedThreshold?: number;
+  /**
+   * Optional stationary structure that participates in the normal enemy
+   * targeting pipeline without masquerading as a capturable Cosmoid.
+   */
+  structure?: {
+    tdConfigId: string;
+    displayName: string;
+    elementTypes: ElementType[];
+    maxHp: number;
+    defense: number;
+    specialDefense: number;
+    /** Structures are status-immune by default. */
+    immuneToStatusEffects?: boolean;
+    /** Structures award no money by default. */
+    moneyReward?: number;
+    /** Immediately wins the battle when this structure is destroyed. */
+    winsLevelOnDestroy?: boolean;
+  };
 }
 
 export interface TDWave {
@@ -272,6 +291,17 @@ export interface StatusCondition {
 
 export interface Enemy extends BaseTDUnit {
   definitionId: string;
+  kind?: 'creature' | 'structure';
+  /** Visual configuration used by structure enemies. */
+  tdConfigId?: string;
+  displayName?: string;
+  /** Overrides creature metadata when resolving defensive typing. */
+  elementTypes?: ElementType[];
+  immuneToStatusEffects?: boolean;
+  moneyReward?: number;
+  winsLevelOnDestroy?: boolean;
+  /** Guards death/reward events when several attacks land in the same tick. */
+  defeatEventEmitted?: boolean;
   /** The unique level-scoped enemy variant that produced this unit. */
   waveEnemyDefinitionId?: string;
   level: number; // The level of this specific enemy instance

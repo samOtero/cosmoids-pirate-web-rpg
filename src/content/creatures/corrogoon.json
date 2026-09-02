@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "id": "corrogoon",
+  "name": "Corrogoon",
+  "element": "POISON",
+  "secondaryElement": "GROUND",
+  "addedAt": "2026-08-31",
+  "sourceImage": "corrogoon-concept.png",
+  "baseStats": {
+    "hp": 78,
+    "attack": 72,
+    "defense": 82,
+    "specialAttack": 62,
+    "specialDefense": 64,
+    "speed": 24
+  },
+  "baseExperience": 78,
+  "movementId": "lizard",
+  "learnableAttacks": [
+    {
+      "level": 1,
+      "attackId": "PINCH"
+    },
+    {
+      "level": 4,
+      "attackId": "TACKLE"
+    },
+    {
+      "level": 7,
+      "attackId": "NIBBLE"
+    }
+  ],
+  "assets": {
+    "icon": {
+      "url": "/UI/Icons/corrogoon_icon.png",
+      "width": 160,
+      "height": 160
+    },
+    "left": {
+      "url": "/battles/cosmoids/corrogoon_left.png",
+      "width": 360,
+      "height": 240
+    },
+    "up": {
+      "url": "/battles/cosmoids/corrogoon_up.png",
+      "width": 220,
+      "height": 300
+    },
+    "down": {
+      "url": "/battles/cosmoids/corrogoon_down.png",
+      "width": 220,
+      "height": 300
+    }
+  },
+  "storyPlacement": {
+    "context": "LEVEL_5",
+    "role": "plannedCaptiveAlly",
+    "level": 8,
+    "fixed": true,
+    "receivesExperience": false,
+    "capturePolicy": "uncapturable"
+  }
+}

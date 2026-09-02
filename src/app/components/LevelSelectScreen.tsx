@@ -30,7 +30,7 @@ function getLevelCreatureIcons(context: TDLevelContext): string[] {
   levelConfig.levelData.waves.forEach((wave) => {
     wave.groups.forEach((group) => {
       const definition = definitionsById.get(group.enemyDefinitionId);
-      if (definition) uniqueIds.add(definition.creatureId);
+      if (definition?.creatureId) uniqueIds.add(definition.creatureId);
     });
   });
 

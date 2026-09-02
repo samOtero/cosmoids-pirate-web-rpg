@@ -230,6 +230,7 @@ export class TowerDefenseEngine {
   private startedRelocationWaveIndexes = new Set<number>();
   private completedRelocationWaveIndexes = new Set<number>();
   public hasFinishedAllWaves: boolean = false;
+  public hasDestroyedVictoryStructure: boolean = false;
   private lastSpawnTime: number = 0;
 
   public playerSelectedAttacks: Record<string, number> = {};
@@ -516,6 +517,7 @@ export class TowerDefenseEngine {
         enemy.damageFlashTimerMs -= deltaMs;
         if (enemy.damageFlashTimerMs < 0) enemy.damageFlashTimerMs = 0;
       }
+      if (enemy.kind === 'structure') return;
       // the map dev uses speed relative to arbitrary frame timing, with a delta based loop we should scale it,
       // but to keep logic equivalent for now we'll just replicate it roughly
       // if 1 frame was originally ~16.6ms, we can normalize deltaMs / 16.6 to apply speed
@@ -754,6 +756,7 @@ export class TowerDefenseEngine {
 
         // Find closest enemy that isn't holding anything
         for (const enemy of newEnemies) {
+          if (enemy.kind === 'structure') continue;
           if (enemy.heldCaptureUnitId) continue;
           const enemyDefinition = enemy.waveEnemyDefinitionId
             ? this.waveEnemyDefinitions[enemy.waveEnemyDefinitionId]
@@ -923,15 +926,7 @@ export class TowerDefenseEngine {
           }
 
           if (target.hp <= 0 && sourceTower) {
-            // Record the killing blow tower as a participant too
-            target.damagedByTowerIds.add(sourceTower.id);
-            this.events.emit({
-              type: 'ENEMY_DIED',
-              enemyId: target.id,
-              enemyDefinitionId: target.definitionId,
-              enemyLevel: target.level,
-              participantTowerIds: Array.from(target.damagedByTowerIds),
-            });
+            this.emitEnemyDefeated(target, sourceTower);
           }
         }
         p.speed = 0; // mark for deletion
@@ -949,7 +944,11 @@ export class TowerDefenseEngine {
     // Filter dead enemies and collect money
     const deadEnemies = newEnemies.filter((e) => e.hp <= 0);
     if (deadEnemies.length > 0) {
-      this.money += deadEnemies.length * 10;
+      this.money += deadEnemies.reduce(
+        (total, enemy) =>
+          total + (enemy.moneyReward ?? (enemy.kind === 'structure' ? 0 : 10)),
+        0
+      );
 
       // Drop capture units when an enemy dies
       deadEnemies.forEach((e) => {
@@ -1017,6 +1016,7 @@ export class TowerDefenseEngine {
     const definition = this.waveEnemyDefinitions[evolvedEnemyDefinitionId];
     if (!definition) return false;
 
+    if (!definition.creatureId || definition.structure) return false;
     const meta = TD_CREATURE_DEFS[definition.creatureId];
     if (!meta) return false;
 
@@ -1458,46 +1458,64 @@ export class TowerDefenseEngine {
       this.waveEnemyDefinitions[waveEnemyDefinitionId];
     if (!waveEnemyDefinition) return;
 
-    const definitionId = waveEnemyDefinition.creatureId;
-    const meta = TD_CREATURE_DEFS[definitionId];
-    if (!meta) return;
+    const structure = waveEnemyDefinition.structure;
+    const creatureId = waveEnemyDefinition.creatureId;
+    const meta = creatureId ? TD_CREATURE_DEFS[creatureId] : undefined;
+    if (!structure && !meta) return;
+
+    const definitionId = structure ? waveEnemyDefinition.id : creatureId!;
 
     const pathIndex = groupPathIndex;
     const startPath = this.paths[pathIndex] || [{ x: 0, y: 0 }];
 
     const enemyLevel = waveEnemyDefinition.level;
-    const enemyHp =
-      calculateMaxHp(meta.baseCreature.maxHp, enemyLevel) *
-      this.enemyHpMultiplier *
-      (waveEnemyDefinition.hpMultiplier ?? 1);
-    const enemyAttack = calculateStat(meta.baseCreature.attack, enemyLevel);
-    const enemySpecialAttack = calculateStat(
-      meta.baseCreature.specialAttack,
-      enemyLevel
-    );
-    const enemyDefense =
-      calculateStat(meta.baseCreature.defense, enemyLevel) *
-      (waveEnemyDefinition.defenseMultiplier ?? 1);
-    const enemySpecialDefense =
-      calculateStat(meta.baseCreature.specialDefense, enemyLevel) *
-      (waveEnemyDefinition.specialDefenseMultiplier ?? 1);
+    const enemyHp = structure
+      ? structure.maxHp * this.enemyHpMultiplier
+      : calculateMaxHp(meta!.baseCreature.maxHp, enemyLevel) *
+        this.enemyHpMultiplier *
+        (waveEnemyDefinition.hpMultiplier ?? 1);
+    const enemyAttack = structure
+      ? 0
+      : calculateStat(meta!.baseCreature.attack, enemyLevel);
+    const enemySpecialAttack = structure
+      ? 0
+      : calculateStat(meta!.baseCreature.specialAttack, enemyLevel);
+    const enemyDefense = structure
+      ? structure.defense
+      : calculateStat(meta!.baseCreature.defense, enemyLevel) *
+        (waveEnemyDefinition.defenseMultiplier ?? 1);
+    const enemySpecialDefense = structure
+      ? structure.specialDefense
+      : calculateStat(meta!.baseCreature.specialDefense, enemyLevel) *
+        (waveEnemyDefinition.specialDefenseMultiplier ?? 1);
 
     const isShiny = false; //TowerDefenseEngine.forceShinySpawns || (Math.random() < 0.5);
-    const abilityDefinitionId = waveEnemyDefinition.abilityId;
+    const abilityDefinitionId = structure
+      ? undefined
+      : waveEnemyDefinition.abilityId;
     const abilityDefinition = abilityDefinitionId
       ? ENEMY_ABILITY_DEFS[abilityDefinitionId]
       : undefined;
     const newEnemy: Enemy = {
       id: `enemy_${time}_${Math.random().toString(36).substring(7)}`,
       definitionId: definitionId,
+      kind: structure ? 'structure' : 'creature',
+      tdConfigId: structure?.tdConfigId,
+      displayName: structure?.displayName,
+      elementTypes: structure?.elementTypes,
+      immuneToStatusEffects:
+        structure?.immuneToStatusEffects ?? Boolean(structure),
+      moneyReward: structure?.moneyReward,
+      winsLevelOnDestroy: structure?.winsLevelOnDestroy,
       waveEnemyDefinitionId,
       level: enemyLevel,
       position: { x: startPath[0].x, y: startPath[0].y },
       hp: enemyHp,
       maxHp: enemyHp,
-      speed:
-        (meta.baseCreature.speed / 100) *
-        (waveEnemyDefinition.speedMultiplier ?? 1),
+      speed: structure
+        ? 0
+        : (meta!.baseCreature.speed / 100) *
+          (waveEnemyDefinition.speedMultiplier ?? 1),
       currentAttack: enemyAttack,
       currentSpecialAttack: enemySpecialAttack,
       currentDefense: enemyDefense,
@@ -1507,7 +1525,7 @@ export class TowerDefenseEngine {
       pathIndex: pathIndex,
       facingDirection: 'down',
       turnAroundAtEnd,
-      uncapturable: uncapturable || isCursed,
+      uncapturable: Boolean(structure) || uncapturable || isCursed,
       damagedByTowerIds: new Set<string>(),
       isShiny,
       isCursed,
@@ -2149,10 +2167,18 @@ export class TowerDefenseEngine {
 
     if (enemiesInRange.length === 0) return null;
 
+    // Active creature threats take precedence. The stationary objective is a
+    // fallback target whenever no moving enemy is in this tower's range.
+    const creatureTargets = enemiesInRange.filter(
+      ({ enemy }) => enemy.kind !== 'structure'
+    );
+    const eligibleTargets =
+      creatureTargets.length > 0 ? creatureTargets : enemiesInRange;
+
     if (mode === 'closest') {
       let minDist = Infinity;
       let target: Enemy | null = null;
-      for (const item of enemiesInRange) {
+      for (const item of eligibleTargets) {
         if (item.dist < minDist) {
           minDist = item.dist;
           target = item.enemy;
@@ -2164,7 +2190,7 @@ export class TowerDefenseEngine {
     if (mode === 'lowest-hp-percent') {
       let minHpPercent = Infinity;
       let target: Enemy | null = null;
-      for (const item of enemiesInRange) {
+      for (const item of eligibleTargets) {
         const hpPercent = item.enemy.hp / item.enemy.maxHp;
         if (hpPercent < minHpPercent) {
           minHpPercent = hpPercent;
@@ -2177,7 +2203,7 @@ export class TowerDefenseEngine {
     if (mode === 'highest-hp-percent') {
       let maxHpPercent = -Infinity;
       let target: Enemy | null = null;
-      for (const item of enemiesInRange) {
+      for (const item of eligibleTargets) {
         const hpPercent = item.enemy.hp / item.enemy.maxHp;
         if (hpPercent > maxHpPercent) {
           maxHpPercent = hpPercent;
@@ -2190,7 +2216,7 @@ export class TowerDefenseEngine {
     if (mode === 'strongest') {
       let maxHp = -Infinity;
       let target: Enemy | null = null;
-      for (const item of enemiesInRange) {
+      for (const item of eligibleTargets) {
         if (item.enemy.hp > maxHp) {
           maxHp = item.enemy.hp;
           target = item.enemy;
@@ -2202,7 +2228,7 @@ export class TowerDefenseEngine {
     if (mode === 'weakest') {
       let minHp = Infinity;
       let target: Enemy | null = null;
-      for (const item of enemiesInRange) {
+      for (const item of eligibleTargets) {
         if (item.enemy.hp < minHp) {
           minHp = item.enemy.hp;
           target = item.enemy;
@@ -2214,7 +2240,7 @@ export class TowerDefenseEngine {
     if (mode === 'last') {
       let minProgress = Infinity;
       let target: Enemy | null = null;
-      for (const item of enemiesInRange) {
+      for (const item of eligibleTargets) {
         const progress = this.getEnemyProgress(item.enemy);
         if (progress < minProgress) {
           minProgress = progress;
@@ -2227,7 +2253,7 @@ export class TowerDefenseEngine {
     // Default 'first'
     let maxProgress = -Infinity;
     let target: Enemy | null = null;
-    for (const item of enemiesInRange) {
+    for (const item of eligibleTargets) {
       const progress = this.getEnemyProgress(item.enemy);
       if (progress > maxProgress) {
         maxProgress = progress;
@@ -2237,13 +2263,40 @@ export class TowerDefenseEngine {
     return target;
   }
 
+  public emitEnemyDefeated(target: Enemy, sourceTower: Tower): void {
+    if (target.defeatEventEmitted) return;
+
+    target.defeatEventEmitted = true;
+    target.damagedByTowerIds.add(sourceTower.id);
+    const participantTowerIds = Array.from(target.damagedByTowerIds);
+
+    if (target.kind === 'structure') {
+      const winsLevel = target.winsLevelOnDestroy === true;
+      if (winsLevel) this.hasDestroyedVictoryStructure = true;
+      this.events.emit({
+        type: 'STRUCTURE_DESTROYED',
+        structureId: target.definitionId,
+        participantTowerIds,
+        winsLevel,
+      });
+      return;
+    }
+
+    this.events.emit({
+      type: 'ENEMY_DIED',
+      enemyId: target.id,
+      enemyDefinitionId: target.definitionId,
+      enemyLevel: target.level,
+      participantTowerIds,
+    });
+  }
+
   /**
    * Distance in attack-range units, normalized to viewport height. This makes
    * the boundary circular on screen and independent of the level map size.
    */
   public getAttackDistance(a: Point, b: Point): number {
-    const dx =
-      (a.x - b.x) * this.aspectRatio * this.backgroundScale;
+    const dx = (a.x - b.x) * this.aspectRatio * this.backgroundScale;
     const dy = (a.y - b.y) * this.backgroundScale;
     return Math.hypot(dx, dy);
   }

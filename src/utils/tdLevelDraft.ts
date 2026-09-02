@@ -152,7 +152,29 @@ export function validateTDLevelDraft(
     }
     enemyDefinitionIds.add(definition.id);
 
-    if (!definition.creatureId.trim()) {
+    if (definition.structure) {
+      if (!definition.structure.tdConfigId.trim()) {
+        errors.push(`${definitionLabel} structure needs a TD config ID.`);
+      }
+      if (!definition.structure.displayName.trim()) {
+        errors.push(`${definitionLabel} structure needs a display name.`);
+      }
+      if (definition.structure.elementTypes.length === 0) {
+        errors.push(`${definitionLabel} structure needs an element type.`);
+      }
+      const structureStats = [
+        ['max HP', definition.structure.maxHp],
+        ['defense', definition.structure.defense],
+        ['special defense', definition.structure.specialDefense],
+      ] as const;
+      structureStats.forEach(([name, value]) => {
+        if (!Number.isFinite(value) || value <= 0) {
+          errors.push(
+            `${definitionLabel} structure ${name} must be greater than 0.`
+          );
+        }
+      });
+    } else if (!definition.creatureId?.trim()) {
       errors.push(`${definitionLabel} needs a creature ID.`);
     } else if (
       validCreatureDefinitionIds &&

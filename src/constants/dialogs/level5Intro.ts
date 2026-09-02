@@ -24,45 +24,41 @@ export const LEVEL_5_INTRO: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.MARIBEL_NEUTRAL_WARY,
-          displayName: 'Mari',
-          flipped: true,
+          key: SpeakerImageKey.EMPTY,
+          displayName: '',
         },
       ],
-      text: 'A Tigrevel. I first saw it sitting alone on the eastern beach.',
+      text: 'Mari: A Tigrevel. I first saw it sitting alone on the eastern beach.',
       backgroundImageKey: BackgroundImageKey.LEVEL_5_MEMORY_BEACH,
     },
     {
       portraits: [
         {
-          key: SpeakerImageKey.MARIBEL_WORRIED,
-          displayName: 'Mari',
-          flipped: true,
+          key: SpeakerImageKey.EMPTY,
+          displayName: '',
         },
       ],
-      text: 'Then the Razhounds came after me. I tripped, and they surrounded me.',
+      text: 'Mari: Then the Razhounds came after me. I tripped, and they surrounded me.',
       backgroundImageKey: BackgroundImageKey.LEVEL_5_MEMORY_RAZHOUND_ATTACK,
     },
     {
       portraits: [
         {
-          key: SpeakerImageKey.MARIBEL_DETERMINED,
-          displayName: 'Mari',
-          flipped: true,
+          key: SpeakerImageKey.EMPTY,
+          displayName: '',
         },
       ],
-      text: 'The tiger charged between us. It drove the entire pack away.',
+      text: 'Mari: The tiger charged between us. It drove the entire pack away.',
       backgroundImageKey: BackgroundImageKey.LEVEL_5_MEMORY_TIGREVEL_RESCUE,
     },
     {
       portraits: [
         {
-          key: SpeakerImageKey.MARIBEL_ANGRY_DEFENSIVE,
-          displayName: 'Mari',
-          flipped: true,
+          key: SpeakerImageKey.EMPTY,
+          displayName: '',
         },
       ],
-      text: 'It never hurt me. But the commander called it dangerous and had his officers drag it beneath Ironbell.',
+      text: 'Mari: It never hurt me. But the commander called it dangerous and had his officers drag it beneath Ironbell.',
       backgroundImageKey: BackgroundImageKey.LEVEL_5_MEMORY_NAVY_CAPTURE,
     },
     {

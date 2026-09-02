@@ -1,4 +1,4 @@
 interface:
-  display_name: "Design Cosmoid Concepts"
-  short_description: "Design ten researched anime-style Cosmoids"
-  default_prompt: "Use $design-cosmoid-concepts to synthesize real-world facts into ten creature-first Cosmoids with signature hooks, then render them as polished 2D creature-collection RPG character art with clean outlines and softly blended cel shading."
+  display_name: 'Design Cosmoid Concepts'
+  short_description: 'Develop, lock, name, and document Cosmoids'
+  default_prompt: 'Use $design-cosmoid-concepts to develop ten researched Cosmoid concepts, preserve my selected design through refinement, then help me name and document it before asking about production assets.'

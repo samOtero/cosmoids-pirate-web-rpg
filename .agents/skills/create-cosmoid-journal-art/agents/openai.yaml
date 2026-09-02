@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Create Cosmoid Journal Art'
+  short_description: 'Design and integrate character-revealing field sketches'
+  default_prompt: 'Use $create-cosmoid-journal-art to develop three character-revealing journal scenes for a Cosmoid, generate my selected direction in Kip’s field-sketch style, and integrate it after I approve the candidate.'
