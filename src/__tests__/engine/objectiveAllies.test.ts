@@ -1,8 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { ElementType } from '@/types/baseGame';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import type { TDLevelData, Tower } from '@/engine/tower-defense/types';
 import { LEVEL_5 } from '@/constants/tdLevels/level5';
+import { EffectProcessor } from '@/engine/tower-defense/attacks/EffectProcessor';
+import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 
 function createBramfritRescueLevel(): TDLevelData {
   return {
@@ -327,6 +329,156 @@ function createParletRescueLevel(): TDLevelData {
   };
 }
 
+function createCorrogoonRescueLevel(): TDLevelData {
+  return {
+    paths: [
+      [
+        { x: 50, y: 0 },
+        { x: 50, y: -1000 },
+      ],
+      [
+        { x: 0, y: 0 },
+        { x: -1000, y: 0 },
+      ],
+      [
+        { x: 50, y: 50 },
+        { x: 50, y: 1000 },
+      ],
+    ],
+    placementSpots: [],
+    waveEnemyDefinitions: [
+      {
+        id: 'main_gate',
+        level: 1,
+        structure: {
+          tdConfigId: 'main_gate',
+          displayName: 'MAIN GATE',
+          elementTypes: [ElementType.STEEL],
+          maxHp: 1000,
+          defense: 100,
+          specialDefense: 100,
+          winsLevelOnDestroy: true,
+          role: 'victory-gate',
+        },
+      },
+      {
+        id: 'corrogoon_gate',
+        level: 1,
+        structure: {
+          tdConfigId: 'corrogoon_gate',
+          displayName: 'CORROGOON CELL',
+          elementTypes: [ElementType.STEEL],
+          maxHp: 20,
+          defense: 5,
+          specialDefense: 5,
+          role: 'prisoner-gate',
+          visualStyle: 'prison-gate',
+        },
+      },
+      {
+        id: 'secondary_gate',
+        level: 1,
+        structure: {
+          tdConfigId: 'secondary_gate',
+          displayName: 'SECONDARY CELL',
+          elementTypes: [ElementType.STEEL],
+          maxHp: 4,
+          defense: 5,
+          specialDefense: 5,
+          role: 'prisoner-gate',
+          visualStyle: 'prison-gate',
+        },
+      },
+      {
+        id: 'acid_target',
+        creatureId: 'sonarion',
+        level: 8,
+      },
+    ],
+    waves: [
+      {
+        id: 'test_wave',
+        groups: [
+          {
+            enemyDefinitionId: 'main_gate',
+            count: 1,
+            spawnIntervalMs: 0,
+            delayBeforeGroupMs: 0,
+            pathIndex: 0,
+          },
+          {
+            enemyDefinitionId: 'corrogoon_gate',
+            count: 1,
+            spawnIntervalMs: 0,
+            delayBeforeGroupMs: 0,
+            pathIndex: 1,
+            concurrentWithPrevious: true,
+          },
+          {
+            enemyDefinitionId: 'secondary_gate',
+            count: 1,
+            spawnIntervalMs: 0,
+            delayBeforeGroupMs: 0,
+            pathIndex: 1,
+            concurrentWithPrevious: true,
+          },
+          {
+            enemyDefinitionId: 'acid_target',
+            count: 1,
+            spawnIntervalMs: 0,
+            delayBeforeGroupMs: 0,
+            pathIndex: 2,
+            concurrentWithPrevious: true,
+          },
+        ],
+      },
+    ],
+    objectiveAllies: [
+      {
+        id: 'corrogoon',
+        creatureId: 'corrogoon',
+        displayName: 'Corrogoon',
+        gateDefinitionId: 'corrogoon_gate',
+        lockedPosition: { x: 0, y: 0 },
+        releasePath: [],
+        moveSpeed: 1000,
+        targetStructureDefinitionId: 'main_gate',
+        behavior: {
+          type: 'CORROGOON_SCOURING_VOLLEY',
+          volleyIntervalMs: 100,
+          projectileTravelMs: 10,
+          projectileStaggerMs: 0,
+          scouredDurationMs: 200,
+          tickDamage: 4,
+          tickIntervalMs: 50,
+          defenseMultiplier: 0.75,
+          specialDefenseMultiplier: 0.75,
+        },
+      },
+      {
+        id: 'secondary_prisoner',
+        creatureId: 'bramfrit',
+        displayName: 'Secondary Prisoner',
+        gateDefinitionId: 'secondary_gate',
+        lockedPosition: { x: 0, y: 0 },
+        releasePath: [],
+        moveSpeed: 1000,
+        targetStructureDefinitionId: 'main_gate',
+        behavior: {
+          type: 'BRAMFRIT_CHARGE',
+          chargeStart: { x: 0, y: 0 },
+          strikePosition: { x: 1, y: 0 },
+          damage: 1,
+          bowDurationMs: 1000,
+          windupDurationMs: 1000,
+          recoveryDurationMs: 1000,
+          chargeSpeed: 1,
+        },
+      },
+    ],
+  };
+}
+
 describe('objective allies', () => {
   it('spawns a reusable prison gate for every established Level 5 prisoner', () => {
     const engine = new TowerDefenseEngine(LEVEL_5);
@@ -529,5 +681,137 @@ describe('objective allies', () => {
     );
 
     engine.destroy();
+  });
+
+  it('lets Corrogoon scour every hostile and chain-release another prisoner', () => {
+    const engine = new TowerDefenseEngine(createCorrogoonRescueLevel());
+    engine.tick(0, 16);
+    engine.tick(16, 16);
+    engine.tick(32, 16);
+
+    const cellGate = engine.enemies.find(
+      (enemy) => enemy.definitionId === 'corrogoon_gate'
+    )!;
+    const tower = { id: 'tower', position: { x: 0, y: 0 } } as Tower;
+    cellGate.hp = 0;
+    engine.emitEnemyDefeated(cellGate, tower);
+    engine.tick(48, 16);
+    engine.tick(64, 16);
+
+    expect(engine.objectiveAllies[0].phase).toBe('volleying');
+    expect(engine.objectiveAllyAcidShots).toHaveLength(3);
+
+    engine.tick(80, 16);
+    const mainGate = engine.enemies.find(
+      (enemy) => enemy.definitionId === 'main_gate'
+    )!;
+    const secondaryGate = engine.enemies.find(
+      (enemy) => enemy.definitionId === 'secondary_gate'
+    )!;
+    const acidTarget = engine.enemies.find(
+      (enemy) => enemy.waveEnemyDefinitionId === 'acid_target'
+    )!;
+
+    for (const target of [mainGate, secondaryGate, acidTarget]) {
+      expect(target.scouredEffect).toMatchObject({
+        defenseMultiplier: 0.75,
+        specialDefenseMultiplier: 0.75,
+        tickDamage: 4,
+      });
+    }
+    expect(secondaryGate.immuneToStatusEffects).toBe(true);
+
+    engine.tick(130, 50);
+    expect(mainGate.hp).toBe(996);
+    expect(acidTarget.hp).toBeLessThan(acidTarget.maxHp);
+    expect(
+      engine.objectiveAllies.find(
+        (ally) => ally.displayName === 'Secondary Prisoner'
+      )?.phase
+    ).toBe('traveling');
+    expect(
+      engine.destroyedStructureVisuals.some(
+        (visual) => visual.tdConfigId === 'secondary_gate'
+      )
+    ).toBe(true);
+
+    const firstExpiry = mainGate.scouredEffect!.expiresAtMs;
+    engine.tick(164, 34);
+    engine.tick(180, 16);
+    expect(mainGate.scouredEffect!.expiresAtMs).toBeGreaterThan(firstExpiry);
+
+    engine.destroy();
+  });
+
+  it('uses Scoured physical and special armor reductions in normal attack damage', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const engine = new TowerDefenseEngine(createCorrogoonRescueLevel());
+    engine.tick(0, 16);
+    const target = engine.enemies.find(
+      (enemy) => enemy.definitionId === 'main_gate'
+    )!;
+    const tower = {
+      id: 'tower',
+      creature: { speciesId: 'bramfrit', level: 10 },
+      currentAttack: 100,
+      currentSpecialAttack: 100,
+    } as Tower;
+
+    const initialHp = target.hp;
+    EffectProcessor.applyDamageAndEffects(
+      engine,
+      tower,
+      target,
+      ATTACK_DEFS.TACKLE
+    );
+    const normalDamage = initialHp - target.hp;
+    target.hp = initialHp;
+    target.scouredEffect = {
+      sourceAllyId: 'test',
+      expiresAtMs: 1000,
+      nextTickAtMs: 1000,
+      tickDamage: 4,
+      tickIntervalMs: 2000,
+      defenseMultiplier: 0.75,
+      specialDefenseMultiplier: 0.75,
+    };
+    EffectProcessor.applyDamageAndEffects(
+      engine,
+      tower,
+      target,
+      ATTACK_DEFS.TACKLE
+    );
+
+    const scouredPhysicalDamage = initialHp - target.hp;
+    expect(scouredPhysicalDamage).toBeGreaterThan(normalDamage);
+
+    target.scouredEffect = undefined;
+    target.hp = initialHp;
+    EffectProcessor.applyDamageAndEffects(
+      engine,
+      tower,
+      target,
+      ATTACK_DEFS.EMBER
+    );
+    const normalSpecialDamage = initialHp - target.hp;
+    target.hp = initialHp;
+    target.scouredEffect = {
+      sourceAllyId: 'test',
+      expiresAtMs: 1000,
+      nextTickAtMs: 1000,
+      tickDamage: 4,
+      tickIntervalMs: 2000,
+      defenseMultiplier: 0.75,
+      specialDefenseMultiplier: 0.75,
+    };
+    EffectProcessor.applyDamageAndEffects(
+      engine,
+      tower,
+      target,
+      ATTACK_DEFS.EMBER
+    );
+    expect(initialHp - target.hp).toBeGreaterThan(normalSpecialDamage);
+    engine.destroy();
+    vi.restoreAllMocks();
   });
 });

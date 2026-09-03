@@ -103,11 +103,10 @@ If an evolutionary line is added later, it should deepen the relationship betwee
 - **Creature manifest:** `src/content/creatures/bufflora.json`
 - **Image status:** Approved standalone identity reference, production game assets, and journal artwork implemented
 - **Implementation status:** Registered Poison/Grass Cosmoid; introduced as two capturable level-8 wild enemies in Level 5's current wave
-- **Initial gameplay profile:** Agile special/utility species; starts with Tackle, learns Vine Whip at level 4, and Wind Gust at level 7
+- **Initial gameplay profile:** Agile special/utility species; starts with Tackle, learns Vine Whip at level 4, Toxic Pollen at level 8, and Wind Gust at level 12. Toxic Pollen is a non-damaging area attack that poisons every eligible target in range without refreshing or stacking an existing Poison condition. Poisoned enemies receive a purple tint and a pollen badge beside their health bar for the duration of the damage-over-time effect.
 
 ## Open Decisions
 
 - Revisit Level 5's temporary single-wave placement when the complete wild-creature wave plan is authored.
-- Decide whether its preference for poisonous flowers eventually gains a dedicated Poison attack or passive behavior.
 - Tune rarity, capture difficulty, spawn count, and level after the complete Level 5 roster is known.
 - Decide whether Bufflora remains single-stage or begins an evolution line.

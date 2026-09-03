@@ -7,6 +7,8 @@ import { applyPersistentSpeedSlow } from '../speedModifiers';
 
 export const DRENCHED_DURATION_MS = 4000;
 export const DRENCHED_DAMAGE_MULTIPLIER = 1.5;
+export const POISON_DURATION_MS = 5000;
+export const MAX_POISON_STACKS = 5;
 
 const NEUTRAL_EFFECTIVENESS: Record<ElementType, number> = {
   [ElementType.NORMAL]: 1,
@@ -140,10 +142,18 @@ export class EffectProcessor {
       attackDef.category === 'special'
         ? source.currentSpecialAttack
         : source.currentAttack;
-    const defense =
+    const baseDefense =
       attackDef.category === 'special'
         ? target.currentSpecialDefense
         : target.currentDefense;
+    const scouredMultiplier =
+      target.scouredEffect &&
+      target.scouredEffect.expiresAtMs > engine.elapsedTimeMs
+        ? attackDef.category === 'special'
+          ? target.scouredEffect.specialDefenseMultiplier
+          : target.scouredEffect.defenseMultiplier
+        : 1;
+    const defense = Math.max(1, baseDefense * scouredMultiplier);
 
     // Get Defender Type
     const defenderMeta = TD_CREATURE_DEFS[target.definitionId];
@@ -261,14 +271,65 @@ export class EffectProcessor {
                 lastTickTime: 0,
               });
               break;
-            case 'POISON':
+            case 'POISON': {
+              const poisonTickDamage = Math.max(1, finalDamage * 0.05);
               target.statusConditions.push({
                 type: 'POISON',
-                durationMs: 5000,
-                tickDamage: Math.max(1, finalDamage * 0.05),
+                durationMs: POISON_DURATION_MS,
+                tickDamage: poisonTickDamage,
                 lastTickTime: 0,
+                stackCount: 1,
+                damagePerStack: poisonTickDamage,
               });
               break;
+            }
+            case 'STACKING_POISON': {
+              const maxStacks = effect.maxStacks ?? MAX_POISON_STACKS;
+              const newDamagePerStack = Math.max(1, finalDamage * 0.05);
+              const existing = target.statusConditions.find(
+                (status) => status.type === 'POISON'
+              );
+
+              if (existing) {
+                const currentStacks = Math.max(1, existing.stackCount ?? 1);
+                const nextStacks = Math.min(maxStacks, currentStacks + 1);
+                const damagePerStack = Math.max(
+                  existing.damagePerStack ??
+                    existing.tickDamage ??
+                    newDamagePerStack,
+                  newDamagePerStack
+                );
+                existing.stackCount = nextStacks;
+                existing.damagePerStack = damagePerStack;
+                existing.tickDamage = damagePerStack * nextStacks;
+                existing.durationMs = POISON_DURATION_MS;
+              } else {
+                target.statusConditions.push({
+                  type: 'POISON',
+                  durationMs: POISON_DURATION_MS,
+                  tickDamage: newDamagePerStack,
+                  lastTickTime: 0,
+                  stackCount: 1,
+                  damagePerStack: newDamagePerStack,
+                });
+              }
+
+              const poison = target.statusConditions.find(
+                (status) => status.type === 'POISON'
+              );
+              engine.floatingTexts.push({
+                id: `ft_poison_${Date.now()}_${Math.random()
+                  .toString(36)
+                  .substring(7)}`,
+                text: `Poison ×${poison?.stackCount ?? 1}`,
+                position: { ...target.position },
+                color: 0xe879f9,
+                scale: 0.8,
+                durationMs: 900,
+                elapsedMs: 0,
+              });
+              break;
+            }
             case 'STUN':
               target.statusConditions.push({
                 type: 'STUN',

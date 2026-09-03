@@ -197,6 +197,16 @@ export const LEVEL_5: TDLevelData = {
       y: 18.5,
     },
   ],
+  environmentUnits: [
+    {
+      position: {
+        x: 75,
+        y: 29,
+      },
+      tdConfigId: 'navy_guard_battle',
+      facingDirection: 'left',
+    },
+  ],
   captureUnits: [
     {
       position: {
@@ -765,6 +775,42 @@ export const LEVEL_5: TDLevelData = {
         surgeVisualDurationMs: 1000,
         pushDistance: 3,
         gateDamagePerCurrent: 8,
+      },
+    },
+    {
+      id: 'corrogoon_rescue',
+      creatureId: 'corrogoon',
+      displayName: 'Corrogoon',
+      gateDefinitionId: 'corrogoon_cell_gate',
+      lockedPosition: {
+        x: 93.77,
+        y: 75.24,
+      },
+      releasePath: [
+        { x: 90, y: 65 },
+        { x: 82.5, y: 65 },
+        { x: 82.5, y: 53 },
+        { x: 79, y: 53 },
+        { x: 79, y: 43 },
+        { x: 74, y: 43 },
+        { x: 74, y: 32 },
+        { x: 66, y: 32 },
+        { x: 66, y: 23 },
+        { x: 58, y: 23 },
+        { x: 58, y: 17 },
+      ],
+      moveSpeed: 8,
+      targetStructureDefinitionId: 'tigrevel_cell_bars',
+      behavior: {
+        type: 'CORROGOON_SCOURING_VOLLEY',
+        volleyIntervalMs: 6000,
+        projectileTravelMs: 750,
+        projectileStaggerMs: 55,
+        scouredDurationMs: 10000,
+        tickDamage: 4,
+        tickIntervalMs: 2000,
+        defenseMultiplier: 0.75,
+        specialDefenseMultiplier: 0.75,
       },
     },
   ],

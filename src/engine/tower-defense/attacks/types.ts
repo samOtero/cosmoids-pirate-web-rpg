@@ -6,6 +6,7 @@ export interface AttackEffect {
   type:
     | 'BURN'
     | 'POISON'
+    | 'STACKING_POISON'
     | 'STUN'
     | 'DRENCHED'
     | 'SPEED_SLOW'
@@ -13,6 +14,8 @@ export interface AttackEffect {
     | 'KNOCKBACK';
   chance: number; // 0 to 1
   value?: number; // e.g., how many times to multi-hit, or duration of stun
+  /** Maximum number of stacks for effects that accumulate. */
+  maxStacks?: number;
 }
 
 export interface ProjectilePattern {
@@ -38,7 +41,7 @@ export type ProjectileVisual =
       innerColor: number;
     }
   | {
-      type: 'WATER_STREAM';
+      type: 'WATER_STREAM' | 'VENOM_STREAM';
       outerColor: number;
       innerColor: number;
       highlightColor: number;
@@ -85,6 +88,7 @@ export interface AttackDefinition {
   behaviorType:
     | 'PROJECTILE'
     | 'INSTANT_AOE'
+    | 'POISON_AOE'
     | 'BEAM'
     | 'SUPPORT_AURA'
     | 'INSTANT_MELEE';

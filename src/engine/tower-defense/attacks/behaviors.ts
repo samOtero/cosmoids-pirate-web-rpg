@@ -258,6 +258,57 @@ export const InstantAoeBehavior: AttackBehavior = {
   },
 };
 
+function isEligiblePoisonAoeTarget(
+  engine: TowerDefenseEngine,
+  source: Tower,
+  attackDef: AttackDefinition,
+  enemy: Enemy
+): boolean {
+  return (
+    enemy.hp > 0 &&
+    !enemy.immuneToStatusEffects &&
+    !enemy.statusConditions.some((status) => status.type === 'POISON') &&
+    engine.isPositionInAttackRange(
+      source.position,
+      enemy.position,
+      attackDef.rangeIndex
+    )
+  );
+}
+
+export const PoisonAoeBehavior: AttackBehavior = {
+  canExecute(engine, source, attackDef): boolean {
+    return engine.enemies.some((enemy) =>
+      isEligiblePoisonAoeTarget(engine, source, attackDef, enemy)
+    );
+  },
+
+  execute(engine, source, attackDef): void {
+    const targets = engine.enemies.filter((enemy) =>
+      isEligiblePoisonAoeTarget(engine, source, attackDef, enemy)
+    );
+    if (targets.length === 0) return;
+
+    targets.forEach((enemy) => {
+      EffectProcessor.applyDamageAndEffects(engine, source, enemy, attackDef);
+    });
+
+    if (attackDef.visualEffectConfigId) {
+      const configId = attackDef.visualEffectConfigId;
+      const vfxConfig = CREATURE_TD_CONFIGS[configId]?.default?.vfxAnimation;
+      engine.visualEffects.push({
+        id: `vfx_toxic_pollen_${source.id}_${engine.elapsedTimeMs}_${Math.random()}`,
+        configId,
+        position: { ...source.position },
+        durationMs: vfxConfig?.durationMs ?? 900,
+        elapsedMs: 0,
+        facingDirection: source.facingDirection,
+        rangeIndex: attackDef.rangeIndex,
+      });
+    }
+  },
+};
+
 export const SupportAuraBehavior: AttackBehavior = {
   canExecute(engine, source, attackDef) {
     // Open with the howl as soon as enemies arrive, without wasting it between waves.
@@ -308,5 +359,6 @@ export const AttackBehaviorRegistry: Record<string, AttackBehavior> = {
   PROJECTILE: ProjectileBehavior,
   INSTANT_MELEE: InstantMeleeBehavior,
   INSTANT_AOE: InstantAoeBehavior,
+  POISON_AOE: PoisonAoeBehavior,
   SUPPORT_AURA: SupportAuraBehavior,
 };

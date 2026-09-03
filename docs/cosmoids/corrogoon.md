@@ -1,6 +1,6 @@
 # Corrogoon
 
-> Concept record finalized August 30, 2026. Corrogoon's production game assets, creature registry entry, manifest, and Level 5 prisoner definition are implemented; its captive-ally behavior remains planned.
+> Concept record finalized August 30, 2026. Corrogoon's production game assets, creature registry entry, manifest, Level 5 prisoner definition, and captive-ally behavior are implemented.
 
 ![Corrogoon concept art](./images/corrogoon-concept.png)
 
@@ -63,7 +63,9 @@ The production icon and directional sprites follow the project's smooth painted 
 
 Corrogoon is one of several optional prisoners the player can release while trying to free Tigrevel. Every released prisoner should contribute directly to breaking the main cell gate.
 
-After its cell opens, Corrogoon travels to Tigrevel's gate and repeatedly blasts it with acid-soaked grit. Its attack can deal direct structure damage while applying a persistent **Scoured** effect that reduces the gate's defense against attacks from the player and other freed prisoners.
+After its cell opens, Corrogoon travels to Tigrevel's gate and launches acid-soaked grit at every living hostile creature and surviving gate on the battlefield every six seconds. Each impact applies **Scoured** for ten seconds. Scoured deals 4 Poison damage every two seconds and reduces both Defense and Special Defense by 25%; later volleys refresh the timer without stacking the reduction.
+
+Scoured deliberately works on normally status-immune structures. This lets Corrogoon erode Tigrevel's bars while also creating chain breakouts: if the damage-over-time effect destroys another prisoner gate, that gate's normal release sequence runs. Towers and freed objective allies are excluded from the volley.
 
 This makes Corrogoon valuable without making it the sole solution: every captive joins the breach effort, while each brings a different secondary benefit.
 
@@ -90,8 +92,6 @@ This makes Corrogoon valuable without making it the sole solution: every captive
 
 ## Open Decisions
 
-- Define the final gate-defense reduction, duration, attack cadence, and gameplay visual effects.
 - Decide whether Corrogoon is a single-stage species or part of an evolutionary family.
 - Define its broader habitat and species ecology outside the Ironbell Navy prison.
 - Create journal artwork after its broader habitat and observed wild behavior are finalized.
-- Implement optional-cell release, allied navigation, and the gate-scouring sequence.

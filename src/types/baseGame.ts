@@ -192,6 +192,7 @@ export interface VFXAnimationConfig {
     | 'COIR_SNARE'
     | 'STRING_SHOT'
     | 'WIND_GUST'
+    | 'TOXIC_POLLEN'
     | 'HOWL'
     | 'RALLY_HOWL'
     | 'HARDEN'

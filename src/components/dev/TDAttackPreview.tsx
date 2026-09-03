@@ -10,6 +10,9 @@ import { ENEMY_ABILITY_DEFS } from '@/engine/tower-defense/enemyAbilities';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 
 const PRIMARY_TARGET_ID = 'attack-preview-primary-target';
+const PREVIEW_TOWER_POSITION = { x: 42, y: 50 };
+const AOE_TARGET_CLUSTER_CENTER = { x: 62, y: 50 };
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 
 interface EnemyPreviewConfig {
   id: string;
@@ -74,6 +77,15 @@ function armWindGustTarget(engine: TowerDefenseEngine) {
   item.position = { ...target.position };
 }
 
+function getAdditionalEnemyPosition(index: number) {
+  const angle = index * GOLDEN_ANGLE - Math.PI / 2;
+  const radius = 10 + (index % 3) * 4;
+  return {
+    x: AOE_TARGET_CLUSTER_CENTER.x + Math.cos(angle) * radius,
+    y: AOE_TARGET_CLUSTER_CENTER.y + Math.sin(angle) * radius,
+  };
+}
+
 function createEngine(
   towerCreatureId: string,
   towerLevel: number,
@@ -104,7 +116,7 @@ function createEngine(
           { x: 100, y: 50 },
         ],
       ],
-      placementSpots: [{ x: 42, y: 50 }],
+      placementSpots: [{ ...PREVIEW_TOWER_POSITION }],
       waveEnemyDefinitions: [],
       waves: [{ id: 'attack-preview', groups: [] }],
       disableCapture: true,
@@ -129,7 +141,11 @@ function createEngine(
     ]
   );
 
-  engine.placeTower(towerCreature.id, 42, 50);
+  engine.placeTower(
+    towerCreature.id,
+    PREVIEW_TOWER_POSITION.x,
+    PREVIEW_TOWER_POSITION.y
+  );
   if (showNearbyAlly) engine.placeTower('attack-preview-ally', 52, 39);
   engine.spawnPreviewEnemy({
     id: PRIMARY_TARGET_ID,
@@ -141,13 +157,11 @@ function createEngine(
   });
 
   additionalEnemies.forEach((enemy, index) => {
-    const column = Math.floor(index / 3);
-    const row = index % 3;
     engine.spawnPreviewEnemy({
       id: enemy.id,
       creatureId: enemy.creatureId,
       level: enemy.level,
-      position: { x: 76 + column * 9, y: 28 + row * 22 },
+      position: getAdditionalEnemyPosition(index),
       abilityId: enemy.abilityId || undefined,
       isInvulnerable: true,
     });
@@ -497,8 +511,9 @@ export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
 
             {additionalEnemies.length === 0 ? (
               <p className="rounded bg-slate-950/60 p-2 text-xs text-slate-400">
-                Add actors to compare creature renders or preview ally-targeting
-                abilities such as Tailwind.
+                Add actors inside the tower&apos;s standard area radius to
+                preview AOE attacks or ally-targeting abilities such as
+                Tailwind.
               </p>
             ) : (
               <div className="flex flex-col gap-2">

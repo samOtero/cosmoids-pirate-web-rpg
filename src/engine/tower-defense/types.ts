@@ -150,6 +150,17 @@ export type TDObjectiveAllyBehavior =
       surgeVisualDurationMs: number;
       pushDistance: number;
       gateDamagePerCurrent: number;
+    }
+  | {
+      type: 'CORROGOON_SCOURING_VOLLEY';
+      volleyIntervalMs: number;
+      projectileTravelMs: number;
+      projectileStaggerMs: number;
+      scouredDurationMs: number;
+      tickDamage: number;
+      tickIntervalMs: number;
+      defenseMultiplier: number;
+      specialDefenseMultiplier: number;
     };
 
 export interface TDObjectiveAllyDefinition {
@@ -361,6 +372,10 @@ export interface StatusCondition {
   durationMs: number;
   tickDamage?: number;
   lastTickTime?: number;
+  /** Current intensity for status effects that support stacking. */
+  stackCount?: number;
+  /** Per-stack damage retained while a stacking status is active. */
+  damagePerStack?: number;
 }
 
 export interface Enemy extends BaseTDUnit {
@@ -388,6 +403,16 @@ export interface Enemy extends BaseTDUnit {
   currentDefense: number;
   currentSpecialDefense: number;
   statusConditions: StatusCondition[];
+  /** Corrogoon's armor-eating damage-over-time effect; structures are valid targets. */
+  scouredEffect?: {
+    sourceAllyId: string;
+    expiresAtMs: number;
+    nextTickAtMs: number;
+    tickDamage: number;
+    tickIntervalMs: number;
+    defenseMultiplier: number;
+    specialDefenseMultiplier: number;
+  };
   currentWaypointIndex: number;
   pathIndex: number; // Index into the level's `paths` array
   heldCaptureUnitId?: string; // ID of the CaptureUnit they are holding
@@ -448,6 +473,7 @@ export interface ObjectiveAlly extends BaseTDUnit {
     | 'recovering'
     | 'assaulting'
     | 'channeling'
+    | 'volleying'
     | 'exhausted';
   path: Point[];
   currentWaypointIndex: number;
@@ -485,6 +511,18 @@ export interface ObjectiveAllyCurrent {
   gateDamage: number;
   nextSurgeAtMs: number;
   lastSurgeAtMs?: number;
+}
+
+export interface ObjectiveAllyAcidShot {
+  id: string;
+  ownerAllyId: string;
+  targetId: string;
+  sourcePosition: Point;
+  targetPosition: Point;
+  launchedAtMs: number;
+  impactAtMs: number;
+  expiresAtMs: number;
+  impactedAtMs?: number;
 }
 
 export interface DestroyedStructureVisual {

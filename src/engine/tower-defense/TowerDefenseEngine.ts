@@ -26,6 +26,7 @@ import {
   ObjectiveAlly,
   ObjectiveAllyShadow,
   ObjectiveAllyCurrent,
+  ObjectiveAllyAcidShot,
   DestroyedStructureVisual,
 } from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
@@ -47,6 +48,62 @@ import {
 interface PathProjection {
   progress: number;
   distanceSq: number;
+}
+
+export interface WaypointStepResult {
+  reachedWaypoint: boolean;
+  facingDirection: 'up' | 'down' | 'left' | 'right';
+}
+
+export function stepUnitTowardsWaypoint(
+  position: Point,
+  targetPoint: Point,
+  frameDistance: number,
+  aspectRatio: number,
+  previousPoint?: Point,
+  currentFacingDirection: 'up' | 'down' | 'left' | 'right' = 'down'
+): WaypointStepResult {
+  const safeAspectRatio = Math.max(aspectRatio, Number.EPSILON);
+  const dx = targetPoint.x - position.x;
+  const dy = targetPoint.y - position.y;
+  const visualDx = dx * safeAspectRatio;
+  const visualDy = dy;
+  const visualDistance = Math.hypot(visualDx, visualDy);
+  const maxStepVisual = frameDistance * safeAspectRatio;
+
+  // Determine facing direction from segment vector (or current delta if previousPoint is unavailable)
+  let refDx = dx;
+  let refDy = dy;
+  if (previousPoint) {
+    const segDx = targetPoint.x - previousPoint.x;
+    const segDy = targetPoint.y - previousPoint.y;
+    if (segDx !== 0 || segDy !== 0) {
+      refDx = segDx;
+      refDy = segDy;
+    }
+  }
+
+  let facingDirection = currentFacingDirection;
+  const refVisualDx = refDx * safeAspectRatio;
+  const refVisualDy = refDy;
+  if (refDx !== 0 || refDy !== 0) {
+    if (Math.abs(refVisualDx) >= Math.abs(refVisualDy)) {
+      facingDirection = refDx >= 0 ? 'right' : 'left';
+    } else {
+      facingDirection = refDy > 0 ? 'down' : 'up';
+    }
+  }
+
+  if (visualDistance <= maxStepVisual || visualDistance === 0) {
+    position.x = targetPoint.x;
+    position.y = targetPoint.y;
+    return { reachedWaypoint: true, facingDirection };
+  }
+
+  const stepRatio = maxStepVisual / visualDistance;
+  position.x += dx * stepRatio;
+  position.y += dy * stepRatio;
+  return { reachedWaypoint: false, facingDirection };
 }
 
 function getPathSegmentLength(
@@ -198,6 +255,7 @@ export class TowerDefenseEngine {
   public objectiveAllies: ObjectiveAlly[] = [];
   public objectiveAllyShadows: ObjectiveAllyShadow[] = [];
   public objectiveAllyCurrents: ObjectiveAllyCurrent[] = [];
+  public objectiveAllyAcidShots: ObjectiveAllyAcidShot[] = [];
   public destroyedStructureVisuals: DestroyedStructureVisual[] = [];
   public focusedStructureId: string | null = null;
 
@@ -290,27 +348,9 @@ export class TowerDefenseEngine {
     this.authoredPaths = rawPaths.map((path) =>
       path.map((point) => ({ ...point }))
     );
-    this.paths = rawPaths.map((path) => {
-      if (path.length <= 1) return path;
-      const snappedPath = [{ ...path[0] }];
-      for (let i = 1; i < path.length; i++) {
-        const prev = snappedPath[i - 1];
-        const curr = path[i];
-        const dx = Math.abs(curr.x - prev.x);
-        // Normalize aspect ratio for coordinate comparison if needed?
-        // Actually, we'll just snap to whichever delta is larger purely in percentage coordinates.
-        const dy = Math.abs(curr.y - prev.y);
-
-        if (dx > dy) {
-          // Horizontal
-          snappedPath.push({ x: curr.x, y: prev.y });
-        } else {
-          // Vertical
-          snappedPath.push({ x: prev.x, y: curr.y });
-        }
-      }
-      return snappedPath;
-    });
+    this.paths = rawPaths.map((path) =>
+      path.map((point) => ({ ...point }))
+    );
     this.placementSpots = levelData.placementSpots || [];
     this.waveEnemyDefinitions = Object.fromEntries(
       (levelData.waveEnemyDefinitions ?? []).map((definition) => [
@@ -503,38 +543,26 @@ export class TowerDefenseEngine {
 
         if (unit.currentWaypointIndex < unit.path.length) {
           const targetPoint = unit.path[unit.currentWaypointIndex];
-          const dx = targetPoint.x - unit.position.x;
-          const dy = targetPoint.y - unit.position.y;
+          const previousPoint =
+            unit.currentWaypointIndex > 0
+              ? unit.path[unit.currentWaypointIndex - 1]
+              : undefined;
           const moveSpeed = unit.speed;
           // speed is in % per second, so distance = speed * (deltaMs / 1000)
           const frameDistance = moveSpeed * (deltaMs / 1000);
 
-          const isHorizontal = Math.abs(dx) > Math.abs(dy);
+          const { reachedWaypoint, facingDirection } = stepUnitTowardsWaypoint(
+            unit.position,
+            targetPoint,
+            frameDistance,
+            this.aspectRatio,
+            previousPoint,
+            unit.facingDirection
+          );
+          unit.facingDirection = facingDirection;
 
-          if (isHorizontal) {
-            const dir = Math.sign(dx);
-            const moveDist = dir * frameDistance;
-
-            if (Math.abs(dx) <= frameDistance) {
-              unit.position.x = targetPoint.x;
-              unit.position.y = targetPoint.y;
-              unit.currentWaypointIndex++;
-            } else {
-              unit.position.x += moveDist;
-              unit.facingDirection = dx > 0 ? 'right' : 'left';
-            }
-          } else {
-            const dir = Math.sign(dy);
-            const moveDist = dir * frameDistance * this.aspectRatio;
-
-            if (Math.abs(dy) <= Math.abs(moveDist)) {
-              unit.position.x = targetPoint.x;
-              unit.position.y = targetPoint.y;
-              unit.currentWaypointIndex++;
-            } else {
-              unit.position.y += moveDist;
-              unit.facingDirection = dy > 0 ? 'down' : 'up';
-            }
+          if (reachedWaypoint) {
+            unit.currentWaypointIndex++;
           }
         } else {
           // Reached end of path, clear path to prevent redundant calculation
@@ -638,64 +666,37 @@ export class TowerDefenseEngine {
         );
       }
 
-      const activePath = this.paths[enemy.pathIndex] || [];
-      if (
-        (!enemy.isMovingBackward &&
-          enemy.currentWaypointIndex < activePath.length) ||
-        (enemy.isMovingBackward && enemy.currentWaypointIndex >= 0)
-      ) {
-        const targetPoint = activePath[enemy.currentWaypointIndex];
-        const dx = targetPoint.x - enemy.position.x;
-        const dy = targetPoint.y - enemy.position.y;
+        const activePath = this.paths[enemy.pathIndex] || [];
+        if (
+          (!enemy.isMovingBackward &&
+            enemy.currentWaypointIndex < activePath.length) ||
+          (enemy.isMovingBackward && enemy.currentWaypointIndex >= 0)
+        ) {
+          const targetPoint = activePath[enemy.currentWaypointIndex];
+          const previousPoint = enemy.isMovingBackward
+            ? activePath[enemy.currentWaypointIndex + 1]
+            : activePath[enemy.currentWaypointIndex - 1];
+          const frameDistance = moveSpeed * timeScale;
 
-        const frameDistance = moveSpeed * timeScale;
+          const { reachedWaypoint, facingDirection } = stepUnitTowardsWaypoint(
+            enemy.position,
+            targetPoint,
+            frameDistance,
+            this.aspectRatio,
+            previousPoint,
+            enemy.facingDirection
+          );
+          enemy.facingDirection = facingDirection;
 
-        // Since paths are strictly horizontal or vertical, only one of dx or dy is non-zero (or both are close to zero)
-        const isHorizontal = Math.abs(dx) > Math.abs(dy);
-
-        if (isHorizontal) {
-          // Horizontal movement
-          const dir = Math.sign(dx);
-          const moveDist = dir * frameDistance;
-
-          if (Math.abs(dx) <= frameDistance) {
-            // Reached waypoint
-            enemy.position.x = targetPoint.x;
-            enemy.position.y = targetPoint.y;
-
+          if (reachedWaypoint) {
             // Advance/regress waypoint
             if (enemy.isMovingBackward) {
               enemy.currentWaypointIndex--;
             } else {
               enemy.currentWaypointIndex++;
             }
-          } else {
-            enemy.position.x += moveDist;
-            enemy.facingDirection = dx > 0 ? 'right' : 'left';
-          }
-        } else {
-          // Vertical movement
-          const dir = Math.sign(dy);
-          // Apply aspect ratio scale directly to vertical speed to keep movement visually consistent
-          const moveDist = dir * frameDistance * this.aspectRatio;
-
-          if (Math.abs(dy) <= Math.abs(moveDist)) {
-            // Reached waypoint
-            enemy.position.x = targetPoint.x;
-            enemy.position.y = targetPoint.y;
-
-            // Advance/regress waypoint
-            if (enemy.isMovingBackward) {
-              enemy.currentWaypointIndex--;
-            } else {
-              enemy.currentWaypointIndex++;
-            }
-          } else {
-            enemy.position.y += moveDist;
-            enemy.facingDirection = dy > 0 ? 'down' : 'up';
           }
         }
-      }
 
       // Check if enemy reached the forward end, and should turnaround instead of despawning
       if (
@@ -708,6 +709,18 @@ export class TowerDefenseEngine {
         // activePath.length - 1 is the last node, activePath.length - 2 is the one before it.
         // It might be possible path is shorter than 2 nodes.
         enemy.currentWaypointIndex = Math.max(0, activePath.length - 2);
+        const nextTarget = activePath[enemy.currentWaypointIndex];
+        if (nextTarget) {
+          const segDx = nextTarget.x - enemy.position.x;
+          const segDy = nextTarget.y - enemy.position.y;
+          const visualDx = segDx * this.aspectRatio;
+          const visualDy = segDy;
+          if (Math.abs(visualDx) >= Math.abs(visualDy)) {
+            enemy.facingDirection = segDx >= 0 ? 'right' : 'left';
+          } else {
+            enemy.facingDirection = segDy > 0 ? 'down' : 'up';
+          }
+        }
       }
     });
 
@@ -982,6 +995,8 @@ export class TowerDefenseEngine {
     this.processObjectiveAllies(newEnemies, deltaMs);
     this.processObjectiveAllyShadows(newEnemies);
     this.processObjectiveAllyCurrents(newEnemies);
+    this.processObjectiveAllyAcidShots(newEnemies);
+    this.processScouredEffects(newEnemies);
 
     // Filter dead enemies and collect money
     const deadEnemies = newEnemies.filter((e) => e.hp <= 0);
@@ -2030,8 +2045,12 @@ export class TowerDefenseEngine {
     );
     const dx = captureUnit.position.x - facingSample.x;
     const dy = captureUnit.position.y - facingSample.y;
-    if (Math.abs(dx) > Math.abs(dy)) {
-      captureUnit.facingDirection = dx > 0 ? 'right' : 'left';
+    const visualDx = dx * this.aspectRatio;
+    const visualDy = dy;
+    if (Math.abs(visualDx) >= Math.abs(visualDy)) {
+      if (Math.abs(dx) > 0.0001) {
+        captureUnit.facingDirection = dx > 0 ? 'right' : 'left';
+      }
     } else if (Math.abs(dy) > 0.0001) {
       captureUnit.facingDirection = dy > 0 ? 'down' : 'up';
     }
@@ -2401,31 +2420,20 @@ export class TowerDefenseEngine {
     ally: ObjectiveAlly,
     target: Point,
     speed: number,
-    deltaMs: number
+    deltaMs: number,
+    previousPoint?: Point
   ): boolean {
-    const dx = target.x - ally.position.x;
-    const dy = target.y - ally.position.y;
     const frameDistance = speed * (deltaMs / 1000);
-    const isHorizontal = Math.abs(dx) > Math.abs(dy);
-
-    if (isHorizontal) {
-      if (Math.abs(dx) <= frameDistance) {
-        ally.position = { ...target };
-        return true;
-      }
-      ally.position.x += Math.sign(dx) * frameDistance;
-      ally.facingDirection = dx > 0 ? 'right' : 'left';
-      return false;
-    }
-
-    const verticalDistance = frameDistance * this.aspectRatio;
-    if (Math.abs(dy) <= verticalDistance) {
-      ally.position = { ...target };
-      return true;
-    }
-    ally.position.y += Math.sign(dy) * verticalDistance;
-    ally.facingDirection = dy > 0 ? 'down' : 'up';
-    return false;
+    const { reachedWaypoint, facingDirection } = stepUnitTowardsWaypoint(
+      ally.position,
+      target,
+      frameDistance,
+      this.aspectRatio,
+      previousPoint,
+      ally.facingDirection
+    );
+    ally.facingDirection = facingDirection;
+    return reachedWaypoint;
   }
 
   private processObjectiveAllies(enemies: Enemy[], deltaMs: number): void {
@@ -2439,14 +2447,26 @@ export class TowerDefenseEngine {
             this.startSepippetShadowAssault(ally);
           } else if (ally.behavior.type === 'PARLET_MOSAIC_CURRENTS') {
             this.startParletMosaicCurrents(ally);
+          } else if (ally.behavior.type === 'CORROGOON_SCOURING_VOLLEY') {
+            this.startCorrogoonScouringVolley(ally);
           } else {
             ally.phase = 'bowing';
             ally.phaseStartedAtMs = this.elapsedTimeMs;
           }
           continue;
         }
+        const previousWaypoint =
+          ally.currentWaypointIndex > 0
+            ? ally.path[ally.currentWaypointIndex - 1]
+            : undefined;
         if (
-          this.moveObjectiveAllyTowards(ally, waypoint, ally.moveSpeed, deltaMs)
+          this.moveObjectiveAllyTowards(
+            ally,
+            waypoint,
+            ally.moveSpeed,
+            deltaMs,
+            previousWaypoint
+          )
         ) {
           ally.currentWaypointIndex++;
         }
@@ -2506,6 +2526,16 @@ export class TowerDefenseEngine {
       }
 
       if (ally.behavior.type === 'PARLET_MOSAIC_CURRENTS') continue;
+
+      if (ally.behavior.type === 'CORROGOON_SCOURING_VOLLEY') {
+        if (
+          ally.phase === 'volleying' &&
+          this.elapsedTimeMs >= (ally.nextActionAtMs ?? 0)
+        ) {
+          this.launchCorrogoonScouringVolley(ally, enemies);
+        }
+        continue;
+      }
 
       if (ally.phase === 'bowing') {
         ally.facingDirection = 'right';
@@ -2851,6 +2881,148 @@ export class TowerDefenseEngine {
         targetStructure,
         Array.from(targetStructure.damagedByTowerIds)
       );
+    }
+  }
+
+  private startCorrogoonScouringVolley(ally: ObjectiveAlly): void {
+    if (ally.behavior.type !== 'CORROGOON_SCOURING_VOLLEY') return;
+    ally.phase = 'volleying';
+    ally.phaseStartedAtMs = this.elapsedTimeMs;
+    ally.nextActionAtMs = this.elapsedTimeMs;
+    ally.facingDirection = 'up';
+  }
+
+  private launchCorrogoonScouringVolley(
+    ally: ObjectiveAlly,
+    enemies: Enemy[]
+  ): void {
+    if (ally.behavior.type !== 'CORROGOON_SCOURING_VOLLEY') return;
+    const behavior = ally.behavior;
+    const targets = enemies.filter((enemy) => enemy.hp > 0);
+
+    ally.impactCount++;
+    ally.phaseStartedAtMs = this.elapsedTimeMs;
+    ally.nextActionAtMs = this.elapsedTimeMs + behavior.volleyIntervalMs;
+    this.objectiveAllyAcidShots.push(
+      ...targets.map((target, index) => {
+        const launchedAtMs =
+          this.elapsedTimeMs + index * behavior.projectileStaggerMs;
+        const impactAtMs = launchedAtMs + behavior.projectileTravelMs;
+        return {
+          id: `${ally.id}_acid_${ally.impactCount}_${target.id}`,
+          ownerAllyId: ally.id,
+          targetId: target.id,
+          sourcePosition: { ...ally.position },
+          targetPosition: { ...target.position },
+          launchedAtMs,
+          impactAtMs,
+          expiresAtMs: impactAtMs + 360,
+        };
+      })
+    );
+  }
+
+  private processObjectiveAllyAcidShots(enemies: Enemy[]): void {
+    for (const shot of this.objectiveAllyAcidShots) {
+      const target = enemies.find((enemy) => enemy.id === shot.targetId);
+      if (target?.hp && shot.impactedAtMs === undefined) {
+        shot.targetPosition = { ...target.position };
+      }
+      if (
+        shot.impactedAtMs !== undefined ||
+        this.elapsedTimeMs < shot.impactAtMs
+      ) {
+        continue;
+      }
+
+      shot.impactedAtMs = this.elapsedTimeMs;
+      if (!target || target.hp <= 0) continue;
+      const owner = this.objectiveAllies.find(
+        (ally) => ally.id === shot.ownerAllyId
+      );
+      if (!owner || owner.behavior.type !== 'CORROGOON_SCOURING_VOLLEY')
+        continue;
+      const behavior = owner.behavior;
+      const activeEffect =
+        target.scouredEffect &&
+        target.scouredEffect.expiresAtMs > this.elapsedTimeMs
+          ? target.scouredEffect
+          : undefined;
+      target.scouredEffect = {
+        sourceAllyId: owner.id,
+        expiresAtMs: this.elapsedTimeMs + behavior.scouredDurationMs,
+        nextTickAtMs:
+          activeEffect?.nextTickAtMs ??
+          this.elapsedTimeMs + behavior.tickIntervalMs,
+        tickDamage: behavior.tickDamage,
+        tickIntervalMs: behavior.tickIntervalMs,
+        defenseMultiplier: behavior.defenseMultiplier,
+        specialDefenseMultiplier: behavior.specialDefenseMultiplier,
+      };
+      startDamageFlash(target, ElementType.POISON);
+      if (!activeEffect) {
+        this.floatingTexts.push({
+          id: `ft_scoured_${target.id}_${this.elapsedTimeMs}`,
+          text: 'SCOURED',
+          position: { ...target.position },
+          color: 0xa3e635,
+          scale: 0.9,
+          durationMs: 900,
+          elapsedMs: 0,
+        });
+      }
+    }
+
+    this.objectiveAllyAcidShots = this.objectiveAllyAcidShots.filter(
+      (shot) => shot.expiresAtMs > this.elapsedTimeMs
+    );
+  }
+
+  private processScouredEffects(enemies: Enemy[]): void {
+    for (const enemy of enemies) {
+      const effect = enemy.scouredEffect;
+      if (!effect || enemy.hp <= 0) continue;
+
+      while (
+        enemy.hp > 0 &&
+        effect.nextTickAtMs <= this.elapsedTimeMs &&
+        effect.nextTickAtMs <= effect.expiresAtMs
+      ) {
+        const damage = Math.min(effect.tickDamage, enemy.hp);
+        enemy.hp -= damage;
+        effect.nextTickAtMs += effect.tickIntervalMs;
+        startDamageFlash(enemy, ElementType.POISON);
+        this.floatingTexts.push({
+          id: `ft_scoured_tick_${enemy.id}_${effect.nextTickAtMs}`,
+          text: Math.ceil(damage).toString(),
+          position: { ...enemy.position },
+          color: 0xd946ef,
+          durationMs: 750,
+          elapsedMs: 0,
+        });
+      }
+
+      if (enemy.hp <= 0 && !enemy.defeatEventEmitted) {
+        enemy.defeatEventEmitted = true;
+        if (enemy.kind === 'structure') {
+          this.handleStructureDestroyed(
+            enemy,
+            Array.from(enemy.damagedByTowerIds)
+          );
+        } else {
+          this.events.emit({
+            type: 'ENEMY_DIED',
+            enemyId: enemy.id,
+            enemyDefinitionId: enemy.definitionId,
+            enemyLevel: enemy.level,
+            participantTowerIds: [],
+          });
+        }
+      }
+
+      if (effect.expiresAtMs <= this.elapsedTimeMs) {
+        enemy.scouredEffect = undefined;
+      }
     }
   }
 

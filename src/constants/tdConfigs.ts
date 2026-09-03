@@ -542,6 +542,18 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowScaleY: 1,
     },
   },
+  navy_guard_battle: {
+    default: {
+      url: '/battles/characters/navy_guard_battle.png',
+      scale: 0.16,
+      flipX: true,
+      shadowScaleX: 3.2,
+      shadowScaleY: 0.9,
+      shadowOffsetY: 13,
+      offsetY: -94,
+      healthBarOffsetY: -5,
+    },
+  },
   rat_catcher_battle: {
     default: {
       url: '/battles/characters/rat_catcher_battle.png',
@@ -659,6 +671,14 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       vfxAnimation: {
         type: 'WIND_GUST',
         durationMs: 750,
+      },
+    },
+  },
+  attack_toxic_pollen_1: {
+    default: {
+      vfxAnimation: {
+        type: 'TOXIC_POLLEN',
+        durationMs: 900,
       },
     },
   },

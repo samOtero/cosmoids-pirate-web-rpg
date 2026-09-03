@@ -26,7 +26,11 @@
       "attackId": "WATER_GUN"
     },
     {
-      "level": 7,
+      "level": 8,
+      "attackId": "VENOM_SPRAY"
+    },
+    {
+      "level": 14,
       "attackId": "BUBBLE_BEAM"
     }
   ],

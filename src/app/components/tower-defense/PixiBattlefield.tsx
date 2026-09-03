@@ -1164,6 +1164,83 @@ function updateWindGust(
   container.alpha = opacity;
 }
 
+function drawToxicPollen(container: PIXI.Container) {
+  const haze = new PIXI.Graphics();
+  haze.label = 'toxic_pollen_haze';
+  container.addChild(haze);
+
+  const bloom = new PIXI.Graphics();
+  bloom.label = 'toxic_pollen_bloom';
+  container.addChild(bloom);
+
+  const motes = new PIXI.Graphics();
+  motes.label = 'toxic_pollen_motes';
+  container.addChild(motes);
+}
+
+function updateToxicPollen(
+  container: PIXI.Container,
+  progress: number,
+  maxRadius: number
+) {
+  const haze = container.getChildByLabel('toxic_pollen_haze') as
+    | PIXI.Graphics
+    | undefined;
+  const bloom = container.getChildByLabel('toxic_pollen_bloom') as
+    | PIXI.Graphics
+    | undefined;
+  const motes = container.getChildByLabel('toxic_pollen_motes') as
+    | PIXI.Graphics
+    | undefined;
+  const expansion = 1 - Math.pow(1 - progress, 3);
+  const radius = Math.max(2, maxRadius * expansion);
+  const fade = Math.min(1, Math.max(0, (progress - 0.68) / 0.32));
+  const opacity = 1 - fade;
+
+  if (haze) {
+    haze.clear();
+    haze.circle(0, 0, radius * 0.88);
+    haze.fill({ color: 0xa855f7, alpha: 0.1 * opacity });
+    haze.circle(0, 0, radius * 0.58);
+    haze.fill({ color: 0xd9f99d, alpha: 0.12 * opacity });
+  }
+
+  if (bloom) {
+    bloom.clear();
+    for (let index = 0; index < 6; index += 1) {
+      const angle = (index / 6) * Math.PI * 2 + progress * 0.35;
+      const petalRadius = radius * 0.38;
+      bloom.ellipse(
+        Math.cos(angle) * petalRadius,
+        Math.sin(angle) * petalRadius,
+        radius * 0.34,
+        radius * 0.17
+      );
+    }
+    bloom.stroke({ color: 0xe879f9, width: 3, alpha: 0.52 * opacity });
+  }
+
+  if (motes) {
+    motes.clear();
+    for (let index = 0; index < 30; index += 1) {
+      const angle = index * 2.399 + progress * (0.8 + (index % 3) * 0.12);
+      const distance = radius * (0.2 + (index % 9) * 0.085);
+      const size = 1.8 + (index % 4) * 0.75;
+      motes.circle(
+        Math.cos(angle) * distance,
+        Math.sin(angle) * distance,
+        size
+      );
+      motes.fill({
+        color: index % 3 === 0 ? 0xf0abfc : 0xd9f99d,
+        alpha: (0.58 + (index % 4) * 0.08) * opacity,
+      });
+    }
+  }
+
+  container.alpha = opacity;
+}
+
 function drawHarden(container: PIXI.Container) {
   const overlay = new PIXI.Graphics();
   overlay.label = 'harden_overlay';
@@ -1477,6 +1554,124 @@ function updateDrenchedAura(
   }
 }
 
+type PoisonIndicator = PIXI.Container & {
+  elapsed: number;
+};
+
+function drawPoisonPollenIcon(graphics: PIXI.Graphics) {
+  const spores = [
+    { x: -3.5, y: 2.5, radius: 3.6 },
+    { x: 3.4, y: 2.2, radius: 3.2 },
+    { x: 0, y: -3.4, radius: 3.8 },
+  ];
+
+  spores.forEach(({ x, y, radius }, index) => {
+    graphics.circle(x, y, radius);
+    graphics.fill({
+      color: index === 1 ? 0xd9f99d : 0xc084fc,
+      alpha: 0.98,
+    });
+    graphics.circle(x - radius * 0.25, y - radius * 0.3, radius * 0.28);
+    graphics.fill({ color: 0xffffff, alpha: 0.72 });
+  });
+}
+
+/** Persistent Poison treatment: a purple tint plus a badge left of the HP bar. */
+function updatePoisonIndicator(
+  container: PIXI.Container,
+  enemy: Enemy,
+  sprite: PIXI.Sprite,
+  configId: string,
+  delta: number
+) {
+  const poison = enemy.statusConditions.find(
+    (status) => status.type === 'POISON'
+  );
+  let indicator = container.getChildByLabel('poisonIndicator') as
+    | PoisonIndicator
+    | undefined;
+
+  if (!poison) {
+    if (indicator) {
+      container.removeChild(indicator);
+      indicator.destroy({ children: true });
+    }
+    return;
+  }
+
+  // Damage flashes briefly take visual priority; the poison tint returns after.
+  if ((enemy.damageFlashTimerMs || 0) <= 0) {
+    sprite.tint = 0xd8b4fe;
+  }
+
+  if (!indicator) {
+    indicator = new PIXI.Container() as PoisonIndicator;
+    indicator.label = 'poisonIndicator';
+    indicator.elapsed = 0;
+
+    const badge = new PIXI.Graphics();
+    badge.circle(0, 0, 11);
+    badge.fill({ color: 0x3b0764, alpha: 0.94 });
+    badge.stroke({ color: 0xe879f9, alpha: 0.98, width: 2 });
+    indicator.addChild(badge);
+
+    const pollen = new PIXI.Graphics();
+    pollen.label = 'poisonPollenIcon';
+    drawPoisonPollenIcon(pollen);
+    indicator.addChild(pollen);
+
+    const stackBadge = new PIXI.Graphics();
+    stackBadge.label = 'poisonStackBadge';
+    stackBadge.roundRect(5, 4, 20, 15, 7.5);
+    stackBadge.fill({ color: 0x581c87, alpha: 0.98 });
+    stackBadge.stroke({ color: 0xd9f99d, alpha: 0.96, width: 1.5 });
+    indicator.addChild(stackBadge);
+
+    const stackText = new PIXI.Text({
+      text: '',
+      style: {
+        fontFamily: 'Arial, sans-serif',
+        fontSize: 10,
+        fontWeight: 'bold',
+        fill: 0xf7fee7,
+        stroke: { color: 0x3b0764, width: 2 },
+      },
+    });
+    stackText.label = 'poisonStackText';
+    stackText.anchor.set(0.5);
+    stackText.position.set(15, 11.5);
+    indicator.addChild(stackText);
+
+    container.addChild(indicator);
+  }
+
+  indicator.elapsed += delta;
+  const tdConfigMap = CREATURE_TD_CONFIGS[configId] || {
+    default: { scale: 1 },
+  };
+  const tdConfig = tdConfigMap[enemy.facingDirection] || tdConfigMap.default;
+  const hpOffsetY =
+    tdConfig.healthBarOffsetY ?? tdConfigMap.default?.healthBarOffsetY ?? -40;
+  indicator.position.set(-33, hpOffsetY - 13);
+
+  const pulse = 1 + Math.sin(indicator.elapsed * 0.11) * 0.055;
+  indicator.scale.set(pulse);
+  indicator.alpha = 0.9 + Math.sin(indicator.elapsed * 0.075) * 0.1;
+
+  const stackCount = Math.max(1, poison.stackCount ?? 1);
+  const stackBadge = indicator.getChildByLabel('poisonStackBadge') as
+    | PIXI.Graphics
+    | undefined;
+  const stackText = indicator.getChildByLabel('poisonStackText') as
+    | PIXI.Text
+    | undefined;
+  if (stackBadge) stackBadge.visible = stackCount > 1;
+  if (stackText) {
+    stackText.visible = stackCount > 1;
+    stackText.text = stackCount > 1 ? `×${stackCount}` : '';
+  }
+}
+
 const TYPE_COLORS: Record<ElementType, number> = {
   [ElementType.WATER]: 0x3b82f6,
   [ElementType.FIRE]: 0xef4444,
@@ -1540,6 +1735,77 @@ function updatePrisonGateVisual(container: PIXI.Container, enemy: Enemy) {
 
   if ((enemy.damageFlashTimerMs ?? 0) > 0) gate.alpha = 0.55;
   else gate.alpha = 1;
+}
+
+function updateScouredIndicator(
+  container: PIXI.Container,
+  enemy: Enemy,
+  elapsedTimeMs: number
+) {
+  let indicator = container.getChildByLabel('scouredIndicator') as
+    | PIXI.Graphics
+    | undefined;
+  if (!indicator) {
+    indicator = new PIXI.Graphics();
+    indicator.label = 'scouredIndicator';
+    container.addChild(indicator);
+  }
+  indicator.clear();
+  const effect = enemy.scouredEffect;
+  if (!effect || effect.expiresAtMs <= elapsedTimeMs) return;
+
+  const pulse = 0.75 + Math.sin(elapsedTimeMs / 130) * 0.2;
+  const isPrisonGate = enemy.structureVisualStyle === 'prison-gate';
+  if (isPrisonGate) {
+    const standing = resolvePrisonGateVisualLayout(
+      enemy.structureVisualLayout
+    ).standing;
+    indicator.position.set(standing.offsetX, standing.offsetY);
+    indicator.rotation = ((standing.rotationDegrees ?? 0) * Math.PI) / 180;
+    indicator.skew.set(
+      ((standing.skewXDegrees ?? 0) * Math.PI) / 180,
+      ((standing.skewYDegrees ?? 0) * Math.PI) / 180
+    );
+    const left = -standing.width / 2;
+    const top = -standing.height / 2;
+    for (let index = 0; index < 11; index++) {
+      const x = left + standing.width * (0.12 + ((index * 37) % 77) / 100);
+      const y = top + standing.height * (0.1 + ((index * 23) % 78) / 100);
+      const radius = 4 + (index % 3) * 2;
+      indicator.circle(x, y, radius);
+      indicator.fill({
+        color: index % 2 === 0 ? 0xa3e635 : 0xd946ef,
+        alpha: 0.35 + pulse * 0.25,
+      });
+      indicator.moveTo(x, y + radius);
+      indicator.lineTo(x - 2, y + radius + 10 + (index % 4) * 3);
+      indicator.stroke({ color: 0x84cc16, width: 3, alpha: 0.5 });
+    }
+    return;
+  }
+
+  indicator.position.set(0, 0);
+  indicator.rotation = 0;
+  indicator.skew.set(0, 0);
+  const radius = enemy.kind === 'structure' ? 58 : 31;
+  indicator.ellipse(
+    0,
+    enemy.kind === 'structure' ? -38 : 1,
+    radius,
+    radius * 0.48
+  );
+  indicator.stroke({ color: 0xa3e635, width: 4, alpha: 0.35 + pulse * 0.3 });
+  for (let index = 0; index < 7; index++) {
+    const angle = elapsedTimeMs / 850 + (index / 7) * Math.PI * 2;
+    const x = Math.cos(angle) * radius * 0.78;
+    const y =
+      (enemy.kind === 'structure' ? -38 : 1) + Math.sin(angle) * radius * 0.32;
+    indicator.circle(x, y, 3 + (index % 2) * 2);
+    indicator.fill({
+      color: index % 2 === 0 ? 0xd946ef : 0xa3e635,
+      alpha: 0.58 + pulse * 0.22,
+    });
+  }
 }
 
 function updateDestroyedPrisonGate(
@@ -1664,6 +1930,23 @@ function updateObjectiveAllyVisual(
       const y = -4 + Math.sin(angle) * 19;
       const size = 4 + (index % 2);
       action.poly([x, y - size, x + size, y, x, y + size, x - size, y]);
+      action.fill({ color: colors[index % colors.length], alpha: 0.82 });
+    }
+  } else if (ally.phase === 'volleying') {
+    const fanPulse = 1 + Math.sin(phaseTime / 100) * 0.12;
+    const colors = [0xd946ef, 0xa3e635, 0xc08457];
+    for (let index = 0; index < 5; index++) {
+      const angle = -Math.PI * 0.82 + (index / 4) * Math.PI * 0.64;
+      const x = Math.cos(angle) * 34 * fanPulse;
+      const y = -12 + Math.sin(angle) * 25 * fanPulse;
+      action.moveTo(0, -8);
+      action.lineTo(x, y);
+      action.stroke({
+        color: colors[index % colors.length],
+        width: 5,
+        alpha: 0.72,
+      });
+      action.circle(x, y, 4 + (index % 2));
       action.fill({ color: colors[index % colors.length], alpha: 0.82 });
     }
   } else if (ally.phase === 'exhausted') {
@@ -1979,6 +2262,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         const mosaicCurrentGraphics = new PIXI.Graphics();
         mosaicCurrentGraphics.eventMode = 'none';
         bgSprite.addChild(mosaicCurrentGraphics);
+        const acidVolleyGraphics = new PIXI.Graphics();
+        acidVolleyGraphics.eventMode = 'none';
+        app.stage.addChild(acidVolleyGraphics);
 
         // Full (unscrolled) background dimensions — used to derive scroll limits
         let fullBgHeight = 0;
@@ -2359,6 +2645,83 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               });
             }
           }
+
+          acidVolleyGraphics.clear();
+          for (const shot of engine.objectiveAllyAcidShots) {
+            if (engine.elapsedTimeMs < shot.launchedAtMs) continue;
+            const sourceX = offsetX + (shot.sourcePosition.x / 100) * screenW;
+            const sourceY = offsetY + (shot.sourcePosition.y / 100) * screenH;
+            const targetX = offsetX + (shot.targetPosition.x / 100) * screenW;
+            const targetY = offsetY + (shot.targetPosition.y / 100) * screenH;
+            const flightDuration = Math.max(
+              1,
+              shot.impactAtMs - shot.launchedAtMs
+            );
+            const progress = Math.max(
+              0,
+              Math.min(
+                1,
+                (engine.elapsedTimeMs - shot.launchedAtMs) / flightDuration
+              )
+            );
+            if (shot.impactedAtMs === undefined) {
+              const x = sourceX + (targetX - sourceX) * progress;
+              const y =
+                sourceY +
+                (targetY - sourceY) * progress -
+                Math.sin(progress * Math.PI) *
+                  Math.min(90, 35 + Math.abs(targetX - sourceX) * 0.08);
+              const previousProgress = Math.max(0, progress - 0.08);
+              const previousX =
+                sourceX + (targetX - sourceX) * previousProgress;
+              const previousY =
+                sourceY +
+                (targetY - sourceY) * previousProgress -
+                Math.sin(previousProgress * Math.PI) *
+                  Math.min(90, 35 + Math.abs(targetX - sourceX) * 0.08);
+              acidVolleyGraphics.moveTo(previousX, previousY);
+              acidVolleyGraphics.lineTo(x, y);
+              acidVolleyGraphics.stroke({
+                color: 0xd946ef,
+                width: 7,
+                alpha: 0.42,
+              });
+              acidVolleyGraphics.circle(x, y, 7);
+              acidVolleyGraphics.fill({ color: 0xa3e635, alpha: 0.92 });
+              acidVolleyGraphics.circle(x - 2, y - 2, 3);
+              acidVolleyGraphics.fill({ color: 0xf0abfc, alpha: 0.85 });
+            } else {
+              const impactAge = engine.elapsedTimeMs - shot.impactedAtMs;
+              const impactProgress = Math.min(1, impactAge / 360);
+              acidVolleyGraphics.circle(
+                targetX,
+                targetY,
+                10 + impactProgress * 28
+              );
+              acidVolleyGraphics.stroke({
+                color: 0xa3e635,
+                width: 5 * (1 - impactProgress) + 1,
+                alpha: 0.85 * (1 - impactProgress),
+              });
+              for (let index = 0; index < 5; index++) {
+                const angle = (index / 5) * Math.PI * 2;
+                const distance = 8 + impactProgress * 24;
+                acidVolleyGraphics.circle(
+                  targetX + Math.cos(angle) * distance,
+                  targetY + Math.sin(angle) * distance,
+                  3
+                );
+                acidVolleyGraphics.fill({
+                  color: index % 2 === 0 ? 0xd946ef : 0xa3e635,
+                  alpha: 0.75 * (1 - impactProgress),
+                });
+              }
+            }
+          }
+          app.stage.setChildIndex(
+            acidVolleyGraphics,
+            app.stage.children.length - 1
+          );
 
           const externalDragState = getDragStateRef.current
             ? getDragStateRef.current()
@@ -3237,6 +3600,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                     .healthBarOffsetY
                 : undefined
             );
+            updateScouredIndicator(container, enemy, engine.elapsedTimeMs);
             if (enemy.kind !== 'structure') {
               updateSparkles(container, enemy, app.ticker.deltaTime);
               updateSpeedBoostIndicator(
@@ -3281,6 +3645,13 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                   container,
                   enemy,
                   esprite,
+                  app.ticker.deltaTime
+                );
+                updatePoisonIndicator(
+                  container,
+                  enemy,
+                  esprite,
+                  enemy.tdConfigId ?? enemy.definitionId,
                   app.ticker.deltaTime
                 );
               }
@@ -3412,7 +3783,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                   def.projectileVisual.innerColor
                 );
                 container.addChild(flame);
-              } else if (def?.projectileVisual?.type === 'WATER_STREAM') {
+              } else if (
+                def?.projectileVisual?.type === 'WATER_STREAM' ||
+                def?.projectileVisual?.type === 'VENOM_STREAM'
+              ) {
                 const water = new PIXI.Graphics();
                 water.label = 'proj_graphics';
                 drawWaterStreamSegment(
@@ -3521,6 +3895,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             } else if (
               def?.projectileVisual?.type === 'FLAME' ||
               def?.projectileVisual?.type === 'WATER_STREAM' ||
+              def?.projectileVisual?.type === 'VENOM_STREAM' ||
               def?.projectileVisual?.type === 'COIR_BOLA' ||
               def?.projectileVisual?.type === 'STRING_COIL' ||
               def?.projectileVisual?.type === 'SAILCUTTER'
@@ -3665,6 +4040,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 container.addChild(rings);
               } else if (animConfig?.type === 'WIND_GUST') {
                 drawWindGust(container);
+              } else if (animConfig?.type === 'TOXIC_POLLEN') {
+                drawToxicPollen(container);
               } else if (animConfig?.type === 'HOWL') {
                 drawHowl(container);
               } else if (animConfig?.type === 'HARDEN') {
@@ -3800,6 +4177,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             } else if (animConfig?.type === 'WIND_GUST') {
               const radius = (TD_BASE_HEIGHT * (vfx.rangeIndex ?? 20)) / 100;
               updateWindGust(container, progress, radius);
+            } else if (animConfig?.type === 'TOXIC_POLLEN') {
+              const radius = (TD_BASE_HEIGHT * (vfx.rangeIndex ?? 20)) / 100;
+              updateToxicPollen(container, progress, radius);
             } else if (animConfig?.type === 'HOWL') {
               const radius = (TD_BASE_HEIGHT * (vfx.rangeIndex ?? 11)) / 100;
               updateHowl(container, progress, radius);

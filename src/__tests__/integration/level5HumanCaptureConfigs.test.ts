@@ -6,7 +6,13 @@ import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 
 describe('Level 5 human capture visuals', () => {
   it('uses capture-specific configs for Caleb, Kip, and Mari', () => {
-    expect(LEVEL_5.environmentUnits).toBeUndefined();
+    expect(LEVEL_5.environmentUnits).toEqual([
+      {
+        position: { x: 75, y: 29 },
+        tdConfigId: 'navy_guard_battle',
+        facingDirection: 'left',
+      },
+    ]);
     expect(LEVEL_5.captureUnits?.map((unit) => unit.tdConfigId)).toEqual([
       'caleb_capture',
       'kip_capture',
@@ -14,10 +20,31 @@ describe('Level 5 human capture visuals', () => {
     ]);
 
     const engine = new TowerDefenseEngine(LEVEL_5);
+    expect(engine.environmentUnits).toHaveLength(1);
+    expect(engine.environmentUnits[0]).toMatchObject({
+      tdConfigId: 'navy_guard_battle',
+      position: { x: 75, y: 29 },
+      facingDirection: 'left',
+    });
     expect(engine.hasCaptureUnitsGoal).toBe(true);
     expect(engine.captureUnits).toHaveLength(3);
     expect(engine.lives).toBe(3);
     engine.destroy();
+  });
+
+  it('renders the Navy guard as a stationary battlefield character', () => {
+    expect(CREATURE_TD_CONFIGS.navy_guard_battle).toEqual({
+      default: {
+        url: '/battles/characters/navy_guard_battle.png',
+        scale: 0.16,
+        flipX: true,
+        shadowScaleX: 3.2,
+        shadowScaleY: 0.9,
+        shadowOffsetY: 13,
+        offsetY: -94,
+        healthBarOffsetY: -5,
+      },
+    });
   });
 
   it('allows each patrol to pick up a child and retreat', () => {

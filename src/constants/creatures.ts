@@ -387,7 +387,8 @@ export const BUFFLORA: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
     { level: 4, attackId: 'VINE_WHIP' },
-    { level: 7, attackId: 'WIND_GUST' },
+    { level: 8, attackId: 'TOXIC_POLLEN' },
+    { level: 12, attackId: 'WIND_GUST' },
   ],
 };
 
@@ -415,7 +416,8 @@ export const MAROPHIS: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'NIBBLE' },
     { level: 4, attackId: 'WATER_GUN' },
-    { level: 7, attackId: 'BUBBLE_BEAM' },
+    { level: 8, attackId: 'VENOM_SPRAY' },
+    { level: 14, attackId: 'BUBBLE_BEAM' },
   ],
 };
 

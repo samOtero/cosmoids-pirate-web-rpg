@@ -26,7 +26,11 @@
       "attackId": "VINE_WHIP"
     },
     {
-      "level": 7,
+      "level": 8,
+      "attackId": "TOXIC_POLLEN"
+    },
+    {
+      "level": 12,
       "attackId": "WIND_GUST"
     }
   ],
