@@ -1572,6 +1572,7 @@ function updateObjectiveAllyVisual(
   marker.clear();
   action.clear();
   sprite.rotation = 0;
+  sprite.alpha = ally.phase === 'exhausted' ? 0.62 : 1;
 
   if (ally.phase !== 'locked') {
     marker.ellipse(0, 7, 34, 13);
@@ -1593,6 +1594,17 @@ function updateObjectiveAllyVisual(
       action.lineTo(-30, y + 5);
       action.stroke({ color: 0xfbbf24, width: 4, alpha: 0.75 });
     }
+  } else if (ally.phase === 'assaulting') {
+    const pulse = 1 + 0.1 * Math.sin(phaseTime / 90);
+    action.circle(0, -4, 28 * pulse);
+    action.stroke({ color: 0x8b5cf6, width: 4, alpha: 0.72 });
+    for (const x of [-10, 0, 10]) {
+      action.moveTo(x, -18);
+      action.bezierCurveTo(x - 6, -35, x + 8, -48, x + 2, -66);
+      action.stroke({ color: 0xc4b5fd, width: 3, alpha: 0.68 });
+    }
+  } else if (ally.phase === 'exhausted') {
+    sprite.rotation = -0.08;
   }
 }
 
@@ -2039,6 +2051,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         const enemySprites = new Map<string, PIXI.Container>();
         const environmentUnitSprites = new Map<string, PIXI.Container>();
         const objectiveAllySprites = new Map<string, PIXI.Container>();
+        const objectiveAllyShadowSprites = new Map<string, PIXI.Container>();
         const destroyedStructureSprites = new Map<string, PIXI.Container>();
         const captureUnitSprites = new Map<string, PIXI.Container>();
         const projectileSprites = new Map<string, PIXI.Container>();
@@ -2318,6 +2331,112 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               }
             );
             updateObjectiveAllyVisual(container, ally, engine.elapsedTimeMs);
+          }
+
+          // Sepippet's projections are temporary, untargetable allied attackers.
+          const currentObjectiveAllyShadowIds = new Set(
+            engine.objectiveAllyShadows.map((shadow) => shadow.id)
+          );
+          for (const [id, container] of objectiveAllyShadowSprites) {
+            if (!currentObjectiveAllyShadowIds.has(id)) {
+              app.stage.removeChild(container);
+              container.destroy({ children: true });
+              objectiveAllyShadowSprites.delete(id);
+            }
+          }
+
+          for (const projection of engine.objectiveAllyShadows) {
+            let container = objectiveAllyShadowSprites.get(projection.id);
+            if (!container) {
+              container = new PIXI.Container();
+              container.eventMode = 'none';
+
+              const marker = new PIXI.Graphics();
+              marker.label = 'projectionMarker';
+              container.addChild(marker);
+
+              const creatureShadow = new PIXI.Graphics();
+              creatureShadow.label = 'shadow';
+              container.addChild(creatureShadow);
+
+              const sprite = new PIXI.Sprite();
+              sprite.label = 'projectionSprite';
+              sprite.anchor.set(0.5);
+              container.addChild(sprite);
+
+              const action = new PIXI.Graphics();
+              action.label = 'projectionAction';
+              container.addChild(action);
+
+              app.stage.addChild(container);
+              objectiveAllyShadowSprites.set(projection.id, container);
+            }
+
+            container.x = offsetX + (projection.position.x / 100) * screenW;
+            container.y = offsetY + (projection.position.y / 100) * screenH;
+            const responsiveScale = app.screen.height / TD_BASE_HEIGHT;
+            const renderScale = zoom * responsiveScale;
+            container.scale.set(renderScale);
+
+            const sprite = container.getChildByLabel(
+              'projectionSprite'
+            ) as PIXI.Sprite;
+            const creatureShadow = container.getChildByLabel(
+              'shadow'
+            ) as PIXI.Graphics;
+            applyTDUnitTransforms(
+              projection,
+              sprite,
+              creatureShadow,
+              projection.tdConfigId,
+              TD_CREATURE_DEFS.sepippet?.baseCreature.battleSpriteUrl,
+              (texture) => {
+                if (!isDestroyed) sprite.texture = texture;
+              }
+            );
+            const remainingMs = Math.max(
+              0,
+              projection.expiresAtMs - engine.elapsedTimeMs
+            );
+            sprite.tint = 0x5b21b6;
+            sprite.alpha = 0.62 * Math.min(1, remainingMs / 450);
+            creatureShadow.alpha = 0.3;
+
+            const marker = container.getChildByLabel(
+              'projectionMarker'
+            ) as PIXI.Graphics;
+            marker.clear();
+            marker.ellipse(0, 7, 32, 12);
+            marker.fill({ color: 0x4c1d95, alpha: 0.24 });
+            marker.stroke({ color: 0xa78bfa, width: 3, alpha: 0.7 });
+
+            const action = container.getChildByLabel(
+              'projectionAction'
+            ) as PIXI.Graphics;
+            action.clear();
+            if (
+              projection.attackTargetPosition &&
+              (projection.attackVisualUntilMs ?? 0) > engine.elapsedTimeMs
+            ) {
+              const targetX =
+                (((projection.attackTargetPosition.x - projection.position.x) /
+                  100) *
+                  screenW) /
+                renderScale;
+              const targetY =
+                (((projection.attackTargetPosition.y - projection.position.y) /
+                  100) *
+                  screenH) /
+                renderScale;
+              action.moveTo(0, -6);
+              action.lineTo(targetX, targetY);
+              action.stroke({ color: 0xa78bfa, width: 7, alpha: 0.3 });
+              action.moveTo(0, -6);
+              action.lineTo(targetX, targetY);
+              action.stroke({ color: 0xede9fe, width: 2, alpha: 0.85 });
+              action.circle(targetX, targetY, 10);
+              action.stroke({ color: 0xc4b5fd, width: 3, alpha: 0.8 });
+            }
           }
 
           // Persistent rubble is separate from dead targetable structures.

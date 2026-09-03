@@ -142,6 +142,10 @@ export const LEVEL_5: TDLevelData = {
   placementSpots: [
     {
       x: 11,
+      y: 48,
+    },
+    {
+      x: 11,
       y: 72,
     },
     {
@@ -167,6 +171,14 @@ export const LEVEL_5: TDLevelData = {
     {
       x: 87,
       y: 84,
+    },
+    {
+      x: 89,
+      y: 72,
+    },
+    {
+      x: 89,
+      y: 48,
     },
     {
       x: 45,
@@ -636,6 +648,71 @@ export const LEVEL_5: TDLevelData = {
         windupDurationMs: 1050,
         recoveryDurationMs: 1700,
         chargeSpeed: 18,
+      },
+    },
+    {
+      id: 'sepippet_rescue',
+      creatureId: 'sepippet',
+      displayName: 'Sepippet',
+      gateDefinitionId: 'sepippet_cell_gate',
+      lockedPosition: {
+        x: 4.75,
+        y: 48.5,
+      },
+      releasePath: [
+        {
+          x: 10,
+          y: 43,
+        },
+        {
+          x: 21,
+          y: 43,
+        },
+        {
+          x: 26,
+          y: 32,
+        },
+        {
+          x: 34,
+          y: 32,
+        },
+        {
+          x: 34,
+          y: 23,
+        },
+        {
+          x: 42,
+          y: 23,
+        },
+        {
+          x: 42,
+          y: 19,
+        },
+      ],
+      moveSpeed: 9,
+      targetStructureDefinitionId: 'tigrevel_cell_bars',
+      behavior: {
+        type: 'SEPIPPET_SHADOW_ASSAULT',
+        durationMs: 15000,
+        gateDamage: 14,
+        gateAttackIntervalMs: 2000,
+        shadowPositions: [
+          {
+            x: 20,
+            y: 53,
+          },
+          {
+            x: 50,
+            y: 50,
+          },
+          {
+            x: 80,
+            y: 53,
+          },
+        ],
+        shadowDamage: 10,
+        shadowAttackIntervalMs: 1500,
+        shadowAttackRange: 38,
       },
     },
   ],

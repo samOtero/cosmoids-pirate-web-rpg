@@ -9,7 +9,7 @@
 - **Primary objective:** Break the main cell bars and free Tigrevel before the crew is overwhelmed.
 - **Core gameplay idea:** Three enemy approaches converge on a visible Steel-type gate at the top center of the map. The player can eventually open connected side cells to release captive Cosmoids that join the effort to destroy the gate.
 - **Story purpose:** Reveal Tigrevel, show the Navy using fear to justify cruelty, and establish that partnership is a choice rather than ownership.
-- **Current status:** Story dialogue, layered battlefield background, three-path draft map, targetable main gate, destruction victory, the Bramfrit rescue vertical slice, and shared breakable gates for all four established prisoners are implemented. Enemy waves and the remaining prisoner ally behaviors remain placeholders or concepts.
+- **Current status:** Story dialogue, layered battlefield background, three-path draft map, targetable main gate, destruction victory, Bramfrit and Sepippet rescue behaviors, and shared breakable gates for all four established prisoners are implemented. Enemy waves and the remaining prisoner ally behaviors remain placeholders or concepts.
 
 ## Thematic Purpose
 
@@ -127,7 +127,7 @@ Destroying the target emits the shared `STRUCTURE_DESTROYED` event with `winsLev
 
 ### Current direction
 
-The player can attack and break optional side-cell gates. Bramfrit, Sepippet, Parlet, and Corrogoon now share the same painted gate damage and rubble images while retaining per-cell position, scale, rotation, and skew controls in the TD Level Editor. Bramfrit remains the first complete rescue example: destroying its gate releases it as an invulnerable allied objective unit that follows an authored route toward Tigrevel's cell and repeatedly performs its formal retreat-and-charge ritual against the main gate.
+The player can attack and break optional side-cell gates. Bramfrit, Sepippet, Parlet, and Corrogoon now share the same painted gate damage and rubble images while retaining per-cell position, scale, rotation, and skew controls in the TD Level Editor. Bramfrit supplies sustained gate damage through its repeated ritual charge. Sepippet provides a one-time split assault: its real body sabotages Tigrevel's gate while three temporary shadow copies defend the enemy lanes.
 
 Every prisoner should help with the same objective in a visibly different way. No single creature should be the only valid solution. The level may be balanced to be very difficult without freeing prisoners, but whether opening cells is a formal requirement or a powerful optional strategy remains undecided.
 
@@ -149,7 +149,7 @@ Bramfrit formally challenges the gate, retreats three paces, pauses in a clearly
 
 #### Sepippet — Dark
 
-Sepippet projects a false Navy guard while its own arms flatten into shadows and pass through the main gate's seams. The shadows remove internal locking pins, dealing defense-bypassing sabotage damage and leaving each removed component visibly absent.
+When released, Sepippet sends a shadow copy to each enemy lane while its real body travels to Tigrevel's gate. For fifteen seconds, the untargetable copies prioritize nearby enemies carrying captives and deal periodic Dark damage, while the real Sepippet deals defense-bypassing sabotage damage to the main gate. The copies then stretch back and merge with the exhausted original.
 
 - [Dedicated Sepippet record](../cosmoids/sepippet.md)
 
@@ -180,6 +180,15 @@ The broader prisoner roster has explored Poison, Dark, Water, Rock, Ground, and 
 - Its optional lower-right cell gate is implemented with the shared damage-state images.
 - Allied navigation, abrasive spray, and the **Scoured** gate effect remain future gameplay work.
 
+### Sepippet implementation status
+
+- Sepippet is represented behind its left-side gate through the objective-ally system.
+- Destroying the gate releases it along an authored route toward Tigrevel's cell.
+- Reaching the objective creates three translucent, untargetable shadow copies at authored lane positions.
+- Shadows attack nearby enemies for fifteen seconds and prioritize enemies carrying a captive.
+- The real Sepippet simultaneously deals defense-bypassing Dark sabotage damage to Tigrevel's gate every two seconds.
+- The projections disappear and Sepippet becomes exhausted when the timed assault ends.
+
 ### Parlet implementation status
 
 - The icon, left-facing, upward-facing, and downward-facing game assets are complete.
@@ -200,7 +209,7 @@ The present battle is a mechanical draft rather than a balanced final encounter:
 - One uncapturable Level 8 Sonarion patrol approaches on each of the three lanes.
 - The player has three lives.
 - Capture is disabled for the entire level.
-- The current message says: “Defend all three approaches to Tigrevel's cell!”
+- The current message invites the player to focus fire on a prisoner gate and begin the breakout.
 
 The placeholder patrols validate lane geometry, tower targeting, structure targeting, and destruction victory. They do not represent the intended final wave design.
 
@@ -244,7 +253,7 @@ The placeholder patrols validate lane geometry, tower targeting, structure targe
 | Green structure health bar and label                  | `src/app/components/tower-defense/PixiBattlefield.tsx`    | Implemented                             |
 | Immediate destruction victory                         | `src/app/components/tower-defense/TowerDefenseScreen.tsx` | Implemented and tested                  |
 | Optional side-cell gates                              | `src/constants/tdLevels/level5.ts`                        | Four shared-image gates implemented     |
-| Freed-prisoner allied behavior                        | `src/engine/tower-defense/TowerDefenseEngine.ts`          | Bramfrit slice implemented              |
+| Freed-prisoner allied behavior                        | `src/engine/tower-defense/TowerDefenseEngine.ts`          | Bramfrit and Sepippet implemented       |
 | Final waves and balance                               | —                                                         | Not designed                            |
 | Gate destruction animation or persistent broken state | `src/app/components/tower-defense/PixiBattlefield.tsx`    | Side-gate stages and rubble implemented |
 

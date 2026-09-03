@@ -120,6 +120,28 @@ export interface TDStructureDefinition {
   visualLayout?: TDStructureVisualLayout;
 }
 
+export type TDObjectiveAllyBehavior =
+  | {
+      type: 'BRAMFRIT_CHARGE';
+      chargeStart: Point;
+      strikePosition: Point;
+      damage: number;
+      bowDurationMs: number;
+      windupDurationMs: number;
+      recoveryDurationMs: number;
+      chargeSpeed: number;
+    }
+  | {
+      type: 'SEPIPPET_SHADOW_ASSAULT';
+      durationMs: number;
+      gateDamage: number;
+      gateAttackIntervalMs: number;
+      shadowPositions: Point[];
+      shadowDamage: number;
+      shadowAttackIntervalMs: number;
+      shadowAttackRange: number;
+    };
+
 export interface TDObjectiveAllyDefinition {
   id: string;
   creatureId: string;
@@ -130,16 +152,7 @@ export interface TDObjectiveAllyDefinition {
   releasePath: Point[];
   moveSpeed: number;
   targetStructureDefinitionId: string;
-  behavior: {
-    type: 'BRAMFRIT_CHARGE';
-    chargeStart: Point;
-    strikePosition: Point;
-    damage: number;
-    bowDurationMs: number;
-    windupDurationMs: number;
-    recoveryDurationMs: number;
-    chargeSpeed: number;
-  };
+  behavior: TDObjectiveAllyBehavior;
 }
 
 export interface TDWave {
@@ -422,13 +435,29 @@ export interface ObjectiveAlly extends BaseTDUnit {
     | 'retreating'
     | 'windup'
     | 'charging'
-    | 'recovering';
+    | 'recovering'
+    | 'assaulting'
+    | 'exhausted';
   path: Point[];
   currentWaypointIndex: number;
   moveSpeed: number;
   behavior: TDObjectiveAllyDefinition['behavior'];
   phaseStartedAtMs: number;
   impactCount: number;
+  nextActionAtMs?: number;
+  assaultEndsAtMs?: number;
+}
+
+export interface ObjectiveAllyShadow extends BaseTDUnit {
+  ownerAllyId: string;
+  tdConfigId: string;
+  expiresAtMs: number;
+  damage: number;
+  attackIntervalMs: number;
+  attackRange: number;
+  nextAttackAtMs: number;
+  attackTargetPosition?: Point;
+  attackVisualUntilMs?: number;
 }
 
 export interface DestroyedStructureVisual {

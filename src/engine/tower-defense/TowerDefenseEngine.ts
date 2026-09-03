@@ -24,6 +24,7 @@ import {
   TDResonantEvolutionConfig,
   TDWaveEnemyDefinition,
   ObjectiveAlly,
+  ObjectiveAllyShadow,
   DestroyedStructureVisual,
 } from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
@@ -194,6 +195,7 @@ export class TowerDefenseEngine {
   public visualEffects: VisualEffect[] = [];
   public floatingTexts: FloatingText[] = [];
   public objectiveAllies: ObjectiveAlly[] = [];
+  public objectiveAllyShadows: ObjectiveAllyShadow[] = [];
   public destroyedStructureVisuals: DestroyedStructureVisual[] = [];
   public focusedStructureId: string | null = null;
 
@@ -970,6 +972,7 @@ export class TowerDefenseEngine {
     });
 
     this.processObjectiveAllies(newEnemies, deltaMs);
+    this.processObjectiveAllyShadows(newEnemies);
 
     // Filter dead enemies and collect money
     const deadEnemies = newEnemies.filter((e) => e.hp <= 0);
@@ -2418,13 +2421,17 @@ export class TowerDefenseEngine {
 
   private processObjectiveAllies(enemies: Enemy[], deltaMs: number): void {
     for (const ally of this.objectiveAllies) {
-      if (ally.phase === 'locked') continue;
+      if (ally.phase === 'locked' || ally.phase === 'exhausted') continue;
 
       if (ally.phase === 'traveling') {
         const waypoint = ally.path[ally.currentWaypointIndex];
         if (!waypoint) {
-          ally.phase = 'bowing';
-          ally.phaseStartedAtMs = this.elapsedTimeMs;
+          if (ally.behavior.type === 'SEPIPPET_SHADOW_ASSAULT') {
+            this.startSepippetShadowAssault(ally);
+          } else {
+            ally.phase = 'bowing';
+            ally.phaseStartedAtMs = this.elapsedTimeMs;
+          }
           continue;
         }
         if (
@@ -2444,6 +2451,49 @@ export class TowerDefenseEngine {
       if (!targetStructure) continue;
 
       const elapsedInPhase = this.elapsedTimeMs - ally.phaseStartedAtMs;
+      if (ally.behavior.type === 'SEPIPPET_SHADOW_ASSAULT') {
+        if (
+          ally.phase === 'assaulting' &&
+          this.elapsedTimeMs >= (ally.assaultEndsAtMs ?? 0)
+        ) {
+          ally.phase = 'exhausted';
+          ally.phaseStartedAtMs = this.elapsedTimeMs;
+          this.objectiveAllyShadows = this.objectiveAllyShadows.filter(
+            (shadow) => shadow.ownerAllyId !== ally.id
+          );
+          continue;
+        }
+
+        if (
+          ally.phase === 'assaulting' &&
+          this.elapsedTimeMs >= (ally.nextActionAtMs ?? 0)
+        ) {
+          const damage = Math.min(ally.behavior.gateDamage, targetStructure.hp);
+          targetStructure.hp -= damage;
+          startDamageFlash(targetStructure, ElementType.DARK);
+          ally.impactCount++;
+          ally.nextActionAtMs =
+            this.elapsedTimeMs + ally.behavior.gateAttackIntervalMs;
+          this.floatingTexts.push({
+            id: `ft_sepippet_gate_${this.elapsedTimeMs}_${ally.impactCount}`,
+            text: Math.ceil(damage).toString(),
+            position: { ...targetStructure.position },
+            color: 0xa78bfa,
+            scale: 1.2,
+            durationMs: 900,
+            elapsedMs: 0,
+          });
+          if (targetStructure.hp <= 0 && !targetStructure.defeatEventEmitted) {
+            targetStructure.defeatEventEmitted = true;
+            this.handleStructureDestroyed(
+              targetStructure,
+              Array.from(targetStructure.damagedByTowerIds)
+            );
+          }
+        }
+        continue;
+      }
+
       if (ally.phase === 'bowing') {
         ally.facingDirection = 'right';
         if (elapsedInPhase >= ally.behavior.bowDurationMs) {
@@ -2507,6 +2557,104 @@ export class TowerDefenseEngine {
       ) {
         ally.phase = 'bowing';
         ally.phaseStartedAtMs = this.elapsedTimeMs;
+      }
+    }
+  }
+
+  private startSepippetShadowAssault(ally: ObjectiveAlly): void {
+    if (ally.behavior.type !== 'SEPIPPET_SHADOW_ASSAULT') return;
+    const behavior = ally.behavior;
+
+    ally.phase = 'assaulting';
+    ally.phaseStartedAtMs = this.elapsedTimeMs;
+    ally.assaultEndsAtMs = this.elapsedTimeMs + behavior.durationMs;
+    ally.nextActionAtMs = this.elapsedTimeMs;
+    ally.facingDirection = 'up';
+
+    this.objectiveAllyShadows = this.objectiveAllyShadows.filter(
+      (shadow) => shadow.ownerAllyId !== ally.id
+    );
+    this.objectiveAllyShadows.push(
+      ...behavior.shadowPositions.map((position, index) => ({
+        id: `${ally.id}_shadow_${index}`,
+        ownerAllyId: ally.id,
+        tdConfigId: ally.tdConfigId,
+        position: { ...position },
+        facingDirection: 'up' as const,
+        hp: 1,
+        maxHp: 1,
+        expiresAtMs: ally.assaultEndsAtMs!,
+        damage: behavior.shadowDamage,
+        attackIntervalMs: behavior.shadowAttackIntervalMs,
+        attackRange: behavior.shadowAttackRange,
+        nextAttackAtMs: this.elapsedTimeMs,
+      }))
+    );
+  }
+
+  private processObjectiveAllyShadows(enemies: Enemy[]): void {
+    this.objectiveAllyShadows = this.objectiveAllyShadows.filter(
+      (shadow) => shadow.expiresAtMs > this.elapsedTimeMs
+    );
+
+    for (const shadow of this.objectiveAllyShadows) {
+      if (this.elapsedTimeMs < shadow.nextAttackAtMs) continue;
+
+      const target = enemies
+        .filter(
+          (enemy) =>
+            enemy.kind === 'creature' &&
+            enemy.hp > 0 &&
+            this.getAttackDistance(shadow.position, enemy.position) <=
+              shadow.attackRange
+        )
+        .sort((a, b) => {
+          const carrierPriority =
+            Number(Boolean(b.heldCaptureUnitId)) -
+            Number(Boolean(a.heldCaptureUnitId));
+          if (carrierPriority !== 0) return carrierPriority;
+          return (
+            this.getAttackDistance(shadow.position, a.position) -
+            this.getAttackDistance(shadow.position, b.position)
+          );
+        })[0];
+
+      shadow.nextAttackAtMs = this.elapsedTimeMs + shadow.attackIntervalMs;
+      if (!target) continue;
+
+      const dx = target.position.x - shadow.position.x;
+      const dy = target.position.y - shadow.position.y;
+      shadow.facingDirection =
+        Math.abs(dx) > Math.abs(dy)
+          ? dx > 0
+            ? 'right'
+            : 'left'
+          : dy > 0
+            ? 'down'
+            : 'up';
+      shadow.attackTargetPosition = { ...target.position };
+      shadow.attackVisualUntilMs = this.elapsedTimeMs + 260;
+
+      const damage = Math.min(shadow.damage, target.hp);
+      target.hp -= damage;
+      startDamageFlash(target, ElementType.DARK);
+      this.floatingTexts.push({
+        id: `ft_sepippet_shadow_${shadow.id}_${this.elapsedTimeMs}`,
+        text: Math.ceil(damage).toString(),
+        position: { ...target.position },
+        color: 0xc4b5fd,
+        durationMs: 750,
+        elapsedMs: 0,
+      });
+      if (target.hp <= 0 && !target.defeatEventEmitted) {
+        target.defeatEventEmitted = true;
+        this.events.emit({
+          type: 'ENEMY_DIED',
+          enemyId: target.id,
+          enemyDefinitionId: target.definitionId,
+          enemyLevel: target.level,
+          participantTowerIds: [],
+        });
       }
     }
   }
