@@ -140,6 +140,16 @@ export type TDObjectiveAllyBehavior =
       shadowDamage: number;
       shadowAttackIntervalMs: number;
       shadowAttackRange: number;
+    }
+  | {
+      type: 'PARLET_MOSAIC_CURRENTS';
+      currentPathIndices: number[];
+      currentWidth: number;
+      slowMultiplier: number;
+      surgeIntervalMs: number;
+      surgeVisualDurationMs: number;
+      pushDistance: number;
+      gateDamagePerCurrent: number;
     };
 
 export interface TDObjectiveAllyDefinition {
@@ -437,6 +447,7 @@ export interface ObjectiveAlly extends BaseTDUnit {
     | 'charging'
     | 'recovering'
     | 'assaulting'
+    | 'channeling'
     | 'exhausted';
   path: Point[];
   currentWaypointIndex: number;
@@ -458,6 +469,22 @@ export interface ObjectiveAllyShadow extends BaseTDUnit {
   nextAttackAtMs: number;
   attackTargetPosition?: Point;
   attackVisualUntilMs?: number;
+}
+
+export interface ObjectiveAllyCurrent {
+  id: string;
+  ownerAllyId: string;
+  pathIndex: number;
+  path: Point[];
+  visualPath: Point[];
+  width: number;
+  slowMultiplier: number;
+  surgeIntervalMs: number;
+  surgeVisualDurationMs: number;
+  pushDistance: number;
+  gateDamage: number;
+  nextSurgeAtMs: number;
+  lastSurgeAtMs?: number;
 }
 
 export interface DestroyedStructureVisual {

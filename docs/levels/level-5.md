@@ -9,7 +9,7 @@
 - **Primary objective:** Break the main cell bars and free Tigrevel before the crew is overwhelmed.
 - **Core gameplay idea:** Three enemy approaches converge on a visible Steel-type gate at the top center of the map. The player can eventually open connected side cells to release captive Cosmoids that join the effort to destroy the gate.
 - **Story purpose:** Reveal Tigrevel, show the Navy using fear to justify cruelty, and establish that partnership is a choice rather than ownership.
-- **Current status:** Story dialogue, layered battlefield background, three-path draft map, targetable main gate, destruction victory, Bramfrit and Sepippet rescue behaviors, and shared breakable gates for all four established prisoners are implemented. Enemy waves and the remaining prisoner ally behaviors remain placeholders or concepts.
+- **Current status:** Story dialogue, layered battlefield background, three-path draft map, targetable main gate, destruction victory, Bramfrit, Sepippet, and Parlet rescue behaviors, and shared breakable gates for all four established prisoners are implemented. Enemy waves and Corrogoon's ally behavior remain placeholders or concepts.
 
 ## Thematic Purpose
 
@@ -127,7 +127,7 @@ Destroying the target emits the shared `STRUCTURE_DESTROYED` event with `winsLev
 
 ### Current direction
 
-The player can attack and break optional side-cell gates. Bramfrit, Sepippet, Parlet, and Corrogoon now share the same painted gate damage and rubble images while retaining per-cell position, scale, rotation, and skew controls in the TD Level Editor. Bramfrit supplies sustained gate damage through its repeated ritual charge. Sepippet provides a one-time split assault: its real body sabotages Tigrevel's gate while three temporary shadow copies defend the enemy lanes.
+The player can attack and break optional side-cell gates. Bramfrit, Sepippet, Parlet, and Corrogoon now share the same painted gate damage and rubble images while retaining per-cell position, scale, rotation, and skew controls in the TD Level Editor. Bramfrit supplies sustained gate damage through its repeated ritual charge. Sepippet provides a one-time split assault: its real body sabotages Tigrevel's gate while three temporary shadow copies defend the enemy lanes. Parlet paints persistent mosaic currents that slow and periodically push enemies while sending synchronized Water surges into Tigrevel's gate.
 
 Every prisoner should help with the same objective in a visibly different way. No single creature should be the only valid solution. The level may be balanced to be very difficult without freeing prisoners, but whether opening cells is a formal requirement or a powerful optional strategy remains undecided.
 
@@ -155,7 +155,7 @@ When released, Sepippet sends a shadow copy to each enemy lane while its real bo
 
 #### Parlet — Water
 
-Parlet is a perfectionist parrotfish whose broad scales rearrange their colors into living mosaic patterns. Its identity is intentionally independent of the gate-breaking objective: it is a complete reef species that happens to have been imprisoned, and its eventual contribution should be chosen after the shared prisoner system is established.
+Parlet is a perfectionist parrotfish whose broad scales rearrange their colors into living mosaic patterns. When released, it paints a colorful Water current along each enemy approach. Enemies inside a current move more slowly, and synchronized surges periodically push them opposite their direction of travel. The colored mosaic crests then converge on Tigrevel's gate for a combined Water-damage strike.
 
 - [Dedicated Parlet record](../cosmoids/parlet.md)
 
@@ -193,9 +193,12 @@ The broader prisoner roster has explored Poison, Dark, Water, Rock, Ground, and 
 
 - The icon, left-facing, upward-facing, and downward-facing game assets are complete.
 - Parlet is registered as a Water-type Cosmoid with a dated creature manifest.
-- Its Level 5 prisoner definition is registered but intentionally excluded from enemy waves.
+- Its Level 5 prisoner definition remains excluded from enemy waves because the captive is represented by the objective-ally system.
 - Its optional right-side cell gate is implemented with the shared damage-state images.
-- Its release behavior and contribution to the escape remain future gameplay work.
+- Destroying the gate sends Parlet along an authored route toward Tigrevel's cell.
+- At the objective, Parlet channels three persistent, animated mosaic currents over the enemy paths.
+- Enemies in those currents move at 70% speed and are pushed backward every 4.5 seconds.
+- Each synchronized surge deals 24 combined Water damage to Tigrevel's gate.
 
 ### Superseded or deferred guard idea
 
@@ -241,21 +244,21 @@ The placeholder patrols validate lane geometry, tower targeting, structure targe
 
 ## Implementation Reference
 
-| Area                                                  | Primary file                                              | Status                                  |
-| ----------------------------------------------------- | --------------------------------------------------------- | --------------------------------------- |
-| Level registration                                    | `src/constants/tdLevels/index.ts`                         | Implemented                             |
-| Battlefield layout and placeholder wave               | `src/constants/tdLevels/level5.ts`                        | Draft implemented                       |
-| Intro dialogue                                        | `src/constants/dialogs/level5Intro.ts`                    | Implemented                             |
-| Victory dialogue                                      | `src/constants/dialogs/level5Win.ts`                      | Implemented                             |
-| Defeat dialogue                                       | `src/constants/dialogs/level5Lose.ts`                     | Implemented                             |
-| Gate structure definition                             | `src/constants/tdLevels/level5.ts`                        | Implemented                             |
-| Structure spawning and destruction event              | `src/engine/tower-defense/TowerDefenseEngine.ts`          | Implemented                             |
-| Green structure health bar and label                  | `src/app/components/tower-defense/PixiBattlefield.tsx`    | Implemented                             |
-| Immediate destruction victory                         | `src/app/components/tower-defense/TowerDefenseScreen.tsx` | Implemented and tested                  |
-| Optional side-cell gates                              | `src/constants/tdLevels/level5.ts`                        | Four shared-image gates implemented     |
-| Freed-prisoner allied behavior                        | `src/engine/tower-defense/TowerDefenseEngine.ts`          | Bramfrit and Sepippet implemented       |
-| Final waves and balance                               | —                                                         | Not designed                            |
-| Gate destruction animation or persistent broken state | `src/app/components/tower-defense/PixiBattlefield.tsx`    | Side-gate stages and rubble implemented |
+| Area                                                  | Primary file                                              | Status                                     |
+| ----------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------ |
+| Level registration                                    | `src/constants/tdLevels/index.ts`                         | Implemented                                |
+| Battlefield layout and placeholder wave               | `src/constants/tdLevels/level5.ts`                        | Draft implemented                          |
+| Intro dialogue                                        | `src/constants/dialogs/level5Intro.ts`                    | Implemented                                |
+| Victory dialogue                                      | `src/constants/dialogs/level5Win.ts`                      | Implemented                                |
+| Defeat dialogue                                       | `src/constants/dialogs/level5Lose.ts`                     | Implemented                                |
+| Gate structure definition                             | `src/constants/tdLevels/level5.ts`                        | Implemented                                |
+| Structure spawning and destruction event              | `src/engine/tower-defense/TowerDefenseEngine.ts`          | Implemented                                |
+| Green structure health bar and label                  | `src/app/components/tower-defense/PixiBattlefield.tsx`    | Implemented                                |
+| Immediate destruction victory                         | `src/app/components/tower-defense/TowerDefenseScreen.tsx` | Implemented and tested                     |
+| Optional side-cell gates                              | `src/constants/tdLevels/level5.ts`                        | Four shared-image gates implemented        |
+| Freed-prisoner allied behavior                        | `src/engine/tower-defense/TowerDefenseEngine.ts`          | Bramfrit, Sepippet, and Parlet implemented |
+| Final waves and balance                               | —                                                         | Not designed                               |
+| Gate destruction animation or persistent broken state | `src/app/components/tower-defense/PixiBattlefield.tsx`    | Side-gate stages and rubble implemented    |
 
 ## Confirmed Decisions
 

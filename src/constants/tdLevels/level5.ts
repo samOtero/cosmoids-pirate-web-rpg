@@ -715,6 +715,58 @@ export const LEVEL_5: TDLevelData = {
         shadowAttackRange: 38,
       },
     },
+    {
+      id: 'parlet_rescue',
+      creatureId: 'parlet',
+      displayName: 'Parlet',
+      gateDefinitionId: 'parlet_cell_gate',
+      lockedPosition: {
+        x: 95.25,
+        y: 48.5,
+      },
+      releasePath: [
+        {
+          x: 90,
+          y: 43,
+        },
+        {
+          x: 79,
+          y: 43,
+        },
+        {
+          x: 74,
+          y: 32,
+        },
+        {
+          x: 66,
+          y: 32,
+        },
+        {
+          x: 66,
+          y: 23,
+        },
+        {
+          x: 58,
+          y: 23,
+        },
+        {
+          x: 58,
+          y: 19,
+        },
+      ],
+      moveSpeed: 8,
+      targetStructureDefinitionId: 'tigrevel_cell_bars',
+      behavior: {
+        type: 'PARLET_MOSAIC_CURRENTS',
+        currentPathIndices: [0, 1, 2],
+        currentWidth: 5,
+        slowMultiplier: 0.7,
+        surgeIntervalMs: 4500,
+        surgeVisualDurationMs: 1000,
+        pushDistance: 3,
+        gateDamagePerCurrent: 8,
+      },
+    },
   ],
   introMessage: 'Tap a prisoner gate to focus fire and begin the breakout!',
 };

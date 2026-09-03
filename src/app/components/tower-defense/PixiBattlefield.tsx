@@ -1553,6 +1553,57 @@ function updateDestroyedPrisonGate(
   sprite.alpha = Math.min(1, ageMs / 180);
 }
 
+function getVisualPathPoint(
+  path: { x: number; y: number }[],
+  progress: number,
+  width: number,
+  height: number
+): { x: number; y: number; angle: number } {
+  if (path.length === 0) return { x: 0, y: 0, angle: 0 };
+  const points = path.map((point) => ({
+    x: (point.x / 100) * width,
+    y: (point.y / 100) * height,
+  }));
+  const lengths = points
+    .slice(1)
+    .map((point, index) =>
+      Math.hypot(point.x - points[index].x, point.y - points[index].y)
+    );
+  const totalLength = lengths.reduce((total, length) => total + length, 0);
+  let remaining = Math.max(0, Math.min(1, progress)) * totalLength;
+
+  for (let index = 1; index < points.length; index++) {
+    const segmentLength = lengths[index - 1];
+    if (segmentLength === 0) continue;
+    if (remaining <= segmentLength) {
+      const amount = remaining / segmentLength;
+      return {
+        x:
+          points[index - 1].x +
+          (points[index].x - points[index - 1].x) * amount,
+        y:
+          points[index - 1].y +
+          (points[index].y - points[index - 1].y) * amount,
+        angle: Math.atan2(
+          points[index].y - points[index - 1].y,
+          points[index].x - points[index - 1].x
+        ),
+      };
+    }
+    remaining -= segmentLength;
+  }
+
+  const lastPoint = points[points.length - 1];
+  const previousPoint = points[Math.max(0, points.length - 2)];
+  return {
+    ...lastPoint,
+    angle: Math.atan2(
+      lastPoint.y - previousPoint.y,
+      lastPoint.x - previousPoint.x
+    ),
+  };
+}
+
 function updateObjectiveAllyVisual(
   container: PIXI.Container,
   ally: ObjectiveAlly,
@@ -1602,6 +1653,18 @@ function updateObjectiveAllyVisual(
       action.moveTo(x, -18);
       action.bezierCurveTo(x - 6, -35, x + 8, -48, x + 2, -66);
       action.stroke({ color: 0xc4b5fd, width: 3, alpha: 0.68 });
+    }
+  } else if (ally.phase === 'channeling') {
+    const colors = [0x22d3ee, 0xf472b6, 0xfacc15, 0xa78bfa];
+    action.circle(0, -4, 29 + Math.sin(phaseTime / 120) * 3);
+    action.stroke({ color: 0x67e8f9, width: 4, alpha: 0.72 });
+    for (let index = 0; index < 8; index++) {
+      const angle = phaseTime / 900 + (index / 8) * Math.PI * 2;
+      const x = Math.cos(angle) * 38;
+      const y = -4 + Math.sin(angle) * 19;
+      const size = 4 + (index % 2);
+      action.poly([x, y - size, x + size, y, x, y + size, x - size, y]);
+      action.fill({ color: colors[index % colors.length], alpha: 0.82 });
     }
   } else if (ally.phase === 'exhausted') {
     sprite.rotation = -0.08;
@@ -1913,6 +1976,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
         const bgSprite = PIXI.Sprite.from(bgUrl);
         app.stage.addChild(bgSprite);
+        const mosaicCurrentGraphics = new PIXI.Graphics();
+        mosaicCurrentGraphics.eventMode = 'none';
+        bgSprite.addChild(mosaicCurrentGraphics);
 
         // Full (unscrolled) background dimensions — used to derive scroll limits
         let fullBgHeight = 0;
@@ -2192,6 +2258,107 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           const offsetX = bgBounds.x;
           const offsetY = bgBounds.y;
           const viewportH = app.screen.height; // For sizing UI elements (not affected by bg scale)
+
+          // Parlet's mosaic currents are painted onto the battlefield itself,
+          // keeping them beneath creatures, towers, labels, and projectiles.
+          mosaicCurrentGraphics.clear();
+          const textureWidth = bgSprite.texture.width;
+          const textureHeight = bgSprite.texture.height;
+          const currentColors = [0x22d3ee, 0xf472b6, 0xfacc15, 0xa78bfa];
+          for (const current of engine.objectiveAllyCurrents) {
+            if (current.visualPath.length < 2) continue;
+            const visualWidth =
+              ((current.width * 2) / Math.max(1, backgroundScale) / 100) *
+              textureHeight;
+            const pathPoints = current.visualPath.map((point) => ({
+              x: (point.x / 100) * textureWidth,
+              y: (point.y / 100) * textureHeight,
+            }));
+
+            mosaicCurrentGraphics.moveTo(pathPoints[0].x, pathPoints[0].y);
+            for (const point of pathPoints.slice(1)) {
+              mosaicCurrentGraphics.lineTo(point.x, point.y);
+            }
+            mosaicCurrentGraphics.stroke({
+              color: 0x155e75,
+              width: visualWidth,
+              alpha: 0.22,
+            });
+            mosaicCurrentGraphics.moveTo(pathPoints[0].x, pathPoints[0].y);
+            for (const point of pathPoints.slice(1)) {
+              mosaicCurrentGraphics.lineTo(point.x, point.y);
+            }
+            mosaicCurrentGraphics.stroke({
+              color: 0x67e8f9,
+              width: visualWidth * 0.52,
+              alpha: 0.13,
+            });
+
+            const tileCount = 13;
+            const tileSize = Math.max(4, visualWidth * 0.13);
+            for (const row of [-1, 0, 1]) {
+              for (let index = 0; index < tileCount; index++) {
+                const tileProgress =
+                  (index / tileCount +
+                    engine.elapsedTimeMs / 6500 +
+                    row * 0.018) %
+                  1;
+                const point = getVisualPathPoint(
+                  current.visualPath,
+                  tileProgress,
+                  textureWidth,
+                  textureHeight
+                );
+                const perpendicularX = -Math.sin(point.angle);
+                const perpendicularY = Math.cos(point.angle);
+                const rowOffset = row * visualWidth * 0.24;
+                const x = point.x + perpendicularX * rowOffset;
+                const y = point.y + perpendicularY * rowOffset;
+                const size = tileSize * (0.85 + ((index + row + 1) % 3) * 0.1);
+                mosaicCurrentGraphics.poly([
+                  x,
+                  y - size,
+                  x + size,
+                  y,
+                  x,
+                  y + size,
+                  x - size,
+                  y,
+                ]);
+                mosaicCurrentGraphics.fill({
+                  color:
+                    currentColors[(index + row + 1) % currentColors.length],
+                  alpha: row === 0 ? 0.72 : 0.58,
+                });
+              }
+            }
+
+            const surgeAge =
+              current.lastSurgeAtMs === undefined
+                ? Infinity
+                : engine.elapsedTimeMs - current.lastSurgeAtMs;
+            if (surgeAge >= 0 && surgeAge < current.surgeVisualDurationMs) {
+              const surgeProgress = surgeAge / current.surgeVisualDurationMs;
+              const point = getVisualPathPoint(
+                current.visualPath,
+                surgeProgress,
+                textureWidth,
+                textureHeight
+              );
+              const pulseSize = visualWidth * (0.28 + surgeProgress * 0.14);
+              mosaicCurrentGraphics.circle(point.x, point.y, pulseSize);
+              mosaicCurrentGraphics.fill({
+                color: currentColors[current.pathIndex % currentColors.length],
+                alpha: 0.3 * (1 - surgeProgress),
+              });
+              mosaicCurrentGraphics.circle(point.x, point.y, pulseSize * 0.7);
+              mosaicCurrentGraphics.stroke({
+                color: 0xecfeff,
+                width: Math.max(2, visualWidth * 0.08),
+                alpha: 0.9 * (1 - surgeProgress),
+              });
+            }
+          }
 
           const externalDragState = getDragStateRef.current
             ? getDragStateRef.current()

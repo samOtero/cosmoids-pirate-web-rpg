@@ -25,6 +25,7 @@ import {
   TDWaveEnemyDefinition,
   ObjectiveAlly,
   ObjectiveAllyShadow,
+  ObjectiveAllyCurrent,
   DestroyedStructureVisual,
 } from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
@@ -196,6 +197,7 @@ export class TowerDefenseEngine {
   public floatingTexts: FloatingText[] = [];
   public objectiveAllies: ObjectiveAlly[] = [];
   public objectiveAllyShadows: ObjectiveAllyShadow[] = [];
+  public objectiveAllyCurrents: ObjectiveAllyCurrent[] = [];
   public destroyedStructureVisuals: DestroyedStructureVisual[] = [];
   public focusedStructureId: string | null = null;
 
@@ -259,6 +261,7 @@ export class TowerDefenseEngine {
 
   // Loaded at initialization
   public paths: { x: number; y: number }[][] = [];
+  public authoredPaths: { x: number; y: number }[][] = [];
   public placementSpots: { x: number; y: number }[] = [];
   public environmentUnits: import('./types').EnvironmentUnit[] = [];
   public captureUnits: CaptureUnit[] = [];
@@ -284,6 +287,9 @@ export class TowerDefenseEngine {
     });
 
     const rawPaths: { x: number; y: number }[][] = levelData.paths || [];
+    this.authoredPaths = rawPaths.map((path) =>
+      path.map((point) => ({ ...point }))
+    );
     this.paths = rawPaths.map((path) => {
       if (path.length <= 1) return path;
       const snappedPath = [{ ...path[0] }];
@@ -553,7 +559,9 @@ export class TowerDefenseEngine {
       // if 1 frame was originally ~16.6ms, we can normalize deltaMs / 16.6 to apply speed
       const timeScale = deltaMs / 16.666;
       let moveSpeed =
-        enemy.speed * getActiveSpeedMultiplier(enemy, this.elapsedTimeMs);
+        enemy.speed *
+        getActiveSpeedMultiplier(enemy, this.elapsedTimeMs) *
+        this.getObjectiveCurrentSpeedMultiplier(enemy);
       const activeAbility = enemy.abilityRuntime
         ? ENEMY_ABILITY_DEFS[enemy.abilityRuntime.definitionId]
         : undefined;
@@ -973,6 +981,7 @@ export class TowerDefenseEngine {
 
     this.processObjectiveAllies(newEnemies, deltaMs);
     this.processObjectiveAllyShadows(newEnemies);
+    this.processObjectiveAllyCurrents(newEnemies);
 
     // Filter dead enemies and collect money
     const deadEnemies = newEnemies.filter((e) => e.hp <= 0);
@@ -2428,6 +2437,8 @@ export class TowerDefenseEngine {
         if (!waypoint) {
           if (ally.behavior.type === 'SEPIPPET_SHADOW_ASSAULT') {
             this.startSepippetShadowAssault(ally);
+          } else if (ally.behavior.type === 'PARLET_MOSAIC_CURRENTS') {
+            this.startParletMosaicCurrents(ally);
           } else {
             ally.phase = 'bowing';
             ally.phaseStartedAtMs = this.elapsedTimeMs;
@@ -2493,6 +2504,8 @@ export class TowerDefenseEngine {
         }
         continue;
       }
+
+      if (ally.behavior.type === 'PARLET_MOSAIC_CURRENTS') continue;
 
       if (ally.phase === 'bowing') {
         ally.facingDirection = 'right';
@@ -2656,6 +2669,188 @@ export class TowerDefenseEngine {
           participantTowerIds: [],
         });
       }
+    }
+  }
+
+  private startParletMosaicCurrents(ally: ObjectiveAlly): void {
+    if (ally.behavior.type !== 'PARLET_MOSAIC_CURRENTS') return;
+    const behavior = ally.behavior;
+
+    ally.phase = 'channeling';
+    ally.phaseStartedAtMs = this.elapsedTimeMs;
+    ally.facingDirection = 'up';
+
+    this.objectiveAllyCurrents = this.objectiveAllyCurrents.filter(
+      (current) => current.ownerAllyId !== ally.id
+    );
+    this.objectiveAllyCurrents.push(
+      ...behavior.currentPathIndices.flatMap((pathIndex, index) => {
+        const path = this.paths[pathIndex];
+        if (!path || path.length < 2) return [];
+        return [
+          {
+            id: `${ally.id}_current_${index}`,
+            ownerAllyId: ally.id,
+            pathIndex,
+            path: path.map((point) => ({ ...point })),
+            visualPath: (this.authoredPaths[pathIndex] ?? path).map(
+              (point) => ({
+                ...point,
+              })
+            ),
+            width: behavior.currentWidth,
+            slowMultiplier: behavior.slowMultiplier,
+            surgeIntervalMs: behavior.surgeIntervalMs,
+            surgeVisualDurationMs: behavior.surgeVisualDurationMs,
+            pushDistance: behavior.pushDistance,
+            gateDamage: behavior.gateDamagePerCurrent,
+            nextSurgeAtMs: this.elapsedTimeMs + behavior.surgeIntervalMs,
+          },
+        ];
+      })
+    );
+  }
+
+  private isEnemyInsideObjectiveCurrent(
+    enemy: Enemy,
+    current: ObjectiveAllyCurrent
+  ): boolean {
+    if (enemy.kind === 'structure' || enemy.pathIndex !== current.pathIndex) {
+      return false;
+    }
+    const projection = projectPointOntoPath(
+      enemy.position,
+      current.path,
+      this.aspectRatio
+    );
+    if (!projection) return false;
+    const distance =
+      Math.sqrt(projection.distanceSq) *
+      this.aspectRatio *
+      this.backgroundScale;
+    return distance <= current.width;
+  }
+
+  private getObjectiveCurrentSpeedMultiplier(enemy: Enemy): number {
+    let multiplier = 1;
+    for (const current of this.objectiveAllyCurrents) {
+      if (this.isEnemyInsideObjectiveCurrent(enemy, current)) {
+        multiplier = Math.min(multiplier, current.slowMultiplier);
+      }
+    }
+    return multiplier;
+  }
+
+  private pushEnemyAgainstMovement(
+    enemy: Enemy,
+    current: ObjectiveAllyCurrent
+  ): void {
+    const projection = projectPointOntoPath(
+      enemy.position,
+      current.path,
+      this.aspectRatio
+    );
+    if (!projection) return;
+
+    const totalProgress = current.path
+      .slice(1)
+      .reduce(
+        (total, point, index) =>
+          total +
+          getPathSegmentLength(current.path[index], point, this.aspectRatio),
+        0
+      );
+    const normalizedPush =
+      current.pushDistance /
+      (Math.max(this.aspectRatio, Number.EPSILON) * this.backgroundScale);
+    const pushedProgress = Math.max(
+      0,
+      Math.min(
+        totalProgress,
+        projection.progress + (enemy.isMovingBackward ? 1 : -1) * normalizedPush
+      )
+    );
+    enemy.position = getPointAtPathProgress(
+      current.path,
+      pushedProgress,
+      this.aspectRatio
+    );
+
+    let cumulativeProgress = 0;
+    let segmentEndIndex = current.path.length - 1;
+    for (let index = 1; index < current.path.length; index++) {
+      cumulativeProgress += getPathSegmentLength(
+        current.path[index - 1],
+        current.path[index],
+        this.aspectRatio
+      );
+      if (pushedProgress <= cumulativeProgress) {
+        segmentEndIndex = index;
+        break;
+      }
+    }
+    enemy.currentWaypointIndex = enemy.isMovingBackward
+      ? Math.max(0, segmentEndIndex - 1)
+      : segmentEndIndex;
+  }
+
+  private processObjectiveAllyCurrents(enemies: Enemy[]): void {
+    const surgingCurrents = this.objectiveAllyCurrents.filter(
+      (current) => this.elapsedTimeMs >= current.nextSurgeAtMs
+    );
+    if (surgingCurrents.length === 0) return;
+
+    const pushedEnemyIds = new Set<string>();
+    for (const current of surgingCurrents) {
+      current.lastSurgeAtMs = this.elapsedTimeMs;
+      current.nextSurgeAtMs = this.elapsedTimeMs + current.surgeIntervalMs;
+      for (const enemy of enemies) {
+        if (
+          enemy.hp > 0 &&
+          !pushedEnemyIds.has(enemy.id) &&
+          this.isEnemyInsideObjectiveCurrent(enemy, current)
+        ) {
+          this.pushEnemyAgainstMovement(enemy, current);
+          pushedEnemyIds.add(enemy.id);
+        }
+      }
+    }
+
+    const owner = this.objectiveAllies.find(
+      (ally) => ally.id === surgingCurrents[0].ownerAllyId
+    );
+    if (!owner) return;
+    const targetStructure = enemies.find(
+      (enemy) =>
+        enemy.definitionId === owner.targetStructureDefinitionId &&
+        enemy.kind === 'structure' &&
+        enemy.hp > 0
+    );
+    if (!targetStructure) return;
+
+    const requestedDamage = surgingCurrents.reduce(
+      (total, current) => total + current.gateDamage,
+      0
+    );
+    const damage = Math.min(requestedDamage, targetStructure.hp);
+    targetStructure.hp -= damage;
+    startDamageFlash(targetStructure, ElementType.WATER);
+    owner.impactCount++;
+    this.floatingTexts.push({
+      id: `ft_parlet_gate_${this.elapsedTimeMs}_${owner.impactCount}`,
+      text: Math.ceil(damage).toString(),
+      position: { ...targetStructure.position },
+      color: 0x22d3ee,
+      scale: 1.3,
+      durationMs: 950,
+      elapsedMs: 0,
+    });
+    if (targetStructure.hp <= 0 && !targetStructure.defeatEventEmitted) {
+      targetStructure.defeatEventEmitted = true;
+      this.handleStructureDestroyed(
+        targetStructure,
+        Array.from(targetStructure.damagedByTowerIds)
+      );
     }
   }
 

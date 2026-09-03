@@ -212,6 +212,121 @@ function createSepippetRescueLevel(): TDLevelData {
   };
 }
 
+function createParletRescueLevel(): TDLevelData {
+  return {
+    paths: [
+      [
+        { x: 0, y: 50 },
+        { x: 1000, y: 50 },
+      ],
+      [
+        { x: 25, y: 100 },
+        { x: 25, y: 0 },
+      ],
+      [
+        { x: 75, y: 100 },
+        { x: 75, y: 0 },
+      ],
+      [
+        { x: 50, y: 0 },
+        { x: 50, y: -1000 },
+      ],
+      [
+        { x: 0, y: 0 },
+        { x: -1000, y: 0 },
+      ],
+    ],
+    placementSpots: [],
+    waveEnemyDefinitions: [
+      {
+        id: 'main_gate',
+        level: 1,
+        structure: {
+          tdConfigId: 'main_gate',
+          displayName: 'MAIN GATE',
+          elementTypes: [ElementType.STEEL],
+          maxHp: 1000,
+          defense: 10,
+          specialDefense: 10,
+          winsLevelOnDestroy: true,
+          role: 'victory-gate',
+        },
+      },
+      {
+        id: 'parlet_gate',
+        level: 1,
+        structure: {
+          tdConfigId: 'parlet_gate',
+          displayName: 'PARLET CELL',
+          elementTypes: [ElementType.STEEL],
+          maxHp: 20,
+          defense: 5,
+          specialDefense: 5,
+          role: 'prisoner-gate',
+          visualStyle: 'prison-gate',
+        },
+      },
+      {
+        id: 'current_target',
+        creatureId: 'sonarion',
+        level: 8,
+      },
+    ],
+    waves: [
+      {
+        id: 'test_wave',
+        groups: [
+          {
+            enemyDefinitionId: 'main_gate',
+            count: 1,
+            spawnIntervalMs: 0,
+            delayBeforeGroupMs: 0,
+            pathIndex: 3,
+          },
+          {
+            enemyDefinitionId: 'parlet_gate',
+            count: 1,
+            spawnIntervalMs: 0,
+            delayBeforeGroupMs: 0,
+            pathIndex: 4,
+            concurrentWithPrevious: true,
+          },
+          {
+            enemyDefinitionId: 'current_target',
+            count: 1,
+            spawnIntervalMs: 0,
+            delayBeforeGroupMs: 0,
+            pathIndex: 0,
+            concurrentWithPrevious: true,
+          },
+        ],
+      },
+    ],
+    objectiveAllies: [
+      {
+        id: 'parlet',
+        creatureId: 'parlet',
+        displayName: 'Parlet',
+        gateDefinitionId: 'parlet_gate',
+        lockedPosition: { x: 0, y: 0 },
+        releasePath: [],
+        moveSpeed: 1000,
+        targetStructureDefinitionId: 'main_gate',
+        behavior: {
+          type: 'PARLET_MOSAIC_CURRENTS',
+          currentPathIndices: [0, 1, 2],
+          currentWidth: 10,
+          slowMultiplier: 0.5,
+          surgeIntervalMs: 100,
+          surgeVisualDurationMs: 50,
+          pushDistance: 20,
+          gateDamagePerCurrent: 4,
+        },
+      },
+    ],
+  };
+}
+
 describe('objective allies', () => {
   it('spawns a reusable prison gate for every established Level 5 prisoner', () => {
     const engine = new TowerDefenseEngine(LEVEL_5);
@@ -368,6 +483,50 @@ describe('objective allies', () => {
 
     expect(engine.objectiveAllies[0].phase).toBe('exhausted');
     expect(engine.objectiveAllyShadows).toHaveLength(0);
+
+    engine.destroy();
+  });
+
+  it('lets Parlet slow and push lane enemies while its currents damage the gate', () => {
+    const engine = new TowerDefenseEngine(createParletRescueLevel());
+    engine.tick(0, 16);
+    engine.tick(16, 16);
+    engine.tick(32, 16);
+
+    const cellGate = engine.enemies.find(
+      (enemy) => enemy.definitionId === 'parlet_gate'
+    )!;
+    const mainGate = engine.enemies.find(
+      (enemy) => enemy.definitionId === 'main_gate'
+    )!;
+    const currentTarget = engine.enemies.find(
+      (enemy) => enemy.waveEnemyDefinitionId === 'current_target'
+    )!;
+    const tower = { id: 'tower', position: { x: 0, y: 0 } } as Tower;
+
+    cellGate.hp = 0;
+    engine.emitEnemyDefeated(cellGate, tower);
+    engine.tick(48, 16);
+
+    expect(engine.objectiveAllies[0].phase).toBe('channeling');
+    expect(engine.objectiveAllyCurrents).toHaveLength(3);
+
+    const positionBeforeSlowTick = currentTarget.position.x;
+    engine.tick(64, 16);
+    const slowedMovement = currentTarget.position.x - positionBeforeSlowTick;
+    expect(slowedMovement).toBeCloseTo(
+      currentTarget.speed * (16 / 16.666) * 0.5,
+      4
+    );
+
+    const positionBeforeSurge = currentTarget.position.x;
+    engine.tick(164, 100);
+
+    expect(currentTarget.position.x).toBeLessThan(positionBeforeSurge);
+    expect(mainGate.hp).toBe(988);
+    expect(engine.objectiveAllyCurrents[0].lastSurgeAtMs).toBe(
+      engine.elapsedTimeMs
+    );
 
     engine.destroy();
   });

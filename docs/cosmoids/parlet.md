@@ -1,6 +1,6 @@
 # Parlet
 
-> Concept record created August 30, 2026. Parlet is the selected Water-type prisoner direction for Level 5 and is registered as a game Cosmoid with production battle assets. Its planned captive-ally behavior remains undecided.
+> Concept record created August 30, 2026. Parlet is the selected Water-type prisoner direction for Level 5 and is registered as a game Cosmoid with production battle assets and a captive-ally behavior.
 
 ![Parlet concept art](./images/parlet-concept.png)
 
@@ -62,7 +62,7 @@ The approved concept reference intentionally omits the curved sand trail that ap
 
 Parlet occupies one of the optional cells connected to Level 5's paths. Its identity should not be built around opening cells or damaging Tigrevel's gate; it is a complete Water-type species that simply happens to have been imprisoned when the crew encounters it.
 
-Opening Parlet's cell should reveal its personality through a brief visual beat, such as immediately inspecting the cell's dull color arrangement or attempting to improve a nearby Navy marking. Its eventual gameplay contribution to the level remains undecided and should be selected only after the overall prisoner system is finalized.
+Opening Parlet's cell reveals its personality through an immediate act of composition. It travels toward Tigrevel's cell and paints a shifting mosaic current over each enemy approach. The currents slow enemies, periodically push them opposite their direction of travel, and send synchronized colored Water crests into the main gate. Parlet remains beside the objective maintaining and endlessly revising the patterns.
 
 ## Design Tests to Preserve
 
@@ -81,12 +81,10 @@ Opening Parlet's cell should reveal its personality through a brief visual beat,
 - **Production assets:** `public/UI/Icons/parlet_icon.png` and `public/battles/cosmoids/parlet_{left,up,down}.png`
 - **Creature manifest:** `src/content/creatures/parlet.json`
 - **Image status:** Cleaned approved direction and production game assets implemented; exploratory curved sand trail removed
-- **Implementation status:** Registered Water-type game Cosmoid and Level 5 planned captive ally; release behavior remains pending
+- **Implementation status:** Registered Water-type game Cosmoid with a Level 5 captive-ally route, persistent mosaic-current battlefield support, and synchronized gate damage
 
 ## Open Decisions
 
 - Decide whether it is a single-stage species or begins an evolution story about learning when to preserve a finished creation.
 - Decide why the Navy imprisoned this particular Parlet and how much of that explanation appears during Level 5.
-- Determine its role after release without forcing the creature's core design to revolve around damaging the main gate.
-- Define its eventual allied-prisoner behavior and tower-defense contribution.
 - Create journal artwork after its habitat and observed wild behavior are finalized.
