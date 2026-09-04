@@ -2,7 +2,7 @@
 
 This document is the working reference for Cosmoid creature concepts currently under consideration. Details are exploratory unless they have already been implemented in the game; names, typings, lore, and evolution paths may change.
 
-Last consolidated: August 30, 2026
+Last consolidated: September 4, 2026
 
 ## Developed Concepts
 
@@ -11,21 +11,51 @@ Last consolidated: August 30, 2026
 - **Core concept:** A freshwater crab that uses a coconut as a boat to protect itself from salt water while traveling across the ocean.
 - **Typing:** Grass
 - **Entry:** A freshwater crab that uses a coconut as a boat to protect itself from salt water when traveling the ocean.
-- **Evolution ideas:** It grows able to handle salt water and becomes a better sailor. Its story starts happily, but by the third evolution it meets its end and becomes a ghost pirate.
+- **Evolution ideas:** It leaves the coconut after growing a stronger natural shell, trains to tolerate seawater, and learns shipbuilding before branching toward a noble shipwright or a cursed Grass/Ghost fate connected to drowning.
+
+#### Carapenter — The Apprentice Shipwright Cosmoid
+
+- **Family:** Approved second evolution of Palmit.
+- **Typing:** Grass
+- **Name concept:** _Carapace_ + _carpenter_, joining its hardened natural shell to its shipbuilding apprenticeship.
+- **Core concept:** An exposed young crab whose own broad carapace has matured into brown, layered, coconut-husk-like armor; it reshapes Palmit's stick into a handmade wooden mallet and practices repairs while training in seawater.
+- **Branch role:** Patient craft and care can lead toward the noble shipwright final form, while pushing its incomplete saltwater adaptation to the point of drowning can lead toward the cursed Grass/Ghost branch.
+- **Status:** Production-integrated with a game icon, corrected two-claw directional battle art, gameplay data, Palmit's level-16 evolution link, and one capturable Level 5 encounter. Journal art and both final branches remain open.
+- **Dedicated record and concept art:** [`docs/cosmoids/carapenter.md`](./docs/cosmoids/carapenter.md)
 
 ### Fueguana — The Bandit Cosmoid
 
 - **Core concept:** An island iguana and gunpowder-inspired bandit.
 - **Typing:** Fire
 - **Entry:** It enjoys causing havoc on pirate ships by devouring gunpowder and setting the decks ablaze. If grabbed by the tail, it detaches the appendage to escape, leaving behind a surprise that explodes moments later!
-- **Evolution ideas:** The sack around its neck could become a bandana. It starts as a bandit and ultimately becomes a noble swordsman.
+- **Evolution ideas:** Its impulsive shipboard mischief develops into Velocinder's explosive speed before branching toward either a noble or cursed final evolution.
+
+#### Velocinder — The Fuse-Racing Cosmoid
+
+- **Family:** Approved second evolution of Fueguana.
+- **Typing:** Fire
+- **Name concept:** _Velocity_ + _cinder_, with a deliberate sound association with _velociraptor_ that reinforces its swift reptilian silhouette.
+- **Core concept:** A competitive young fire iguana whose enlarged hind legs and thorned counterbalancing tail let it race lit cannon fuses across pirate decks. Gunpowder-fed heat builds across its whole body and vents as sparks most visibly from its feet and tail.
+- **Branch role:** Greater balance and speed can mature into disciplined freedom on the noble route, while cursed influence could twist its competitive drive into frantic, self-destructive motion.
+- **Status:** Standalone identity approved and production-integrated with icon, directional battle art, gameplay data, Fueguana evolution logic, and a capturable Level 5 encounter. Journal artwork and both final branches remain open.
+- **Dedicated record and concept art:** [`docs/cosmoids/velocinder.md`](./docs/cosmoids/velocinder.md)
 
 ### Monkeg — The Stowaway Cosmoid
 
 - **Core concept:** A combination of sea monkeys, monkeys in a barrel, and a macaque.
 - **Typing:** Water
 - **Entry:** A shy Cosmoid that hides inside barrels to get from place to place unseen. It uses its tail to navigate the oceans.
-- **Evolution ideas:** Donkey Kong inspiration.
+- **Evolution ideas:** It leaves its barrel, repurposes it as a weighted utility pack, and earns strength and practical wisdom through deck work before branching into a noble or cursed final evolution.
+
+#### Macask — The Deckhand Cosmoid
+
+- **Family:** Approved second evolution of Monkeg.
+- **Typing:** Water
+- **Name concept:** _Macaque_ + _cask_, joining its coastal-primate basis to the barrel it carries for the crew.
+- **Core concept:** A former stowaway that wears its old barrel as a cargo-filled backpack, turning its hiding place into a chosen burden that builds strength, balance, and responsibility.
+- **Branch role:** Honest service and shared responsibility can lead to Astrolape, while exploitative overloading with cursed salvage can twist its persistence toward the cursed final branch.
+- **Status:** Standalone identity approved and production-integrated with icon, directional battle art, gameplay data, Monkeg evolution logic, and a capturable Level 5 encounter. Journal art and the final branches remain open.
+- **Dedicated record and concept art:** [`docs/cosmoids/macask.md`](./docs/cosmoids/macask.md)
 
 #### Astrolape — The Navigator Cosmoid
 

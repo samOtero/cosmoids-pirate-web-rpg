@@ -556,6 +556,34 @@ export const STARTER_CRAB: CosmoidTemplate = {
     { level: 1, attackId: 'PINCH' },
     { level: 6, attackId: 'COIR_SNARE' },
   ],
+  evolutionNodes: [{ level: 16, evolutionDefId: 'carapenter' }],
+};
+
+export const CARAPENTER: CosmoidTemplate = {
+  id: 'carapenter',
+  name: 'Carapenter',
+  type: ElementType.GRASS,
+  baseStats: {
+    hp: 76,
+    attack: 78,
+    defense: 88,
+    specialAttack: 50,
+    specialDefense: 72,
+    speed: 36,
+  },
+  baseExperience: 90,
+  iconImg: '/UI/Icons/carapenter_icon.png',
+  journalImg: '/UI/Journal/carapenter_journal.png',
+  journalEntry:
+    'After outgrowing its coconut, it shapes driftwood into a sturdy mallet. Its layered husk-like shell lets it brave short swims in seawater while repairing damaged ships.',
+  spriteUrl: '/battles/cosmoids/carapenter_down.png',
+  battleSpriteUrl: '/battles/cosmoids/carapenter_left.png',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'PINCH' },
+    { level: 6, attackId: 'COIR_SNARE' },
+    { level: 12, attackId: 'VINE_WHIP' },
+  ],
 };
 
 export const STARTER_IGUANA: CosmoidTemplate = {
@@ -582,6 +610,34 @@ export const STARTER_IGUANA: CosmoidTemplate = {
     { level: 1, attackId: 'SCRATCH' },
     { level: 9, attackId: 'EMBER' },
   ],
+  evolutionNodes: [{ level: 16, evolutionDefId: 'velocinder' }],
+};
+
+export const VELOCINDER: CosmoidTemplate = {
+  id: 'velocinder',
+  name: 'Velocinder',
+  type: ElementType.FIRE,
+  baseStats: {
+    hp: 60,
+    attack: 86,
+    defense: 46,
+    specialAttack: 58,
+    specialDefense: 54,
+    speed: 96,
+  },
+  baseExperience: 90,
+  spriteUrl: '/battles/cosmoids/velocinder_down.png',
+  iconImg: '/UI/Icons/velocinder_icon.png',
+  journalImg: '/UI/Journal/velocinder_journal.png',
+  journalEntry:
+    'Once it learns to balance on its hind legs, it becomes fast enough to race a lit cannon fuse. Its thorny tail sprays sparks around every sharp turn.',
+  battleSpriteUrl: '/battles/cosmoids/velocinder_left.png',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'SCRATCH' },
+    { level: 9, attackId: 'EMBER' },
+    { level: 12, attackId: 'QUICK_ATTACK' },
+  ],
 };
 
 export const STARTER_MONKEY: CosmoidTemplate = {
@@ -607,13 +663,44 @@ export const STARTER_MONKEY: CosmoidTemplate = {
     { level: 1, attackId: 'TACKLE' },
     { level: 8, attackId: 'BARREL_BASH' },
   ],
+  evolutionNodes: [{ level: 16, evolutionDefId: 'macask' }],
+};
+
+export const MACASK: CosmoidTemplate = {
+  id: 'macask',
+  name: 'Macask',
+  type: ElementType.WATER,
+  baseStats: {
+    hp: 82,
+    attack: 80,
+    defense: 76,
+    specialAttack: 55,
+    specialDefense: 68,
+    speed: 34,
+  },
+  baseExperience: 90,
+  iconImg: '/UI/Icons/macask_icon.png',
+  journalImg: '/UI/Journal/macask_journal.png',
+  journalEntry:
+    'It carries the heaviest supplies in the barrel on its back. The shifting load strengthens its body and teaches it to keep its footing on even the roughest seas.',
+  spriteUrl: '/battles/cosmoids/macask_down.png',
+  battleSpriteUrl: '/battles/cosmoids/macask_left.png',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'TACKLE' },
+    { level: 8, attackId: 'BARREL_BASH' },
+    { level: 14, attackId: 'BUBBLE_BEAM' },
+  ],
 };
 
 /** All known species definitions, keyed by species ID. */
 export const COSMOID_TEMPLATES: Record<string, CosmoidTemplate> = {
   [STARTER_CRAB.id]: STARTER_CRAB,
+  [CARAPENTER.id]: CARAPENTER,
   [STARTER_IGUANA.id]: STARTER_IGUANA,
+  [VELOCINDER.id]: VELOCINDER,
   [STARTER_MONKEY.id]: STARTER_MONKEY,
+  [MACASK.id]: MACASK,
   [BUG_STAGE_1.id]: BUG_STAGE_1,
   [BUG_STAGE_2.id]: BUG_STAGE_2,
   [BUG_STAGE_3.id]: BUG_STAGE_3,

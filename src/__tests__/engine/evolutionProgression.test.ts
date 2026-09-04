@@ -4,8 +4,12 @@ import {
   BUG_STAGE_1,
   BUG_STAGE_2,
   BUG_STAGE_3,
+  CARAPENTER,
   RESONARION,
   SONARION,
+  STARTER_CRAB,
+  STARTER_IGUANA,
+  VELOCINDER,
 } from '@/constants/creatures';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { TDEvent } from '@/engine/tower-defense/events/TDEventBus';
@@ -166,6 +170,26 @@ describe('Razcall evolution progression', () => {
     expect(tower.creature.speciesId).toBe('sonarion');
 
     engine.destroy();
+  });
+});
+
+describe('Palmit evolution progression', () => {
+  it('defines Carapenter as its pure Grass evolution at level 16', () => {
+    expect(STARTER_CRAB.evolutionNodes).toEqual([
+      { level: 16, evolutionDefId: 'carapenter' },
+    ]);
+    expect(CARAPENTER.type).toBe(STARTER_CRAB.type);
+    expect(CARAPENTER.secondaryType).toBeUndefined();
+  });
+});
+
+describe('Fueguana evolution progression', () => {
+  it('defines Velocinder as its pure Fire evolution at level 16', () => {
+    expect(STARTER_IGUANA.evolutionNodes).toEqual([
+      { level: 16, evolutionDefId: 'velocinder' },
+    ]);
+    expect(VELOCINDER.type).toBe(STARTER_IGUANA.type);
+    expect(VELOCINDER.secondaryType).toBeUndefined();
   });
 });
 
