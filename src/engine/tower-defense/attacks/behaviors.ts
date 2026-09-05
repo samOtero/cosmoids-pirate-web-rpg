@@ -183,6 +183,109 @@ export const InstantMeleeBehavior: AttackBehavior = {
   },
 };
 
+export const AdaptiveTargetedAoeBehavior: AttackBehavior = {
+  canExecute(engine, source, attackDef): boolean {
+    return engine.enemies.some(
+      (enemy) =>
+        enemy.hp > 0 &&
+        engine.isPositionInAttackRange(
+          source.position,
+          enemy.position,
+          attackDef.rangeIndex
+        )
+    );
+  },
+
+  execute(engine, source, attackDef): void {
+    const primaryTarget = engine.getTargetForTower(
+      source,
+      attackDef.rangeIndex,
+      source.targetingMode || 'first'
+    );
+    if (!primaryTarget) return;
+
+    const dx = primaryTarget.position.x - source.position.x;
+    const dy = primaryTarget.position.y - source.position.y;
+    let facingDirection: 'up' | 'down' | 'left' | 'right' = 'down';
+    if (Math.abs(dx) > Math.abs(dy)) {
+      facingDirection = dx > 0 ? 'right' : 'left';
+    } else {
+      facingDirection = dy > 0 ? 'down' : 'up';
+    }
+    source.facingDirection = facingDirection;
+
+    engine.projectiles.push({
+      id: `proj_adaptive_aoe_${source.id}_${engine.elapsedTimeMs}_${Math.random()}`,
+      attackDefinitionId: attackDef.id,
+      sourceId: source.id,
+      targetId: primaryTarget.id,
+      position: { ...source.position },
+      origin: { ...source.position },
+      launchFacingDirection: facingDirection,
+      speed: attackDef.projectileSpeed ?? 1,
+      damage: attackDef.power,
+      target: { ...primaryTarget.position },
+      facingDirection,
+    });
+  },
+};
+
+export function resolveAdaptiveTargetedAoeImpact(
+  engine: TowerDefenseEngine,
+  source: Tower,
+  attackDef: AttackDefinition,
+  primaryTarget: Enemy,
+  showVisualEffect = true
+): void {
+  const config = attackDef.adaptiveTargetedAoe;
+  if (!config) return;
+
+  const targets = engine.enemies.filter(
+    (enemy) =>
+      enemy.hp > 0 &&
+      engine.isPositionInAttackRange(
+        primaryTarget.position,
+        enemy.position,
+        config.radiusIndex
+      )
+  );
+  const resolvedAttack =
+    targets.length === 1
+      ? {
+          ...attackDef,
+          power: config.singleTargetPower,
+          effects: config.singleTargetEffects,
+        }
+      : attackDef;
+
+  targets.forEach((enemy) => {
+    EffectProcessor.applyDamageAndEffects(
+      engine,
+      source,
+      enemy,
+      resolvedAttack
+    );
+    if (enemy.hp <= 0) {
+      engine.emitEnemyDefeated(enemy, source);
+    }
+  });
+
+  if (showVisualEffect && attackDef.visualEffectConfigId) {
+    const configId = attackDef.visualEffectConfigId;
+    const vfxConfig = CREATURE_TD_CONFIGS[configId]?.default?.vfxAnimation;
+    engine.visualEffects.push({
+      id: `vfx_adaptive_aoe_${source.id}_${engine.elapsedTimeMs}_${Math.random()}`,
+      configId,
+      position: { ...primaryTarget.position },
+      durationMs: vfxConfig?.durationMs ?? 520,
+      elapsedMs: 0,
+      facingDirection: source.facingDirection,
+      targetId: primaryTarget.id,
+      rangeIndex: config.radiusIndex,
+    });
+  }
+}
+
 export const InstantAoeBehavior: AttackBehavior = {
   canExecute(
     engine: TowerDefenseEngine,
@@ -359,6 +462,7 @@ export const AttackBehaviorRegistry: Record<string, AttackBehavior> = {
   PROJECTILE: ProjectileBehavior,
   INSTANT_MELEE: InstantMeleeBehavior,
   INSTANT_AOE: InstantAoeBehavior,
+  ADAPTIVE_TARGETED_AOE: AdaptiveTargetedAoeBehavior,
   POISON_AOE: PoisonAoeBehavior,
   SUPPORT_AURA: SupportAuraBehavior,
 };

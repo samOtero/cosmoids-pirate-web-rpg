@@ -716,6 +716,40 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       offsetY: -19,
     },
   },
+  attack_mallet_smash_1: {
+    default: {
+      scale: 0.4,
+      // Keep the grip planted beside the target; the head strikes at (0, 0).
+      offsetX: -68,
+      offsetY: -28,
+      vfxAnimation: {
+        type: 'KEYFRAME_SPRITES',
+        durationMs: 520,
+        impactProgress: 0.56,
+        layers: [
+          {
+            url: '/battles/attacks/mallet_smash.png',
+            anchorX: 0.5,
+            anchorY: 0.48,
+            keyframes: [
+              // Raise a rigid hammer, then briefly gather weight at the top.
+              { progress: 0, rotation: -35, alpha: 0 },
+              { progress: 0.08, rotation: -45, alpha: 1 },
+              { progress: 0.24, rotation: -65, alpha: 1 },
+              { progress: 0.32, rotation: -65, alpha: 1 },
+              // Increasing angular speed carries the head over and down.
+              { progress: 0.4, rotation: -42, alpha: 1 },
+              { progress: 0.47, rotation: 0, alpha: 1 },
+              { progress: 0.56, rotation: 90, alpha: 1 },
+              // Hold the contact pose, then fade without recoiling.
+              { progress: 0.65, rotation: 90, alpha: 1 },
+              { progress: 1, rotation: 90, alpha: 0 },
+            ],
+          },
+        ],
+      },
+    },
+  },
   attack_spark_launch_1: {
     default: {
       vfxAnimation: { type: 'SPARK_LAUNCH', durationMs: 160 },

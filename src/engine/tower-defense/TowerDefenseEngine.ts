@@ -31,7 +31,10 @@ import {
 } from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
 import { startDamageFlash } from './damageFlash';
-import { AttackBehaviorRegistry } from './attacks/behaviors';
+import {
+  AttackBehaviorRegistry,
+  resolveAdaptiveTargetedAoeImpact,
+} from './attacks/behaviors';
 import { EffectProcessor } from './attacks/EffectProcessor';
 import { getAttackSpeedMultiplier } from './attackSpeedModifiers';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
@@ -913,6 +916,97 @@ export class TowerDefenseEngine {
         p.target = { ...target.position };
       }
 
+      const dashDef = p.attackDefinitionId
+        ? ATTACK_DEFS[p.attackDefinitionId]
+        : undefined;
+      const dashVisual = dashDef?.visualEffectConfigId
+        ? CREATURE_TD_CONFIGS[dashDef.visualEffectConfigId]?.default?.vfxAnimation
+        : undefined;
+      if (
+        dashDef?.isDashAttack &&
+        dashDef.dashImpactHoldMs &&
+        dashVisual?.impactProgress !== undefined
+      ) {
+        const source = newTowers.find((tower) => tower.id === p.sourceId);
+        if (!p.hasImpacted) {
+          if (!target || target.hp <= 0 || !source) {
+            p.speed = 0;
+            return;
+          }
+
+          // Approach from the caster's side, stopping short even on wide maps.
+          const origin = p.origin ?? source.position;
+          const distance = this.getAttackDistance(origin, target.position);
+          const backoff = distance > 0
+            ? Math.min(1, (dashDef.dashStopRange ?? 0) / distance)
+            : 0;
+          const stopOffset = {
+            x: (origin.x - target.position.x) * backoff,
+            y: (origin.y - target.position.y) * backoff,
+          };
+          const stopPoint = {
+            x: target.position.x + stopOffset.x,
+            y: target.position.y + stopOffset.y,
+          };
+          const dx = stopPoint.x - p.position.x;
+          const dy = stopPoint.y - p.position.y;
+          const travelDistance = Math.hypot(dx, dy);
+          const frameSpeed = p.speed * timeScale;
+          if (travelDistance > frameSpeed) {
+            p.position.x += (dx / travelDistance) * frameSpeed;
+            p.position.y += (dy / travelDistance) * frameSpeed;
+            return;
+          }
+
+          const travelMs = p.speed > 0 ? (travelDistance / p.speed) * 16.666 : 0;
+          p.position = stopPoint;
+          p.dashTargetOffset = stopOffset;
+          p.hasImpacted = true;
+          p.impactElapsedMs = Math.max(0, deltaMs - travelMs);
+          p.impactHoldDurationMs = dashVisual.durationMs ?? dashDef.dashImpactHoldMs;
+          p.speed = 0;
+          this.visualEffects.push({
+            id: `vfx_dash_${p.id}`,
+            configId: dashDef.visualEffectConfigId!,
+            position: { ...target.position },
+            durationMs: p.impactHoldDurationMs,
+            elapsedMs: p.impactElapsedMs,
+            dashProjectileId: p.id,
+            targetId: target.id,
+            facingDirection: p.facingDirection,
+            rangeIndex: dashDef.adaptiveTargetedAoe?.radiusIndex,
+          });
+        } else {
+          p.impactElapsedMs = (p.impactElapsedMs ?? 0) + deltaMs;
+          if (target && p.dashTargetOffset) {
+            p.position = {
+              x: target.position.x + p.dashTargetOffset.x,
+              y: target.position.y + p.dashTargetOffset.y,
+            };
+          }
+        }
+
+        const contactMs = dashVisual.impactProgress * p.impactHoldDurationMs!;
+        if (!p.impactDamageApplied && (p.impactElapsedMs ?? 0) >= contactMs) {
+          p.impactDamageApplied = true;
+          if (source && target && target.hp > 0 && p.dealsDamage !== false) {
+            if (dashDef.adaptiveTargetedAoe) {
+              resolveAdaptiveTargetedAoeImpact(this, source, dashDef, target, false);
+            } else {
+              EffectProcessor.applyDamageAndEffects(this, source, target, dashDef);
+              if (target.hp <= 0) this.emitEnemyDefeated(target, source);
+            }
+          }
+        }
+        return;
+      }
+
+      if (p.hasImpacted) {
+        if (target) p.position = { ...target.position };
+        p.impactElapsedMs = (p.impactElapsedMs ?? 0) + deltaMs;
+        return;
+      }
+
       const dx = p.target.x - p.position.x;
       const dy = p.target.y - p.position.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
@@ -925,14 +1019,26 @@ export class TowerDefenseEngine {
           if (p.attackDefinitionId && sourceTower) {
             const attackDef = ATTACK_DEFS[p.attackDefinitionId];
             if (attackDef) {
-              EffectProcessor.applyDamageAndEffects(
-                this,
-                sourceTower,
-                target,
-                attackDef
-              );
+              if (attackDef.adaptiveTargetedAoe) {
+                resolveAdaptiveTargetedAoeImpact(
+                  this,
+                  sourceTower,
+                  attackDef,
+                  target
+                );
+              } else {
+                EffectProcessor.applyDamageAndEffects(
+                  this,
+                  sourceTower,
+                  target,
+                  attackDef
+                );
+              }
 
-              if (attackDef.visualEffectConfigId) {
+              if (
+                !attackDef.adaptiveTargetedAoe &&
+                attackDef.visualEffectConfigId
+              ) {
                 const configMap =
                   CREATURE_TD_CONFIGS[attackDef.visualEffectConfigId];
                 const vfxConfig = configMap?.default?.vfxAnimation;
@@ -976,11 +1082,30 @@ export class TowerDefenseEngine {
             });
           }
 
-          if (target.hp <= 0 && sourceTower) {
+          const impactAttackDef = p.attackDefinitionId
+            ? ATTACK_DEFS[p.attackDefinitionId]
+            : undefined;
+          if (
+            target.hp <= 0 &&
+            sourceTower &&
+            !impactAttackDef?.adaptiveTargetedAoe
+          ) {
             this.emitEnemyDefeated(target, sourceTower);
           }
         }
-        p.speed = 0; // mark for deletion
+
+        const impactDef = p.attackDefinitionId
+          ? ATTACK_DEFS[p.attackDefinitionId]
+          : undefined;
+        if (target && impactDef?.isDashAttack && impactDef.dashImpactHoldMs) {
+          p.position = { ...p.target };
+          p.hasImpacted = true;
+          p.impactElapsedMs = 0;
+          p.impactHoldDurationMs = impactDef.dashImpactHoldMs;
+          p.speed = 0;
+        } else {
+          p.speed = 0; // mark for deletion
+        }
       } else {
         p.position.x += (dx / dist) * frameSpeed;
         p.position.y += (dy / dist) * frameSpeed;
@@ -1014,12 +1139,23 @@ export class TowerDefenseEngine {
     }
     newEnemies = newEnemies.filter((e) => e.hp > 0);
 
-    // Keep projectiles that haven't hit yet (speed > 0)
-    const activeProjectiles = this.projectiles.filter((p) => p.speed > 0);
+    // Keep projectiles that are traveling or holding a dash attacker at impact.
+    const activeProjectiles = this.projectiles.filter(
+      (p) =>
+        p.speed > 0 ||
+        (p.hasImpacted &&
+          (p.impactElapsedMs ?? 0) < (p.impactHoldDurationMs ?? 0))
+    );
 
     // Update Visual Effects
     this.visualEffects.forEach((effect) => {
-      effect.elapsedMs += deltaMs;
+      const dash = effect.dashProjectileId
+        ? this.projectiles.find((p) => p.id === effect.dashProjectileId)
+        : undefined;
+      effect.elapsedMs = dash
+        ? (dash.impactElapsedMs ?? 0)
+        : effect.elapsedMs + deltaMs;
+      if (dash) effect.position = { ...dash.target };
       // If attached to a target, update position
       if (effect.targetId) {
         const target =

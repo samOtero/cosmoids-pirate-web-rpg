@@ -582,7 +582,7 @@ export const CARAPENTER: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'PINCH' },
     { level: 6, attackId: 'COIR_SNARE' },
-    { level: 12, attackId: 'VINE_WHIP' },
+    { level: 16, attackId: 'MALLET_SMASH' },
   ],
 };
 

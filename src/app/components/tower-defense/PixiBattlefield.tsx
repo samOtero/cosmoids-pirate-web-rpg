@@ -3996,7 +3996,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 animConfig.layers?.forEach((layer, layerIdx) => {
                   const sprite = new PIXI.Sprite();
                   sprite.label = `vfx_layer_${layerIdx}`;
-                  sprite.anchor.set(0.5);
+                  sprite.anchor.set(layer.anchorX ?? 0.5, layer.anchorY ?? 0.5);
                   container.addChild(sprite);
 
                   PIXI.Assets.load(layer.url).then((t) => {

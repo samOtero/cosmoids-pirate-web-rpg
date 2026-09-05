@@ -67,6 +67,15 @@ export type ProjectileVisual =
       highlightColor: number;
     };
 
+export interface AdaptiveTargetedAoeConfig {
+  /** Splash radius measured with the battlefield's normalized range scale. */
+  radiusIndex: number;
+  /** Replaces the attack's normal power when only one enemy is in the splash. */
+  singleTargetPower: number;
+  /** Replaces the attack's normal effects when only one enemy is in the splash. */
+  singleTargetEffects?: AttackEffect[];
+}
+
 export interface AttackDefinition {
   id: string; // e.g., 'BUBBLE_BEAM'
   name: string;
@@ -85,9 +94,11 @@ export interface AttackDefinition {
     attackSpeedMultiplier: number;
     durationMs: number;
   };
+  adaptiveTargetedAoe?: AdaptiveTargetedAoeConfig;
   behaviorType:
     | 'PROJECTILE'
     | 'INSTANT_AOE'
+    | 'ADAPTIVE_TARGETED_AOE'
     | 'POISON_AOE'
     | 'BEAM'
     | 'SUPPORT_AURA'
@@ -97,6 +108,10 @@ export interface AttackDefinition {
   /** A short, cosmetic effect attached to the caster when a projectile fires. */
   launchVisualEffectConfigId?: string;
   isDashAttack?: boolean; // whether the base unit itself behaves as the projectile visually
+  /** Keeps a dash attacker at the impact point while its hit animation plays. */
+  dashImpactHoldMs?: number;
+  /** Gap from the target in viewport-height range units. */
+  dashStopRange?: number;
   dashTrailType?: 'WATER';
 }
 

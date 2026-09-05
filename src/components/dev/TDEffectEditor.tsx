@@ -407,6 +407,7 @@ export default function TDEffectEditor({ onClose }: { onClose: () => void }) {
 
           spr.x = ox + values.x;
           spr.y = oy + values.y;
+          spr.anchor.set(layer.anchorX ?? 0.5, layer.anchorY ?? 0.5);
           spr.scale.set(baseScale * values.scaleX, baseScale * values.scaleY);
           spr.rotation = (values.rotation * Math.PI) / 180;
           spr.alpha = values.alpha;
@@ -665,6 +666,23 @@ export default function TDEffectEditor({ onClose }: { onClose: () => void }) {
                     className="w-1/2 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500"
                   />
                 </div>
+              </div>
+
+              <div className="flex gap-3">
+                {(['anchorX', 'anchorY'] as const).map((field) => (
+                  <label key={field} className="flex-1 text-xs text-slate-400">
+                    Pivot {field === 'anchorX' ? 'X' : 'Y'}
+                    <input
+                      type="number"
+                      min={0}
+                      max={1}
+                      step={0.01}
+                      value={activeLayer[field] ?? 0.5}
+                      onChange={(e) => updateActiveLayer({ [field]: Math.max(0, Math.min(1, Number(e.target.value))) })}
+                      className="mt-1 w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-slate-300"
+                    />
+                  </label>
+                ))}
               </div>
 
               {/* Timeline Section */}

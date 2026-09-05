@@ -550,6 +550,12 @@ export interface Projectile {
   visualScale?: number;
   target: Point;
   facingDirection?: 'up' | 'down' | 'left' | 'right';
+  /** Dash attacks can remain at their impact point until their hit VFX ends. */
+  hasImpacted?: boolean;
+  impactElapsedMs?: number;
+  impactHoldDurationMs?: number;
+  dashTargetOffset?: Point;
+  impactDamageApplied?: boolean;
 }
 
 export interface FloatingText {
@@ -568,6 +574,8 @@ export interface VisualEffect {
   position: Point;
   durationMs: number;
   elapsedMs: number;
+  /** Uses the dash hold clock so contact damage and visuals stay in sync. */
+  dashProjectileId?: string;
   facingDirection?: 'up' | 'down' | 'left' | 'right';
   targetId?: string; // If attached to moving unit
   rangeIndex?: number; // Optional battlefield radius for area effects

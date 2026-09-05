@@ -179,6 +179,8 @@ export interface VFXSpriteKeyframe {
 
 export interface VFXSpriteLayer {
   url: string;
+  anchorX?: number; // normalized texture pivot; defaults to 0.5
+  anchorY?: number;
   keyframes: VFXSpriteKeyframe[];
 }
 
@@ -207,6 +209,7 @@ export interface VFXAnimationConfig {
   fadeInProgress?: number; // 0 to 1
   fadeOutProgress?: number; // 0 to 1
   durationMs?: number; // overall duration of effect in ms
+  impactProgress?: number; // contact frame (0 to 1) for delayed dash damage
   layers?: VFXSpriteLayer[];
 }
 
