@@ -1,0 +1,117 @@
+.screen {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0d2b45;
+}
+
+.artwork {
+  object-fit: cover;
+  object-position: center top;
+  pointer-events: none;
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgb(5 28 47 / 72%) 0%,
+    rgb(5 28 47 / 42%) 29%,
+    rgb(5 28 47 / 8%) 48%,
+    transparent 62%
+  );
+  pointer-events: none;
+}
+
+.content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 44%;
+  height: 100%;
+  gap: 0.75rem;
+  padding: max(1.25rem, 9vh, env(safe-area-inset-top)) 1rem
+    max(1rem, 5vh, env(safe-area-inset-bottom))
+    max(1rem, env(safe-area-inset-left));
+  text-align: center;
+}
+
+.heading {
+  text-shadow: 0 3px 12px rgb(0 24 46 / 65%);
+}
+
+.title {
+  color: #ecfeff;
+  font-size: clamp(1.75rem, 4.4vw, 5.5rem);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+}
+
+.subtitle {
+  margin-top: 0.6rem;
+  color: #ffe6ae;
+  font-size: clamp(0.85rem, 1.8vw, 2rem);
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.launcher {
+  margin-top: auto;
+  margin-bottom: clamp(0rem, 4vh, 3rem);
+}
+
+.launcher > div > button:first-child,
+.launcher > button {
+  margin-top: 0;
+  padding: clamp(0.65rem, 1.4vh, 1rem) clamp(1rem, 3.3vw, 3rem);
+  font-size: clamp(0.85rem, 1.4vw, 1.25rem);
+}
+
+.credit {
+  color: #d5edf3;
+  font-size: clamp(0.625rem, 1vw, 0.875rem);
+  text-shadow: 0 2px 6px #051c2f;
+}
+
+/* Keep the entire crew visible on wide phone screens. */
+@media (min-aspect-ratio: 16/9) {
+  .screen::before {
+    position: absolute;
+    inset: -2rem;
+    content: '';
+    background: url('/title/four-at-the-bow.png') center / cover;
+    filter: blur(24px);
+    opacity: 0.6;
+  }
+
+  .artwork {
+    object-fit: contain;
+    object-position: right center;
+    /* Feather the 1672 × 941 artwork into the extra space beside it. */
+    mask-image: linear-gradient(
+      90deg,
+      transparent calc(100% - 177.7vh),
+      #000 calc(100% - 177.7vh + 4rem)
+    );
+  }
+}
+
+@media (max-height: 450px) {
+  .content {
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  .launcher {
+    margin-bottom: 0;
+  }
+}
