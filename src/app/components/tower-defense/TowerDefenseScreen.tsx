@@ -17,6 +17,7 @@ import {
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { TDLevelData } from '@/engine/tower-defense/types';
 import { TDStatSnapshot } from '@/engine/tower-defense/events/TDEventBus';
+import { createBattleAnalytics } from '@/utils/battleAnalytics';
 
 type QueuedModal =
   | {
@@ -81,11 +82,13 @@ function resolveSpeciesVisuals(speciesId: string): {
 
 export default function TowerDefenseScreen({
   levelData,
+  levelId = 'unknown',
   onClose,
   onWin,
   onLose,
 }: {
   levelData: TDLevelData;
+  levelId?: string;
   onClose: () => void;
   onWin?: () => void;
   onLose?: () => void;
@@ -111,6 +114,28 @@ export default function TowerDefenseScreen({
   if (!engineRef.current) {
     engineRef.current = new TowerDefenseEngine(levelData, playerCreatures);
   }
+
+  const analyticsRef = useRef<ReturnType<typeof createBattleAnalytics> | null>(
+    null
+  );
+  if (!analyticsRef.current) {
+    analyticsRef.current = createBattleAnalytics(
+      levelId,
+      levelData.isChallengeLevel ? 'challenge' : 'story',
+      playerCreatures.map(
+        (creature) => `${creature.speciesId}:${creature.level}`
+      )
+    );
+  }
+  const finishAnalytics = (outcome: 'win' | 'loss' | 'quit') => {
+    const engine = engineRef.current;
+    analyticsRef.current?.finish(
+      outcome,
+      engine.elapsedTimeMs,
+      engine.currentWaveIndex,
+      engine.lives
+    );
+  };
 
   const [uiLives, setUiLives] = useState(engineRef.current.lives);
   const [uiElapsedSeconds, setUiElapsedSeconds] = useState(0);
@@ -213,6 +238,10 @@ export default function TowerDefenseScreen({
 
   useEffect(() => {
     if (isPlaying && !hasStarted) {
+      analyticsRef.current?.start();
+      engineRef.current.towers.forEach((tower) =>
+        analyticsRef.current?.deploy(tower.creature.speciesId)
+      );
       setHasStarted(true);
     }
   }, [isPlaying, hasStarted]);
@@ -352,6 +381,7 @@ export default function TowerDefenseScreen({
           setIsPlaying(false);
           saveTowerProgress();
           setOutroState('lose'); // Show defeat screen before callback
+          finishAnalytics('loss');
         }
       }
 
@@ -387,6 +417,7 @@ export default function TowerDefenseScreen({
         setIsPlaying(false);
         saveTowerProgress();
         setOutroState('win'); // Show win screen before callback
+        finishAnalytics('win');
       }
     }
     previousTimeRef.current = time;
@@ -409,6 +440,9 @@ export default function TowerDefenseScreen({
 
   const handleMapDrop = (creatureId: string, x: number, y: number) => {
     engineRef.current.placeTower(creatureId, x, y);
+    engineRef.current.towers.forEach((tower) =>
+      analyticsRef.current?.deploy(tower.creature.speciesId)
+    );
     setActiveTowerIds(engineRef.current.towers.map((t: any) => t.creature.id));
   };
 
@@ -425,6 +459,7 @@ export default function TowerDefenseScreen({
     const wasSentToStorage = profile ? profile.creatures.length >= 6 : false;
 
     const capturedCreature = engineRef.current.captureEnemy(enemyId);
+    analyticsRef.current?.capture(speciesId, enemy.level, !!capturedCreature);
     if (capturedCreature) {
       if (currentProfileId !== null && !isPremadeLevel) {
         addCreatureToProfile(currentProfileId, capturedCreature);
@@ -601,7 +636,10 @@ export default function TowerDefenseScreen({
             {isPlaying ? 'Pause' : 'Start'}
           </button>
           <button
-            onClick={onClose}
+            onClick={() => {
+              finishAnalytics('quit');
+              onClose();
+            }}
             className="rounded bg-red-600 px-3 py-1 text-sm font-bold hover:bg-red-500 lg:px-4 lg:py-2 lg:text-base"
           >
             Close

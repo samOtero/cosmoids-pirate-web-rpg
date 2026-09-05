@@ -1,6 +1,7 @@
 'use client';
 
 import FullscreenLauncher from './FullscreenLauncher';
+import { trackGameEvent } from '@/utils/analytics';
 
 export default function StartScreen({ onStart }: { onStart: () => void }) {
   return (
@@ -13,7 +14,12 @@ export default function StartScreen({ onStart }: { onStart: () => void }) {
           The Grand Voyage
         </h2>
       </div>
-      <FullscreenLauncher onStart={onStart} />
+      <FullscreenLauncher
+        onStart={() => {
+          void trackGameEvent('game_started');
+          onStart();
+        }}
+      />
       <p className="text-sm text-cyan-800">v1.0.1 • By Samuel Otero</p>
     </div>
   );

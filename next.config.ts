@@ -25,6 +25,12 @@ const nextConfig: NextConfig = {
   output: 'export',
   env: {
     NEXT_PUBLIC_COSMOIDS_BUILD_BRANCH: getBuildBranch(),
+    NEXT_PUBLIC_COSMOIDS_BUILD_VERSION:
+      process.env.VERCEL_GIT_COMMIT_SHA ||
+      process.env.CF_PAGES_COMMIT_SHA ||
+      process.env.GITHUB_SHA ||
+      process.env.npm_package_version ||
+      '0.1.0',
   },
   images: {
     unoptimized: true,

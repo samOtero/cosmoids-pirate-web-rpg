@@ -5,6 +5,7 @@ import DevTools from '@/components/dev/DevTools';
 import AnimationProvider from '@/app/components/AnimationProvider';
 import RotateDeviceOverlay from '@/app/components/RotateDeviceOverlay';
 import { Analytics } from '@vercel/analytics/next';
+import AnalyticsControls from './components/AnalyticsControls';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -51,6 +52,7 @@ export default function RootLayout({
         <AnimationProvider />
         <DevTools />
         <Analytics />
+        <AnalyticsControls />
         <RotateDeviceOverlay />
       </body>
     </html>

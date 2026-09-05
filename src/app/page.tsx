@@ -169,6 +169,11 @@ export default function Home() {
     return (
       <Suspense fallback={<div>Loading Tower Defense...</div>}>
         <TowerDefenseScreen
+          levelId={
+            Object.entries(TD_LEVELS).find(
+              ([, config]) => config.levelData === currentTdLevel.levelData
+            )?.[0]
+          }
           levelData={currentTdLevel.levelData}
           onClose={() => {
             if (currentTdLevel.levelData.isChallengeLevel) {

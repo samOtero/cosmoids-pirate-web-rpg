@@ -29,6 +29,7 @@
     "@vercel/analytics": "^2.0.1",
     "next": "16.2.4",
     "pixi.js": "^8.16.0",
+    "posthog-js": "^1.427.2",
     "react": "19.2.5",
     "react-dom": "19.2.5",
     "zustand": "^5.0.8"
