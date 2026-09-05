@@ -41,11 +41,6 @@ export function analyticsEnabled(): boolean {
   const notTestProfile = !testProfile;
   const nodeEnv = process.env.NODE_ENV;
   const isProduction = nodeEnv === 'production';
-  const hostname = isWindowDefined ? window.location.hostname : undefined;
-  const testProfileOverride = isWindowDefined
-    ? isTestProfileOverrideEnabled(hostname)
-    : false;
-  const notTestProfileOverride = !testProfileOverride;
   const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
   const hasPosthogKey = !!posthogKey;
   const preference = getAnalyticsPreference();
@@ -55,29 +50,8 @@ export function analyticsEnabled(): boolean {
     isWindowDefined &&
     notTestProfile &&
     isProduction &&
-    notTestProfileOverride &&
     hasPosthogKey &&
     isAllowed;
-
-  console.log('[Analytics Debug] analyticsEnabled values:', {
-    enabled,
-    'typeof window !== undefined': isWindowDefined,
-    '!testProfile': notTestProfile,
-    testProfile,
-    "NODE_ENV === 'production'": isProduction,
-    NODE_ENV: nodeEnv,
-    '!isTestProfileOverrideEnabled': notTestProfileOverride,
-    isTestProfileOverrideEnabled: testProfileOverride,
-    hostname,
-    NEXT_PUBLIC_COSMOIDS_BUILD_BRANCH:
-      process.env.NEXT_PUBLIC_COSMOIDS_BUILD_BRANCH,
-    '!!NEXT_PUBLIC_POSTHOG_KEY': hasPosthogKey,
-    hasPosthogKey,
-    posthogKeyLength: posthogKey ? posthogKey.length : 0,
-    getAnalyticsPreference: preference,
-    "getAnalyticsPreference() === 'allowed'": isAllowed,
-    profileId: state.currentProfileId,
-  });
 
   return enabled;
 }
