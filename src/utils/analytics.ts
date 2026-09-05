@@ -1,5 +1,4 @@
 import type { PostHog } from 'posthog-js';
-import { isTestProfileOverrideEnabled } from './testProfileAccess';
 import { useGameStore } from '@/store/gameStore';
 
 export const ANALYTICS_PREFERENCE_KEY = 'cosmoids.analytics-consent.v1';
