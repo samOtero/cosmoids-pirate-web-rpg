@@ -37,6 +37,11 @@ import {
 } from '@/utils/tdStructureVisuals';
 import { drawRallyHowlRings, updateRallyIndicator } from './rallyHowlVisuals';
 import {
+  drawPhysicalDefenseShield,
+  drawShipshapeHealing,
+  drawShipshapeBrace,
+} from './shipshapeVisuals';
+import {
   drawSparkImpact,
   drawSparkLaunch,
   drawSparkProjectile,
@@ -463,6 +468,7 @@ function updateSpeedSlowIndicator(
 
 type DefenseBoostIndicator = PIXI.Container & {
   elapsed: number;
+  physicalOnly?: boolean;
 };
 
 function drawDefenseShield(graphics: PIXI.Graphics) {
@@ -507,20 +513,35 @@ function updateDefenseBoostIndicator(
     return;
   }
 
+  const physicalOnly =
+    (unit.defenseBoostMultiplier ?? 1) > 1 &&
+    (unit.specialDefenseBoostMultiplier ?? 1) <= 1;
+  if (indicator && indicator.physicalOnly !== physicalOnly) {
+    container.removeChild(indicator);
+    indicator.destroy({ children: true });
+    indicator = undefined;
+  }
+
   if (!indicator) {
     indicator = new PIXI.Container() as DefenseBoostIndicator;
     indicator.label = 'defenseBoostIndicator';
     indicator.elapsed = 0;
+    indicator.physicalOnly = physicalOnly;
 
     const badge = new PIXI.Graphics();
     badge.circle(0, 0, 11);
     badge.fill({ color: 0x1e293b, alpha: 0.92 });
-    badge.stroke({ color: 0xcbd5e1, alpha: 0.98, width: 2 });
+    badge.stroke({
+      color: physicalOnly ? 0xd99659 : 0xcbd5e1,
+      alpha: 0.98,
+      width: 2,
+    });
     indicator.addChild(badge);
 
     const shield = new PIXI.Graphics();
     shield.label = 'defenseBoostShield';
-    drawDefenseShield(shield);
+    if (physicalOnly) drawPhysicalDefenseShield(shield);
+    else drawDefenseShield(shield);
     indicator.addChild(shield);
 
     container.addChild(indicator);
@@ -4034,6 +4055,13 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                     stringVisual.sparkColor
                   );
                 }
+              } else if (
+                animConfig?.type === 'SHIPSHAPE_HEAL' ||
+                animConfig?.type === 'SHIPSHAPE_BRACE'
+              ) {
+                const repairEffect = new PIXI.Graphics();
+                repairEffect.label = 'shipshape_effect';
+                container.addChild(repairEffect);
               } else if (animConfig?.type === 'RALLY_HOWL') {
                 const rings = new PIXI.Graphics();
                 rings.label = 'rally_howl_rings';
@@ -4168,6 +4196,18 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               animConfig?.type === 'STRING_SHOT'
             ) {
               updateCoirSnareImpact(container, progress);
+            } else if (
+              animConfig?.type === 'SHIPSHAPE_HEAL' ||
+              animConfig?.type === 'SHIPSHAPE_BRACE'
+            ) {
+              const repairEffect = container.getChildByLabel(
+                'shipshape_effect'
+              ) as PIXI.Graphics;
+              if (animConfig.type === 'SHIPSHAPE_HEAL') {
+                drawShipshapeHealing(repairEffect, progress);
+              } else {
+                drawShipshapeBrace(repairEffect, progress);
+              }
             } else if (animConfig?.type === 'RALLY_HOWL') {
               drawRallyHowlRings(
                 container.getChildByLabel('rally_howl_rings') as PIXI.Graphics,

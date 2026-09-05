@@ -750,6 +750,40 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       },
     },
   },
+  attack_shipshape_taps: {
+    default: {
+      scale: 0.2,
+      offsetX: -36,
+      offsetY: -22,
+      vfxAnimation: {
+        type: 'KEYFRAME_SPRITES',
+        durationMs: 440,
+        layers: [
+          {
+            url: '/battles/attacks/mallet_smash.png',
+            anchorX: 0.5,
+            anchorY: 0.48,
+            keyframes: [
+              { progress: 0, rotation: 45, alpha: 0 },
+              { progress: 0.1, rotation: 45, alpha: 1 },
+              { progress: 0.28, rotation: 90, alpha: 1 },
+              { progress: 0.4, rotation: 90, alpha: 1 },
+              { progress: 0.55, rotation: 45, alpha: 1 },
+              { progress: 0.72, rotation: 90, alpha: 1 },
+              { progress: 0.84, rotation: 90, alpha: 1 },
+              { progress: 1, rotation: 75, alpha: 0 },
+            ],
+          },
+        ],
+      },
+    },
+  },
+  attack_shipshape_heal: {
+    default: { vfxAnimation: { type: 'SHIPSHAPE_HEAL', durationMs: 950 } },
+  },
+  attack_shipshape_brace: {
+    default: { vfxAnimation: { type: 'SHIPSHAPE_BRACE', durationMs: 950 } },
+  },
   attack_spark_launch_1: {
     default: {
       vfxAnimation: { type: 'SPARK_LAUNCH', durationMs: 160 },

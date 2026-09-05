@@ -197,6 +197,8 @@ export interface VFXAnimationConfig {
     | 'TOXIC_POLLEN'
     | 'HOWL'
     | 'RALLY_HOWL'
+    | 'SHIPSHAPE_HEAL'
+    | 'SHIPSHAPE_BRACE'
     | 'HARDEN'
     | 'BARREL_BASH'
     | 'STATIC_YIP'

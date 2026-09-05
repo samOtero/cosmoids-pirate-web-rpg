@@ -110,10 +110,9 @@ export class TDProgressionManager {
       newTemplate.baseStats.specialAttack,
       tower.creature.level
     );
-    tower.currentDefense = calculateStat(
-      newTemplate.baseStats.defense,
-      tower.creature.level
-    );
+    tower.currentDefense =
+      calculateStat(newTemplate.baseStats.defense, tower.creature.level) *
+      (tower.defenseBoostMultiplier ?? 1);
     tower.currentSpecialDefense = calculateStat(
       newTemplate.baseStats.specialDefense,
       tower.creature.level
@@ -225,10 +224,9 @@ export class TDProgressionManager {
             towerTemplate.baseStats.specialAttack,
             tower.creature.level
           );
-          tower.currentDefense = calculateStat(
-            towerTemplate.baseStats.defense,
-            tower.creature.level
-          );
+          tower.currentDefense =
+            calculateStat(towerTemplate.baseStats.defense, tower.creature.level) *
+            (tower.defenseBoostMultiplier ?? 1);
           tower.currentSpecialDefense = calculateStat(
             towerTemplate.baseStats.specialDefense,
             tower.creature.level

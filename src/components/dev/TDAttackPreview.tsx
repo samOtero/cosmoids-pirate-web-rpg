@@ -413,6 +413,39 @@ export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
               />
               Show nearby ally
             </label>
+            {activeAttack.repairSupport && (
+              <div className="mt-2 space-y-2 text-xs text-emerald-200">
+                <p>
+                  Heals 20% max HP and grants +25% physical defense. Repairs the
+                  lowest HP percentage first, then reinforces allies before self.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    className="rounded border border-emerald-800 px-2 py-1"
+                    onClick={() => {
+                      const tower = engine.towers.find(
+                        (unit) => unit.creature.id === 'attack-preview-tower'
+                      );
+                      if (tower) tower.hp = tower.maxHp * 0.4;
+                    }}
+                  >
+                    Injure caster
+                  </button>
+                  <button
+                    className="rounded border border-emerald-800 px-2 py-1 disabled:opacity-40"
+                    disabled={!showNearbyAlly}
+                    onClick={() => {
+                      const ally = engine.towers.find(
+                        (unit) => unit.creature.id === 'attack-preview-ally'
+                      );
+                      if (ally) ally.hp = ally.maxHp * 0.4;
+                    }}
+                  >
+                    Injure ally
+                  </button>
+                </div>
+              </div>
+            )}
             <p className="mt-2 text-[11px] text-slate-400">
               Attack swaps keep buffs and cooldowns. Changing actors resets the
               preview.

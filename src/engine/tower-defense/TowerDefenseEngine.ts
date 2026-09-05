@@ -870,7 +870,9 @@ export class TowerDefenseEngine {
       const attackDef = ATTACK_DEFS[attackInstance.definitionId];
       if (!attackDef) return;
 
-      const isSupport = attackDef.behaviorType === 'SUPPORT_AURA';
+      const isSupport =
+        attackDef.behaviorType === 'SUPPORT_AURA' ||
+        attackDef.behaviorType === 'REPAIR_SUPPORT';
       const isReady = isSupport
         ? this.elapsedTimeMs >= (attackInstance.readyAtMs ?? 0)
         : time - attackInstance.lastFiredTime >

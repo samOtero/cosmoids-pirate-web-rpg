@@ -458,6 +458,75 @@ export const SupportAuraBehavior: AttackBehavior = {
   },
 };
 
+export function getShipshapeTarget(
+  engine: TowerDefenseEngine,
+  source: Tower,
+  attackDef: AttackDefinition
+): Tower | undefined {
+  if (source.hp <= 0 || !attackDef.repairSupport) return undefined;
+  const candidates = engine.towers.filter(
+    (ally) =>
+      ally.hp > 0 &&
+      ally.maxHp > 0 &&
+      engine.isPositionInAttackRange(
+        source.position,
+        ally.position,
+        attackDef.rangeIndex
+      )
+  );
+  const injured = candidates.filter((ally) => ally.hp < ally.maxHp);
+  // Stable ordering breaks equal-health ties in favor of the crew over self.
+  injured.sort(
+    (a, b) =>
+      a.hp / a.maxHp - b.hp / b.maxHp ||
+      Number(a.id === source.id) - Number(b.id === source.id)
+  );
+  if (injured.length) return injured[0];
+  return (
+    candidates.find(
+      (ally) => ally.id !== source.id && (ally.defenseBoostMultiplier ?? 1) <= 1
+    ) ?? candidates.find((ally) => (ally.defenseBoostMultiplier ?? 1) <= 1)
+  );
+}
+
+export const RepairSupportBehavior: AttackBehavior = {
+  canExecute(engine, source, attackDef) {
+    return Boolean(getShipshapeTarget(engine, source, attackDef));
+  },
+  execute(engine, source, attackDef) {
+    const recipient = getShipshapeTarget(engine, source, attackDef);
+    const repair = attackDef.repairSupport;
+    if (!recipient || !repair) return;
+
+    const healed = Math.min(
+      recipient.maxHp - recipient.hp,
+      recipient.maxHp * repair.healFraction
+    );
+    recipient.hp += healed;
+    const previousMultiplier = recipient.defenseBoostMultiplier ?? 1;
+    const nextMultiplier = Math.max(previousMultiplier, repair.defenseMultiplier);
+    // currentDefense is the combat stat; the multiplier also drives its badge.
+    recipient.currentDefense *= nextMultiplier / previousMultiplier;
+    recipient.defenseBoostMultiplier = nextMultiplier;
+
+    const effects = [attackDef.visualEffectConfigId];
+    if (healed > 0) effects.push('attack_shipshape_heal');
+    if (previousMultiplier <= 1) effects.push('attack_shipshape_brace');
+    for (const configId of effects) {
+      if (!configId) continue;
+      engine.visualEffects.push({
+        id: `vfx_shipshape_${configId}_${recipient.id}_${engine.elapsedTimeMs}_${Math.random()}`,
+        configId,
+        position: { ...recipient.position },
+        targetId: recipient.id,
+        durationMs:
+          CREATURE_TD_CONFIGS[configId]?.default?.vfxAnimation?.durationMs ?? 900,
+        elapsedMs: 0,
+      });
+    }
+  },
+};
+
 export const AttackBehaviorRegistry: Record<string, AttackBehavior> = {
   PROJECTILE: ProjectileBehavior,
   INSTANT_MELEE: InstantMeleeBehavior,
@@ -465,4 +534,5 @@ export const AttackBehaviorRegistry: Record<string, AttackBehavior> = {
   ADAPTIVE_TARGETED_AOE: AdaptiveTargetedAoeBehavior,
   POISON_AOE: PoisonAoeBehavior,
   SUPPORT_AURA: SupportAuraBehavior,
+  REPAIR_SUPPORT: RepairSupportBehavior,
 };

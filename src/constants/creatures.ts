@@ -555,6 +555,7 @@ export const STARTER_CRAB: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'PINCH' },
     { level: 6, attackId: 'COIR_SNARE' },
+    { level: 12, attackId: 'SHIPSHAPE' },
   ],
   evolutionNodes: [{ level: 16, evolutionDefId: 'carapenter' }],
 };
@@ -582,6 +583,7 @@ export const CARAPENTER: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'PINCH' },
     { level: 6, attackId: 'COIR_SNARE' },
+    { level: 12, attackId: 'SHIPSHAPE' },
     { level: 16, attackId: 'MALLET_SMASH' },
   ],
 };

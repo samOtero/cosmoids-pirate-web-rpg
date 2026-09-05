@@ -95,6 +95,10 @@ export interface AttackDefinition {
     durationMs: number;
   };
   adaptiveTargetedAoe?: AdaptiveTargetedAoeConfig;
+  repairSupport?: {
+    healFraction: number;
+    defenseMultiplier: number;
+  };
   behaviorType:
     | 'PROJECTILE'
     | 'INSTANT_AOE'
@@ -102,6 +106,7 @@ export interface AttackDefinition {
     | 'POISON_AOE'
     | 'BEAM'
     | 'SUPPORT_AURA'
+    | 'REPAIR_SUPPORT'
     | 'INSTANT_MELEE';
   effects?: AttackEffect[];
   visualEffectConfigId?: string; // which tdConfig to use for a visual effect

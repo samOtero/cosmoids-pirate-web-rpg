@@ -13,6 +13,18 @@ const ATTACK_RANGES = {
 };
 
 export const ATTACK_DEFS: Record<string, AttackDefinition> = {
+  SHIPSHAPE: {
+    id: 'SHIPSHAPE',
+    name: 'Shipshape',
+    type: ElementType.GRASS,
+    category: 'physical',
+    power: 0,
+    cooldownMs: 5000,
+    rangeIndex: ATTACK_RANGES.NORMAL,
+    behaviorType: 'REPAIR_SUPPORT',
+    repairSupport: { healFraction: 0.2, defenseMultiplier: 1.25 },
+    visualEffectConfigId: 'attack_shipshape_taps',
+  },
   SCRATCH: {
     id: 'SCRATCH',
     name: 'Claw',
