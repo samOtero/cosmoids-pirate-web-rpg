@@ -99,6 +99,17 @@ export interface AttackDefinition {
     healFraction: number;
     defenseMultiplier: number;
   };
+  /** Shared, non-expiring marks on each enemy; only this move advances them. */
+  fuseRushCombo?: {
+    hitsToTrigger: number;
+    damageMultiplier: number;
+  };
+  rollingBarrel?: {
+    lobDurationMs: number;
+    rollDistance: number;
+    rollSpeed: number;
+    hitRadius: number;
+  };
   behaviorType:
     | 'PROJECTILE'
     | 'INSTANT_AOE'
@@ -107,6 +118,7 @@ export interface AttackDefinition {
     | 'BEAM'
     | 'SUPPORT_AURA'
     | 'REPAIR_SUPPORT'
+    | 'ROLLING_BARREL'
     | 'INSTANT_MELEE';
   effects?: AttackEffect[];
   visualEffectConfigId?: string; // which tdConfig to use for a visual effect
@@ -117,7 +129,7 @@ export interface AttackDefinition {
   dashImpactHoldMs?: number;
   /** Gap from the target in viewport-height range units. */
   dashStopRange?: number;
-  dashTrailType?: 'WATER';
+  dashTrailType?: 'WATER' | 'FIRE';
 }
 
 export interface AttackInstance {

@@ -37,6 +37,15 @@ import {
 } from '@/utils/tdStructureVisuals';
 import { drawRallyHowlRings, updateRallyIndicator } from './rallyHowlVisuals';
 import {
+  createBarrelBowlingVisual,
+  updateBarrelBowlingVisual,
+} from './barrelBowlingVisuals';
+import {
+  drawFuseRushImpact,
+  drawFuseRushTrail,
+  updateFuseRushMarks,
+} from './fuseRushVisuals';
+import {
   drawPhysicalDefenseShield,
   drawShipshapeHealing,
   drawShipshapeBrace,
@@ -3622,6 +3631,11 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 : undefined
             );
             updateScouredIndicator(container, enemy, engine.elapsedTimeMs);
+            updateFuseRushMarks(
+              container,
+              enemy.fuseRushMarks ?? 0,
+              engine.elapsedTimeMs
+            );
             if (enemy.kind !== 'structure') {
               updateSparkles(container, enemy, app.ticker.deltaTime);
               updateSpeedBoostIndicator(
@@ -3769,11 +3783,14 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 ? ATTACK_DEFS[proj.attackDefinitionId]
                 : undefined;
 
-              if (def && def.isDashAttack) {
-                if (def.dashTrailType === 'WATER') {
+              if (def?.rollingBarrel) {
+                createBarrelBowlingVisual(container);
+              } else if (def && def.isDashAttack) {
+                if (def.dashTrailType) {
                   const trail = new PIXI.Graphics();
                   trail.label = 'dash_trail';
-                  drawWaterDashTrail(trail);
+                  if (def.dashTrailType === 'FIRE') drawFuseRushTrail(trail);
+                  else drawWaterDashTrail(trail);
                   container.addChild(trail);
                 }
 
@@ -3940,6 +3957,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               }
             }
 
+            if (def?.rollingBarrel && proj.rollingBarrel) {
+              updateBarrelBowlingVisual(container, proj, def);
+            }
+
             if (def && def.isDashAttack) {
               const trail = container.getChildByLabel('dash_trail') as
                 | PIXI.Graphics
@@ -3983,6 +4004,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                   );
                   if (def.dashTrailType === 'WATER') {
                     psprite.tint = 0x7dd3fc;
+                  } else if (def.dashTrailType === 'FIRE') {
+                    psprite.tint = 0xffd5a3;
                   }
                   shadow.visible = false; // Keep shadow hidden
                 }
@@ -4062,6 +4085,13 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 const repairEffect = new PIXI.Graphics();
                 repairEffect.label = 'shipshape_effect';
                 container.addChild(repairEffect);
+              } else if (
+                animConfig?.type === 'FUSE_RUSH_HIT' ||
+                animConfig?.type === 'FUSE_RUSH_DETONATION'
+              ) {
+                const sparks = new PIXI.Graphics();
+                sparks.label = 'fuse_rush_effect';
+                container.addChild(sparks);
               } else if (animConfig?.type === 'RALLY_HOWL') {
                 const rings = new PIXI.Graphics();
                 rings.label = 'rally_howl_rings';
@@ -4208,6 +4238,15 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               } else {
                 drawShipshapeBrace(repairEffect, progress);
               }
+            } else if (
+              animConfig?.type === 'FUSE_RUSH_HIT' ||
+              animConfig?.type === 'FUSE_RUSH_DETONATION'
+            ) {
+              drawFuseRushImpact(
+                container.getChildByLabel('fuse_rush_effect') as PIXI.Graphics,
+                progress,
+                animConfig.type === 'FUSE_RUSH_DETONATION'
+              );
             } else if (animConfig?.type === 'RALLY_HOWL') {
               drawRallyHowlRings(
                 container.getChildByLabel('rally_howl_rings') as PIXI.Graphics,

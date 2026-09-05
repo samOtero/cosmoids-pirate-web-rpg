@@ -4,6 +4,7 @@ import { AttackDefinition } from './types';
 const ATTACK_COOLDOWNS = {
   NORMAL: 800,
   QUICK: 400,
+  FAST: 600,
   HEAVY: 1000,
   CONTROL: 1600,
 };
@@ -13,6 +14,36 @@ const ATTACK_RANGES = {
 };
 
 export const ATTACK_DEFS: Record<string, AttackDefinition> = {
+  BARREL_BOWLING: {
+    id: 'BARREL_BOWLING',
+    name: 'Barrel Bowling',
+    type: ElementType.WATER,
+    category: 'physical',
+    power: 50,
+    cooldownMs: ATTACK_COOLDOWNS.CONTROL,
+    rangeIndex: ATTACK_RANGES.NORMAL,
+    behaviorType: 'ROLLING_BARREL',
+    rollingBarrel: {
+      lobDurationMs: 400,
+      rollDistance: 45,
+      rollSpeed: 45,
+      hitRadius: 4,
+    },
+  },
+  FUSE_RUSH: {
+    id: 'FUSE_RUSH',
+    name: 'Hot Streak',
+    type: ElementType.FIRE,
+    category: 'physical',
+    power: 45,
+    cooldownMs: ATTACK_COOLDOWNS.FAST,
+    rangeIndex: ATTACK_RANGES.NORMAL,
+    behaviorType: 'PROJECTILE',
+    projectileSpeed: 1.5,
+    isDashAttack: true,
+    dashTrailType: 'FIRE',
+    fuseRushCombo: { hitsToTrigger: 3, damageMultiplier: 2 },
+  },
   SHIPSHAPE: {
     id: 'SHIPSHAPE',
     name: 'Shipshape',

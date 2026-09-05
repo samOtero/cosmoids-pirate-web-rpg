@@ -4,6 +4,7 @@ import { AttackDefinition } from './types';
 import { ElementType } from '@/types/baseGame';
 import { startDamageFlash } from '../damageFlash';
 import { applyPersistentSpeedSlow } from '../speedModifiers';
+import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 
 export const DRENCHED_DURATION_MS = 4000;
 export const DRENCHED_DAMAGE_MULTIPLIER = 1.5;
@@ -134,6 +135,8 @@ export class EffectProcessor {
     attackDef: AttackDefinition,
     hitCount: number = 1
   ) {
+    // Multiple projectiles can arrive in one tick; dead targets cannot build combos.
+    if (target.hp <= 0) return;
     const level = source.creature.level;
     const power = attackDef.power;
 
@@ -219,6 +222,28 @@ export class EffectProcessor {
           : Math.max(1, finalDamage)
         : 0;
 
+    let fuseFinisher = false;
+    if (finalDamage > 0 && attackDef.fuseRushCombo) {
+      const combo = attackDef.fuseRushCombo;
+      const nextMarks = (target.fuseRushMarks ?? 0) + 1;
+      fuseFinisher = nextMarks >= combo.hitsToTrigger;
+      target.fuseRushMarks = fuseFinisher ? 0 : nextMarks;
+      // Multiply the resolved hit, not base power, using the finishing caster's stats.
+      if (fuseFinisher) finalDamage *= combo.damageMultiplier;
+      const configId = fuseFinisher
+        ? 'attack_fuse_rush_detonation'
+        : 'attack_fuse_rush_hit';
+      engine.visualEffects.push({
+        id: `vfx_fuse_${target.id}_${engine.elapsedTimeMs}_${Math.random()}`,
+        configId,
+        position: { ...target.position },
+        targetId: target.id,
+        durationMs:
+          CREATURE_TD_CONFIGS[configId].default.vfxAnimation!.durationMs!,
+        elapsedMs: 0,
+      });
+    }
+
     // Reaching an enemy with an attack counts as participating in its defeat,
     // even when the attack is a non-damaging status move.
     target.damagedByTowerIds.add(source.id);
@@ -237,6 +262,11 @@ export class EffectProcessor {
     if (finalDamage > 0) {
       if (!target.isInvulnerable) {
         target.hp -= finalDamage;
+      }
+      if (target.hp <= 0) target.fuseRushMarks = undefined;
+      if (fuseFinisher) {
+        textColor = 0xffa63d;
+        textScale = Math.max(textScale, 1.5);
       }
       startDamageFlash(target, attackDef.type);
 

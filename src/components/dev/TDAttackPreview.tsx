@@ -8,6 +8,7 @@ import { FIRST_LEVEL } from '@/constants/tdLevels/firstLevel';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { ENEMY_ABILITY_DEFS } from '@/engine/tower-defense/enemyAbilities';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
+import { configureBowlingPreview } from './barrelBowlingPreview';
 
 const PRIMARY_TARGET_ID = 'attack-preview-primary-target';
 const PREVIEW_TOWER_POSITION = { x: 42, y: 50 };
@@ -444,6 +445,33 @@ export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
                     Injure ally
                   </button>
                 </div>
+              </div>
+            )}
+            {activeAttack.fuseRushCombo && (
+              <p className="mt-2 text-xs text-orange-200">
+                Shared fuse marks stay on each enemy. Every third Hot Streak hit
+                deals double damage and resets its marks. Attack swaps preserve
+                the combo; existing targeting rules still apply.
+              </p>
+            )}
+            {activeAttack.rollingBarrel && (
+              <div className="mt-2 space-y-2 text-xs text-cyan-200">
+                <p>
+                  Throws at the selected enemy, then rolls toward the path
+                  entrance. Hits each enemy once; the final splash is cosmetic.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {(['horizontal', 'vertical', 'bend'] as const).map((direction) => (
+                    <button
+                      key={direction}
+                      className={buttonClass}
+                      onClick={() => configureBowlingPreview(engine, direction)}
+                    >
+                      Test {direction}
+                    </button>
+                  ))}
+                </div>
+                <p>Lane tests add immortal targets and use First targeting.</p>
               </div>
             )}
             <p className="mt-2 text-[11px] text-slate-400">

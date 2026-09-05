@@ -379,6 +379,8 @@ export interface StatusCondition {
 }
 
 export interface Enemy extends BaseTDUnit {
+  /** Shared by all Hot Streak users. No timer; consumed on the third hit. */
+  fuseRushMarks?: number;
   definitionId: string;
   kind?: 'creature' | 'structure';
   /** Visual configuration used by structure enemies. */
@@ -535,6 +537,16 @@ export interface DestroyedStructureVisual {
 }
 
 export interface Projectile {
+  rollingBarrel?: {
+    phase: 'lob' | 'roll';
+    elapsedMs: number;
+    route: Point[];
+    routeIndex: number;
+    distanceRolled: number;
+    hitEnemyIds: Set<string>;
+    /** A thrown barrel keeps going even after its caster is removed. */
+    sourceSnapshot: Tower;
+  };
   id: string;
   attackDefinitionId?: string; // Used to know what sprite to render and what effects to apply
   sourceId: string;

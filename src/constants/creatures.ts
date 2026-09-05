@@ -565,12 +565,12 @@ export const CARAPENTER: CosmoidTemplate = {
   name: 'Carapenter',
   type: ElementType.GRASS,
   baseStats: {
-    hp: 76,
-    attack: 78,
-    defense: 88,
-    specialAttack: 50,
-    specialDefense: 72,
-    speed: 36,
+    hp: 65,
+    attack: 75,
+    defense: 80,
+    specialAttack: 55,
+    specialDefense: 75,
+    speed: 50,
   },
   baseExperience: 90,
   iconImg: '/UI/Icons/carapenter_icon.png',
@@ -583,7 +583,7 @@ export const CARAPENTER: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'PINCH' },
     { level: 6, attackId: 'COIR_SNARE' },
-    { level: 12, attackId: 'SHIPSHAPE' },
+    { level: 16, attackId: 'SHIPSHAPE' },
     { level: 16, attackId: 'MALLET_SMASH' },
   ],
 };
@@ -620,12 +620,12 @@ export const VELOCINDER: CosmoidTemplate = {
   name: 'Velocinder',
   type: ElementType.FIRE,
   baseStats: {
-    hp: 60,
-    attack: 86,
+    hp: 58,
+    attack: 90,
     defense: 46,
-    specialAttack: 58,
+    specialAttack: 60,
     specialDefense: 54,
-    speed: 96,
+    speed: 90,
   },
   baseExperience: 90,
   spriteUrl: '/battles/cosmoids/velocinder_down.png',
@@ -638,7 +638,7 @@ export const VELOCINDER: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'SCRATCH' },
     { level: 9, attackId: 'EMBER' },
-    { level: 12, attackId: 'QUICK_ATTACK' },
+    { level: 16, attackId: 'FUSE_RUSH' },
   ],
 };
 
@@ -676,9 +676,9 @@ export const MACASK: CosmoidTemplate = {
     hp: 82,
     attack: 80,
     defense: 76,
-    specialAttack: 55,
-    specialDefense: 68,
-    speed: 34,
+    specialAttack: 60,
+    specialDefense: 70,
+    speed: 35,
   },
   baseExperience: 90,
   iconImg: '/UI/Icons/macask_icon.png',
@@ -691,7 +691,7 @@ export const MACASK: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
     { level: 8, attackId: 'BARREL_BASH' },
-    { level: 14, attackId: 'BUBBLE_BEAM' },
+    { level: 16, attackId: 'BARREL_BOWLING' },
   ],
 };
 

@@ -781,6 +781,15 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   attack_shipshape_heal: {
     default: { vfxAnimation: { type: 'SHIPSHAPE_HEAL', durationMs: 950 } },
   },
+  attack_barrel_bowling_splash: {
+    default: { vfxAnimation: { type: 'BARREL_BASH', durationMs: 450 } },
+  },
+  attack_fuse_rush_hit: {
+    default: { vfxAnimation: { type: 'FUSE_RUSH_HIT', durationMs: 240 } },
+  },
+  attack_fuse_rush_detonation: {
+    default: { vfxAnimation: { type: 'FUSE_RUSH_DETONATION', durationMs: 480 } },
+  },
   attack_shipshape_brace: {
     default: { vfxAnimation: { type: 'SHIPSHAPE_BRACE', durationMs: 950 } },
   },

@@ -36,6 +36,7 @@ import {
   resolveAdaptiveTargetedAoeImpact,
 } from './attacks/behaviors';
 import { EffectProcessor } from './attacks/EffectProcessor';
+import { updateRollingBarrel } from './attacks/rollingBarrel';
 import { getAttackSpeedMultiplier } from './attackSpeedModifiers';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { TDWave, TDWaveGroup, Point } from './types';
@@ -913,6 +914,16 @@ export class TowerDefenseEngine {
     // Update projectiles
     const timeScale = deltaMs / 16.666;
     this.projectiles.forEach((p) => {
+      if (p.rollingBarrel && p.attackDefinitionId) {
+        updateRollingBarrel(
+          this,
+          p,
+          newEnemies,
+          ATTACK_DEFS[p.attackDefinitionId],
+          deltaMs
+        );
+        return;
+      }
       const target = newEnemies.find((e) => e.id === p.targetId);
       if (target) {
         p.target = { ...target.position };

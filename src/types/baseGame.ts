@@ -199,6 +199,8 @@ export interface VFXAnimationConfig {
     | 'RALLY_HOWL'
     | 'SHIPSHAPE_HEAL'
     | 'SHIPSHAPE_BRACE'
+    | 'FUSE_RUSH_HIT'
+    | 'FUSE_RUSH_DETONATION'
     | 'HARDEN'
     | 'BARREL_BASH'
     | 'STATIC_YIP'
