@@ -95,7 +95,15 @@ If an evolutionary line is added later, it should advance or complicate the rela
 
 Marophis is introduced as one capturable level-8 wild enemy on the right-hand approach in Level 5's current placeholder wave. Its slower movement and high special defense support the patient deep-diver concept without adding creature-specific engine behavior.
 
-Its learnset begins with Nibble at level 1 and Spurt at level 4. At level 8 it learns Venom Spray, a direct-damage special Poison attack with a chance to apply a five-second stacking poison. Each successful application increases the poison's damage up to five stacks; further applications refresh its duration. Bubble Beam provides its first major Water-type power spike at level 14. A dedicated prey-feint mechanic remains a possible future addition.
+Its learnset begins with Nibble at level 1 and Spurt at level 4. At level 8 it learns Venom Spray, a direct-damage special Poison attack with a chance to apply a five-second stacking poison. Each successful application increases the poison's damage up to five stacks; further applications refresh its duration. At level 12 it learns Deepwater Grip. A dedicated prey-feint mechanic remains a possible future addition.
+
+### Deepwater Grip
+
+Implemented September 6, 2026 as a special Water attack focused on single-target control. Marophis holds one enemy for four seconds, dealing four equal, moderate damage pulses (20 power per pulse, once per second). It cannot use another attack during the hold, including when the player switches its selected move. The eight-second cooldown begins when the hold starts and uses simulation time; attack-speed buffs do not shorten it.
+
+After release, the enemy resists all further constriction for six seconds, shared across every Marophis. Resistance has no battlefield indicator. Structures and status-immune enemies cannot be gripped. Removing or moving the caster, losing the target, or moving the target out of range ends the hold early. Existing poison continues independently.
+
+The initial procedural visual places Marophis beside the target with smooth navy coils, pale underside highlights, a coral-to-blue crown glow, and a shrinking breath meter. These use existing battle sprites without changing the shipped art assets.
 
 ## Creation Record
 

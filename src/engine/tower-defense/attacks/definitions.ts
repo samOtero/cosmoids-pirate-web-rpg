@@ -14,6 +14,19 @@ const ATTACK_RANGES = {
 };
 
 export const ATTACK_DEFS: Record<string, AttackDefinition> = {
+  DEEPWATER_GRIP: {
+    id: 'DEEPWATER_GRIP',
+    name: 'Deepwater Grip',
+    description:
+      'Holds one enemy for 4 seconds, dealing moderate Water damage once per second. The user cannot attack during the hold. After release, the target resists constriction for 6 seconds. Power is per pulse.',
+    type: ElementType.WATER,
+    category: 'special',
+    power: 20,
+    cooldownMs: 8000,
+    rangeIndex: ATTACK_RANGES.NORMAL,
+    behaviorType: 'CONSTRICTION',
+    constriction: { durationMs: 4000, pulseIntervalMs: 1000, resistanceMs: 6000 },
+  },
   BARREL_BOWLING: {
     id: 'BARREL_BOWLING',
     name: 'Barrel Bowling',

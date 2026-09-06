@@ -417,6 +417,7 @@ export const MAROPHIS: CosmoidTemplate = {
     { level: 1, attackId: 'NIBBLE' },
     { level: 4, attackId: 'WATER_GUN' },
     { level: 8, attackId: 'VENOM_SPRAY' },
+    { level: 12, attackId: 'DEEPWATER_GRIP' },
   ],
 };
 

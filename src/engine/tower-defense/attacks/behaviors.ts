@@ -6,6 +6,7 @@ import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { hasActiveSpeedBoost, hasActiveSpeedSlow } from '../speedModifiers';
 import { applyAttackSpeedBuff } from '../attackSpeedModifiers';
 import { RollingBarrelBehavior } from './rollingBarrel';
+import { ConstrictionBehavior } from './deepwaterGrip';
 
 const MAX_PROJECTILES_PER_PATTERN = 12;
 
@@ -529,6 +530,7 @@ export const RepairSupportBehavior: AttackBehavior = {
 };
 
 export const AttackBehaviorRegistry: Record<string, AttackBehavior> = {
+  CONSTRICTION: ConstrictionBehavior,
   ROLLING_BARREL: RollingBarrelBehavior,
   PROJECTILE: ProjectileBehavior,
   INSTANT_MELEE: InstantMeleeBehavior,

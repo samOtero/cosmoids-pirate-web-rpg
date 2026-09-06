@@ -348,6 +348,14 @@ export type TowerTargetingMode =
   | 'highest-hp-percent';
 
 export interface Tower extends BaseTDUnit {
+  deepwaterGrip?: {
+    targetId: string;
+    attackDefinitionId: string;
+    origin: Point;
+    startedAtMs: number;
+    expiresAtMs: number;
+    nextPulseAtMs: number;
+  };
   creature: PlayerCreature; // The singular source of truth for level, xp, and attacks
   lastAttackTime: number; // Deprecate or keep for generic attacks
   currentAttack: number;
@@ -379,6 +387,8 @@ export interface StatusCondition {
 }
 
 export interface Enemy extends BaseTDUnit {
+  constrictedByTowerId?: string;
+  constrictionResistantUntilMs?: number;
   /** Shared by all Hot Streak users. No timer; consumed on the third hit. */
   fuseRushMarks?: number;
   definitionId: string;

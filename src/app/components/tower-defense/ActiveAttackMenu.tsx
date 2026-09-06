@@ -62,6 +62,7 @@ export function ActiveAttackMenu({
             return (
               <button
                 key={`${attackId}-${index}`}
+                title={def.description}
                 onClick={() => onSelectAttack(index)}
                 className={`flex flex-col items-center p-1.5 lg:p-3 rounded border-2 transition-all min-w-[90px] lg:min-w-[120px] shrink-0 ${
                   isSelected
@@ -75,7 +76,7 @@ export function ActiveAttackMenu({
                   {def.name}
                 </span>
                 <div className="flex gap-1 lg:gap-2 text-[8px] lg:text-xs">
-                  <span className="text-red-400">Pwr: {def.power}</span>
+                  <span className="text-red-400">Pwr: {def.power}{def.constriction ? '/pulse' : ''}</span>
                   <span className="text-blue-400">
                     CD: {def.cooldownMs / 1000}s
                   </span>
@@ -83,6 +84,11 @@ export function ActiveAttackMenu({
                 {def.supportBuff && (
                   <span className="mt-1 text-[8px] lg:text-xs text-amber-200">
                     +{Math.round((def.supportBuff.attackSpeedMultiplier - 1) * 100)}% attack speed · {def.supportBuff.durationMs / 1000}s
+                  </span>
+                )}
+                {def.constriction && (
+                  <span className="mt-1 text-[8px] lg:text-xs text-cyan-200">
+                    Hold {def.constriction.durationMs / 1000}s · Resist {def.constriction.resistanceMs / 1000}s
                   </span>
                 )}
                 {isSelected && (

@@ -84,6 +84,7 @@ export interface AdaptiveTargetedAoeConfig {
 export interface AttackDefinition {
   id: string; // e.g., 'BUBBLE_BEAM'
   name: string;
+  description?: string;
   type: ElementType; // Water
   category: 'physical' | 'special';
   power: number; // Base damage multiplier
@@ -115,6 +116,11 @@ export interface AttackDefinition {
     rollSpeed: number;
     hitRadius: number;
   };
+  constriction?: {
+    durationMs: number;
+    pulseIntervalMs: number;
+    resistanceMs: number;
+  };
   behaviorType:
     | 'PROJECTILE'
     | 'INSTANT_AOE'
@@ -124,6 +130,7 @@ export interface AttackDefinition {
     | 'SUPPORT_AURA'
     | 'REPAIR_SUPPORT'
     | 'ROLLING_BARREL'
+    | 'CONSTRICTION'
     | 'INSTANT_MELEE';
   effects?: AttackEffect[];
   visualEffectConfigId?: string; // which tdConfig to use for a visual effect

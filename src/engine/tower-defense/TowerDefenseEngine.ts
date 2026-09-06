@@ -37,6 +37,7 @@ import {
 } from './attacks/behaviors';
 import { EffectProcessor } from './attacks/EffectProcessor';
 import { updateRollingBarrel } from './attacks/rollingBarrel';
+import { releaseDeepwaterGrip, updateDeepwaterGrips } from './attacks/deepwaterGrip';
 import { getAttackSpeedMultiplier } from './attackSpeedModifiers';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { TDWave, TDWaveGroup, Point } from './types';
@@ -578,6 +579,7 @@ export class TowerDefenseEngine {
     });
 
     this.processEnemyAbilities(newEnemies);
+    const constrictedMs = updateDeepwaterGrips(this, newEnemies, deltaMs);
 
     // Update enemies
     newEnemies.forEach((enemy) => {
@@ -589,7 +591,7 @@ export class TowerDefenseEngine {
       // the map dev uses speed relative to arbitrary frame timing, with a delta based loop we should scale it,
       // but to keep logic equivalent for now we'll just replicate it roughly
       // if 1 frame was originally ~16.6ms, we can normalize deltaMs / 16.6 to apply speed
-      const timeScale = deltaMs / 16.666;
+      const timeScale = (deltaMs - (constrictedMs.get(enemy.id) ?? 0)) / 16.666;
       let moveSpeed =
         enemy.speed *
         getActiveSpeedMultiplier(enemy, this.elapsedTimeMs) *
@@ -859,11 +861,14 @@ export class TowerDefenseEngine {
     }
 
     // Towers attack
+    // Target selection must see captures/despawns from this frame.
+    this.enemies = newEnemies;
     newTowers.forEach((tower) => {
       if (tower.damageFlashTimerMs) {
         tower.damageFlashTimerMs -= deltaMs;
         if (tower.damageFlashTimerMs < 0) tower.damageFlashTimerMs = 0;
       }
+      if (tower.deepwaterGrip || tower.hp <= 0) return;
       const attackInstance =
         tower.equippedAttacksRuntime[tower.selectedAttackIndex];
       if (!attackInstance) return;
@@ -871,10 +876,11 @@ export class TowerDefenseEngine {
       const attackDef = ATTACK_DEFS[attackInstance.definitionId];
       if (!attackDef) return;
 
-      const isSupport =
+      const usesSimulationCooldown =
         attackDef.behaviorType === 'SUPPORT_AURA' ||
-        attackDef.behaviorType === 'REPAIR_SUPPORT';
-      const isReady = isSupport
+        attackDef.behaviorType === 'REPAIR_SUPPORT' ||
+        attackDef.behaviorType === 'CONSTRICTION';
+      const isReady = usesSimulationCooldown
         ? this.elapsedTimeMs >= (attackInstance.readyAtMs ?? 0)
         : time - attackInstance.lastFiredTime >
           attackDef.cooldownMs /
@@ -902,7 +908,7 @@ export class TowerDefenseEngine {
         if (behavior && behavior.canExecute(this, tower, attackDef)) {
           behavior.execute(this, tower, attackDef);
           attackInstance.lastFiredTime = time;
-          if (isSupport) {
+          if (usesSimulationCooldown) {
             // Stored on the move, not the selected slot or buff: swapping cannot reset it.
             attackInstance.readyAtMs =
               this.elapsedTimeMs + attackDef.cooldownMs;
@@ -1195,6 +1201,7 @@ export class TowerDefenseEngine {
     this.enemies = newEnemies;
     this.projectiles = activeProjectiles;
     this.towers = newTowers;
+    updateDeepwaterGrips(this, newEnemies, 0);
   }
 
   private getCaptureDistanceSq(enemy: Enemy, captureUnit: CaptureUnit) {
@@ -2208,6 +2215,7 @@ export class TowerDefenseEngine {
   public removeTower(creatureId: string) {
     const tower = this.towers.find((t) => t.creature.id === creatureId);
     if (tower?.isFixed) return false;
+    if (tower) releaseDeepwaterGrip(this, tower);
     this.towers = this.towers.filter((t) => t.creature.id !== creatureId);
     return true;
   }
@@ -2232,6 +2240,7 @@ export class TowerDefenseEngine {
 
       if (targetTower) {
         if (targetTower.isFixed) return false;
+        releaseDeepwaterGrip(this, targetTower);
         // Swap positions
         targetTower.position = {
           x: existingTower.position.x,
@@ -2245,6 +2254,7 @@ export class TowerDefenseEngine {
         existingTower.position = { x, y };
         existingTower.facingDirection = 'down';
       }
+      releaseDeepwaterGrip(this, existingTower);
       return true;
     }
 
@@ -2252,6 +2262,7 @@ export class TowerDefenseEngine {
     if (targetTower) {
       if (targetTower.isFixed) return false;
       // Remove whatever tower was there previously, taking its spot
+      releaseDeepwaterGrip(this, targetTower);
       this.towers = this.towers.filter((t) => t.id !== targetTower.id);
     }
 

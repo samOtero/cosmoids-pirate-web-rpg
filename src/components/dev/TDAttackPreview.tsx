@@ -391,11 +391,12 @@ export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
               </select>
             </label>
             <div className="mt-2 grid grid-cols-4 gap-1 text-center text-[11px]">
-              <Stat label="Power" value={activeAttack.power} />
+              <Stat label={activeAttack.constriction ? 'Power/pulse' : 'Power'} value={activeAttack.power} />
               <Stat label="Type" value={activeAttack.type} />
               <Stat label="Class" value={activeAttack.category} />
               <Stat label="CD" value={`${activeAttack.cooldownMs}ms`} />
             </div>
+            {activeAttack.description && <p className="mt-2 text-xs text-cyan-200">{activeAttack.description}</p>}
             {activeAttack.supportBuff && (
               <p className="mt-2 text-xs text-amber-200">
                 +

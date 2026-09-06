@@ -36,6 +36,7 @@ import {
   resolvePrisonGateVisualLayout,
 } from '@/utils/tdStructureVisuals';
 import { drawRallyHowlRings, updateRallyIndicator } from './rallyHowlVisuals';
+import { updateDeepwaterBreath, updateDeepwaterCoils } from './deepwaterGripVisuals';
 import {
   createBarrelBowlingVisual,
   updateBarrelBowlingVisual,
@@ -3278,6 +3279,14 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               return def && def.isDashAttack;
             });
 
+            const grippedTarget = tower.deepwaterGrip
+              ? engine.enemies.find((enemy) => enemy.id === tower.deepwaterGrip!.targetId)
+              : undefined;
+            if (grippedTarget) {
+              container.x = offsetX + (grippedTarget.position.x / 100) * screenW + 32 * finalScale;
+              container.y = offsetY + (grippedTarget.position.y / 100) * screenH - 5 * finalScale;
+            }
+            updateDeepwaterBreath(container, tower, engine.elapsedTimeMs);
             if (isDashing) {
               container.alpha = 0;
             } else {
@@ -3631,6 +3640,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 : undefined
             );
             updateScouredIndicator(container, enemy, engine.elapsedTimeMs);
+            updateDeepwaterCoils(container, enemy,
+              engine.towers.find((tower) => tower.id === enemy.constrictedByTowerId), engine.elapsedTimeMs);
             updateFuseRushMarks(
               container,
               enemy.fuseRushMarks ?? 0,
