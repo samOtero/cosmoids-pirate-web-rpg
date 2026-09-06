@@ -47,6 +47,22 @@ Kip's dream is to travel every sea and **draw every kind of Cosmoid in the world
 
 Kip's decisive early character moment is publicly stating his dream in front of Vane, the person who taught him to feel ashamed of it. Caleb can give him the courage to speak, but Kip must make the choice himself.
 
+### Mari and Tigrevel
+
+Mari helps Caleb and Kip free Tigrevel from captivity beneath Ironbell in Level 5. After the Navy officer confrontation in Level 6, both Mari and Tigrevel join the sailing crew. Mari is the crew's **navigator**; demonstrate her practical navigation knowledge as part of her joining. Kip remains the artist and Cosmoid chronicler.
+
+Tigrevel travels with them voluntarily but continues to refuse capture. Its missing trainer remains an unresolved mystery. Mari joining supersedes the earlier direction in which she stayed at Ironbell.
+
+The enlarged crew agrees that it needs a bigger boat, establishing the immediate next objective after Ironbell.
+
+### Ironbell Navy Officer
+
+The officer who arrives at the end of Level 5 confronts the children in Level 6. His broad creative touchstones are Morgan's fixation on obedience and status and Lt. Surge's intimidating military confidence, expressed through an original Cosmoids character. He treats compassion as weakness and uses force to maintain control.
+
+His **Steel/Electric Cosmoid** traps Tigrevel in a steel net, and he sends it and **Electric-type minions** to drag Tigrevel back into captivity. The minions' detailed mechanics remain undecided. At approximately half boss health, a paused intermission shows the officer forcing a Cursed Relic onto his partner to make it stronger. This triggers a painful Cursed Aura state, not a permanent Cursed evolution.
+
+After victory, Caleb removes the forced relic and the creature's aura begins to subside, although it remains exhausted and needs care. This is not an established universal cure. The encounter plants the idea that cursed Cosmoids need rescuing too, without yet giving Caleb a full cure quest or revealing the curse's source. The immediate departure objective remains finding a bigger boat. See [the Level 6 direction](docs/levels/level-6.md) for encounter and ending details.
+
 ### Captain Vane
 
 Captain Vane is a woman and the commanding captain of the pirate crew camped on the Level 2 island. She is polished, imposing, proud, and accustomed to treating obedience as proof of her superiority. Her teal, purple, white, and gold uniform, sculpted dark hair, elevated posture, and controlled expressions give her the bearing of someone who expects to dominate a room before a fight begins.

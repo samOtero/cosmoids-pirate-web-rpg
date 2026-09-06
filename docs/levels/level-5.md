@@ -48,7 +48,7 @@ The missing trainer should not be explained during Level 5. Tigrevel can join th
 
 ### Longer arc direction
 
-After the Navy confrontation is resolved, Tigrevel should travel with the children voluntarily but should not allow itself to be captured. Mari remains at Ironbell rather than joining the sailing crew. This outcome is planned story direction and is not yet represented by the current Level 5 ending, which stops at the commander's arrival.
+After the Navy confrontation in Level 6 is resolved, Tigrevel travels with the children voluntarily but does not allow itself to be captured. Mari also joins the sailing crew as its navigator, while Kip remains the artist and Cosmoid chronicler. The enlarged crew agrees that it needs a bigger boat. This September 6, 2026 direction supersedes the earlier plan for Mari to remain at Ironbell. These outcomes are planned story direction and are not yet represented by the current Level 5 ending, which stops at the commander's arrival. See [the Level 6 direction](level-6.md).
 
 ## Intro Sequence
 
@@ -284,6 +284,7 @@ The placeholder patrols validate lane geometry, tower targeting, structure targe
 - Freed objective allies are invulnerable, non-capturable, and ignored by enemies in the initial implementation.
 - Tigrevel chooses to remain with and protect the children after being freed.
 - The Navy commander arrives at the end as the cliffhanger.
+- His confrontation continues in Level 6; Mari and Tigrevel join the crew after it, with Mari serving as navigator.
 
 ## Open Decisions
 
@@ -295,6 +296,4 @@ The placeholder patrols validate lane geometry, tower targeting, structure targe
 - Balance the main gate after prisoner contributions exist; the current 260 HP and defenses are provisional.
 - Create matching damage stages for the main gate and remaining cells, plus destruction effects and audio.
 - Determine how Tigrevel's voluntary, uncaptured companionship is represented in the roster and later battles.
-- Decide when Mari stays behind and how that farewell is shown.
-- Decide where the commander's confrontation occurs and whether it becomes Level 6, an overworld sequence, or another encounter.
 - Plan the first subtle clue about Tigrevel's missing trainer without revealing the mystery during this level.
