@@ -14,8 +14,14 @@ For the narrative premise, world lore, themes, character art direction, and dial
 - **Styling**: Tailwind CSS v4.
 - **Testing**: Vitest, React Testing Library.
 
+### Workspace boundaries
+- The repository uses pnpm workspaces with the game in `apps/web` (`@cosmoids/web`). Future apps belong in `apps/`; shared packages belong in `packages/` when needed.
+- Install from the root and commit its single lockfile. Root scripts forward to the web package; direct tooling should use `pnpm --filter @cosmoids/web exec <tool>` so content validators and development save routes resolve `process.cwd()` to the app directory.
+- App configs, tests, scripts, assets, and local `.env.local` live with the web app. Git hooks, documentation, and repository skills remain at the root. Asset URLs do not include `apps/web/public`.
+- Vercel's web Root Directory is `apps/web`. Coordinate that project setting with the branch migration; a branch with the old root layout cannot build with the new setting.
+
 ### Navigation & Flow
-The application is a single-page app structure (`src/app/page.tsx`). Screens are conditionally rendered based on the `currentScreen` state in the Zustand store.
+The application is a single-page app structure (`apps/web/src/app/page.tsx`). Screens are conditionally rendered based on the `currentScreen` state in the Zustand store.
 - **Flow**: `Screens.START` ➔ `Screens.PROFILES` ➔ `Screens.MODE_SELECT` ➔ `Screens.LEVEL_SELECT` (Story) or `Screens.CHALLENGE_SELECT` (Challenge).
 - **Party Preparation**: In Story Mode, selecting a level routes the player to the Party Screen to arrange their team first. Pressing "Set Sail!" continues to the TD level. Challenge levels use a fixed roster (`premadeRoster` field in `TDLevelData`) and bypass the Party Screen.
 - **Zustand Event Queue**: Dialogues and progression transitions are driven sequentially by an event queue defined in `gameStore.ts`.
@@ -62,7 +68,7 @@ The application is a single-page app structure (`src/app/page.tsx`). Screens are
 - **Coordinate Mapping**: Percentage-based layouts remain correct because coordinates map relative to background dimensions. Make sure any layout modifications update coordinates relative to the scaled background bounds, not raw screen coordinates.
 
 ### 🧪 Vite 8 / Vitest Type Compatibility
-- **TypeScript Workaround**: To bypass compatibility differences between Vite 8's Rolldown-based plugin types and Vitest's rollup types in `vitest.config.ts`, the `react()` plugin configuration must be cast to `any`.
+- **TypeScript Workaround**: To bypass compatibility differences between Vite 8's Rolldown-based plugin types and Vitest's rollup types in `apps/web/vitest.config.ts`, the `react()` plugin configuration must be cast to `any`.
 
 ---
 

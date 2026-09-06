@@ -101,7 +101,7 @@ The defeat scene uses the existing background of Tigrevel still inside the cell 
 - Optional cells should connect directly to the traversable path network. No cell should appear isolated from the route.
 - Tower placement supports all three approaches, with additional positions near the center and the main gate.
 
-The current battlefield background is [`public/battles/bg/bg_level_5_ironbell_prison.png`](../../public/battles/bg/bg_level_5_ironbell_prison.png).
+The current battlefield background is [`apps/web/public/battles/bg/bg_level_5_ironbell_prison.png`](../../apps/web/public/battles/bg/bg_level_5_ironbell_prison.png).
 
 ## Main Gate Objective
 
@@ -225,49 +225,49 @@ The placeholder patrols validate lane geometry, tower targeting, structure targe
 
 ### Story backgrounds
 
-- [`public/bg_level_5_ironbell_undercroft.png`](../../public/bg_level_5_ironbell_undercroft.png)
-- [`public/bg_level_5_memory_beach.png`](../../public/bg_level_5_memory_beach.png)
-- [`public/bg_level_5_memory_razhound_attack.png`](../../public/bg_level_5_memory_razhound_attack.png)
-- [`public/bg_level_5_memory_tigrevel_rescue.png`](../../public/bg_level_5_memory_tigrevel_rescue.png)
-- [`public/bg_level_5_memory_navy_capture.png`](../../public/bg_level_5_memory_navy_capture.png)
-- [`public/bg_level_5_tigrevel_cell.png`](../../public/bg_level_5_tigrevel_cell.png)
-- [`public/bg_level_5_tigrevel_freed.png`](../../public/bg_level_5_tigrevel_freed.png)
-- [`public/bg_level_5_tigrevel_protects_kids.png`](../../public/bg_level_5_tigrevel_protects_kids.png)
+- [`apps/web/public/bg_level_5_ironbell_undercroft.png`](../../apps/web/public/bg_level_5_ironbell_undercroft.png)
+- [`apps/web/public/bg_level_5_memory_beach.png`](../../apps/web/public/bg_level_5_memory_beach.png)
+- [`apps/web/public/bg_level_5_memory_razhound_attack.png`](../../apps/web/public/bg_level_5_memory_razhound_attack.png)
+- [`apps/web/public/bg_level_5_memory_tigrevel_rescue.png`](../../apps/web/public/bg_level_5_memory_tigrevel_rescue.png)
+- [`apps/web/public/bg_level_5_memory_navy_capture.png`](../../apps/web/public/bg_level_5_memory_navy_capture.png)
+- [`apps/web/public/bg_level_5_tigrevel_cell.png`](../../apps/web/public/bg_level_5_tigrevel_cell.png)
+- [`apps/web/public/bg_level_5_tigrevel_freed.png`](../../apps/web/public/bg_level_5_tigrevel_freed.png)
+- [`apps/web/public/bg_level_5_tigrevel_protects_kids.png`](../../apps/web/public/bg_level_5_tigrevel_protects_kids.png)
 
 ### Human portraits
 
-- [`public/dialog/navy_guard_alert.png`](../../public/dialog/navy_guard_alert.png)
-- [`public/dialog/navy_commander_neutral.png`](../../public/dialog/navy_commander_neutral.png)
+- [`apps/web/public/dialog/navy_guard_alert.png`](../../apps/web/public/dialog/navy_guard_alert.png)
+- [`apps/web/public/dialog/navy_commander_neutral.png`](../../apps/web/public/dialog/navy_commander_neutral.png)
 
 ### Human battlefield assets
 
-- [`public/battles/characters/navy_guard_battle.png`](../../public/battles/characters/navy_guard_battle.png)
+- [`apps/web/public/battles/characters/navy_guard_battle.png`](../../apps/web/public/battles/characters/navy_guard_battle.png)
 
 ### Tigrevel assets
 
-- [`public/UI/Icons/tigrevel_icon.png`](../../public/UI/Icons/tigrevel_icon.png)
-- [`public/UI/Journal/tigrevel_journal.png`](../../public/UI/Journal/tigrevel_journal.png)
-- [`public/battles/cosmoids/tigrevel_left.png`](../../public/battles/cosmoids/tigrevel_left.png)
-- [`public/battles/cosmoids/tigrevel_up.png`](../../public/battles/cosmoids/tigrevel_up.png)
-- [`public/battles/cosmoids/tigrevel_down.png`](../../public/battles/cosmoids/tigrevel_down.png)
+- [`apps/web/public/UI/Icons/tigrevel_icon.png`](../../apps/web/public/UI/Icons/tigrevel_icon.png)
+- [`apps/web/public/UI/Journal/tigrevel_journal.png`](../../apps/web/public/UI/Journal/tigrevel_journal.png)
+- [`apps/web/public/battles/cosmoids/tigrevel_left.png`](../../apps/web/public/battles/cosmoids/tigrevel_left.png)
+- [`apps/web/public/battles/cosmoids/tigrevel_up.png`](../../apps/web/public/battles/cosmoids/tigrevel_up.png)
+- [`apps/web/public/battles/cosmoids/tigrevel_down.png`](../../apps/web/public/battles/cosmoids/tigrevel_down.png)
 
 ## Implementation Reference
 
 | Area                                                  | Primary file                                              | Status                                  |
 | ----------------------------------------------------- | --------------------------------------------------------- | --------------------------------------- |
-| Level registration                                    | `src/constants/tdLevels/index.ts`                         | Implemented                             |
-| Battlefield layout and placeholder wave               | `src/constants/tdLevels/level5.ts`                        | Draft implemented                       |
-| Intro dialogue                                        | `src/constants/dialogs/level5Intro.ts`                    | Implemented                             |
-| Victory dialogue                                      | `src/constants/dialogs/level5Win.ts`                      | Implemented                             |
-| Defeat dialogue                                       | `src/constants/dialogs/level5Lose.ts`                     | Implemented                             |
-| Gate structure definition                             | `src/constants/tdLevels/level5.ts`                        | Implemented                             |
-| Structure spawning and destruction event              | `src/engine/tower-defense/TowerDefenseEngine.ts`          | Implemented                             |
-| Green structure health bar and label                  | `src/app/components/tower-defense/PixiBattlefield.tsx`    | Implemented                             |
-| Immediate destruction victory                         | `src/app/components/tower-defense/TowerDefenseScreen.tsx` | Implemented and tested                  |
-| Optional side-cell gates                              | `src/constants/tdLevels/level5.ts`                        | Four shared-image gates implemented     |
-| Freed-prisoner allied behavior                        | `src/engine/tower-defense/TowerDefenseEngine.ts`          | All four prisoner behaviors implemented |
+| Level registration                                    | `apps/web/src/constants/tdLevels/index.ts`                         | Implemented                             |
+| Battlefield layout and placeholder wave               | `apps/web/src/constants/tdLevels/level5.ts`                        | Draft implemented                       |
+| Intro dialogue                                        | `apps/web/src/constants/dialogs/level5Intro.ts`                    | Implemented                             |
+| Victory dialogue                                      | `apps/web/src/constants/dialogs/level5Win.ts`                      | Implemented                             |
+| Defeat dialogue                                       | `apps/web/src/constants/dialogs/level5Lose.ts`                     | Implemented                             |
+| Gate structure definition                             | `apps/web/src/constants/tdLevels/level5.ts`                        | Implemented                             |
+| Structure spawning and destruction event              | `apps/web/src/engine/tower-defense/TowerDefenseEngine.ts`          | Implemented                             |
+| Green structure health bar and label                  | `apps/web/src/app/components/tower-defense/PixiBattlefield.tsx`    | Implemented                             |
+| Immediate destruction victory                         | `apps/web/src/app/components/tower-defense/TowerDefenseScreen.tsx` | Implemented and tested                  |
+| Optional side-cell gates                              | `apps/web/src/constants/tdLevels/level5.ts`                        | Four shared-image gates implemented     |
+| Freed-prisoner allied behavior                        | `apps/web/src/engine/tower-defense/TowerDefenseEngine.ts`          | All four prisoner behaviors implemented |
 | Final waves and balance                               | —                                                         | Not designed                            |
-| Gate destruction animation or persistent broken state | `src/app/components/tower-defense/PixiBattlefield.tsx`    | Side-gate stages and rubble implemented |
+| Gate destruction animation or persistent broken state | `apps/web/src/app/components/tower-defense/PixiBattlefield.tsx`    | Side-gate stages and rubble implemented |
 
 ## Confirmed Decisions
 

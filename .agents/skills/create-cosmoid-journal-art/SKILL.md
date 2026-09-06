@@ -13,8 +13,8 @@ Create journal pages that reveal what a Cosmoid is like outside combat. The batt
 2. Read `docs/art/JOURNAL_ART_DIRECTION.md` completely. Treat it as the visual and export source of truth for every journal-art task.
 3. Read the target species record under `docs/cosmoids` when one exists. Identify its character contradiction, signature behavior, anatomy lock, habitat, ecology, and unresolved decisions.
 4. Inspect the approved concept image, icon, and all shipped directional sprites with `view_image`. They are identity references only.
-5. Inspect the journal references required by the hierarchy in `docs/art/JOURNAL_ART_DIRECTION.md`, including `public/UI/Journal/palmit_journal.png`.
-6. For a roster request, audit creature registration, `journalImg` fields, and files under `public/UI/Journal`, then work through missing species one at a time.
+5. Inspect the journal references required by the hierarchy in `docs/art/JOURNAL_ART_DIRECTION.md`, including `apps/web/public/UI/Journal/palmit_journal.png`.
+6. For a roster request, audit creature registration, `journalImg` fields, and files under `apps/web/public/UI/Journal`, then work through missing species one at a time.
 
 If a species record leaves habitat or ecology unresolved, use brief authoritative natural-history research when it would materially improve the ideas. Present the results as proposals for the user to choose, not established canon.
 
@@ -78,7 +78,7 @@ When revising an already integrated page, preserve the current accepted file unt
 
 After approval:
 
-1. Save or replace the accepted image at `public/UI/Journal/<species>_journal.png`.
+1. Save or replace the accepted image at `apps/web/public/UI/Journal/<species>_journal.png`.
 2. Set the species' optional `journalImg` field to `/UI/Journal/<species>_journal.png`.
 3. Leave the icon and directional battle sprites unchanged.
 4. Verify the PNG dimensions and path, run the creature-manifest validator, and run relevant focused tests when dependencies are available.

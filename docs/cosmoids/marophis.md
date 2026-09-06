@@ -113,10 +113,10 @@ The initial procedural visual places Marophis beside the target with smooth navy
 - **Final-name approval date:** September 1, 2026
 - **Final ID:** `marophis`
 - **Concept-art file:** `docs/cosmoids/images/marophis-concept.png`
-- **Game icon:** `public/UI/Icons/marophis_icon.png`
-- **Directional battle art:** `public/battles/cosmoids/marophis_left.png`, `marophis_up.png`, and `marophis_down.png`
-- **Journal art:** `public/UI/Journal/marophis_journal.png` — resting in a loose horizontal coil while breathing from a flooded-cavern air pocket
-- **Creature manifest:** `src/content/creatures/marophis.json`
+- **Game icon:** `apps/web/public/UI/Icons/marophis_icon.png`
+- **Directional battle art:** `apps/web/public/battles/cosmoids/marophis_left.png`, `marophis_up.png`, and `marophis_down.png`
+- **Journal art:** `apps/web/public/UI/Journal/marophis_journal.png` — resting in a loose horizontal coil while breathing from a flooded-cavern air pocket
+- **Creature manifest:** `apps/web/src/content/creatures/marophis.json`
 - **Image status:** Approved standalone visual identity, production game assets, and naturalist journal art implemented
 - **Implementation status:** Registered Poison/Water Cosmoid; introduced as one capturable level-8 wild enemy in Level 5's current placeholder wave
 - **Initial gameplay profile:** Special-defense specialist; starts with Nibble, learns Spurt at level 4, Venom Spray at level 8, and Bubble Beam at level 14

@@ -1,8 +1,15 @@
 # Cosmoids Web Project Guidance
 
+## Workspace layout
+
+- This repository uses pnpm workspaces. The Next.js game lives in `apps/web`; future applications belong under `apps/` and shared packages under `packages/`.
+- Run `pnpm install` and the root forwarding scripts (`pnpm dev`, `pnpm verify:quick`, `pnpm build`) from the repository root. Run direct app tools with `pnpm --filter @cosmoids/web exec <tool>` so they resolve app-relative paths correctly.
+- Game filesystem paths are under `apps/web/src` and `apps/web/public`. Browser asset URLs remain rooted at `/` (for example, `/UI/Icons/...`). Treat older external skill references to root `src/` or `public/` as paths under `apps/web`.
+- Keep the workspace lockfile, Git hooks, narrative documents, `docs/`, and repository skills at the root. Local web environment variables belong in `apps/web/.env.local`.
+
 ## Creature art direction
 
-- Render new and updated directional Cosmoid battle assets as smooth painted 2D game illustrations, not pixel art. Use `public/battles/cosmoids/fueguana_left_1_v3.png`, `fueguana_up_1_v3.png`, and `fueguana_down_1_v3.png` as the primary finish references.
+- Render new and updated directional Cosmoid battle assets as smooth painted 2D game illustrations, not pixel art. Use `apps/web/public/battles/cosmoids/fueguana_left_1_v3.png`, `fueguana_up_1_v3.png`, and `fueguana_down_1_v3.png` as the primary finish references.
 - Use clean antialiased outlines and controlled painted/cel shading. Avoid visible pixel blocks, dithering, jagged stair-step edges, and nearest-neighbor styling.
 - Creature icons should be tight head-and-face portraits. Show only a minimal amount of neck when needed; do not include shoulders, chest, forelegs, or torso. Follow the framing of the existing Fueguana, Monkeg, Palmit, and Senticle icons rather than Mopup.
 - Keep shipped creature assets as transparent PNGs and preserve the dimensions declared by their creature manifest unless the integration is intentionally updated.

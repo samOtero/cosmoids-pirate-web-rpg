@@ -7,6 +7,12 @@ settings:
 importers:
 
   .:
+    devDependencies:
+      husky:
+        specifier: ^9.1.7
+        version: 9.1.7
+
+  apps/web:
     dependencies:
       '@vercel/analytics':
         specifier: ^2.0.1
@@ -96,9 +102,6 @@ importers:
       eslint-plugin-storybook:
         specifier: ^10.4.0
         version: 10.4.0(eslint@9.39.1(jiti@2.6.1))(storybook@10.4.0(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)(@testing-library/dom@10.4.1)(@types/react@19.2.5)(prettier@3.8.3)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(typescript@5.9.3)
-      husky:
-        specifier: ^9.1.7
-        version: 9.1.7
       jsdom:
         specifier: ^27.2.0
         version: 27.2.0

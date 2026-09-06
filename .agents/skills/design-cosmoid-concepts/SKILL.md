@@ -238,9 +238,9 @@ Render ensemble sheets and selected concept previews as original polished 2D cre
 Before generating, optionally inspect these three Fueguana v3 sprites with `view_image` only to calibrate silhouette clarity and facial readability at game scale:
 
 ```text
-public/battles/cosmoids/fueguana_left_1_v3.png
-public/battles/cosmoids/fueguana_up_1_v3.png
-public/battles/cosmoids/fueguana_down_1_v3.png
+apps/web/public/battles/cosmoids/fueguana_left_1_v3.png
+apps/web/public/battles/cosmoids/fueguana_up_1_v3.png
+apps/web/public/battles/cosmoids/fueguana_down_1_v3.png
 ```
 
 Do not pass the Fueguana files or other existing creature art to the image generator as style references during concept generation. Use the written art direction below without copying an existing creature's anatomy, markings, palette, proportions, or signature features.

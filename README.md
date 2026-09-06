@@ -24,12 +24,45 @@ pnpm build      # Production build
 
 ## Project Structure
 ```
-src/
-├── app/components/     # UI components
-├── store/gameStore.ts  # Zustand state
-├── types/baseGame.ts   # TypeScript types
-└── __tests__/          # Integration tests
+apps/
+└── web/                  # @cosmoids/web: Next.js game
+    ├── src/              # UI, game engine, content, and unit/integration tests
+    ├── public/           # Shipped artwork and other browser assets
+    ├── tests/            # Playwright browser tests
+    ├── scripts/          # App-specific content and asset tooling
+    └── package.json      # Web dependencies and scripts
+docs/                     # Shared art, creature, and story documentation
+package.json              # Repository tooling and forwarding commands
+pnpm-workspace.yaml       # apps/* and future packages/* workspaces
+pnpm-lock.yaml            # One dependency lockfile for the repository
 ```
+
+Run the Quick Start commands from the repository root. Existing root scripts
+forward to `@cosmoids/web`, so their working directory is `apps/web`. For direct
+tools, use `pnpm --filter @cosmoids/web exec <tool>`; for example,
+`pnpm --filter @cosmoids/web exec playwright test`.
+
+Keep local web environment variables in `apps/web/.env.local` (untracked).
+The web TypeScript alias `@/*` still maps to `apps/web/src/*`. Browser asset URLs
+such as `/UI/Icons/fueguana_icon.png` remain unchanged.
+
+Future apps belong under `apps/` (for example, `apps/api`); add shared packages
+under `packages/` only when needed. Each workspace needs a unique package name.
+Keep dependency declarations in the app/package that uses them and commit the
+root lockfile after running `pnpm install`.
+
+## Vercel deployment
+
+Configure the web project with Root Directory `apps/web`, Framework Preset
+Next.js, automatic pnpm installation, and Build Command `pnpm build`. Keep the
+framework's default Output Directory; the static export is `apps/web/out` on
+disk, or `out` relative to the Vercel project root.
+
+Root Directory is a Vercel project setting. If `experimental` and `main` still
+have different layouts, use a separate experimental project before changing
+that setting. Update the production project's root when the migration reaches
+its deployment branch. Keep the existing Node.js version and environment
+variables; this migration does not require a framework upgrade.
 
 ## Dialog System & Validation
 
@@ -84,7 +117,7 @@ Catches issues during development and CI/CD before code ships.
 
 ```bash
 pnpm validate:dialogs   # Validates all dialog configs
-pnpm build              # Includes validation checks
+pnpm build              # Build the static web export
 pnpm build:check        # Lint + Test + Build (full check)
 ```
 
@@ -97,7 +130,7 @@ pnpm test:ui            # Interactive test UI
 pnpm test:coverage      # Coverage report
 ```
 
-Tests are automatically run before commits via Husky pre-push hook.
+Tests are automatically run before pushes via the root Husky pre-push hook.
 
 #### 3. **Runtime Validation**
 Defensive validation in the dialog component catches any issues that slip through:
@@ -130,11 +163,11 @@ Available line IDs: choice_start, choice_fire, choice_grass, choice_water.
 
 ### File Organization
 
-- `src/utils/buildTimeDialogValidator.ts` - Build-time validation logic
-- `src/utils/dialogLineValidator.ts` - Runtime validation utilities  
-- `src/__tests__/utils/dialogLineValidator.test.ts` - Runtime validator tests
-- `src/__tests__/utils/buildTimeDialogValidator.test.ts` - Build validator tests
-- `src/__tests__/integration/dialogConfig.test.ts` - All dialog config integration tests
+- `apps/web/src/utils/buildTimeDialogValidator.ts` - Build-time validation logic
+- `apps/web/src/utils/dialogLineValidator.ts` - Runtime validation utilities
+- `apps/web/src/__tests__/utils/dialogLineValidator.test.ts` - Runtime validator tests
+- `apps/web/src/__tests__/utils/buildTimeDialogValidator.test.ts` - Build validator tests
+- `apps/web/src/__tests__/integration/dialogConfig.test.ts` - All dialog config integration tests
 
 ## Testing
 - **Integration tests** cover profile management, state, and persistence

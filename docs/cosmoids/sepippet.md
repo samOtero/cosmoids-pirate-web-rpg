@@ -86,7 +86,7 @@ The projected guard may eventually support a secondary distraction mechanic, but
 - **Selection date:** August 30, 2026
 - **Name meaning:** *Sepia* + *puppet*, reflecting its cuttlefish basis and shadow-puppet performances
 - **Concept-art file:** `docs/cosmoids/images/sepippet-concept.png`
-- **Production assets:** `public/UI/Icons/sepippet_icon.png` and `public/battles/cosmoids/sepippet_{left,up,down}.png`
+- **Production assets:** `apps/web/public/UI/Icons/sepippet_icon.png` and `apps/web/public/battles/cosmoids/sepippet_{left,up,down}.png`
 - **Current art status:** Dedicated concept reference, icon, and directional battle sprites created
 - **Implementation status:** Registered game Cosmoid and Level 5 planned captive ally; release behavior remains pending
 

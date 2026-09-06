@@ -84,9 +84,9 @@ This makes Corrogoon valuable without making it the sole solution: every captive
 - **Name selection date:** August 30, 2026
 - **Production integration date:** August 31, 2026
 - **Concept-art file:** `docs/cosmoids/images/corrogoon-concept.png`
-- **Game icon:** `public/UI/Icons/corrogoon_icon.png`
-- **Directional battle art:** `public/battles/cosmoids/corrogoon_left.png`, `corrogoon_up.png`, and `corrogoon_down.png`
-- **Creature manifest:** `src/content/creatures/corrogoon.json`
+- **Game icon:** `apps/web/public/UI/Icons/corrogoon_icon.png`
+- **Directional battle art:** `apps/web/public/battles/cosmoids/corrogoon_left.png`, `corrogoon_up.png`, and `corrogoon_down.png`
+- **Creature manifest:** `apps/web/src/content/creatures/corrogoon.json`
 - **Image status:** Approved standalone visual identity and production game assets implemented
 - **Initial gameplay profile:** Poison/Ground type; slow armored bruiser; starts with Pinch, learns Tackle at level 4, and learns Nibble at level 7
 

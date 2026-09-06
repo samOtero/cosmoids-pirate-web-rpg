@@ -31,5 +31,5 @@ When adding new conventions, quirks, or roadmap items:
 ### Formatting Guidelines
 
 - Use clear, concise Markdown bullet points and headers.
-- Provide links to referenced files (e.g. `[globals.css](file:///c:/Projects/2026/cosmoids_web/src/app/globals.css)`).
+- Provide links to referenced files (e.g. `[globals.css](file:///c:/Projects/2026/cosmoids_web/apps/web/src/app/globals.css)`).
 - When documenting quirks or code implementations, explain *why* it was done that way (e.g., event propagation workarounds, type compatibility shims).

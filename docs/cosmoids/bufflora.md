@@ -97,10 +97,10 @@ If an evolutionary line is added later, it should deepen the relationship betwee
 - **Journal-art approval date:** August 31, 2026
 - **Final ID:** `bufflora`
 - **Concept-art file:** `docs/cosmoids/images/bufflora-concept.png`
-- **Game icon:** `public/UI/Icons/bufflora_icon.png`
-- **Directional battle art:** `public/battles/cosmoids/bufflora_left.png`, `bufflora_up.png`, and `bufflora_down.png`
-- **Journal art:** `public/UI/Journal/bufflora_journal.png` — a Bufflora hangs upside down from a cave-mouth branch and drinks from a nearby poisonous trumpet flower without leaving its roost
-- **Creature manifest:** `src/content/creatures/bufflora.json`
+- **Game icon:** `apps/web/public/UI/Icons/bufflora_icon.png`
+- **Directional battle art:** `apps/web/public/battles/cosmoids/bufflora_left.png`, `bufflora_up.png`, and `bufflora_down.png`
+- **Journal art:** `apps/web/public/UI/Journal/bufflora_journal.png` — a Bufflora hangs upside down from a cave-mouth branch and drinks from a nearby poisonous trumpet flower without leaving its roost
+- **Creature manifest:** `apps/web/src/content/creatures/bufflora.json`
 - **Image status:** Approved standalone identity reference, production game assets, and journal artwork implemented
 - **Implementation status:** Registered Poison/Grass Cosmoid; introduced as two capturable level-8 wild enemies in Level 5's current wave
 - **Initial gameplay profile:** Agile special/utility species; starts with Tackle, learns Wind Gust at level 4, Toxic Pollen at level 8, and Siphon Lash at level 12. Toxic Pollen is a non-damaging area attack that poisons every eligible target in range without refreshing or stacking an existing Poison condition. Poisoned enemies receive a purple tint and a pollen badge beside their health bar for the duration of the damage-over-time effect. Siphon Lash lashes out with Bufflora's long tongue, deals special Grass damage, and heals Bufflora for half of the damage actually dealt.
