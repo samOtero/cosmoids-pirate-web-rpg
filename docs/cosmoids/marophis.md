@@ -95,7 +95,7 @@ If an evolutionary line is added later, it should advance or complicate the rela
 
 Marophis is introduced as one capturable level-8 wild enemy on the right-hand approach in Level 5's current placeholder wave. Its slower movement and high special defense support the patient deep-diver concept without adding creature-specific engine behavior.
 
-Its learnset begins with Nibble at level 1 and Water Gun at level 4. At level 8 it learns Venom Spray, a direct-damage special Poison attack with a chance to apply a five-second stacking poison. Each successful application increases the poison's damage up to five stacks; further applications refresh its duration. Bubble Beam provides its first major Water-type power spike at level 14. A dedicated prey-feint mechanic remains a possible future addition.
+Its learnset begins with Nibble at level 1 and Spurt at level 4. At level 8 it learns Venom Spray, a direct-damage special Poison attack with a chance to apply a five-second stacking poison. Each successful application increases the poison's damage up to five stacks; further applications refresh its duration. Bubble Beam provides its first major Water-type power spike at level 14. A dedicated prey-feint mechanic remains a possible future addition.
 
 ## Creation Record
 
@@ -111,7 +111,7 @@ Its learnset begins with Nibble at level 1 and Water Gun at level 4. At level 8 
 - **Creature manifest:** `src/content/creatures/marophis.json`
 - **Image status:** Approved standalone visual identity, production game assets, and naturalist journal art implemented
 - **Implementation status:** Registered Poison/Water Cosmoid; introduced as one capturable level-8 wild enemy in Level 5's current placeholder wave
-- **Initial gameplay profile:** Special-defense specialist; starts with Nibble, learns Water Gun at level 4, Venom Spray at level 8, and Bubble Beam at level 14
+- **Initial gameplay profile:** Special-defense specialist; starts with Nibble, learns Spurt at level 4, Venom Spray at level 8, and Bubble Beam at level 14
 
 ## Open Decisions
 

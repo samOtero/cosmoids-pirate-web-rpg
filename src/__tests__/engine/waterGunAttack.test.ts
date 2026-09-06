@@ -51,10 +51,10 @@ const createEnemy = (): Enemy => ({
   damagedByTowerIds: new Set(),
 });
 
-describe('Water Gun', () => {
+describe('Spurt', () => {
   it("remains registered but is no longer in Monkeg's learnset", () => {
     expect(ATTACK_DEFS.WATER_GUN).toMatchObject({
-      name: 'Water Gun',
+      name: 'Spurt',
       behaviorType: 'PROJECTILE',
     });
     expect(

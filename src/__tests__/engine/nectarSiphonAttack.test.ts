@@ -63,7 +63,7 @@ const createEnemy = (): Enemy => ({
 
 afterEach(() => vi.restoreAllMocks());
 
-describe('Nectar Siphon', () => {
+describe('Siphon Lash', () => {
   it("replaces Vine Whip in Bufflora's level-12 slot", () => {
     expect(BUFFLORA.learnableAttacks).toContainEqual({
       level: 12,

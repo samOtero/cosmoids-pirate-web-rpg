@@ -74,7 +74,7 @@ afterEach(() => {
 });
 
 describe('Barrel Bash', () => {
-  it("replaces Water Gun in Monkeg's level-8 learnset", () => {
+  it("replaces Spurt in Monkeg's level-8 learnset", () => {
     expect(
       STARTER_MONKEY.learnableAttacks.find(
         (attack) => attack.attackId === 'BARREL_BASH'

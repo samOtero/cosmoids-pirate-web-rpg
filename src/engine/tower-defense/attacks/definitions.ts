@@ -82,7 +82,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
   },
   NECTAR_SIPHON: {
     id: 'NECTAR_SIPHON',
-    name: 'Nectar Siphon',
+    name: 'Siphon Lash',
     type: ElementType.GRASS,
     category: 'special',
     power: 30,
@@ -144,7 +144,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
   },
   WATER_GUN: {
     id: 'WATER_GUN',
-    name: 'Water Gun',
+    name: 'Spurt',
     type: ElementType.WATER,
     category: 'special',
     power: 40,
