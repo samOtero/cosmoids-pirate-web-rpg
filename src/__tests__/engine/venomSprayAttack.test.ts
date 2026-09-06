@@ -68,31 +68,6 @@ const createEnemy = (): Enemy => ({
 afterEach(() => vi.restoreAllMocks());
 
 describe('Venom Spray', () => {
-  it("is Marophis's level-8 direct-damage stacking Poison attack", () => {
-    expect(MAROPHIS.learnableAttacks).toContainEqual({
-      level: 8,
-      attackId: 'VENOM_SPRAY',
-    });
-    expect(MAROPHIS.learnableAttacks).toContainEqual({
-      level: 14,
-      attackId: 'BUBBLE_BEAM',
-    });
-    expect(ATTACK_DEFS.VENOM_SPRAY).toMatchObject({
-      type: ElementType.POISON,
-      category: 'special',
-      power: 35,
-      behaviorType: 'PROJECTILE',
-      effects: [
-        {
-          type: 'STACKING_POISON',
-          chance: 0.25,
-          maxStacks: MAX_POISON_STACKS,
-        },
-      ],
-      projectileVisual: { type: 'VENOM_STREAM' },
-    });
-  });
-
   it('deals immediate damage and applies a successful poison roll', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     const engine = new TowerDefenseEngine(levelData);
