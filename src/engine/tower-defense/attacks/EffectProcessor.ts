@@ -259,8 +259,10 @@ export class EffectProcessor {
       textScale = 0.75;
     }
 
+    let damageDealt = 0;
     if (finalDamage > 0) {
       if (!target.isInvulnerable) {
+        damageDealt = Math.min(target.hp, finalDamage);
         target.hp -= finalDamage;
       }
       if (target.hp <= 0) target.fuseRushMarks = undefined;
@@ -289,8 +291,33 @@ export class EffectProcessor {
       });
     }
 
+    attackDef.effects
+      ?.filter((effect) => effect.type === 'DRAIN')
+      .forEach((effect) => {
+        if (damageDealt <= 0 || Math.random() > effect.chance) return;
+
+        const missingHp = Math.max(0, source.maxHp - source.hp);
+        const healAmount = Math.min(
+          missingHp,
+          Math.floor(damageDealt * (effect.value ?? 0.5))
+        );
+        if (healAmount <= 0) return;
+
+        source.hp += healAmount;
+        engine.floatingTexts.push({
+          id: `ft_drain_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+          text: `+${healAmount}`,
+          position: { ...source.position },
+          color: 0x86efac,
+          scale: 0.9,
+          durationMs: 1000,
+          elapsedMs: 0,
+        });
+      });
+
     if (attackDef.effects && target.hp > 0 && !target.immuneToStatusEffects) {
       attackDef.effects.forEach((effect) => {
+        if (effect.type === 'DRAIN') return;
         if (Math.random() <= effect.chance) {
           switch (effect.type) {
             case 'BURN':

@@ -3834,6 +3834,19 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                   def.projectileVisual.highlightColor
                 );
                 container.addChild(water);
+              } else if (def?.projectileVisual?.type === 'NECTAR_TONGUE') {
+                const tongue = new PIXI.Sprite();
+                tongue.label = 'proj_graphics';
+                tongue.anchor.set(0.5);
+                container.addChild(tongue);
+                void PIXI.Assets.load(def.projectileVisual.spriteUrl).then(
+                  (texture) => {
+                    if (tongue.destroyed) return;
+                    tongue.texture = texture as PIXI.Texture;
+                    tongue.width = 72;
+                    tongue.height = 72;
+                  }
+                );
               } else if (def?.projectileVisual?.type === 'COIR_BOLA') {
                 drawCoirBola(
                   container,
@@ -3930,6 +3943,24 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 targetY - container.y,
                 targetX - container.x
               );
+            } else if (def?.projectileVisual?.type === 'NECTAR_TONGUE') {
+              const flightProgress = getElectricAttackFlightProgress(
+                proj.origin ?? proj.position,
+                proj.position,
+                proj.target
+              );
+              const lickProgress = Math.max(
+                0,
+                Math.min(1, (flightProgress - 0.3) / 0.7)
+              );
+              const easedProgress = 1 - Math.pow(1 - lickProgress, 2);
+              container.x = offsetX + (proj.target.x / 100) * screenW;
+              container.y =
+                offsetY +
+                (proj.target.y / 100) * screenH +
+                (28 - easedProgress * 56) * finalScale;
+              container.alpha = Math.min(1, lickProgress / 0.16);
+              container.rotation = 0;
             } else if (
               def?.projectileVisual?.type === 'FLAME' ||
               def?.projectileVisual?.type === 'WATER_STREAM' ||

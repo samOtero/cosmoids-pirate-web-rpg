@@ -10,6 +10,7 @@ export interface AttackEffect {
     | 'STUN'
     | 'DRENCHED'
     | 'SPEED_SLOW'
+    | 'DRAIN'
     | 'MULTI_HIT'
     | 'KNOCKBACK';
   chance: number; // 0 to 1
@@ -65,6 +66,10 @@ export type ProjectileVisual =
       shadowColor: number;
       windColor: number;
       highlightColor: number;
+    }
+  | {
+      type: 'NECTAR_TONGUE';
+      spriteUrl: string;
     };
 
 export interface AdaptiveTargetedAoeConfig {

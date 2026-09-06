@@ -23,7 +23,7 @@
     },
     {
       "level": 4,
-      "attackId": "VINE_WHIP"
+      "attackId": "WIND_GUST"
     },
     {
       "level": 8,
@@ -31,7 +31,7 @@
     },
     {
       "level": 12,
-      "attackId": "WIND_GUST"
+      "attackId": "NECTAR_SIPHON"
     }
   ],
   "assets": {

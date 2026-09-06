@@ -80,6 +80,22 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     behaviorType: 'PROJECTILE',
     projectileSpeed: 1.5,
   },
+  NECTAR_SIPHON: {
+    id: 'NECTAR_SIPHON',
+    name: 'Nectar Siphon',
+    type: ElementType.GRASS,
+    category: 'special',
+    power: 30,
+    cooldownMs: ATTACK_COOLDOWNS.NORMAL,
+    rangeIndex: ATTACK_RANGES.NORMAL,
+    behaviorType: 'PROJECTILE',
+    projectileSpeed: 1.5,
+    projectileVisual: {
+      type: 'NECTAR_TONGUE',
+      spriteUrl: '/battles/attacks/nectar_siphon.png',
+    },
+    effects: [{ type: 'DRAIN', chance: 1, value: 0.5 }],
+  },
   MALLET_SMASH: {
     id: 'MALLET_SMASH',
     name: 'Mallet Smash',

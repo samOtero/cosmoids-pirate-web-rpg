@@ -369,12 +369,12 @@ export const BUFFLORA: CosmoidTemplate = {
   type: ElementType.POISON,
   secondaryType: ElementType.GRASS,
   baseStats: {
-    hp: 48,
-    attack: 52,
-    defense: 40,
-    specialAttack: 68,
-    specialDefense: 56,
-    speed: 76,
+    hp: 40,
+    attack: 45,
+    defense: 35,
+    specialAttack: 45,
+    specialDefense: 35,
+    speed: 60,
   },
   baseExperience: 70,
   iconImg: '/UI/Icons/bufflora_icon.png',
@@ -386,9 +386,9 @@ export const BUFFLORA: CosmoidTemplate = {
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
-    { level: 4, attackId: 'VINE_WHIP' },
+    { level: 4, attackId: 'WIND_GUST' },
     { level: 8, attackId: 'TOXIC_POLLEN' },
-    { level: 12, attackId: 'WIND_GUST' },
+    { level: 12, attackId: 'NECTAR_SIPHON' },
   ],
 };
 
@@ -398,12 +398,12 @@ export const MAROPHIS: CosmoidTemplate = {
   type: ElementType.POISON,
   secondaryType: ElementType.WATER,
   baseStats: {
-    hp: 64,
-    attack: 46,
-    defense: 50,
-    specialAttack: 74,
-    specialDefense: 82,
-    speed: 40,
+    hp: 40,
+    attack: 40,
+    defense: 44,
+    specialAttack: 60,
+    specialDefense: 54,
+    speed: 55,
   },
   baseExperience: 74,
   iconImg: '/UI/Icons/marophis_icon.png',
@@ -417,7 +417,6 @@ export const MAROPHIS: CosmoidTemplate = {
     { level: 1, attackId: 'NIBBLE' },
     { level: 4, attackId: 'WATER_GUN' },
     { level: 8, attackId: 'VENOM_SPRAY' },
-    { level: 14, attackId: 'BUBBLE_BEAM' },
   ],
 };
 
