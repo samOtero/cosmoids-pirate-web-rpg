@@ -257,6 +257,32 @@ export const TIGREVEL: CosmoidTemplate = {
   ],
 };
 
+export const VOLTUSK: CosmoidTemplate = {
+  id: 'voltusk',
+  name: 'Voltusk',
+  type: ElementType.STEEL,
+  secondaryType: ElementType.ELECTRIC,
+  baseStats: {
+    hp: 90,
+    attack: 74,
+    defense: 88,
+    specialAttack: 92,
+    specialDefense: 78,
+    speed: 24,
+  },
+  baseExperience: 96,
+  iconImg: '/UI/Icons/voltusk_icon.png',
+  journalEntry:
+    'Its metallic whiskers tremble when a storm approaches, guiding it to the place where lightning will strike. The larger its steel tusks, the more electricity it can store—and the more confidently it challenges rivals.',
+  spriteUrl: '/battles/cosmoids/voltusk_down.png',
+  battleSpriteUrl: '/battles/cosmoids/voltusk_left.png',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'TACKLE' },
+    { level: 1, attackId: 'SPARK' },
+  ],
+};
+
 export const BRAMFRIT: CosmoidTemplate = {
   id: 'bramfrit',
   name: 'Bramfrit',
@@ -716,6 +742,7 @@ export const COSMOID_TEMPLATES: Record<string, CosmoidTemplate> = {
   [SONARION.id]: SONARION,
   [RESONARION.id]: RESONARION,
   [TIGREVEL.id]: TIGREVEL,
+  [VOLTUSK.id]: VOLTUSK,
   [BRAMFRIT.id]: BRAMFRIT,
   [SEPIPPET.id]: SEPIPPET,
   [PARLET.id]: PARLET,

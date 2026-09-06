@@ -290,7 +290,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     supportBuff: { attackSpeedMultiplier: 1.2, durationMs: 5000 },
     visualEffectConfigId: 'attack_rally_howl_1',
   },
-  // Preserved lightning-bolt version; intentionally not in any species learnset.
+  // Lightning-bolt attack used by Voltusk; distinct from Razcall's Static Yip.
   SPARK: {
     id: 'SPARK',
     name: 'Spark',

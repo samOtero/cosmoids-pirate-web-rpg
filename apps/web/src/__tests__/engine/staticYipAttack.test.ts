@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { COSMOID_TEMPLATES, RESONARION, SONARION } from '@/constants/creatures';
+import { RESONARION, SONARION } from '@/constants/creatures';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { ProjectileBehavior } from '@/engine/tower-defense/attacks/behaviors';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
@@ -139,7 +139,7 @@ describe('Static Yip', () => {
     }
   );
 
-  it('preserves the bolt attack as Spark without assigning it to any species', () => {
+  it('preserves Spark separately from the Razcall family learnsets', () => {
     expect(ATTACK_DEFS.SPARK).toMatchObject({
       id: 'SPARK',
       name: 'Spark',
@@ -153,7 +153,7 @@ describe('Static Yip', () => {
       launchVisualEffectConfigId: 'attack_spark_launch_1',
       visualEffectConfigId: 'attack_spark_1',
     });
-    for (const species of Object.values(COSMOID_TEMPLATES)) {
+    for (const species of [SONARION, RESONARION]) {
       expect(
         species.learnableAttacks.some((move) => move.attackId === 'SPARK')
       ).toBe(false);
