@@ -25,7 +25,11 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     cooldownMs: 8000,
     rangeIndex: ATTACK_RANGES.NORMAL,
     behaviorType: 'CONSTRICTION',
-    constriction: { durationMs: 4000, pulseIntervalMs: 1000, resistanceMs: 6000 },
+    constriction: {
+      durationMs: 4000,
+      pulseIntervalMs: 1000,
+      resistanceMs: 6000,
+    },
   },
   BARREL_BOWLING: {
     id: 'BARREL_BOWLING',
@@ -49,7 +53,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     type: ElementType.FIRE,
     category: 'physical',
     power: 45,
-    cooldownMs: ATTACK_COOLDOWNS.FAST,
+    cooldownMs: ATTACK_COOLDOWNS.NORMAL,
     rangeIndex: ATTACK_RANGES.NORMAL,
     behaviorType: 'PROJECTILE',
     projectileSpeed: 1.5,
@@ -123,9 +127,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     adaptiveTargetedAoe: {
       radiusIndex: 12,
       singleTargetPower: 75,
-      singleTargetEffects: [
-        { type: 'SPEED_SLOW', chance: 1, value: 0.5 },
-      ],
+      singleTargetEffects: [{ type: 'SPEED_SLOW', chance: 1, value: 0.5 }],
     },
     visualEffectConfigId: 'attack_mallet_smash_1',
     isDashAttack: true,

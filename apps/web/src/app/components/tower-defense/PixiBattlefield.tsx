@@ -2955,12 +2955,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 if (!isDestroyed) sprite.texture = texture;
               }
             );
-            const remainingMs = Math.max(
-              0,
-              projection.expiresAtMs - engine.elapsedTimeMs
-            );
             sprite.tint = 0x5b21b6;
-            sprite.alpha = 0.62 * Math.min(1, remainingMs / 450);
+            sprite.alpha = 0.62;
             creatureShadow.alpha = 0.3;
 
             const marker = container.getChildByLabel(

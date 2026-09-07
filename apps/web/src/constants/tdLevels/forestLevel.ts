@@ -257,6 +257,7 @@ export const FOREST_LEVEL: TDLevelData = {
     offsetY: 0,
     zoom: 0.9,
   },
+  introMessage: 'Protect the supplies!',
   openingPan: {
     fromOffsetY: 100,
     durationMs: 2000,

@@ -581,7 +581,8 @@ export const STARTER_CRAB: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'PINCH' },
     { level: 6, attackId: 'COIR_SNARE' },
-    { level: 12, attackId: 'SHIPSHAPE' },
+    { level: 16, attackId: 'SHIPSHAPE' },
+    { level: 16, attackId: 'MALLET_SMASH' },
   ],
   evolutionNodes: [{ level: 16, evolutionDefId: 'carapenter' }],
 };
@@ -637,6 +638,7 @@ export const STARTER_IGUANA: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'SCRATCH' },
     { level: 9, attackId: 'EMBER' },
+    { level: 16, attackId: 'FUSE_RUSH' },
   ],
   evolutionNodes: [{ level: 16, evolutionDefId: 'velocinder' }],
 };
@@ -690,6 +692,7 @@ export const STARTER_MONKEY: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
     { level: 8, attackId: 'BARREL_BASH' },
+    { level: 16, attackId: 'BARREL_BOWLING' },
   ],
   evolutionNodes: [{ level: 16, evolutionDefId: 'macask' }],
 };

@@ -228,6 +228,7 @@ export const VANE_LEVEL: TDLevelData = {
     offsetY: 0,
     zoom: 0.7,
   },
+  introMessage: 'Defend the boat!',
   openingPan: {
     fromOffsetY: 100,
     durationMs: 2000,

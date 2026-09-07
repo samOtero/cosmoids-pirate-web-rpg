@@ -9,6 +9,7 @@ import {
   calculateMaxHp,
   calculateStat,
   createWildCreature,
+  getDefaultAttacksForLevel,
 } from '@/utils/resolvePlayerCreature';
 import {
   Tower,
@@ -298,6 +299,8 @@ export class TowerDefenseEngine {
   public waves: TDWave[] = [];
   public waveEnemyDefinitions: Record<string, TDWaveEnemyDefinition> = {};
   public currentWaveIndex: number = 0;
+  private endlessWaves?: TDLevelData['endlessWaves'];
+  private endlessWaveTemplate?: TDWave;
   private activeSpawners: ActiveSpawnerState[] = [];
   private nextGroupIndexToStart: number = 0;
   private startedRelocationWaveIndexes = new Set<number>();
@@ -364,6 +367,19 @@ export class TowerDefenseEngine {
       ])
     );
     this.waves = levelData.waves || [];
+    this.endlessWaves = levelData.endlessWaves;
+    if (this.endlessWaves) {
+      const finalWave = this.waves[this.waves.length - 1];
+      const groups = finalWave?.groups.filter(
+        (group) =>
+          group.count > 0 &&
+          this.waveEnemyDefinitions[group.enemyDefinitionId]?.creatureId &&
+          !this.waveEnemyDefinitions[group.enemyDefinitionId]?.structure
+      );
+      if (groups?.length) {
+        this.endlessWaveTemplate = { id: 'endless_reinforcements', groups };
+      }
+    }
     this.surviveUntil = levelData.surviveUntil;
     this.enemyHpMultiplier = levelData.enemyHpMultiplier ?? 1;
     this.disableCapture = levelData.disableCapture ?? false;
@@ -1552,7 +1568,8 @@ export class TowerDefenseEngine {
   }
 
   private loadNextSpawners() {
-    const currentWave = this.waves[this.currentWaveIndex];
+    const currentWave =
+      this.waves[this.currentWaveIndex] ?? this.endlessWaveTemplate;
     if (
       !currentWave ||
       this.nextGroupIndexToStart >= currentWave.groups.length
@@ -1561,14 +1578,34 @@ export class TowerDefenseEngine {
       return;
     }
 
+    // Delay every concurrent group in the opening batch of a repeated wave.
+    const waveDelay =
+      this.currentWaveIndex >= this.waves.length &&
+      this.nextGroupIndexToStart === 0
+        ? (this.endlessWaves?.delayBetweenWavesMs ?? 0)
+        : 0;
+
+    const countInterval = this.endlessWaves?.spawnCountIncreaseEveryWaves;
+    const countIncrease =
+      this.currentWaveIndex >= this.waves.length &&
+      countInterval &&
+      Number.isInteger(countInterval) &&
+      countInterval > 0
+        ? Math.floor(this.currentWaveIndex / countInterval) *
+          Math.max(
+            0,
+            Math.floor(this.endlessWaves?.spawnCountIncreasePerStep ?? 1)
+          )
+        : 0;
+
     // Always load at least one group
     const groupToLoad = currentWave.groups[this.nextGroupIndexToStart];
     this.activeSpawners.push({
       group: groupToLoad,
-      spawnsRemaining: groupToLoad.count,
+      spawnsRemaining: groupToLoad.count + countIncrease,
       lastSpawnTime: 0,
-      delayTimer: groupToLoad.delayBeforeGroupMs || 0,
-      isWaitingForDelay: (groupToLoad.delayBeforeGroupMs || 0) > 0,
+      delayTimer: (groupToLoad.delayBeforeGroupMs || 0) + waveDelay,
+      isWaitingForDelay: (groupToLoad.delayBeforeGroupMs || 0) + waveDelay > 0,
     });
     this.nextGroupIndexToStart++;
 
@@ -1578,10 +1615,10 @@ export class TowerDefenseEngine {
       if (nextGroup.concurrentWithPrevious) {
         this.activeSpawners.push({
           group: nextGroup,
-          spawnsRemaining: nextGroup.count,
+          spawnsRemaining: nextGroup.count + countIncrease,
           lastSpawnTime: 0,
-          delayTimer: nextGroup.delayBeforeGroupMs || 0,
-          isWaitingForDelay: (nextGroup.delayBeforeGroupMs || 0) > 0,
+          delayTimer: (nextGroup.delayBeforeGroupMs || 0) + waveDelay,
+          isWaitingForDelay: (nextGroup.delayBeforeGroupMs || 0) + waveDelay > 0,
         });
         this.nextGroupIndexToStart++;
       } else {
@@ -1595,7 +1632,7 @@ export class TowerDefenseEngine {
     deltaMs: number,
     newEnemies: Enemy[]
   ) {
-    if (this.hasFinishedAllWaves) return;
+    if (this.hasFinishedAllWaves || this.hasDestroyedVictoryStructure) return;
 
     if (this.activeSpawners.length === 0) {
       this.loadNextSpawners();
@@ -1645,10 +1682,11 @@ export class TowerDefenseEngine {
     this.nextGroupIndexToStart = 0;
     this.activeSpawners = [];
 
-    if (this.currentWaveIndex >= this.waves.length) {
+    const nextWave =
+      this.waves[this.currentWaveIndex] ?? this.endlessWaveTemplate;
+    if (!nextWave) {
       this.hasFinishedAllWaves = true;
     } else {
-      const nextWave = this.waves[this.currentWaveIndex];
       // Skip empty waves
       if (nextWave.groups.length === 0) {
         this.advanceToNextWave();
@@ -1682,11 +1720,18 @@ export class TowerDefenseEngine {
     const startPath = this.paths[pathIndex] || [{ x: 0, y: 0 }];
 
     const enemyLevel = waveEnemyDefinition.level;
+    const repeatedWaveNumber = Math.max(
+      0,
+      this.currentWaveIndex - this.waves.length + 1
+    );
+    const waveHpMultiplier =
+      1 + repeatedWaveNumber * (this.endlessWaves?.hpIncreasePerWave ?? 0);
     const enemyHp = structure
       ? structure.maxHp * this.enemyHpMultiplier
       : calculateMaxHp(meta!.baseCreature.maxHp, enemyLevel) *
         this.enemyHpMultiplier *
-        (waveEnemyDefinition.hpMultiplier ?? 1);
+        (waveEnemyDefinition.hpMultiplier ?? 1) *
+        waveHpMultiplier;
     const enemyAttack = structure
       ? 0
       : calculateStat(meta!.baseCreature.attack, enemyLevel);
@@ -1999,13 +2044,16 @@ export class TowerDefenseEngine {
     this.dropCaptureUnit(enemy);
 
     const capturedLevel = enemy.level;
+    const template = COSMOID_TEMPLATES[enemy.definitionId];
 
     const captured: PlayerCreature = {
       id: crypto.randomUUID(),
       speciesId: enemy.definitionId,
       level: capturedLevel,
       xp: 0,
-      equippedAttacks: TowerDefenseEngine.getDefaultAttacks(enemy.definitionId),
+      equippedAttacks: template
+        ? getDefaultAttacksForLevel(template, capturedLevel)
+        : ['TACKLE'],
       isShiny: enemy.isShiny ?? false,
     };
 
@@ -2643,6 +2691,8 @@ export class TowerDefenseEngine {
 
       const elapsedInPhase = this.elapsedTimeMs - ally.phaseStartedAtMs;
       if (ally.behavior.type === 'SEPIPPET_SHADOW_ASSAULT') {
+        /*
+        // don't have a limit for the shadow clones
         if (
           ally.phase === 'assaulting' &&
           this.elapsedTimeMs >= (ally.assaultEndsAtMs ?? 0)
@@ -2654,6 +2704,7 @@ export class TowerDefenseEngine {
           );
           continue;
         }
+        */
 
         if (
           ally.phase === 'assaulting' &&
@@ -2772,7 +2823,7 @@ export class TowerDefenseEngine {
     ally.phaseStartedAtMs = this.elapsedTimeMs;
     ally.assaultEndsAtMs = this.elapsedTimeMs + behavior.durationMs;
     ally.nextActionAtMs = this.elapsedTimeMs;
-    ally.facingDirection = 'up';
+    ally.facingDirection = 'down';
 
     this.objectiveAllyShadows = this.objectiveAllyShadows.filter(
       (shadow) => shadow.ownerAllyId !== ally.id
@@ -2783,7 +2834,7 @@ export class TowerDefenseEngine {
         ownerAllyId: ally.id,
         tdConfigId: ally.tdConfigId,
         position: { ...position },
-        facingDirection: 'up' as const,
+        facingDirection: 'down' as const,
         hp: 1,
         maxHp: 1,
         expiresAtMs: ally.assaultEndsAtMs!,
@@ -2796,9 +2847,12 @@ export class TowerDefenseEngine {
   }
 
   private processObjectiveAllyShadows(enemies: Enemy[]): void {
+    /*
+    Keep shadow allies alive the whole time
     this.objectiveAllyShadows = this.objectiveAllyShadows.filter(
       (shadow) => shadow.expiresAtMs > this.elapsedTimeMs
     );
+    */
 
     for (const shadow of this.objectiveAllyShadows) {
       if (this.elapsedTimeMs < shadow.nextAttackAtMs) continue;
@@ -2868,7 +2922,7 @@ export class TowerDefenseEngine {
 
     ally.phase = 'channeling';
     ally.phaseStartedAtMs = this.elapsedTimeMs;
-    ally.facingDirection = 'up';
+    ally.facingDirection = 'down';
 
     this.objectiveAllyCurrents = this.objectiveAllyCurrents.filter(
       (current) => current.ownerAllyId !== ally.id
@@ -3049,7 +3103,7 @@ export class TowerDefenseEngine {
     ally.phase = 'volleying';
     ally.phaseStartedAtMs = this.elapsedTimeMs;
     ally.nextActionAtMs = this.elapsedTimeMs;
-    ally.facingDirection = 'up';
+    ally.facingDirection = 'down';
   }
 
   private launchCorrogoonScouringVolley(

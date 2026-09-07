@@ -98,5 +98,5 @@ The introduction, cursed intermission, and victory/departure are separate story 
 
 ## Related Records
 
-- [Level 5 — The Caged Claw](level-5.md)
+- [Level 5 — Jail Break](level-5.md)
 - [Story, themes, and dialogue guide](../../STORY_AND_THEMES.md)

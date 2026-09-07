@@ -6,6 +6,15 @@ import { BaseTDUnit } from '@/engine/tower-defense/types';
 const colorChannel = (color: number, shift: number) =>
   ((color >> shift) & 0xff) / 255;
 
+const spriteVisualStates = new WeakMap<
+  PIXI.Sprite,
+  {
+    url?: string;
+    ready: boolean;
+    commit: (texture: PIXI.Texture) => void;
+  }
+>();
+
 export function applyTDUnitTransforms(
   unit: BaseTDUnit,
   sprite: PIXI.Sprite,
@@ -21,35 +30,65 @@ export function applyTDUnitTransforms(
   const tdConfig =
     tdConfigMap[visualState ?? unit.facingDirection] || tdConfigMap.default;
 
-  const baseScale = tdConfig.scale ?? 1;
-  sprite.scale.x = tdConfig.flipX ? -baseScale : baseScale;
-  sprite.scale.y = tdConfig.flipY ? -baseScale : baseScale;
-  sprite.x = tdConfig.offsetX ?? 0;
-  sprite.y = tdConfig.offsetY ?? 0;
+  const applyLayout = () => {
+    const baseScale = tdConfig.scale ?? 1;
+    sprite.scale.x = tdConfig.flipX ? -baseScale : baseScale;
+    sprite.scale.y = tdConfig.flipY ? -baseScale : baseScale;
+    sprite.x = tdConfig.offsetX ?? 0;
+    sprite.y = tdConfig.offsetY ?? 0;
+
+    const shadowOffsetX = tdConfig.shadowOffsetX ?? 0;
+    const shadowOffsetY = tdConfig.shadowOffsetY ?? 0;
+
+    shadow.clear();
+    shadow.ellipse(
+      shadowOffsetX,
+      30 * baseScale + shadowOffsetY,
+      25 * (tdConfig.shadowScaleX ?? 1),
+      12 * (tdConfig.shadowScaleY ?? 1)
+    );
+    shadow.fill({ color: 0x000000, alpha: 0.4 });
+    shadow.scale.x = tdConfig.flipX ? -1 : 1;
+  };
 
   const spriteUrl = tdConfig.url || fallbackUrl;
-  if (
-    spriteUrl &&
-    (sprite as PIXI.Sprite & { currentUrl?: string }).currentUrl !== spriteUrl
-  ) {
-    (sprite as PIXI.Sprite & { currentUrl?: string }).currentUrl = spriteUrl;
-    void PIXI.Assets.load(spriteUrl).then((texture) => {
-      onImageLoaded?.(texture as PIXI.Texture);
-    });
+  let visualStateForSprite = spriteVisualStates.get(sprite);
+  const needsLoad =
+    !visualStateForSprite || visualStateForSprite.url !== spriteUrl;
+  if (needsLoad) {
+    visualStateForSprite = {
+      url: spriteUrl,
+      ready: !spriteUrl,
+      commit: () => {},
+    };
+    spriteVisualStates.set(sprite, visualStateForSprite);
   }
 
-  const shadowOffsetX = tdConfig.shadowOffsetX ?? 0;
-  const shadowOffsetY = tdConfig.shadowOffsetY ?? 0;
-
-  shadow.clear();
-  shadow.ellipse(
-    shadowOffsetX,
-    30 * baseScale + shadowOffsetY,
-    25 * (tdConfig.shadowScaleX ?? 1),
-    12 * (tdConfig.shadowScaleY ?? 1)
-  );
-  shadow.fill({ color: 0x000000, alpha: 0.4 });
-  shadow.scale.x = tdConfig.flipX ? -1 : 1;
+  const pendingState = visualStateForSprite!;
+  // Keep the old image and layout paired until the new texture is ready.
+  // Refresh this closure each frame: left/right can share a URL but differ in flip.
+  pendingState.commit = (texture) => {
+    onImageLoaded?.(texture);
+    applyLayout();
+  };
+  if (pendingState.ready) applyLayout();
+  if (needsLoad && spriteUrl) {
+    void PIXI.Assets.load(spriteUrl)
+      .then((texture) => {
+        if (
+          sprite.destroyed ||
+          shadow.destroyed ||
+          spriteVisualStates.get(sprite) !== pendingState
+        ) {
+          return;
+        }
+        pendingState.commit(texture as PIXI.Texture);
+        pendingState.ready = true;
+      })
+      .catch((error: unknown) => {
+        console.error(`Failed to load unit sprite: ${spriteUrl}`, error);
+      });
+  }
 
   if ((unit.damageFlashTimerMs || 0) > 0) {
     sprite.tint = 0xffffff;

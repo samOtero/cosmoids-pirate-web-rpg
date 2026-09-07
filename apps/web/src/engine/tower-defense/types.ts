@@ -303,6 +303,17 @@ export interface TDLevelData {
   placementSpots: Point[];
   waveEnemyDefinitions: TDWaveEnemyDefinition[];
   waves: TDWave[];
+  /** Repeat the final wave's creature groups indefinitely after authored waves. */
+  endlessWaves?: {
+    /** Pause after the previous wave finishes spawning, without waiting for kills. */
+    delayBetweenWavesMs: number;
+    /** Add this fraction of base HP per repeated wave (0.1 means +10%). */
+    hpIncreasePerWave: number;
+    /** Increase repeated creature group counts every N total waves; omit or use 0 to disable. */
+    spawnCountIncreaseEveryWaves?: number;
+    /** Creatures added per interval, relative to the authored count. Defaults to 1. */
+    spawnCountIncreasePerStep?: number;
+  };
   surviveUntil?: number; // Win after surviving for this many seconds
   lives?: number; // Default is 3 if not provided, or overridden by captureUnits length
   enemyHpMultiplier?: number; // Defaults to 1 if not provided

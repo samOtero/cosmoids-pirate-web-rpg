@@ -109,7 +109,7 @@ On the cursed path, Carapenter pushes its seawater training too far and begins t
 - `COSMOID_CONCEPTS.md` verifies the existing family arc from improving sailor to a third-stage death and ghost-pirate outcome.
 - `apps/web/public/battles/cosmoids/palmit_down_1.png` is the current in-game visual reference for Palmit's green coconut shelter and carried stick.
 - The user-directed lineage adds Carapenter's seawater training, noble shipwright destination, and drowning-related cursed Grass/Ghost branch.
-- **Story placement:** One capturable level-10 Carapenter appears in Level 5, `The Caged Claw`, on the central path of `level_5_placeholder_wave`.
+- **Story placement:** One capturable level-10 Carapenter appears in Level 5, `Jail Break`, on the central path of `level_5_placeholder_wave`.
 
 ## Design Tests to Preserve
 

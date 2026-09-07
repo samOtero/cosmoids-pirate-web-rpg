@@ -1,10 +1,10 @@
-# Level 5 — The Caged Claw
+# Level 5 — Jail Break
 
 > Working level-design record created August 30, 2026. `STORY_AND_THEMES.md` remains the source of truth for the game's overall premise, factions, themes, and dialogue rules. This document records the focused story, gameplay, art, implementation status, and open decisions for Level 5.
 
 ## Level Summary
 
-- **Level-select name:** The Caged Claw
+- **Level-select name:** Jail Break
 - **Location:** The flooded prison block beneath Ironbell's Navy fortress
 - **Primary objective:** Break the main cell bars and free Tigrevel before the crew is overwhelmed.
 - **Core gameplay idea:** Three enemy approaches converge on a visible Steel-type gate at the top center of the map. The player can eventually open connected side cells to release captive Cosmoids that join the effort to destroy the gate.
@@ -209,17 +209,21 @@ The broader prisoner roster has explored Poison, Dark, Water, Rock, Ground, and 
 
 An earlier idea had a Navy guard move between cells and open them to release hostile Cosmoids. The current preferred direction is that the **player** breaks side-cell gates and releases allies. Guard movement and special behavior are deferred and should not be implemented until the prisoner system is established.
 
-## Current Battle Placeholder
+## Current Battle Waves
 
 The present battle is a mechanical draft rather than a balanced final encounter:
 
-- One stationary cell-bar structure spawns at the main cell.
-- One uncapturable Level 8 Sonarion patrol approaches on each of the three lanes.
+- One stationary cell-bar structure spawns at the main cell, alongside four side-cell gates. Structures spawn only once.
+- The opening wave sends one capturable Bufflora along each lane. The second authored wave sends one Marophis along each lane, followed by one Bufflora along each lane.
+- After the two authored waves, the second wave's creature groups repeat indefinitely. Each reinforcement wave starts after a 12-second pause following the previous wave's last spawn, plus the authored lane delays. Living enemies and intact gates do not block reinforcements.
+- `endlessWaves.spawnCountIncreaseEveryWaves` controls how often each creature spawn group's count grows, currently every 2 waves. `spawnCountIncreasePerStep` sets the additive increase, currently 1: waves 1–2 use authored counts, waves 3–4 add one per group, waves 5–6 add two, and so on. Counts are always calculated from the authored groups; structures never repeat. Omitting the interval or setting it to 0 disables count growth.
+- Each repeated wave adds 10% of the creatures' original health: wave 3 has 110%, wave 4 has 120%, and so on. Levels, capture rules, movement speeds, and gate stats stay fixed.
+- Clearing enemies never wins this encounter. Destroying Tigrevel's main bars wins immediately and stops reinforcements.
 - The player has three lives.
-- Capture is disabled for the entire level.
+- Capture is enabled for wild creatures; Sonarion patrols and structures remain uncapturable.
 - The current message invites the player to focus fire on a prisoner gate and begin the breakout.
 
-The placeholder patrols validate lane geometry, tower targeting, structure targeting, and destruction victory. They do not represent the intended final wave design.
+The endless escalation is implemented; the enemy roster and balance remain provisional.
 
 ## Art and Dialogue Assets
 

@@ -168,7 +168,15 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
     levelData: LEVEL_5,
     journalCompletion: {
       progression: StoryProgression.DEFEAT_LEVEL_5,
-      seenSpeciesIds: ['tigrevel'],
+      seenSpeciesIds: [
+        'marophis',
+        'tigrevel',
+        'bufflora',
+        'corrogoon',
+        'parlet',
+        'sepippet',
+        'bramfrit',
+      ],
     },
     introEvents: [
       {
@@ -266,8 +274,8 @@ export const LEVEL_ORDER: LevelInfo[] = [
   },
   {
     context: TDLevelContext.LEVEL_5,
-    name: 'The Caged Claw',
-    description: "Find the prisoner hidden beneath Ironbell's fortress.",
+    name: 'Jail Break',
+    description: "Free the prisoner hidden beneath Ironbell's fortress.",
     requiredProgression: StoryProgression.DEFEAT_LEVEL_4,
   },
   {

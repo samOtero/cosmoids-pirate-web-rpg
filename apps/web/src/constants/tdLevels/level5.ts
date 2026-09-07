@@ -3,119 +3,124 @@ import { ElementType } from '@/types/baseGame';
 
 /**
  * Level 5 takes place in Ironbell's flooded prison block. Three approaches
- * converge on Tigrevel's cell while the optional side-cell mechanics and the
- * final prison-break objective are developed.
+ * converge on Tigrevel's cell. Escalating reinforcements continue until the
+ * player breaks the main bars, with optional side-cell allies helping the breach.
  */
+const PRISON_GATE_HP = 350;
 export const LEVEL_5: TDLevelData = {
   paths: [
     [
       {
-        x: 17.5,
+        x: 14.57,
         y: 103,
       },
       {
-        x: 17.5,
-        y: 84,
+        x: 20.27,
+        y: 83.23,
       },
       {
-        x: 21.5,
-        y: 74,
+        x: 21.81,
+        y: 73.9,
       },
       {
-        x: 20.5,
-        y: 64,
+        x: 19.42,
+        y: 63.46,
       },
       {
-        x: 20,
-        y: 53,
+        x: 20.79,
+        y: 50.48,
       },
       {
-        x: 21,
-        y: 43,
+        x: 19.82,
+        y: 37.2,
       },
       {
-        x: 26,
-        y: 32,
+        x: 24.66,
+        y: 26.86,
       },
       {
-        x: 34,
-        y: 23,
+        x: 32.65,
+        y: 20.47,
       },
       {
-        x: 42,
-        y: 19,
+        x: 38.81,
+        y: 19.26,
       },
       {
-        x: 50,
-        y: 17,
+        x: 49.83,
+        y: 21.69,
+      },
+      {
+        x: 61.24,
+        y: 19.56,
       },
     ],
     [
       {
-        x: 50,
-        y: 103,
+        x: 49.6,
+        y: 102.29,
       },
       {
-        x: 50,
-        y: 83,
+        x: 49.66,
+        y: 72.48,
       },
       {
-        x: 50,
-        y: 65,
+        x: 49.71,
+        y: 44.5,
       },
       {
-        x: 50,
-        y: 50,
+        x: 49.83,
+        y: 18.95,
       },
       {
-        x: 50,
-        y: 33,
+        x: 59.53,
+        y: 19.16,
       },
       {
-        x: 50,
-        y: 17,
+        x: 38.99,
+        y: 19.05,
       },
     ],
     [
       {
-        x: 82.5,
-        y: 103,
+        x: 82.22,
+        y: 102.89,
       },
       {
-        x: 82.5,
-        y: 84,
+        x: 76.74,
+        y: 75.22,
       },
       {
-        x: 78.5,
-        y: 74,
+        x: 79.36,
+        y: 62.24,
       },
       {
-        x: 79.5,
-        y: 64,
+        x: 78.11,
+        y: 50.08,
       },
       {
-        x: 80,
-        y: 53,
+        x: 79.99,
+        y: 43.39,
       },
       {
-        x: 79,
-        y: 43,
+        x: 78.79,
+        y: 35.48,
       },
       {
-        x: 74,
-        y: 32,
+        x: 72.86,
+        y: 25.34,
       },
       {
-        x: 66,
-        y: 23,
+        x: 61.73,
+        y: 19.16,
       },
       {
-        x: 58,
-        y: 19,
+        x: 49.98,
+        y: 21.59,
       },
       {
-        x: 50,
-        y: 17,
+        x: 37.08,
+        y: 19.36,
       },
     ],
     [
@@ -141,67 +146,115 @@ export const LEVEL_5: TDLevelData = {
   ],
   placementSpots: [
     {
-      x: 11,
-      y: 48,
+      x: 10.94,
+      y: 37.03,
     },
     {
-      x: 11,
-      y: 72,
+      x: 8.48,
+      y: 76.06,
     },
     {
-      x: 13,
-      y: 84,
+      x: 15.88,
+      y: 80.69,
     },
     {
-      x: 27,
-      y: 84,
+      x: 25.35,
+      y: 81.91,
     },
     {
-      x: 42,
-      y: 84,
+      x: 44.92,
+      y: 81.5,
     },
     {
-      x: 58,
-      y: 84,
+      x: 54.79,
+      y: 81.81,
     },
     {
       x: 73,
       y: 84,
     },
     {
-      x: 87,
-      y: 84,
+      x: 83.15,
+      y: 84.04,
     },
     {
-      x: 89,
-      y: 72,
+      x: 87.58,
+      y: 68.83,
     },
     {
-      x: 89,
-      y: 48,
+      x: 86.72,
+      y: 38.45,
     },
     {
-      x: 45,
-      y: 45,
+      x: 45.49,
+      y: 44.6,
     },
     {
-      x: 55,
-      y: 45,
+      x: 53.88,
+      y: 44.3,
     },
     {
-      x: 44.5,
-      y: 18.5,
+      x: 43.72,
+      y: 18.04,
     },
     {
-      x: 55.5,
-      y: 18.5,
+      x: 55.3,
+      y: 17.94,
+    },
+    {
+      x: 16.28,
+      y: 61.02,
+    },
+    {
+      x: 22.99,
+      y: 23.11,
+    },
+    {
+      x: 23.68,
+      y: 48.35,
+    },
+    {
+      x: 46.52,
+      y: 58.79,
+    },
+    {
+      x: 76.28,
+      y: 21.99,
+    },
+    {
+      x: 75.03,
+      y: 46.22,
+    },
+    {
+      x: 82.73,
+      y: 35.58,
+    },
+    {
+      x: 8.71,
+      y: 43.82,
+    },
+    {
+      x: 11.74,
+      y: 71.29,
+    },
+    {
+      x: 89.4,
+      y: 43.92,
+    },
+    {
+      x: 90.49,
+      y: 76.43,
+    },
+    {
+      x: 82.16,
+      y: 62.24,
     },
   ],
   environmentUnits: [
     {
       position: {
-        x: 75,
-        y: 29,
+        x: 70.01,
+        y: 75.52,
       },
       tdConfigId: 'navy_guard_battle',
       facingDirection: 'left',
@@ -210,8 +263,8 @@ export const LEVEL_5: TDLevelData = {
   captureUnits: [
     {
       position: {
-        x: 38,
-        y: 24,
+        x: 35.9,
+        y: 18.27,
       },
       tdConfigId: 'caleb_capture',
       carrierSpeedMultiplier: 0.9,
@@ -223,8 +276,8 @@ export const LEVEL_5: TDLevelData = {
     },
     {
       position: {
-        x: 50,
-        y: 27,
+        x: 49.66,
+        y: 20.11,
       },
       tdConfigId: 'kip_capture',
       carrierSpeedMultiplier: 0.9,
@@ -236,8 +289,8 @@ export const LEVEL_5: TDLevelData = {
     },
     {
       position: {
-        x: 62,
-        y: 24,
+        x: 62.44,
+        y: 17.77,
       },
       tdConfigId: 'maribel_capture',
       carrierSpeedMultiplier: 0.9,
@@ -257,17 +310,11 @@ export const LEVEL_5: TDLevelData = {
         tdConfigId: 'tigrevel_cell_bars',
         displayName: 'CELL BARS',
         elementTypes: [ElementType.STEEL],
-        maxHp: 260,
+        maxHp: 2500,
         defense: 32,
         specialDefense: 32,
         winsLevelOnDestroy: true,
       },
-    },
-    {
-      id: 'level_5_placeholder_patrol',
-      creatureId: 'sonarion',
-      level: 8,
-      speedMultiplier: 1.2,
     },
     {
       id: 'bramfrit_cell_gate',
@@ -277,7 +324,7 @@ export const LEVEL_5: TDLevelData = {
         tdConfigId: 'bramfrit_cell_gate',
         displayName: 'BRAMFRIT CELL',
         elementTypes: [ElementType.STEEL],
-        maxHp: 90,
+        maxHp: PRISON_GATE_HP,
         defense: 14,
         specialDefense: 14,
         role: 'prisoner-gate',
@@ -318,14 +365,14 @@ export const LEVEL_5: TDLevelData = {
         tdConfigId: 'sepippet_cell_gate',
         displayName: 'SEPIPPET CELL',
         elementTypes: [ElementType.STEEL],
-        maxHp: 90,
+        maxHp: PRISON_GATE_HP,
         defense: 14,
         specialDefense: 14,
         role: 'prisoner-gate',
         visualStyle: 'prison-gate',
         position: {
-          x: 4.75,
-          y: 48.5,
+          x: 5.89,
+          y: 41.97,
         },
         visualLayout: {
           standing: {
@@ -333,7 +380,7 @@ export const LEVEL_5: TDLevelData = {
             offsetY: -139,
             width: 260,
             height: 306,
-            rotationDegrees: -9.5,
+            rotationDegrees: -3.5,
             skewXDegrees: 4,
             skewYDegrees: -43.5,
           },
@@ -359,22 +406,22 @@ export const LEVEL_5: TDLevelData = {
         tdConfigId: 'parlet_cell_gate',
         displayName: 'PARLET CELL',
         elementTypes: [ElementType.STEEL],
-        maxHp: 90,
+        maxHp: PRISON_GATE_HP,
         defense: 14,
         specialDefense: 14,
         role: 'prisoner-gate',
         visualStyle: 'prison-gate',
         position: {
-          x: 95.25,
-          y: 48.5,
+          x: 92.56,
+          y: 42.07,
         },
         visualLayout: {
           standing: {
             offsetX: 8,
             offsetY: -139,
             width: 260,
-            height: 306,
-            rotationDegrees: 9.5,
+            height: 264,
+            rotationDegrees: 4,
             skewXDegrees: -4,
             skewYDegrees: 43.5,
           },
@@ -400,21 +447,21 @@ export const LEVEL_5: TDLevelData = {
         tdConfigId: 'corrogoon_cell_gate',
         displayName: 'CORROGOON CELL',
         elementTypes: [ElementType.STEEL],
-        maxHp: 90,
+        maxHp: 400,
         defense: 14,
         specialDefense: 14,
         role: 'prisoner-gate',
         visualStyle: 'prison-gate',
         position: {
-          x: 93.77,
-          y: 75.24,
+          x: 92.5,
+          y: 74.81,
         },
         visualLayout: {
           standing: {
             offsetX: 8,
             offsetY: -139,
             width: 260,
-            height: 306,
+            height: 271,
             rotationDegrees: 9.5,
             skewXDegrees: -4,
             skewYDegrees: 43.5,
@@ -436,18 +483,20 @@ export const LEVEL_5: TDLevelData = {
     {
       id: 'level_5_bufflora_wild',
       creatureId: 'bufflora',
-      level: 8,
+      level: 12,
       speedMultiplier: 1.1,
-      canCarryCaptureUnits: false,
-      weakenedThreshold: 0.45,
+      canCarryCaptureUnits: true,
+      weakenedThreshold: 0.25,
+      hpMultiplier: 6,
     },
     {
       id: 'level_5_marophis_wild',
       creatureId: 'marophis',
-      level: 8,
-      speedMultiplier: 0.9,
-      canCarryCaptureUnits: false,
-      weakenedThreshold: 0.45,
+      level: 12,
+      speedMultiplier: 1.1,
+      canCarryCaptureUnits: true,
+      weakenedThreshold: 0.25,
+      hpMultiplier: 6,
     },
     {
       id: 'level_5_bramfrit_prisoner',
@@ -527,54 +576,100 @@ export const LEVEL_5: TDLevelData = {
           uncapturable: true,
         },
         {
-          enemyDefinitionId: 'level_5_placeholder_patrol',
-          count: 1,
-          spawnIntervalMs: 1200,
-          delayBeforeGroupMs: 250,
-          pathIndex: 0,
-          concurrentWithPrevious: true,
-          uncapturable: true,
-          turnAroundAtEnd: true,
-        },
-        {
-          enemyDefinitionId: 'level_5_placeholder_patrol',
-          count: 1,
-          spawnIntervalMs: 1200,
-          delayBeforeGroupMs: 500,
-          pathIndex: 1,
-          concurrentWithPrevious: true,
-          uncapturable: true,
-          turnAroundAtEnd: true,
-        },
-        {
-          enemyDefinitionId: 'level_5_placeholder_patrol',
-          count: 1,
-          spawnIntervalMs: 1200,
-          delayBeforeGroupMs: 750,
-          pathIndex: 2,
-          concurrentWithPrevious: true,
-          uncapturable: true,
-          turnAroundAtEnd: true,
-        },
-        {
           enemyDefinitionId: 'level_5_bufflora_wild',
-          count: 2,
+          count: 1,
           spawnIntervalMs: 1400,
           delayBeforeGroupMs: 1100,
           pathIndex: 0,
           concurrentWithPrevious: true,
+          turnAroundAtEnd: true,
+        },
+        {
+          enemyDefinitionId: 'level_5_bufflora_wild',
+          count: 1,
+          spawnIntervalMs: 1400,
+          delayBeforeGroupMs: 1100,
+          pathIndex: 1,
+          concurrentWithPrevious: true,
+          turnAroundAtEnd: true,
+        },
+        {
+          enemyDefinitionId: 'level_5_bufflora_wild',
+          count: 1,
+          spawnIntervalMs: 1400,
+          delayBeforeGroupMs: 1100,
+          pathIndex: 2,
+          concurrentWithPrevious: true,
+          turnAroundAtEnd: true,
+        },
+      ],
+    },
+    {
+      id: 'level_5_wave_2',
+      groups: [
+        {
+          enemyDefinitionId: 'level_5_marophis_wild',
+          count: 1,
+          spawnIntervalMs: 1400,
+          delayBeforeGroupMs: 8000,
+          pathIndex: 0,
+          concurrentWithPrevious: true,
+          turnAroundAtEnd: true,
         },
         {
           enemyDefinitionId: 'level_5_marophis_wild',
           count: 1,
           spawnIntervalMs: 1400,
-          delayBeforeGroupMs: 1350,
+          delayBeforeGroupMs: 8000,
+          pathIndex: 1,
+          concurrentWithPrevious: true,
+          turnAroundAtEnd: true,
+        },
+        {
+          enemyDefinitionId: 'level_5_marophis_wild',
+          count: 1,
+          spawnIntervalMs: 1400,
+          delayBeforeGroupMs: 8000,
           pathIndex: 2,
           concurrentWithPrevious: true,
+          turnAroundAtEnd: true,
+        },
+        {
+          enemyDefinitionId: 'level_5_bufflora_wild',
+          count: 1,
+          spawnIntervalMs: 1400,
+          delayBeforeGroupMs: 8000,
+          pathIndex: 0,
+          concurrentWithPrevious: false,
+          turnAroundAtEnd: true,
+        },
+        {
+          enemyDefinitionId: 'level_5_bufflora_wild',
+          count: 1,
+          spawnIntervalMs: 1400,
+          delayBeforeGroupMs: 8000,
+          pathIndex: 1,
+          concurrentWithPrevious: true,
+          turnAroundAtEnd: true,
+        },
+        {
+          enemyDefinitionId: 'level_5_bufflora_wild',
+          count: 1,
+          spawnIntervalMs: 1400,
+          delayBeforeGroupMs: 8000,
+          pathIndex: 2,
+          concurrentWithPrevious: true,
+          turnAroundAtEnd: true,
         },
       ],
     },
   ],
+  endlessWaves: {
+    delayBetweenWavesMs: 8000,
+    hpIncreasePerWave: 0.1,
+    spawnCountIncreaseEveryWaves: 2,
+    spawnCountIncreasePerStep: 1,
+  },
   lives: 3,
   disableCapture: false,
   enemyHpMultiplier: 1,
@@ -597,44 +692,36 @@ export const LEVEL_5: TDLevelData = {
       },
       releasePath: [
         {
-          x: 10,
-          y: 65,
+          x: 20,
+          y: 83,
         },
         {
-          x: 17.5,
-          y: 65,
+          x: 22,
+          y: 74,
         },
         {
-          x: 17.5,
-          y: 53,
-        },
-        {
-          x: 21,
-          y: 53,
+          x: 19,
+          y: 64,
         },
         {
           x: 21,
-          y: 43,
+          y: 50,
         },
         {
-          x: 26,
-          y: 43,
+          x: 20,
+          y: 37,
         },
         {
-          x: 26,
-          y: 32,
+          x: 25,
+          y: 27,
         },
         {
-          x: 34,
-          y: 32,
+          x: 33,
+          y: 21,
         },
         {
-          x: 34,
-          y: 23,
-        },
-        {
-          x: 42,
-          y: 23,
+          x: 39,
+          y: 19,
         },
         {
           x: 42,
@@ -653,7 +740,7 @@ export const LEVEL_5: TDLevelData = {
           x: 44,
           y: 17,
         },
-        damage: 38,
+        damage: 50,
         bowDurationMs: 650,
         windupDurationMs: 1050,
         recoveryDurationMs: 1700,
@@ -666,8 +753,8 @@ export const LEVEL_5: TDLevelData = {
       displayName: 'Sepippet',
       gateDefinitionId: 'sepippet_cell_gate',
       lockedPosition: {
-        x: 4.75,
-        y: 48.5,
+        x: 5.8934338762126695,
+        y: 41.96573013697712,
       },
       releasePath: [
         {
@@ -675,24 +762,20 @@ export const LEVEL_5: TDLevelData = {
           y: 43,
         },
         {
-          x: 21,
-          y: 43,
+          x: 20,
+          y: 37,
         },
         {
-          x: 26,
-          y: 32,
+          x: 25,
+          y: 27,
         },
         {
-          x: 34,
-          y: 32,
+          x: 33,
+          y: 21,
         },
         {
-          x: 34,
-          y: 23,
-        },
-        {
-          x: 42,
-          y: 23,
+          x: 39,
+          y: 19,
         },
         {
           x: 42,
@@ -704,7 +787,7 @@ export const LEVEL_5: TDLevelData = {
       behavior: {
         type: 'SEPIPPET_SHADOW_ASSAULT',
         durationMs: 15000,
-        gateDamage: 14,
+        gateDamage: 30,
         gateAttackIntervalMs: 2000,
         shadowPositions: [
           {
@@ -720,7 +803,7 @@ export const LEVEL_5: TDLevelData = {
             y: 53,
           },
         ],
-        shadowDamage: 10,
+        shadowDamage: 25,
         shadowAttackIntervalMs: 1500,
         shadowAttackRange: 38,
       },
@@ -731,33 +814,25 @@ export const LEVEL_5: TDLevelData = {
       displayName: 'Parlet',
       gateDefinitionId: 'parlet_cell_gate',
       lockedPosition: {
-        x: 95.25,
-        y: 48.5,
+        x: 92.82808022022613,
+        y: 41.894774756185846,
       },
       releasePath: [
         {
-          x: 90,
+          x: 80,
           y: 43,
         },
         {
           x: 79,
-          y: 43,
+          y: 35,
         },
         {
-          x: 74,
-          y: 32,
+          x: 73,
+          y: 25,
         },
         {
-          x: 66,
-          y: 32,
-        },
-        {
-          x: 66,
-          y: 23,
-        },
-        {
-          x: 58,
-          y: 23,
+          x: 62,
+          y: 19,
         },
         {
           x: 58,
@@ -771,10 +846,10 @@ export const LEVEL_5: TDLevelData = {
         currentPathIndices: [0, 1, 2],
         currentWidth: 5,
         slowMultiplier: 0.7,
-        surgeIntervalMs: 4500,
+        surgeIntervalMs: 10000,
         surgeVisualDurationMs: 1000,
-        pushDistance: 3,
-        gateDamagePerCurrent: 8,
+        pushDistance: 50,
+        gateDamagePerCurrent: 7,
       },
     },
     {
@@ -783,21 +858,38 @@ export const LEVEL_5: TDLevelData = {
       displayName: 'Corrogoon',
       gateDefinitionId: 'corrogoon_cell_gate',
       lockedPosition: {
-        x: 93.77,
-        y: 75.24,
+        x: 92.50423336885933,
+        y: 74.81245273143759,
       },
       releasePath: [
-        { x: 90, y: 65 },
-        { x: 82.5, y: 65 },
-        { x: 82.5, y: 53 },
-        { x: 79, y: 53 },
-        { x: 79, y: 43 },
-        { x: 74, y: 43 },
-        { x: 74, y: 32 },
-        { x: 66, y: 32 },
-        { x: 66, y: 23 },
-        { x: 58, y: 23 },
-        { x: 58, y: 17 },
+        {
+          x: 77,
+          y: 75,
+        },
+        {
+          x: 79,
+          y: 62,
+        },
+        {
+          x: 78,
+          y: 50,
+        },
+        {
+          x: 80,
+          y: 43,
+        },
+        {
+          x: 79,
+          y: 35,
+        },
+        {
+          x: 73,
+          y: 25,
+        },
+        {
+          x: 60,
+          y: 17,
+        },
       ],
       moveSpeed: 8,
       targetStructureDefinitionId: 'tigrevel_cell_bars',
@@ -807,12 +899,12 @@ export const LEVEL_5: TDLevelData = {
         projectileTravelMs: 750,
         projectileStaggerMs: 55,
         scouredDurationMs: 10000,
-        tickDamage: 4,
+        tickDamage: 7,
         tickIntervalMs: 2000,
         defenseMultiplier: 0.75,
         specialDefenseMultiplier: 0.75,
       },
     },
   ],
-  introMessage: 'Tap a prisoner gate to focus fire and begin the breakout!',
+  introMessage: 'Destroy the cell gate!',
 };
