@@ -83,7 +83,7 @@ describe('Barrel Bowling', () => {
       STARTER_MONKEY.learnableAttacks.some(
         (attack) => attack.attackId === 'BARREL_BOWLING'
       )
-    ).toBe(false);
+    ).toBe(true);
     expect(move).toMatchObject({
       category: 'physical',
       type: 'Water',

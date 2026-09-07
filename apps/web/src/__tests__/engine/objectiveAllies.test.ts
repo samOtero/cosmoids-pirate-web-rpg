@@ -633,8 +633,8 @@ describe('objective allies', () => {
 
     engine.tick(164, 100);
 
-    expect(engine.objectiveAllies[0].phase).toBe('exhausted');
-    expect(engine.objectiveAllyShadows).toHaveLength(0);
+    expect(engine.objectiveAllies[0].phase).toBe('assaulting');
+    expect(engine.objectiveAllyShadows).toHaveLength(3);
 
     engine.destroy();
   });

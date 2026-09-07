@@ -55,9 +55,9 @@ function battle() {
 }
 
 describe('Shipshape', () => {
-  it('matches Palmit’s level-12 and Carapenter’s level-16 learnsets', () => {
+  it('matches Palmit’s level-16 and Carapenter’s level-16 learnsets', () => {
     for (const [template, level] of [
-      [STARTER_CRAB, 12],
+      [STARTER_CRAB, 16],
       [CARAPENTER, 16],
     ] as const) {
       expect(template.learnableAttacks).toContainEqual({

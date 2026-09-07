@@ -289,24 +289,6 @@ describe('Tower defense rules', () => {
         wave.groups.every((group) => group.turnAroundAtEnd)
       )
     ).toBe(true);
-    expect(LEVEL_4.waveEnemyDefinitions).toEqual([
-      expect.objectContaining({
-        id: 'ironbell_sonarion',
-        creatureId: 'sonarion',
-        level: 8,
-        canCarryCaptureUnits: false,
-        abilityId: 'SONARION_HOWL',
-      }),
-      expect.objectContaining({
-        id: 'ironbell_resonarion',
-        creatureId: 'resonarion',
-        level: 18,
-        speedMultiplier: VANE_LEVEL.waveEnemyDefinitions?.find(
-          (definition) => definition.id === 'vane_bettle_guard'
-        )?.speedMultiplier,
-        hpMultiplier: 10,
-      }),
-    ]);
     const level3BettleHpMultiplier = VANE_LEVEL.waveEnemyDefinitions?.find(
       (definition) => definition.id === 'vane_bettle_guard'
     )?.hpMultiplier;

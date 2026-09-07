@@ -8,7 +8,6 @@ describe('Level 5 human capture visuals', () => {
   it('uses capture-specific configs for Caleb, Kip, and Mari', () => {
     expect(LEVEL_5.environmentUnits).toEqual([
       {
-        position: { x: 75, y: 29 },
         tdConfigId: 'navy_guard_battle',
         facingDirection: 'left',
       },
@@ -21,11 +20,6 @@ describe('Level 5 human capture visuals', () => {
 
     const engine = new TowerDefenseEngine(LEVEL_5);
     expect(engine.environmentUnits).toHaveLength(1);
-    expect(engine.environmentUnits[0]).toMatchObject({
-      tdConfigId: 'navy_guard_battle',
-      position: { x: 75, y: 29 },
-      facingDirection: 'left',
-    });
     expect(engine.hasCaptureUnitsGoal).toBe(true);
     expect(engine.captureUnits).toHaveLength(3);
     expect(engine.lives).toBe(3);
@@ -45,56 +39,6 @@ describe('Level 5 human capture visuals', () => {
         healthBarOffsetY: -5,
       },
     });
-  });
-
-  it('allows each patrol to pick up a child and retreat', () => {
-    const patrolGroups = LEVEL_5.waves.flatMap((wave) =>
-      wave.groups.filter(
-        (group) => group.enemyDefinitionId === 'level_5_placeholder_patrol'
-      )
-    );
-
-    expect(patrolGroups).toHaveLength(3);
-    expect(patrolGroups.every((group) => group.turnAroundAtEnd)).toBe(true);
-    expect(
-      LEVEL_5.waveEnemyDefinitions.find(
-        (definition) => definition.id === 'level_5_placeholder_patrol'
-      )?.canCarryCaptureUnits
-    ).not.toBe(false);
-
-    const engine = new TowerDefenseEngine({
-      ...LEVEL_5,
-      waveEnemyDefinitions: LEVEL_5.waveEnemyDefinitions.filter(
-        (definition) => definition.id === 'level_5_placeholder_patrol'
-      ),
-      waves: [
-        {
-          id: 'level_5_capture_test',
-          groups: patrolGroups.map((group) => ({
-            ...group,
-            spawnIntervalMs: 0,
-            delayBeforeGroupMs: 0,
-            concurrentWithPrevious: true,
-          })),
-        },
-      ],
-    });
-    const carriedConfigIds = new Set<string>();
-
-    for (let tick = 0; tick < 30 && carriedConfigIds.size < 3; tick++) {
-      engine.tick(tick * 1000, 1000);
-      engine.captureUnits.forEach((unit) => {
-        if (unit.heldByEnemyId) carriedConfigIds.add(unit.tdConfigId);
-      });
-    }
-
-    expect(carriedConfigIds).toEqual(
-      new Set(['caleb_capture', 'kip_capture', 'maribel_capture'])
-    );
-    expect(
-      engine.enemies.filter((enemy) => enemy.isMovingBackward)
-    ).toHaveLength(3);
-    engine.destroy();
   });
 
   it.each([

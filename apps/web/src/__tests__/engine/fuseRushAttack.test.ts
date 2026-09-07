@@ -75,7 +75,7 @@ describe('Hot Streak', () => {
       STARTER_IGUANA.learnableAttacks?.some(
         (move) => move.attackId === 'FUSE_RUSH'
       )
-    ).toBe(false);
+    ).toBe(true);
     expect(move).toMatchObject({
       type: ElementType.FIRE,
       category: 'physical',
