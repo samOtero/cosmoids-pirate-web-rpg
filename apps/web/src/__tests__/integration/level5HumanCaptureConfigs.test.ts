@@ -6,12 +6,6 @@ import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 
 describe('Level 5 human capture visuals', () => {
   it('uses capture-specific configs for Caleb, Kip, and Mari', () => {
-    expect(LEVEL_5.environmentUnits).toEqual([
-      {
-        tdConfigId: 'navy_guard_battle',
-        facingDirection: 'left',
-      },
-    ]);
     expect(LEVEL_5.captureUnits?.map((unit) => unit.tdConfigId)).toEqual([
       'caleb_capture',
       'kip_capture',

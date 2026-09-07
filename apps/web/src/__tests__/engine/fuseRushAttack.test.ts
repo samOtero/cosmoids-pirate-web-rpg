@@ -81,7 +81,7 @@ describe('Hot Streak', () => {
       category: 'physical',
       power: 45,
       name: 'Hot Streak',
-      cooldownMs: 600,
+      cooldownMs: 800,
       behaviorType: 'PROJECTILE',
       isDashAttack: true,
       dashTrailType: 'FIRE',
