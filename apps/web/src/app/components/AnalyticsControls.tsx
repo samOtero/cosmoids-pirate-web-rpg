@@ -78,11 +78,14 @@ export default function AnalyticsControls() {
 
   return (
     <aside
-      className="fixed right-3 bottom-3 z-[10001] max-w-[calc(100vw-1.5rem)] text-slate-100"
+      className="fixed right-[max(0.75rem,env(safe-area-inset-right))] bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-[10001] max-w-[calc(100vw-1.5rem)] text-slate-100"
       aria-label="Gameplay analytics and feedback"
     >
-      {open || preference === null ? (
-        <div className="max-h-[70dvh] w-80 max-w-full overflow-y-auto rounded-xl border border-slate-600 bg-slate-950 p-4 shadow-xl">
+      {(open || preference === null) && (
+        <div
+          id="privacy-feedback-panel"
+          className={`${open ? '' : 'hidden lg:block'} max-h-[70dvh] w-80 max-w-full overflow-y-auto rounded-xl border border-slate-600 bg-slate-950 p-3 shadow-xl lg:p-4`}
+        >
           <p className="font-bold">Help improve Cosmoids</p>
           <p className="mt-2 text-sm text-slate-300">
             Allow optional gameplay analytics? We send level attempts, results,
@@ -140,21 +143,36 @@ export default function AnalyticsControls() {
               </button>
             </form>
           )}
-          {preference !== null && (
-            <button
-              className="mt-3 text-sm underline"
-              onClick={() => setOpen(false)}
-            >
-              Close
-            </button>
-          )}
+          <button
+            className={`${preference === null ? 'lg:hidden' : ''} mt-3 min-h-11 text-sm underline lg:min-h-0`}
+            onClick={() => setOpen(false)}
+          >
+            Close
+          </button>
         </div>
-      ) : (
+      )}
+      {!open && (
         <button
-          className="rounded bg-slate-950/90 px-3 py-2 text-xs text-slate-300 hover:text-white"
+          className={`${preference === null ? 'lg:hidden' : 'lg:flex'} flex h-11 w-11 items-center justify-center rounded-full border border-slate-600 bg-slate-950/90 text-xs text-slate-300 shadow-lg hover:text-white focus-visible:outline-2 focus-visible:outline-cyan-300 lg:h-auto lg:w-auto lg:rounded lg:border-0 lg:px-3 lg:py-2 lg:shadow-none`}
           onClick={() => setOpen(true)}
+          aria-expanded={false}
+          aria-controls="privacy-feedback-panel"
+          title="Privacy & feedback"
         >
-          Privacy &amp; feedback
+          <svg
+            className="h-5 w-5 lg:hidden"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 3 4 6v5c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-3Z" />
+            <path d="m9 12 2 2 4-4" />
+          </svg>
+          <span className="sr-only lg:not-sr-only">Privacy &amp; feedback</span>
         </button>
       )}
     </aside>
