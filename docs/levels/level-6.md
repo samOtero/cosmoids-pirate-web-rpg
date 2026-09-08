@@ -7,10 +7,10 @@
 - **Location:** Ironbell's Navy fortress, continuing directly from the commander's arrival at the end of Level 5. Exact battlefield layout remains open.
 - **Primary objective:** Defeat the officer's boss Cosmoid and prevent Tigrevel from being dragged back into captivity.
 - **Boss:** [Voltusk](../cosmoids/voltusk.md), a Steel/Electric walrus with approved name, visual design, and core lore.
-- **Supporting enemies:** Electric-type minions. Their specific mechanics remain under discussion.
+- **Supporting enemies:** [Poguin](../cosmoids/poguin.md), the selected Electric/Water penguin minion concept. Its rockhopper jumping is part of the intended direction; specific mechanics remain under discussion.
 - **Midbattle escalation:** At approximately half boss health, combat pauses while the officer forces a Cursed Relic onto his partner, triggering a stronger Cursed Aura phase.
 - **Story resolution:** Tigrevel is freed; Mari and Tigrevel join the crew. Mari becomes the navigator, and the enlarged crew agrees that it needs a bigger boat.
-- **Status:** Direction approved; Voltusk's concept, approved normal-form transparent assets, species registration, and directional visuals are complete. Minion designs, cursed-phase visuals, battle implementation, dialogue, and encounter balance remain to be developed. Level 6 is still a locked runtime placeholder.
+- **Status:** Direction approved; Voltusk's concept, approved normal-form transparent assets, species registration, and directional visuals are complete. Poguin's name and visual concept were selected September 7, 2026. Minion production assets, cursed-phase visuals, battle implementation, dialogue, and encounter balance remain to be developed. Level 6 is still a locked runtime placeholder.
 
 ## Continuity and Officer Direction
 
@@ -42,7 +42,9 @@ This progresses from Level 5's stationary gate objective. The player must balanc
 
 ## Electric Minions — Mechanics Undecided
 
-Electric typing and participation in the officer's recapture effort are confirmed. Species, number of roles, wave composition, and detailed behaviors are not yet approved.
+Electric typing and participation in the officer's recapture effort are confirmed. Poguin is the selected Electric/Water penguin species, with the existing concept-9 appearance preserved and rockhopper jumping added as a movement inspiration. Number of roles, wave composition, and detailed behaviors are not yet approved.
+
+The [Poguin concept record](../cosmoids/poguin.md) preserves the September 7, 2026 direction. A proposed hop-hop-stomp rhythm could provide a visible windup, electrical splash, and coordinated hauling beat; Voltusk's cursed-phase surges could accelerate that rhythm. These remain mechanics candidates, not approved timing, attack, or balance specifications.
 
 The previous brainstorm explored the following possibilities, which remain candidates rather than requirements:
 
@@ -86,7 +88,7 @@ The introduction, cursed intermission, and victory/departure are separate story 
 
 - Choose the final level title and officer name.
 - Develop Voltusk's cursed-phase visual treatment while preserving its approved normal-form identity.
-- Develop the Electric minion species, identities, and art.
+- Create Poguin's production assets while preserving its selected concept; decide whether additional Electric minion species or roles are needed.
 - Decide minion mechanics and the cursed phase's electrical interaction.
 - Explore whether bell- or gong-like calls contribute to the encounter; their use remains optional and outside the core species description.
 - Define the net's route, hauling and recovery rules, recapture endpoint, and battlefield layout.

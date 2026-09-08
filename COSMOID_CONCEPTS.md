@@ -6,6 +6,16 @@ Last consolidated: September 4, 2026
 
 ## Developed Concepts
 
+### Poguin — The Hopping Penguin Cosmoid
+
+- **Typing:** Electric/Water
+- **Name concept:** Pogo + penguin, pronounced "POH-gwin".
+- **Core concept:** An exuberant rockhopper-inspired penguin whose oversized webbed feet turn rhythmic hops and stamps into charged splashes and coordinated movement.
+- **Visual identity:** Selected penguin concept 9, with its existing appearance preserved: slender charcoal-and-cream body, sweeping golden eyebrow plumes, and enormous green webbed feet.
+- **Story placement:** Selected supporting enemy direction for Level 6's Ironbell officer confrontation. Jumping is part of the intended direction; hop-hop-stomp timing, hauling effects, and Voltusk interactions remain proposals.
+- **Status:** Final name selected and concept documented September 7, 2026. Production assets and gameplay integration remain pending.
+- **Dedicated record and concept art:** [`docs/cosmoids/poguin.md`](./docs/cosmoids/poguin.md)
+
 ### Palmit — The Castaway Cosmoid
 
 - **Core concept:** A freshwater crab that uses a coconut as a boat to protect itself from salt water while traveling across the ocean.
