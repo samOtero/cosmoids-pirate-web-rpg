@@ -283,6 +283,33 @@ export const VOLTUSK: CosmoidTemplate = {
   ],
 };
 
+export const POGUIN: CosmoidTemplate = {
+  id: 'poguin',
+  name: 'Poguin',
+  type: ElementType.ELECTRIC,
+  secondaryType: ElementType.WATER,
+  baseStats: {
+    hp: 58,
+    attack: 52,
+    defense: 48,
+    specialAttack: 78,
+    specialDefense: 62,
+    speed: 76,
+  },
+  baseExperience: 76,
+  iconImg: '/UI/Icons/poguin_icon.png',
+  journalEntry:
+    'It drums its oversized feet across rain-slick stone until nearby Poguin fall into step. A final stomp scatters a charged splash in every direction.',
+  spriteUrl: '/battles/cosmoids/poguin_down.png',
+  battleSpriteUrl: '/battles/cosmoids/poguin_left.png',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'TACKLE' },
+    { level: 4, attackId: 'WATER_GUN' },
+    { level: 7, attackId: 'SPARK' },
+  ],
+};
+
 export const BRAMFRIT: CosmoidTemplate = {
   id: 'bramfrit',
   name: 'Bramfrit',
@@ -746,6 +773,7 @@ export const COSMOID_TEMPLATES: Record<string, CosmoidTemplate> = {
   [RESONARION.id]: RESONARION,
   [TIGREVEL.id]: TIGREVEL,
   [VOLTUSK.id]: VOLTUSK,
+  [POGUIN.id]: POGUIN,
   [BRAMFRIT.id]: BRAMFRIT,
   [SEPIPPET.id]: SEPIPPET,
   [PARLET.id]: PARLET,

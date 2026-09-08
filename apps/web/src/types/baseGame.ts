@@ -16,6 +16,7 @@ export enum TDLevelContext {
   VANE_LEVEL_3 = 'VANE_LEVEL_3',
   LEVEL_4 = 'LEVEL_4',
   LEVEL_5 = 'LEVEL_5',
+  LEVEL_6 = 'LEVEL_6',
   CHALLENGE_FIRST_LEVEL = 'CHALLENGE_FIRST_LEVEL',
   CHALLENGE_FIRST_LEVEL_NO_CAPTURE = 'CHALLENGE_FIRST_LEVEL_NO_CAPTURE',
 }
@@ -96,6 +97,7 @@ export enum SpeakerImageKey {
   MARIBEL_ANGRY_DEFENSIVE = 'Maribel_Angry_Defensive',
   MARIBEL_RELIEVED_HAPPY = 'Maribel_Relieved_Happy',
   TIGREVEL = 'Tigrevel',
+  VOLTUSK_WARNING = 'Voltusk_Warning',
   NAVY_GUARD_ALERT = 'Navy_Guard_Alert',
   NAVY_COMMANDER_NEUTRAL = 'Navy_Commander_Neutral',
   CAPTAIN_VANE_HAUGHTY_NEUTRAL = 'Captain_Vane_Haughty_Neutral',
@@ -141,6 +143,10 @@ export enum BackgroundImageKey {
   LEVEL_5_TIGREVEL_CELL = 'Level_5_Tigrevel_Cell',
   LEVEL_5_TIGREVEL_FREED = 'Level_5_Tigrevel_Freed',
   LEVEL_5_TIGREVEL_PROTECTS_KIDS = 'Level_5_Tigrevel_Protects_Kids',
+  LEVEL_6_NET_THROW = 'Level_6_Net_Throw',
+  LEVEL_6_TIGREVEL_NETTED = 'Level_6_Tigrevel_Netted',
+  LEVEL_6_TIGREVEL_CLAIMS_BOAT = 'Level_6_Tigrevel_Claims_Boat',
+  LEVEL_6_CRAMPED_CREW_DEPARTURE = 'Level_6_Cramped_Crew_Departure',
   DEFAULT = 'default',
 }
 
@@ -427,6 +433,8 @@ export enum DialogContext {
   LEVEL_5_INTRO = 'LEVEL_5_INTRO',
   LEVEL_5_WIN = 'LEVEL_5_WIN',
   LEVEL_5_LOSE = 'LEVEL_5_LOSE',
+  LEVEL_6_INTRO = 'LEVEL_6_INTRO',
+  LEVEL_6_WIN = 'LEVEL_6_WIN',
   STARTER_BATTLE_LOSE = 'STARTER_BATTLE_LOSE',
   NEW_PLAYER_WELCOME_DIALOG_PART_2 = 'NEW_PLAYER_WELCOME_DIALOG_PART_2',
   GAME_INTRO_AFTER_STARTER = 'GAME_INTRO_AFTER_STARTER',

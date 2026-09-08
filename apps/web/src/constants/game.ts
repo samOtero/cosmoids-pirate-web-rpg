@@ -77,6 +77,7 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
   [SpeakerImageKey.MARIBEL_RELIEVED_HAPPY]:
     '/dialog/maribel_relieved_happy.png',
   [SpeakerImageKey.TIGREVEL]: '/UI/Icons/tigrevel_icon.png',
+  [SpeakerImageKey.VOLTUSK_WARNING]: '/dialog/voltusk_warning.png',
   [SpeakerImageKey.NAVY_GUARD_ALERT]: '/dialog/navy_guard_alert.png',
   [SpeakerImageKey.NAVY_COMMANDER_NEUTRAL]:
     '/dialog/navy_commander_neutral.png',
@@ -141,5 +142,12 @@ export const BACKGROUND_IMAGES: Record<BackgroundImageKey, string> = {
     '/bg_level_5_tigrevel_freed.png',
   [BackgroundImageKey.LEVEL_5_TIGREVEL_PROTECTS_KIDS]:
     '/bg_level_5_tigrevel_protects_kids.png',
+  [BackgroundImageKey.LEVEL_6_NET_THROW]: '/bg_level_6_net_throw.png',
+  [BackgroundImageKey.LEVEL_6_TIGREVEL_NETTED]:
+    '/bg_level_6_tigrevel_netted.png',
+  [BackgroundImageKey.LEVEL_6_TIGREVEL_CLAIMS_BOAT]:
+    '/bg_level_6_tigrevel_claims_boat.png',
+  [BackgroundImageKey.LEVEL_6_CRAMPED_CREW_DEPARTURE]:
+    '/bg_level_6_cramped_crew_departure.png',
   [BackgroundImageKey.DEFAULT]: '/bg_caleb_house_1.png',
 };

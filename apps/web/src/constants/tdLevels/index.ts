@@ -8,6 +8,7 @@ import { FIRST_LEVEL } from './firstLevel';
 import { FOREST_LEVEL } from './forestLevel';
 import { LEVEL_4 } from './level4';
 import { LEVEL_5 } from './level5';
+import { LEVEL_6 } from './level6';
 import { VANE_LEVEL } from './vaneLevel';
 import {
   CHALLENGE_FIRST_LEVEL,
@@ -210,6 +211,31 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
       },
     ],
   },
+  [TDLevelContext.LEVEL_6]: {
+    levelData: LEVEL_6,
+    introEvents: [
+      {
+        type: 'SHOW_DIALOG',
+        payload: {
+          context: DialogContext.LEVEL_6_INTRO,
+        },
+      },
+    ],
+    winEvents: [
+      {
+        type: 'SHOW_DIALOG',
+        payload: { context: DialogContext.LEVEL_6_WIN },
+      },
+      {
+        type: 'GO_TO_LEVEL_SELECT',
+      },
+    ],
+    loseEvents: [
+      {
+        type: 'GO_TO_LEVEL_SELECT',
+      },
+    ],
+  },
   [TDLevelContext.CHALLENGE_FIRST_LEVEL]: {
     levelData: CHALLENGE_FIRST_LEVEL,
     winEvents: [
@@ -279,9 +305,9 @@ export const LEVEL_ORDER: LevelInfo[] = [
     requiredProgression: StoryProgression.DEFEAT_LEVEL_4,
   },
   {
-    context: 'LOCKED_6' as TDLevelContext,
-    name: 'Coming soon',
-    description: 'More story adventures are on the way.',
+    context: TDLevelContext.LEVEL_6,
+    name: 'Officer Confrontation (WIP)',
+    description: 'Stop the Navy from dragging Tigrevel back into captivity.',
     requiredProgression: StoryProgression.DEFEAT_LEVEL_5,
   },
 ];

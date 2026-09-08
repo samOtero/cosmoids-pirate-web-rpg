@@ -1,6 +1,6 @@
 # Poguin
 
-> Concept and final name recorded September 7, 2026. The user selected penguin concept 9, approved its existing appearance without changes, and chose Poguin as its final name. Production assets and Level 6 implementation remain pending.
+> Concept and final name recorded September 7, 2026. The user selected penguin concept 9, approved its existing appearance without changes, and chose Poguin as its final name. Production assets were completed September 8, 2026; Level 6 implementation remains pending.
 
 ![Poguin concept art](./images/poguin-concept.png)
 
@@ -81,14 +81,14 @@ Do not infer approved attack IDs, damage, movement speed, invulnerability during
 - **Standalone source:** `exec-63f1a6d6-2ae6-4b0f-ac92-2019ebd357dc.png`.
 - **Concept-art file:** `docs/cosmoids/images/poguin-concept.png`, copied unchanged from the standalone source.
 - **Image generation:** Built-in imagegen; standalone extraction/enlargement used the selected ensemble as its visual reference.
-- **Production status:** No icon, directional battle sprites, creature manifest, registry entry, attacks, or gameplay integration created in this concept phase.
+- **Production assets:** `apps/web/public/UI/Icons/poguin_icon.png`, `apps/web/public/battles/cosmoids/poguin_left.png`, `poguin_down.png`, and `poguin_up.png`.
+- **Production status:** Icon, directional battle sprites, creature manifest, species registry entry, reused attacks, and tower-defense visuals completed September 8, 2026. Story-level placement and bespoke gameplay behavior remain pending.
 
 ## Open Decisions
 
 - Finalize the species description, habitat, physical size, and ecology beyond the selected character and movement ideas.
 - Decide whether Poguin is a single-stage species or has an evolutionary family; none is approved.
-- Create and validate production icon and directional assets after the user accepts the production handoff.
 - Decide whether hopping is a movement presentation, an attack, a terrain interaction, or a combination, and define its readable counters.
 - Resolve group synchronization, hauling effects, interactions with Voltusk, wave composition, and balance in Level 6.
-- Decide capture availability, stats, learnable attacks, and progression.
+- Decide capture availability and progression.
 - Develop journal art separately through the journal-art workflow when requested.
