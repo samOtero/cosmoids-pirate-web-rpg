@@ -4,13 +4,13 @@
 
 ## Level Summary
 
-- **Location:** A flooded undercroft in Ironbell's Navy fortress, continuing directly from the commander's arrival at the end of Level 5. The first playable layout has two lanes connecting the same prison gate to Tigrevel's defense point.
+- **Location:** A dry stone undercroft in Ironbell's Navy fortress, continuing directly from the commander's arrival at the end of Level 5. The first playable layout has an upper Poguin lane, a central Tigrevel extraction track, and a lower Poguin lane.
 - **Primary objective:** Defeat the officer's boss Cosmoid and prevent Tigrevel from being dragged back into captivity.
 - **Boss:** [Voltusk](../cosmoids/voltusk.md), a Steel/Electric walrus with approved name, visual design, and core lore.
 - **Supporting enemies:** [Poguin](../cosmoids/poguin.md), the selected Electric/Water penguin minion concept. Its rockhopper jumping is part of the intended direction; specific mechanics remain under discussion.
 - **Midbattle escalation:** At approximately half boss health, combat pauses while the officer forces a Cursed Relic onto his partner, triggering a stronger Cursed Aura phase.
 - **Story resolution:** Tigrevel is freed; Mari and Tigrevel join the crew. Mari becomes the navigator, and the enlarged crew agrees that it needs a bigger boat.
-- **Status:** Direction approved; Voltusk's concept, approved normal-form transparent assets, species registration, and directional visuals are complete. Poguin's concept, transparent production assets, species registration, and directional visuals are also complete. A first playable two-lane battlefield slice, its ten-panel illustrated opening dialogue, and its nine-panel victory dialogue were added September 8, 2026. The two lanes currently use ordinary capture-unit movement; Poguin lane hopping and stacked hauling, allied damage, Mari's healing role, the cursed phase, story intermissions, final encounter mechanics, and balance remain to be developed.
+- **Status:** Direction approved; Voltusk's concept, approved normal-form transparent assets, species registration, and directional visuals are complete. Poguin's concept, transparent production assets, species registration, and directional visuals are also complete. A first playable three-corridor battlefield slice, its illustrated opening dialogue, and its victory dialogue were added September 8, 2026. Voltusk now remains on the north platform and bombards occupied combat placements with dodgeable electric orbs. Poguin lane hopping and stacked hauling, Mari's healing role, the cursed phase, story intermissions, final encounter mechanics, and balance remain to be developed.
 
 ## Continuity and Officer Direction
 
@@ -36,7 +36,7 @@ Bell- or gong-like calls remain an optional source of Level 6 mechanics, rather 
 
 The officer throws a steel net over Tigrevel as Navy equipment; the net is not produced by the boss or part of its anatomy. The officer sends his boss and supporting Cosmoids to drag Tigrevel back toward the prison. Tigrevel struggles against the restraint and remains visibly present as the creature the player is protecting. The playable placeholder uses a dedicated transparent netted-Tigrevel capture-unit graphic in every objective state, including while an enemy carries it.
 
-Tigrevel is a moving objective: reaching the recapture endpoint causes defeat. Defeating the boss breaks its control of the net, frees Tigrevel, and wins the encounter. The first playable battlefield uses upper and lower lanes that leave the same prison gate and reunite at Tigrevel, so every carrier pulls toward one recapture destination. The exact stacked-hauling rules and presentation of recapture progress remain to be designed.
+Tigrevel is a moving objective: reaching the recapture endpoint causes defeat. Defeating the boss breaks its control of the net, frees Tigrevel, and wins the encounter. The first playable battlefield keeps Tigrevel on an unobstructed central extraction track while Poguin haul from parallel upper and lower lanes. A carrier's progress along either Poguin lane is synchronized to Tigrevel's progress along the center track, preserving one leftward recapture direction. The exact stacked-hauling rules and presentation of recapture progress remain to be designed.
 
 This progresses from Level 5's stationary gate objective. The player must balance damaging the boss against stopping the recapture effort, rather than simply repeat the previous level's gate destruction. The relationship between enemy pressure and Tigrevel's movement should be readable at a glance.
 
@@ -44,7 +44,7 @@ This progresses from Level 5's stationary gate objective. The player must balanc
 
 Electric typing and participation in the officer's recapture effort are confirmed. Poguin is the selected Electric/Water penguin species, with the existing concept-9 appearance preserved and rockhopper jumping added as a movement inspiration. Number of roles, wave composition, and detailed behaviors are not yet approved.
 
-The battlefield direction now uses two lanes with the same origin and destination. Poguin will eventually be able to hop between marked points on those lanes, but the first playable slice deliberately keeps them on their authored lane. Groups on either lane currently reach Tigrevel and reverse toward the same prison gate. Future work will add lane switching and a stacking bonus that makes larger hauling groups pull faster.
+The battlefield direction now uses three dry, parallel corridors: Poguin travel along the upper and lower lanes, and Tigrevel moves along the wider middle track. Poguin will eventually be able to hop between marked points on their two lanes, but the first playable slice deliberately keeps them on their authored lane. Voltusk remains stationary on a raised platform above the upper lane with three dedicated combat placements. He periodically marks an occupied combat spot and launches an electric orb at that fixed location; the tower avoids damage if the player moves it before impact, while any tower occupying the marked location when the orb lands takes damage. Mari occupies a sheltered recovery position below the lower lane with three safe healing placements that Voltusk will not select. Future work will add Mari's actual healing behavior, lane switching, and a stacking bonus that makes larger hauling groups pull faster.
 
 The [Poguin concept record](../cosmoids/poguin.md) preserves the September 7, 2026 direction. A proposed hop-hop-stomp rhythm could provide a visible windup, electrical splash, and coordinated hauling beat; Voltusk's cursed-phase surges could accelerate that rhythm. These remain mechanics candidates, not approved timing, attack, or balance specifications.
 
@@ -99,7 +99,7 @@ Two dedicated victory backgrounds support the departure. `bg_level_6_tigrevel_cl
 - Integrate Poguin's approved production assets when its gameplay role is finalized; decide whether additional Electric minion species or roles are needed.
 - Decide minion mechanics and the cursed phase's electrical interaction.
 - Explore whether bell- or gong-like calls contribute to the encounter; their use remains optional and outside the core species description.
-- Develop stacked hauling, lane-switch decisions, marked hop points, and Tigrevel recovery rules on the implemented two-lane battlefield.
+- Develop stacked hauling, lane-switch decisions, marked hop points, and Tigrevel recovery rules on the implemented three-corridor battlefield.
 - Tune Voltusk's initial movement, Body Rush and Spark attacks, and stats for the boss encounter; specify wave composition and balance.
 - Define precise threshold handling and pause/resume behavior for the one-time intermission.
 - Decide how Tigrevel's voluntary, uncaptured companionship appears in the roster and later battles.

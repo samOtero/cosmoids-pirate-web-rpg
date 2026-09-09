@@ -27,6 +27,13 @@ export type EnemyAbilityDefinition =
       speedIncreasePerActivation: number;
       maxSpeedMultiplier: number;
       retreatSpeedMultiplier: number;
+    })
+  | (EnemyAbilityDefinitionBase & {
+      type: 'TOWER_GROUND_ORB';
+      cooldownMs: number;
+      projectileTravelMs: number;
+      maxHpDamageFraction: number;
+      impactRadius: number;
     });
 
 /**
@@ -66,5 +73,15 @@ export const ENEMY_ABILITY_DEFS: Record<string, EnemyAbilityDefinition> = {
     maxSpeedMultiplier: 30,
     retreatSpeedMultiplier: 0.1,
     visualEffectConfigId: 'enemy_sonarion_howl_1',
+  },
+  VOLTUSK_ELECTRIC_ORB: {
+    id: 'VOLTUSK_ELECTRIC_ORB',
+    type: 'TOWER_GROUND_ORB',
+    initialCooldownMs: 2500,
+    cooldownMs: 4500,
+    projectileTravelMs: 1400,
+    maxHpDamageFraction: 0.25,
+    impactRadius: 4,
+    visualEffectConfigId: 'attack_spark_launch_1',
   },
 };

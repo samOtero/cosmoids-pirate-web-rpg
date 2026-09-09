@@ -39,6 +39,9 @@ export function prepareTDLevelDraftForSave(
   );
   savedLevel.environmentUnits?.forEach((unit) => roundPoint(unit.position));
   savedLevel.waveEnemyDefinitions.forEach((definition) => {
+    if (definition.stationaryPosition) {
+      roundPoint(definition.stationaryPosition);
+    }
     const structure = definition.structure;
     if (!structure) return;
     if (structure.position) roundPoint(structure.position);
@@ -100,10 +103,29 @@ export function validateTDLevelDraft(
   levelData.placementSpots.forEach((point, index) =>
     validatePoint(point, `Placement spot ${index + 1}`, errors)
   );
+  levelData.safePlacementSpotIndices?.forEach((spotIndex) => {
+    if (
+      !Number.isInteger(spotIndex) ||
+      spotIndex < 0 ||
+      spotIndex >= levelData.placementSpots.length
+    ) {
+      errors.push('A safe placement spot references an invalid placement.');
+    }
+  });
   levelData.captureUnits?.forEach((unit, index) => {
     validatePoint(unit.position, `Capture unit ${index + 1}`, errors);
     if (!unit.tdConfigId.trim()) {
       errors.push(`Capture unit ${index + 1} needs a TD config ID.`);
+    }
+    if (
+      unit.haulPathIndex !== undefined &&
+      (!Number.isInteger(unit.haulPathIndex) ||
+        unit.haulPathIndex < 0 ||
+        unit.haulPathIndex >= levelData.paths.length)
+    ) {
+      errors.push(
+        `Capture unit ${index + 1} hauling behavior references an invalid path.`
+      );
     }
     if (unit.returnHome) {
       if (
@@ -167,6 +189,13 @@ export function validateTDLevelDraft(
   const enemyDefinitionIds = new Set<string>();
   levelData.waveEnemyDefinitions.forEach((definition, definitionIndex) => {
     const definitionLabel = `Enemy definition ${definitionIndex + 1}`;
+    if (definition.stationaryPosition) {
+      validatePoint(
+        definition.stationaryPosition,
+        `${definitionLabel} stationary position`,
+        errors
+      );
+    }
     if (!definition.id.trim()) {
       errors.push(`${definitionLabel} needs an ID.`);
     } else if (enemyDefinitionIds.has(definition.id)) {

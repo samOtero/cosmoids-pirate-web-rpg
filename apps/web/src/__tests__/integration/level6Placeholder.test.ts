@@ -67,22 +67,37 @@ describe('Level 6 playable placeholder', () => {
     engine.destroy();
   });
 
-  it('routes both lanes from one prison gate to the same Tigrevel position', () => {
-    expect(LEVEL_6.paths).toHaveLength(2);
+  it('gives Poguin two lanes and Tigrevel a separate center track', () => {
+    expect(LEVEL_6.paths).toHaveLength(3);
 
-    const [upperLane, lowerLane] = LEVEL_6.paths;
-    const upperStart = upperLane[0];
-    const lowerStart = lowerLane[0];
-    const upperEnd = upperLane.at(-1);
-    const lowerEnd = lowerLane.at(-1);
-
-    expect(upperStart).toEqual(lowerStart);
-    expect(upperEnd).toEqual(lowerEnd);
-    expect(LEVEL_6.captureUnits?.[0].position).toEqual(upperEnd);
-    expect(Math.min(...upperLane.map((point) => point.y))).toBeLessThan(30);
-    expect(Math.max(...lowerLane.map((point) => point.y))).toBeGreaterThan(60);
+    const [upperLane, tigrevelTrack, lowerLane] = LEVEL_6.paths;
+    expect(tigrevelTrack.every((point) => point.y === 50)).toBe(true);
+    expect(LEVEL_6.captureUnits?.[0]).toMatchObject({
+      position: tigrevelTrack.at(-1),
+      haulPathIndex: 1,
+    });
+    expect(Math.max(...upperLane.map((point) => point.y))).toBeLessThan(50);
+    expect(Math.min(...lowerLane.map((point) => point.y))).toBeGreaterThan(50);
+    expect(
+      LEVEL_6.waves.flatMap((wave) =>
+        wave.groups
+          .filter((group) => group.enemyDefinitionId === 'level_6_poguin')
+          .map((group) => group.pathIndex)
+      )
+    ).toEqual([0, 2, 2]);
+    expect(
+      LEVEL_6.waveEnemyDefinitions.find(
+        (definition) => definition.id === 'level_6_voltusk'
+      )
+    ).toMatchObject({
+      stationaryPosition: { x: 50, y: 12 },
+      abilityId: 'VOLTUSK_ELECTRIC_ORB',
+    });
+    expect(LEVEL_6.placementSpots.filter((spot) => spot.y < 30)).toHaveLength(3);
+    expect(LEVEL_6.placementSpots.filter((spot) => spot.y > 70)).toHaveLength(3);
+    expect(LEVEL_6.safePlacementSpotIndices).toEqual([3, 4, 5]);
     expect(LEVEL_6.backgroundUrl).toBe(
-      '/battles/bg/bg_level_6_two_lane_draft.png'
+      '/battles/bg/bg_level_6_three_lane_draft_v3.png'
     );
   });
 

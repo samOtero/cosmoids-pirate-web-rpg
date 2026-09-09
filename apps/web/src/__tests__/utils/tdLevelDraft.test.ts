@@ -294,6 +294,7 @@ describe('TD level drafts', () => {
         {
           tdConfigId: 'map_1',
           position: { x: 100, y: 50 },
+          haulPathIndex: 3,
           returnHome: { pathIndex: 2, speed: 0, delayMs: -1 },
         },
       ],
@@ -302,6 +303,7 @@ describe('TD level drafts', () => {
     };
 
     expect(validateTDLevelDraft(level)).toEqual([
+      'Capture unit 1 hauling behavior references an invalid path.',
       'Capture unit 1 return-home behavior references an invalid path.',
       'Capture unit 1 return-home speed must be greater than 0.',
       'Capture unit 1 return-home delay cannot be negative.',
@@ -438,6 +440,22 @@ describe('TD level drafts', () => {
 
     expect(validateTDLevelDraft(level)).toContain(
       'Enemy definition 1 goal damage must be a positive integer.'
+    );
+  });
+
+  it('rejects safe placement references outside the placement list', () => {
+    const level = createEmptyTDLevelDraft();
+    level.paths = [
+      [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+      ],
+    ];
+    level.placementSpots = [{ x: 25, y: 20 }];
+    level.safePlacementSpotIndices = [1];
+
+    expect(validateTDLevelDraft(level)).toContain(
+      'A safe placement spot references an invalid placement.'
     );
   });
 

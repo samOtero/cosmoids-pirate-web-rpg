@@ -60,6 +60,8 @@ export interface TDWaveEnemyDefinition {
   /** Creature-backed enemies use a registered Cosmoid definition. */
   creatureId?: string;
   level: number;
+  /** Optional fixed spawn point for a stationary creature encounter. */
+  stationaryPosition?: Point;
   speedMultiplier?: number;
   /** Whether this enemy can pick up a capture objective. Defaults to true. */
   canCarryCaptureUnits?: boolean;
@@ -283,6 +285,11 @@ export interface CaptureUnitDefinition {
   position: Point;
   /** Multiplies an enemy's final movement speed while it carries this unit. */
   carrierSpeedMultiplier?: number;
+  /**
+   * Optional path used by the objective while a carrier moves along a separate
+   * flanking lane. Both paths are synchronized by normalized path progress.
+   */
+  haulPathIndex?: number;
   returnHome?: CaptureUnitReturnHomeConfig;
   waveRelocations?: CaptureUnitWaveRelocation[];
 }
@@ -292,6 +299,7 @@ export interface CaptureUnit extends BaseTDUnit {
   heldByEnemyId?: string;
   homePosition: Point;
   carrierSpeedMultiplier?: number;
+  haulPathIndex?: number;
   returnHome?: CaptureUnitReturnHomeConfig;
   returnHomeAvailableAtMs?: number;
   waveRelocations?: CaptureUnitWaveRelocation[];
@@ -301,6 +309,8 @@ export interface CaptureUnit extends BaseTDUnit {
 export interface TDLevelData {
   paths: Point[][];
   placementSpots: Point[];
+  /** Placement spots excluded from enemy tower-targeting mechanics. */
+  safePlacementSpotIndices?: number[];
   waveEnemyDefinitions: TDWaveEnemyDefinition[];
   waves: TDWave[];
   /** Repeat the final wave's creature groups indefinitely after authored waves. */
@@ -545,6 +555,19 @@ export interface ObjectiveAllyAcidShot {
   launchedAtMs: number;
   impactAtMs: number;
   expiresAtMs: number;
+  impactedAtMs?: number;
+}
+
+export interface EnemyGroundOrb {
+  id: string;
+  sourceEnemyId: string;
+  sourcePosition: Point;
+  targetPosition: Point;
+  launchedAtMs: number;
+  impactAtMs: number;
+  expiresAtMs: number;
+  maxHpDamageFraction: number;
+  impactRadius: number;
   impactedAtMs?: number;
 }
 

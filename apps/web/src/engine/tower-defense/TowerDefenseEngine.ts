@@ -28,6 +28,7 @@ import {
   ObjectiveAllyShadow,
   ObjectiveAllyCurrent,
   ObjectiveAllyAcidShot,
+  EnemyGroundOrb,
   DestroyedStructureVisual,
 } from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
@@ -119,6 +120,14 @@ function getPathSegmentLength(
 ): number {
   const safeAspectRatio = Math.max(aspectRatio, Number.EPSILON);
   return Math.hypot(end.x - start.x, (end.y - start.y) / safeAspectRatio);
+}
+
+function getPathLength(path: Point[], aspectRatio: number): number {
+  let length = 0;
+  for (let index = 1; index < path.length; index++) {
+    length += getPathSegmentLength(path[index - 1], path[index], aspectRatio);
+  }
+  return length;
 }
 
 function projectPointOntoPath(
@@ -262,6 +271,7 @@ export class TowerDefenseEngine {
   public objectiveAllyShadows: ObjectiveAllyShadow[] = [];
   public objectiveAllyCurrents: ObjectiveAllyCurrent[] = [];
   public objectiveAllyAcidShots: ObjectiveAllyAcidShot[] = [];
+  public enemyGroundOrbs: EnemyGroundOrb[] = [];
   public destroyedStructureVisuals: DestroyedStructureVisual[] = [];
   public focusedStructureId: string | null = null;
 
@@ -329,6 +339,7 @@ export class TowerDefenseEngine {
   public paths: { x: number; y: number }[][] = [];
   public authoredPaths: { x: number; y: number }[][] = [];
   public placementSpots: { x: number; y: number }[] = [];
+  public safePlacementSpotIndices = new Set<number>();
   public environmentUnits: import('./types').EnvironmentUnit[] = [];
   public captureUnits: CaptureUnit[] = [];
   public hasCaptureUnitsGoal: boolean = false;
@@ -360,6 +371,9 @@ export class TowerDefenseEngine {
       path.map((point) => ({ ...point }))
     );
     this.placementSpots = levelData.placementSpots || [];
+    this.safePlacementSpotIndices = new Set(
+      levelData.safePlacementSpotIndices ?? []
+    );
     this.waveEnemyDefinitions = Object.fromEntries(
       (levelData.waveEnemyDefinitions ?? []).map((definition) => [
         definition.id,
@@ -427,6 +441,7 @@ export class TowerDefenseEngine {
         position: { x: cu.position.x, y: cu.position.y },
         homePosition: { x: cu.position.x, y: cu.position.y },
         carrierSpeedMultiplier: cu.carrierSpeedMultiplier,
+        haulPathIndex: cu.haulPathIndex,
         returnHome: cu.returnHome ? { ...cu.returnHome } : undefined,
         waveRelocations: cu.waveRelocations?.map((relocation) => ({
           ...relocation,
@@ -839,9 +854,10 @@ export class TowerDefenseEngine {
             continue;
           }
 
-          const dx = enemy.position.x - cu.position.x;
+          const pickupPosition = this.getCapturePickupPosition(cu, enemy);
+          const dx = enemy.position.x - pickupPosition.x;
           // Apply aspect ratio properly to dy since screen isn't perfectly square
-          const dy = (enemy.position.y - cu.position.y) * this.aspectRatio;
+          const dy = (enemy.position.y - pickupPosition.y) * this.aspectRatio;
           const distSq = dx * dx + dy * dy;
 
           // Expand pickup radius generously because the new snapped orthogonal paths
@@ -869,8 +885,7 @@ export class TowerDefenseEngine {
         // 2. Update position of held items to match their carrier
         const carrier = newEnemies.find((e) => e.id === cu.heldByEnemyId);
         if (carrier) {
-          cu.position.x = carrier.position.x;
-          cu.position.y = carrier.position.y;
+          this.syncCaptureUnitToCarrier(cu, carrier);
           cu.returnHomeAvailableAtMs = undefined;
         }
       }
@@ -932,6 +947,8 @@ export class TowerDefenseEngine {
         }
       }
     });
+
+    this.processEnemyGroundOrbs();
 
     // Update projectiles
     const timeScale = deltaMs / 16.666;
@@ -1774,13 +1791,16 @@ export class TowerDefenseEngine {
       level: enemyLevel,
       position: structure?.position
         ? { ...structure.position }
-        : { x: startPath[0].x, y: startPath[0].y },
+        : waveEnemyDefinition.stationaryPosition
+          ? { ...waveEnemyDefinition.stationaryPosition }
+          : { x: startPath[0].x, y: startPath[0].y },
       hp: enemyHp,
       maxHp: enemyHp,
-      speed: structure
-        ? 0
-        : (meta!.baseCreature.speed / 100) *
-          (waveEnemyDefinition.speedMultiplier ?? 1),
+      speed:
+        structure || waveEnemyDefinition.stationaryPosition
+          ? 0
+          : (meta!.baseCreature.speed / 100) *
+            (waveEnemyDefinition.speedMultiplier ?? 1),
       currentAttack: enemyAttack,
       currentSpecialAttack: enemySpecialAttack,
       currentDefense: enemyDefense,
@@ -1840,6 +1860,51 @@ export class TowerDefenseEngine {
 
     const ability = ENEMY_ABILITY_DEFS[runtime.definitionId];
     if (!ability) return false;
+
+    if (ability.type === 'TOWER_GROUND_ORB') {
+      const targets = this.towers.filter(
+        (tower) =>
+          tower.hp > 0 &&
+          !tower.isFixed &&
+          !this.isTowerOnSafePlacementSpot(tower)
+      );
+      if (targets.length === 0) return false;
+
+      const target = targets[Math.floor(Math.random() * targets.length)];
+      const dx = target.position.x - enemy.position.x;
+      const dy = target.position.y - enemy.position.y;
+      enemy.facingDirection =
+        Math.abs(dx * this.aspectRatio) >= Math.abs(dy)
+          ? dx >= 0
+            ? 'right'
+            : 'left'
+          : dy >= 0
+            ? 'down'
+            : 'up';
+
+      runtime.nextReadyTimeMs = this.elapsedTimeMs + ability.cooldownMs;
+      this.enemyGroundOrbs.push({
+        id: `enemy_orb_${enemy.id}_${this.elapsedTimeMs}`,
+        sourceEnemyId: enemy.id,
+        sourcePosition: { ...enemy.position },
+        targetPosition: { ...target.position },
+        launchedAtMs: this.elapsedTimeMs,
+        impactAtMs: this.elapsedTimeMs + ability.projectileTravelMs,
+        expiresAtMs: this.elapsedTimeMs + ability.projectileTravelMs + 450,
+        maxHpDamageFraction: ability.maxHpDamageFraction,
+        impactRadius: ability.impactRadius,
+      });
+      this.visualEffects.push({
+        id: `vfx_enemy_orb_launch_${enemy.id}_${this.elapsedTimeMs}`,
+        configId: ability.visualEffectConfigId,
+        position: { ...enemy.position },
+        durationMs: 220,
+        elapsedMs: 0,
+        targetId: enemy.id,
+        facingDirection: enemy.facingDirection,
+      });
+      return true;
+    }
 
     if (ability.type === 'PROXIMITY_HOWL_SPEED_STACK') {
       if ((runtime.activationCount ?? 0) === 0) {
@@ -1969,6 +2034,72 @@ export class TowerDefenseEngine {
     return true;
   }
 
+  private isTowerOnSafePlacementSpot(tower: Tower): boolean {
+    for (const spotIndex of this.safePlacementSpotIndices) {
+      const spot = this.placementSpots[spotIndex];
+      if (
+        spot &&
+        Math.abs(spot.x - tower.position.x) < 0.001 &&
+        Math.abs(spot.y - tower.position.y) < 0.001
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private processEnemyGroundOrbs(): void {
+    for (const orb of this.enemyGroundOrbs) {
+      if (
+        orb.impactedAtMs !== undefined ||
+        this.elapsedTimeMs < orb.impactAtMs
+      ) {
+        continue;
+      }
+
+      orb.impactedAtMs = this.elapsedTimeMs;
+      const impactedTower = this.towers.find(
+        (tower) =>
+          tower.hp > 0 &&
+          this.getPositionDistanceSq(tower.position, orb.targetPosition) <=
+            orb.impactRadius * orb.impactRadius
+      );
+
+      if (!impactedTower) {
+        this.floatingTexts.push({
+          id: `ft_orb_dodged_${orb.id}`,
+          text: 'DODGED!',
+          position: { ...orb.targetPosition },
+          color: 0x93c5fd,
+          scale: 0.85,
+          durationMs: 800,
+          elapsedMs: 0,
+        });
+        continue;
+      }
+
+      const damage = Math.min(
+        impactedTower.hp,
+        Math.max(1, Math.floor(impactedTower.maxHp * orb.maxHpDamageFraction))
+      );
+      impactedTower.hp -= damage;
+      startDamageFlash(impactedTower, ElementType.ELECTRIC);
+      this.floatingTexts.push({
+        id: `ft_orb_damage_${orb.id}`,
+        text: damage.toString(),
+        position: { ...impactedTower.position },
+        color: 0xfde047,
+        scale: 1.1,
+        durationMs: 1000,
+        elapsedMs: 0,
+      });
+    }
+
+    this.enemyGroundOrbs = this.enemyGroundOrbs.filter(
+      (orb) => this.elapsedTimeMs < orb.expiresAtMs
+    );
+  }
+
   /** Activates an enemy's configured ability immediately, ignoring cooldowns. */
   public triggerEnemyAbility(enemyId: string): boolean {
     const enemy = this.enemies.find((candidate) => candidate.id === enemyId);
@@ -2087,12 +2218,92 @@ export class TowerDefenseEngine {
 
     droppedUnit.heldByEnemyId = undefined;
     if (droppedUnit.returnHome) {
-      droppedUnit.returnHome.pathIndex = enemy.pathIndex;
+      droppedUnit.returnHome.pathIndex =
+        droppedUnit.haulPathIndex ?? enemy.pathIndex;
     }
     droppedUnit.returnHomeAvailableAtMs =
       this.elapsedTimeMs + (droppedUnit.returnHome?.delayMs ?? 0);
     enemy.heldCaptureUnitId = undefined;
     return droppedUnit;
+  }
+
+  private getCapturePickupPosition(
+    captureUnit: CaptureUnit,
+    enemy: Enemy
+  ): Point {
+    if (captureUnit.haulPathIndex === undefined) {
+      return captureUnit.position;
+    }
+
+    const haulPath = this.paths[captureUnit.haulPathIndex];
+    const enemyPath = this.paths[enemy.pathIndex];
+    const haulProjection = haulPath
+      ? projectPointOntoPath(captureUnit.position, haulPath, this.aspectRatio)
+      : undefined;
+    const haulLength = haulPath ? getPathLength(haulPath, this.aspectRatio) : 0;
+    const enemyPathLength = enemyPath
+      ? getPathLength(enemyPath, this.aspectRatio)
+      : 0;
+    if (!haulProjection || haulLength <= 0 || enemyPathLength <= 0) {
+      return captureUnit.position;
+    }
+
+    const normalizedProgress = Math.max(
+      0,
+      Math.min(1, haulProjection.progress / haulLength)
+    );
+    return getPointAtPathProgress(
+      enemyPath,
+      normalizedProgress * enemyPathLength,
+      this.aspectRatio
+    );
+  }
+
+  private syncCaptureUnitToCarrier(
+    captureUnit: CaptureUnit,
+    carrier: Enemy
+  ): void {
+    if (captureUnit.haulPathIndex === undefined) {
+      captureUnit.position = { ...carrier.position };
+      return;
+    }
+
+    const carrierPath = this.paths[carrier.pathIndex];
+    const haulPath = this.paths[captureUnit.haulPathIndex];
+    const carrierProjection = carrierPath
+      ? projectPointOntoPath(carrier.position, carrierPath, this.aspectRatio)
+      : undefined;
+    const carrierPathLength = carrierPath
+      ? getPathLength(carrierPath, this.aspectRatio)
+      : 0;
+    const haulPathLength = haulPath
+      ? getPathLength(haulPath, this.aspectRatio)
+      : 0;
+    if (!carrierProjection || carrierPathLength <= 0 || haulPathLength <= 0) {
+      captureUnit.position = { ...carrier.position };
+      return;
+    }
+
+    const normalizedProgress = Math.max(
+      0,
+      Math.min(1, carrierProjection.progress / carrierPathLength)
+    );
+    const previousPosition = { ...captureUnit.position };
+    captureUnit.position = getPointAtPathProgress(
+      haulPath,
+      normalizedProgress * haulPathLength,
+      this.aspectRatio
+    );
+
+    const dx = captureUnit.position.x - previousPosition.x;
+    const dy = captureUnit.position.y - previousPosition.y;
+    if (Math.abs(dx * this.aspectRatio) >= Math.abs(dy)) {
+      if (Math.abs(dx) > 0.0001) {
+        captureUnit.facingDirection = dx > 0 ? 'right' : 'left';
+      }
+    } else if (Math.abs(dy) > 0.0001) {
+      captureUnit.facingDirection = dy > 0 ? 'down' : 'up';
+    }
   }
 
   private shouldWaitForCaptureUnitRelocation(): boolean {

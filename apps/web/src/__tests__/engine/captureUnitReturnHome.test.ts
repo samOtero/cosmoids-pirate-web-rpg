@@ -170,4 +170,55 @@ describe('returning capture objectives', () => {
     expect(objective.heldByEnemyId).toBe(adult.id);
     engine.destroy();
   });
+
+  it('synchronizes a capture objective to a separate hauling path', () => {
+    const level = createLevel();
+    level.paths = [
+      [
+        { x: 0, y: 0 },
+        { x: 10, y: 0 },
+        { x: 20, y: 0 },
+      ],
+      [
+        { x: 0, y: 50 },
+        { x: 10, y: 50 },
+        { x: 20, y: 50 },
+      ],
+      [
+        { x: 0, y: 100 },
+        { x: 10, y: 100 },
+        { x: 20, y: 100 },
+      ],
+    ];
+    level.captureUnits = [
+      {
+        tdConfigId: 'map_1',
+        position: { x: 20, y: 50 },
+        haulPathIndex: 1,
+        returnHome: { pathIndex: 1, speed: 10 },
+      },
+    ];
+
+    const engine = new TowerDefenseEngine(level);
+    const objective = engine.captureUnits[0];
+    const carrier = createCarrier('');
+    carrier.heldCaptureUnitId = undefined;
+    carrier.position = { x: 19, y: 0 };
+    carrier.currentWaypointIndex = 2;
+    engine.enemies = [carrier];
+
+    engine.tick(100, 0);
+
+    expect(carrier.heldCaptureUnitId).toBe(objective.id);
+    expect(objective.heldByEnemyId).toBe(carrier.id);
+
+    carrier.position = { x: 10, y: 0 };
+    engine.tick(200, 0);
+
+    expect(objective.position).toEqual({ x: 10, y: 50 });
+    expect(objective.facingDirection).toBe('left');
+    expect(engine.dropCaptureUnit(carrier)).toBe(objective);
+    expect(objective.returnHome?.pathIndex).toBe(1);
+    engine.destroy();
+  });
 });

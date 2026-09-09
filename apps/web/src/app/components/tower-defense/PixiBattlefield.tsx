@@ -2296,6 +2296,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         const acidVolleyGraphics = new PIXI.Graphics();
         acidVolleyGraphics.eventMode = 'none';
         app.stage.addChild(acidVolleyGraphics);
+        const enemyGroundOrbGraphics = new PIXI.Graphics();
+        enemyGroundOrbGraphics.eventMode = 'none';
+        app.stage.addChild(enemyGroundOrbGraphics);
 
         // Full (unscrolled) background dimensions — used to derive scroll limits
         let fullBgHeight = 0;
@@ -2751,6 +2754,116 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           }
           app.stage.setChildIndex(
             acidVolleyGraphics,
+            app.stage.children.length - 1
+          );
+
+          enemyGroundOrbGraphics.clear();
+          for (const orb of engine.enemyGroundOrbs) {
+            const sourceX = offsetX + (orb.sourcePosition.x / 100) * screenW;
+            const sourceY = offsetY + (orb.sourcePosition.y / 100) * screenH;
+            const targetX = offsetX + (orb.targetPosition.x / 100) * screenW;
+            const targetY = offsetY + (orb.targetPosition.y / 100) * screenH;
+            const warningRadius = Math.max(
+              20,
+              (orb.impactRadius / 100) * screenH
+            );
+
+            if (orb.impactedAtMs === undefined) {
+              const flightDuration = Math.max(
+                1,
+                orb.impactAtMs - orb.launchedAtMs
+              );
+              const progress = Math.max(
+                0,
+                Math.min(
+                  1,
+                  (engine.elapsedTimeMs - orb.launchedAtMs) / flightDuration
+                )
+              );
+              const pulse = 0.5 + Math.sin(engine.elapsedTimeMs / 90) * 0.5;
+              enemyGroundOrbGraphics.circle(
+                targetX,
+                targetY,
+                warningRadius * (0.92 + pulse * 0.08)
+              );
+              enemyGroundOrbGraphics.fill({
+                color: 0xfacc15,
+                alpha: 0.08 + pulse * 0.05,
+              });
+              enemyGroundOrbGraphics.circle(
+                targetX,
+                targetY,
+                warningRadius * (0.92 + pulse * 0.08)
+              );
+              enemyGroundOrbGraphics.stroke({
+                color: 0xfde047,
+                width: 3,
+                alpha: 0.72 + pulse * 0.2,
+              });
+
+              const x = sourceX + (targetX - sourceX) * progress;
+              const y =
+                sourceY +
+                (targetY - sourceY) * progress -
+                Math.sin(progress * Math.PI) * 38;
+              const previousProgress = Math.max(0, progress - 0.06);
+              const previousX =
+                sourceX + (targetX - sourceX) * previousProgress;
+              const previousY =
+                sourceY +
+                (targetY - sourceY) * previousProgress -
+                Math.sin(previousProgress * Math.PI) * 38;
+              enemyGroundOrbGraphics.moveTo(previousX, previousY);
+              enemyGroundOrbGraphics.lineTo(x, y);
+              enemyGroundOrbGraphics.stroke({
+                color: 0x60a5fa,
+                width: 8,
+                alpha: 0.32,
+              });
+              enemyGroundOrbGraphics.circle(x, y, 13 + pulse * 2);
+              enemyGroundOrbGraphics.fill({ color: 0x2563eb, alpha: 0.38 });
+              enemyGroundOrbGraphics.circle(x, y, 8 + pulse);
+              enemyGroundOrbGraphics.fill({ color: 0x60a5fa, alpha: 0.95 });
+              enemyGroundOrbGraphics.circle(x - 2, y - 2, 3.5);
+              enemyGroundOrbGraphics.fill({ color: 0xfef9c3, alpha: 0.95 });
+            } else {
+              const impactProgress = Math.min(
+                1,
+                (engine.elapsedTimeMs - orb.impactedAtMs) / 450
+              );
+              enemyGroundOrbGraphics.circle(
+                targetX,
+                targetY,
+                warningRadius * (0.7 + impactProgress * 1.4)
+              );
+              enemyGroundOrbGraphics.stroke({
+                color: 0x60a5fa,
+                width: 7 * (1 - impactProgress) + 1,
+                alpha: 0.95 * (1 - impactProgress),
+              });
+              for (let index = 0; index < 8; index++) {
+                const angle = (index / 8) * Math.PI * 2;
+                const innerDistance = warningRadius * 0.4;
+                const outerDistance =
+                  warningRadius * (0.8 + impactProgress * 1.3);
+                enemyGroundOrbGraphics.moveTo(
+                  targetX + Math.cos(angle) * innerDistance,
+                  targetY + Math.sin(angle) * innerDistance
+                );
+                enemyGroundOrbGraphics.lineTo(
+                  targetX + Math.cos(angle) * outerDistance,
+                  targetY + Math.sin(angle) * outerDistance
+                );
+                enemyGroundOrbGraphics.stroke({
+                  color: index % 2 === 0 ? 0xfde047 : 0x60a5fa,
+                  width: 4 * (1 - impactProgress) + 1,
+                  alpha: 0.85 * (1 - impactProgress),
+                });
+              }
+            }
+          }
+          app.stage.setChildIndex(
+            enemyGroundOrbGraphics,
             app.stage.children.length - 1
           );
 
