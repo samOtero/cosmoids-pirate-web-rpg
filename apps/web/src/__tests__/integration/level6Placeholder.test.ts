@@ -111,17 +111,17 @@ describe('Level 6 playable placeholder', () => {
         type: 'GO_TO_LEVEL_SELECT',
       },
     ]);
-    expect(LEVEL_6_WIN.sequence).toHaveLength(9);
+    expect(LEVEL_6_WIN.sequence).toHaveLength(11);
     expect(LEVEL_6_WIN.sequence[0].text).toContain(
       'My Voltusk—defeated?'
     );
-    expect(LEVEL_6_WIN.sequence[3].text).toContain(
+    expect(LEVEL_6_WIN.sequence[4].text).toContain(
       'walks straight past the doubloon'
     );
-    expect(LEVEL_6_WIN.sequence[7].text).toContain(
+    expect(LEVEL_6_WIN.sequence[8].text).toContain(
       'I think I have more.'
     );
-    expect(LEVEL_6_WIN.sequence[8]).toMatchObject({
+    expect(LEVEL_6_WIN.sequence[10]).toMatchObject({
       text: expect.stringContaining('We need a bigger boat.'),
       portraits: [
         expect.objectContaining({
@@ -132,10 +132,10 @@ describe('Level 6 playable placeholder', () => {
       backgroundImageKey: 'Level_6_Cramped_Crew_Departure',
     });
     expect(
-      LEVEL_6_WIN.sequence.slice(2, 7).map((line) => line.backgroundImageKey)
-    ).toEqual(Array(5).fill('Level_6_Tigrevel_Claims_Boat'));
+      LEVEL_6_WIN.sequence.slice(2, 9).map((line) => line.backgroundImageKey)
+    ).toEqual(Array(7).fill('Level_6_Tigrevel_Claims_Boat'));
     expect(
-      LEVEL_6_WIN.sequence.slice(7).map((line) => line.backgroundImageKey)
+      LEVEL_6_WIN.sequence.slice(9).map((line) => line.backgroundImageKey)
     ).toEqual(Array(2).fill('Level_6_Cramped_Crew_Departure'));
   });
 
