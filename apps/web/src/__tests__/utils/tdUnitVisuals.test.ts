@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Assets, Graphics, Sprite, Texture, TextureSource } from 'pixi.js';
-import { applyTDUnitTransforms } from '@/utils/tdUnitVisuals';
+import {
+  applyTDUnitTransforms,
+  getTDUnitGroundContactOffset,
+} from '@/utils/tdUnitVisuals';
 import type { BaseTDUnit } from '@/engine/tower-defense/types';
 import type { UnitVisuals } from '@/types/baseGame';
 
@@ -133,5 +136,32 @@ describe('unit sprite transitions', () => {
     pending.resolve(idle());
     await Promise.resolve();
     expect(redrawShadow).not.toHaveBeenCalled();
+  });
+});
+
+describe('unit ground contact', () => {
+  it('uses the active visual state shadow as the depth anchor', () => {
+    const unit: BaseTDUnit = {
+      id: 'caleb',
+      position: { x: 50, y: 50 },
+      facingDirection: 'left',
+      hp: 1,
+      maxHp: 1,
+    };
+
+    const walkingContact = getTDUnitGroundContactOffset(
+      unit,
+      'caleb_capture'
+    );
+    expect(walkingContact.x).toBe(0);
+    expect(walkingContact.y).toBeCloseTo(-9.4);
+
+    const idleContact = getTDUnitGroundContactOffset(
+      unit,
+      'caleb_capture',
+      'idle'
+    );
+    expect(idleContact.x).toBe(0);
+    expect(idleContact.y).toBeCloseTo(-11.6);
   });
 });

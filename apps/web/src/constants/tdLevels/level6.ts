@@ -13,61 +13,221 @@ import { TDLevelData } from '@/engine/tower-defense/types';
 export const LEVEL_6: TDLevelData = {
   paths: [
     [
-      { x: -1, y: 29 },
-      { x: 9, y: 29 },
-      { x: 20, y: 27 },
-      { x: 35, y: 27 },
-      { x: 50, y: 27 },
-      { x: 65, y: 27 },
-      { x: 78, y: 29 },
-      { x: 86, y: 34 },
-      { x: 89, y: 39 },
+      {
+        x: -1,
+        y: 43,
+      },
+      {
+        x: 9,
+        y: 43,
+      },
+      {
+        x: 20,
+        y: 43,
+      },
+      {
+        x: 35,
+        y: 43,
+      },
+      {
+        x: 50,
+        y: 43,
+      },
+      {
+        x: 65,
+        y: 43,
+      },
+      {
+        x: 78,
+        y: 43,
+      },
+      {
+        x: 86,
+        y: 43,
+      },
+      {
+        x: 89,
+        y: 43,
+      },
     ],
     [
-      { x: -1, y: 50 },
-      { x: 12, y: 50 },
-      { x: 28, y: 50 },
-      { x: 44, y: 50 },
-      { x: 60, y: 50 },
-      { x: 76, y: 50 },
-      { x: 89, y: 50 },
+      {
+        x: -1,
+        y: 46,
+      },
+      {
+        x: 12,
+        y: 46,
+      },
+      {
+        x: 28,
+        y: 46,
+      },
+      {
+        x: 44,
+        y: 46,
+      },
+      {
+        x: 60,
+        y: 46,
+      },
+      {
+        x: 76,
+        y: 46,
+      },
+      {
+        x: 89,
+        y: 46,
+      },
     ],
     [
-      { x: -1, y: 71 },
-      { x: 9, y: 71 },
-      { x: 20, y: 73 },
-      { x: 35, y: 73 },
-      { x: 50, y: 73 },
-      { x: 65, y: 73 },
-      { x: 78, y: 71 },
-      { x: 86, y: 66 },
-      { x: 89, y: 61 },
+      {
+        x: -1,
+        y: 49,
+      },
+      {
+        x: 9,
+        y: 49,
+      },
+      {
+        x: 20,
+        y: 49,
+      },
+      {
+        x: 35,
+        y: 49,
+      },
+      {
+        x: 50,
+        y: 49,
+      },
+      {
+        x: 65,
+        y: 49,
+      },
+      {
+        x: 78,
+        y: 49,
+      },
+      {
+        x: 86,
+        y: 49,
+      },
+      {
+        x: 89,
+        y: 49,
+      },
     ],
   ],
   placementSpots: [
-    // Voltusk combat positions on the upper platform.
-    { x: 28, y: 19 },
-    { x: 50, y: 20 },
-    { x: 72, y: 19 },
-    // Mari recovery positions in the lower alcove.
-    { x: 28, y: 81 },
-    { x: 50, y: 80 },
-    { x: 72, y: 81 },
+    {
+      x: 42.37,
+      y: 16.33,
+    },
+    {
+      x: 50,
+      y: 20,
+    },
+    {
+      x: 57.71,
+      y: 16.09,
+    },
+    {
+      x: 41.21,
+      y: 90.05,
+    },
+    {
+      x: 24.51,
+      y: 65.6,
+    },
+    {
+      x: 57.23,
+      y: 90.42,
+    },
+    {
+      x: 31.28,
+      y: 66.21,
+    },
+    {
+      x: 17.59,
+      y: 65.48,
+    },
+    {
+      x: 24.64,
+      y: 26.06,
+    },
+    {
+      x: 17.86,
+      y: 25.58,
+    },
+    {
+      x: 40.8,
+      y: 65.85,
+    },
+    {
+      x: 31.76,
+      y: 26.67,
+    },
+    {
+      x: 50.11,
+      y: 65.12,
+    },
+    {
+      x: 40.73,
+      y: 26.79,
+    },
+    {
+      x: 49.97,
+      y: 27.16,
+    },
+    {
+      x: 59.35,
+      y: 27.65,
+    },
+    {
+      x: 59.22,
+      y: 65.24,
+    },
+    {
+      x: 71.82,
+      y: 27.4,
+    },
+    {
+      x: 81.95,
+      y: 27.4,
+    },
+    {
+      x: 70.72,
+      y: 64.99,
+    },
+    {
+      x: 81.74,
+      y: 64.63,
+    },
   ],
   safePlacementSpotIndices: [3, 4, 5],
   environmentUnits: [
     {
-      position: { x: 44, y: 88 },
+      position: {
+        x: 26.22,
+        y: 78.74,
+      },
       tdConfigId: 'caleb_battle',
       facingDirection: 'up',
     },
     {
-      position: { x: 56, y: 88 },
+      position: {
+        x: 76.13,
+        y: 79.23,
+      },
       tdConfigId: 'kip_battle',
       facingDirection: 'up',
     },
     {
-      position: { x: 50, y: 88 },
+      position: {
+        x: 49.97,
+        y: 87.74,
+      },
       tdConfigId: 'maribel_capture',
       facingDirection: 'up',
     },
@@ -84,7 +244,10 @@ export const LEVEL_6: TDLevelData = {
         targetingMode: 'first',
         isShiny: false,
       },
-      position: { x: 82, y: 50 },
+      position: {
+        x: 82,
+        y: 46,
+      },
       facingDirection: 'left',
       isFixed: true,
       receivesExperience: false,
@@ -92,7 +255,10 @@ export const LEVEL_6: TDLevelData = {
   ],
   captureUnits: [
     {
-      position: { x: 89, y: 50 },
+      position: {
+        x: 89,
+        y: 46,
+      },
       tdConfigId: 'tigrevel_netted',
       haulPathIndex: 1,
       groupHauling: {
@@ -116,7 +282,10 @@ export const LEVEL_6: TDLevelData = {
       id: 'level_6_voltusk',
       creatureId: 'voltusk',
       level: 10,
-      stationaryPosition: { x: 50, y: 12 },
+      stationaryPosition: {
+        x: 50,
+        y: 12,
+      },
       abilityId: 'VOLTUSK_ELECTRIC_ORB',
       hpMultiplier: 4,
       weakenedThreshold: 0.5,
@@ -175,7 +344,7 @@ export const LEVEL_6: TDLevelData = {
   lives: 1,
   disableCapture: false,
   enemyHpMultiplier: 1,
-  backgroundUrl: '/battles/bg/bg_level_6_three_lane_draft_v3.png',
+  backgroundUrl: '/battles/bg/bg_level_6_three_lane_draft_v6.png',
   backgroundScale: 3,
   initialView: {
     offsetX: 50,

@@ -71,7 +71,7 @@ describe('Level 6 playable placeholder', () => {
     expect(LEVEL_6.paths).toHaveLength(3);
 
     const [upperLane, tigrevelTrack, lowerLane] = LEVEL_6.paths;
-    expect(tigrevelTrack.every((point) => point.y === 50)).toBe(true);
+    expect(tigrevelTrack.every((point) => point.y === 46)).toBe(true);
     expect(LEVEL_6.captureUnits?.[0]).toMatchObject({
       position: tigrevelTrack.at(-1),
       haulPathIndex: 1,
@@ -83,8 +83,9 @@ describe('Level 6 playable placeholder', () => {
         maxSpeedMultiplier: 0.92,
       },
     });
-    expect(Math.max(...upperLane.map((point) => point.y))).toBeLessThan(50);
-    expect(Math.min(...lowerLane.map((point) => point.y))).toBeGreaterThan(50);
+    expect(upperLane.every((point) => point.y === 43)).toBe(true);
+    expect(lowerLane.every((point) => point.y === 49)).toBe(true);
+    expect(lowerLane[0].y - upperLane[0].y).toBe(6);
     expect(
       LEVEL_6.waves.flatMap((wave) =>
         wave.groups
@@ -100,11 +101,33 @@ describe('Level 6 playable placeholder', () => {
       stationaryPosition: { x: 50, y: 12 },
       abilityId: 'VOLTUSK_ELECTRIC_ORB',
     });
-    expect(LEVEL_6.placementSpots.filter((spot) => spot.y < 30)).toHaveLength(3);
-    expect(LEVEL_6.placementSpots.filter((spot) => spot.y > 70)).toHaveLength(3);
     expect(LEVEL_6.safePlacementSpotIndices).toEqual([3, 4, 5]);
+
+    const engine = new TowerDefenseEngine(LEVEL_6);
+    const combatSpots = LEVEL_6.placementSpots.slice(0, 3);
+    const safeSpots = LEVEL_6.safePlacementSpotIndices.map(
+      (index) => LEVEL_6.placementSpots[index]
+    );
+    expect(combatSpots.every((spot) => spot.y < 30)).toBe(true);
+    expect(safeSpots).toHaveLength(3);
+    for (const spot of combatSpots) {
+      expect(
+        Math.min(
+          ...upperLane.map((point) => engine.getAttackDistance(spot, point))
+        )
+      ).toBeGreaterThan(40);
+    }
+    for (const spot of safeSpots) {
+      expect(
+        Math.min(
+          ...lowerLane.map((point) => engine.getAttackDistance(spot, point))
+        )
+      ).toBeGreaterThan(40);
+    }
+    engine.destroy();
+
     expect(LEVEL_6.backgroundUrl).toBe(
-      '/battles/bg/bg_level_6_three_lane_draft_v3.png'
+      '/battles/bg/bg_level_6_three_lane_draft_v6.png'
     );
     expect(LEVEL_6.backgroundScale).toBe(3);
     expect(LEVEL_6.initialView).toEqual({

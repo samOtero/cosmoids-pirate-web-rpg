@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
-import { UnitVisuals } from '@/types/baseGame';
+import { UnitSpriteConfig, UnitVisuals } from '@/types/baseGame';
 import { BaseTDUnit } from '@/engine/tower-defense/types';
 
 const colorChannel = (color: number, shift: number) =>
@@ -15,6 +15,34 @@ const spriteVisualStates = new WeakMap<
   }
 >();
 
+function resolveTDUnitSpriteConfig(
+  unit: BaseTDUnit,
+  configId: string,
+  visualState?: keyof UnitVisuals
+): UnitSpriteConfig {
+  const tdConfigMap: UnitVisuals = CREATURE_TD_CONFIGS[configId] || {
+    default: { scale: 1 },
+  };
+  return (
+    tdConfigMap[visualState ?? unit.facingDirection] || tdConfigMap.default
+  );
+}
+
+/** Local-space point where this unit visually meets the battlefield. */
+export function getTDUnitGroundContactOffset(
+  unit: BaseTDUnit,
+  configId: string,
+  visualState?: keyof UnitVisuals
+) {
+  const tdConfig = resolveTDUnitSpriteConfig(unit, configId, visualState);
+  const baseScale = tdConfig.scale ?? 1;
+  const shadowOffsetX = tdConfig.shadowOffsetX ?? 0;
+  return {
+    x: (tdConfig.flipX ? -1 : 1) * shadowOffsetX,
+    y: 30 * baseScale + (tdConfig.shadowOffsetY ?? 0),
+  };
+}
+
 export function applyTDUnitTransforms(
   unit: BaseTDUnit,
   sprite: PIXI.Sprite,
@@ -24,11 +52,7 @@ export function applyTDUnitTransforms(
   onImageLoaded?: (texture: PIXI.Texture) => void,
   visualState?: keyof UnitVisuals
 ) {
-  const tdConfigMap: UnitVisuals = CREATURE_TD_CONFIGS[configId] || {
-    default: { scale: 1 },
-  };
-  const tdConfig =
-    tdConfigMap[visualState ?? unit.facingDirection] || tdConfigMap.default;
+  const tdConfig = resolveTDUnitSpriteConfig(unit, configId, visualState);
 
   const applyLayout = () => {
     const baseScale = tdConfig.scale ?? 1;

@@ -18,6 +18,7 @@ import {
   DestroyedStructureVisual,
   Enemy,
   ObjectiveAlly,
+  Point,
   TDInitialView,
   TDOpeningPan,
   TDStructureSpriteLayout,
@@ -27,9 +28,13 @@ import {
   resolveTDInitialView,
   resolveTDOpeningPanView,
 } from '@/utils/tdInitialView';
-import { applyTDUnitTransforms } from '@/utils/tdUnitVisuals';
+import {
+  applyTDUnitTransforms,
+  getTDUnitGroundContactOffset,
+} from '@/utils/tdUnitVisuals';
 import { getCaptureUnitVisualState } from '@/utils/captureUnitVisualState';
 import { getTDRangePreviewRadius } from '@/utils/tdAttackRangePreview';
+import { calculateTDWorldDepth } from '@/utils/tdDepthSorting';
 import { buildTDOffscreenIndicators } from '@/utils/tdOffscreenIndicators';
 import {
   PRISON_GATE_TEXTURES,
@@ -67,6 +72,26 @@ import {
 } from '@/engine/tower-defense/speedModifiers';
 
 export const WEAKENED_THRESHOLD = 0.9;
+
+const CARRIED_WORLD_DEPTH_OFFSET = 0.01;
+const DRAGGED_WORLD_DEPTH = 1_000_000_000;
+
+function getContainerWorldDepth(
+  container: PIXI.Container,
+  localGroundContact: Point = { x: 0, y: 0 }
+) {
+  return calculateTDWorldDepth(
+    container.x + localGroundContact.x * container.scale.x,
+    container.y + localGroundContact.y * container.scale.y
+  );
+}
+
+function updateContainerWorldDepth(
+  container: PIXI.Container,
+  localGroundContact: Point = { x: 0, y: 0 }
+) {
+  container.zIndex = getContainerWorldDepth(container, localGroundContact);
+}
 
 export function isUnitWeakened(
   unit: Pick<BaseTDUnit, 'hp' | 'maxHp' | 'isShiny' | 'weakenedThreshold'>
@@ -2280,6 +2305,28 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
         containerRef.current!.appendChild(app.canvas);
 
+        // Keep broad render concerns in stable layers. Objects within each layer
+        // still use their existing insertion order for now; depth sorting is a
+        // separate concern that can be added without reshuffling the stage.
+        const backgroundLayer = new PIXI.Container();
+        backgroundLayer.label = 'backgroundLayer';
+        const groundFxLayer = new PIXI.Container();
+        groundFxLayer.label = 'groundFxLayer';
+        const worldLayer = new PIXI.Container();
+        worldLayer.label = 'worldLayer';
+        worldLayer.sortableChildren = true;
+        const airFxLayer = new PIXI.Container();
+        airFxLayer.label = 'airFxLayer';
+        const hudLayer = new PIXI.Container();
+        hudLayer.label = 'hudLayer';
+        app.stage.addChild(
+          backgroundLayer,
+          groundFxLayer,
+          worldLayer,
+          airFxLayer,
+          hudLayer
+        );
+
         // Add background
         const bgUrl = backgroundUrl || '/battles/bg/bg_dock_battle_td.png';
         const scale = backgroundScale > 1 ? backgroundScale : 1;
@@ -2289,19 +2336,19 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         if (isDestroyed) return;
 
         const bgSprite = PIXI.Sprite.from(bgUrl);
-        app.stage.addChild(bgSprite);
+        backgroundLayer.addChild(bgSprite);
         const mosaicCurrentGraphics = new PIXI.Graphics();
         mosaicCurrentGraphics.eventMode = 'none';
         bgSprite.addChild(mosaicCurrentGraphics);
         const acidVolleyGraphics = new PIXI.Graphics();
         acidVolleyGraphics.eventMode = 'none';
-        app.stage.addChild(acidVolleyGraphics);
+        airFxLayer.addChild(acidVolleyGraphics);
         const enemyGroundOrbGraphics = new PIXI.Graphics();
         enemyGroundOrbGraphics.eventMode = 'none';
-        app.stage.addChild(enemyGroundOrbGraphics);
+        airFxLayer.addChild(enemyGroundOrbGraphics);
         const captureHaulRopeGraphics = new PIXI.Graphics();
         captureHaulRopeGraphics.eventMode = 'none';
-        app.stage.addChild(captureHaulRopeGraphics);
+        airFxLayer.addChild(captureHaulRopeGraphics);
 
         // Full (unscrolled) background dimensions — used to derive scroll limits
         let fullBgHeight = 0;
@@ -2755,9 +2802,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               }
             }
           }
-          app.stage.setChildIndex(
+          airFxLayer.setChildIndex(
             acidVolleyGraphics,
-            app.stage.children.length - 1
+            airFxLayer.children.length - 1
           );
 
           enemyGroundOrbGraphics.clear();
@@ -2865,9 +2912,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               }
             }
           }
-          app.stage.setChildIndex(
+          airFxLayer.setChildIndex(
             enemyGroundOrbGraphics,
-            app.stage.children.length - 1
+            airFxLayer.children.length - 1
           );
 
           const externalDragState = getDragStateRef.current
@@ -2886,7 +2933,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           );
           for (const [id, sprite] of environmentUnitSprites.entries()) {
             if (!currentEnvUnitIds.has(id)) {
-              app.stage.removeChild(sprite);
+              worldLayer.removeChild(sprite);
               sprite.destroy({ children: true });
               environmentUnitSprites.delete(id);
             }
@@ -2907,8 +2954,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               sprite.anchor.set(0.5);
               container.addChildAt(sprite, 1);
 
-              app.stage.addChild(container);
-              app.stage.setChildIndex(container, 1); // just above background
+              worldLayer.addChild(container);
 
               environmentUnitSprites.set(envUnit.id, container);
             }
@@ -2947,6 +2993,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               envUnit.tdConfigId,
               true /* hideWhenFull */
             );
+            updateContainerWorldDepth(
+              container,
+              getTDUnitGroundContactOffset(envUnit, envUnit.tdConfigId)
+            );
           }
 
           // --- Render objective allies (captives and released helpers) ---
@@ -2955,7 +3005,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           );
           for (const [id, container] of objectiveAllySprites) {
             if (!currentObjectiveAllyIds.has(id)) {
-              app.stage.removeChild(container);
+              worldLayer.removeChild(container);
               container.destroy({ children: true });
               objectiveAllySprites.delete(id);
             }
@@ -2984,7 +3034,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               action.label = 'objectiveAllyAction';
               container.addChild(action);
 
-              app.stage.addChild(container);
+              worldLayer.addChild(container);
               objectiveAllySprites.set(ally.id, container);
             }
 
@@ -3008,6 +3058,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               }
             );
             updateObjectiveAllyVisual(container, ally, engine.elapsedTimeMs);
+            updateContainerWorldDepth(
+              container,
+              getTDUnitGroundContactOffset(ally, ally.tdConfigId)
+            );
           }
 
           // Sepippet's projections are temporary, untargetable allied attackers.
@@ -3016,7 +3070,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           );
           for (const [id, container] of objectiveAllyShadowSprites) {
             if (!currentObjectiveAllyShadowIds.has(id)) {
-              app.stage.removeChild(container);
+              worldLayer.removeChild(container);
               container.destroy({ children: true });
               objectiveAllyShadowSprites.delete(id);
             }
@@ -3045,7 +3099,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               action.label = 'projectionAction';
               container.addChild(action);
 
-              app.stage.addChild(container);
+              worldLayer.addChild(container);
               objectiveAllyShadowSprites.set(projection.id, container);
             }
 
@@ -3110,6 +3164,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               action.circle(targetX, targetY, 10);
               action.stroke({ color: 0xc4b5fd, width: 3, alpha: 0.8 });
             }
+            updateContainerWorldDepth(
+              container,
+              getTDUnitGroundContactOffset(projection, projection.tdConfigId)
+            );
           }
 
           // Persistent rubble is separate from dead targetable structures.
@@ -3120,7 +3178,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           );
           for (const [id, container] of destroyedStructureSprites) {
             if (!currentRemnantIds.has(id)) {
-              app.stage.removeChild(container);
+              worldLayer.removeChild(container);
               container.destroy({ children: true });
               destroyedStructureSprites.delete(id);
             }
@@ -3134,7 +3192,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               const sprite = new PIXI.Sprite() as UrlTrackedSprite;
               sprite.label = 'destroyedPrisonGate';
               container.addChild(sprite);
-              app.stage.addChild(container);
+              worldLayer.addChild(container);
               destroyedStructureSprites.set(remnant.id, container);
             }
             container.x = offsetX + (remnant.position.x / 100) * screenW;
@@ -3145,6 +3203,13 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               'destroyedPrisonGate'
             ) as UrlTrackedSprite;
             updateDestroyedPrisonGate(sprite, remnant, engine.elapsedTimeMs);
+            const rubbleLayout = resolvePrisonGateVisualLayout(
+              remnant.visualLayout
+            ).rubble;
+            updateContainerWorldDepth(container, {
+              x: rubbleLayout.offsetX,
+              y: rubbleLayout.offsetY + rubbleLayout.height / 2,
+            });
           }
 
           captureHaulRopeGraphics.clear();
@@ -3204,7 +3269,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               }
             }
           }
-          app.stage.setChildIndex(captureHaulRopeGraphics, 1);
+          airFxLayer.setChildIndex(captureHaulRopeGraphics, 0);
 
           // --- Render Capture Units ---
           const currentCaptureUnitIds = new Set(
@@ -3212,7 +3277,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           );
           for (const [id, sprite] of captureUnitSprites.entries()) {
             if (!currentCaptureUnitIds.has(id)) {
-              app.stage.removeChild(sprite);
+              worldLayer.removeChild(sprite);
               sprite.destroy({ children: true });
               captureUnitSprites.delete(id);
             }
@@ -3233,8 +3298,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               sprite.anchor.set(0.5);
               container.addChildAt(sprite, 1);
 
-              app.stage.addChild(container);
-              app.stage.setChildIndex(container, 1); // just above background
+              worldLayer.addChild(container);
 
               captureUnitSprites.set(capUnit.id, container);
             }
@@ -3256,7 +3320,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
             // Make it render above the enemy if held (enemy might be index 1 or so, we'll just push to top)
             if (capUnit.heldByEnemyId) {
-              app.stage.setChildIndex(container, app.stage.children.length - 1);
+              worldLayer.setChildIndex(container, worldLayer.children.length - 1);
             }
 
             const sprite = container.getChildByLabel('cap_sprite') as
@@ -3265,6 +3329,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             const shadow = container.getChildByLabel('shadow') as
               | PIXI.Graphics
               | undefined;
+            const captureVisualState = getCaptureUnitVisualState(
+              capUnit,
+              engine.elapsedTimeMs
+            );
 
             if (sprite && shadow) {
               // Hide shadow if held
@@ -3280,7 +3348,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 (t) => {
                   if (!isDestroyed) sprite.texture = t;
                 },
-                getCaptureUnitVisualState(capUnit, engine.elapsedTimeMs)
+                captureVisualState
               );
             }
             renderHealthBar(
@@ -3289,6 +3357,40 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               capUnit.tdConfigId,
               true /* hideWhenFull */
             );
+
+            const isIndividuallyCarried =
+              Boolean(capUnit.heldByEnemyId) && !capUnit.groupHauling;
+            const carrier = isIndividuallyCarried
+              ? engine.enemies.find(
+                  (enemy) => enemy.id === capUnit.heldByEnemyId
+                )
+              : undefined;
+            if (carrier && carrier.kind !== 'structure') {
+              const carrierGroundContact = getTDUnitGroundContactOffset(
+                carrier,
+                carrier.tdConfigId ?? carrier.definitionId
+              );
+              const carrierX =
+                offsetX +
+                (carrier.position.x / 100) * screenW +
+                carrierGroundContact.x * finalScale;
+              const carrierY =
+                offsetY +
+                (carrier.position.y / 100) * screenH +
+                carrierGroundContact.y * finalScale;
+              container.zIndex =
+                calculateTDWorldDepth(carrierX, carrierY) +
+                CARRIED_WORLD_DEPTH_OFFSET;
+            } else {
+              updateContainerWorldDepth(
+                container,
+                getTDUnitGroundContactOffset(
+                  capUnit,
+                  capUnit.tdConfigId,
+                  captureVisualState
+                )
+              );
+            }
           }
 
           // --- Render Towers ---
@@ -3297,7 +3399,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           );
           for (const [key, sprite] of towerSprites.entries()) {
             if (!currentTowerKeys.has(key)) {
-              app.stage.removeChild(sprite);
+              worldLayer.removeChild(sprite);
               sprite.destroy({ children: true });
               towerSprites.delete(key);
             }
@@ -3316,9 +3418,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                   draggingNode = newContainer;
                   draggingTowerCreatureId = tower.creature.id;
                   newContainer.cursor = 'grabbing';
-                  app.stage.setChildIndex(
+                  newContainer.zIndex = DRAGGED_WORLD_DEPTH;
+                  worldLayer.setChildIndex(
                     newContainer,
-                    app.stage.children.length - 1
+                    worldLayer.children.length - 1
                   );
                   if (onDragStateChangeRef.current) {
                     onDragStateChangeRef.current(true);
@@ -3342,7 +3445,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               rangeCircle.label = 'rangeCircle';
               container.addChild(rangeCircle);
 
-              app.stage.addChild(container);
+              worldLayer.addChild(container);
               towerSprites.set(cacheKey, container);
             }
             const responsiveScale = app.screen.height / TD_BASE_HEIGHT;
@@ -3467,6 +3570,17 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             } else {
               container.alpha = 1;
             }
+            if (draggingTowerCreatureId === tower.creature.id) {
+              container.zIndex = DRAGGED_WORLD_DEPTH;
+            } else {
+              updateContainerWorldDepth(
+                container,
+                getTDUnitGroundContactOffset(
+                  tower,
+                  tower.creature.speciesId
+                )
+              );
+            }
           }
 
           // --- Render Placement Spots & Capture Hover ---
@@ -3475,18 +3589,21 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           resonantEvolutionGraphics.clear();
 
           if (!resonantEvolutionGraphics.parent) {
-            app.stage.addChildAt(
+            groundFxLayer.addChildAt(
               resonantEvolutionGraphics,
-              Math.min(1, app.stage.children.length)
+              Math.min(1, groundFxLayer.children.length)
             );
           }
 
-          app.stage.addChild(spotGraphics); // Ensure it's on the stage
-          app.stage.addChild(invalidSpotGraphics);
-          app.stage.setChildIndex(spotGraphics, app.stage.children.length - 2);
-          app.stage.setChildIndex(
+          groundFxLayer.addChild(spotGraphics); // Ensure ground interactions stay together
+          groundFxLayer.addChild(invalidSpotGraphics);
+          groundFxLayer.setChildIndex(
+            spotGraphics,
+            groundFxLayer.children.length - 2
+          );
+          groundFxLayer.setChildIndex(
             invalidSpotGraphics,
-            app.stage.children.length - 1
+            groundFxLayer.children.length - 1
           );
 
           let isHoveringValidSpot = false;
@@ -3710,7 +3827,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           const currentEnemyIds = new Set(engine.enemies.map((e) => e.id));
           for (const [id, sprite] of enemySprites.entries()) {
             if (!currentEnemyIds.has(id)) {
-              app.stage.removeChild(sprite);
+              worldLayer.removeChild(sprite);
               sprite.destroy({ children: true });
               enemySprites.delete(id);
             }
@@ -3759,7 +3876,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               esprite.anchor.set(0.5);
               container.addChildAt(esprite, 1);
 
-              app.stage.addChild(container);
+              worldLayer.addChild(container);
               enemySprites.set(enemy.id, container);
             }
             container.x = offsetX + (enemy.position.x / 100) * screenW;
@@ -3877,6 +3994,27 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 );
               }
             }
+
+            if (
+              enemy.kind === 'structure' &&
+              enemy.structureVisualStyle === 'prison-gate'
+            ) {
+              const standingLayout = resolvePrisonGateVisualLayout(
+                enemy.structureVisualLayout
+              ).standing;
+              updateContainerWorldDepth(container, {
+                x: standingLayout.offsetX,
+                y: standingLayout.offsetY + standingLayout.height / 2,
+              });
+            } else {
+              updateContainerWorldDepth(
+                container,
+                getTDUnitGroundContactOffset(
+                  enemy,
+                  enemy.tdConfigId ?? enemy.definitionId
+                )
+              );
+            }
           }
 
           // --- Render clustered off-screen enemy indicators ---
@@ -3899,7 +4037,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           );
           for (const [id, container] of offscreenEnemyIndicatorSprites) {
             if (!currentIndicatorIds.has(id)) {
-              app.stage.removeChild(container);
+              hudLayer.removeChild(container);
               container.destroy({ children: true });
               offscreenEnemyIndicatorSprites.delete(id);
             }
@@ -3914,7 +4052,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               graphics.label = 'indicator_graphics';
               container.addChild(graphics);
 
-              app.stage.addChild(container);
+              hudLayer.addChild(container);
               offscreenEnemyIndicatorSprites.set(indicator.id, container);
             }
 
@@ -3948,14 +4086,14 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
             container.x = indicator.x;
             container.y = indicator.y;
-            app.stage.setChildIndex(container, app.stage.children.length - 1);
+            hudLayer.setChildIndex(container, hudLayer.children.length - 1);
           }
 
           // --- Render Projectiles ---
           const currentProjIds = new Set(engine.projectiles.map((p) => p.id));
           for (const [id, container] of projectileSprites.entries()) {
             if (!currentProjIds.has(id)) {
-              app.stage.removeChild(container);
+              airFxLayer.removeChild(container);
               container.destroy({ children: true });
               projectileSprites.delete(id);
             }
@@ -4073,7 +4211,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 container.addChild(g);
               }
 
-              app.stage.addChild(container);
+              airFxLayer.addChild(container);
               projectileSprites.set(proj.id, container);
             }
 
@@ -4234,7 +4372,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           const currentVfxIds = new Set(engine.visualEffects.map((v) => v.id));
           for (const [id, container] of vfxSprites.entries()) {
             if (!currentVfxIds.has(id)) {
-              app.stage.removeChild(container);
+              airFxLayer.removeChild(container);
               container.destroy({ children: true });
               vfxSprites.delete(id);
             }
@@ -4335,7 +4473,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 sprite.mask = mask;
               }
 
-              app.stage.addChild(container);
+              airFxLayer.addChild(container);
               vfxSprites.set(vfx.id, container);
             }
 
@@ -4569,7 +4707,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           const currentFtIds = new Set(engine.floatingTexts.map((ft) => ft.id));
           for (const [id, textObj] of floatingTextSprites.entries()) {
             if (!currentFtIds.has(id)) {
-              app.stage.removeChild(textObj);
+              hudLayer.removeChild(textObj);
               textObj.destroy();
               floatingTextSprites.delete(id);
             }
@@ -4588,10 +4726,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 },
               });
               textObj.anchor.set(0.5);
-              app.stage.addChild(textObj);
+              hudLayer.addChild(textObj);
 
               // Render on top
-              app.stage.setChildIndex(textObj, app.stage.children.length - 1);
+              hudLayer.setChildIndex(textObj, hudLayer.children.length - 1);
 
               floatingTextSprites.set(ft.id, textObj);
             }
