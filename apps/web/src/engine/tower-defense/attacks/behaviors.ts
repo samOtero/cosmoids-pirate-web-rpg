@@ -329,7 +329,13 @@ export const InstantAoeBehavior: AttackBehavior = {
       const carriedUnit = engine.captureUnits.find(
         (unit) => unit.id === enemy.heldCaptureUnitId
       );
-      if (!carriedUnit || carriedUnit.heldByEnemyId !== enemy.id) return;
+      if (
+        !carriedUnit ||
+        (carriedUnit.heldByEnemyId !== enemy.id &&
+          !carriedUnit.groupHauling)
+      ) {
+        return;
+      }
 
       engine.dropCaptureUnit(enemy);
       enemy.hasBeenWindDisarmed = true;

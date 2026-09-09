@@ -75,6 +75,13 @@ describe('Level 6 playable placeholder', () => {
     expect(LEVEL_6.captureUnits?.[0]).toMatchObject({
       position: tigrevelTrack.at(-1),
       haulPathIndex: 1,
+      groupHauling: {
+        eligibleCreatureId: 'poguin',
+        joinRadius: 12,
+        baseSpeedMultiplier: 0.12,
+        speedMultiplierPerAdditionalHauler: 0.16,
+        maxSpeedMultiplier: 0.92,
+      },
     });
     expect(Math.max(...upperLane.map((point) => point.y))).toBeLessThan(50);
     expect(Math.min(...lowerLane.map((point) => point.y))).toBeGreaterThan(50);
@@ -99,6 +106,12 @@ describe('Level 6 playable placeholder', () => {
     expect(LEVEL_6.backgroundUrl).toBe(
       '/battles/bg/bg_level_6_three_lane_draft_v3.png'
     );
+    expect(LEVEL_6.backgroundScale).toBe(3);
+    expect(LEVEL_6.initialView).toEqual({
+      offsetX: 50,
+      offsetY: 50,
+      zoom: 0.3,
+    });
   });
 
   it('ends with Tigrevel and Mari voluntarily joining the crew', () => {

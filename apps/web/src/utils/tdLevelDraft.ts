@@ -127,6 +127,43 @@ export function validateTDLevelDraft(
         `Capture unit ${index + 1} hauling behavior references an invalid path.`
       );
     }
+    if (unit.groupHauling) {
+      const hauling = unit.groupHauling;
+      if (!hauling.eligibleCreatureId.trim()) {
+        errors.push(
+          `Capture unit ${index + 1} group hauling needs an eligible creature ID.`
+        );
+      }
+      if (!Number.isFinite(hauling.joinRadius) || hauling.joinRadius <= 0) {
+        errors.push(
+          `Capture unit ${index + 1} group hauling join radius must be greater than 0.`
+        );
+      }
+      if (
+        !Number.isFinite(hauling.baseSpeedMultiplier) ||
+        hauling.baseSpeedMultiplier <= 0
+      ) {
+        errors.push(
+          `Capture unit ${index + 1} group hauling base speed must be greater than 0.`
+        );
+      }
+      if (
+        !Number.isFinite(hauling.speedMultiplierPerAdditionalHauler) ||
+        hauling.speedMultiplierPerAdditionalHauler < 0
+      ) {
+        errors.push(
+          `Capture unit ${index + 1} group hauling speed increase cannot be negative.`
+        );
+      }
+      if (
+        !Number.isFinite(hauling.maxSpeedMultiplier) ||
+        hauling.maxSpeedMultiplier < hauling.baseSpeedMultiplier
+      ) {
+        errors.push(
+          `Capture unit ${index + 1} group hauling max speed cannot be below its base speed.`
+        );
+      }
+    }
     if (unit.returnHome) {
       if (
         !Number.isInteger(unit.returnHome.pathIndex) ||

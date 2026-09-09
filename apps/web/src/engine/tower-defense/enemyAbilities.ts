@@ -32,6 +32,7 @@ export type EnemyAbilityDefinition =
       type: 'TOWER_GROUND_ORB';
       cooldownMs: number;
       projectileTravelMs: number;
+      aimDurationMs: number;
       maxHpDamageFraction: number;
       impactRadius: number;
     });
@@ -80,6 +81,7 @@ export const ENEMY_ABILITY_DEFS: Record<string, EnemyAbilityDefinition> = {
     initialCooldownMs: 2500,
     cooldownMs: 4500,
     projectileTravelMs: 1400,
+    aimDurationMs: 350,
     maxHpDamageFraction: 0.25,
     impactRadius: 4,
     visualEffectConfigId: 'attack_spark_launch_1',

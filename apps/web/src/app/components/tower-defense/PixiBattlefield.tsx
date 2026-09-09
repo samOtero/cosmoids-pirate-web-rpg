@@ -2299,6 +2299,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         const enemyGroundOrbGraphics = new PIXI.Graphics();
         enemyGroundOrbGraphics.eventMode = 'none';
         app.stage.addChild(enemyGroundOrbGraphics);
+        const captureHaulRopeGraphics = new PIXI.Graphics();
+        captureHaulRopeGraphics.eventMode = 'none';
+        app.stage.addChild(captureHaulRopeGraphics);
 
         // Full (unscrolled) background dimensions — used to derive scroll limits
         let fullBgHeight = 0;
@@ -3144,6 +3147,65 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             updateDestroyedPrisonGate(sprite, remnant, engine.elapsedTimeMs);
           }
 
+          captureHaulRopeGraphics.clear();
+          for (const captureUnit of engine.captureUnits) {
+            if (!captureUnit.groupHauling || !captureUnit.heldByEnemyId) {
+              continue;
+            }
+
+            const haulers = engine.enemies.filter(
+              (enemy) => enemy.heldCaptureUnitId === captureUnit.id
+            );
+            for (const hauler of haulers) {
+              const linkTarget = hauler.captureHaulLinkTargetEnemyId
+                ? engine.enemies.find(
+                    (enemy) =>
+                      enemy.id === hauler.captureHaulLinkTargetEnemyId
+                  )
+                : captureUnit;
+              if (!linkTarget) continue;
+
+              const startX = offsetX + (hauler.position.x / 100) * screenW;
+              const startY = offsetY + (hauler.position.y / 100) * screenH;
+              const endX = offsetX + (linkTarget.position.x / 100) * screenW;
+              const endY = offsetY + (linkTarget.position.y / 100) * screenH;
+              captureHaulRopeGraphics.moveTo(startX, startY);
+              captureHaulRopeGraphics.lineTo(endX, endY);
+              captureHaulRopeGraphics.stroke({
+                color: 0x111827,
+                width: 7 * zoom,
+                alpha: 0.9,
+              });
+              captureHaulRopeGraphics.moveTo(startX, startY);
+              captureHaulRopeGraphics.lineTo(endX, endY);
+              captureHaulRopeGraphics.stroke({
+                color: 0x94a3b8,
+                width: 3 * zoom,
+                alpha: 0.95,
+              });
+
+              const ropeLength = Math.hypot(endX - startX, endY - startY);
+              const linkCount = Math.max(
+                1,
+                Math.floor(ropeLength / Math.max(10, 16 * zoom))
+              );
+              for (let linkIndex = 1; linkIndex < linkCount; linkIndex++) {
+                const progress = linkIndex / linkCount;
+                captureHaulRopeGraphics.circle(
+                  startX + (endX - startX) * progress,
+                  startY + (endY - startY) * progress,
+                  2.5 * zoom
+                );
+                captureHaulRopeGraphics.stroke({
+                  color: 0xe2e8f0,
+                  width: Math.max(1, zoom),
+                  alpha: 0.72,
+                });
+              }
+            }
+          }
+          app.stage.setChildIndex(captureHaulRopeGraphics, 1);
+
           // --- Render Capture Units ---
           const currentCaptureUnitIds = new Set(
             engine.captureUnits.map((c) => c.id)
@@ -3179,7 +3241,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
             // If held, maybe offset slightly so it looks carried,
             // or just render it at the enemy position (with a small Y offset)
-            const heldOffset = capUnit.heldByEnemyId ? screenH * -0.02 : 0;
+            const heldOffset =
+              capUnit.heldByEnemyId && !capUnit.groupHauling
+                ? screenH * -0.02
+                : 0;
 
             container.x = offsetX + (capUnit.position.x / 100) * screenW;
             container.y =
@@ -3203,7 +3268,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
             if (sprite && shadow) {
               // Hide shadow if held
-              shadow.visible = !capUnit.heldByEnemyId;
+              shadow.visible =
+                !capUnit.heldByEnemyId || Boolean(capUnit.groupHauling);
 
               applyTDUnitTransforms(
                 capUnit,

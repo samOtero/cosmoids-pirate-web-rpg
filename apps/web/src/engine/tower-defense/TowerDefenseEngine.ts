@@ -442,6 +442,7 @@ export class TowerDefenseEngine {
         homePosition: { x: cu.position.x, y: cu.position.y },
         carrierSpeedMultiplier: cu.carrierSpeedMultiplier,
         haulPathIndex: cu.haulPathIndex,
+        groupHauling: cu.groupHauling ? { ...cu.groupHauling } : undefined,
         returnHome: cu.returnHome ? { ...cu.returnHome } : undefined,
         waveRelocations: cu.waveRelocations?.map((relocation) => ({
           ...relocation,
@@ -641,7 +642,9 @@ export class TowerDefenseEngine {
             (captureUnit) => captureUnit.id === enemy.heldCaptureUnitId
           )
         : undefined;
-      moveSpeed *= heldCaptureUnit?.carrierSpeedMultiplier ?? 1;
+      moveSpeed *= heldCaptureUnit
+        ? this.getCaptureHaulingSpeedMultiplier(heldCaptureUnit)
+        : 1;
       const resonantTarget = enemy.resonantEvolutionTargetCaptureUnitId
         ? this.captureUnits.find(
             (captureUnit) =>
@@ -703,37 +706,39 @@ export class TowerDefenseEngine {
         );
       }
 
-        const activePath = this.paths[enemy.pathIndex] || [];
-        if (
-          (!enemy.isMovingBackward &&
+      const activePath = this.paths[enemy.pathIndex] || [];
+      if (
+        moveSpeed > 0 &&
+        timeScale > 0 &&
+        ((!enemy.isMovingBackward &&
             enemy.currentWaypointIndex < activePath.length) ||
-          (enemy.isMovingBackward && enemy.currentWaypointIndex >= 0)
-        ) {
-          const targetPoint = activePath[enemy.currentWaypointIndex];
-          const previousPoint = enemy.isMovingBackward
-            ? activePath[enemy.currentWaypointIndex + 1]
-            : activePath[enemy.currentWaypointIndex - 1];
-          const frameDistance = moveSpeed * timeScale;
+          (enemy.isMovingBackward && enemy.currentWaypointIndex >= 0))
+      ) {
+        const targetPoint = activePath[enemy.currentWaypointIndex];
+        const previousPoint = enemy.isMovingBackward
+          ? activePath[enemy.currentWaypointIndex + 1]
+          : activePath[enemy.currentWaypointIndex - 1];
+        const frameDistance = moveSpeed * timeScale;
 
-          const { reachedWaypoint, facingDirection } = stepUnitTowardsWaypoint(
-            enemy.position,
-            targetPoint,
-            frameDistance,
-            this.aspectRatio,
-            previousPoint,
-            enemy.facingDirection
-          );
-          enemy.facingDirection = facingDirection;
+        const { reachedWaypoint, facingDirection } = stepUnitTowardsWaypoint(
+          enemy.position,
+          targetPoint,
+          frameDistance,
+          this.aspectRatio,
+          previousPoint,
+          enemy.facingDirection
+        );
+        enemy.facingDirection = facingDirection;
 
-          if (reachedWaypoint) {
-            // Advance/regress waypoint
-            if (enemy.isMovingBackward) {
-              enemy.currentWaypointIndex--;
-            } else {
-              enemy.currentWaypointIndex++;
-            }
+        if (reachedWaypoint) {
+          // Advance/regress waypoint
+          if (enemy.isMovingBackward) {
+            enemy.currentWaypointIndex--;
+          } else {
+            enemy.currentWaypointIndex++;
           }
         }
+      }
 
       // Check if enemy reached the forward end, and should turnaround instead of despawning
       if (
@@ -786,7 +791,10 @@ export class TowerDefenseEngine {
       let livesToLose = 0;
       reachedEnd.forEach((e) => {
         if (this.hasCaptureUnitsGoal) {
-          if (e.heldCaptureUnitId) {
+          const carriedUnit = e.heldCaptureUnitId
+            ? this.captureUnits.find((unit) => unit.id === e.heldCaptureUnitId)
+            : undefined;
+          if (carriedUnit?.heldByEnemyId === e.id) {
             livesToLose++;
           }
         } else {
@@ -806,10 +814,22 @@ export class TowerDefenseEngine {
       // Enemies that reached the end take their held unit with them.
       reachedEnd.forEach((e) => {
         if (e.heldCaptureUnitId) {
-          // Remove the unit from the map entirely
-          this.captureUnits = this.captureUnits.filter(
-            (cu) => cu.id !== e.heldCaptureUnitId
+          const carriedUnit = this.captureUnits.find(
+            (unit) => unit.id === e.heldCaptureUnitId
           );
+          if (carriedUnit?.heldByEnemyId === e.id) {
+            const removedCaptureUnitId = carriedUnit.id;
+            newEnemies.forEach((enemy) => {
+              if (enemy.heldCaptureUnitId !== removedCaptureUnitId) return;
+              enemy.heldCaptureUnitId = undefined;
+              enemy.captureHaulLinkTargetEnemyId = undefined;
+            });
+            this.captureUnits = this.captureUnits.filter(
+              (unit) => unit.id !== removedCaptureUnitId
+            );
+          } else {
+            this.dropCaptureUnit(e);
+          }
         }
       });
     }
@@ -850,6 +870,12 @@ export class TowerDefenseEngine {
             ? this.waveEnemyDefinitions[enemy.waveEnemyDefinitionId]
             : undefined;
           if (enemyDefinition?.canCarryCaptureUnits === false) continue;
+          if (
+            cu.groupHauling &&
+            enemy.definitionId !== cu.groupHauling.eligibleCreatureId
+          ) {
+            continue;
+          }
           if ((enemy.itemPickupBlockedUntilMs ?? 0) > this.elapsedTimeMs) {
             continue;
           }
@@ -888,6 +914,10 @@ export class TowerDefenseEngine {
           this.syncCaptureUnitToCarrier(cu, carrier);
           cu.returnHomeAvailableAtMs = undefined;
         }
+      }
+
+      if (cu.heldByEnemyId && cu.groupHauling) {
+        this.attachCaptureHaulAssistants(cu, newEnemies);
       }
     }
 
@@ -1839,6 +1869,13 @@ export class TowerDefenseEngine {
     for (const enemy of enemies) {
       const runtime = enemy.abilityRuntime;
       if (
+        runtime?.facingResetAtMs !== undefined &&
+        this.elapsedTimeMs >= runtime.facingResetAtMs
+      ) {
+        enemy.facingDirection = 'down';
+        runtime.facingResetAtMs = undefined;
+      }
+      if (
         !runtime ||
         runtime.manualOnly ||
         this.elapsedTimeMs < runtime.nextReadyTimeMs
@@ -1881,6 +1918,7 @@ export class TowerDefenseEngine {
           : dy >= 0
             ? 'down'
             : 'up';
+      runtime.facingResetAtMs = this.elapsedTimeMs + ability.aimDurationMs;
 
       runtime.nextReadyTimeMs = this.elapsedTimeMs + ability.cooldownMs;
       this.enemyGroundOrbs.push({
@@ -2206,13 +2244,131 @@ export class TowerDefenseEngine {
     return captured;
   }
 
+  private getCaptureHaulingSpeedMultiplier(captureUnit: CaptureUnit): number {
+    const config = captureUnit.groupHauling;
+    if (!config) return captureUnit.carrierSpeedMultiplier ?? 1;
+
+    const haulerCount = this.enemies.filter(
+      (enemy) =>
+        enemy.hp > 0 && enemy.heldCaptureUnitId === captureUnit.id
+    ).length;
+    return Math.min(
+      config.maxSpeedMultiplier,
+      config.baseSpeedMultiplier +
+        Math.max(0, haulerCount - 1) *
+          config.speedMultiplierPerAdditionalHauler
+    );
+  }
+
+  private attachCaptureHaulAssistants(
+    captureUnit: CaptureUnit,
+    enemies: Enemy[]
+  ): void {
+    const config = captureUnit.groupHauling;
+    if (!config) return;
+
+    const connectedHaulers = enemies.filter(
+      (enemy) =>
+        enemy.hp > 0 && enemy.heldCaptureUnitId === captureUnit.id
+    );
+    if (connectedHaulers.length === 0) return;
+
+    const joinRadiusSq = config.joinRadius * config.joinRadius;
+    for (const enemy of enemies) {
+      if (
+        enemy.hp <= 0 ||
+        enemy.kind === 'structure' ||
+        enemy.definitionId !== config.eligibleCreatureId ||
+        enemy.heldCaptureUnitId ||
+        (enemy.itemPickupBlockedUntilMs ?? 0) > this.elapsedTimeMs
+      ) {
+        continue;
+      }
+
+      const nearestHauler = connectedHaulers
+        .map((hauler) => ({
+          hauler,
+          distanceSq: this.getPositionDistanceSq(
+            enemy.position,
+            hauler.position
+          ),
+        }))
+        .filter((candidate) => candidate.distanceSq <= joinRadiusSq)
+        .sort((a, b) => a.distanceSq - b.distanceSq)[0]?.hauler;
+      const pickupPosition = this.getCapturePickupPosition(captureUnit, enemy);
+      const canAnchorToCapture =
+        this.getPositionDistanceSq(enemy.position, pickupPosition) < 125;
+      if (!nearestHauler && !canAnchorToCapture) continue;
+
+      enemy.heldCaptureUnitId = captureUnit.id;
+      enemy.captureHaulLinkTargetEnemyId = nearestHauler?.id;
+      enemy.resonantEvolutionTargetCaptureUnitId = undefined;
+      if (enemy.turnAroundAtEnd && !enemy.isMovingBackward) {
+        enemy.isMovingBackward = true;
+        enemy.currentWaypointIndex = Math.max(
+          0,
+          enemy.currentWaypointIndex - 1
+        );
+      }
+      connectedHaulers.push(enemy);
+      this.floatingTexts.push({
+        id: `ft_haul_join_${captureUnit.id}_${enemy.id}`,
+        text: '+1 Pull!',
+        position: { ...enemy.position },
+        color: 0xcbd5e1,
+        scale: 0.8,
+        durationMs: 850,
+        elapsedMs: 0,
+      });
+    }
+  }
+
   public dropCaptureUnit(enemy: Enemy): CaptureUnit | undefined {
     if (!enemy.heldCaptureUnitId) return undefined;
 
     const droppedUnit = this.captureUnits.find(
       (cu) => cu.id === enemy.heldCaptureUnitId
     );
-    if (!droppedUnit || droppedUnit.heldByEnemyId !== enemy.id) {
+    if (!droppedUnit) return undefined;
+
+    if (droppedUnit.groupHauling) {
+      const wasLeadHauler = droppedUnit.heldByEnemyId === enemy.id;
+      enemy.heldCaptureUnitId = undefined;
+      enemy.captureHaulLinkTargetEnemyId = undefined;
+
+      const remainingHaulers = this.enemies.filter(
+        (candidate) =>
+          candidate.id !== enemy.id &&
+          candidate.hp > 0 &&
+          candidate.heldCaptureUnitId === droppedUnit.id
+      );
+      if (remainingHaulers.length > 0) {
+        const replacementLead = wasLeadHauler
+          ? remainingHaulers.sort(
+              (a, b) =>
+                this.getPositionDistanceSq(a.position, droppedUnit.position) -
+                this.getPositionDistanceSq(b.position, droppedUnit.position)
+            )[0]
+          : this.enemies.find(
+              (candidate) => candidate.id === droppedUnit.heldByEnemyId
+            );
+        if (replacementLead) {
+          if (wasLeadHauler) {
+            droppedUnit.heldByEnemyId = replacementLead.id;
+            replacementLead.captureHaulLinkTargetEnemyId = undefined;
+          }
+          remainingHaulers.forEach((hauler) => {
+            if (hauler.captureHaulLinkTargetEnemyId === enemy.id) {
+              hauler.captureHaulLinkTargetEnemyId = replacementLead.id;
+            }
+          });
+          droppedUnit.returnHomeAvailableAtMs = undefined;
+          return droppedUnit;
+        }
+      }
+
+      if (!wasLeadHauler) return droppedUnit;
+    } else if (droppedUnit.heldByEnemyId !== enemy.id) {
       return undefined;
     }
 
@@ -2224,6 +2380,7 @@ export class TowerDefenseEngine {
     droppedUnit.returnHomeAvailableAtMs =
       this.elapsedTimeMs + (droppedUnit.returnHome?.delayMs ?? 0);
     enemy.heldCaptureUnitId = undefined;
+    enemy.captureHaulLinkTargetEnemyId = undefined;
     return droppedUnit;
   }
 

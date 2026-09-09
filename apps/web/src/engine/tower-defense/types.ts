@@ -276,6 +276,18 @@ export interface CaptureUnitWaveRelocation {
   speed: number;
 }
 
+export interface CaptureUnitGroupHaulingConfig {
+  /** Only this creature species can join the hauling chain. */
+  eligibleCreatureId: string;
+  /** Distance at which a new hauler can connect to an existing hauler. */
+  joinRadius: number;
+  /** Movement multiplier with exactly one connected hauler. */
+  baseSpeedMultiplier: number;
+  /** Added movement multiplier for each additional connected hauler. */
+  speedMultiplierPerAdditionalHauler: number;
+  maxSpeedMultiplier: number;
+}
+
 export interface CaptureUnitRelocationState extends CaptureUnitWaveRelocation {
   currentWaypointIndex: number;
 }
@@ -290,6 +302,8 @@ export interface CaptureUnitDefinition {
    * flanking lane. Both paths are synchronized by normalized path progress.
    */
   haulPathIndex?: number;
+  /** Optional cooperative rope-chain hauling behavior. */
+  groupHauling?: CaptureUnitGroupHaulingConfig;
   returnHome?: CaptureUnitReturnHomeConfig;
   waveRelocations?: CaptureUnitWaveRelocation[];
 }
@@ -300,6 +314,7 @@ export interface CaptureUnit extends BaseTDUnit {
   homePosition: Point;
   carrierSpeedMultiplier?: number;
   haulPathIndex?: number;
+  groupHauling?: CaptureUnitGroupHaulingConfig;
   returnHome?: CaptureUnitReturnHomeConfig;
   returnHomeAvailableAtMs?: number;
   waveRelocations?: CaptureUnitWaveRelocation[];
@@ -449,6 +464,8 @@ export interface Enemy extends BaseTDUnit {
   currentWaypointIndex: number;
   pathIndex: number; // Index into the level's `paths` array
   heldCaptureUnitId?: string; // ID of the CaptureUnit they are holding
+  /** Enemy this cooperative hauler's rope connects to; omitted for Tigrevel anchors. */
+  captureHaulLinkTargetEnemyId?: string;
   /** Permanent guard: Wind Gust can force this enemy to drop an item only once. */
   hasBeenWindDisarmed?: boolean;
   /** While active, this enemy cannot pick up capture units; other enemies still can. */
@@ -482,6 +499,8 @@ export interface Enemy extends BaseTDUnit {
   abilityRuntime?: {
     definitionId: string;
     nextReadyTimeMs: number;
+    /** Restores stationary attackers to their neutral facing after a cast. */
+    facingResetAtMs?: number;
     hasActivated?: boolean;
     activationCount?: number;
     despawnRequested?: boolean;

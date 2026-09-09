@@ -6,9 +6,9 @@ import { TDLevelData } from '@/engine/tower-defense/types';
  * Poguin use the upper and lower lanes while Tigrevel is synchronized to the
  * unobstructed center track. Voltusk occupies the raised northern dais and Mari
  * waits in the southern recovery alcove. Voltusk bombards occupied upper spots
- * with dodgeable electric orbs; lane hopping, stacked hauling, Mari's healing,
- * the bespoke cursed phase, boss scripting, and final balance remain out of
- * scope here.
+ * with dodgeable electric orbs. Poguin cooperatively haul Tigrevel through
+ * steel-rope chains; lane hopping, Mari's healing, the bespoke cursed phase,
+ * boss scripting, and final balance remain out of scope here.
  */
 export const LEVEL_6: TDLevelData = {
   paths: [
@@ -94,8 +94,14 @@ export const LEVEL_6: TDLevelData = {
     {
       position: { x: 89, y: 50 },
       tdConfigId: 'tigrevel_netted',
-      carrierSpeedMultiplier: 0.6,
       haulPathIndex: 1,
+      groupHauling: {
+        eligibleCreatureId: 'poguin',
+        joinRadius: 12,
+        baseSpeedMultiplier: 0.12,
+        speedMultiplierPerAdditionalHauler: 0.16,
+        maxSpeedMultiplier: 0.92,
+      },
     },
   ],
   waveEnemyDefinitions: [
@@ -170,5 +176,11 @@ export const LEVEL_6: TDLevelData = {
   disableCapture: false,
   enemyHpMultiplier: 1,
   backgroundUrl: '/battles/bg/bg_level_6_three_lane_draft_v3.png',
+  backgroundScale: 3,
+  initialView: {
+    offsetX: 50,
+    offsetY: 50,
+    zoom: 0.3,
+  },
   introMessage: 'Protect Tigrevel!',
 };

@@ -63,6 +63,7 @@ describe('Voltusk Electric Orb enemy ability', () => {
       initialCooldownMs: 2500,
       cooldownMs: 4500,
       projectileTravelMs: 1400,
+      aimDurationMs: 350,
       maxHpDamageFraction: 0.25,
       impactRadius: 4,
     });
@@ -86,6 +87,7 @@ describe('Voltusk Electric Orb enemy ability', () => {
     engine.tick(0, 2499);
     expect(engine.enemyGroundOrbs).toHaveLength(0);
     engine.tick(0, 1);
+    expect(engine.enemies[0].facingDirection).toBe('left');
     expect(engine.enemyGroundOrbs).toContainEqual(
       expect.objectContaining({
         sourceEnemyId: 'voltusk',
@@ -96,8 +98,13 @@ describe('Voltusk Electric Orb enemy ability', () => {
       })
     );
 
+    engine.tick(0, 349);
+    expect(engine.enemies[0].facingDirection).toBe('left');
+    engine.tick(0, 1);
+    expect(engine.enemies[0].facingDirection).toBe('down');
+
     expect(engine.placeTower('dodger', 25, 80)).toBe(true);
-    engine.tick(0, 1399);
+    engine.tick(0, 1049);
     engine.tick(0, 1);
 
     expect(tower.hp).toBe(startingHp);
