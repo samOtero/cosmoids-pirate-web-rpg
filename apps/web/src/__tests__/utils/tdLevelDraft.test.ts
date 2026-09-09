@@ -502,4 +502,52 @@ describe('TD level drafts', () => {
       'Enemy definition 1 weakened threshold must be greater than 0 and at most 1.'
     );
   });
+
+  it('validates authored lane hops', () => {
+    const level = createEmptyTDLevelDraft();
+    level.paths = [
+      [
+        { x: 0, y: 20 },
+        { x: 100, y: 20 },
+      ],
+      [
+        { x: 0, y: 50 },
+        { x: 100, y: 50 },
+      ],
+    ];
+    level.waveEnemyDefinitions = [
+      { id: 'hopper', creatureId: 'poguin', level: 8 },
+    ];
+    level.waves = [
+      {
+        id: 'hop_wave',
+        groups: [
+          {
+            enemyDefinitionId: 'hopper',
+            count: 1,
+            spawnIntervalMs: 0,
+            delayBeforeGroupMs: 0,
+            pathIndex: 0,
+            laneHop: {
+              targetPathIndex: 0,
+              triggerProgress: 1,
+              windupMs: -1,
+              durationMs: 0,
+              arcHeight: -1,
+            },
+          },
+        ],
+      },
+    ];
+
+    expect(validateTDLevelDraft(level)).toEqual(
+      expect.arrayContaining([
+        'Wave 1, group 1 lane hop references an invalid target path.',
+        'Wave 1, group 1 lane hop trigger must be between 0 and 1.',
+        'Wave 1, group 1 lane hop windup cannot be negative.',
+        'Wave 1, group 1 lane hop duration must be greater than 0.',
+        'Wave 1, group 1 lane hop arc height cannot be negative.',
+      ])
+    );
+  });
 });

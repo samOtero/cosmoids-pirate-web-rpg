@@ -420,6 +420,35 @@ export function validateTDLevelDraft(
       ) {
         errors.push(`${groupLabel} references an invalid path.`);
       }
+      if (group.laneHop) {
+        const hop = group.laneHop;
+        if (
+          !Number.isInteger(hop.targetPathIndex) ||
+          hop.targetPathIndex < 0 ||
+          hop.targetPathIndex >= levelData.paths.length ||
+          hop.targetPathIndex === group.pathIndex
+        ) {
+          errors.push(`${groupLabel} lane hop references an invalid target path.`);
+        }
+        if (
+          !Number.isFinite(hop.triggerProgress) ||
+          hop.triggerProgress <= 0 ||
+          hop.triggerProgress >= 1
+        ) {
+          errors.push(
+            `${groupLabel} lane hop trigger must be between 0 and 1.`
+          );
+        }
+        if (!Number.isFinite(hop.windupMs) || hop.windupMs < 0) {
+          errors.push(`${groupLabel} lane hop windup cannot be negative.`);
+        }
+        if (!Number.isFinite(hop.durationMs) || hop.durationMs <= 0) {
+          errors.push(`${groupLabel} lane hop duration must be greater than 0.`);
+        }
+        if (!Number.isFinite(hop.arcHeight) || hop.arcHeight < 0) {
+          errors.push(`${groupLabel} lane hop arc height cannot be negative.`);
+        }
+      }
     });
   });
 

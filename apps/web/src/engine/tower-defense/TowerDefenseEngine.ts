@@ -211,6 +211,27 @@ function getPointAtPathProgress(
   return { ...path[path.length - 1] };
 }
 
+function getWaypointIndexAfterPathProgress(
+  path: Point[],
+  progress: number,
+  aspectRatio: number
+): number {
+  let remainingProgress = Math.max(0, progress);
+
+  for (let index = 1; index < path.length; index++) {
+    const segmentLength = getPathSegmentLength(
+      path[index - 1],
+      path[index],
+      aspectRatio
+    );
+    if (segmentLength === 0) continue;
+    if (remainingProgress < segmentLength) return index;
+    remainingProgress -= segmentLength;
+  }
+
+  return path.length;
+}
+
 const defaultLevels: Record<string, number> = {
   senticle: 15,
   mouse_1: 3,
@@ -706,8 +727,126 @@ export class TowerDefenseEngine {
         );
       }
 
-      const activePath = this.paths[enemy.pathIndex] || [];
+      let activePath = this.paths[enemy.pathIndex] || [];
+      const laneHop = enemy.laneHopState;
+      let laneHopControlsMovement = false;
+
       if (
+        laneHop?.phase === 'approaching' &&
+        !enemy.isMovingBackward &&
+        !enemy.heldCaptureUnitId &&
+        moveSpeed > 0 &&
+        timeScale > 0
+      ) {
+        const pathLength = getPathLength(activePath, this.aspectRatio);
+        const projection = projectPointOntoPath(
+          enemy.position,
+          activePath,
+          this.aspectRatio
+        );
+        const normalizedProgress =
+          pathLength > 0 && projection ? projection.progress / pathLength : 0;
+        if (
+          normalizedProgress >= Math.max(0, Math.min(1, laneHop.triggerProgress))
+        ) {
+          const targetPath = this.paths[laneHop.targetPathIndex];
+          const targetLength = getPathLength(targetPath ?? [], this.aspectRatio);
+          if (
+            targetPath &&
+            targetPath.length >= 2 &&
+            laneHop.targetPathIndex !== enemy.pathIndex &&
+            targetLength > 0
+          ) {
+            const targetProgress = normalizedProgress * targetLength;
+            laneHop.phase = 'windup';
+            laneHop.elapsedMs = 0;
+            laneHop.fromPathIndex = enemy.pathIndex;
+            laneHop.fromPosition = { ...enemy.position };
+            laneHop.destination = getPointAtPathProgress(
+              targetPath,
+              targetProgress,
+              this.aspectRatio
+            );
+            laneHop.destinationWaypointIndex = getWaypointIndexAfterPathProgress(
+              targetPath,
+              targetProgress,
+              this.aspectRatio
+            );
+          } else {
+            laneHop.phase = 'landed';
+          }
+        }
+      }
+
+      if (laneHop?.phase === 'windup') {
+        laneHopControlsMovement = true;
+        // Stuns and constriction can hold the targetable anticipation pose, but
+        // gravity finishes a hop once takeoff has occurred.
+        if (moveSpeed > 0 && timeScale > 0) {
+          laneHop.elapsedMs += deltaMs;
+        }
+
+        if (laneHop.elapsedMs >= laneHop.windupMs) {
+          if (!laneHop.fromPosition || !laneHop.destination) {
+            laneHop.phase = 'landed';
+            laneHop.elapsedMs = 0;
+          } else {
+            laneHop.phase = 'airborne';
+            laneHop.elapsedMs = Math.max(
+              0,
+              laneHop.elapsedMs - laneHop.windupMs
+            );
+            enemy.facingDirection =
+              laneHop.destination.y >= enemy.position.y ? 'down' : 'up';
+          }
+        }
+      } else if (laneHop?.phase === 'airborne') {
+        laneHop.elapsedMs += deltaMs;
+      }
+
+      if (
+        laneHop?.phase === 'airborne' &&
+        laneHop.fromPosition &&
+        laneHop.destination
+      ) {
+        laneHopControlsMovement = true;
+        const hopProgress = Math.max(
+          0,
+          Math.min(1, laneHop.elapsedMs / Math.max(1, laneHop.durationMs))
+        );
+        enemy.position.x =
+          laneHop.fromPosition.x +
+          (laneHop.destination.x - laneHop.fromPosition.x) * hopProgress;
+        enemy.position.y =
+          laneHop.fromPosition.y +
+          (laneHop.destination.y - laneHop.fromPosition.y) * hopProgress;
+
+        if (hopProgress >= 1) {
+          enemy.pathIndex = laneHop.targetPathIndex;
+          enemy.currentWaypointIndex =
+            laneHop.destinationWaypointIndex ??
+            Math.min(1, this.paths[enemy.pathIndex]?.length ?? 1);
+          laneHop.phase = 'landed';
+          laneHop.elapsedMs = 0;
+          activePath = this.paths[enemy.pathIndex] || [];
+          const nextWaypoint = activePath[enemy.currentWaypointIndex];
+          if (nextWaypoint) {
+            const dx = nextWaypoint.x - enemy.position.x;
+            const dy = nextWaypoint.y - enemy.position.y;
+            enemy.facingDirection =
+              Math.abs(dx * this.aspectRatio) >= Math.abs(dy)
+                ? dx >= 0
+                  ? 'right'
+                  : 'left'
+                : dy >= 0
+                  ? 'down'
+                  : 'up';
+          }
+        }
+      }
+
+      if (
+        !laneHopControlsMovement &&
         moveSpeed > 0 &&
         timeScale > 0 &&
         ((!enemy.isMovingBackward &&
@@ -1710,7 +1849,8 @@ export class TowerDefenseEngine {
           spawner.group.pathIndex,
           spawner.group.turnAroundAtEnd,
           spawner.group.uncapturable,
-          spawner.group.isCursed
+          spawner.group.isCursed,
+          spawner.group.laneHop
         );
         spawner.spawnsRemaining--;
         spawner.lastSpawnTime = time;
@@ -1750,7 +1890,8 @@ export class TowerDefenseEngine {
     groupPathIndex: number,
     turnAroundAtEnd?: boolean,
     uncapturable?: boolean,
-    isCursed?: boolean
+    isCursed?: boolean,
+    laneHop?: TDWaveGroup['laneHop']
   ) {
     const waveEnemyDefinition =
       this.waveEnemyDefinitions[waveEnemyDefinitionId];
@@ -1845,6 +1986,13 @@ export class TowerDefenseEngine {
       isShiny,
       isCursed,
       weakenedThreshold: waveEnemyDefinition.weakenedThreshold,
+      laneHopState: laneHop
+        ? {
+            ...laneHop,
+            phase: 'approaching',
+            elapsedMs: 0,
+          }
+        : undefined,
       abilityRuntime: abilityDefinition
         ? {
             definitionId: abilityDefinition.id,
@@ -2802,7 +2950,11 @@ export class TowerDefenseEngine {
   ): Enemy | null {
     const enemiesInRange: { enemy: Enemy; dist: number }[] = [];
     for (const enemy of this.enemies) {
-      if (enemy.hp <= 0 || (enemyFilter && !enemyFilter(enemy))) continue;
+      if (
+        !this.isEnemyTargetable(enemy) ||
+        (enemyFilter && !enemyFilter(enemy))
+      )
+        continue;
       const dist = this.getAttackDistance(tower.position, enemy.position);
       if (dist <= range) {
         enemiesInRange.push({ enemy, dist });
@@ -2913,6 +3065,11 @@ export class TowerDefenseEngine {
       }
     }
     return target;
+  }
+
+  /** Airborne lane hoppers can still take committed damage, but cannot be acquired anew. */
+  public isEnemyTargetable(enemy: Enemy): boolean {
+    return enemy.hp > 0 && enemy.laneHopState?.phase !== 'airborne';
   }
 
   public emitEnemyDefeated(target: Enemy, sourceTower: Tower): void {

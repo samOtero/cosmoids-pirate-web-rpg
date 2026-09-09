@@ -7,8 +7,10 @@ import { TDLevelData } from '@/engine/tower-defense/types';
  * unobstructed center track. Voltusk occupies the raised northern dais and Mari
  * waits in the southern recovery alcove. Voltusk bombards occupied upper spots
  * with dodgeable electric orbs. Poguin cooperatively haul Tigrevel through
- * steel-rope chains; lane hopping, Mari's healing, the bespoke cursed phase,
- * boss scripting, and final balance remain out of scope here.
+ * steel-rope chains. Before they attach, Poguin make one telegraphed hop to
+ * the opposite Poguin lane and cannot be newly targeted while airborne.
+ * Mari's healing, the bespoke cursed phase, boss scripting, and final balance
+ * remain out of scope here.
  */
 export const LEVEL_6: TDLevelData = {
   paths: [
@@ -303,6 +305,13 @@ export const LEVEL_6: TDLevelData = {
           pathIndex: 0,
           turnAroundAtEnd: true,
           uncapturable: true,
+          laneHop: {
+            targetPathIndex: 2,
+            triggerProgress: 0.34,
+            windupMs: 650,
+            durationMs: 600,
+            arcHeight: 58,
+          },
         },
         {
           enemyDefinitionId: 'level_6_poguin',
@@ -313,6 +322,13 @@ export const LEVEL_6: TDLevelData = {
           turnAroundAtEnd: true,
           concurrentWithPrevious: true,
           uncapturable: true,
+          laneHop: {
+            targetPathIndex: 0,
+            triggerProgress: 0.66,
+            windupMs: 650,
+            durationMs: 600,
+            arcHeight: 58,
+          },
         },
       ],
     },
@@ -337,6 +353,13 @@ export const LEVEL_6: TDLevelData = {
           turnAroundAtEnd: true,
           concurrentWithPrevious: true,
           uncapturable: true,
+          laneHop: {
+            targetPathIndex: 0,
+            triggerProgress: 0.5,
+            windupMs: 500,
+            durationMs: 550,
+            arcHeight: 62,
+          },
         },
       ],
     },

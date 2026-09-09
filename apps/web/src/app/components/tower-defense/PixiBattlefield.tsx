@@ -76,6 +76,61 @@ export const WEAKENED_THRESHOLD = 0.9;
 const CARRIED_WORLD_DEPTH_OFFSET = 0.01;
 const DRAGGED_WORLD_DEPTH = 1_000_000_000;
 
+function updateLaneHopVisual(
+  container: PIXI.Container,
+  sprite: PIXI.Sprite,
+  shadow: PIXI.Graphics,
+  enemy: Enemy,
+  screenW: number,
+  screenH: number,
+  finalScale: number
+) {
+  const hop = enemy.laneHopState;
+  let marker = container.getChildByLabel('laneHopLandingMarker') as
+    | PIXI.Graphics
+    | undefined;
+  const isPreparingOrAirborne =
+    hop?.phase === 'windup' || hop?.phase === 'airborne';
+
+  if (isPreparingOrAirborne && hop?.destination && finalScale > 0) {
+    if (!marker) {
+      marker = new PIXI.Graphics();
+      marker.label = 'laneHopLandingMarker';
+      container.addChildAt(marker, 0);
+    }
+    marker.visible = true;
+    marker.clear();
+    marker.ellipse(0, 0, 22, 8);
+    marker.fill({ color: 0xfacc15, alpha: 0.14 });
+    marker.stroke({ color: 0xfde047, alpha: 0.9, width: 2 });
+    marker.position.set(
+      ((hop.destination.x - enemy.position.x) / 100) * screenW / finalScale,
+      ((hop.destination.y - enemy.position.y) / 100) * screenH / finalScale
+    );
+    const pulse = 0.9 + Math.sin(hop.elapsedMs * 0.012) * 0.12;
+    marker.scale.set(pulse);
+  } else if (marker) {
+    marker.visible = false;
+  }
+
+  shadow.alpha = 1;
+  if (hop?.phase === 'windup') {
+    const anticipation = Math.max(
+      0,
+      Math.min(1, hop.elapsedMs / Math.max(1, hop.windupMs))
+    );
+    sprite.y += anticipation * 7;
+    sprite.scale.y *= 1 - anticipation * 0.16;
+  } else if (hop?.phase === 'airborne') {
+    const progress = Math.max(
+      0,
+      Math.min(1, hop.elapsedMs / Math.max(1, hop.durationMs))
+    );
+    sprite.y -= Math.sin(progress * Math.PI) * hop.arcHeight;
+    shadow.alpha = 0.42;
+  }
+}
+
 function getContainerWorldDepth(
   container: PIXI.Container,
   localGroundContact: Point = { x: 0, y: 0 }
@@ -3917,6 +3972,15 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 (t) => {
                   if (!isDestroyed) esprite.texture = t;
                 }
+              );
+              updateLaneHopVisual(
+                container,
+                esprite,
+                shadow,
+                enemy,
+                screenW,
+                screenH,
+                finalScale
               );
             }
 

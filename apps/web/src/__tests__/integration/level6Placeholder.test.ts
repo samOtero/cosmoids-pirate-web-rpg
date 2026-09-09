@@ -94,6 +94,26 @@ describe('Level 6 playable placeholder', () => {
       )
     ).toEqual([0, 2, 2]);
     expect(
+      LEVEL_6.waves.flatMap((wave) =>
+        wave.groups
+          .filter((group) => group.enemyDefinitionId === 'level_6_poguin')
+          .map((group) => group.laneHop)
+      )
+    ).toEqual([
+      expect.objectContaining({
+        targetPathIndex: 2,
+        triggerProgress: 0.34,
+      }),
+      expect.objectContaining({
+        targetPathIndex: 0,
+        triggerProgress: 0.66,
+      }),
+      expect.objectContaining({
+        targetPathIndex: 0,
+        triggerProgress: 0.5,
+      }),
+    ]);
+    expect(
       LEVEL_6.waveEnemyDefinitions.find(
         (definition) => definition.id === 'level_6_voltusk'
       )
@@ -105,7 +125,7 @@ describe('Level 6 playable placeholder', () => {
 
     const engine = new TowerDefenseEngine(LEVEL_6);
     const combatSpots = LEVEL_6.placementSpots.slice(0, 3);
-    const safeSpots = LEVEL_6.safePlacementSpotIndices.map(
+    const safeSpots = LEVEL_6.safePlacementSpotIndices!.map(
       (index) => LEVEL_6.placementSpots[index]
     );
     expect(combatSpots.every((spot) => spot.y < 30)).toBe(true);

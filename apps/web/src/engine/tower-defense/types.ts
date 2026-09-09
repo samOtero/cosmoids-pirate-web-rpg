@@ -52,6 +52,21 @@ export interface TDWaveGroup {
   uncapturable?: boolean;
   /** Gives spawned enemies the cursed aura and makes them uncapturable. */
   isCursed?: boolean;
+  /** Optional one-time switch from this lane to another at a marked route progress. */
+  laneHop?: TDLaneHopConfig;
+}
+
+export interface TDLaneHopConfig {
+  /** Path the enemy lands on. The capture-unit path may be crossed, but not used. */
+  targetPathIndex: number;
+  /** Normalized forward progress (0 to 1) where the hop windup begins. */
+  triggerProgress: number;
+  /** Targetable anticipation before takeoff. */
+  windupMs: number;
+  /** Untargetable travel time between lanes. */
+  durationMs: number;
+  /** Visual-only sprite lift in local pixels at the top of the arc. */
+  arcHeight: number;
 }
 
 /** A uniquely configurable enemy variant that wave groups can reuse. */
@@ -473,6 +488,15 @@ export interface Enemy extends BaseTDUnit {
   turnAroundAtEnd?: boolean;
   isMovingBackward?: boolean;
   uncapturable?: boolean;
+  /** Runtime state for an authored, one-time switch between enemy paths. */
+  laneHopState?: TDLaneHopConfig & {
+    phase: 'approaching' | 'windup' | 'airborne' | 'landed';
+    elapsedMs: number;
+    fromPathIndex?: number;
+    fromPosition?: Point;
+    destination?: Point;
+    destinationWaypointIndex?: number;
+  };
   // Tracks towers that participated with a successful enemy-targeting attack.
   // The legacy field name is retained because it is part of the runtime model.
   damagedByTowerIds: Set<string>;

@@ -36,7 +36,7 @@ export const ProjectileBehavior: AttackBehavior = {
   ): boolean {
     return engine.enemies.some((enemy) => {
       if (
-        enemy.hp <= 0 ||
+        !engine.isEnemyTargetable(enemy) ||
         !isEligibleProjectileTarget(engine, enemy, attackDef)
       ) {
         return false;
@@ -131,13 +131,15 @@ export const InstantMeleeBehavior: AttackBehavior = {
     source: Tower,
     attackDef: AttackDefinition
   ): boolean {
-    return engine.enemies.some((enemy) => {
-      return engine.isPositionInAttackRange(
-        source.position,
-        enemy.position,
-        attackDef.rangeIndex
-      );
-    });
+    return engine.enemies.some(
+      (enemy) =>
+        engine.isEnemyTargetable(enemy) &&
+        engine.isPositionInAttackRange(
+          source.position,
+          enemy.position,
+          attackDef.rangeIndex
+        )
+    );
   },
 
   execute(
@@ -189,7 +191,7 @@ export const AdaptiveTargetedAoeBehavior: AttackBehavior = {
   canExecute(engine, source, attackDef): boolean {
     return engine.enemies.some(
       (enemy) =>
-        enemy.hp > 0 &&
+        engine.isEnemyTargetable(enemy) &&
         engine.isPositionInAttackRange(
           source.position,
           enemy.position,
@@ -296,6 +298,7 @@ export const InstantAoeBehavior: AttackBehavior = {
   ): boolean {
     return engine.enemies.some(
       (enemy) =>
+        engine.isEnemyTargetable(enemy) &&
         engine.isPositionInAttackRange(
           source.position,
           enemy.position,
@@ -315,6 +318,7 @@ export const InstantAoeBehavior: AttackBehavior = {
 
     engine.enemies.forEach((enemy) => {
       if (
+        !engine.isEnemyTargetable(enemy) ||
         !engine.isPositionInAttackRange(
           source.position,
           enemy.position,
@@ -376,7 +380,7 @@ function isEligiblePoisonAoeTarget(
   enemy: Enemy
 ): boolean {
   return (
-    enemy.hp > 0 &&
+    engine.isEnemyTargetable(enemy) &&
     !enemy.immuneToStatusEffects &&
     !enemy.statusConditions.some((status) => status.type === 'POISON') &&
     engine.isPositionInAttackRange(
