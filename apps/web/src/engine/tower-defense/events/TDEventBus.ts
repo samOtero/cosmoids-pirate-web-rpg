@@ -15,6 +15,23 @@ export type TDEvent =
       damage: number;
     }
   | {
+      type: 'TOWER_DAMAGED';
+      towerId: string;
+      creatureId: string;
+      sourceEnemyId: string;
+      damage: number;
+      hp: number;
+      maxHp: number;
+    }
+  | {
+      type: 'TOWER_HEALED';
+      towerId: string;
+      creatureId: string;
+      amount: number;
+      hp: number;
+      maxHp: number;
+    }
+  | {
       type: 'ENEMY_DIED';
       enemyId: string;
       enemyDefinitionId: string;

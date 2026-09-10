@@ -341,6 +341,8 @@ export interface TDLevelData {
   placementSpots: Point[];
   /** Placement spots excluded from enemy tower-targeting mechanics. */
   safePlacementSpotIndices?: number[];
+  /** Optional ally-run recovery area that periodically feeds injured towers. */
+  towerRecovery?: TDTowerRecoveryConfig;
   waveEnemyDefinitions: TDWaveEnemyDefinition[];
   waves: TDWave[];
   /** Repeat the final wave's creature groups indefinitely after authored waves. */
@@ -389,6 +391,22 @@ export interface TDLevelData {
   isChallengeLevel?: boolean;
 }
 
+export interface TDTowerRecoveryConfig {
+  placementSpotIndices: number[];
+  healerPosition: Point;
+  /** Fraction of maximum HP restored by each feeding. */
+  healFraction: number;
+  feedingIntervalMs: number;
+  tutorial?: {
+    /** Show the one-time lesson at or below this remaining-health fraction. */
+    triggerHealthFraction: number;
+    speakerName: string;
+    portraitUrl: string;
+    message: string;
+    instruction: string;
+  };
+}
+
 export type TowerTargetingMode =
   | 'first'
   | 'last'
@@ -424,6 +442,8 @@ export interface Tower extends BaseTDUnit {
   targetingMode?: TowerTargetingMode;
   isFixed?: boolean;
   receivesExperience?: boolean;
+  /** Simulation time when an occupied recovery spot may feed this tower again. */
+  recoveryFeedAvailableAtMs?: number;
 }
 
 export interface StatusCondition {
@@ -611,6 +631,18 @@ export interface EnemyGroundOrb {
   expiresAtMs: number;
   maxHpDamageFraction: number;
   impactRadius: number;
+  impactedAtMs?: number;
+}
+
+export interface TowerRecoveryFeed {
+  id: string;
+  towerId: string;
+  sourcePosition: Point;
+  targetPosition: Point;
+  startedAtMs: number;
+  impactAtMs: number;
+  expiresAtMs: number;
+  healAmount: number;
   impactedAtMs?: number;
 }
 

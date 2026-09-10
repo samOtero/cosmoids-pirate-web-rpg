@@ -2140,6 +2140,8 @@ interface PixiBattlefieldProps {
   openingPan?: TDOpeningPan;
   onOpeningPanComplete?: () => void;
   hideUi?: boolean;
+  /** Creature being guided toward Mari's recovery area by the first-heal lesson. */
+  healingTutorialTowerCreatureId?: string;
 }
 
 export interface PixiBattlefieldRef {
@@ -2174,6 +2176,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
       openingPan,
       onOpeningPanComplete,
       hideUi = false,
+      healingTutorialTowerCreatureId,
     },
     ref
   ) => {
@@ -2187,6 +2190,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
     const onOpeningPanCompleteRef = useRef(onOpeningPanComplete);
     const getDragStateRef = useRef(getDragState);
     const hideUiRef = useRef(hideUi);
+    const healingTutorialTowerCreatureIdRef = useRef(
+      healingTutorialTowerCreatureId
+    );
     const dragPosRef = useRef<{ x: number; y: number } | null>(null);
     const draggingCaptureDeviceRef = useRef<boolean>(false);
     const externalDraggingTowerIdRef = useRef<string | null>(null);
@@ -2312,6 +2318,11 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
     useEffect(() => {
       hideUiRef.current = hideUi;
     }, [hideUi]);
+
+    useEffect(() => {
+      healingTutorialTowerCreatureIdRef.current =
+        healingTutorialTowerCreatureId;
+    }, [healingTutorialTowerCreatureId]);
 
     useEffect(() => {
       onMapRemoveRef.current = onMapRemove;
@@ -2548,12 +2559,14 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         const projectileSprites = new Map<string, PIXI.Container>();
         const vfxSprites = new Map<string, PIXI.Container>();
         const floatingTextSprites = new Map<string, PIXI.Text>();
+        const recoveryFeedSprites = new Map<string, PIXI.Container>();
         const offscreenEnemyIndicatorSprites = new Map<
           string,
           PIXI.Container
         >();
         const spotGraphics = new PIXI.Graphics();
         const invalidSpotGraphics = new PIXI.Graphics();
+        const recoveryTutorialGraphics = new PIXI.Graphics();
         const resonantEvolutionGraphics = new PIXI.Graphics();
 
         let draggingNode: PIXI.Container | null = null;
@@ -3641,6 +3654,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           // --- Render Placement Spots & Capture Hover ---
           spotGraphics.clear();
           invalidSpotGraphics.clear();
+          recoveryTutorialGraphics.clear();
           resonantEvolutionGraphics.clear();
 
           if (!resonantEvolutionGraphics.parent) {
@@ -3652,14 +3666,109 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
           groundFxLayer.addChild(spotGraphics); // Ensure ground interactions stay together
           groundFxLayer.addChild(invalidSpotGraphics);
+          groundFxLayer.addChild(recoveryTutorialGraphics);
           groundFxLayer.setChildIndex(
             spotGraphics,
-            groundFxLayer.children.length - 2
+            groundFxLayer.children.length - 3
           );
           groundFxLayer.setChildIndex(
             invalidSpotGraphics,
+            groundFxLayer.children.length - 2
+          );
+          groundFxLayer.setChildIndex(
+            recoveryTutorialGraphics,
             groundFxLayer.children.length - 1
           );
+
+          const healingTutorialCreatureId =
+            healingTutorialTowerCreatureIdRef.current;
+          const tutorialTower = healingTutorialCreatureId
+            ? engine.towers.find(
+                (tower) => tower.creature.id === healingTutorialCreatureId
+              )
+            : undefined;
+          if (tutorialTower && engine.towerRecovery) {
+            const pulse = 0.5 + Math.sin(performance.now() / 180) * 0.18;
+            const recoverySpots = engine.towerRecovery.placementSpotIndices
+              .map((index) => engine.placementSpots[index])
+              .filter((spot): spot is Point => !!spot);
+
+            for (const spot of recoverySpots) {
+              const spotX = offsetX + (spot.x / 100) * screenW;
+              const spotY = offsetY + (spot.y / 100) * screenH;
+              const radius = viewportH * 0.055 * zoom;
+              recoveryTutorialGraphics.circle(spotX, spotY, radius);
+              recoveryTutorialGraphics.fill({
+                color: 0x22c55e,
+                alpha: pulse * 0.35,
+              });
+              recoveryTutorialGraphics.stroke({
+                color: 0x86efac,
+                alpha: 0.95,
+                width: Math.max(3, viewportH * 0.004 * zoom),
+              });
+            }
+
+            const targetSpot = recoverySpots.reduce<Point | undefined>(
+              (closest, spot) => {
+                if (!closest) return spot;
+                const currentDistance =
+                  (spot.x - tutorialTower.position.x) ** 2 +
+                  (spot.y - tutorialTower.position.y) ** 2;
+                const closestDistance =
+                  (closest.x - tutorialTower.position.x) ** 2 +
+                  (closest.y - tutorialTower.position.y) ** 2;
+                return currentDistance < closestDistance ? spot : closest;
+              },
+              undefined
+            );
+
+            if (targetSpot) {
+              const startX =
+                offsetX + (tutorialTower.position.x / 100) * screenW;
+              const startY =
+                offsetY + (tutorialTower.position.y / 100) * screenH;
+              const endX = offsetX + (targetSpot.x / 100) * screenW;
+              const endY = offsetY + (targetSpot.y / 100) * screenH;
+              const controlX = (startX + endX) / 2 + viewportH * 0.05;
+              const controlY = (startY + endY) / 2;
+
+              recoveryTutorialGraphics.circle(
+                startX,
+                startY,
+                viewportH * 0.06 * zoom
+              );
+              recoveryTutorialGraphics.stroke({
+                color: 0xfde047,
+                alpha: 0.95,
+                width: Math.max(3, viewportH * 0.004 * zoom),
+              });
+              recoveryTutorialGraphics.moveTo(startX, startY);
+              recoveryTutorialGraphics.quadraticCurveTo(
+                controlX,
+                controlY,
+                endX,
+                endY
+              );
+              recoveryTutorialGraphics.stroke({
+                color: 0xfde047,
+                alpha: 0.9,
+                width: Math.max(3, viewportH * 0.005 * zoom),
+              });
+
+              const angle = Math.atan2(endY - controlY, endX - controlX);
+              const arrowSize = Math.max(10, viewportH * 0.018 * zoom);
+              recoveryTutorialGraphics.poly([
+                endX,
+                endY,
+                endX - Math.cos(angle - Math.PI / 5) * arrowSize,
+                endY - Math.sin(angle - Math.PI / 5) * arrowSize,
+                endX - Math.cos(angle + Math.PI / 5) * arrowSize,
+                endY - Math.sin(angle + Math.PI / 5) * arrowSize,
+              ]);
+              recoveryTutorialGraphics.fill({ color: 0xfde047, alpha: 0.95 });
+            }
+          }
 
           let isHoveringValidSpot = false;
 
@@ -4765,6 +4874,70 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 }
               }
             }
+          }
+
+          // --- Render food tossed from Mari to towers in the recovery area ---
+          const currentRecoveryFeedIds = new Set(
+            engine.towerRecoveryFeeds.map((feed) => feed.id)
+          );
+          for (const [id, container] of recoveryFeedSprites.entries()) {
+            if (!currentRecoveryFeedIds.has(id)) {
+              airFxLayer.removeChild(container);
+              container.destroy({ children: true });
+              recoveryFeedSprites.delete(id);
+            }
+          }
+          for (const feed of engine.towerRecoveryFeeds) {
+            let container = recoveryFeedSprites.get(feed.id);
+            if (!container) {
+              container = new PIXI.Container();
+              container.eventMode = 'none';
+
+              const fruit = new PIXI.Graphics();
+              fruit.circle(0, 0, 10);
+              fruit.fill({ color: 0xf97316, alpha: 1 });
+              fruit.stroke({ color: 0x7c2d12, alpha: 1, width: 2 });
+              fruit.ellipse(5, -10, 5, 2.5);
+              fruit.fill({ color: 0x65a30d, alpha: 1 });
+              container.addChild(fruit);
+
+              airFxLayer.addChild(container);
+              recoveryFeedSprites.set(feed.id, container);
+            }
+
+            const travelDuration = Math.max(
+              1,
+              feed.impactAtMs - feed.startedAtMs
+            );
+            const progress = Math.max(
+              0,
+              Math.min(
+                1,
+                (engine.elapsedTimeMs - feed.startedAtMs) / travelDuration
+              )
+            );
+            const sourceX = offsetX + (feed.sourcePosition.x / 100) * screenW;
+            const sourceY = offsetY + (feed.sourcePosition.y / 100) * screenH;
+            const targetX = offsetX + (feed.targetPosition.x / 100) * screenW;
+            const targetY = offsetY + (feed.targetPosition.y / 100) * screenH;
+            const eased = 1 - (1 - progress) ** 2;
+
+            container.x = sourceX + (targetX - sourceX) * eased;
+            container.y =
+              sourceY +
+              (targetY - sourceY) * eased -
+              Math.sin(progress * Math.PI) * viewportH * 0.07 * zoom;
+            container.rotation = progress * Math.PI * 2;
+            container.scale.set(Math.max(0.45, zoom));
+            container.alpha =
+              feed.impactedAtMs === undefined
+                ? 1
+                : Math.max(
+                    0,
+                    1 -
+                      (engine.elapsedTimeMs - feed.impactedAtMs) /
+                        Math.max(1, feed.expiresAtMs - feed.impactedAtMs)
+                  );
           }
 
           // --- Render Floating Texts ---

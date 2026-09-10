@@ -46,6 +46,11 @@ type QueuedModal =
       newDefinitionId: string;
     };
 
+type HealingTutorialState = {
+  phase: 'callout' | 'guiding' | 'success';
+  towerCreatureId: string;
+};
+
 const sortModalQueue = (queue: QueuedModal[]): QueuedModal[] => {
   const typePriority = {
     SHINY_APPEARED: -1,
@@ -152,6 +157,9 @@ export default function TowerDefenseScreen({
   const dragStateRef = useRef<'tower' | 'capture' | false>(false);
   const justDraggedRef = useRef(false);
   const pixiRef = useRef<PixiBattlefieldRef>(null);
+  const healingTutorialTriggeredRef = useRef(false);
+  const [healingTutorial, setHealingTutorial] =
+    useState<HealingTutorialState | null>(null);
 
   const DRAG_THRESHOLD = 10; // pixels before a pointerdown becomes a drag
   const pendingDragRef = useRef<{
@@ -218,6 +226,12 @@ export default function TowerDefenseScreen({
   }, [introState]);
 
   useEffect(() => {
+    if (healingTutorial?.phase !== 'success') return;
+    const timeout = setTimeout(() => setHealingTutorial(null), 1400);
+    return () => clearTimeout(timeout);
+  }, [healingTutorial?.phase]);
+
+  useEffect(() => {
     // Progression decisions raised by the final enemy must finish before the
     // battle result is shown or handed back to the story event queue.
     if (!isOutroReady) return;
@@ -278,6 +292,27 @@ export default function TowerDefenseScreen({
         case 'TOWER_LEVELED_UP':
           setUiUpdateToggle((prev) => !prev);
           break;
+        case 'TOWER_DAMAGED': {
+          const tutorial = levelData.towerRecovery?.tutorial;
+          if (
+            tutorial &&
+            !healingTutorialTriggeredRef.current &&
+            event.hp > 0 &&
+            event.hp / event.maxHp <= tutorial.triggerHealthFraction
+          ) {
+            healingTutorialTriggeredRef.current = true;
+            setHealingTutorial({
+              phase: 'callout',
+              towerCreatureId: event.creatureId,
+            });
+            setIsPlaying(false);
+          }
+          setUiUpdateToggle((prev) => !prev);
+          break;
+        }
+        case 'TOWER_HEALED':
+          setUiUpdateToggle((prev) => !prev);
+          break;
         case 'TOWER_ASK_EVOLUTION':
           setModalQueue((prev) => {
             const added: QueuedModal = {
@@ -326,7 +361,7 @@ export default function TowerDefenseScreen({
       }
     });
     return unsub;
-  }, []);
+  }, [levelData.towerRecovery?.tutorial]);
 
   // Listen for global TD action events
   useEffect(() => {
@@ -439,11 +474,28 @@ export default function TowerDefenseScreen({
   }, [isPlaying, uiLives]); // Dependencies for state sync closure
 
   const handleMapDrop = (creatureId: string, x: number, y: number) => {
-    engineRef.current.placeTower(creatureId, x, y);
+    const placed = engineRef.current.placeTower(creatureId, x, y);
     engineRef.current.towers.forEach((tower) =>
       analyticsRef.current?.deploy(tower.creature.speciesId)
     );
     setActiveTowerIds(engineRef.current.towers.map((t: any) => t.creature.id));
+
+    if (
+      placed &&
+      healingTutorial?.phase === 'guiding' &&
+      healingTutorial.towerCreatureId === creatureId
+    ) {
+      const tower = engineRef.current.towers.find(
+        (candidate) => candidate.creature.id === creatureId
+      );
+      if (tower && engineRef.current.isTowerOnRecoverySpot(tower)) {
+        setHealingTutorial({
+          phase: 'success',
+          towerCreatureId: creatureId,
+        });
+        setIsPlaying(true);
+      }
+    }
   };
 
   const handleMapRemove = (creatureId: string) => {
@@ -575,6 +627,64 @@ export default function TowerDefenseScreen({
         </div>
       )}
 
+      {healingTutorial?.phase === 'callout' &&
+        levelData.towerRecovery?.tutorial && (
+          <div className="fixed inset-0 z-10001 flex items-center justify-center bg-black/70 p-3">
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="healing-tutorial-title"
+              className="flex w-full max-w-xl items-center gap-4 rounded-2xl border-2 border-emerald-400 bg-slate-900/95 p-4 shadow-[0_0_35px_rgba(52,211,153,0.35)] sm:gap-6 sm:p-6"
+            >
+              <div className="h-28 w-28 shrink-0 overflow-hidden rounded-full border-2 border-emerald-300 bg-slate-800 sm:h-40 sm:w-40">
+                <Image
+                  src={levelData.towerRecovery.tutorial.portraitUrl}
+                  alt={levelData.towerRecovery.tutorial.speakerName}
+                  width={160}
+                  height={160}
+                  className="h-full w-full object-cover object-top"
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3
+                  id="healing-tutorial-title"
+                  className="text-lg font-black text-emerald-300 sm:text-2xl"
+                >
+                  {levelData.towerRecovery.tutorial.speakerName}
+                </h3>
+                <p className="mt-1 text-base font-bold text-white sm:text-xl">
+                  {levelData.towerRecovery.tutorial.message}
+                </p>
+                <button
+                  className="mt-4 w-full rounded-lg bg-emerald-600 px-4 py-2 font-black text-white hover:bg-emerald-500"
+                  onClick={() =>
+                    setHealingTutorial((current) =>
+                      current ? { ...current, phase: 'guiding' } : current
+                    )
+                  }
+                >
+                  Show me
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+      {healingTutorial?.phase === 'guiding' &&
+        levelData.towerRecovery?.tutorial && (
+          <div className="pointer-events-none fixed top-16 left-1/2 z-10000 w-[min(92vw,42rem)] -translate-x-1/2 rounded-xl border-2 border-emerald-300 bg-slate-950/90 px-4 py-3 text-center shadow-[0_0_24px_rgba(74,222,128,0.4)] lg:top-24">
+            <div className="text-sm font-black text-emerald-300 sm:text-lg">
+              {levelData.towerRecovery.tutorial.instruction}
+            </div>
+          </div>
+        )}
+
+      {healingTutorial?.phase === 'success' && (
+        <div className="pointer-events-none fixed top-16 left-1/2 z-10000 -translate-x-1/2 rounded-xl border-2 border-emerald-300 bg-slate-950/90 px-5 py-3 text-center font-black text-emerald-300 shadow-[0_0_24px_rgba(74,222,128,0.4)] lg:top-24">
+          Mari is feeding them!
+        </div>
+      )}
+
       {isOutroReady && (
         <div className="pointer-events-none fixed inset-0 z-10000 flex items-center justify-center bg-black/80 transition-opacity duration-1000">
           {outroState === 'win' ? (
@@ -630,7 +740,7 @@ export default function TowerDefenseScreen({
             onClick={() => {
               if (introState === 'none') setIsPlaying(!isPlaying);
             }}
-            disabled={introState !== 'none'}
+            disabled={introState !== 'none' || healingTutorial !== null}
             className="rounded bg-cyan-700 px-3 py-1 text-sm font-bold hover:bg-cyan-600 disabled:cursor-not-allowed disabled:opacity-50 lg:px-4 lg:py-2 lg:text-base"
           >
             {isPlaying ? 'Pause' : 'Start'}
@@ -655,6 +765,11 @@ export default function TowerDefenseScreen({
         initialView={levelData.initialView}
         openingPan={levelData.openingPan}
         hideUi={introState === 'cameraPan'}
+        healingTutorialTowerCreatureId={
+          healingTutorial?.phase === 'guiding'
+            ? healingTutorial.towerCreatureId
+            : undefined
+        }
         onOpeningPanComplete={() => {
           setIntroState((current) =>
             current === 'cameraPan'

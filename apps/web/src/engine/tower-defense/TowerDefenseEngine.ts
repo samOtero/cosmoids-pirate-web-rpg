@@ -29,6 +29,8 @@ import {
   ObjectiveAllyCurrent,
   ObjectiveAllyAcidShot,
   EnemyGroundOrb,
+  TowerRecoveryFeed,
+  TDTowerRecoveryConfig,
   DestroyedStructureVisual,
 } from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
@@ -293,6 +295,7 @@ export class TowerDefenseEngine {
   public objectiveAllyCurrents: ObjectiveAllyCurrent[] = [];
   public objectiveAllyAcidShots: ObjectiveAllyAcidShot[] = [];
   public enemyGroundOrbs: EnemyGroundOrb[] = [];
+  public towerRecoveryFeeds: TowerRecoveryFeed[] = [];
   public destroyedStructureVisuals: DestroyedStructureVisual[] = [];
   public focusedStructureId: string | null = null;
 
@@ -348,6 +351,7 @@ export class TowerDefenseEngine {
   public enemyHpMultiplier: number = 1;
   public disableCapture: boolean = false;
   public resonantEvolution?: TDResonantEvolutionConfig;
+  public towerRecovery?: TDTowerRecoveryConfig;
 
   public aspectRatio: number = 1;
   public backgroundScale: number = 1;
@@ -419,6 +423,9 @@ export class TowerDefenseEngine {
     this.enemyHpMultiplier = levelData.enemyHpMultiplier ?? 1;
     this.disableCapture = levelData.disableCapture ?? false;
     this.resonantEvolution = levelData.resonantEvolution;
+    this.towerRecovery = levelData.towerRecovery
+      ? structuredClone(levelData.towerRecovery)
+      : undefined;
     this.backgroundScale = Math.max(1, levelData.backgroundScale ?? 1);
 
     this.objectiveAllies = (levelData.objectiveAllies ?? []).map(
@@ -1118,6 +1125,8 @@ export class TowerDefenseEngine {
     });
 
     this.processEnemyGroundOrbs();
+    this.processTowerRecovery();
+    this.processTowerRecoveryFeeds();
 
     // Update projectiles
     const timeScale = deltaMs / 16.666;
@@ -2279,10 +2288,114 @@ export class TowerDefenseEngine {
         durationMs: 1000,
         elapsedMs: 0,
       });
+      this.events.emit({
+        type: 'TOWER_DAMAGED',
+        towerId: impactedTower.id,
+        creatureId: impactedTower.creature.id,
+        sourceEnemyId: orb.sourceEnemyId,
+        damage,
+        hp: impactedTower.hp,
+        maxHp: impactedTower.maxHp,
+      });
     }
 
     this.enemyGroundOrbs = this.enemyGroundOrbs.filter(
       (orb) => this.elapsedTimeMs < orb.expiresAtMs
+    );
+  }
+
+  public isTowerOnRecoverySpot(tower: Tower): boolean {
+    const recovery = this.towerRecovery;
+    if (!recovery) return false;
+
+    return recovery.placementSpotIndices.some((spotIndex) => {
+      const spot = this.placementSpots[spotIndex];
+      return (
+        !!spot &&
+        Math.abs(spot.x - tower.position.x) < 0.001 &&
+        Math.abs(spot.y - tower.position.y) < 0.001
+      );
+    });
+  }
+
+  private queueTowerRecoveryFeed(tower: Tower): boolean {
+    const recovery = this.towerRecovery;
+    if (
+      !recovery ||
+      tower.hp <= 0 ||
+      tower.hp >= tower.maxHp ||
+      !this.isTowerOnRecoverySpot(tower) ||
+      (tower.recoveryFeedAvailableAtMs ?? 0) > this.elapsedTimeMs ||
+      this.towerRecoveryFeeds.some(
+        (feed) => feed.towerId === tower.id && feed.impactedAtMs === undefined
+      )
+    ) {
+      return false;
+    }
+
+    tower.recoveryFeedAvailableAtMs =
+      this.elapsedTimeMs + recovery.feedingIntervalMs;
+    this.towerRecoveryFeeds.push({
+      id: `recovery_feed_${tower.id}_${this.elapsedTimeMs}_${Math.random()
+        .toString(36)
+        .substring(7)}`,
+      towerId: tower.id,
+      sourcePosition: { ...recovery.healerPosition },
+      targetPosition: { ...tower.position },
+      startedAtMs: this.elapsedTimeMs,
+      impactAtMs: this.elapsedTimeMs + 450,
+      expiresAtMs: this.elapsedTimeMs + 850,
+      healAmount: Math.max(1, Math.ceil(tower.maxHp * recovery.healFraction)),
+    });
+    return true;
+  }
+
+  private processTowerRecovery(): void {
+    if (!this.towerRecovery) return;
+    this.towers.forEach((tower) => this.queueTowerRecoveryFeed(tower));
+  }
+
+  private processTowerRecoveryFeeds(): void {
+    for (const feed of this.towerRecoveryFeeds) {
+      const tower = this.towers.find(
+        (candidate) => candidate.id === feed.towerId
+      );
+      if (tower) feed.targetPosition = { ...tower.position };
+      if (
+        feed.impactedAtMs !== undefined ||
+        this.elapsedTimeMs < feed.impactAtMs
+      ) {
+        continue;
+      }
+
+      feed.impactedAtMs = this.elapsedTimeMs;
+      if (!tower || tower.hp <= 0) continue;
+
+      const amount = Math.min(feed.healAmount, tower.maxHp - tower.hp);
+      if (amount <= 0) continue;
+
+      tower.hp += amount;
+      this.floatingTexts.push({
+        id: `ft_recovery_heal_${feed.id}`,
+        text: `+${amount} HP`,
+        position: { ...tower.position },
+        color: 0x4ade80,
+        scale: 1.05,
+        durationMs: 1100,
+        elapsedMs: 0,
+      });
+      this.events.emit({
+        type: 'TOWER_HEALED',
+        towerId: tower.id,
+        creatureId: tower.creature.id,
+        amount,
+        hp: tower.hp,
+        maxHp: tower.maxHp,
+      });
+    }
+
+    this.towerRecoveryFeeds = this.towerRecoveryFeeds.filter(
+      (feed) => this.elapsedTimeMs < feed.expiresAtMs
     );
   }
 
@@ -2819,6 +2932,7 @@ export class TowerDefenseEngine {
         existingTower.facingDirection = 'down';
       }
       releaseDeepwaterGrip(this, existingTower);
+      this.queueTowerRecoveryFeed(existingTower);
       return true;
     }
 
@@ -2833,6 +2947,7 @@ export class TowerDefenseEngine {
     const tower = this.createTower(creature, x, y);
     if (!tower) return false;
     this.towers.push(tower);
+    this.queueTowerRecoveryFeed(tower);
     return true;
   }
 

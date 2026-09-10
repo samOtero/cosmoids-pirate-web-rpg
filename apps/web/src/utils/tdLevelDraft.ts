@@ -31,6 +31,9 @@ export function prepareTDLevelDraftForSave(
 
   savedLevel.paths.forEach((path) => path.forEach(roundPoint));
   savedLevel.placementSpots.forEach(roundPoint);
+  if (savedLevel.towerRecovery) {
+    roundPoint(savedLevel.towerRecovery.healerPosition);
+  }
   savedLevel.captureUnits?.forEach((unit) => roundPoint(unit.position));
   savedLevel.captureUnits?.forEach((unit) =>
     unit.waveRelocations?.forEach((relocation) =>
@@ -112,6 +115,44 @@ export function validateTDLevelDraft(
       errors.push('A safe placement spot references an invalid placement.');
     }
   });
+  if (levelData.towerRecovery) {
+    const recovery = levelData.towerRecovery;
+    validatePoint(recovery.healerPosition, 'Tower recovery healer', errors);
+    recovery.placementSpotIndices.forEach((spotIndex) => {
+      if (
+        !Number.isInteger(spotIndex) ||
+        spotIndex < 0 ||
+        spotIndex >= levelData.placementSpots.length
+      ) {
+        errors.push('A tower recovery spot references an invalid placement.');
+      }
+    });
+    if (
+      !Number.isFinite(recovery.healFraction) ||
+      recovery.healFraction <= 0 ||
+      recovery.healFraction > 1
+    ) {
+      errors.push(
+        'Tower recovery heal fraction must be greater than 0 and at most 1.'
+      );
+    }
+    if (
+      !Number.isFinite(recovery.feedingIntervalMs) ||
+      recovery.feedingIntervalMs <= 0
+    ) {
+      errors.push('Tower recovery feeding interval must be greater than 0.');
+    }
+    if (
+      recovery.tutorial &&
+      (!Number.isFinite(recovery.tutorial.triggerHealthFraction) ||
+        recovery.tutorial.triggerHealthFraction <= 0 ||
+        recovery.tutorial.triggerHealthFraction > 1)
+    ) {
+      errors.push(
+        'Tower recovery tutorial health threshold must be greater than 0 and at most 1.'
+      );
+    }
+  }
   levelData.captureUnits?.forEach((unit, index) => {
     validatePoint(unit.position, `Capture unit ${index + 1}`, errors);
     if (!unit.tdConfigId.trim()) {

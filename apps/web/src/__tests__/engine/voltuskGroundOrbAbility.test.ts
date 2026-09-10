@@ -123,6 +123,10 @@ describe('Voltusk Electric Orb enemy ability', () => {
 
   it('damages whichever tower occupies the marked location on impact', () => {
     const engine = createEngine(['original-target', 'replacement']);
+    const damageEvents: unknown[] = [];
+    engine.events.subscribe((event) => {
+      if (event.type === 'TOWER_DAMAGED') damageEvents.push(event);
+    });
     expect(engine.placeTower('original-target', 25, 20)).toBe(true);
     expect(engine.placeTower('replacement', 25, 80)).toBe(true);
     const originalTarget = engine.towers.find(
@@ -149,6 +153,14 @@ describe('Voltusk Electric Orb enemy ability', () => {
       expect.objectContaining({
         text: Math.floor(replacement.maxHp * 0.25).toString(),
         position: { x: 25, y: 20 },
+      })
+    );
+    expect(damageEvents).toContainEqual(
+      expect.objectContaining({
+        towerId: replacement.id,
+        creatureId: 'replacement',
+        sourceEnemyId: 'voltusk',
+        damage: Math.floor(replacement.maxHp * 0.25),
       })
     );
   });

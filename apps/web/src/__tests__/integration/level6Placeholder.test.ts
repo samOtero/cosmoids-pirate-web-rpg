@@ -122,6 +122,16 @@ describe('Level 6 playable placeholder', () => {
       abilityId: 'VOLTUSK_ELECTRIC_ORB',
     });
     expect(LEVEL_6.safePlacementSpotIndices).toEqual([3, 4, 5]);
+    expect(LEVEL_6.towerRecovery).toMatchObject({
+      placementSpotIndices: [3, 4, 5],
+      healerPosition: { x: 49.97, y: 87.74 },
+      healFraction: 0.35,
+      feedingIntervalMs: 8000,
+      tutorial: {
+        triggerHealthFraction: 0.75,
+        speakerName: 'Mari',
+      },
+    });
 
     const engine = new TowerDefenseEngine(LEVEL_6);
     const combatSpots = LEVEL_6.placementSpots.slice(0, 3);
@@ -153,7 +163,7 @@ describe('Level 6 playable placeholder', () => {
     expect(LEVEL_6.initialView).toEqual({
       offsetX: 50,
       offsetY: 50,
-      zoom: 0.3,
+      zoom: 1 / 3,
     });
   });
 

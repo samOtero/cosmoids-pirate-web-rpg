@@ -459,6 +459,39 @@ describe('TD level drafts', () => {
     );
   });
 
+  it('validates tower recovery spots, healing, and tutorial timing', () => {
+    const level = createEmptyTDLevelDraft();
+    level.paths = [
+      [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+      ],
+    ];
+    level.placementSpots = [{ x: 25, y: 20 }];
+    level.towerRecovery = {
+      placementSpotIndices: [1],
+      healerPosition: { x: 50, y: 90 },
+      healFraction: 1.1,
+      feedingIntervalMs: 0,
+      tutorial: {
+        triggerHealthFraction: 0,
+        speakerName: 'Mari',
+        portraitUrl: '/dialog/maribel_determined.png',
+        message: 'Bring them here!',
+        instruction: 'Move the injured tower.',
+      },
+    };
+
+    expect(validateTDLevelDraft(level)).toEqual(
+      expect.arrayContaining([
+        'A tower recovery spot references an invalid placement.',
+        'Tower recovery heal fraction must be greater than 0 and at most 1.',
+        'Tower recovery feeding interval must be greater than 0.',
+        'Tower recovery tutorial health threshold must be greater than 0 and at most 1.',
+      ])
+    );
+  });
+
   it('validates enemy weakened threshold', () => {
     const level = createEmptyTDLevelDraft();
     level.paths = [
