@@ -69,7 +69,7 @@ describe('Level 6 playable placeholder', () => {
     expect(LEVEL_6.paths).toHaveLength(3);
 
     const [upperLane, tigrevelTrack, lowerLane] = LEVEL_6.paths;
-    expect(tigrevelTrack.every((point) => point.y === 46)).toBe(true);
+    expect(tigrevelTrack.every((point) => point.y === 55)).toBe(true);
     expect(LEVEL_6.captureUnits?.[0]).toMatchObject({
       position: tigrevelTrack.at(-1),
       haulPathIndex: 1,
@@ -81,8 +81,8 @@ describe('Level 6 playable placeholder', () => {
         maxSpeedMultiplier: 0.92,
       },
     });
-    expect(upperLane.every((point) => point.y === 43)).toBe(true);
-    expect(lowerLane.every((point) => point.y === 49)).toBe(true);
+    expect(upperLane.every((point) => point.y === 52)).toBe(true);
+    expect(lowerLane.every((point) => point.y === 58)).toBe(true);
     expect(lowerLane[0].y - upperLane[0].y).toBe(6);
     expect(
       LEVEL_6.waves.flatMap((wave) =>
@@ -116,13 +116,14 @@ describe('Level 6 playable placeholder', () => {
         (definition) => definition.id === 'level_6_voltusk'
       )
     ).toMatchObject({
-      stationaryPosition: { x: 50, y: 12 },
+      stationaryPosition: { x: 85, y: 14 },
       abilityId: 'VOLTUSK_ELECTRIC_ORB',
     });
     expect(LEVEL_6.safePlacementSpotIndices).toEqual([3, 5]);
     expect(LEVEL_6.towerRecovery).toMatchObject({
       placementSpotIndices: [3, 5],
-      healerPosition: { x: 49.97, y: 87.74 },
+      healerPosition: { x: 18, y: 14 },
+      healerIdleFacingDirection: 'down',
       healFraction: 0.35,
       feedingIntervalMs: 8000,
       tutorial: {
@@ -130,14 +131,20 @@ describe('Level 6 playable placeholder', () => {
         speakerName: 'Mari',
       },
     });
+    expect(
+      LEVEL_6.environmentUnits?.find(
+        (unit) => unit.tdConfigId === 'maribel_capture'
+      )?.facingDirection
+    ).toBe('down');
 
     const engine = new TowerDefenseEngine(LEVEL_6);
     const combatSpots = LEVEL_6.placementSpots.slice(0, 3);
     const safeSpots = LEVEL_6.safePlacementSpotIndices!.map(
       (index) => LEVEL_6.placementSpots[index]
     );
-    expect(combatSpots.every((spot) => spot.y < 30)).toBe(true);
+    expect(combatSpots.every((spot) => spot.x > 70 && spot.y < 30)).toBe(true);
     expect(safeSpots).toHaveLength(2);
+    expect(safeSpots.every((spot) => spot.x < 30 && spot.y < 30)).toBe(true);
     for (const spot of combatSpots) {
       expect(
         Math.min(
@@ -148,20 +155,20 @@ describe('Level 6 playable placeholder', () => {
     for (const spot of safeSpots) {
       expect(
         Math.min(
-          ...lowerLane.map((point) => engine.getAttackDistance(spot, point))
+          ...upperLane.map((point) => engine.getAttackDistance(spot, point))
         )
       ).toBeGreaterThan(40);
     }
     engine.destroy();
 
     expect(LEVEL_6.backgroundUrl).toBe(
-      '/battles/bg/bg_level_6_three_lane_draft_v6.png'
+      '/battles/bg/bg_level_6_three_lane_compact_v1.png'
     );
-    expect(LEVEL_6.backgroundScale).toBe(3);
+    expect(LEVEL_6.backgroundScale).toBe(2);
     expect(LEVEL_6.initialView).toEqual({
       offsetX: 50,
       offsetY: 50,
-      zoom: 1 / 3,
+      zoom: 1 / 2,
     });
   });
 

@@ -36,9 +36,17 @@ function createEngine() {
       towerRecovery: {
         placementSpotIndices: [1],
         healerPosition: { x: 50, y: 90 },
+        healerIdleFacingDirection: 'down',
         healFraction: 0.25,
         feedingIntervalMs: 1000,
       },
+      environmentUnits: [
+        {
+          tdConfigId: 'maribel_capture',
+          position: { x: 50, y: 90 },
+          facingDirection: 'down',
+        },
+      ],
     },
     [createCreature()]
   );
@@ -115,5 +123,25 @@ describe('tower recovery feeding', () => {
 
     expect(engine.towerRecoveryFeeds).toHaveLength(0);
     expect(tower.hp).toBe(tower.maxHp - 10);
+  });
+
+  it('faces the injured recovery target, then returns to the idle facing', () => {
+    const engine = createEngine();
+    const healer = engine.environmentUnits[0];
+    expect(healer.facingDirection).toBe('down');
+
+    expect(engine.placeTower('patient', 25, 25)).toBe(true);
+    const tower = engine.towers[0];
+    tower.hp -= 10;
+    expect(engine.placeTower('patient', 50, 80)).toBe(true);
+
+    engine.tick(0, 1);
+    expect(healer.facingDirection).toBe('up');
+    expect(engine.towerRecoveryTargetTowerId).toBe(tower.id);
+
+    tower.hp = tower.maxHp;
+    engine.tick(0, 1);
+    expect(healer.facingDirection).toBe('down');
+    expect(engine.towerRecoveryTargetTowerId).toBeUndefined();
   });
 });

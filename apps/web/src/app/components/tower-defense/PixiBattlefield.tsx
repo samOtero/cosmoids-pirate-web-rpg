@@ -3008,6 +3008,18 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           }
 
           for (const envUnit of engine.environmentUnits) {
+            const isTowerRecoveryHealer =
+              engine.towerRecovery !== undefined &&
+              Math.abs(
+                envUnit.position.x - engine.towerRecovery.healerPosition.x
+              ) < 0.001 &&
+              Math.abs(
+                envUnit.position.y - engine.towerRecovery.healerPosition.y
+              ) < 0.001;
+            const environmentVisualState =
+              isTowerRecoveryHealer && !engine.towerRecoveryTargetTowerId
+                ? 'idle'
+                : undefined;
             let container = environmentUnitSprites.get(envUnit.id);
             if (!container) {
               container = new PIXI.Container();
@@ -3052,7 +3064,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 undefined,
                 (t) => {
                   if (!isDestroyed) sprite.texture = t;
-                }
+                },
+                environmentVisualState
               );
             }
             renderHealthBar(
@@ -3063,7 +3076,11 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             );
             updateContainerWorldDepth(
               container,
-              getTDUnitGroundContactOffset(envUnit, envUnit.tdConfigId)
+              getTDUnitGroundContactOffset(
+                envUnit,
+                envUnit.tdConfigId,
+                environmentVisualState
+              )
             );
           }
 

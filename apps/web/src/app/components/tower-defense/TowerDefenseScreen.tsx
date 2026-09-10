@@ -672,7 +672,10 @@ export default function TowerDefenseScreen({
 
       {healingTutorial?.phase === 'guiding' &&
         levelData.towerRecovery?.tutorial && (
-          <div className="pointer-events-none fixed top-16 left-1/2 z-10000 w-[min(92vw,42rem)] -translate-x-1/2 rounded-xl border-2 border-emerald-300 bg-slate-950/90 px-4 py-3 text-center shadow-[0_0_24px_rgba(74,222,128,0.4)] lg:top-24">
+          <div
+            data-testid="desktop-healing-guidance"
+            className="pointer-events-none fixed top-24 left-1/2 z-10000 hidden w-[min(92vw,42rem)] -translate-x-1/2 rounded-xl border-2 border-emerald-300 bg-slate-950/90 px-4 py-3 text-center shadow-[0_0_24px_rgba(74,222,128,0.4)] lg:block"
+          >
             <div className="text-sm font-black text-emerald-300 sm:text-lg">
               {levelData.towerRecovery.tutorial.instruction}
             </div>
@@ -700,11 +703,22 @@ export default function TowerDefenseScreen({
       )}
 
       <div
+        data-testid="tower-defense-hud"
         className={`flex shrink-0 items-center justify-between gap-2 border-b border-cyan-800 bg-slate-800 p-2 lg:p-4 ${
           introState === 'cameraPan' ? 'invisible' : ''
         }`}
       >
-        {levelData.introMessage ? (
+        {healingTutorial?.phase === 'guiding' &&
+        levelData.towerRecovery?.tutorial ? (
+          <div
+            data-testid="mobile-healing-guidance"
+            className="pointer-events-none min-w-0 flex-1 rounded-lg border border-emerald-300 bg-slate-950/90 px-2 py-1 text-center shadow-[0_0_16px_rgba(74,222,128,0.35)] lg:hidden"
+          >
+            <div className="text-[11px] leading-tight font-black text-emerald-300 sm:text-sm">
+              {levelData.towerRecovery.tutorial.instruction}
+            </div>
+          </div>
+        ) : levelData.introMessage ? (
           <h2 className="truncate text-sm font-bold text-cyan-400 lg:text-xl">
             {levelData.introMessage}
           </h2>
@@ -838,6 +852,8 @@ export default function TowerDefenseScreen({
                   isActive={isActive}
                   displayLevel={displayLevel}
                   displayXp={displayXp}
+                  displayHp={tower?.hp}
+                  displayMaxHp={tower?.maxHp}
                   equippedAttacks={equippedAttacks}
                   activeAttackIndex={activeAttackIndex}
                   onSelectAttack={(index) => {
@@ -869,18 +885,16 @@ export default function TowerDefenseScreen({
         </div>
         {engineRef.current.roster.map((creature) => {
           const isActive = activeTowerIds.includes(creature.id);
+          const activeTower = engineRef.current.towers.find(
+            (tower) => tower.creature.id === creature.id
+          );
 
           let displayLevel = creature.level;
           let displayXp = creature.xp;
 
-          if (isActive) {
-            const activeTower = engineRef.current.towers.find(
-              (t: any) => t.creature.id === creature.id
-            );
-            if (activeTower) {
-              displayLevel = activeTower.creature.level;
-              displayXp = activeTower.creature.xp;
-            }
+          if (activeTower) {
+            displayLevel = activeTower.creature.level;
+            displayXp = activeTower.creature.xp;
           }
 
           const { name, spriteUrl } = resolveSpeciesVisuals(creature.speciesId);
@@ -894,6 +908,8 @@ export default function TowerDefenseScreen({
               isActive={isActive}
               displayLevel={displayLevel}
               displayXp={displayXp}
+              displayHp={activeTower?.hp}
+              displayMaxHp={activeTower?.maxHp}
               onClick={() => {
                 if (justDraggedRef.current) {
                   justDraggedRef.current = false;

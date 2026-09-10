@@ -57,7 +57,7 @@ function createEngine(creatureIds: string[]) {
 }
 
 describe('Voltusk Electric Orb enemy ability', () => {
-  it('is assigned to stationary Level 6 Voltusk with the lower placements safe', () => {
+  it('is assigned to stationary Level 6 Voltusk with the recovery placements safe', () => {
     expect(ENEMY_ABILITY_DEFS.VOLTUSK_ELECTRIC_ORB).toMatchObject({
       type: 'TOWER_GROUND_ORB',
       initialCooldownMs: 2500,
@@ -73,7 +73,7 @@ describe('Voltusk Electric Orb enemy ability', () => {
         (definition) => definition.id === 'level_6_voltusk'
       )
     ).toMatchObject({
-      stationaryPosition: { x: 50, y: 12 },
+      stationaryPosition: { x: 85, y: 14 },
       abilityId: 'VOLTUSK_ELECTRIC_ORB',
     });
   });

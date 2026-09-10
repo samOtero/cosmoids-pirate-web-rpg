@@ -4,12 +4,12 @@ import { TDLevelData } from '@/engine/tower-defense/types';
  * First playable three-corridor slice for the Level 6 officer confrontation.
  *
  * Poguin use the upper and lower lanes while Tigrevel is synchronized to the
- * unobstructed center track. Voltusk occupies the raised northern dais and Mari
- * waits in the southern recovery alcove. Voltusk bombards occupied upper spots
+ * unobstructed center track. Mari waits in the upper-left recovery alcove while
+ * Voltusk occupies the raised upper-right dais. Voltusk bombards combat spots
  * with dodgeable electric orbs. Poguin cooperatively haul Tigrevel through
  * steel-rope chains. Before they attach, Poguin make one telegraphed hop to
  * the opposite Poguin lane and cannot be newly targeted while airborne.
- * Mari feeds injured towers on the two safe southern recovery spots. The
+ * Mari feeds injured towers on the two safe upper-left recovery spots. The
  * bespoke cursed phase, boss scripting, and final balance remain out of scope.
  */
 export const LEVEL_6: TDLevelData = {
@@ -17,203 +17,204 @@ export const LEVEL_6: TDLevelData = {
     [
       {
         x: -1,
-        y: 43,
+        y: 52,
       },
       {
         x: 9,
-        y: 43,
+        y: 52,
       },
       {
         x: 20,
-        y: 43,
+        y: 52,
       },
       {
         x: 35,
-        y: 43,
+        y: 52,
       },
       {
         x: 50,
-        y: 43,
+        y: 52,
       },
       {
         x: 65,
-        y: 43,
+        y: 52,
       },
       {
         x: 78,
-        y: 43,
+        y: 52,
       },
       {
         x: 86,
-        y: 43,
+        y: 52,
       },
       {
         x: 89,
-        y: 43,
+        y: 52,
       },
     ],
     [
       {
         x: -1,
-        y: 46,
+        y: 55,
       },
       {
         x: 12,
-        y: 46,
+        y: 55,
       },
       {
         x: 28,
-        y: 46,
+        y: 55,
       },
       {
         x: 44,
-        y: 46,
+        y: 55,
       },
       {
         x: 60,
-        y: 46,
+        y: 55,
       },
       {
         x: 76,
-        y: 46,
+        y: 55,
       },
       {
         x: 89,
-        y: 46,
+        y: 55,
       },
     ],
     [
       {
         x: -1,
-        y: 49,
+        y: 58,
       },
       {
         x: 9,
-        y: 49,
+        y: 58,
       },
       {
         x: 20,
-        y: 49,
+        y: 58,
       },
       {
         x: 35,
-        y: 49,
+        y: 58,
       },
       {
         x: 50,
-        y: 49,
+        y: 58,
       },
       {
         x: 65,
-        y: 49,
+        y: 58,
       },
       {
         x: 78,
-        y: 49,
+        y: 58,
       },
       {
         x: 86,
-        y: 49,
+        y: 58,
       },
       {
         x: 89,
-        y: 49,
+        y: 58,
       },
     ],
   ],
   placementSpots: [
     {
-      x: 42.37,
-      y: 16.33,
+      x: 78,
+      y: 25,
     },
     {
-      x: 50,
-      y: 20,
+      x: 85,
+      y: 28,
     },
     {
-      x: 57.71,
-      y: 16.09,
+      x: 92,
+      y: 25,
     },
     {
-      x: 41.21,
-      y: 90.05,
+      x: 13,
+      y: 25,
     },
     {
-      x: 24.51,
-      y: 65.6,
+      x: 25,
+      y: 66,
     },
     {
-      x: 57.23,
-      y: 90.42,
+      x: 23,
+      y: 25,
     },
     {
-      x: 31.28,
-      y: 66.21,
+      x: 34,
+      y: 66,
     },
     {
-      x: 17.59,
-      y: 65.48,
+      x: 16,
+      y: 66,
     },
     {
-      x: 24.64,
-      y: 26.06,
+      x: 25,
+      y: 43,
     },
     {
-      x: 17.86,
-      y: 25.58,
+      x: 16,
+      y: 43,
     },
     {
-      x: 40.8,
-      y: 65.85,
+      x: 44,
+      y: 66,
     },
     {
-      x: 31.76,
-      y: 26.67,
+      x: 35,
+      y: 43,
     },
     {
-      x: 50.11,
-      y: 65.12,
+      x: 54,
+      y: 66,
     },
     {
-      x: 40.73,
-      y: 26.79,
+      x: 45,
+      y: 43,
     },
     {
-      x: 49.97,
-      y: 27.16,
+      x: 55,
+      y: 43,
     },
     {
-      x: 59.35,
-      y: 27.65,
+      x: 65,
+      y: 43,
     },
     {
-      x: 59.22,
-      y: 65.24,
+      x: 64,
+      y: 66,
     },
     {
-      x: 71.82,
-      y: 27.4,
+      x: 75,
+      y: 43,
     },
     {
-      x: 81.95,
-      y: 27.4,
+      x: 86,
+      y: 43,
     },
     {
-      x: 70.72,
-      y: 64.99,
+      x: 75,
+      y: 66,
     },
     {
-      x: 81.74,
-      y: 64.63,
+      x: 86,
+      y: 66,
     },
   ],
   safePlacementSpotIndices: [3, 5],
   towerRecovery: {
     placementSpotIndices: [3, 5],
     healerPosition: {
-      x: 49.97,
-      y: 87.74,
+      x: 18,
+      y: 14,
     },
+    healerIdleFacingDirection: 'down',
     healFraction: 0.35,
     feedingIntervalMs: 8000,
     tutorial: {
@@ -227,27 +228,27 @@ export const LEVEL_6: TDLevelData = {
   environmentUnits: [
     {
       position: {
-        x: 26.22,
-        y: 78.74,
+        x: 30,
+        y: 83,
       },
       tdConfigId: 'caleb_battle',
       facingDirection: 'up',
     },
     {
       position: {
-        x: 76.13,
-        y: 79.23,
+        x: 70,
+        y: 83,
       },
       tdConfigId: 'kip_battle',
       facingDirection: 'up',
     },
     {
       position: {
-        x: 49.97,
-        y: 87.74,
+        x: 18,
+        y: 14,
       },
       tdConfigId: 'maribel_capture',
-      facingDirection: 'up',
+      facingDirection: 'down',
     },
   ],
   startingTowers: [
@@ -264,7 +265,7 @@ export const LEVEL_6: TDLevelData = {
       },
       position: {
         x: 82,
-        y: 46,
+        y: 55,
       },
       facingDirection: 'left',
       isFixed: true,
@@ -275,7 +276,7 @@ export const LEVEL_6: TDLevelData = {
     {
       position: {
         x: 89,
-        y: 46,
+        y: 55,
       },
       tdConfigId: 'tigrevel_netted',
       haulPathIndex: 1,
@@ -301,8 +302,8 @@ export const LEVEL_6: TDLevelData = {
       creatureId: 'voltusk',
       level: 10,
       stationaryPosition: {
-        x: 50,
-        y: 12,
+        x: 85,
+        y: 14,
       },
       abilityId: 'VOLTUSK_ELECTRIC_ORB',
       hpMultiplier: 4,
@@ -383,12 +384,12 @@ export const LEVEL_6: TDLevelData = {
   lives: 1,
   disableCapture: false,
   enemyHpMultiplier: 1,
-  backgroundUrl: '/battles/bg/bg_level_6_three_lane_draft_v6.png',
-  backgroundScale: 3,
+  backgroundUrl: '/battles/bg/bg_level_6_three_lane_compact_v1.png',
+  backgroundScale: 2,
   initialView: {
     offsetX: 50,
     offsetY: 50,
-    zoom: 1 / 3,
+    zoom: 1 / 2,
   },
   introMessage: 'Protect Tigrevel!',
 };

@@ -11,6 +11,8 @@ export function ActiveAttackMenu({
   isActive,
   displayLevel,
   displayXp,
+  displayHp,
+  displayMaxHp,
   equippedAttacks,
   activeAttackIndex,
   onSelectAttack,
@@ -24,6 +26,8 @@ export function ActiveAttackMenu({
   isActive: boolean;
   displayLevel: number;
   displayXp: number;
+  displayHp?: number;
+  displayMaxHp?: number;
   equippedAttacks: string[];
   activeAttackIndex: number;
   onSelectAttack: (index: number) => void;
@@ -43,6 +47,8 @@ export function ActiveAttackMenu({
             isActive={isActive}
             displayLevel={displayLevel}
             displayXp={displayXp}
+            displayHp={displayHp}
+            displayMaxHp={displayMaxHp}
           />
           <span className="text-[8px] lg:text-xs text-slate-400 mt-1 lg:mt-2 font-bold uppercase tracking-wider hidden lg:block">
             Selected

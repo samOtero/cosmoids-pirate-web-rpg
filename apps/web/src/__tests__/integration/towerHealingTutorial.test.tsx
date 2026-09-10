@@ -124,9 +124,18 @@ describe('Mari healing tutorial', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Show me' }));
 
-    expect(
-      screen.getByText('Drag the injured Cosmoid onto a glowing recovery spot.')
-    ).toBeInTheDocument();
+    const instruction =
+      'Drag the injured Cosmoid onto a glowing recovery spot.';
+    expect(screen.getAllByText(instruction)).toHaveLength(2);
+    expect(screen.getByTestId('desktop-healing-guidance')).toHaveClass(
+      'hidden',
+      'lg:block'
+    );
+    const mobileGuidance = screen.getByTestId('mobile-healing-guidance');
+    expect(mobileGuidance).toHaveClass('lg:hidden');
+    expect(screen.getByTestId('tower-defense-hud')).toContainElement(
+      mobileGuidance
+    );
     expect(tutorialHarness.battlefieldProps).toMatchObject({
       healingTutorialTowerCreatureId: 'patient',
     });

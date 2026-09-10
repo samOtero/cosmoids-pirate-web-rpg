@@ -394,6 +394,8 @@ export interface TDLevelData {
 export interface TDTowerRecoveryConfig {
   placementSpotIndices: number[];
   healerPosition: Point;
+  /** Direction the healer faces when no injured tower occupies a recovery spot. */
+  healerIdleFacingDirection?: BaseTDUnit['facingDirection'];
   /** Fraction of maximum HP restored by each feeding. */
   healFraction: number;
   feedingIntervalMs: number;

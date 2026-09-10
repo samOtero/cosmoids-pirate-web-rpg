@@ -8,6 +8,8 @@ export function TowerButton({
   isActive,
   displayLevel,
   displayXp,
+  displayHp,
+  displayMaxHp,
   onClick,
   onPointerDown,
 }: {
@@ -17,10 +19,21 @@ export function TowerButton({
   isActive: boolean;
   displayLevel: number;
   displayXp: number;
+  displayHp?: number;
+  displayMaxHp?: number;
   onClick?: () => void;
   draggable?: boolean;
   onPointerDown?: (e: React.PointerEvent<HTMLButtonElement>) => void;
 }) {
+  const hasLife = displayHp !== undefined && displayMaxHp !== undefined;
+  const lifeRatio = hasLife && displayMaxHp > 0 ? displayHp / displayMaxHp : 1;
+  const lifeColor =
+    lifeRatio < 0.2
+      ? 'text-red-400'
+      : lifeRatio < 0.5
+        ? 'text-yellow-400'
+        : 'text-green-400';
+
   return (
     <button
       onClick={onClick}
@@ -51,6 +64,14 @@ export function TowerButton({
           <span className="text-[6px] lg:text-[8px] text-gray-300 leading-none">
             Lv.{displayLevel}
           </span>
+          {hasLife && (
+            <span
+              className={`text-[6px] font-bold leading-none lg:text-[8px] ${lifeColor}`}
+              title={`HP ${displayHp} / ${displayMaxHp}`}
+            >
+              HP {displayHp}/{displayMaxHp}
+            </span>
+          )}
         </div>
 
         <div className="w-full px-0.5 lg:px-1 mt-0.5">

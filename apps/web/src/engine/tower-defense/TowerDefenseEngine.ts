@@ -296,6 +296,7 @@ export class TowerDefenseEngine {
   public objectiveAllyAcidShots: ObjectiveAllyAcidShot[] = [];
   public enemyGroundOrbs: EnemyGroundOrb[] = [];
   public towerRecoveryFeeds: TowerRecoveryFeed[] = [];
+  public towerRecoveryTargetTowerId?: string;
   public destroyedStructureVisuals: DestroyedStructureVisual[] = [];
   public focusedStructureId: string | null = null;
 
@@ -2352,7 +2353,60 @@ export class TowerDefenseEngine {
 
   private processTowerRecovery(): void {
     if (!this.towerRecovery) return;
+    this.updateTowerRecoveryHealerFacing();
     this.towers.forEach((tower) => this.queueTowerRecoveryFeed(tower));
+  }
+
+  private updateTowerRecoveryHealerFacing(): void {
+    const recovery = this.towerRecovery;
+    if (!recovery) return;
+
+    const healer = this.environmentUnits.find(
+      (unit) =>
+        Math.abs(unit.position.x - recovery.healerPosition.x) < 0.001 &&
+        Math.abs(unit.position.y - recovery.healerPosition.y) < 0.001
+    );
+    if (!healer) {
+      this.towerRecoveryTargetTowerId = undefined;
+      return;
+    }
+
+    const activeFeed = this.towerRecoveryFeeds.find(
+      (feed) => feed.impactedAtMs === undefined
+    );
+    const activeFeedTarget = activeFeed
+      ? this.towers.find(
+          (tower) =>
+            tower.id === activeFeed.towerId &&
+            tower.hp > 0 &&
+            tower.hp < tower.maxHp
+        )
+      : undefined;
+    const target =
+      activeFeedTarget ??
+      this.towers.find(
+        (tower) =>
+          tower.hp > 0 &&
+          tower.hp < tower.maxHp &&
+          this.isTowerOnRecoverySpot(tower)
+      );
+    if (!target) {
+      this.towerRecoveryTargetTowerId = undefined;
+      healer.facingDirection = recovery.healerIdleFacingDirection ?? 'down';
+      return;
+    }
+
+    this.towerRecoveryTargetTowerId = target.id;
+    const dx = target.position.x - healer.position.x;
+    const dy = target.position.y - healer.position.y;
+    healer.facingDirection =
+      Math.abs(dx * this.aspectRatio) >= Math.abs(dy)
+        ? dx >= 0
+          ? 'right'
+          : 'left'
+        : dy >= 0
+          ? 'down'
+          : 'up';
   }
 
   private processTowerRecoveryFeeds(): void {
