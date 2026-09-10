@@ -629,14 +629,14 @@ export default function TowerDefenseScreen({
 
       {healingTutorial?.phase === 'callout' &&
         levelData.towerRecovery?.tutorial && (
-          <div className="fixed inset-0 z-10001 flex items-center justify-center bg-black/70 p-3">
+          <div className="fixed inset-0 z-10001 flex items-end justify-center bg-black/30 p-2 lg:items-center lg:bg-black/70 lg:p-3">
             <div
               role="dialog"
               aria-modal="true"
               aria-labelledby="healing-tutorial-title"
-              className="flex w-full max-w-xl items-center gap-4 rounded-2xl border-2 border-emerald-400 bg-slate-900/95 p-4 shadow-[0_0_35px_rgba(52,211,153,0.35)] sm:gap-6 sm:p-6"
+              className="flex w-full max-w-md items-center gap-3 rounded-xl border-2 border-emerald-400 bg-slate-900/95 p-3 shadow-[0_0_35px_rgba(52,211,153,0.35)] lg:max-w-xl lg:gap-6 lg:rounded-2xl lg:p-6"
             >
-              <div className="h-28 w-28 shrink-0 overflow-hidden rounded-full border-2 border-emerald-300 bg-slate-800 sm:h-40 sm:w-40">
+              <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-emerald-300 bg-slate-800 lg:h-40 lg:w-40">
                 <Image
                   src={levelData.towerRecovery.tutorial.portraitUrl}
                   alt={levelData.towerRecovery.tutorial.speakerName}
@@ -648,15 +648,15 @@ export default function TowerDefenseScreen({
               <div className="min-w-0 flex-1">
                 <h3
                   id="healing-tutorial-title"
-                  className="text-lg font-black text-emerald-300 sm:text-2xl"
+                  className="text-base font-black text-emerald-300 lg:text-2xl"
                 >
                   {levelData.towerRecovery.tutorial.speakerName}
                 </h3>
-                <p className="mt-1 text-base font-bold text-white sm:text-xl">
+                <p className="mt-0.5 text-sm leading-tight font-bold text-white lg:mt-1 lg:text-xl lg:leading-normal">
                   {levelData.towerRecovery.tutorial.message}
                 </p>
                 <button
-                  className="mt-4 w-full rounded-lg bg-emerald-600 px-4 py-2 font-black text-white hover:bg-emerald-500"
+                  className="mt-2 w-full rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-black text-white hover:bg-emerald-500 lg:mt-4 lg:px-4 lg:py-2 lg:text-base"
                   onClick={() =>
                     setHealingTutorial((current) =>
                       current ? { ...current, phase: 'guiding' } : current

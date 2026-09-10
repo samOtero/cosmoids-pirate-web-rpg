@@ -34,9 +34,7 @@ describe('Level 6 playable placeholder', () => {
       text: 'BWOOOONG!',
       portraits: [{ key: 'Voltusk_Warning', displayName: 'Voltusk' }],
     });
-    expect(LEVEL_6_INTRO.backgroundImageKey).toBe(
-      'Level_6_Tigrevel_Netted'
-    );
+    expect(LEVEL_6_INTRO.backgroundImageKey).toBe('Level_6_Tigrevel_Netted');
   });
 
   it('uses the netted Tigrevel visual as the single recapture objective', () => {
@@ -121,9 +119,9 @@ describe('Level 6 playable placeholder', () => {
       stationaryPosition: { x: 50, y: 12 },
       abilityId: 'VOLTUSK_ELECTRIC_ORB',
     });
-    expect(LEVEL_6.safePlacementSpotIndices).toEqual([3, 4, 5]);
+    expect(LEVEL_6.safePlacementSpotIndices).toEqual([3, 5]);
     expect(LEVEL_6.towerRecovery).toMatchObject({
-      placementSpotIndices: [3, 4, 5],
+      placementSpotIndices: [3, 5],
       healerPosition: { x: 49.97, y: 87.74 },
       healFraction: 0.35,
       feedingIntervalMs: 8000,
@@ -139,7 +137,7 @@ describe('Level 6 playable placeholder', () => {
       (index) => LEVEL_6.placementSpots[index]
     );
     expect(combatSpots.every((spot) => spot.y < 30)).toBe(true);
-    expect(safeSpots).toHaveLength(3);
+    expect(safeSpots).toHaveLength(2);
     for (const spot of combatSpots) {
       expect(
         Math.min(
@@ -178,15 +176,11 @@ describe('Level 6 playable placeholder', () => {
       },
     ]);
     expect(LEVEL_6_WIN.sequence).toHaveLength(11);
-    expect(LEVEL_6_WIN.sequence[0].text).toContain(
-      'My Voltusk—defeated?'
-    );
+    expect(LEVEL_6_WIN.sequence[0].text).toContain('My Voltusk—defeated?');
     expect(LEVEL_6_WIN.sequence[4].text).toContain(
       'walks straight past the doubloon'
     );
-    expect(LEVEL_6_WIN.sequence[8].text).toContain(
-      'I think I have more.'
-    );
+    expect(LEVEL_6_WIN.sequence[8].text).toContain('I think I have more.');
     expect(LEVEL_6_WIN.sequence[10]).toMatchObject({
       text: expect.stringContaining('We need a bigger boat.'),
       portraits: [

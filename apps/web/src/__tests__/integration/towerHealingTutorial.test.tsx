@@ -111,8 +111,15 @@ describe('Mari healing tutorial', () => {
       });
     });
 
-    expect(screen.getByRole('dialog')).toHaveTextContent(
+    const callout = screen.getByRole('dialog');
+    expect(callout).toHaveTextContent(
       "They're hurt! Bring them here—I packed food!"
+    );
+    expect(callout).toHaveClass('max-w-md', 'p-3', 'lg:max-w-xl', 'lg:p-6');
+    expect(callout.parentElement).toHaveClass(
+      'items-end',
+      'bg-black/30',
+      'lg:items-center'
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'Show me' }));

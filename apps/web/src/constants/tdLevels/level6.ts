@@ -9,7 +9,7 @@ import { TDLevelData } from '@/engine/tower-defense/types';
  * with dodgeable electric orbs. Poguin cooperatively haul Tigrevel through
  * steel-rope chains. Before they attach, Poguin make one telegraphed hop to
  * the opposite Poguin lane and cannot be newly targeted while airborne.
- * Mari feeds injured towers on the three safe southern recovery spots. The
+ * Mari feeds injured towers on the two safe southern recovery spots. The
  * bespoke cursed phase, boss scripting, and final balance remain out of scope.
  */
 export const LEVEL_6: TDLevelData = {
@@ -207,9 +207,9 @@ export const LEVEL_6: TDLevelData = {
       y: 64.63,
     },
   ],
-  safePlacementSpotIndices: [3, 4, 5],
+  safePlacementSpotIndices: [3, 5],
   towerRecovery: {
-    placementSpotIndices: [3, 4, 5],
+    placementSpotIndices: [3, 5],
     healerPosition: {
       x: 49.97,
       y: 87.74,

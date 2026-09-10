@@ -67,7 +67,7 @@ describe('Voltusk Electric Orb enemy ability', () => {
       maxHpDamageFraction: 0.25,
       impactRadius: 4,
     });
-    expect(LEVEL_6.safePlacementSpotIndices).toEqual([3, 4, 5]);
+    expect(LEVEL_6.safePlacementSpotIndices).toEqual([3, 5]);
     expect(
       LEVEL_6.waveEnemyDefinitions.find(
         (definition) => definition.id === 'level_6_voltusk'
