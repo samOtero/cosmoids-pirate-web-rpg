@@ -9,8 +9,8 @@ export const LEVEL_6_WIN: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.NAVY_COMMANDER_NEUTRAL,
-          displayName: 'Navy Commander',
+          key: SpeakerImageKey.NAVY_COMMANDER_SHOCKED_DEFEAT,
+          displayName: 'Commander Strake',
           flipped: true,
         },
       ],
@@ -105,7 +105,7 @@ export const LEVEL_6_WIN: DialogConfig = {
     {
       portraits: [
         {
-          key: SpeakerImageKey.MARIBEL_DETERMINED,
+          key: SpeakerImageKey.MARIBEL_RELIEVED_HAPPY,
           displayName: 'Mari',
           flipped: true,
         },

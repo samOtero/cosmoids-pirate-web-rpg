@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { LEVEL_6_INTRO, LEVEL_6_WIN } from '@/constants/dialogs';
+import {
+  LEVEL_6_INTRO,
+  LEVEL_6_LOSE,
+  LEVEL_6_WIN,
+} from '@/constants/dialogs';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { LEVEL_ORDER, TD_LEVELS } from '@/constants/tdLevels';
 import { LEVEL_6 } from '@/constants/tdLevels/level6';
@@ -24,13 +28,26 @@ describe('Level 6 playable placeholder', () => {
       },
     ]);
     expect(LEVEL_6_INTRO.sequence).toHaveLength(10);
-    expect(LEVEL_6_INTRO.sequence[0].text).toContain(
+    expect(LEVEL_6_INTRO.sequence[0]).toMatchObject({
+      text: 'Commander Strake... He’s the one who ordered Tigrevel dragged beneath Ironbell.',
+      portraits: [
+        {
+          key: 'Maribel_Worried',
+          displayName: 'Mari',
+          flipped: true,
+        },
+      ],
+    });
+    expect(LEVEL_6_INTRO.sequence[1].text).toContain(
       'You’ll be dragged back by force.'
     );
-    expect(LEVEL_6_INTRO.sequence[1].backgroundImageKey).toBe(
+    expect(LEVEL_6_INTRO.sequence[1].portraits[0].displayName).toBe(
+      'Commander Strake'
+    );
+    expect(LEVEL_6_INTRO.sequence[2].backgroundImageKey).toBe(
       'Level_6_Net_Throw'
     );
-    expect(LEVEL_6_INTRO.sequence[4]).toMatchObject({
+    expect(LEVEL_6_INTRO.sequence[5]).toMatchObject({
       text: 'BWOOOONG!',
       portraits: [{ key: 'Voltusk_Warning', displayName: 'Voltusk' }],
     });
@@ -184,6 +201,13 @@ describe('Level 6 playable placeholder', () => {
     ]);
     expect(LEVEL_6_WIN.sequence).toHaveLength(11);
     expect(LEVEL_6_WIN.sequence[0].text).toContain('My Voltusk—defeated?');
+    expect(LEVEL_6_WIN.sequence[0].portraits).toEqual([
+      expect.objectContaining({
+        key: 'Navy_Commander_Shocked_Defeat',
+        displayName: 'Commander Strake',
+        flipped: true,
+      }),
+    ]);
     expect(LEVEL_6_WIN.sequence[4].text).toContain(
       'walks straight past the doubloon'
     );
@@ -204,6 +228,31 @@ describe('Level 6 playable placeholder', () => {
     expect(
       LEVEL_6_WIN.sequence.slice(9).map((line) => line.backgroundImageKey)
     ).toEqual(Array(2).fill('Level_6_Cramped_Crew_Departure'));
+  });
+
+  it('lets Commander Strake deliver the defeat line', () => {
+    expect(TD_LEVELS[TDLevelContext.LEVEL_6].loseEvents).toEqual([
+      {
+        type: 'SHOW_DIALOG',
+        payload: { context: DialogContext.LEVEL_6_LOSE },
+      },
+      { type: 'GO_TO_LEVEL_SELECT' },
+    ]);
+    expect(LEVEL_6_LOSE).toMatchObject({
+      sequence: [
+        {
+          text: 'Order is restored.',
+          portraits: [
+            {
+              key: 'Navy_Commander_Neutral',
+              displayName: 'Commander Strake',
+              flipped: true,
+            },
+          ],
+        },
+      ],
+      backgroundImageKey: 'Level_6_Tigrevel_Netted',
+    });
   });
 
   it('fields uncapturable Poguin support and Voltusk as the placeholder boss', () => {

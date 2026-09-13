@@ -274,6 +274,7 @@ export const VOLTUSK: CosmoidTemplate = {
   iconImg: '/UI/Icons/voltusk_icon.png',
   journalEntry:
     'Its metallic whiskers tremble when a storm approaches, guiding it to the place where lightning will strike. The larger its steel tusks, the more electricity it can store—and the more confidently it challenges rivals.',
+  journalImg: '/UI/Journal/voltusk_journal.png',
   spriteUrl: '/battles/cosmoids/voltusk_down.png',
   battleSpriteUrl: '/battles/cosmoids/voltusk_left.png',
   movementId: 'lizard',
@@ -300,6 +301,7 @@ export const POGUIN: CosmoidTemplate = {
   iconImg: '/UI/Icons/poguin_icon.png',
   journalEntry:
     'It drums its oversized feet across rain-slick stone until nearby Poguin fall into step. A final stomp scatters a charged splash in every direction.',
+  journalImg: '/UI/Journal/poguin_journal.png',
   spriteUrl: '/battles/cosmoids/poguin_down.png',
   battleSpriteUrl: '/battles/cosmoids/poguin_left.png',
   movementId: 'lizard',

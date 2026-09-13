@@ -81,6 +81,8 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
   [SpeakerImageKey.NAVY_GUARD_ALERT]: '/dialog/navy_guard_alert.png',
   [SpeakerImageKey.NAVY_COMMANDER_NEUTRAL]:
     '/dialog/navy_commander_neutral.png',
+  [SpeakerImageKey.NAVY_COMMANDER_SHOCKED_DEFEAT]:
+    '/dialog/navy_commander_shocked_defeat.png',
   [SpeakerImageKey.CAPTAIN_VANE_HAUGHTY_NEUTRAL]:
     '/dialog/captain_vane_haughty_neutral.png',
   [SpeakerImageKey.CAPTAIN_VANE_MOCKING_DISBELIEF]:

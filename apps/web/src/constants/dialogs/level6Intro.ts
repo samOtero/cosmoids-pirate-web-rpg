@@ -9,8 +9,19 @@ export const LEVEL_6_INTRO: DialogConfig = {
     {
       portraits: [
         {
+          key: SpeakerImageKey.MARIBEL_WORRIED,
+          displayName: 'Mari',
+          flipped: true,
+        },
+      ],
+      text: 'Commander Strake... He’s the one who ordered Tigrevel dragged beneath Ironbell.',
+      backgroundImageKey: BackgroundImageKey.LEVEL_5_TIGREVEL_PROTECTS_KIDS,
+    },
+    {
+      portraits: [
+        {
           key: SpeakerImageKey.NAVY_COMMANDER_NEUTRAL,
-          displayName: 'Navy Commander',
+          displayName: 'Commander Strake',
           flipped: true,
         },
       ],
@@ -36,7 +47,7 @@ export const LEVEL_6_INTRO: DialogConfig = {
       portraits: [
         {
           key: SpeakerImageKey.NAVY_COMMANDER_NEUTRAL,
-          displayName: 'Navy Commander',
+          displayName: 'Commander Strake',
           flipped: true,
         },
       ],
@@ -63,10 +74,6 @@ export const LEVEL_6_INTRO: DialogConfig = {
         },
       ],
       text: 'I-I’m scared… but Tigrevel stood between us and him. So I’m standing here.',
-    },
-    {
-      portraits: [{ key: SpeakerImageKey.EMPTY, displayName: '' }],
-      text: 'Kip and Mopup step forward together.',
     },
     {
       portraits: [

@@ -232,6 +232,10 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
     ],
     loseEvents: [
       {
+        type: 'SHOW_DIALOG',
+        payload: { context: DialogContext.LEVEL_6_LOSE },
+      },
+      {
         type: 'GO_TO_LEVEL_SELECT',
       },
     ],
