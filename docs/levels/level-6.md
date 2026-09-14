@@ -8,9 +8,9 @@
 - **Primary objective:** Defeat the officer's boss Cosmoid and prevent Tigrevel from being dragged back into captivity.
 - **Boss:** [Voltusk](../cosmoids/voltusk.md), a Steel/Electric walrus with approved name, visual design, and core lore.
 - **Supporting enemies:** [Poguin](../cosmoids/poguin.md), the selected Electric/Water penguin minion concept. Its rockhopper movement now includes one authored, telegraphed switch between the upper and lower Poguin lanes before hauling.
-- **Midbattle escalation:** At approximately half boss health, combat pauses while the officer forces a Cursed Relic onto his partner, triggering a stronger Cursed Aura phase.
+- **Midbattle escalation:** At 30% boss health, combat pauses for a short five-panel intermission in which the officer forces his partner into a Cursed Aura phase. How he triggers the transformation is neither named nor shown.
 - **Story resolution:** Tigrevel is freed; Mari and Tigrevel join the crew. Mari becomes the navigator, and the enlarged crew agrees that it needs a bigger boat.
-- **Status:** Direction approved; Voltusk's concept, approved normal-form transparent assets, species registration, and directional visuals are complete. Poguin's concept, transparent production assets, species registration, and directional visuals are also complete. A first playable three-corridor battlefield slice, its illustrated opening dialogue, and its victory dialogue were added September 8, 2026. Voltusk now remains on the north platform and bombards occupied combat placements with dodgeable electric orbs. Poguin attach steel-rope hauling chains to Tigrevel, with each connected helper increasing the group's pull speed, and perform telegraphed lane hops before reaching the objective. Mari now feeds injured towers placed in her two safe recovery positions. The first tower reduced to 75% health pauses the battle for a one-time Mari callout, then highlights the injured tower and recovery positions until the player moves it to safety. The cursed phase, story intermissions, final encounter mechanics, and balance remain to be developed.
+- **Status:** Direction approved; Voltusk's concept, approved normal-form transparent assets, species registration, and directional visuals are complete. Poguin's concept, transparent production assets, species registration, and directional visuals are also complete. A first playable three-corridor battlefield slice, its illustrated opening dialogue, victory dialogue, and cursed intermission were added in September 2026. Voltusk remains on the north platform and bombards occupied combat placements with dodgeable electric orbs. At 30% health, the battle pauses for the cursed intermission, the existing Cursed Aura treatment activates, and each later orb attack marks up to three distinct valid targets. Poguin attach steel-rope hauling chains to Tigrevel, with each connected helper increasing the group's pull speed, and perform telegraphed lane hops before reaching the objective. Mari feeds injured towers placed in her two safe recovery positions. The first tower reduced to 75% health pauses the battle for a one-time Mari callout, then highlights the injured tower and recovery positions until the player moves it to safety. Final encounter balance remains to be developed.
 
 ## Continuity and Officer Direction
 
@@ -59,19 +59,17 @@ Do not treat any of those interactions as settled mechanics. Further design shou
 
 ## Cursed Intermission and Second Phase
 
-Trigger a one-time intermission when the main enemy Cosmoid reaches approximately 50% of its maximum health. Pause the battle completely while the story plays, including objective movement and ongoing combat effects, so the player cannot lose ground during dialogue.
+Trigger a one-time intermission when Voltusk reaches 30% of its maximum health. Pause the battle completely while the story plays, including objective movement and ongoing combat effects, so the player cannot lose ground during dialogue.
 
-The officer blames his partner for failing to overpower the children and fastens a Cursed Relic onto it to force greater strength. Show its pain and the emergence of a dark purple Cursed Aura. This is exploitation inflicted on a living creature, not a willing or celebratory power-up.
+The intermission contains five panels: two terse lines from Strake, a violet transformation flare, Voltusk's cry, and Kip recognizing that Strake is forcing the curse into Voltusk. The means by which Strake triggers it is deliberately left unidentified and unseen. Show Voltusk's pain and the emergence of the existing dark purple Cursed Aura. This is exploitation inflicted on a living creature, not a willing or celebratory power-up.
 
 The transformation is a **Cursed Aura state**, distinct from a permanent Cursed evolution. The boss becomes more dangerous after the intermission, but retains its remaining health instead of receiving a fresh health bar. The player keeps the progress made in the first phase.
 
-The second phase should intensify the established capture-and-control threat through the boss's electrical abilities. The officer forces the walrus to release more power than it can safely control, turning its normally measured discharges into painful, uncontrolled surges. Exact attacks, numerical boosts, minion interactions, telegraphs, and counters remain open for encounter design.
+During the second phase, Voltusk's electric-orb attack marks up to three distinct occupied combat placements at once instead of one. If fewer than three valid targets are deployed, it marks each available target once. Mari's recovery placements remain safe and are never selected. Orb timing, damage, travel time, and telegraph behavior otherwise remain unchanged. Voltusk retains its remaining health and the player keeps all progress made before the intermission.
 
-## Aftermath and Curse Story Seed
+## Aftermath and Escape
 
-After the boss is defeated and Tigrevel freed, Caleb removes the forced relic from the officer's Cosmoid. Its aura begins to subside, but it remains exhausted and needs care. Relic removal here is relief from this forced exposure, not proof of a universal or complete cure for the Stone Curse.
-
-Caleb's emerging realization is that a cursed Cosmoid can need rescuing too. This plants a compassionate motive for later curse-related objectives while preserving his early dream of becoming the greatest Cosmoid Captain. Do not turn the ending into a full cure-quest declaration or reveal Patient Zero, the Isle of Whispers, or the complete curse mechanism.
+After the boss is defeated and Tigrevel freed, Strake reacts in stunned disbelief. Kip urges the group to leave before the commander recovers, and the children immediately run to Ironbell harbor.
 
 ## Crew Recruitment and Next Objective
 
@@ -95,15 +93,14 @@ Two dedicated victory backgrounds support the departure. `bg_level_6_tigrevel_cl
 ## Remaining Design Work
 
 - Choose the final level title and officer name.
-- Develop Voltusk's cursed-phase visual treatment while preserving its approved normal-form identity.
+- Tune the existing Cursed Aura treatment on Voltusk if visual inspection reveals scale or readability issues.
 - Integrate Poguin's approved production assets when its gameplay role is finalized; decide whether additional Electric minion species or roles are needed.
-- Decide minion mechanics and the cursed phase's electrical interaction.
+- Tune the three-target cursed orb pressure alongside Poguin hauling and Mari's recovery mechanic.
 - Explore whether bell- or gong-like calls contribute to the encounter; their use remains optional and outside the core species description.
 - Tune the implemented cooperative hauling values, hop timing and presentation, lane-coverage decisions, and Tigrevel recovery rules on the three-corridor battlefield.
 - Tune Voltusk's initial movement, Body Rush and Spark attacks, and stats for the boss encounter; specify wave composition and balance.
-- Define precise threshold handling and pause/resume behavior for the one-time intermission.
 - Decide how Tigrevel's voluntary, uncaptured companionship appears in the roster and later battles.
-- Write the cursed intermission; revise the implemented introduction and victory dialogue as the final staging and art become available.
+- Revise the implemented introduction, intermission, and victory dialogue only if final staging or art requires it.
 - Develop the larger-boat objective beyond this level's closing agreement.
 
 ## Related Records

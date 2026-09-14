@@ -8,6 +8,7 @@ import {
   TD_CREATURE_DEFS,
 } from '@/engine/tower-defense/TowerDefenseEngine';
 import PixiBattlefield, { PixiBattlefieldRef } from './PixiBattlefield';
+import DialogContent from '@/app/components/ui/DialogContent';
 import { ActiveAttackMenu } from './ActiveAttackMenu';
 import { TowerButton } from './TowerButton';
 import {
@@ -160,6 +161,10 @@ export default function TowerDefenseScreen({
   const healingTutorialTriggeredRef = useRef(false);
   const [healingTutorial, setHealingTutorial] =
     useState<HealingTutorialState | null>(null);
+  const [cursedIntermissionEnemyId, setCursedIntermissionEnemyId] = useState<
+    string | null
+  >(null);
+  const cursedTransformationShownRef = useRef(false);
 
   const DRAG_THRESHOLD = 10; // pixels before a pointerdown becomes a drag
   const pendingDragRef = useRef<{
@@ -358,6 +363,11 @@ export default function TowerDefenseScreen({
             setUiUpdateToggle((prev) => !prev);
           }, 500);
           break;
+        case 'CURSED_PHASE_TRIGGERED':
+          cursedTransformationShownRef.current = false;
+          setCursedIntermissionEnemyId(event.enemyId);
+          setIsPlaying(false);
+          break;
       }
     });
     return unsub;
@@ -529,6 +539,22 @@ export default function TowerDefenseScreen({
     }
   };
 
+  const revealCursedTransformation = () => {
+    if (!cursedIntermissionEnemyId || cursedTransformationShownRef.current) {
+      return;
+    }
+    if (engineRef.current.activateCursedPhase(cursedIntermissionEnemyId)) {
+      cursedTransformationShownRef.current = true;
+      setUiUpdateToggle((previous) => !previous);
+    }
+  };
+
+  const finishCursedIntermission = () => {
+    revealCursedTransformation();
+    setCursedIntermissionEnemyId(null);
+    setIsPlaying(true);
+  };
+
   return (
     <div
       className="fixed inset-0 z-9998 flex touch-none flex-col bg-slate-900"
@@ -624,6 +650,28 @@ export default function TowerDefenseScreen({
                 ? 'Ready!'
                 : 'GO!'}
           </div>
+        </div>
+      )}
+
+      {cursedIntermissionEnemyId && levelData.cursedPhase && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Cursed transformation"
+          className="fixed inset-0 z-10002 bg-black/70"
+        >
+          <DialogContent
+            sequence={levelData.cursedPhase.intermission.sequence}
+            dialogName="Level 6 cursed intermission"
+            onContinue={finishCursedIntermission}
+            onDialogAction={() => {}}
+            onLineChange={(lineIndex) => {
+              if (lineIndex >= levelData.cursedPhase!.transformationLineIndex) {
+                revealCursedTransformation();
+              }
+            }}
+            allowSkip={true}
+          />
         </div>
       )}
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  LEVEL_6_CURSED_INTERMISSION,
   LEVEL_6_INTRO,
   LEVEL_6_LOSE,
   LEVEL_6_WIN,
@@ -80,6 +81,45 @@ describe('Level 6 playable placeholder', () => {
     expect(engine.hasCaptureUnitsGoal).toBe(true);
     expect(engine.lives).toBe(1);
     engine.destroy();
+  });
+
+  it('pauses at 30% health for the short cursed transformation', () => {
+    expect(LEVEL_6.cursedPhase).toMatchObject({
+      enemyDefinitionId: 'level_6_voltusk',
+      triggerHealthFraction: 0.3,
+      transformationLineIndex: 2,
+      intermission: LEVEL_6_CURSED_INTERMISSION,
+    });
+    expect(LEVEL_6_CURSED_INTERMISSION.sequence).toHaveLength(5);
+    expect(
+      LEVEL_6_CURSED_INTERMISSION.sequence.map((line) => line.text)
+    ).toEqual([
+      'Enough. I will not be humiliated by a band of children.',
+      'In war, victory is all that matters, no matter the cost.',
+      'A violent violet flare erupts around Voltusk.',
+      'BWOOOOARGH!',
+      'That aura... He’s forcing the curse into Voltusk!',
+    ]);
+    expect(LEVEL_6_CURSED_INTERMISSION.sequence[4].portraits).toEqual([
+      expect.objectContaining({ displayName: 'Kip' }),
+    ]);
+    expect(LEVEL_6_CURSED_INTERMISSION.sequence[1].portraits).toEqual([
+      expect.objectContaining({
+        key: 'Navy_Commander_Desperate_Shout',
+        displayName: 'Commander Strake',
+      }),
+    ]);
+    expect(LEVEL_6_CURSED_INTERMISSION.sequence[3].portraits).toEqual([
+      expect.objectContaining({
+        key: 'Voltusk_Cursed_Warning',
+        displayName: 'Voltusk',
+      }),
+    ]);
+    expect(
+      LEVEL_6.waveEnemyDefinitions.find(
+        (definition) => definition.id === 'level_6_voltusk'
+      )?.weakenedThreshold
+    ).toBe(0.3);
   });
 
   it('gives Poguin two lanes and Tigrevel a separate center track', () => {
@@ -216,7 +256,7 @@ describe('Level 6 playable placeholder', () => {
       text: expect.stringContaining('We need a bigger boat.'),
       portraits: [
         expect.objectContaining({
-          key: 'Maribel_Determined',
+          key: 'Maribel_Relieved_Happy',
           displayName: 'Mari',
         }),
       ],

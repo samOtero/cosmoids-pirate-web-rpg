@@ -35,6 +35,8 @@ export type EnemyAbilityDefinition =
       aimDurationMs: number;
       maxHpDamageFraction: number;
       impactRadius: number;
+      targetCount: number;
+      cursedTargetCount?: number;
     });
 
 /**
@@ -84,6 +86,8 @@ export const ENEMY_ABILITY_DEFS: Record<string, EnemyAbilityDefinition> = {
     aimDurationMs: 350,
     maxHpDamageFraction: 0.25,
     impactRadius: 4,
+    targetCount: 1,
+    cursedTargetCount: 3,
     visualEffectConfigId: 'attack_spark_launch_1',
   },
 };

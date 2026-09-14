@@ -353,6 +353,9 @@ export class TowerDefenseEngine {
   public disableCapture: boolean = false;
   public resonantEvolution?: TDResonantEvolutionConfig;
   public towerRecovery?: TDTowerRecoveryConfig;
+  private cursedPhase?: TDLevelData['cursedPhase'];
+  private hasTriggeredCursedPhase = false;
+  public pendingCursedPhaseEnemyId?: string;
 
   public aspectRatio: number = 1;
   public backgroundScale: number = 1;
@@ -427,6 +430,7 @@ export class TowerDefenseEngine {
     this.towerRecovery = levelData.towerRecovery
       ? structuredClone(levelData.towerRecovery)
       : undefined;
+    this.cursedPhase = levelData.cursedPhase;
     this.backgroundScale = Math.max(1, levelData.backgroundScale ?? 1);
 
     this.objectiveAllies = (levelData.objectiveAllies ?? []).map(
@@ -1370,6 +1374,8 @@ export class TowerDefenseEngine {
     }
     newEnemies = newEnemies.filter((e) => e.hp > 0);
 
+    this.processCursedPhaseTrigger(newEnemies);
+
     // Keep projectiles that are traveling or holding a dash attacker at impact.
     const activeProjectiles = this.projectiles.filter(
       (p) =>
@@ -2023,6 +2029,49 @@ export class TowerDefenseEngine {
     }
   }
 
+  private processCursedPhaseTrigger(enemies: Enemy[]): void {
+    const phase = this.cursedPhase;
+    if (!phase || this.hasTriggeredCursedPhase) return;
+
+    const enemy = enemies.find(
+      (candidate) =>
+        candidate.waveEnemyDefinitionId === phase.enemyDefinitionId &&
+        candidate.hp > 0 &&
+        candidate.hp / candidate.maxHp <= phase.triggerHealthFraction
+    );
+    if (!enemy) return;
+
+    this.hasTriggeredCursedPhase = true;
+    this.pendingCursedPhaseEnemyId = enemy.id;
+    this.events.emit({
+      type: 'CURSED_PHASE_TRIGGERED',
+      enemyId: enemy.id,
+      enemyDefinitionId: enemy.definitionId,
+    });
+  }
+
+  public activateCursedPhase(enemyId: string): boolean {
+    if (this.pendingCursedPhaseEnemyId !== enemyId) return false;
+
+    const enemy = this.enemies.find(
+      (candidate) => candidate.id === enemyId && candidate.hp > 0
+    );
+    if (!enemy) return false;
+
+    enemy.isCursed = true;
+    if (enemy.abilityRuntime) {
+      const ability = ENEMY_ABILITY_DEFS[enemy.abilityRuntime.definitionId];
+      if (ability) {
+        enemy.abilityRuntime.nextReadyTimeMs =
+          this.elapsedTimeMs + ability.initialCooldownMs;
+      }
+      enemy.abilityRuntime.facingResetAtMs = undefined;
+    }
+    enemy.facingDirection = 'down';
+    this.pendingCursedPhaseEnemyId = undefined;
+    return true;
+  }
+
   private processEnemyAbilities(enemies: Enemy[]) {
     for (const enemy of enemies) {
       const runtime = enemy.abilityRuntime;
@@ -2065,9 +2114,25 @@ export class TowerDefenseEngine {
       );
       if (targets.length === 0) return false;
 
-      const target = targets[Math.floor(Math.random() * targets.length)];
-      const dx = target.position.x - enemy.position.x;
-      const dy = target.position.y - enemy.position.y;
+      const availableTargets = [...targets];
+      for (let index = availableTargets.length - 1; index > 0; index--) {
+        const swapIndex = Math.floor(Math.random() * (index + 1));
+        [availableTargets[index], availableTargets[swapIndex]] = [
+          availableTargets[swapIndex],
+          availableTargets[index],
+        ];
+      }
+      const requestedTargetCount =
+        enemy.isCursed && ability.cursedTargetCount !== undefined
+          ? ability.cursedTargetCount
+          : ability.targetCount;
+      const selectedTargets = availableTargets.slice(
+        0,
+        Math.max(1, requestedTargetCount)
+      );
+      const facingTarget = selectedTargets[0];
+      const dx = facingTarget.position.x - enemy.position.x;
+      const dy = facingTarget.position.y - enemy.position.y;
       enemy.facingDirection =
         Math.abs(dx * this.aspectRatio) >= Math.abs(dy)
           ? dx >= 0
@@ -2079,16 +2144,18 @@ export class TowerDefenseEngine {
       runtime.facingResetAtMs = this.elapsedTimeMs + ability.aimDurationMs;
 
       runtime.nextReadyTimeMs = this.elapsedTimeMs + ability.cooldownMs;
-      this.enemyGroundOrbs.push({
-        id: `enemy_orb_${enemy.id}_${this.elapsedTimeMs}`,
-        sourceEnemyId: enemy.id,
-        sourcePosition: { ...enemy.position },
-        targetPosition: { ...target.position },
-        launchedAtMs: this.elapsedTimeMs,
-        impactAtMs: this.elapsedTimeMs + ability.projectileTravelMs,
-        expiresAtMs: this.elapsedTimeMs + ability.projectileTravelMs + 450,
-        maxHpDamageFraction: ability.maxHpDamageFraction,
-        impactRadius: ability.impactRadius,
+      selectedTargets.forEach((target, targetIndex) => {
+        this.enemyGroundOrbs.push({
+          id: `enemy_orb_${enemy.id}_${this.elapsedTimeMs}_${targetIndex}`,
+          sourceEnemyId: enemy.id,
+          sourcePosition: { ...enemy.position },
+          targetPosition: { ...target.position },
+          launchedAtMs: this.elapsedTimeMs,
+          impactAtMs: this.elapsedTimeMs + ability.projectileTravelMs,
+          expiresAtMs: this.elapsedTimeMs + ability.projectileTravelMs + 450,
+          maxHpDamageFraction: ability.maxHpDamageFraction,
+          impactRadius: ability.impactRadius,
+        });
       });
       this.visualEffects.push({
         id: `vfx_enemy_orb_launch_${enemy.id}_${this.elapsedTimeMs}`,

@@ -1,4 +1,5 @@
 import { TDLevelData } from '@/engine/tower-defense/types';
+import { LEVEL_6_CURSED_INTERMISSION } from '@/constants/dialogs/level6CursedIntermission';
 
 /**
  * First playable three-corridor slice for the Level 6 officer confrontation.
@@ -9,8 +10,10 @@ import { TDLevelData } from '@/engine/tower-defense/types';
  * with dodgeable electric orbs. Poguin cooperatively haul Tigrevel through
  * steel-rope chains. Before they attach, Poguin make one telegraphed hop to
  * the opposite Poguin lane and cannot be newly targeted while airborne.
- * Mari feeds injured towers on the two safe upper-left recovery spots. The
- * bespoke cursed phase, boss scripting, and final balance remain out of scope.
+ * Mari feeds injured towers on the two safe upper-left recovery spots. At 30%
+ * health, Voltusk pauses the fight for a short story intermission, gains the
+ * cursed aura, and begins marking up to three distinct orb targets per attack.
+ * Final encounter balance remains in progress.
  */
 export const LEVEL_6: TDLevelData = {
   paths: [
@@ -225,6 +228,12 @@ export const LEVEL_6: TDLevelData = {
       instruction: 'Drag the injured Cosmoid onto a glowing recovery spot.',
     },
   },
+  cursedPhase: {
+    enemyDefinitionId: 'level_6_voltusk',
+    triggerHealthFraction: 0.3,
+    intermission: LEVEL_6_CURSED_INTERMISSION,
+    transformationLineIndex: 2,
+  },
   environmentUnits: [
     {
       position: {
@@ -307,7 +316,7 @@ export const LEVEL_6: TDLevelData = {
       },
       abilityId: 'VOLTUSK_ELECTRIC_ORB',
       hpMultiplier: 4,
-      weakenedThreshold: 0.5,
+      weakenedThreshold: 0.3,
     },
   ],
   waves: [

@@ -70,7 +70,7 @@ The user endorsed rockhopper jumping as an additional source for the level. The 
 - Interrupting the windup could prevent the next coordinated action.
 - Voltusk's cursed-phase surges could force a faster, increasingly frantic rhythm while retaining a readable warning.
 
-Do not infer approved attack IDs, damage, movement speed, invulnerability during jumps, terrain bypass, stun rules, pulse timing, or hauling progress from these notes. Final mechanics need implementation and balance decisions. The officer forces the Cursed Relic onto Voltusk; Poguin has no approved independent cursed form or evolution.
+Do not infer approved attack IDs, damage, movement speed, invulnerability during jumps, terrain bypass, stun rules, pulse timing, or hauling progress from these notes. Final mechanics need implementation and balance decisions. The officer forces Voltusk into a Cursed Aura state by unidentified means; Poguin has no approved independent cursed form or evolution.
 
 ## Creation Record
 

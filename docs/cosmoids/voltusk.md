@@ -26,7 +26,7 @@ Keep the species description focused on these two connected ideas. Bell- or gong
 
 Voltusk is proud, imposing, and normally controlled in its use of force. Its tusks visibly advertise how much electrical power it can hold; larger tusks permit stronger discharges and give it greater confidence when confronting rivals. Its restrained electrical warnings express strength without requiring immediate violence.
 
-Its contradiction is formidable power paired with deliberate restraint. The Level 6 officer mistakes that restraint for weakness and forces a Cursed Relic onto it. The resulting uncontrolled release of power hurts Voltusk, preserving the distinction between the officer's cruelty and the suffering of his partner.
+Its contradiction is formidable power paired with deliberate restraint. The Level 6 officer mistakes that restraint for weakness and forces it into a Cursed Aura state through unidentified, unseen means. The resulting uncontrolled release of power hurts Voltusk, preserving the distinction between the officer's cruelty and the suffering of his partner.
 
 The storm-seeking behavior and tusk storage are species traits. The officer relationship and forced curse belong to this individual encounter, rather than defining every Voltusk as an obedient Navy creature.
 
@@ -68,9 +68,9 @@ Preserve the reference's proportions, facial structure, appendages, palette, mar
 
 The officer throws a steel net over Tigrevel as Navy equipment, then sends Voltusk and Electric minions to drag Tigrevel back into captivity. Voltusk does not create the net. The minions' behaviors and any electrical interaction with the hauling effort remain undecided.
 
-At approximately half Voltusk health, the battle pauses for a one-time intermission. The officer forces a Cursed Relic onto Voltusk, causing a painful dark-purple Cursed Aura state and stronger, uncontrolled electrical surges. This is not a permanent Cursed evolution. Voltusk retains its remaining health after the intermission.
+At 30% Voltusk health, the battle pauses for a short five-panel intermission. The officer forces Voltusk into a Cursed Aura state, but the means by which he does so is neither named nor shown. A painful dark-purple Cursed Aura appears, and Voltusk's electric-orb attack begins marking up to three distinct valid targets at once instead of one. This is not a permanent Cursed evolution. Voltusk retains its remaining health after the intermission.
 
-Defeating the boss frees Tigrevel. Caleb removes the forced relic from Voltusk; its aura begins to subside, but it remains exhausted and needs care. This relief does not establish a universal cure for the Stone Curse. The officer's exploitation should seed Caleb's understanding that cursed Cosmoids can need rescuing too.
+Defeating the boss frees Tigrevel. Strake is stunned by the loss, Kip urges everyone to run before he recovers, and the children immediately escape to Ironbell harbor.
 
 Bell or gong calls may contribute to this encounter, but their timing, effects, and relationship to minions are open. Follow the [Level 6 record](../levels/level-6.md) for the broader objective, recruitment ending, and unsettled battle details.
 
@@ -92,6 +92,6 @@ Bell or gong calls may contribute to this encounter, but their timing, effects, 
 - Define broader habitat, distribution, physical size, diet, and ecology beyond its approved storm-seeking behavior.
 - Tune the initial display scale and gameplay defaults during Level 6 encounter balancing.
 - Decide boss and minion mechanics, including whether bell/gong calls or lightning collection have gameplay effects.
-- Design the Cursed Aura phase's visual treatment, exact abilities, and balance while preserving Voltusk's identity.
+- Tune the existing Cursed Aura treatment and three-target electric-orb phase while preserving Voltusk's identity.
 - Decide Voltusk's capture availability and longer-term fate after the officer's defeat.
 - Create journal artwork through the dedicated journal workflow when requested.

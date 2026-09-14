@@ -89,6 +89,11 @@ export type TDEvent =
       enemyId: string;
       enemyDefinitionId: string;
       level: number;
+    }
+  | {
+      type: 'CURSED_PHASE_TRIGGERED';
+      enemyId: string;
+      enemyDefinitionId: string;
     };
 
 type TDEventHandler = (event: TDEvent) => void;

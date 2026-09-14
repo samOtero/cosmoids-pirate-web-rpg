@@ -78,9 +78,13 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
     '/dialog/maribel_relieved_happy.png',
   [SpeakerImageKey.TIGREVEL]: '/UI/Icons/tigrevel_icon.png',
   [SpeakerImageKey.VOLTUSK_WARNING]: '/dialog/voltusk_warning.png',
+  [SpeakerImageKey.VOLTUSK_CURSED_WARNING]:
+    '/dialog/voltusk_cursed_warning.png',
   [SpeakerImageKey.NAVY_GUARD_ALERT]: '/dialog/navy_guard_alert.png',
   [SpeakerImageKey.NAVY_COMMANDER_NEUTRAL]:
     '/dialog/navy_commander_neutral.png',
+  [SpeakerImageKey.NAVY_COMMANDER_DESPERATE_SHOUT]:
+    '/dialog/navy_commander_desperate_shout.png',
   [SpeakerImageKey.NAVY_COMMANDER_SHOCKED_DEFEAT]:
     '/dialog/navy_commander_shocked_defeat.png',
   [SpeakerImageKey.CAPTAIN_VANE_HAUGHTY_NEUTRAL]:
@@ -140,8 +144,7 @@ export const BACKGROUND_IMAGES: Record<BackgroundImageKey, string> = {
   [BackgroundImageKey.LEVEL_5_MEMORY_NAVY_CAPTURE]:
     '/bg_level_5_memory_navy_capture.png',
   [BackgroundImageKey.LEVEL_5_TIGREVEL_CELL]: '/bg_level_5_tigrevel_cell.png',
-  [BackgroundImageKey.LEVEL_5_TIGREVEL_FREED]:
-    '/bg_level_5_tigrevel_freed.png',
+  [BackgroundImageKey.LEVEL_5_TIGREVEL_FREED]: '/bg_level_5_tigrevel_freed.png',
   [BackgroundImageKey.LEVEL_5_TIGREVEL_PROTECTS_KIDS]:
     '/bg_level_5_tigrevel_protects_kids.png',
   [BackgroundImageKey.LEVEL_6_NET_THROW]: '/bg_level_6_net_throw.png',

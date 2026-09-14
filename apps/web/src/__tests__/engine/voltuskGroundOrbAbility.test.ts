@@ -36,9 +36,11 @@ function createEngine(creatureIds: string[]) {
       ],
       placementSpots: [
         { x: 25, y: 20 },
+        { x: 45, y: 20 },
+        { x: 65, y: 20 },
         { x: 25, y: 80 },
       ],
-      safePlacementSpotIndices: [1],
+      safePlacementSpotIndices: [3],
       waves: [],
     },
     creatureIds.map(createCreature)
@@ -66,6 +68,8 @@ describe('Voltusk Electric Orb enemy ability', () => {
       aimDurationMs: 350,
       maxHpDamageFraction: 0.25,
       impactRadius: 4,
+      targetCount: 1,
+      cursedTargetCount: 3,
     });
     expect(LEVEL_6.safePlacementSpotIndices).toEqual([3, 5]);
     expect(
@@ -163,5 +167,73 @@ describe('Voltusk Electric Orb enemy ability', () => {
         damage: Math.floor(replacement.maxHp * 0.25),
       })
     );
+  });
+
+  it('marks up to three distinct occupied combat spots while cursed', () => {
+    const engine = createEngine(['one', 'two', 'three', 'safe']);
+    expect(engine.placeTower('one', 25, 20)).toBe(true);
+    expect(engine.placeTower('two', 45, 20)).toBe(true);
+    expect(engine.placeTower('three', 65, 20)).toBe(true);
+    expect(engine.placeTower('safe', 25, 80)).toBe(true);
+    engine.enemies[0].isCursed = true;
+
+    engine.tick(0, 2500);
+
+    expect(engine.enemyGroundOrbs).toHaveLength(3);
+    expect(
+      new Set(
+        engine.enemyGroundOrbs.map(
+          (orb) => `${orb.targetPosition.x},${orb.targetPosition.y}`
+        )
+      )
+    ).toEqual(new Set(['25,20', '45,20', '65,20']));
+  });
+
+  it('triggers the Level 6 cursed phase once at 30% health', () => {
+    const engine = new TowerDefenseEngine({
+      paths: [
+        [
+          { x: 0, y: 50 },
+          { x: 100, y: 50 },
+        ],
+      ],
+      placementSpots: [],
+      waves: [],
+      cursedPhase: LEVEL_6.cursedPhase,
+    });
+    engines.push(engine);
+    const voltusk = engine.spawnPreviewEnemy({
+      id: 'phase-voltusk',
+      creatureId: 'voltusk',
+      level: 10,
+      position: { x: 50, y: 10 },
+      abilityId: 'VOLTUSK_ELECTRIC_ORB',
+      manualAbilityOnly: true,
+    })!;
+    voltusk.waveEnemyDefinitionId = 'level_6_voltusk';
+    const phaseEvents: unknown[] = [];
+    engine.events.subscribe((event) => {
+      if (event.type === 'CURSED_PHASE_TRIGGERED') phaseEvents.push(event);
+    });
+
+    voltusk.hp = voltusk.maxHp * 0.31;
+    engine.tick(0, 1);
+    expect(phaseEvents).toHaveLength(0);
+
+    voltusk.hp = voltusk.maxHp * 0.3;
+    engine.tick(0, 1);
+    expect(phaseEvents).toEqual([
+      expect.objectContaining({
+        enemyId: 'phase-voltusk',
+        enemyDefinitionId: 'voltusk',
+      }),
+    ]);
+    expect(voltusk.isCursed).not.toBe(true);
+    expect(engine.activateCursedPhase(voltusk.id)).toBe(true);
+    expect(voltusk.isCursed).toBe(true);
+
+    engine.tick(0, 1);
+    expect(phaseEvents).toHaveLength(1);
+    expect(engine.activateCursedPhase(voltusk.id)).toBe(false);
   });
 });

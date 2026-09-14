@@ -1,4 +1,9 @@
-import { Creature, ElementType, PlayerCreature } from '@/types/baseGame';
+import {
+  Creature,
+  ElementType,
+  PlayerCreature,
+} from '@/types/baseGame';
+import type { DialogConfig } from '@/types/baseGame';
 import type { AttackInstance } from './attacks/types';
 
 export interface TDEvolutionNode {
@@ -336,6 +341,17 @@ export interface CaptureUnit extends BaseTDUnit {
   activeRelocation?: CaptureUnitRelocationState;
 }
 
+export interface TDCursedPhaseConfig {
+  /** Level-scoped enemy definition that triggers and receives the cursed phase. */
+  enemyDefinitionId: string;
+  /** Remaining HP ratio at which the one-time intermission begins. */
+  triggerHealthFraction: number;
+  /** Dialogue shown while the simulation is paused. */
+  intermission: DialogConfig;
+  /** Zero-based line index at which the cursed aura appears. */
+  transformationLineIndex: number;
+}
+
 export interface TDLevelData {
   paths: Point[][];
   placementSpots: Point[];
@@ -343,6 +359,8 @@ export interface TDLevelData {
   safePlacementSpotIndices?: number[];
   /** Optional ally-run recovery area that periodically feeds injured towers. */
   towerRecovery?: TDTowerRecoveryConfig;
+  /** Optional one-time boss escalation that pauses for an in-battle intermission. */
+  cursedPhase?: TDCursedPhaseConfig;
   waveEnemyDefinitions: TDWaveEnemyDefinition[];
   waves: TDWave[];
   /** Repeat the final wave's creature groups indefinitely after authored waves. */
