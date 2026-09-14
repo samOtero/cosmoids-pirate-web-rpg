@@ -126,28 +126,28 @@ export const LEVEL_6: TDLevelData = {
   ],
   placementSpots: [
     {
-      x: 78,
-      y: 25,
+      x: 70.99,
+      y: 18.16,
     },
     {
-      x: 85,
-      y: 28,
+      x: 79.83,
+      y: 23.27,
     },
     {
-      x: 92,
-      y: 25,
+      x: 88.11,
+      y: 19.13,
     },
     {
-      x: 13,
-      y: 25,
+      x: 11.22,
+      y: 25.09,
     },
     {
       x: 25,
       y: 66,
     },
     {
-      x: 23,
-      y: 25,
+      x: 24.98,
+      y: 24.85,
     },
     {
       x: 34,
@@ -237,27 +237,35 @@ export const LEVEL_6: TDLevelData = {
   environmentUnits: [
     {
       position: {
-        x: 30,
-        y: 83,
+        x: 45.27,
+        y: 31.48,
       },
       tdConfigId: 'caleb_battle',
       facingDirection: 'up',
     },
     {
       position: {
-        x: 70,
-        y: 83,
+        x: 36.32,
+        y: 29.22,
       },
       tdConfigId: 'kip_battle',
       facingDirection: 'up',
     },
     {
       position: {
-        x: 18,
-        y: 14,
+        x: 18.07,
+        y: 20.1,
       },
       tdConfigId: 'maribel_capture',
       facingDirection: 'down',
+    },
+    {
+      position: {
+        x: 61.46,
+        y: 28.7,
+      },
+      tdConfigId: 'commander_strake_battle',
+      facingDirection: 'left',
     },
   ],
   startingTowers: [
@@ -397,8 +405,9 @@ export const LEVEL_6: TDLevelData = {
   backgroundScale: 2,
   initialView: {
     offsetX: 50,
-    offsetY: 50,
-    zoom: 1 / 2,
+    offsetY: 0,
+    zoom: 0.7,
   },
   introMessage: 'Protect Tigrevel!',
 };
+
