@@ -47,5 +47,15 @@ only here.
    That pipeline writes WebP derivatives up to 1920x1080 at quality 86. It
    includes only narrative backgrounds referenced by the story system and
    intentionally excludes every background under `battles/bg`.
+
+   Story portraits use:
+
+   ```sh
+   pnpm assets:optimize:story-portraits
+   ```
+
+   That pipeline writes transparency-preserving WebP derivatives up to
+   1024x1024 at quality 88. It preserves the existing `public` versus
+   `public/dialog` placement and excludes source-only unused portraits.
 3. Update the runtime asset URL if its filename or format changed.
 4. Verify that no application code references `art-source` directly.

@@ -10,36 +10,36 @@ export const TD_BASE_HEIGHT = 600;
 
 export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
   [SpeakerImageKey.GUIDE]:
-    '/dialog/dialog_caleb_neutral_starter_outfit_small.png',
+    '/dialog/dialog_caleb_neutral_starter_outfit_small.webp',
   [SpeakerImageKey.GRANDPA_NEUTRAL_STARTER_OUTFIT]:
-    '/dialog_grandpa_neutral_starter_outfit.png',
+    '/dialog_grandpa_neutral_starter_outfit.webp',
   [SpeakerImageKey.GRANDPA_SURPRISED_STARTER_OUTFIT]:
-    '/dialog_grandpa_surprised_starter_outfit.png',
+    '/dialog_grandpa_surprised_starter_outfit.webp',
   [SpeakerImageKey.CALEB_NEUTRAL_STARTER_OUTFIT]:
-    '/dialog/dialog_caleb_neutral_starter_outfit_small.png',
+    '/dialog/dialog_caleb_neutral_starter_outfit_small.webp',
   [SpeakerImageKey.CALEB_YAWN_STARTER_OUTFIT]:
-    '/dialog_caleb_yawn_starter_outfit.png',
+    '/dialog_caleb_yawn_starter_outfit.webp',
   [SpeakerImageKey.CALEB_HAPPY_STARTER_OUTFIT]:
-    '/dialog/dialog_caleb_happy_starter_outfit_small.png',
+    '/dialog/dialog_caleb_happy_starter_outfit_small.webp',
   [SpeakerImageKey.CALEB_DISAPPOINTED_STARTER_OUTFIT]:
-    '/dialog_caleb_disappointed_starter_outfit.png',
+    '/dialog_caleb_disappointed_starter_outfit.webp',
   [SpeakerImageKey.CALEB_SCARED_SURPRISED_STARTER_OUTFIT]:
-    '/dialog/dialog_caleb_scared_surprised_starter_outfit_small.png',
+    '/dialog/dialog_caleb_scared_surprised_starter_outfit_small.webp',
   [SpeakerImageKey.CALEB_ANGRY_STARTER_OUTFIT]:
-    '/dialog/dialog_caleb_angry_starter_outfit_clean.png',
+    '/dialog/dialog_caleb_angry_starter_outfit_clean.webp',
   [SpeakerImageKey.CALEB_ANNOYED_STARTER_OUTFIT]:
-    '/dialog/dialog_caleb_annoyed_starter_outfit_small.png',
+    '/dialog/dialog_caleb_annoyed_starter_outfit_small.webp',
   [SpeakerImageKey.CALEB_CONFIDENT_STARTER_OUTFIT]:
-    '/dialog/dialog_caleb_confident_starter_outfit_small.png',
+    '/dialog/dialog_caleb_confident_starter_outfit_small.webp',
   [SpeakerImageKey.CALEB_FLUSTERED_STARTER_OUTFIT]:
-    '/dialog/dialog_caleb_flustered_starter_outfit_small.png',
+    '/dialog/dialog_caleb_flustered_starter_outfit_small.webp',
   [SpeakerImageKey.CALEB_SCARED_STARTER_OUTFIT]:
-    '/dialog/dialog_caleb_scared_starter_outfit_small.png',
+    '/dialog/dialog_caleb_scared_starter_outfit_small.webp',
   [SpeakerImageKey.CALEB_SHIPWRECKED_DAZED_STARTER_OUTFIT]:
-    '/dialog/dialog_caleb_shipwrecked_dazed.png',
+    '/dialog/dialog_caleb_shipwrecked_dazed.webp',
   [SpeakerImageKey.HOOKAW_TIRED_DIVE_SKIN_1]:
-    '/dialog_parrot_tired_dive_skin_1.png',
-  [SpeakerImageKey.HOOKAW_TIRED_SKIN_1]: '/dialog_parrot_tired_skin_1-v1.png',
+    '/dialog_parrot_tired_dive_skin_1.webp',
+  [SpeakerImageKey.HOOKAW_TIRED_SKIN_1]: '/dialog_parrot_tired_skin_1-v1.webp',
   [SpeakerImageKey.STARTER_CHEST_CLOSED]: '/starter_box.png',
   [SpeakerImageKey.STARTER_CHEST_OPEN]: '/starter_box_opened.png',
   [SpeakerImageKey.STARTER_1_CRAB]: '/crab-starter-grass-neutral-skin-1.png',
@@ -47,66 +47,66 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
   [SpeakerImageKey.STARTER_3_MONKEY]:
     '/monkey_starter_water_neutral_skin_1.png',
   [SpeakerImageKey.MOPUP]: '/UI/Icons/mopup_icon.png',
-  [SpeakerImageKey.EEL_SENTICLE]: '/dialog/senticle_dark_aura_small.png',
+  [SpeakerImageKey.EEL_SENTICLE]: '/dialog/senticle_dark_aura_small.webp',
   [SpeakerImageKey.CREWMATE]: 'https://picsum.photos/seed/crewmate_npc/300/300',
   [SpeakerImageKey.OLD_SAILOR]: 'https://picsum.photos/seed/oldsailor/300/300',
-  [SpeakerImageKey.PIRATE_GRUNT_JOE_SMIRK]: '/dialog_pirate_grunt_smirk.png',
+  [SpeakerImageKey.PIRATE_GRUNT_JOE_SMIRK]: '/dialog_pirate_grunt_smirk.webp',
   [SpeakerImageKey.PIRATE_GRUNT_JOE_ANGRY]:
-    '/dialog_pirate_grunt_aggressive.png',
+    '/dialog_pirate_grunt_aggressive.webp',
   [SpeakerImageKey.PIRATE_GRUNT_JOE_ANGRY_POINTING]:
-    '/dialog_pirate_grunt_aggressive_point.png',
-  [SpeakerImageKey.LANCE_NEUTRAL_OUTFIT_1]: '/dialog/lance_portrait_actual.png',
-  [SpeakerImageKey.LANCE_AMUSED]: '/dialog/lance_amused_small.png',
-  [SpeakerImageKey.LANCE_ANGRY]: '/dialog/lance_angry_small.png',
-  [SpeakerImageKey.LANCE_CALM]: '/dialog/lance_calm_small.png',
-  [SpeakerImageKey.LANCE_SERIOUS]: '/dialog/lance_serious_small.png',
-  [SpeakerImageKey.LANCE_SMILING]: '/dialog/lance_smiling_small.png',
-  [SpeakerImageKey.LANCE_SURPRISED]: '/dialog/lance_surprised_small.png',
-  [SpeakerImageKey.KIP_NERVOUS_NEUTRAL]: '/dialog/kip_nervous_neutral.png',
-  [SpeakerImageKey.KIP_PANICKED]: '/dialog/kip_panicked.png',
-  [SpeakerImageKey.KIP_WORRIED]: '/dialog/kip_worried.png',
-  [SpeakerImageKey.KIP_DETERMINED]: '/dialog/kip_determined.png',
-  [SpeakerImageKey.KIP_HOPEFUL_SURPRISED]: '/dialog/kip_hopeful_surprised.png',
-  [SpeakerImageKey.KIP_RELIEVED_HAPPY]: '/dialog/kip_relieved_happy.png',
-  [SpeakerImageKey.MARIBEL_NEUTRAL_WARY]: '/dialog/maribel_neutral_wary.png',
-  [SpeakerImageKey.MARIBEL_WORRIED]: '/dialog/maribel_worried.png',
-  [SpeakerImageKey.MARIBEL_STARTLED]: '/dialog/maribel_startled.png',
-  [SpeakerImageKey.MARIBEL_DETERMINED]: '/dialog/maribel_determined.png',
+    '/dialog_pirate_grunt_aggressive_point.webp',
+  [SpeakerImageKey.LANCE_NEUTRAL_OUTFIT_1]: '/dialog/lance_portrait_actual.webp',
+  [SpeakerImageKey.LANCE_AMUSED]: '/dialog/lance_amused_small.webp',
+  [SpeakerImageKey.LANCE_ANGRY]: '/dialog/lance_angry_small.webp',
+  [SpeakerImageKey.LANCE_CALM]: '/dialog/lance_calm_small.webp',
+  [SpeakerImageKey.LANCE_SERIOUS]: '/dialog/lance_serious_small.webp',
+  [SpeakerImageKey.LANCE_SMILING]: '/dialog/lance_smiling_small.webp',
+  [SpeakerImageKey.LANCE_SURPRISED]: '/dialog/lance_surprised_small.webp',
+  [SpeakerImageKey.KIP_NERVOUS_NEUTRAL]: '/dialog/kip_nervous_neutral.webp',
+  [SpeakerImageKey.KIP_PANICKED]: '/dialog/kip_panicked.webp',
+  [SpeakerImageKey.KIP_WORRIED]: '/dialog/kip_worried.webp',
+  [SpeakerImageKey.KIP_DETERMINED]: '/dialog/kip_determined.webp',
+  [SpeakerImageKey.KIP_HOPEFUL_SURPRISED]: '/dialog/kip_hopeful_surprised.webp',
+  [SpeakerImageKey.KIP_RELIEVED_HAPPY]: '/dialog/kip_relieved_happy.webp',
+  [SpeakerImageKey.MARIBEL_NEUTRAL_WARY]: '/dialog/maribel_neutral_wary.webp',
+  [SpeakerImageKey.MARIBEL_WORRIED]: '/dialog/maribel_worried.webp',
+  [SpeakerImageKey.MARIBEL_STARTLED]: '/dialog/maribel_startled.webp',
+  [SpeakerImageKey.MARIBEL_DETERMINED]: '/dialog/maribel_determined.webp',
   [SpeakerImageKey.MARIBEL_ANGRY_DEFENSIVE]:
-    '/dialog/maribel_angry_defensive.png',
+    '/dialog/maribel_angry_defensive.webp',
   [SpeakerImageKey.MARIBEL_RELIEVED_HAPPY]:
-    '/dialog/maribel_relieved_happy.png',
+    '/dialog/maribel_relieved_happy.webp',
   [SpeakerImageKey.TIGREVEL]: '/UI/Icons/tigrevel_icon.png',
-  [SpeakerImageKey.VOLTUSK_WARNING]: '/dialog/voltusk_warning.png',
+  [SpeakerImageKey.VOLTUSK_WARNING]: '/dialog/voltusk_warning.webp',
   [SpeakerImageKey.VOLTUSK_CURSED_WARNING]:
-    '/dialog/voltusk_cursed_warning.png',
-  [SpeakerImageKey.NAVY_GUARD_ALERT]: '/dialog/navy_guard_alert.png',
+    '/dialog/voltusk_cursed_warning.webp',
+  [SpeakerImageKey.NAVY_GUARD_ALERT]: '/dialog/navy_guard_alert.webp',
   [SpeakerImageKey.NAVY_COMMANDER_NEUTRAL]:
-    '/dialog/navy_commander_neutral.png',
+    '/dialog/navy_commander_neutral.webp',
   [SpeakerImageKey.NAVY_COMMANDER_DESPERATE_SHOUT]:
-    '/dialog/navy_commander_desperate_shout.png',
+    '/dialog/navy_commander_desperate_shout.webp',
   [SpeakerImageKey.NAVY_COMMANDER_SHOCKED_DEFEAT]:
-    '/dialog/navy_commander_shocked_defeat.png',
+    '/dialog/navy_commander_shocked_defeat.webp',
   [SpeakerImageKey.CAPTAIN_VANE_HAUGHTY_NEUTRAL]:
-    '/dialog/captain_vane_haughty_neutral.png',
+    '/dialog/captain_vane_haughty_neutral.webp',
   [SpeakerImageKey.CAPTAIN_VANE_MOCKING_DISBELIEF]:
-    '/dialog/captain_vane_mocking_disbelief.png',
+    '/dialog/captain_vane_mocking_disbelief.webp',
   [SpeakerImageKey.CAPTAIN_VANE_COMMANDING_ANGRY]:
-    '/dialog/captain_vane_commanding_angry.png',
+    '/dialog/captain_vane_commanding_angry.webp',
   [SpeakerImageKey.CAPTAIN_VANE_SMUG_AMUSED]:
-    '/dialog/captain_vane_smug_amused.png',
+    '/dialog/captain_vane_smug_amused.webp',
   [SpeakerImageKey.CAPTAIN_VANE_STUNNED_DEFEAT]:
-    '/dialog/captain_vane_stunned_defeat.png',
-  [SpeakerImageKey.BEETADEL_STERN]: '/dialog/beetadel_stern.png',
-  [SpeakerImageKey.RAT_CATCHER_1]: '/dialog/rat_catcher_1.png',
-  [SpeakerImageKey.RAT_CATCHER_ANGRY]: '/dialog/rat_catcher_angry_small.png',
-  [SpeakerImageKey.RAT_CATCHER_CALM]: '/dialog/rat_catcher_calm.png',
-  [SpeakerImageKey.RAT_CATCHER_COCKY]: '/dialog/rat_catcher_cocky_small.png',
+    '/dialog/captain_vane_stunned_defeat.webp',
+  [SpeakerImageKey.BEETADEL_STERN]: '/dialog/beetadel_stern.webp',
+  [SpeakerImageKey.RAT_CATCHER_1]: '/dialog/rat_catcher_1.webp',
+  [SpeakerImageKey.RAT_CATCHER_ANGRY]: '/dialog/rat_catcher_angry_small.webp',
+  [SpeakerImageKey.RAT_CATCHER_CALM]: '/dialog/rat_catcher_calm.webp',
+  [SpeakerImageKey.RAT_CATCHER_COCKY]: '/dialog/rat_catcher_cocky_small.webp',
   [SpeakerImageKey.RAT_CATCHER_MOCKING]:
-    '/dialog/rat_catcher_mocking_small.png',
-  [SpeakerImageKey.RAT_CATCHER_SMUG]: '/dialog/rat_catcher_smug_small.png',
-  [SpeakerImageKey.ASTROLAPE]: '/dialog/astrolape_neutral.png',
-  [SpeakerImageKey.ASTROLAPE_ROAR]: '/dialog/astrolape_roar.png',
+    '/dialog/rat_catcher_mocking_small.webp',
+  [SpeakerImageKey.RAT_CATCHER_SMUG]: '/dialog/rat_catcher_smug_small.webp',
+  [SpeakerImageKey.ASTROLAPE]: '/dialog/astrolape_neutral.webp',
+  [SpeakerImageKey.ASTROLAPE_ROAR]: '/dialog/astrolape_roar.webp',
   [SpeakerImageKey.NARRATOR]:
     'https://picsum.photos/seed/narrator_book/300/300',
   [SpeakerImageKey.DEFAULT]: 'https://picsum.photos/seed/unknown_npc/300/300',

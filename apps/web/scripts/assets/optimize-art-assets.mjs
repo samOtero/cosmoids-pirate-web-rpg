@@ -83,6 +83,49 @@ const categories = {
       smartSubsample: true,
     },
   },
+  'story-portraits': {
+    sourceDirectory: path.join(
+      repositoryRoot,
+      'art-source',
+      'characters',
+      'dialogue',
+    ),
+    outputDirectory: path.join(webRoot, 'public'),
+    defaultOutputSubdirectory: 'dialog',
+    rootFiles: [
+      'dialog_caleb_disappointed_starter_outfit.png',
+      'dialog_caleb_yawn_starter_outfit.png',
+      'dialog_grandpa_neutral_starter_outfit.png',
+      'dialog_grandpa_surprised_starter_outfit.png',
+      'dialog_parrot_tired_dive_skin_1.png',
+      'dialog_parrot_tired_skin_1-v1.png',
+      'dialog_pirate_grunt_aggressive.png',
+      'dialog_pirate_grunt_aggressive_point.png',
+      'dialog_pirate_grunt_smirk.png',
+    ],
+    excludeFiles: [
+      'dialog_caleb_happy_starter_outfit.png',
+      'dialog_caleb_neutral_starter_outfit.png',
+      'dialog_caleb_sad_starter_outfit.png',
+      'dialog_caleb_scared_surprised_starter_outfit.png',
+      'lance_neutral_outfit_1.png',
+    ],
+    sourceExtension: '.png',
+    outputExtension: '.webp',
+    resize: {
+      width: 1024,
+      height: 1024,
+      fit: 'inside',
+      withoutEnlargement: true,
+      kernel: sharp.kernel.lanczos3,
+    },
+    webp: {
+      quality: 88,
+      alphaQuality: 100,
+      effort: 6,
+      smartSubsample: true,
+    },
+  },
 };
 
 function formatBytes(bytes) {
@@ -121,9 +164,10 @@ async function optimizeCategory(categoryName) {
       )
       .map((entry) => entry.name),
   );
-  const sourceFiles = [...(config.files ?? availableSourceFiles)].sort(
-    (left, right) => left.localeCompare(right),
-  );
+  const excludedSourceFiles = new Set(config.excludeFiles ?? []);
+  const sourceFiles = [...(config.files ?? availableSourceFiles)]
+    .filter((sourceFile) => !excludedSourceFiles.has(sourceFile))
+    .sort((left, right) => left.localeCompare(right));
 
   const missingSourceFiles = sourceFiles.filter(
     (sourceFile) => !availableSourceFiles.has(sourceFile),
@@ -147,7 +191,13 @@ async function optimizeCategory(categoryName) {
   for (const sourceName of sourceFiles) {
     const sourcePath = path.join(config.sourceDirectory, sourceName);
     const outputName = `${path.basename(sourceName, config.sourceExtension)}${config.outputExtension}`;
-    const outputPath = path.join(config.outputDirectory, outputName);
+    const outputDirectory = config.rootFiles?.includes(sourceName)
+      ? config.outputDirectory
+      : path.join(
+          config.outputDirectory,
+          config.defaultOutputSubdirectory ?? '',
+        );
+    const outputPath = path.join(outputDirectory, outputName);
     assertInside(config.outputDirectory, outputPath);
 
     const sourceStats = await stat(sourcePath);
@@ -158,6 +208,7 @@ async function optimizeCategory(categoryName) {
       .toBuffer();
     const outputMetadata = await sharp(outputBuffer).metadata();
 
+    await mkdir(outputDirectory, { recursive: true });
     await writeFile(outputPath, outputBuffer);
 
     const sourceBytes = sourceStats.size;

@@ -87,7 +87,7 @@ describe('Mari healing tutorial', () => {
               tutorial: {
                 triggerHealthFraction: 0.75,
                 speakerName: 'Mari',
-                portraitUrl: '/dialog/maribel_determined.png',
+                portraitUrl: '/dialog/maribel_determined.webp',
                 message: "They're hurt! Bring them here—I packed food!",
                 instruction:
                   'Drag the injured Cosmoid onto a glowing recovery spot.',

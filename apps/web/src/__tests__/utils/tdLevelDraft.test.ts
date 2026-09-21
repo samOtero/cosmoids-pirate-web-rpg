@@ -476,7 +476,7 @@ describe('TD level drafts', () => {
       tutorial: {
         triggerHealthFraction: 0,
         speakerName: 'Mari',
-        portraitUrl: '/dialog/maribel_determined.png',
+        portraitUrl: '/dialog/maribel_determined.webp',
         message: 'Bring them here!',
         instruction: 'Move the injured tower.',
       },
