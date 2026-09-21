@@ -74,6 +74,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
   const waves = draft.waves;
   const surviveUntil = draft.surviveUntil ?? 0;
   const lives = draft.lives ?? 3;
+  const towerRangeMultiplier = draft.towerRangeMultiplier ?? 1;
   const backgroundUrl = draft.backgroundUrl ?? '';
   const backgroundScale = draft.backgroundScale ?? 1;
   const initialView = resolveTDInitialView(
@@ -640,6 +641,29 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
                         }}
                         className="w-full rounded border border-slate-700 bg-slate-950 p-2 text-white"
                         placeholder="3"
+                      />
+                    </label>
+                    <label className="block text-sm text-slate-300">
+                      <span className="mb-1 block font-bold">
+                        Tower range multiplier
+                      </span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.05"
+                        value={towerRangeMultiplier}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value);
+                          setDraft((previousDraft) => ({
+                            ...previousDraft,
+                            towerRangeMultiplier:
+                              !Number.isFinite(value) || value === 1
+                                ? undefined
+                                : Math.max(0, value),
+                          }));
+                        }}
+                        className="w-full rounded border border-slate-700 bg-slate-950 p-2 text-white"
+                        title="Scales every player tower's attack and support range in this level"
                       />
                     </label>
                   </div>

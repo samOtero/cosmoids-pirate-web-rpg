@@ -312,6 +312,58 @@ export const POGUIN: CosmoidTemplate = {
   ],
 };
 
+export const DORMATEE: CosmoidTemplate = {
+  id: 'dormatee',
+  name: 'Dormatee',
+  type: ElementType.PSYCHIC,
+  baseStats: {
+    hp: 86,
+    attack: 42,
+    defense: 70,
+    specialAttack: 76,
+    specialDefense: 90,
+    speed: 18,
+  },
+  baseExperience: 82,
+  iconImg: '/UI/Icons/dormatee_icon.png',
+  journalEntry:
+    'While it sleeps, its whiskers link the dreams of every creature resting nearby. It often wakes to find an entire lagoon napping beside it.',
+  spriteUrl: '/battles/cosmoids/dormatee_down.png',
+  battleSpriteUrl: '/battles/cosmoids/dormatee_left.png',
+  movementId: 'lizard',
+  // Existing placeholder attacks until Dormatee's custom dream techniques are selected.
+  learnableAttacks: [
+    { level: 1, attackId: 'TACKLE' },
+    { level: 4, attackId: 'STRING_SHOT' },
+  ],
+};
+
+export const YOKODILLO: CosmoidTemplate = {
+  id: 'yokodillo',
+  name: 'Yokodillo',
+  type: ElementType.FIGHTING,
+  baseStats: {
+    hp: 92,
+    attack: 78,
+    defense: 90,
+    specialAttack: 30,
+    specialDefense: 68,
+    speed: 22,
+  },
+  baseExperience: 80,
+  iconImg: '/UI/Icons/yokodillo_icon.png',
+  journalEntry:
+    'It braces with an eager grin and refuses to budge. Once a rival finally moves it, Yokodillo curls into a ball and rolls back much farther than intended.',
+  spriteUrl: '/battles/cosmoids/yokodillo_down.png',
+  battleSpriteUrl: '/battles/cosmoids/yokodillo_left.png',
+  movementId: 'lizard',
+  // Existing physical attacks until Yokodillo's custom sumo techniques are selected.
+  learnableAttacks: [
+    { level: 1, attackId: 'TACKLE' },
+    { level: 6, attackId: 'QUICK_ATTACK' },
+  ],
+};
+
 export const BRAMFRIT: CosmoidTemplate = {
   id: 'bramfrit',
   name: 'Bramfrit',
@@ -776,6 +828,8 @@ export const COSMOID_TEMPLATES: Record<string, CosmoidTemplate> = {
   [TIGREVEL.id]: TIGREVEL,
   [VOLTUSK.id]: VOLTUSK,
   [POGUIN.id]: POGUIN,
+  [DORMATEE.id]: DORMATEE,
+  [YOKODILLO.id]: YOKODILLO,
   [BRAMFRIT.id]: BRAMFRIT,
   [SEPIPPET.id]: SEPIPPET,
   [PARLET.id]: PARLET,

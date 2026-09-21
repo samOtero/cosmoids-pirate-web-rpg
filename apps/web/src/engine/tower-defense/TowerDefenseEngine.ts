@@ -350,6 +350,7 @@ export class TowerDefenseEngine {
   public surviveUntil?: number;
   public elapsedTimeMs: number = 0;
   public enemyHpMultiplier: number = 1;
+  public towerRangeMultiplier: number = 1;
   public disableCapture: boolean = false;
   public resonantEvolution?: TDResonantEvolutionConfig;
   public towerRecovery?: TDTowerRecoveryConfig;
@@ -425,6 +426,9 @@ export class TowerDefenseEngine {
     }
     this.surviveUntil = levelData.surviveUntil;
     this.enemyHpMultiplier = levelData.enemyHpMultiplier ?? 1;
+    this.towerRangeMultiplier = Number.isFinite(levelData.towerRangeMultiplier)
+      ? Math.max(0, levelData.towerRangeMultiplier!)
+      : 1;
     this.disableCapture = levelData.disableCapture ?? false;
     this.resonantEvolution = levelData.resonantEvolution;
     this.towerRecovery = levelData.towerRecovery
@@ -3184,6 +3188,7 @@ export class TowerDefenseEngine {
     mode: TowerTargetingMode = 'first',
     enemyFilter?: (enemy: Enemy) => boolean
   ): Enemy | null {
+    const effectiveRange = this.getTowerAttackRange(range);
     const enemiesInRange: { enemy: Enemy; dist: number }[] = [];
     for (const enemy of this.enemies) {
       if (
@@ -3192,7 +3197,7 @@ export class TowerDefenseEngine {
       )
         continue;
       const dist = this.getAttackDistance(tower.position, enemy.position);
-      if (dist <= range) {
+      if (dist <= effectiveRange) {
         enemiesInRange.push({ enemy, dist });
       }
     }
@@ -4017,6 +4022,23 @@ export class TowerDefenseEngine {
     range: number
   ): boolean {
     return this.getAttackDistance(source, target) <= range;
+  }
+
+  /** Resolve an attack's authored range through the current level's tower scaling. */
+  public getTowerAttackRange(range: number): number {
+    return Math.max(0, range) * this.towerRangeMultiplier;
+  }
+
+  public isPositionInTowerRange(
+    source: Point,
+    target: Point,
+    range: number
+  ): boolean {
+    return this.isPositionInAttackRange(
+      source,
+      target,
+      this.getTowerAttackRange(range)
+    );
   }
 
   public setTowerTargetingMode(creatureId: string, mode: TowerTargetingMode) {

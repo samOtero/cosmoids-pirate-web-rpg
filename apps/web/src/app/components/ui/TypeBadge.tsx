@@ -15,8 +15,10 @@ const TYPE_COLORS: Record<ElementType, string> = {
   [ElementType.STEEL]: 'bg-slate-600',
   [ElementType.POISON]: 'bg-purple-600',
   [ElementType.DARK]: 'bg-indigo-950',
+  [ElementType.PSYCHIC]: 'bg-fuchsia-600',
   [ElementType.ELECTRIC]: 'bg-yellow-500',
   [ElementType.NORMAL]: 'bg-gray-500',
+  [ElementType.FIGHTING]: 'bg-red-700',
   [ElementType.FLYING]: 'bg-sky-400',
 };
 

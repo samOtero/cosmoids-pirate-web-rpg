@@ -16,6 +16,7 @@ import { LEVEL_6_CURSED_INTERMISSION } from '@/constants/dialogs/level6CursedInt
  * Final encounter balance remains in progress.
  */
 export const LEVEL_6: TDLevelData = {
+  towerRangeMultiplier: 0.5,
   paths: [
     [
       {
@@ -410,4 +411,3 @@ export const LEVEL_6: TDLevelData = {
   },
   introMessage: 'Protect Tigrevel!',
 };
-

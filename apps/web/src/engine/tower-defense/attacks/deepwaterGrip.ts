@@ -95,7 +95,7 @@ export function updateDeepwaterGrips(
       target.constrictedByTowerId !== source.id ||
       source.position.x !== grip.origin.x ||
       source.position.y !== grip.origin.y ||
-      !engine.isPositionInAttackRange(
+      !engine.isPositionInTowerRange(
         source.position,
         target.position,
         def.rangeIndex

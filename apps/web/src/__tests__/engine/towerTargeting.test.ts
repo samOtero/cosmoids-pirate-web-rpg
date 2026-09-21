@@ -115,6 +115,23 @@ describe('Tower Targeting Modes', () => {
     expect(engine.getTargetForTower(tower, 10, 'closest')?.id).toBe('inside');
   });
 
+  it('applies the level tower range multiplier to targeting', () => {
+    const engine = new TowerDefenseEngine(
+      { ...levelData, towerRangeMultiplier: 0.5 },
+      []
+    );
+    const tower = createMockTower(0, 0, 'closest');
+    const outsideScaledRange = createMockEnemy('outside', 6, 0, 50, 100);
+    const insideScaledRange = createMockEnemy('inside', 4, 0, 50, 100);
+    engine.enemies = [outsideScaledRange, insideScaledRange];
+
+    expect(engine.getTowerAttackRange(10)).toBe(5);
+    expect(engine.getTargetForTower(tower, 10, 'closest')?.id).toBe('inside');
+    expect(
+      engine.isPositionInTowerRange(tower.position, { x: 6, y: 0 }, 10)
+    ).toBe(false);
+  });
+
   it('should target the furthest enemy along path in first mode', () => {
     const engine = new TowerDefenseEngine(levelData, []);
     const tower = createMockTower(5, 0, 'first');

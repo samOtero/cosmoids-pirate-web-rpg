@@ -2,9 +2,29 @@
 
 This document is the working reference for Cosmoid creature concepts currently under consideration. Details are exploratory unless they have already been implemented in the game; names, typings, lore, and evolution paths may change.
 
-Last consolidated: September 4, 2026
+Last consolidated: September 21, 2026
 
 ## Developed Concepts
+
+### Dormatee — The Shared-Dream Cosmoid
+
+- **Typing:** Psychic
+- **Name concept:** _Dormire_ ("to sleep") or _dormant_ + _manatee_, giving the name a simple, warmly sleepy sound.
+- **Core concept:** A rare Psychic manatee whose naps calm an entire lagoon by linking nearby sleeping minds through its dense tactile whiskers.
+- **Visual identity:** A round blue-lavender manatee curled into a floating resting pose, with a broad paddle tail, dense pearl-tipped whisker fan, and exactly one pearly dream orb.
+- **Story placement:** Proposed rare wildlife encounter for Level 7's no-objective, cannot-lose island stop. The player may catch it or leave it sleeping in a sheltered lagoon.
+- **Status:** Final name and standalone identity approved September 18, 2026. Icon, directional battle assets, Psychic element support, species registration, gameplay defaults, and manifest are implemented; custom dream techniques and Level 7 runtime integration remain pending.
+- **Dedicated record and concept art:** [`docs/cosmoids/dormatee.md`](./docs/cosmoids/dormatee.md)
+
+### Yokodillo — The Sumo Armadillo Cosmoid
+
+- **Typing:** Fighting
+- **Name concept:** _Yokozuna_ + _armadillo_, joining sumo's highest rank to the creature's animal basis.
+- **Core concept:** A jovial armadillo brawler that plants itself in a sumo stance, welcomes an opponent's strongest shove, then curls into a rolling countercharge when finally moved.
+- **Visual identity:** A huge cream-bellied round torso inside layered brown armadillo armor, broad raised palms, a cheerful grin, and two stout feet firmly planted in a low, wide stance.
+- **Story placement:** Proposed Level 7 wildlife for the relaxed no-objective, cannot-lose island stop, where it turns stretching and friendly sparring into playful pushing contests.
+- **Status:** Production-integrated with a game icon, directional battle art, Fighting element support, gameplay data, and a dated manifest. Custom sumo techniques, journal art, and Level 7 runtime placement remain open.
+- **Dedicated record and concept art:** [`docs/cosmoids/yokodillo.md`](./docs/cosmoids/yokodillo.md)
 
 ### Poguin — The Hopping Penguin Cosmoid
 
@@ -49,6 +69,29 @@ Last consolidated: September 4, 2026
 - **Branch role:** Greater balance and speed can mature into disciplined freedom on the noble route, while cursed influence could twist its competitive drive into frantic, self-destructive motion.
 - **Status:** Standalone identity approved and production-integrated with icon, directional battle art, gameplay data, Fueguana evolution logic, and a capturable Level 5 encounter. Journal artwork and both final branches remain open.
 - **Dedicated record and concept art:** [`docs/cosmoids/velocinder.md`](./docs/cosmoids/velocinder.md)
+
+### Aguana — The Shore-Grazing Cosmoid
+
+- **Family:** First stage; evolves into Nautiguan.
+- **Typing:** Water
+- **Name concept:** _Agua_ + _iguana_, directly expressing a young iguana adapted to life at the water's edge.
+- **Core concept:** A nimble marine-iguana Cosmoid that makes brief dives for algae and uses oversized hooked claws to cling to slippery rocks against the surf.
+- **Entry:** It makes brief dives to graze on algae growing beneath the waves. Its hooked claws grip slippery rocks, keeping it from being swept away before it must return to shore and warm itself.
+- **Visual identity:** A long, low coral-and-indigo juvenile with four widely spread clawed feet, an enormous paddle tail, a smooth back, and only a few small salt nubs around the nostrils and front brow.
+- **Status:** Final name, standalone base image, and concept record approved September 21, 2026. Production assets, gameplay implementation, story placement, and journal art remain open.
+- **Dedicated record and concept art:** [`docs/cosmoids/aguana.md`](./docs/cosmoids/aguana.md)
+
+#### Nautiguan — The Salt-Crowned Cosmoid
+
+- **Family:** Second and currently final stage of Aguana.
+- **Typing:** Water
+- **Name concept:** _Nautical_ + _iguana_, connecting its marine-iguana basis to the long voyages on which sailors value it.
+- **Core concept:** A broad, heat-retaining marine grazer that dives beyond Aguana's range, propels itself with a massive paddle tail, and forcefully expels salt gathered from seawater.
+- **Entry:** Its greater strength and heat-retaining body allow it to graze in deeper water for much longer. It spits excess salt collected from seawater, so sailors often bring one aboard and gather the crystals to replenish the ship's salt reserves.
+- **Visual identity:** A squat coral-and-indigo adult with a huge rounded torso, four powerful clawed limbs, a high curved paddle tail, and a dramatic white salt-crystal crown and dorsal fringe.
+- **Gameplay direction:** Reversible growing and shrinking, anchoring claws, a powerful paddle tail, salt-spitting, and extended dives are concept-level directions rather than defined mechanics.
+- **Status:** Final name, standalone base image, and concept record approved September 21, 2026. Production assets, gameplay implementation, story placement, and journal art remain open.
+- **Dedicated record and concept art:** [`docs/cosmoids/nautiguan.md`](./docs/cosmoids/nautiguan.md)
 
 ### Monkeg — The Stowaway Cosmoid
 

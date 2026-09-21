@@ -377,6 +377,8 @@ export interface TDLevelData {
   surviveUntil?: number; // Win after surviving for this many seconds
   lives?: number; // Default is 3 if not provided, or overridden by captureUnits length
   enemyHpMultiplier?: number; // Defaults to 1 if not provided
+  /** Scales every player tower's attack/support reach for this level. Defaults to 1. */
+  towerRangeMultiplier?: number;
   disableCapture?: boolean;
   backgroundUrl?: string;
   backgroundScale?: number; // If > 1, background is taller than viewport and can be scrolled

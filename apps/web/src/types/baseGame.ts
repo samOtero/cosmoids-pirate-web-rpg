@@ -43,8 +43,10 @@ export enum ElementType {
   STEEL = 'Steel',
   POISON = 'Poison',
   DARK = 'Dark',
+  PSYCHIC = 'Psychic',
   ELECTRIC = 'Electric',
   NORMAL = 'Normal',
+  FIGHTING = 'Fighting',
   FLYING = 'Flying',
 }
 

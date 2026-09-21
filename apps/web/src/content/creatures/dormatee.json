@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "id": "dormatee",
+  "name": "Dormatee",
+  "element": "PSYCHIC",
+  "addedAt": "2026-09-18",
+  "sourceImage": "dormatee-concept.png",
+  "baseStats": {
+    "hp": 86,
+    "attack": 42,
+    "defense": 70,
+    "specialAttack": 76,
+    "specialDefense": 90,
+    "speed": 18
+  },
+  "baseExperience": 82,
+  "movementId": "lizard",
+  "learnableAttacks": [
+    {
+      "level": 1,
+      "attackId": "TACKLE"
+    },
+    {
+      "level": 4,
+      "attackId": "STRING_SHOT"
+    }
+  ],
+  "assets": {
+    "icon": {
+      "url": "/UI/Icons/dormatee_icon.png",
+      "width": 160,
+      "height": 160
+    },
+    "left": {
+      "url": "/battles/cosmoids/dormatee_left.png",
+      "width": 360,
+      "height": 240
+    },
+    "up": {
+      "url": "/battles/cosmoids/dormatee_up.png",
+      "width": 200,
+      "height": 275
+    },
+    "down": {
+      "url": "/battles/cosmoids/dormatee_down.png",
+      "width": 200,
+      "height": 275
+    }
+  },
+  "storyPlacement": {
+    "context": "LEVEL_7",
+    "role": "plannedRareEncounter",
+    "status": "planned"
+  }
+}

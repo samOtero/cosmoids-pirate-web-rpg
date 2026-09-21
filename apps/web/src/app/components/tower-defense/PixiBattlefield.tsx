@@ -1793,8 +1793,10 @@ const TYPE_COLORS: Record<ElementType, number> = {
   [ElementType.STEEL]: 0x64748b,
   [ElementType.POISON]: 0xa855f7,
   [ElementType.DARK]: 0x312e81,
+  [ElementType.PSYCHIC]: 0xd946ef,
   [ElementType.ELECTRIC]: 0xeab308,
   [ElementType.NORMAL]: 0xa3a3a3,
+  [ElementType.FIGHTING]: 0xb91c1c,
   [ElementType.FLYING]: 0x38bdf8,
 };
 
@@ -3555,7 +3557,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 rCircle.clear();
                 if (rangeIndex !== undefined && finalScale > 0) {
                   const radius = getTDRangePreviewRadius(
-                    rangeIndex,
+                    engine.getTowerAttackRange(rangeIndex),
                     viewportH,
                     zoom
                   );
@@ -3880,7 +3882,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
               if (rangeIndex !== undefined) {
                 const radius = getTDRangePreviewRadius(
-                  rangeIndex,
+                  engine.getTowerAttackRange(rangeIndex),
                   viewportH,
                   zoom
                 );

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Animal-Led Cosmoids"
+  short_description: "Build Cosmoids from remarkable real animals"
+  default_prompt: "Use $design-animal-led-cosmoids to research a real animal and develop it into a distinct, documented Cosmoid evolution family."

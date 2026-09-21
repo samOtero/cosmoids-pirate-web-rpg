@@ -1,0 +1,4 @@
+# Full-resolution art masters are retained in the repository but are not part
+# of the deployable web application. Runtime-ready assets live in
+# apps/web/public.
+/art-source/

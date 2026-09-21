@@ -41,7 +41,7 @@ export const ProjectileBehavior: AttackBehavior = {
       ) {
         return false;
       }
-      return engine.isPositionInAttackRange(
+      return engine.isPositionInTowerRange(
         source.position,
         enemy.position,
         attackDef.rangeIndex
@@ -134,7 +134,7 @@ export const InstantMeleeBehavior: AttackBehavior = {
     return engine.enemies.some(
       (enemy) =>
         engine.isEnemyTargetable(enemy) &&
-        engine.isPositionInAttackRange(
+        engine.isPositionInTowerRange(
           source.position,
           enemy.position,
           attackDef.rangeIndex
@@ -192,7 +192,7 @@ export const AdaptiveTargetedAoeBehavior: AttackBehavior = {
     return engine.enemies.some(
       (enemy) =>
         engine.isEnemyTargetable(enemy) &&
-        engine.isPositionInAttackRange(
+        engine.isPositionInTowerRange(
           source.position,
           enemy.position,
           attackDef.rangeIndex
@@ -299,7 +299,7 @@ export const InstantAoeBehavior: AttackBehavior = {
     return engine.enemies.some(
       (enemy) =>
         engine.isEnemyTargetable(enemy) &&
-        engine.isPositionInAttackRange(
+        engine.isPositionInTowerRange(
           source.position,
           enemy.position,
           attackDef.rangeIndex
@@ -319,7 +319,7 @@ export const InstantAoeBehavior: AttackBehavior = {
     engine.enemies.forEach((enemy) => {
       if (
         !engine.isEnemyTargetable(enemy) ||
-        !engine.isPositionInAttackRange(
+        !engine.isPositionInTowerRange(
           source.position,
           enemy.position,
           attackDef.rangeIndex
@@ -367,7 +367,7 @@ export const InstantAoeBehavior: AttackBehavior = {
         durationMs: vfxConfig?.durationMs ?? 750,
         elapsedMs: 0,
         facingDirection: source.facingDirection,
-        rangeIndex: attackDef.rangeIndex,
+        rangeIndex: engine.getTowerAttackRange(attackDef.rangeIndex),
       });
     }
   },
@@ -383,7 +383,7 @@ function isEligiblePoisonAoeTarget(
     engine.isEnemyTargetable(enemy) &&
     !enemy.immuneToStatusEffects &&
     !enemy.statusConditions.some((status) => status.type === 'POISON') &&
-    engine.isPositionInAttackRange(
+    engine.isPositionInTowerRange(
       source.position,
       enemy.position,
       attackDef.rangeIndex
@@ -418,7 +418,7 @@ export const PoisonAoeBehavior: AttackBehavior = {
         durationMs: vfxConfig?.durationMs ?? 900,
         elapsedMs: 0,
         facingDirection: source.facingDirection,
-        rangeIndex: attackDef.rangeIndex,
+        rangeIndex: engine.getTowerAttackRange(attackDef.rangeIndex),
       });
     }
   },
@@ -439,7 +439,7 @@ export const SupportAuraBehavior: AttackBehavior = {
     for (const ally of engine.towers) {
       if (
         ally.hp <= 0 ||
-        !engine.isPositionInAttackRange(
+        !engine.isPositionInTowerRange(
           source.position,
           ally.position,
           attackDef.rangeIndex
@@ -464,7 +464,7 @@ export const SupportAuraBehavior: AttackBehavior = {
           800,
         elapsedMs: 0,
         facingDirection: source.facingDirection,
-        rangeIndex: attackDef.rangeIndex,
+        rangeIndex: engine.getTowerAttackRange(attackDef.rangeIndex),
       });
     }
   },
@@ -480,7 +480,7 @@ export function getShipshapeTarget(
     (ally) =>
       ally.hp > 0 &&
       ally.maxHp > 0 &&
-      engine.isPositionInAttackRange(
+      engine.isPositionInTowerRange(
         source.position,
         ally.position,
         attackDef.rangeIndex

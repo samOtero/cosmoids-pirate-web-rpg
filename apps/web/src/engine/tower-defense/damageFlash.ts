@@ -15,7 +15,9 @@ export const DAMAGE_FLASH_COLORS: Record<ElementType, number> = {
   [ElementType.STEEL]: 0xd2dde5,
   [ElementType.POISON]: 0xe7bdf3,
   [ElementType.DARK]: 0xc4b5fd,
+  [ElementType.PSYCHIC]: 0xf5c2f1,
   [ElementType.ELECTRIC]: 0xffeb91,
+  [ElementType.FIGHTING]: 0xffc2a1,
   [ElementType.FLYING]: 0xd2daff,
 };
 

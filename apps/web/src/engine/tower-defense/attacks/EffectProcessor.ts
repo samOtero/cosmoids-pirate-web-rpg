@@ -22,7 +22,9 @@ const NEUTRAL_EFFECTIVENESS: Record<ElementType, number> = {
   [ElementType.STEEL]: 1,
   [ElementType.POISON]: 1,
   [ElementType.DARK]: 1,
+  [ElementType.PSYCHIC]: 1,
   [ElementType.ELECTRIC]: 1,
+  [ElementType.FIGHTING]: 1,
   [ElementType.FLYING]: 1,
 };
 
@@ -69,6 +71,17 @@ const TYPE_EFFECTIVENESS: Record<ElementType, Record<ElementType, number>> = {
     [ElementType.FLYING]: 2,
     [ElementType.GROUND]: 0,
   },
+  [ElementType.FIGHTING]: {
+    ...NEUTRAL_EFFECTIVENESS,
+    [ElementType.NORMAL]: 2,
+    [ElementType.ROCK]: 2,
+    [ElementType.STEEL]: 2,
+    [ElementType.DARK]: 2,
+    [ElementType.POISON]: 0.5,
+    [ElementType.BUG]: 0.5,
+    [ElementType.PSYCHIC]: 0.5,
+    [ElementType.FLYING]: 0.5,
+  },
   [ElementType.FLYING]: {
     ...NEUTRAL_EFFECTIVENESS,
     [ElementType.GRASS]: 2,
@@ -90,6 +103,7 @@ const TYPE_EFFECTIVENESS: Record<ElementType, Record<ElementType, number>> = {
     [ElementType.FIRE]: 0.5,
     [ElementType.GRASS]: 2,
     [ElementType.DARK]: 2,
+    [ElementType.PSYCHIC]: 2,
     [ElementType.POISON]: 0.5,
     [ElementType.FLYING]: 0.5,
     [ElementType.STEEL]: 0.5,
@@ -125,6 +139,14 @@ const TYPE_EFFECTIVENESS: Record<ElementType, Record<ElementType, number>> = {
   [ElementType.DARK]: {
     ...NEUTRAL_EFFECTIVENESS,
     [ElementType.DARK]: 0.5,
+    [ElementType.PSYCHIC]: 2,
+  },
+  [ElementType.PSYCHIC]: {
+    ...NEUTRAL_EFFECTIVENESS,
+    [ElementType.POISON]: 2,
+    [ElementType.PSYCHIC]: 0.5,
+    [ElementType.STEEL]: 0.5,
+    [ElementType.DARK]: 0,
   },
 };
 export class EffectProcessor {
