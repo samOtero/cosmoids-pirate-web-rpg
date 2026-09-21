@@ -111,7 +111,7 @@ describe('CosmoidCodexScreen', () => {
       screen
         .getByRole('img', { name: 'Palmit field sketch' })
         .getAttribute('src')
-    ).toContain(encodeURIComponent('/UI/Journal/palmit_journal.png'));
+    ).toContain(encodeURIComponent('/UI/Journal/palmit_journal.webp'));
     expect(screen.getByText("Kip's Notes")).toBeInTheDocument();
     expect(
       screen.getByText(/freshwater crab that uses a hollow coconut/i)
@@ -122,21 +122,21 @@ describe('CosmoidCodexScreen', () => {
       screen
         .getByRole('img', { name: 'Fueguana field sketch' })
         .getAttribute('src')
-    ).toContain(encodeURIComponent('/UI/Journal/fueguana_journal.png'));
+    ).toContain(encodeURIComponent('/UI/Journal/fueguana_journal.webp'));
 
     fireEvent.click(screen.getByRole('button', { name: 'Monkeg, captured' }));
     expect(
       screen
         .getByRole('img', { name: 'Monkeg field sketch' })
         .getAttribute('src')
-    ).toContain(encodeURIComponent('/UI/Journal/monkeg_journal.png'));
+    ).toContain(encodeURIComponent('/UI/Journal/monkeg_journal.webp'));
 
     fireEvent.click(screen.getByRole('button', { name: 'Harlequill, seen' }));
     expect(
       screen
         .getByRole('img', { name: 'Harlequill field sketch' })
         .getAttribute('src')
-    ).toContain(encodeURIComponent('/UI/Journal/harlequill_journal.png'));
+    ).toContain(encodeURIComponent('/UI/Journal/harlequill_journal.webp'));
     expect(screen.getByText("Kip's notes are unfinished")).toBeInTheDocument();
     expect(screen.queryByText(/aerial comedy/i)).not.toBeInTheDocument();
 
@@ -145,7 +145,7 @@ describe('CosmoidCodexScreen', () => {
       screen
         .getByRole('img', { name: 'Knotia field sketch' })
         .getAttribute('src')
-    ).toContain(encodeURIComponent('/UI/Journal/knotia_journal.png'));
+    ).toContain(encodeURIComponent('/UI/Journal/knotia_journal.webp'));
     expect(screen.getByText('Base Stats')).toBeInTheDocument();
     expect(screen.getByText('Highest Level').parentElement).toHaveTextContent(
       '7'
@@ -156,7 +156,7 @@ describe('CosmoidCodexScreen', () => {
       screen
         .getByRole('img', { name: 'Mopup field sketch' })
         .getAttribute('src')
-    ).toContain(encodeURIComponent('/UI/Journal/mopup_journal.png'));
+    ).toContain(encodeURIComponent('/UI/Journal/mopup_journal.webp'));
 
     fireEvent.click(
       screen.getByRole('button', { name: 'Sailkworm, captured' })
@@ -165,14 +165,14 @@ describe('CosmoidCodexScreen', () => {
       screen
         .getByRole('img', { name: 'Sailkworm field sketch' })
         .getAttribute('src')
-    ).toContain(encodeURIComponent('/UI/Journal/buglet_journal.png'));
+    ).toContain(encodeURIComponent('/UI/Journal/buglet_journal.webp'));
 
     fireEvent.click(screen.getByRole('button', { name: 'Cocoonot, captured' }));
     expect(
       screen
         .getByRole('img', { name: 'Cocoonot field sketch' })
         .getAttribute('src')
-    ).toContain(encodeURIComponent('/UI/Journal/bugitor_journal.png'));
+    ).toContain(encodeURIComponent('/UI/Journal/bugitor_journal.webp'));
 
     fireEvent.click(
       screen.getByRole('button', { name: 'Mainscale, captured' })
@@ -181,14 +181,14 @@ describe('CosmoidCodexScreen', () => {
       screen
         .getByRole('img', { name: 'Mainscale field sketch' })
         .getAttribute('src')
-    ).toContain(encodeURIComponent('/UI/Journal/moth_journal.png'));
+    ).toContain(encodeURIComponent('/UI/Journal/moth_journal.webp'));
 
     fireEvent.click(screen.getByRole('button', { name: 'Beetadel, captured' }));
     expect(
       screen
         .getByRole('img', { name: 'Beetadel field sketch' })
         .getAttribute('src')
-    ).toContain(encodeURIComponent('/UI/Journal/bettle_journal.png'));
+    ).toContain(encodeURIComponent('/UI/Journal/bettle_journal.webp'));
   }, 15000);
 
   it('shows evolved-away forms as captured without invalid owned stats', () => {
@@ -234,7 +234,7 @@ describe('CosmoidCodexScreen', () => {
       screen
         .getByRole('img', { name: 'Razcall field sketch' })
         .getAttribute('src')
-    ).toContain(encodeURIComponent('/UI/Journal/sonarion_journal.png'));
+    ).toContain(encodeURIComponent('/UI/Journal/sonarion_journal.webp'));
     expect(screen.getByText(/howl for Razound when cornered/i)).toBeInTheDocument();
 
     fireEvent.click(
@@ -244,7 +244,7 @@ describe('CosmoidCodexScreen', () => {
       screen
         .getByRole('img', { name: 'Razound field sketch' })
         .getAttribute('src')
-    ).toContain(encodeURIComponent('/UI/Journal/resonarion_journal.png'));
+    ).toContain(encodeURIComponent('/UI/Journal/resonarion_journal.webp'));
     expect(screen.getByText(/At a Razcall's two-toned call/i)).toBeInTheDocument();
   });
 });

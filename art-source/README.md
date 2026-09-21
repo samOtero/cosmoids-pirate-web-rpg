@@ -29,7 +29,15 @@ only here.
 ## Export workflow
 
 1. Edit or replace the source-quality file in this directory.
-2. Export a web-sized PNG, WebP, or AVIF derivative to the corresponding
-   runtime location under `apps/web/public`.
+2. Run the configured optimizer from the repository root. Journal art uses:
+
+   ```sh
+   pnpm assets:optimize:journals
+   ```
+
+   The journal pipeline writes 1024x1024 WebP derivatives to
+   `apps/web/public/UI/Journal` at quality 84. Additional asset categories can
+   be added to `apps/web/scripts/assets/optimize-art-assets.mjs` as their
+   runtime requirements are established.
 3. Update the runtime asset URL if its filename or format changed.
 4. Verify that no application code references `art-source` directly.

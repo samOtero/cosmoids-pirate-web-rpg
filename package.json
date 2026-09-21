@@ -20,6 +20,8 @@
     "validate:dialogs": "pnpm --filter @cosmoids/web validate:dialogs",
     "validate:creature-manifests": "pnpm --filter @cosmoids/web validate:creature-manifests",
     "test:creatures": "pnpm --filter @cosmoids/web test:creatures",
+    "assets:optimize": "pnpm --filter @cosmoids/web assets:optimize",
+    "assets:optimize:journals": "pnpm --filter @cosmoids/web assets:optimize:journals",
     "prepare": "husky",
     "storybook": "pnpm --filter @cosmoids/web storybook",
     "build-storybook": "pnpm --filter @cosmoids/web build-storybook"

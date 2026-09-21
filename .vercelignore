@@ -1,4 +1,22 @@
-# Full-resolution art masters are retained in the repository but are not part
-# of the deployable web application. Runtime-ready assets live in
-# apps/web/public.
+# Source art and project-only documentation
 /art-source/
+/docs/
+/.agent/
+/.agents/
+/.vscode/
+
+# Local and generated output
+/output/
+/tmp/
+/storybook-static/
+/playwright-report/
+/test-results/
+**/.next/
+**/out/
+**/coverage/
+**/*.tsbuildinfo
+*.log
+
+# Locally installed dependencies and caches
+**/node_modules/
+/.pnpm-store/

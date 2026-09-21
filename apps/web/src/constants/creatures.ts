@@ -35,7 +35,7 @@ export const MOUSE_1: CosmoidTemplate = {
   },
   baseExperience: 51,
   iconImg: '/UI/Icons/mouse_1_icon.png',
-  journalImg: '/UI/Journal/knotia_journal.png',
+  journalImg: '/UI/Journal/knotia_journal.webp',
   journalEntry:
     'While gnawing on mooring lines, it somehow twists them into incredibly complex knots. Even seasoned sailors study its knot making abilities.',
   spriteUrl: '/battles/cosmoids/mouse_1_down_1_25.png',
@@ -62,7 +62,7 @@ export const BIRD_1: CosmoidTemplate = {
   },
   baseExperience: 50,
   iconImg: '/UI/Icons/bird_1_icon.png',
-  journalImg: '/UI/Journal/harlequill_journal.png',
+  journalImg: '/UI/Journal/harlequill_journal.webp',
   journalEntry:
     'It brings cheer to coastal towns with loops, tumbles, and other aerial comedy. The bells on its feathers make every performance impossible to ignore.',
   spriteUrl: '/battles/cosmoids/bird_1_down_1_25.png',
@@ -89,7 +89,7 @@ export const MOPUP: CosmoidTemplate = {
   },
   baseExperience: 62,
   iconImg: '/UI/Icons/mopup_icon.png',
-  journalImg: '/UI/Journal/mopup_journal.png',
+  journalImg: '/UI/Journal/mopup_journal.webp',
   journalEntry:
     'This playful Cosmoid loves sliding across wet decks. Its highly absorbent coat soaks up seawater, leaving every plank cleaner after playtime.',
   spriteUrl: '/battles/cosmoids/mopup_down.png',
@@ -185,7 +185,7 @@ export const SONARION: CosmoidTemplate = {
   },
   baseExperience: 58,
   iconImg: '/UI/Icons/sonarion_icon.png',
-  journalImg: '/UI/Journal/sonarion_journal.png',
+  journalImg: '/UI/Journal/sonarion_journal.webp',
   journalEntry:
     "Ironbell's Razcall know no one dares chase them. They mimic market bells, snatch unattended meals, then loose a two-toned howl for Razound when cornered.",
   spriteUrl: '/battles/cosmoids/sonarion_down.png',
@@ -215,7 +215,7 @@ export const RESONARION: CosmoidTemplate = {
   },
   baseExperience: 90,
   iconImg: '/UI/Icons/resonarion_icon.png',
-  journalImg: '/UI/Journal/resonarion_journal.png',
+  journalImg: '/UI/Journal/resonarion_journal.webp',
   journalEntry:
     "At a Razcall's two-toned call, golden static races through its enlarged neck ruff and heavy tail tuft. Once charged, it barrels through the market to the rescue.",
   spriteUrl: '/battles/cosmoids/resonarion_down.png',
@@ -244,7 +244,7 @@ export const TIGREVEL: CosmoidTemplate = {
   },
   baseExperience: 78,
   iconImg: '/UI/Icons/tigrevel_icon.png',
-  journalImg: '/UI/Journal/tigrevel_journal.png',
+  journalImg: '/UI/Journal/tigrevel_journal.webp',
   journalEntry:
     'Deep in the eastern jungles, it sharpens its claws on stone. A focused swipe can split a boulder clean in half.',
   spriteUrl: '/battles/cosmoids/tigrevel_down.png',
@@ -274,7 +274,7 @@ export const VOLTUSK: CosmoidTemplate = {
   iconImg: '/UI/Icons/voltusk_icon.png',
   journalEntry:
     'Its metallic whiskers tremble when a storm approaches, guiding it to the place where lightning will strike. The larger its steel tusks, the more electricity it can store—and the more confidently it challenges rivals.',
-  journalImg: '/UI/Journal/voltusk_journal.png',
+  journalImg: '/UI/Journal/voltusk_journal.webp',
   spriteUrl: '/battles/cosmoids/voltusk_down.png',
   battleSpriteUrl: '/battles/cosmoids/voltusk_left.png',
   movementId: 'lizard',
@@ -301,7 +301,7 @@ export const POGUIN: CosmoidTemplate = {
   iconImg: '/UI/Icons/poguin_icon.png',
   journalEntry:
     'It drums its oversized feet across rain-slick stone until nearby Poguin fall into step. A final stomp scatters a charged splash in every direction.',
-  journalImg: '/UI/Journal/poguin_journal.png',
+  journalImg: '/UI/Journal/poguin_journal.webp',
   spriteUrl: '/battles/cosmoids/poguin_down.png',
   battleSpriteUrl: '/battles/cosmoids/poguin_left.png',
   movementId: 'lizard',
@@ -378,7 +378,7 @@ export const BRAMFRIT: CosmoidTemplate = {
   },
   baseExperience: 76,
   iconImg: '/UI/Icons/bramfrit_icon.png',
-  journalImg: '/UI/Journal/bramfrit_journal.png',
+  journalImg: '/UI/Journal/bramfrit_journal.webp',
   journalEntry:
     'A fiery spirit burns beneath its dense fleece. Before charging a wall, it bows, retreats exactly three paces, and waits as if expecting the obstacle to answer.',
   spriteUrl: '/battles/cosmoids/bramfrit_down.png',
@@ -404,7 +404,7 @@ export const SEPIPPET: CosmoidTemplate = {
   },
   baseExperience: 75,
   iconImg: '/UI/Icons/sepippet_icon.png',
-  journalImg: '/UI/Journal/sepippet_journal.png',
+  journalImg: '/UI/Journal/sepippet_journal.webp',
   journalEntry:
     'Its mantle projects convincing silhouettes while its ribbonlike arms slip through narrow gaps. It often ruins the illusion by waving proudly before the trick is finished.',
   spriteUrl: '/battles/cosmoids/sepippet_down.png',
@@ -430,7 +430,7 @@ export const PARLET: CosmoidTemplate = {
   },
   baseExperience: 72,
   iconImg: '/UI/Icons/parlet_icon.png',
-  journalImg: '/UI/Journal/parlet_journal.png',
+  journalImg: '/UI/Journal/parlet_journal.webp',
   journalEntry:
     'It rearranges the colors across its broad scales like a living palette. The moment it notices one imperfect patch, it starts the entire design again.',
   spriteUrl: '/battles/cosmoids/parlet_down.png',
@@ -457,7 +457,7 @@ export const CORROGOON: CosmoidTemplate = {
   },
   baseExperience: 78,
   iconImg: '/UI/Icons/corrogoon_icon.png',
-  journalImg: '/UI/Journal/corrogoon_journal.png',
+  journalImg: '/UI/Journal/corrogoon_journal.webp',
   journalEntry:
     'It gathers mineral grit with its shovel-like pedipalps, saturates it with acidic spray, and lashes the abrasive mixture from its tail fan.',
   spriteUrl: '/battles/cosmoids/corrogoon_down.png',
@@ -485,7 +485,7 @@ export const BUFFLORA: CosmoidTemplate = {
   },
   baseExperience: 70,
   iconImg: '/UI/Icons/bufflora_icon.png',
-  journalImg: '/UI/Journal/bufflora_journal.png',
+  journalImg: '/UI/Journal/bufflora_journal.webp',
   journalEntry:
     'Nicknamed cave flowers, they sleep in damp caverns by day and emerge after dark to drink from blossoms. They especially favor poisonous species avoided by other pollinators.',
   spriteUrl: '/battles/cosmoids/bufflora_down.png',
@@ -514,7 +514,7 @@ export const MAROPHIS: CosmoidTemplate = {
   },
   baseExperience: 74,
   iconImg: '/UI/Icons/marophis_icon.png',
-  journalImg: '/UI/Journal/marophis_journal.png',
+  journalImg: '/UI/Journal/marophis_journal.webp',
   journalEntry:
     'It waits deep underwater in a loose hook-shaped coil. A precise body feint startles prey toward its mouth while the colors across its crown slowly cool as its stored breath runs low.',
   spriteUrl: '/battles/cosmoids/marophis_down.png',
@@ -543,7 +543,7 @@ export const BETTLE: CosmoidTemplate = {
   },
   baseExperience: 68,
   iconImg: '/UI/Icons/bettle_icon.png',
-  journalImg: '/UI/Journal/bettle_journal.png',
+  journalImg: '/UI/Journal/bettle_journal.webp',
   journalEntry:
     'It allows rivals one free strike against its ironclad back. If the blow leaves no mark, Beetadel drums its mandibles in triumph.',
   spriteUrl: '/battles/cosmoids/bettle_down.png',
@@ -561,7 +561,7 @@ export const BUG_STAGE_1: CosmoidTemplate = {
   name: 'Sailkworm',
   type: ElementType.GRASS,
   iconImg: '/UI/Icons/buglet_icon.png',
-  journalImg: '/UI/Journal/buglet_journal.png',
+  journalImg: '/UI/Journal/buglet_journal.webp',
   journalEntry:
     'It disguises itself as a scrap of stitched sailcloth, then quietly eats the real sails around it.',
   baseStats: {
@@ -588,7 +588,7 @@ export const BUG_STAGE_2: CosmoidTemplate = {
   name: 'Cocoonot',
   type: ElementType.GRASS,
   iconImg: '/UI/Icons/bugitor_icon.png',
-  journalImg: '/UI/Journal/bugitor_journal.png',
+  journalImg: '/UI/Journal/bugitor_journal.webp',
   journalEntry:
     'It spins coconut-husk thread into a knot so tight that hurricane winds cannot tear it from a mast. No sailor has ever managed to untie one.',
   baseStats: {
@@ -616,7 +616,7 @@ export const BUG_STAGE_3: CosmoidTemplate = {
   name: 'Mainscale',
   type: ElementType.GRASS,
   iconImg: '/UI/Icons/moth_icon.png',
-  journalImg: '/UI/Journal/moth_journal.png',
+  journalImg: '/UI/Journal/moth_journal.webp',
   journalEntry:
     'Its enormous sail-like wings catch and command the wind. A single powerful flap can generate enough force to move a ship.',
   baseStats: {
@@ -654,7 +654,7 @@ export const STARTER_CRAB: CosmoidTemplate = {
   },
   baseExperience: 64,
   iconImg: '/UI/Icons/palmit_icon.png',
-  journalImg: '/UI/Journal/palmit_journal.png',
+  journalImg: '/UI/Journal/palmit_journal.webp',
   journalEntry:
     'A freshwater crab that uses a hollow coconut as a boat. Its shell keeps the salty sea away while it drifts between islands.',
   spriteUrl: '/battles/cosmoids/palmit_down_1.png',
@@ -682,7 +682,7 @@ export const CARAPENTER: CosmoidTemplate = {
   },
   baseExperience: 90,
   iconImg: '/UI/Icons/carapenter_icon.png',
-  journalImg: '/UI/Journal/carapenter_journal.png',
+  journalImg: '/UI/Journal/carapenter_journal.webp',
   journalEntry:
     'After outgrowing its coconut, it shapes driftwood into a sturdy mallet. Its layered husk-like shell lets it brave short swims in seawater while repairing damaged ships.',
   spriteUrl: '/battles/cosmoids/carapenter_down.png',
@@ -711,7 +711,7 @@ export const STARTER_IGUANA: CosmoidTemplate = {
   baseExperience: 62,
   spriteUrl: '/battles/cosmoids/fueguana_left_1_v3.png',
   iconImg: '/UI/Icons/fueguana_icon.png',
-  journalImg: '/UI/Journal/fueguana_journal.png',
+  journalImg: '/UI/Journal/fueguana_journal.webp',
   journalEntry:
     'It sneaks aboard pirate ships to devour gunpowder and set the decks ablaze. If grabbed by the tail, it leaves it behind as a surprise that explodes moments later!',
   battleSpriteUrl: '/battles/cosmoids/fueguana_left_1_v3.png',
@@ -739,7 +739,7 @@ export const VELOCINDER: CosmoidTemplate = {
   baseExperience: 90,
   spriteUrl: '/battles/cosmoids/velocinder_down.png',
   iconImg: '/UI/Icons/velocinder_icon.png',
-  journalImg: '/UI/Journal/velocinder_journal.png',
+  journalImg: '/UI/Journal/velocinder_journal.webp',
   journalEntry:
     'Once it learns to balance on its hind legs, it becomes fast enough to race a lit cannon fuse. Its thorny tail sprays sparks around every sharp turn.',
   battleSpriteUrl: '/battles/cosmoids/velocinder_left.png',
@@ -765,7 +765,7 @@ export const STARTER_MONKEY: CosmoidTemplate = {
   },
   baseExperience: 63,
   iconImg: '/UI/Icons/monkeg_icon.png',
-  journalImg: '/UI/Journal/monkeg_journal.png',
+  journalImg: '/UI/Journal/monkeg_journal.webp',
   journalEntry:
     'A shy Cosmoid that hides inside barrels to travel unseen. Its long tail trails in the water like a rudder, steering it safely across the sea.',
   spriteUrl: '/battles/cosmoids/monkeg_down_1_v2.png',
@@ -792,7 +792,7 @@ export const MACASK: CosmoidTemplate = {
   },
   baseExperience: 90,
   iconImg: '/UI/Icons/macask_icon.png',
-  journalImg: '/UI/Journal/macask_journal.png',
+  journalImg: '/UI/Journal/macask_journal.webp',
   journalEntry:
     'It carries the heaviest supplies in the barrel on its back. The shifting load strengthens its body and teaches it to keep its footing on even the roughest seas.',
   spriteUrl: '/battles/cosmoids/macask_down.png',
