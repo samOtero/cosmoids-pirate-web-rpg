@@ -40,12 +40,12 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
   [SpeakerImageKey.HOOKAW_TIRED_DIVE_SKIN_1]:
     '/dialog_parrot_tired_dive_skin_1.webp',
   [SpeakerImageKey.HOOKAW_TIRED_SKIN_1]: '/dialog_parrot_tired_skin_1-v1.webp',
-  [SpeakerImageKey.STARTER_CHEST_CLOSED]: '/starter_box.png',
-  [SpeakerImageKey.STARTER_CHEST_OPEN]: '/starter_box_opened.png',
-  [SpeakerImageKey.STARTER_1_CRAB]: '/crab-starter-grass-neutral-skin-1.png',
-  [SpeakerImageKey.STARTER_2_IGUANA]: '/iguana_starter_fire_neutral_skin_1.png',
+  [SpeakerImageKey.STARTER_CHEST_CLOSED]: '/starter_box.webp',
+  [SpeakerImageKey.STARTER_CHEST_OPEN]: '/starter_box_opened.webp',
+  [SpeakerImageKey.STARTER_1_CRAB]: '/crab-starter-grass-neutral-skin-1.webp',
+  [SpeakerImageKey.STARTER_2_IGUANA]: '/iguana_starter_fire_neutral_skin_1.webp',
   [SpeakerImageKey.STARTER_3_MONKEY]:
-    '/monkey_starter_water_neutral_skin_1.png',
+    '/monkey_starter_water_neutral_skin_1.webp',
   [SpeakerImageKey.MOPUP]: '/UI/Icons/mopup_icon.png',
   [SpeakerImageKey.EEL_SENTICLE]: '/dialog/senticle_dark_aura_small.webp',
   [SpeakerImageKey.CREWMATE]: 'https://picsum.photos/seed/crewmate_npc/300/300',

@@ -19,7 +19,7 @@ export const CreaturePortrait: React.FC<CreaturePortraitProps> = ({
   const spriteUrl =
     creature.battleSpriteUrl ||
     creature.spriteUrl ||
-    '/iguana_starter_fire_battle_skin_2_actual.png';
+    '/iguana_starter_fire_battle_skin_2_actual.webp';
 
   return (
     <div

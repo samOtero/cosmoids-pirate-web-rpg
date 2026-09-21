@@ -155,6 +155,35 @@ const categories = {
       smartSubsample: true,
     },
   },
+  'starter-art': {
+    sourceDirectories: [
+      path.join(repositoryRoot, 'art-source', 'props', 'story'),
+      path.join(
+        repositoryRoot,
+        'art-source',
+        'creatures',
+        'legacy-renders',
+      ),
+    ],
+    outputDirectory: path.join(webRoot, 'public'),
+    sourceExtension: '.png',
+    outputExtension: '.webp',
+    files: [
+      'crab-starter-grass-neutral-skin-1.png',
+      'eel-basic-normal-neutral-skin-1.png',
+      'iguana_starter_fire_battle_skin_2_actual.png',
+      'iguana_starter_fire_neutral_skin_1.png',
+      'monkey_starter_water_neutral_skin_1.png',
+      'starter_box.png',
+      'starter_box_opened.png',
+    ],
+    webp: {
+      quality: 88,
+      alphaQuality: 100,
+      effort: 6,
+      smartSubsample: true,
+    },
+  },
 };
 
 function formatBytes(bytes) {
@@ -178,21 +207,33 @@ async function optimizeCategory(categoryName) {
     );
   }
 
-  assertInside(repositoryRoot, config.sourceDirectory);
+  const sourceDirectories = config.sourceDirectories ?? [config.sourceDirectory];
+  for (const sourceDirectory of sourceDirectories) {
+    assertInside(repositoryRoot, sourceDirectory);
+  }
   assertInside(webRoot, config.outputDirectory);
 
-  const directoryEntries = await readdir(config.sourceDirectory, {
-    withFileTypes: true,
-  });
-  const availableSourceFiles = new Set(
-    directoryEntries
-      .filter(
-        (entry) =>
-          entry.isFile() &&
-          path.extname(entry.name).toLowerCase() === config.sourceExtension,
-      )
-      .map((entry) => entry.name),
-  );
+  const sourceFileDirectories = new Map();
+  for (const sourceDirectory of sourceDirectories) {
+    const directoryEntries = await readdir(sourceDirectory, {
+      withFileTypes: true,
+    });
+    for (const entry of directoryEntries) {
+      if (
+        !entry.isFile() ||
+        path.extname(entry.name).toLowerCase() !== config.sourceExtension
+      ) {
+        continue;
+      }
+      if (sourceFileDirectories.has(entry.name)) {
+        throw new Error(
+          `Duplicate ${categoryName} source asset found: ${entry.name}`,
+        );
+      }
+      sourceFileDirectories.set(entry.name, sourceDirectory);
+    }
+  }
+  const availableSourceFiles = new Set(sourceFileDirectories.keys());
   const excludedSourceFiles = new Set(config.excludeFiles ?? []);
   const sourceFiles = [...(config.files ?? availableSourceFiles)]
     .filter((sourceFile) => !excludedSourceFiles.has(sourceFile))
@@ -208,7 +249,9 @@ async function optimizeCategory(categoryName) {
   }
 
   if (sourceFiles.length === 0) {
-    throw new Error(`No source assets found in ${config.sourceDirectory}`);
+    throw new Error(
+      `No source assets found in ${sourceDirectories.join(', ')}`,
+    );
   }
 
   await mkdir(config.outputDirectory, { recursive: true });
@@ -218,7 +261,10 @@ async function optimizeCategory(categoryName) {
   let totalOutputBytes = 0;
 
   for (const sourceName of sourceFiles) {
-    const sourcePath = path.join(config.sourceDirectory, sourceName);
+    const sourcePath = path.join(
+      sourceFileDirectories.get(sourceName),
+      sourceName,
+    );
     const outputName = `${path.basename(sourceName, config.sourceExtension)}${config.outputExtension}`;
     const outputDirectory = config.rootFiles?.includes(sourceName)
       ? config.outputDirectory

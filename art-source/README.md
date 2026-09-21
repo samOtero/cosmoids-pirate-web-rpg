@@ -68,5 +68,15 @@ only here.
    source dimensions are retained because Pixi level geometry and camera
    behavior can depend on the background texture dimensions. Draft and unused
    level backgrounds remain source-only.
+
+   Starter selection and showcase art uses:
+
+   ```sh
+   pnpm assets:optimize:starter-art
+   ```
+
+   That pipeline writes quality-88 transparency-preserving WebP derivatives
+   without resizing. It combines the active chest art in `props/story` with
+   the active full-size creature renders in `creatures/legacy-renders`.
 3. Update the runtime asset URL if its filename or format changed.
 4. Verify that no application code references `art-source` directly.

@@ -14,7 +14,7 @@ export const SENTICLE: CosmoidTemplate = {
   },
   baseExperience: 62,
   iconImg: '/UI/Icons/senticle_icon.png',
-  spriteUrl: '/eel-basic-normal-neutral-skin-1.png',
+  spriteUrl: '/eel-basic-normal-neutral-skin-1.webp',
   battleSpriteUrl:
     '/battles/cosmoids/eel-basic-normal-neutral-skin-battle-ground-2.png',
   movementId: 'lizard',
