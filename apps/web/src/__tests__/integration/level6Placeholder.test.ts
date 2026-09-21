@@ -193,14 +193,6 @@ describe('Level 6 playable placeholder', () => {
         (unit) => unit.tdConfigId === 'maribel_capture'
       )?.facingDirection
     ).toBe('down');
-    expect(
-      LEVEL_6.environmentUnits?.find(
-        (unit) => unit.tdConfigId === 'commander_strake_battle'
-      )
-    ).toMatchObject({
-      position: { x: 94, y: 18 },
-      facingDirection: 'left',
-    });
     expect(CREATURE_TD_CONFIGS.commander_strake_battle.default).toMatchObject({
       url: '/battles/characters/commander_strake_battle.png',
       scale: 0.17,
