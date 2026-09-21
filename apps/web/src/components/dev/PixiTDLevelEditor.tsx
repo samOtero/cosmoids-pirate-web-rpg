@@ -224,7 +224,7 @@ export default function PixiTDLevelEditor({
 
       // Add background
       let currentBgUrl =
-        backgroundUrlRef.current || '/battles/bg/bg_dock_battle_td.png';
+        backgroundUrlRef.current || '/battles/bg/bg_dock_battle_td.webp';
       await PIXI.Assets.load(currentBgUrl);
       if (isDestroyed) return;
 
@@ -574,7 +574,7 @@ export default function PixiTDLevelEditor({
         const viewportH = app.screen.height;
 
         const bgUrl =
-          backgroundUrlRef.current || '/battles/bg/bg_dock_battle_td.png';
+          backgroundUrlRef.current || '/battles/bg/bg_dock_battle_td.webp';
         if (bgUrl !== currentBgUrl) {
           currentBgUrl = bgUrl;
           PIXI.Assets.load(bgUrl)

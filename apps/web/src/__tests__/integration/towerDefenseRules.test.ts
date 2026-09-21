@@ -44,10 +44,10 @@ describe('Tower defense rules', () => {
 
   it('keeps separate path backgrounds for Levels 2 and 3', () => {
     expect(FOREST_LEVEL.backgroundUrl).toBe(
-      '/battles/bg/bg_coastal_island_battle_path_v2.png'
+      '/battles/bg/bg_coastal_island_battle_path_v2.webp'
     );
     expect(VANE_LEVEL.backgroundUrl).toBe(
-      '/battles/bg/bg_coastal_island_battle_path_level_3.png'
+      '/battles/bg/bg_coastal_island_battle_path_level_3.webp'
     );
   });
 
@@ -243,7 +243,7 @@ describe('Tower defense rules', () => {
 
   it('sets up Level 4 with its intro and staged market objective', () => {
     expect(LEVEL_4.paths).toHaveLength(6);
-    expect(LEVEL_4.backgroundUrl).toBe('/battles/bg/bg_market_level_4.png');
+    expect(LEVEL_4.backgroundUrl).toBe('/battles/bg/bg_market_level_4.webp');
     expect(LEVEL_4.backgroundScale).toBe(3);
     expect(LEVEL_4.resonantEvolution).toBeUndefined();
     expect(LEVEL_4.captureUnits).toEqual([

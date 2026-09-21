@@ -24,6 +24,7 @@
     "assets:optimize:journals": "node scripts/assets/optimize-art-assets.mjs journal",
     "assets:optimize:story-backgrounds": "node scripts/assets/optimize-art-assets.mjs story-backgrounds",
     "assets:optimize:story-portraits": "node scripts/assets/optimize-art-assets.mjs story-portraits",
+    "assets:optimize:level-backgrounds": "node scripts/assets/optimize-art-assets.mjs level-backgrounds",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },

@@ -204,7 +204,7 @@ export const FIRST_LEVEL: TDLevelData = {
   ],
   enemyHpMultiplier: 2,
   lives: 10,
-  backgroundUrl: '/battles/bg/bg_dock_battle_td_extended_single_lane.png',
+  backgroundUrl: '/battles/bg/bg_dock_battle_td_extended_single_lane.webp',
   backgroundScale: 1.2,
   introMessage: 'Protect the coins!',
 };

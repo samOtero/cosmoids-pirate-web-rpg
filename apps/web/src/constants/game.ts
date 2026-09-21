@@ -117,10 +117,10 @@ export const BACKGROUND_IMAGES: Record<BackgroundImageKey, string> = {
   [BackgroundImageKey.CALEB_HOUSE]: '/bg_caleb_house_1.webp',
   [BackgroundImageKey.FIRST_TOWN_DOCKS]: '/bg_first_town_docks_1.webp',
   [BackgroundImageKey.ISLAND_1]: '/island_1_wip.webp',
-  [BackgroundImageKey.FOREST]: '/battles/bg/bg_first_island_forest_battle.png',
+  [BackgroundImageKey.FOREST]: '/battles/bg/bg_first_island_forest_battle.webp',
   [BackgroundImageKey.FOREST_2]:
-    '/battles/bg/bg_first_island_forest_battle_2.png',
-  [BackgroundImageKey.DOCK_PIXEL]: '/battles/bg/bg_dock_battle_pixel.png',
+    '/battles/bg/bg_first_island_forest_battle_2.webp',
+  [BackgroundImageKey.DOCK_PIXEL]: '/battles/bg/bg_dock_battle_pixel.webp',
   [BackgroundImageKey.LEVEL_2_STORMY_SEA]: '/bg_level_2_stormy_sea.webp',
   [BackgroundImageKey.LEVEL_2_WAVE_IMPACT]: '/bg_level_2_wave_impact.webp',
   [BackgroundImageKey.LEVEL_2_SHIPWRECK_BEACH]:

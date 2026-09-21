@@ -402,7 +402,7 @@ export const LEVEL_6: TDLevelData = {
   lives: 1,
   disableCapture: false,
   enemyHpMultiplier: 1,
-  backgroundUrl: '/battles/bg/bg_level_6_three_lane_compact_v1.png',
+  backgroundUrl: '/battles/bg/bg_level_6_three_lane_compact_v1.webp',
   backgroundScale: 2,
   initialView: {
     offsetX: 50,

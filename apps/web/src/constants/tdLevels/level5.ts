@@ -673,7 +673,7 @@ export const LEVEL_5: TDLevelData = {
   lives: 3,
   disableCapture: false,
   enemyHpMultiplier: 1,
-  backgroundUrl: '/battles/bg/bg_level_5_ironbell_prison_layered_v2.png',
+  backgroundUrl: '/battles/bg/bg_level_5_ironbell_prison_layered_v2.webp',
   backgroundScale: 3,
   initialView: {
     offsetX: 50,

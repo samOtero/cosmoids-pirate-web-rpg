@@ -221,7 +221,7 @@ export const VANE_LEVEL: TDLevelData = {
   ],
   enemyHpMultiplier: 2,
   lives: 10,
-  backgroundUrl: '/battles/bg/bg_coastal_island_battle_path_level_3.png',
+  backgroundUrl: '/battles/bg/bg_coastal_island_battle_path_level_3.webp',
   backgroundScale: 2,
   initialView: {
     offsetX: 50,

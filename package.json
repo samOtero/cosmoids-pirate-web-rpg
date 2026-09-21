@@ -24,6 +24,7 @@
     "assets:optimize:journals": "pnpm --filter @cosmoids/web assets:optimize:journals",
     "assets:optimize:story-backgrounds": "pnpm --filter @cosmoids/web assets:optimize:story-backgrounds",
     "assets:optimize:story-portraits": "pnpm --filter @cosmoids/web assets:optimize:story-portraits",
+    "assets:optimize:level-backgrounds": "pnpm --filter @cosmoids/web assets:optimize:level-backgrounds",
     "prepare": "husky",
     "storybook": "pnpm --filter @cosmoids/web storybook",
     "build-storybook": "pnpm --filter @cosmoids/web build-storybook"

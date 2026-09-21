@@ -126,6 +126,35 @@ const categories = {
       smartSubsample: true,
     },
   },
+  'level-backgrounds': {
+    sourceDirectory: path.join(
+      repositoryRoot,
+      'art-source',
+      'backgrounds',
+      'battle',
+    ),
+    outputDirectory: path.join(webRoot, 'public', 'battles', 'bg'),
+    sourceExtension: '.png',
+    outputExtension: '.webp',
+    files: [
+      'bg_coastal_island_battle_path_level_3.png',
+      'bg_coastal_island_battle_path_v2.png',
+      'bg_dock_battle_pixel.png',
+      'bg_dock_battle_td_extended_single_lane.png',
+      'bg_dock_battle_td.png',
+      'bg_first_island_forest_battle.png',
+      'bg_first_island_forest_battle_2.png',
+      'bg_level_5_ironbell_prison_layered_v2.png',
+      'bg_level_6_three_lane_compact_v1.png',
+      'bg_market_level_4.png',
+    ],
+    webp: {
+      quality: 88,
+      alphaQuality: 100,
+      effort: 6,
+      smartSubsample: true,
+    },
+  },
 };
 
 function formatBytes(bytes) {
@@ -201,11 +230,9 @@ async function optimizeCategory(categoryName) {
     assertInside(config.outputDirectory, outputPath);
 
     const sourceStats = await stat(sourcePath);
-    const outputBuffer = await sharp(sourcePath, { failOn: 'error' })
-      .rotate()
-      .resize(config.resize)
-      .webp(config.webp)
-      .toBuffer();
+    let pipeline = sharp(sourcePath, { failOn: 'error' }).rotate();
+    if (config.resize) pipeline = pipeline.resize(config.resize);
+    const outputBuffer = await pipeline.webp(config.webp).toBuffer();
     const outputMetadata = await sharp(outputBuffer).metadata();
 
     await mkdir(outputDirectory, { recursive: true });

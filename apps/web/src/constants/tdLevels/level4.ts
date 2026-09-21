@@ -529,7 +529,7 @@ export const LEVEL_4: TDLevelData = {
     },
   ],
   enemyHpMultiplier: 2,
-  backgroundUrl: '/battles/bg/bg_market_level_4.png',
+  backgroundUrl: '/battles/bg/bg_market_level_4.webp',
   backgroundScale: 3,
   initialView: {
     offsetX: 0,

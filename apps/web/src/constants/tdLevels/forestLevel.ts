@@ -250,7 +250,7 @@ export const FOREST_LEVEL: TDLevelData = {
   ],
   enemyHpMultiplier: 2,
   lives: 10,
-  backgroundUrl: '/battles/bg/bg_coastal_island_battle_path_v2.png',
+  backgroundUrl: '/battles/bg/bg_coastal_island_battle_path_v2.webp',
   backgroundScale: 2,
   initialView: {
     offsetX: 50,

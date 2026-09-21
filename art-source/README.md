@@ -57,5 +57,16 @@ only here.
    That pipeline writes transparency-preserving WebP derivatives up to
    1024x1024 at quality 88. It preserves the existing `public` versus
    `public/dialog` placement and excludes source-only unused portraits.
+
+   Level backgrounds use:
+
+   ```sh
+   pnpm assets:optimize:level-backgrounds
+   ```
+
+   That pipeline writes quality-88 WebP derivatives without resizing. Exact
+   source dimensions are retained because Pixi level geometry and camera
+   behavior can depend on the background texture dimensions. Draft and unused
+   level backgrounds remain source-only.
 3. Update the runtime asset URL if its filename or format changed.
 4. Verify that no application code references `art-source` directly.

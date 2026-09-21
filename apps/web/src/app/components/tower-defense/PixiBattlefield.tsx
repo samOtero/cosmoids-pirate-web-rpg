@@ -2396,7 +2396,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         );
 
         // Add background
-        const bgUrl = backgroundUrl || '/battles/bg/bg_dock_battle_td.png';
+        const bgUrl = backgroundUrl || '/battles/bg/bg_dock_battle_td.webp';
         const scale = backgroundScale > 1 ? backgroundScale : 1;
         const resolvedInitialView = resolveTDInitialView(scale, initialView);
         zoomRef.current = resolvedInitialView.zoom;
