@@ -26,6 +26,7 @@
     "assets:optimize:story-portraits": "node scripts/assets/optimize-art-assets.mjs story-portraits",
     "assets:optimize:level-backgrounds": "node scripts/assets/optimize-art-assets.mjs level-backgrounds",
     "assets:optimize:starter-art": "node scripts/assets/optimize-art-assets.mjs starter-art",
+    "assets:optimize:battle-characters": "node scripts/assets/optimize-art-assets.mjs battle-characters",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },

@@ -364,7 +364,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   caleb_capture: {
     default: {
-      url: '/battles/characters/caleb_battle.png',
+      url: '/battles/characters/caleb_battle.webp',
       scale: 0.68,
       shadowScaleX: 3.05,
       shadowOffsetY: -32,
@@ -373,7 +373,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowScaleY: 0.7,
     },
     idle: {
-      url: '/battles/characters/caleb_battle.png',
+      url: '/battles/characters/caleb_battle.webp',
       scale: 0.68,
       shadowScaleX: 3.05,
       shadowOffsetY: -32,
@@ -382,14 +382,14 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowScaleY: 0.7,
     },
     carried: {
-      url: '/battles/characters/caleb_carried_1.png',
+      url: '/battles/characters/caleb_carried_1.webp',
       scale: 0.12,
       offsetY: 0,
       shadowScaleX: 0,
       shadowScaleY: 0,
     },
     left: {
-      url: '/battles/characters/caleb_left_1.png',
+      url: '/battles/characters/caleb_left_1.webp',
       scale: 0.12,
       shadowScaleX: 2.8,
       shadowOffsetY: -13,
@@ -398,7 +398,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowScaleY: 0.7,
     },
     right: {
-      url: '/battles/characters/caleb_left_1.png',
+      url: '/battles/characters/caleb_left_1.webp',
       scale: 0.12,
       shadowScaleX: 2.8,
       shadowOffsetY: -19,
@@ -408,7 +408,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       flipX: true,
     },
     up: {
-      url: '/battles/characters/caleb_up_1.png',
+      url: '/battles/characters/caleb_up_1.webp',
       scale: 0.12,
       shadowScaleX: 1.45,
       shadowOffsetY: -14,
@@ -417,7 +417,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowScaleY: 0.7,
     },
     down: {
-      url: '/battles/characters/caleb_down_1.png',
+      url: '/battles/characters/caleb_down_1.webp',
       scale: 0.12,
       shadowScaleX: 1.55,
       shadowOffsetY: -17,
@@ -428,7 +428,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   kip_capture: {
     default: {
-      url: '/battles/characters/kip_battle.png',
+      url: '/battles/characters/kip_battle.webp',
       scale: 0.13,
       shadowScaleX: 2.8,
       shadowScaleY: 0.7,
@@ -438,7 +438,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -5,
     },
     idle: {
-      url: '/battles/characters/kip_battle.png',
+      url: '/battles/characters/kip_battle.webp',
       scale: 0.13,
       shadowScaleX: 2.8,
       shadowScaleY: 0.7,
@@ -448,14 +448,14 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -5,
     },
     carried: {
-      url: '/battles/characters/kip_carried_1.png',
+      url: '/battles/characters/kip_carried_1.webp',
       scale: 0.13,
       offsetY: 0,
       shadowScaleX: 0,
       shadowScaleY: 0,
     },
     left: {
-      url: '/battles/characters/kip_left_1.png',
+      url: '/battles/characters/kip_left_1.webp',
       scale: 0.13,
       shadowScaleX: 2.8,
       shadowScaleY: 0.7,
@@ -465,7 +465,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -5,
     },
     right: {
-      url: '/battles/characters/kip_left_1.png',
+      url: '/battles/characters/kip_left_1.webp',
       scale: 0.13,
       shadowScaleX: 2.8,
       shadowScaleY: 0.7,
@@ -476,7 +476,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       flipX: true,
     },
     up: {
-      url: '/battles/characters/kip_up_1.png',
+      url: '/battles/characters/kip_up_1.webp',
       scale: 0.13,
       shadowScaleX: 1.6,
       shadowScaleY: 0.7,
@@ -486,7 +486,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -5,
     },
     down: {
-      url: '/battles/characters/kip_down_1.png',
+      url: '/battles/characters/kip_down_1.webp',
       scale: 0.13,
       shadowScaleX: 2,
       shadowScaleY: 0.7,
@@ -498,7 +498,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   maribel_capture: {
     default: {
-      url: '/battles/characters/maribel_idle_1.png',
+      url: '/battles/characters/maribel_idle_1.webp',
       scale: 0.26,
       offsetY: -72,
       shadowScaleX: 1.95,
@@ -506,7 +506,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetY: 6,
     },
     idle: {
-      url: '/battles/characters/maribel_idle_1.png',
+      url: '/battles/characters/maribel_idle_1.webp',
       scale: 0.26,
       offsetY: -72,
       shadowScaleX: 2.2,
@@ -514,7 +514,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetY: 2,
     },
     carried: {
-      url: '/battles/characters/maribel_carried_1.png',
+      url: '/battles/characters/maribel_carried_1.webp',
       scale: 0.26,
       offsetY: 0,
       shadowScaleX: 0,
@@ -522,7 +522,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetY: 2,
     },
     left: {
-      url: '/battles/characters/maribel_left_1.png',
+      url: '/battles/characters/maribel_left_1.webp',
       scale: 0.26,
       offsetY: -72,
       shadowScaleX: 2.2,
@@ -530,7 +530,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetY: -2,
     },
     right: {
-      url: '/battles/characters/maribel_left_1.png',
+      url: '/battles/characters/maribel_left_1.webp',
       scale: 0.26,
       offsetY: -72,
       shadowScaleX: 2.2,
@@ -539,7 +539,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       flipX: true,
     },
     up: {
-      url: '/battles/characters/maribel_up_1.png',
+      url: '/battles/characters/maribel_up_1.webp',
       scale: 0.26,
       offsetY: -72,
       shadowScaleX: 1.75,
@@ -548,7 +548,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetX: 0,
     },
     down: {
-      url: '/battles/characters/maribel_down_1.png',
+      url: '/battles/characters/maribel_down_1.webp',
       scale: 0.26,
       offsetY: -72,
       shadowScaleX: 1.85,
@@ -595,7 +595,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   caleb_battle: {
     default: {
-      url: '/battles/characters/caleb_battle.png',
+      url: '/battles/characters/caleb_battle.webp',
       scale: 0.68,
       shadowScaleX: 3.05,
       shadowOffsetY: -32,
@@ -606,7 +606,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   kip_battle: {
     default: {
-      url: '/battles/characters/kip_battle.png',
+      url: '/battles/characters/kip_battle.webp',
       scale: 0.13,
       shadowScaleX: 2.8,
       shadowScaleY: 0.7,
@@ -618,7 +618,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   captain_vane_battle: {
     default: {
-      url: '/battles/characters/captain_vane_battle.png',
+      url: '/battles/characters/captain_vane_battle.webp',
       scale: 0.17,
       shadowScaleX: 3.4,
       shadowScaleY: 0.9,
@@ -629,7 +629,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   commander_strake_battle: {
     default: {
-      url: '/battles/characters/commander_strake_battle.png',
+      url: '/battles/characters/commander_strake_battle.webp',
       scale: 0.17,
       shadowScaleX: 3.4,
       shadowScaleY: 0.9,
@@ -640,7 +640,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   pirate_grunt_battle: {
     default: {
-      url: '/battles/characters/pirate_grunt_battle.png',
+      url: '/battles/characters/pirate_grunt_battle.webp',
       scale: 0.29,
       shadowScaleX: 3.7,
       shadowOffsetY: 5,
@@ -652,7 +652,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   navy_guard_battle: {
     default: {
-      url: '/battles/characters/navy_guard_battle.png',
+      url: '/battles/characters/navy_guard_battle.webp',
       scale: 0.16,
       flipX: true,
       shadowScaleX: 3.2,
@@ -664,7 +664,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   rat_catcher_battle: {
     default: {
-      url: '/battles/characters/rat_catcher_battle.png',
+      url: '/battles/characters/rat_catcher_battle.webp',
       scale: 0.66,
       shadowScaleX: 2.3,
       shadowOffsetY: 5,
@@ -677,7 +677,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   lance_calm_battle: {
     default: {
-      url: '/battles/characters/lance_calm_battle.png',
+      url: '/battles/characters/lance_calm_battle.webp',
       scale: 0.37,
       shadowScaleX: 2.85,
       shadowOffsetY: 34,
@@ -690,7 +690,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   grandpa_battle: {
     default: {
-      url: '/battles/characters/grandpa_battle.png',
+      url: '/battles/characters/grandpa_battle.webp',
       scale: 0.37,
       shadowScaleX: 2.65,
       shadowOffsetY: -6,

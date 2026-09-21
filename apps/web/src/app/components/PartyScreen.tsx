@@ -459,7 +459,7 @@ export default function PartyScreen({
             {/* Character Sprite on the right */}
             <div className="pointer-events-none absolute right-0 bottom-12 flex h-auto w-32 justify-end lg:bottom-16 lg:w-48">
               <img
-                src="/battles/characters/lance_calm_battle.png"
+                src="/battles/characters/lance_calm_battle.webp"
                 alt="Lance"
                 className="h-auto w-full object-contain drop-shadow-[0_0_15px_rgba(0,0,0,0.8)]"
               />

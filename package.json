@@ -26,6 +26,7 @@
     "assets:optimize:story-portraits": "pnpm --filter @cosmoids/web assets:optimize:story-portraits",
     "assets:optimize:level-backgrounds": "pnpm --filter @cosmoids/web assets:optimize:level-backgrounds",
     "assets:optimize:starter-art": "pnpm --filter @cosmoids/web assets:optimize:starter-art",
+    "assets:optimize:battle-characters": "pnpm --filter @cosmoids/web assets:optimize:battle-characters",
     "prepare": "husky",
     "storybook": "pnpm --filter @cosmoids/web storybook",
     "build-storybook": "pnpm --filter @cosmoids/web build-storybook"

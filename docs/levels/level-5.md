@@ -245,7 +245,7 @@ The endless escalation is implemented; the enemy roster and balance remain provi
 
 ### Human battlefield assets
 
-- [`apps/web/public/battles/characters/navy_guard_battle.png`](../../apps/web/public/battles/characters/navy_guard_battle.png)
+- [`apps/web/public/battles/characters/navy_guard_battle.webp`](../../apps/web/public/battles/characters/navy_guard_battle.webp)
 
 ### Tigrevel assets
 

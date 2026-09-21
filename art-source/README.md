@@ -78,5 +78,15 @@ only here.
    That pipeline writes quality-88 transparency-preserving WebP derivatives
    without resizing. It combines the active chest art in `props/story` with
    the active full-size creature renders in `creatures/legacy-renders`.
+
+   Battle character art uses:
+
+   ```sh
+   pnpm assets:optimize:battle-characters
+   ```
+
+   That pipeline writes quality-90 transparency-preserving WebP derivatives
+   without resizing. Exact source dimensions are retained because Pixi sprite
+   geometry and configured character placement can depend on texture size.
 3. Update the runtime asset URL if its filename or format changed.
 4. Verify that no application code references `art-source` directly.

@@ -23,7 +23,7 @@ describe('Level 5 human capture visuals', () => {
   it('renders the Navy guard as a stationary battlefield character', () => {
     expect(CREATURE_TD_CONFIGS.navy_guard_battle).toEqual({
       default: {
-        url: '/battles/characters/navy_guard_battle.png',
+        url: '/battles/characters/navy_guard_battle.webp',
         scale: 0.16,
         flipX: true,
         shadowScaleX: 3.2,
@@ -38,19 +38,19 @@ describe('Level 5 human capture visuals', () => {
   it.each([
     [
       'caleb_capture',
-      '/battles/characters/caleb_battle.png',
-      '/battles/characters/caleb_carried_1.png',
-      '/battles/characters/caleb_left_1.png',
-      '/battles/characters/caleb_up_1.png',
-      '/battles/characters/caleb_down_1.png',
+      '/battles/characters/caleb_battle.webp',
+      '/battles/characters/caleb_carried_1.webp',
+      '/battles/characters/caleb_left_1.webp',
+      '/battles/characters/caleb_up_1.webp',
+      '/battles/characters/caleb_down_1.webp',
     ],
     [
       'kip_capture',
-      '/battles/characters/kip_battle.png',
-      '/battles/characters/kip_carried_1.png',
-      '/battles/characters/kip_left_1.png',
-      '/battles/characters/kip_up_1.png',
-      '/battles/characters/kip_down_1.png',
+      '/battles/characters/kip_battle.webp',
+      '/battles/characters/kip_carried_1.webp',
+      '/battles/characters/kip_left_1.webp',
+      '/battles/characters/kip_up_1.webp',
+      '/battles/characters/kip_down_1.webp',
     ],
   ] as const)(
     '%s has distinct idle, carried, and directional states',
@@ -75,7 +75,7 @@ describe('Level 5 human capture visuals', () => {
   it('does not change the shared battle configs', () => {
     expect(CREATURE_TD_CONFIGS.caleb_battle).toEqual({
       default: {
-        url: '/battles/characters/caleb_battle.png',
+        url: '/battles/characters/caleb_battle.webp',
         scale: 0.68,
         shadowScaleX: 3.05,
         shadowOffsetY: -32,
@@ -86,7 +86,7 @@ describe('Level 5 human capture visuals', () => {
     });
     expect(CREATURE_TD_CONFIGS.kip_battle).toEqual({
       default: {
-        url: '/battles/characters/kip_battle.png',
+        url: '/battles/characters/kip_battle.webp',
         scale: 0.13,
         shadowScaleX: 2.8,
         shadowScaleY: 0.7,
