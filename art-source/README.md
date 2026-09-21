@@ -38,6 +38,14 @@ only here.
    The journal pipeline writes 1024x1024 WebP derivatives to
    `apps/web/public/UI/Journal` at quality 84. Additional asset categories can
    be added to `apps/web/scripts/assets/optimize-art-assets.mjs` as their
-   runtime requirements are established.
+   runtime requirements are established. Story backgrounds use:
+
+   ```sh
+   pnpm assets:optimize:story-backgrounds
+   ```
+
+   That pipeline writes WebP derivatives up to 1920x1080 at quality 86. It
+   includes only narrative backgrounds referenced by the story system and
+   intentionally excludes every background under `battles/bg`.
 3. Update the runtime asset URL if its filename or format changed.
 4. Verify that no application code references `art-source` directly.

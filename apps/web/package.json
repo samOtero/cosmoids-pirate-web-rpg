@@ -22,6 +22,7 @@
     "test:creatures": "vitest run src/__tests__/integration/creatureManifest.test.ts --project=unit",
     "assets:optimize": "node scripts/assets/optimize-art-assets.mjs",
     "assets:optimize:journals": "node scripts/assets/optimize-art-assets.mjs journal",
+    "assets:optimize:story-backgrounds": "node scripts/assets/optimize-art-assets.mjs story-backgrounds",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },

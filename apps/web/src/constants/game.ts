@@ -114,45 +114,45 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
 };
 
 export const BACKGROUND_IMAGES: Record<BackgroundImageKey, string> = {
-  [BackgroundImageKey.CALEB_HOUSE]: '/bg_caleb_house_1.png',
-  [BackgroundImageKey.FIRST_TOWN_DOCKS]: '/bg_first_town_docks_1.png',
-  [BackgroundImageKey.ISLAND_1]: '/island_1_wip.png',
+  [BackgroundImageKey.CALEB_HOUSE]: '/bg_caleb_house_1.webp',
+  [BackgroundImageKey.FIRST_TOWN_DOCKS]: '/bg_first_town_docks_1.webp',
+  [BackgroundImageKey.ISLAND_1]: '/island_1_wip.webp',
   [BackgroundImageKey.FOREST]: '/battles/bg/bg_first_island_forest_battle.png',
   [BackgroundImageKey.FOREST_2]:
     '/battles/bg/bg_first_island_forest_battle_2.png',
   [BackgroundImageKey.DOCK_PIXEL]: '/battles/bg/bg_dock_battle_pixel.png',
-  [BackgroundImageKey.LEVEL_2_STORMY_SEA]: '/bg_level_2_stormy_sea.png',
-  [BackgroundImageKey.LEVEL_2_WAVE_IMPACT]: '/bg_level_2_wave_impact.png',
+  [BackgroundImageKey.LEVEL_2_STORMY_SEA]: '/bg_level_2_stormy_sea.webp',
+  [BackgroundImageKey.LEVEL_2_WAVE_IMPACT]: '/bg_level_2_wave_impact.webp',
   [BackgroundImageKey.LEVEL_2_SHIPWRECK_BEACH]:
-    '/bg_level_2_shipwreck_beach.png',
+    '/bg_level_2_shipwreck_beach.webp',
   [BackgroundImageKey.LEVEL_2_REPAIRED_BOAT_SUPPLIES]:
-    '/bg_level_2_repaired_boat_supplies.png',
-  [BackgroundImageKey.LEVEL_3_SAILING_AWAY]: '/bg_level_3_sailing_away.png',
-  [BackgroundImageKey.LEVEL_4_VANE_CHASE]: '/bg_level_4_vane_chase.png',
+    '/bg_level_2_repaired_boat_supplies.webp',
+  [BackgroundImageKey.LEVEL_3_SAILING_AWAY]: '/bg_level_3_sailing_away.webp',
+  [BackgroundImageKey.LEVEL_4_VANE_CHASE]: '/bg_level_4_vane_chase.webp',
   [BackgroundImageKey.LEVEL_4_IRONBELL_HARBOR]:
-    '/bg_level_4_ironbell_harbor.png',
+    '/bg_level_4_ironbell_harbor.webp',
   [BackgroundImageKey.LEVEL_4_IRONBELL_MARKET]:
-    '/bg_level_4_ironbell_market.png',
-  [BackgroundImageKey.LEVEL_4_IRONBELL_CELL]: '/bg_level_4_ironbell_cell.png',
+    '/bg_level_4_ironbell_market.webp',
+  [BackgroundImageKey.LEVEL_4_IRONBELL_CELL]: '/bg_level_4_ironbell_cell.webp',
   [BackgroundImageKey.LEVEL_5_IRONBELL_UNDERCROFT]:
-    '/bg_level_5_ironbell_undercroft.png',
-  [BackgroundImageKey.LEVEL_5_MEMORY_BEACH]: '/bg_level_5_memory_beach.png',
+    '/bg_level_5_ironbell_undercroft.webp',
+  [BackgroundImageKey.LEVEL_5_MEMORY_BEACH]: '/bg_level_5_memory_beach.webp',
   [BackgroundImageKey.LEVEL_5_MEMORY_RAZHOUND_ATTACK]:
-    '/bg_level_5_memory_razhound_attack.png',
+    '/bg_level_5_memory_razhound_attack.webp',
   [BackgroundImageKey.LEVEL_5_MEMORY_TIGREVEL_RESCUE]:
-    '/bg_level_5_memory_tigrevel_rescue.png',
+    '/bg_level_5_memory_tigrevel_rescue.webp',
   [BackgroundImageKey.LEVEL_5_MEMORY_NAVY_CAPTURE]:
-    '/bg_level_5_memory_navy_capture.png',
-  [BackgroundImageKey.LEVEL_5_TIGREVEL_CELL]: '/bg_level_5_tigrevel_cell.png',
-  [BackgroundImageKey.LEVEL_5_TIGREVEL_FREED]: '/bg_level_5_tigrevel_freed.png',
+    '/bg_level_5_memory_navy_capture.webp',
+  [BackgroundImageKey.LEVEL_5_TIGREVEL_CELL]: '/bg_level_5_tigrevel_cell.webp',
+  [BackgroundImageKey.LEVEL_5_TIGREVEL_FREED]: '/bg_level_5_tigrevel_freed.webp',
   [BackgroundImageKey.LEVEL_5_TIGREVEL_PROTECTS_KIDS]:
-    '/bg_level_5_tigrevel_protects_kids.png',
-  [BackgroundImageKey.LEVEL_6_NET_THROW]: '/bg_level_6_net_throw.png',
+    '/bg_level_5_tigrevel_protects_kids.webp',
+  [BackgroundImageKey.LEVEL_6_NET_THROW]: '/bg_level_6_net_throw.webp',
   [BackgroundImageKey.LEVEL_6_TIGREVEL_NETTED]:
-    '/bg_level_6_tigrevel_netted.png',
+    '/bg_level_6_tigrevel_netted.webp',
   [BackgroundImageKey.LEVEL_6_TIGREVEL_CLAIMS_BOAT]:
-    '/bg_level_6_tigrevel_claims_boat.png',
+    '/bg_level_6_tigrevel_claims_boat.webp',
   [BackgroundImageKey.LEVEL_6_CRAMPED_CREW_DEPARTURE]:
-    '/bg_level_6_cramped_crew_departure.png',
-  [BackgroundImageKey.DEFAULT]: '/bg_caleb_house_1.png',
+    '/bg_level_6_cramped_crew_departure.webp',
+  [BackgroundImageKey.DEFAULT]: '/bg_caleb_house_1.webp',
 };

@@ -57,7 +57,7 @@ describe('DialogScreen background dimming', () => {
     await waitFor(() =>
       expect(screen.getByAltText('Story background')).toHaveAttribute(
         'src',
-        '/bg_level_2_wave_impact.png'
+        '/bg_level_2_wave_impact.webp'
       )
     );
   });

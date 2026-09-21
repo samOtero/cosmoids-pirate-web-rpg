@@ -33,6 +33,56 @@ const categories = {
       smartSubsample: true,
     },
   },
+  'story-backgrounds': {
+    sourceDirectory: path.join(
+      repositoryRoot,
+      'art-source',
+      'backgrounds',
+      'story',
+    ),
+    outputDirectory: path.join(webRoot, 'public'),
+    sourceExtension: '.png',
+    outputExtension: '.webp',
+    files: [
+      'bg_caleb_house_1.png',
+      'bg_first_town_docks_1.png',
+      'bg_level_2_repaired_boat_supplies.png',
+      'bg_level_2_shipwreck_beach.png',
+      'bg_level_2_stormy_sea.png',
+      'bg_level_2_wave_impact.png',
+      'bg_level_3_sailing_away.png',
+      'bg_level_4_ironbell_cell.png',
+      'bg_level_4_ironbell_harbor.png',
+      'bg_level_4_ironbell_market.png',
+      'bg_level_4_vane_chase.png',
+      'bg_level_5_ironbell_undercroft.png',
+      'bg_level_5_memory_beach.png',
+      'bg_level_5_memory_navy_capture.png',
+      'bg_level_5_memory_razhound_attack.png',
+      'bg_level_5_memory_tigrevel_rescue.png',
+      'bg_level_5_tigrevel_cell.png',
+      'bg_level_5_tigrevel_freed.png',
+      'bg_level_5_tigrevel_protects_kids.png',
+      'bg_level_6_cramped_crew_departure.png',
+      'bg_level_6_net_throw.png',
+      'bg_level_6_tigrevel_claims_boat.png',
+      'bg_level_6_tigrevel_netted.png',
+      'island_1_wip.png',
+    ],
+    resize: {
+      width: 1920,
+      height: 1080,
+      fit: 'inside',
+      withoutEnlargement: true,
+      kernel: sharp.kernel.lanczos3,
+    },
+    webp: {
+      quality: 86,
+      alphaQuality: 100,
+      effort: 6,
+      smartSubsample: true,
+    },
+  },
 };
 
 function formatBytes(bytes) {
@@ -62,14 +112,27 @@ async function optimizeCategory(categoryName) {
   const directoryEntries = await readdir(config.sourceDirectory, {
     withFileTypes: true,
   });
-  const sourceFiles = directoryEntries
-    .filter(
-      (entry) =>
-        entry.isFile() &&
-        path.extname(entry.name).toLowerCase() === config.sourceExtension,
-    )
-    .map((entry) => entry.name)
-    .sort((left, right) => left.localeCompare(right));
+  const availableSourceFiles = new Set(
+    directoryEntries
+      .filter(
+        (entry) =>
+          entry.isFile() &&
+          path.extname(entry.name).toLowerCase() === config.sourceExtension,
+      )
+      .map((entry) => entry.name),
+  );
+  const sourceFiles = [...(config.files ?? availableSourceFiles)].sort(
+    (left, right) => left.localeCompare(right),
+  );
+
+  const missingSourceFiles = sourceFiles.filter(
+    (sourceFile) => !availableSourceFiles.has(sourceFile),
+  );
+  if (missingSourceFiles.length > 0) {
+    throw new Error(
+      `Missing ${categoryName} source assets: ${missingSourceFiles.join(', ')}`,
+    );
+  }
 
   if (sourceFiles.length === 0) {
     throw new Error(`No source assets found in ${config.sourceDirectory}`);

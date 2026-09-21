@@ -22,6 +22,7 @@
     "test:creatures": "pnpm --filter @cosmoids/web test:creatures",
     "assets:optimize": "pnpm --filter @cosmoids/web assets:optimize",
     "assets:optimize:journals": "pnpm --filter @cosmoids/web assets:optimize:journals",
+    "assets:optimize:story-backgrounds": "pnpm --filter @cosmoids/web assets:optimize:story-backgrounds",
     "prepare": "husky",
     "storybook": "pnpm --filter @cosmoids/web storybook",
     "build-storybook": "pnpm --filter @cosmoids/web build-storybook"
