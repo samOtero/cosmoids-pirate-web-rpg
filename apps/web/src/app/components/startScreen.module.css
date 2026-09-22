@@ -88,7 +88,7 @@
     position: absolute;
     inset: -2rem;
     content: '';
-    background: url('/title/four-at-the-bow.png') center / cover;
+    background: url('/title/four-at-the-bow.webp') center / cover;
     filter: blur(24px);
     opacity: 0.6;
   }

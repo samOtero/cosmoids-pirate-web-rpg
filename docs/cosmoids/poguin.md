@@ -81,7 +81,7 @@ Do not infer approved attack IDs, damage, movement speed, invulnerability during
 - **Standalone source:** `exec-63f1a6d6-2ae6-4b0f-ac92-2019ebd357dc.png`.
 - **Concept-art file:** `docs/cosmoids/images/poguin-concept.png`, copied unchanged from the standalone source.
 - **Image generation:** Built-in imagegen; standalone extraction/enlargement used the selected ensemble as its visual reference.
-- **Production assets:** `apps/web/public/UI/Icons/poguin_icon.png`, `apps/web/public/battles/cosmoids/poguin_left.png`, `poguin_down.png`, and `poguin_up.png`.
+- **Production assets:** `apps/web/public/UI/Icons/poguin_icon.png`, `apps/web/public/battles/cosmoids/poguin_left.webp`, `poguin_down.png`, and `poguin_up.png`.
 - **Production status:** Icon, directional battle sprites, creature manifest, species registry entry, reused attacks, and tower-defense visuals completed September 8, 2026. Story-level placement and bespoke gameplay behavior remain pending.
 
 ## Open Decisions

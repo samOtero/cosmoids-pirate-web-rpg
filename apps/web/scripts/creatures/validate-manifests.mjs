@@ -1,6 +1,8 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { basename, join } from 'node:path';
 
+import sharp from 'sharp';
+
 const repoRoot = process.cwd();
 const manifestDirectory = join(repoRoot, 'src', 'content', 'creatures');
 const errors = [];
@@ -9,33 +11,21 @@ function fail(file, message) {
   errors.push(`${basename(file)}: ${message}`);
 }
 
-function inspectPng(file) {
-  const bytes = readFileSync(file);
-  const signature = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
-
-  if (bytes.length < 33 || !bytes.subarray(0, 8).equals(signature)) {
-    return { error: 'asset is not a valid PNG' };
+async function inspectImage(file) {
+  try {
+    const metadata = await sharp(file, { failOn: 'error' }).metadata();
+    if (metadata.format !== 'png' && metadata.format !== 'webp') {
+      return { error: 'asset must be a valid PNG or WebP' };
+    }
+    return {
+      format: metadata.format,
+      width: metadata.width,
+      height: metadata.height,
+      hasAlpha: metadata.hasAlpha,
+    };
+  } catch {
+    return { error: 'asset must be a valid PNG or WebP' };
   }
-
-  const width = bytes.readUInt32BE(16);
-  const height = bytes.readUInt32BE(20);
-  const colorType = bytes[25];
-  let hasTransparencyChunk = false;
-  let offset = 8;
-
-  while (offset + 12 <= bytes.length) {
-    const chunkLength = bytes.readUInt32BE(offset);
-    const chunkType = bytes.toString('ascii', offset + 4, offset + 8);
-    if (chunkType === 'tRNS') hasTransparencyChunk = true;
-    offset += chunkLength + 12;
-    if (chunkType === 'IEND') break;
-  }
-
-  return {
-    width,
-    height,
-    hasAlpha: colorType === 4 || colorType === 6 || hasTransparencyChunk,
-  };
 }
 
 if (!existsSync(manifestDirectory)) {
@@ -112,18 +102,20 @@ for (const file of manifestFiles) {
       continue;
     }
 
-    const png = inspectPng(assetFile);
-    if (png.error) {
-      fail(file, `${role} ${png.error}`);
+    const image = await inspectImage(assetFile);
+    if (image.error) {
+      fail(file, `${role} ${image.error}`);
       continue;
     }
-    if (png.width !== asset.width || png.height !== asset.height) {
+    if (image.width !== asset.width || image.height !== asset.height) {
       fail(
         file,
-        `${role} dimensions are ${png.width}x${png.height}; expected ${asset.width}x${asset.height}`
+        `${role} dimensions are ${image.width}x${image.height}; expected ${asset.width}x${asset.height}`
       );
     }
-    if (!png.hasAlpha) fail(file, `${role} PNG has no alpha channel`);
+    if (!image.hasAlpha) {
+      fail(file, `${role} ${image.format.toUpperCase()} has no alpha channel`);
+    }
   }
 }
 

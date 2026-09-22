@@ -98,7 +98,7 @@ If an evolutionary line is added later, it should deepen the relationship betwee
 - **Final ID:** `bufflora`
 - **Concept-art file:** `docs/cosmoids/images/bufflora-concept.png`
 - **Game icon:** `apps/web/public/UI/Icons/bufflora_icon.png`
-- **Directional battle art:** `apps/web/public/battles/cosmoids/bufflora_left.png`, `bufflora_up.png`, and `bufflora_down.png`
+- **Directional battle art:** `apps/web/public/battles/cosmoids/bufflora_left.webp`, `bufflora_up.png`, and `bufflora_down.png`
 - **Journal art:** `apps/web/public/UI/Journal/bufflora_journal.png` — a Bufflora hangs upside down from a cave-mouth branch and drinks from a nearby poisonous trumpet flower without leaving its roost
 - **Creature manifest:** `apps/web/src/content/creatures/bufflora.json`
 - **Image status:** Approved standalone identity reference, production game assets, and journal artwork implemented

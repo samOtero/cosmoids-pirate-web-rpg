@@ -114,7 +114,7 @@ The initial procedural visual places Marophis beside the target with smooth navy
 - **Final ID:** `marophis`
 - **Concept-art file:** `docs/cosmoids/images/marophis-concept.png`
 - **Game icon:** `apps/web/public/UI/Icons/marophis_icon.png`
-- **Directional battle art:** `apps/web/public/battles/cosmoids/marophis_left.png`, `marophis_up.png`, and `marophis_down.png`
+- **Directional battle art:** `apps/web/public/battles/cosmoids/marophis_left.webp`, `marophis_up.png`, and `marophis_down.png`
 - **Journal art:** `apps/web/public/UI/Journal/marophis_journal.png` — resting in a loose horizontal coil while breathing from a flooded-cavern air pocket
 - **Creature manifest:** `apps/web/src/content/creatures/marophis.json`
 - **Image status:** Approved standalone visual identity, production game assets, and naturalist journal art implemented

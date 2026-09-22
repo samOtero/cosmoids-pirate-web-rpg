@@ -8,17 +8,17 @@ import { interpolateKeyframes } from '@/utils/animationUtils';
 import { VFXSpriteKeyframe, VFXSpriteLayer, VFXAnimationConfig } from '@/types/baseGame';
 
 const BATTLE_SPRITES = [
-  '/battles/attacks/nibble_top_teeth.png',
-  '/battles/attacks/nibble_bottom_teeth.png',
-  '/battles/attacks/scratch.png',
+  '/battles/attacks/nibble_top_teeth.webp',
+  '/battles/attacks/nibble_bottom_teeth.webp',
+  '/battles/attacks/scratch.webp',
 ];
 
 const TARGET_DUMMIES = [
-  { id: 'senticle', name: 'Senticle', url: '/battles/cosmoids/senticle_left_1.png' },
-  { id: 'starter_crab', name: 'Palmit (Crab)', url: '/battles/cosmoids/palmit_down_1.png' },
-  { id: 'starter_iguana', name: 'Fueguana (Iguana)', url: '/battles/cosmoids/fueguana_left_1_v3.png' },
-  { id: 'starter_monkey', name: 'Monkeg (Monkey)', url: '/battles/cosmoids/monkeg_down_1_v2.png' },
-  { id: 'mouse_1', name: 'Mouse', url: '/battles/cosmoids/mouse_1_left_1_25.png' },
+  { id: 'senticle', name: 'Senticle', url: '/battles/cosmoids/senticle_left_1.webp' },
+  { id: 'starter_crab', name: 'Palmit (Crab)', url: '/battles/cosmoids/palmit_down_1.webp' },
+  { id: 'starter_iguana', name: 'Fueguana (Iguana)', url: '/battles/cosmoids/fueguana_left_1_v3.webp' },
+  { id: 'starter_monkey', name: 'Monkeg (Monkey)', url: '/battles/cosmoids/monkeg_down_1_v2.webp' },
+  { id: 'mouse_1', name: 'Mouse', url: '/battles/cosmoids/mouse_1_left_1_25.webp' },
 ];
 
 export default function TDEffectEditor({ onClose }: { onClose: () => void }) {
@@ -138,7 +138,7 @@ export default function TDEffectEditor({ onClose }: { onClose: () => void }) {
   const handleAddLayer = () => {
     if (!currentConfig) return;
     const newLayer: VFXSpriteLayer = {
-      url: '/battles/attacks/scratch.png',
+      url: '/battles/attacks/scratch.webp',
       keyframes: [
         { progress: 0.0, x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0, alpha: 1 },
         { progress: 1.0, x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0, alpha: 0 }
@@ -660,7 +660,7 @@ export default function TDEffectEditor({ onClose }: { onClose: () => void }) {
                   </select>
                   <input
                     type="text"
-                    placeholder="/battles/attacks/custom.png"
+                    placeholder="/battles/attacks/custom.webp"
                     value={activeLayer.url}
                     onChange={(e) => updateActiveLayer({ url: e.target.value })}
                     className="w-1/2 bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-cyan-500"

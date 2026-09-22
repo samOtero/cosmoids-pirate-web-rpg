@@ -16,7 +16,7 @@ Reject a direction when its main action duplicates an attack or tower-defense ro
 
 ## Reference hierarchy
 
-1. `apps/web/public/UI/Journal/harlequill_journal.png` is the primary reference for composition, medium, parchment, and finish.
+1. `apps/web/public/UI/Journal/harlequill_journal.webp` is the primary runtime reference for composition, medium, parchment, and finish. Its full-quality master is under `art-source/creatures/journal`.
 2. Approved recent journal pages may be used as secondary references for a behavior or treatment they handle especially well. They do not supersede Harlequill or this document.
 3. The target Cosmoid's approved concept image, icon, and shipped directional sprites are species-identity references only. Preserve the recognizable anatomy, proportions, markings, palette, materials, and signature props, but never copy a battle sprite's exact pose.
 4. The target species record under `docs/cosmoids` is the source of truth for its character contradiction, behavior, anatomy lock, habitat, ecology, and unresolved decisions.
@@ -52,11 +52,11 @@ The page must remain unmistakably the documented species. Preserve its locked si
 
 ## Export and integration
 
-- Export a square PNG at no less than 1024x1024.
-- Save the approved final artwork as `apps/web/public/UI/Journal/<species>_journal.png`.
-- Set that species' optional `journalImg` field to `/UI/Journal/<species>_journal.png`.
+- Export the approved full-quality master as a square PNG at no less than 1024x1024 and save it as `art-source/creatures/journal/<species>_journal.png`.
+- Run `pnpm assets:optimize:journals` from the repository root to publish `apps/web/public/UI/Journal/<species>_journal.webp`.
+- Set that species' optional `journalImg` field to `/UI/Journal/<species>_journal.webp`.
 - Leave the species icon and directional battle sprites unchanged.
-- Keep an existing accepted journal file in place until the user approves its replacement.
+- Keep an existing accepted source master and runtime derivative in place until the user approves their replacement.
 
 ## Acceptance check
 
@@ -69,4 +69,4 @@ A finished candidate passes only when:
 - ink and graphite dominate restrained watercolor, with generous exposed parchment;
 - the focal subject reads at journal size and supporting material remains secondary;
 - there is no generated text, watermark, anatomy error, or unintended duplicate creature; and
-- the export is a square PNG at least 1024x1024.
+- the source master is a square PNG at least 1024x1024 and the generated runtime WebP preserves the expected square dimensions and visual quality.

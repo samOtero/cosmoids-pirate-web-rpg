@@ -10,7 +10,7 @@ export default function StartScreen({ onStart }: { onStart: () => void }) {
   return (
     <main className={`${styles.screen} animate-fade-in`}>
       <Image
-        src="/title/four-at-the-bow.png"
+        src="/title/four-at-the-bow.webp"
         alt=""
         fill
         priority

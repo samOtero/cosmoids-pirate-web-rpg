@@ -78,7 +78,7 @@ Last consolidated: September 21, 2026
 - **Core concept:** A nimble marine-iguana Cosmoid that makes brief dives for algae and uses oversized hooked claws to cling to slippery rocks against the surf.
 - **Entry:** It makes brief dives to graze on algae growing beneath the waves. Its hooked claws grip slippery rocks, keeping it from being swept away before it must return to shore and warm itself.
 - **Visual identity:** A long, low coral-and-indigo juvenile with four widely spread clawed feet, an enormous paddle tail, a smooth back, and only a few small salt nubs around the nostrils and front brow.
-- **Status:** Final name, standalone base image, and concept record approved September 21, 2026. Production assets, gameplay implementation, story placement, and journal art remain open.
+- **Status:** Standalone identity approved September 21, 2026 and production-integrated September 22, 2026 with an icon, directional battle art, gameplay data, level-16 evolution, and capturable Level 6 encounters. Journal art remains open.
 - **Dedicated record and concept art:** [`docs/cosmoids/aguana.md`](./docs/cosmoids/aguana.md)
 
 #### Nautiguan — The Salt-Crowned Cosmoid
@@ -89,8 +89,8 @@ Last consolidated: September 21, 2026
 - **Core concept:** A broad, heat-retaining marine grazer that dives beyond Aguana's range, propels itself with a massive paddle tail, and forcefully expels salt gathered from seawater.
 - **Entry:** Its greater strength and heat-retaining body allow it to graze in deeper water for much longer. It spits excess salt collected from seawater, so sailors often bring one aboard and gather the crystals to replenish the ship's salt reserves.
 - **Visual identity:** A squat coral-and-indigo adult with a huge rounded torso, four powerful clawed limbs, a high curved paddle tail, and a dramatic white salt-crystal crown and dorsal fringe.
-- **Gameplay direction:** Reversible growing and shrinking, anchoring claws, a powerful paddle tail, salt-spitting, and extended dives are concept-level directions rather than defined mechanics.
-- **Status:** Final name, standalone base image, and concept record approved September 21, 2026. Production assets, gameplay implementation, story placement, and journal art remain open.
+- **Gameplay direction:** The integrated move set emphasizes water attacks and gripping; reversible size change, a dedicated tail move, and salt-spitting remain future mechanical directions.
+- **Status:** Standalone identity approved September 21, 2026 and production-integrated September 22, 2026 with an icon, directional battle art, gameplay data, and its role as Aguana's level-16 evolution. Wild placement and journal art remain open.
 - **Dedicated record and concept art:** [`docs/cosmoids/nautiguan.md`](./docs/cosmoids/nautiguan.md)
 
 ### Monkeg — The Stowaway Cosmoid

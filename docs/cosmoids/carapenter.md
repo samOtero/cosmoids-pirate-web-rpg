@@ -107,7 +107,7 @@ On the cursed path, Carapenter pushes its seawater training too far and begins t
 
 - `apps/web/src/constants/creatures.ts` verifies Palmit's name, pure Grass typing, freshwater-crab basis, coconut boat, and saltwater-protection premise.
 - `COSMOID_CONCEPTS.md` verifies the existing family arc from improving sailor to a third-stage death and ghost-pirate outcome.
-- `apps/web/public/battles/cosmoids/palmit_down_1.png` is the current in-game visual reference for Palmit's green coconut shelter and carried stick.
+- `apps/web/public/battles/cosmoids/palmit_down_1.webp` is the current in-game visual reference for Palmit's green coconut shelter and carried stick.
 - The user-directed lineage adds Carapenter's seawater training, noble shipwright destination, and drowning-related cursed Grass/Ghost branch.
 - **Story placement:** One capturable level-10 Carapenter appears in Level 5, `Jail Break`, on the central path of `level_5_placeholder_wave`.
 
@@ -129,7 +129,7 @@ On the cursed path, Carapenter pushes its seawater training too far and begins t
 - **Concept-art file:** `docs/cosmoids/images/carapenter-concept.png`
 - **Image status:** Approved standalone visual identity reference; stray emphasis ticks removed before approval
 - **Game icon:** `apps/web/public/UI/Icons/carapenter_icon.png`
-- **Directional battle art:** `apps/web/public/battles/cosmoids/carapenter_left.png`, `carapenter_up.png`, and `carapenter_down.png`
+- **Directional battle art:** `apps/web/public/battles/cosmoids/carapenter_left.webp`, `carapenter_up.png`, and `carapenter_down.png`
 - **Creature manifest:** `apps/web/src/content/creatures/carapenter.json`
 - **Implementation status:** Production icon, corrected two-claw directional battle art, Grass gameplay data, Palmit's level-16 evolution node, TD visuals, and one capturable Level 5 encounter implemented
 

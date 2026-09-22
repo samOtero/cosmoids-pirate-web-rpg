@@ -91,9 +91,9 @@ The current gameplay values establish Dormatee as a very slow, specially defensi
 Production assets:
 
 - `apps/web/public/UI/Icons/dormatee_icon.png` — 160x160 tight head-and-face icon.
-- `apps/web/public/battles/cosmoids/dormatee_left.png` — 360x240 left-facing sprite; the right-facing view mirrors this asset.
-- `apps/web/public/battles/cosmoids/dormatee_down.png` — 200x275 direct-front sprite.
-- `apps/web/public/battles/cosmoids/dormatee_up.png` — 200x275 direct-rear sprite.
+- `apps/web/public/battles/cosmoids/dormatee_left.webp` — 360x240 left-facing sprite; the right-facing view mirrors this asset.
+- `apps/web/public/battles/cosmoids/dormatee_down.webp` — 200x275 direct-front sprite.
+- `apps/web/public/battles/cosmoids/dormatee_up.webp` — 200x275 direct-rear sprite.
 - `apps/web/src/content/creatures/dormatee.json` — dated creature manifest and planned Level 7 placement record.
 
 ## Creation Record

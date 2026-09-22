@@ -27,17 +27,17 @@
       "height": 160
     },
     "left": {
-      "url": "/battles/cosmoids/tigrevel_left.png",
+      "url": "/battles/cosmoids/tigrevel_left.webp",
       "width": 360,
       "height": 240
     },
     "up": {
-      "url": "/battles/cosmoids/tigrevel_up.png",
+      "url": "/battles/cosmoids/tigrevel_up.webp",
       "width": 220,
       "height": 300
     },
     "down": {
-      "url": "/battles/cosmoids/tigrevel_down.png",
+      "url": "/battles/cosmoids/tigrevel_down.webp",
       "width": 220,
       "height": 300
     }

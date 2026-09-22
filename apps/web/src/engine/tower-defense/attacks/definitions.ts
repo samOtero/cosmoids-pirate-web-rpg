@@ -109,7 +109,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     projectileSpeed: 1.5,
     projectileVisual: {
       type: 'NECTAR_TONGUE',
-      spriteUrl: '/battles/attacks/nectar_siphon.png',
+      spriteUrl: '/battles/attacks/nectar_siphon.webp',
     },
     effects: [{ type: 'DRAIN', chance: 1, value: 0.5 }],
   },

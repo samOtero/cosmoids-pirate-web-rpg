@@ -1,6 +1,6 @@
 # Nautiguan
 
-> Final name and base visual identity approved September 21, 2026. This is a documented concept only; production assets and game integration have not begun.
+> Final name and base visual identity approved September 21, 2026. Production game assets and integration completed September 22, 2026; journal artwork remains open.
 
 ![Nautiguan concept art](./images/nautiguan-concept.png)
 
@@ -91,15 +91,18 @@ The exact economics, prevalence, handling method, and story use of this salt-col
 - **Approved concept image:** [`docs/cosmoids/images/nautiguan-concept.png`](./images/nautiguan-concept.png)
 - **Image status:** Preserved unchanged from the selected full-body adult identity crop.
 - **Family:** Aguana -> Nautiguan
-- **Production status:** Concept documentation only. No icon, directional battle sprites, manifest, registry entry, stats, attacks, or story placement have been created.
+- **Production date:** September 22, 2026
+- **Production assets:** Tight portrait icon plus left, up, and down directional battle sprites, with PNG masters under `art-source/creatures` and transparency-preserving WebP derivatives in `apps/web/public`.
+- **Gameplay implementation:** Pure Water type with a slow, durable adult stat profile and `SCRATCH`, `WATER_GUN`, `DEEPWATER_GRIP`, and `BUBBLE_BEAM`. It is the level-16 evolution of Aguana.
+- **Story placement:** Evolution-only within the current Level 6 family integration; wild Nautiguan placement remains open.
+- **Manifest:** [`apps/web/src/content/creatures/nautiguan.json`](../../apps/web/src/content/creatures/nautiguan.json)
+- **Production status:** Integrated into the creature registry, evolution data, tower-defense visuals, and creature manifest. Journal scene and journal artwork remain open.
 
 ## Open Decisions
 
-- Exact evolution level, condition, or story trigger
 - Exact physical scale and diving limits in Cosmoids lore
-- Numeric stats, battle role, abilities, and named attacks
 - Mechanical treatment of salt-spitting, anchoring, tail power, heat retention, and reversible size change
-- Habitat distribution, rarity, capture rules, and story placement
+- Wild habitat distribution, rarity, capture rules, and direct story placement
 - How common the shipboard salt-harvesting relationship is
 - Journal scene and journal artwork
 

@@ -7,6 +7,8 @@ description: Develop original Cosmoids from a required typing and short seed thr
 
 Create a text-first concept batch, automatically render all ten designs in one ensemble sheet, and support as many feedback rounds as the user needs. After explicit selection, preserve the chosen visual identity through standalone art, naming, and documentation, then ask before beginning production game assets.
 
+Before saving or integrating raster art intended for the app, follow the `Art source and deployment workflow` in the root `AGENTS.md`: retain its full-quality master under `art-source/`, create its runtime derivative with the configured optimizer, and never reference `art-source/` at runtime. Documentation-only concept images remain under `docs/` and must not be copied into `apps/web/public` by this workflow.
+
 ## Accept the input
 
 Require two inputs, in labeled or natural-language form:
@@ -238,9 +240,9 @@ Render ensemble sheets and selected concept previews as original polished 2D cre
 Before generating, optionally inspect these three Fueguana v3 sprites with `view_image` only to calibrate silhouette clarity and facial readability at game scale:
 
 ```text
-apps/web/public/battles/cosmoids/fueguana_left_1_v3.png
-apps/web/public/battles/cosmoids/fueguana_up_1_v3.png
-apps/web/public/battles/cosmoids/fueguana_down_1_v3.png
+apps/web/public/battles/cosmoids/fueguana_left_1_v3.webp
+apps/web/public/battles/cosmoids/fueguana_up_1_v3.webp
+apps/web/public/battles/cosmoids/fueguana_down_1_v3.webp
 ```
 
 Do not pass the Fueguana files or other existing creature art to the image generator as style references during concept generation. Use the written art direction below without copying an existing creature's anatomy, markings, palette, proportions, or signature features.

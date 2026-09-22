@@ -1,6 +1,6 @@
 # Aguana
 
-> Final name and base visual identity approved September 21, 2026. This is a documented concept only; production assets and game integration have not begun.
+> Final name and base visual identity approved September 21, 2026. Production game assets and integration completed September 22, 2026; journal artwork remains open.
 
 ![Aguana concept art](./images/aguana-concept.png)
 
@@ -85,15 +85,17 @@ These are approved sources of possible abilities and attacks, not defined mechan
 - **Approved concept image:** [`docs/cosmoids/images/aguana-concept.png`](./images/aguana-concept.png)
 - **Image status:** Preserved unchanged from the user-approved revised standalone render.
 - **Family:** Aguana -> Nautiguan
-- **Production status:** Concept documentation only. No icon, directional battle sprites, manifest, registry entry, stats, attacks, or story placement have been created.
+- **Production date:** September 22, 2026
+- **Production assets:** Tight portrait icon plus left, up, and down directional battle sprites, with PNG masters under `art-source/creatures` and transparency-preserving WebP derivatives in `apps/web/public`.
+- **Gameplay implementation:** Pure Water type with a fast juvenile stat profile, `SCRATCH`, `WATER_GUN`, and `DEEPWATER_GRIP`; evolves into Nautiguan at level 16.
+- **Story placement:** Capturable level-8 Aguana appear in both Level 6 waves on the center lane.
+- **Manifest:** [`apps/web/src/content/creatures/aguana.json`](../../apps/web/src/content/creatures/aguana.json)
+- **Production status:** Integrated into the creature registry, tower-defense visuals, Level 6 encounter data, and creature manifest. Journal scene and journal artwork remain open.
 
 ## Open Decisions
 
-- Exact evolution level, condition, or story trigger
-- Exact body scale for both stages
-- Numeric stats, battle role, abilities, and named attacks
 - How growing and shrinking would manifest mechanically, if used
-- Habitat distribution, rarity, capture rules, and story placement
+- Broader habitat distribution and rarity beyond the Level 6 encounter
 - Journal scene and journal artwork
 
 Individual natures or personality variants are intentionally outside this species-concept record.

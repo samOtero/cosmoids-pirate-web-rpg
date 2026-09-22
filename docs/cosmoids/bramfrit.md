@@ -83,7 +83,7 @@ Because the ritual includes a deliberate pause, the player can anticipate each m
 - **Selection date:** August 30, 2026
 - **Concept-art file:** `docs/cosmoids/images/bramfrit-concept.png`
 - **Game icon:** `apps/web/public/UI/Icons/bramfrit_icon.png`
-- **Directional battle art:** `apps/web/public/battles/cosmoids/bramfrit_left.png`, `bramfrit_up.png`, and `bramfrit_down.png`
+- **Directional battle art:** `apps/web/public/battles/cosmoids/bramfrit_left.webp`, `bramfrit_up.png`, and `bramfrit_down.png`
 - **Creature manifest:** `apps/web/src/content/creatures/bramfrit.json`
 - **Image status:** Approved concept direction and production game assets implemented
 - **Initial gameplay profile:** Fire type; bulky physical attacker; starts with Tackle and learns Ember at level 4

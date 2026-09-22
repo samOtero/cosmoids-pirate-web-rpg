@@ -327,6 +327,13 @@ export const LEVEL_6: TDLevelData = {
       hpMultiplier: 4,
       weakenedThreshold: 0.3,
     },
+    {
+      id: 'level_6_aguana',
+      creatureId: 'aguana',
+      level: 8,
+      speedMultiplier: 1.1,
+      hpMultiplier: 0.9,
+    },
   ],
   waves: [
     {
@@ -365,6 +372,14 @@ export const LEVEL_6: TDLevelData = {
             arcHeight: 58,
           },
         },
+        {
+          enemyDefinitionId: 'level_6_aguana',
+          count: 1,
+          spawnIntervalMs: 1000,
+          delayBeforeGroupMs: 800,
+          pathIndex: 1,
+          turnAroundAtEnd: true,
+        },
       ],
     },
     {
@@ -395,6 +410,14 @@ export const LEVEL_6: TDLevelData = {
             durationMs: 550,
             arcHeight: 62,
           },
+        },
+        {
+          enemyDefinitionId: 'level_6_aguana',
+          count: 2,
+          spawnIntervalMs: 1200,
+          delayBeforeGroupMs: 700,
+          pathIndex: 1,
+          turnAroundAtEnd: true,
         },
       ],
     },

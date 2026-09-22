@@ -7,13 +7,15 @@ description: Develop, generate, revise, and integrate Kip-style naturalist journ
 
 Create journal pages that reveal what a Cosmoid is like outside combat. The battle assets answer what the species looks like; the journal should reveal something Kip learned by quietly observing it.
 
+Before saving or integrating repository art, follow the `Art source and deployment workflow` in the root `AGENTS.md`. Keep the approved full-quality master under `art-source/` and generate the deployable derivative with the configured optimizer; never use a source master as a runtime asset.
+
 ## Establish context
 
 1. Work in the `cosmoids_web` repository.
 2. Read `docs/art/JOURNAL_ART_DIRECTION.md` completely. Treat it as the visual and export source of truth for every journal-art task.
 3. Read the target species record under `docs/cosmoids` when one exists. Identify its character contradiction, signature behavior, anatomy lock, habitat, ecology, and unresolved decisions.
 4. Inspect the approved concept image, icon, and all shipped directional sprites with `view_image`. They are identity references only.
-5. Inspect the journal references required by the hierarchy in `docs/art/JOURNAL_ART_DIRECTION.md`, including `apps/web/public/UI/Journal/palmit_journal.png`.
+5. Inspect the journal references required by the hierarchy in `docs/art/JOURNAL_ART_DIRECTION.md`, including `apps/web/public/UI/Journal/palmit_journal.webp`.
 6. For a roster request, audit creature registration, `journalImg` fields, and files under `apps/web/public/UI/Journal`, then work through missing species one at a time.
 
 If a species record leaves habitat or ecology unresolved, use brief authoritative natural-history research when it would materially improve the ideas. Present the results as proposals for the user to choose, not established canon.
@@ -78,10 +80,11 @@ When revising an already integrated page, preserve the current accepted file unt
 
 After approval:
 
-1. Save or replace the accepted image at `apps/web/public/UI/Journal/<species>_journal.png`.
-2. Set the species' optional `journalImg` field to `/UI/Journal/<species>_journal.png`.
-3. Leave the icon and directional battle sprites unchanged.
-4. Verify the PNG dimensions and path, run the creature-manifest validator, and run relevant focused tests when dependencies are available.
-5. Report the saved path, final prompt summary, generation mode, and validation results.
+1. Save or replace the accepted full-quality PNG master at `art-source/creatures/journal/<species>_journal.png`.
+2. Run `pnpm assets:optimize:journals` from the repository root and verify that it publishes `apps/web/public/UI/Journal/<species>_journal.webp`.
+3. Set the species' optional `journalImg` field to `/UI/Journal/<species>_journal.webp`.
+4. Leave the icon and directional battle sprites unchanged.
+5. Verify the source PNG and runtime WebP dimensions and paths, inspect the runtime derivative for visual quality, run the creature-manifest validator, and run relevant focused tests when dependencies are available.
+6. Report both saved paths, the final prompt summary, generation mode, optimizer result, and validation results.
 
 For multi-species requests, finish this complete selection, candidate, approval, and integration loop before presenting the next species' three directions.

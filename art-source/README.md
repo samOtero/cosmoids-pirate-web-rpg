@@ -88,5 +88,42 @@ only here.
    That pipeline writes quality-90 transparency-preserving WebP derivatives
    without resizing. Exact source dimensions are retained because Pixi sprite
    geometry and configured character placement can depend on texture size.
+
+   New creature icons use:
+
+   ```sh
+   pnpm assets:optimize:creature-icons
+   ```
+
+   This pipeline writes 160x160 transparency-preserving WebP derivatives at
+   quality 90 from the full-quality PNG masters in `creatures/icons`. Its
+   explicit file list currently publishes the Aguana family without changing
+   the existing PNG icon library.
+
+   Directional and battle Cosmoid art uses:
+
+   ```sh
+   pnpm assets:optimize:battle-cosmoids
+   ```
+
+   That pipeline writes quality-90 transparency-preserving WebP derivatives
+   without resizing. It publishes the production sprite library from
+   `creatures/directional-sprites` while preserving exact Pixi texture sizes.
+
+   Attack effects, battle units, and structures use:
+
+   ```sh
+   pnpm assets:optimize:battle-support
+   ```
+
+   Title-screen art and active root-level legacy creature renders use:
+
+   ```sh
+   pnpm assets:optimize:title-art
+   pnpm assets:optimize:root-creature-art
+   ```
+
+   These pipelines write quality-90 transparency-preserving WebP derivatives
+   without resizing. Unreferenced legacy renders remain source-only.
 3. Update the runtime asset URL if its filename or format changed.
 4. Verify that no application code references `art-source` directly.

@@ -251,9 +251,9 @@ The endless escalation is implemented; the enemy roster and balance remain provi
 
 - [`apps/web/public/UI/Icons/tigrevel_icon.png`](../../apps/web/public/UI/Icons/tigrevel_icon.png)
 - [`apps/web/public/UI/Journal/tigrevel_journal.png`](../../apps/web/public/UI/Journal/tigrevel_journal.png)
-- [`apps/web/public/battles/cosmoids/tigrevel_left.png`](../../apps/web/public/battles/cosmoids/tigrevel_left.png)
-- [`apps/web/public/battles/cosmoids/tigrevel_up.png`](../../apps/web/public/battles/cosmoids/tigrevel_up.png)
-- [`apps/web/public/battles/cosmoids/tigrevel_down.png`](../../apps/web/public/battles/cosmoids/tigrevel_down.png)
+- [`apps/web/public/battles/cosmoids/tigrevel_left.webp`](../../apps/web/public/battles/cosmoids/tigrevel_left.webp)
+- [`apps/web/public/battles/cosmoids/tigrevel_up.webp`](../../apps/web/public/battles/cosmoids/tigrevel_up.webp)
+- [`apps/web/public/battles/cosmoids/tigrevel_down.webp`](../../apps/web/public/battles/cosmoids/tigrevel_down.webp)
 
 ## Implementation Reference
 

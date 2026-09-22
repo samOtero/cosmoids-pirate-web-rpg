@@ -16,7 +16,7 @@ export const SENTICLE: CosmoidTemplate = {
   iconImg: '/UI/Icons/senticle_icon.png',
   spriteUrl: '/eel-basic-normal-neutral-skin-1.webp',
   battleSpriteUrl:
-    '/battles/cosmoids/eel-basic-normal-neutral-skin-battle-ground-2.png',
+    '/battles/cosmoids/eel-basic-normal-neutral-skin-battle-ground-2.webp',
   movementId: 'lizard',
   learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
 };
@@ -38,8 +38,8 @@ export const MOUSE_1: CosmoidTemplate = {
   journalImg: '/UI/Journal/knotia_journal.webp',
   journalEntry:
     'While gnawing on mooring lines, it somehow twists them into incredibly complex knots. Even seasoned sailors study its knot making abilities.',
-  spriteUrl: '/battles/cosmoids/mouse_1_down_1_25.png',
-  battleSpriteUrl: '/battles/cosmoids/mouse_1_down_1_25.png',
+  spriteUrl: '/battles/cosmoids/mouse_1_down_1_25.webp',
+  battleSpriteUrl: '/battles/cosmoids/mouse_1_down_1_25.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'NIBBLE' },
@@ -65,8 +65,8 @@ export const BIRD_1: CosmoidTemplate = {
   journalImg: '/UI/Journal/harlequill_journal.webp',
   journalEntry:
     'It brings cheer to coastal towns with loops, tumbles, and other aerial comedy. The bells on its feathers make every performance impossible to ignore.',
-  spriteUrl: '/battles/cosmoids/bird_1_down_1_25.png',
-  battleSpriteUrl: '/battles/cosmoids/bird_1_down_1_25.png',
+  spriteUrl: '/battles/cosmoids/bird_1_down_1_25.webp',
+  battleSpriteUrl: '/battles/cosmoids/bird_1_down_1_25.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'PECK' },
@@ -92,8 +92,8 @@ export const MOPUP: CosmoidTemplate = {
   journalImg: '/UI/Journal/mopup_journal.webp',
   journalEntry:
     'This playful Cosmoid loves sliding across wet decks. Its highly absorbent coat soaks up seawater, leaving every plank cleaner after playtime.',
-  spriteUrl: '/battles/cosmoids/mopup_down.png',
-  battleSpriteUrl: '/battles/cosmoids/mopup_left.png',
+  spriteUrl: '/battles/cosmoids/mopup_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/mopup_left.webp',
   movementId: 'lizard',
   learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
 };
@@ -112,8 +112,8 @@ export const CAFFIQUI: CosmoidTemplate = {
   },
   baseExperience: 64,
   iconImg: '/UI/Icons/caffiqui_icon.png',
-  spriteUrl: '/battles/cosmoids/caffiqui_down.png',
-  battleSpriteUrl: '/battles/cosmoids/caffiqui_left.png',
+  spriteUrl: '/battles/cosmoids/caffiqui_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/caffiqui_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
@@ -136,8 +136,8 @@ export const SNOUTASCO: CosmoidTemplate = {
   },
   baseExperience: 63,
   iconImg: '/UI/Icons/snoutasco_icon.png',
-  spriteUrl: '/battles/cosmoids/snoutasco_down.png',
-  battleSpriteUrl: '/battles/cosmoids/snoutasco_left.png',
+  spriteUrl: '/battles/cosmoids/snoutasco_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/snoutasco_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'NIBBLE' },
@@ -160,8 +160,8 @@ export const ZAPYBARA: CosmoidTemplate = {
   },
   baseExperience: 65,
   iconImg: '/UI/Icons/zapybara_icon.png',
-  spriteUrl: '/battles/cosmoids/zapybara_down.png',
-  battleSpriteUrl: '/battles/cosmoids/zapybara_left.png',
+  spriteUrl: '/battles/cosmoids/zapybara_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/zapybara_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'NIBBLE' },
@@ -188,8 +188,8 @@ export const SONARION: CosmoidTemplate = {
   journalImg: '/UI/Journal/sonarion_journal.webp',
   journalEntry:
     "Ironbell's Razcall know no one dares chase them. They mimic market bells, snatch unattended meals, then loose a two-toned howl for Razound when cornered.",
-  spriteUrl: '/battles/cosmoids/sonarion_down.png',
-  battleSpriteUrl: '/battles/cosmoids/sonarion_left.png',
+  spriteUrl: '/battles/cosmoids/sonarion_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/sonarion_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'NIBBLE' },
@@ -218,8 +218,8 @@ export const RESONARION: CosmoidTemplate = {
   journalImg: '/UI/Journal/resonarion_journal.webp',
   journalEntry:
     "At a Razcall's two-toned call, golden static races through its enlarged neck ruff and heavy tail tuft. Once charged, it barrels through the market to the rescue.",
-  spriteUrl: '/battles/cosmoids/resonarion_down.png',
-  battleSpriteUrl: '/battles/cosmoids/resonarion_left.png',
+  spriteUrl: '/battles/cosmoids/resonarion_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/resonarion_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'NIBBLE' },
@@ -247,8 +247,8 @@ export const TIGREVEL: CosmoidTemplate = {
   journalImg: '/UI/Journal/tigrevel_journal.webp',
   journalEntry:
     'Deep in the eastern jungles, it sharpens its claws on stone. A focused swipe can split a boulder clean in half.',
-  spriteUrl: '/battles/cosmoids/tigrevel_down.png',
-  battleSpriteUrl: '/battles/cosmoids/tigrevel_left.png',
+  spriteUrl: '/battles/cosmoids/tigrevel_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/tigrevel_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'SCRATCH' },
@@ -275,8 +275,8 @@ export const VOLTUSK: CosmoidTemplate = {
   journalEntry:
     'Its metallic whiskers tremble when a storm approaches, guiding it to the place where lightning will strike. The larger its steel tusks, the more electricity it can store—and the more confidently it challenges rivals.',
   journalImg: '/UI/Journal/voltusk_journal.webp',
-  spriteUrl: '/battles/cosmoids/voltusk_down.png',
-  battleSpriteUrl: '/battles/cosmoids/voltusk_left.png',
+  spriteUrl: '/battles/cosmoids/voltusk_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/voltusk_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
@@ -302,8 +302,8 @@ export const POGUIN: CosmoidTemplate = {
   journalEntry:
     'It drums its oversized feet across rain-slick stone until nearby Poguin fall into step. A final stomp scatters a charged splash in every direction.',
   journalImg: '/UI/Journal/poguin_journal.webp',
-  spriteUrl: '/battles/cosmoids/poguin_down.png',
-  battleSpriteUrl: '/battles/cosmoids/poguin_left.png',
+  spriteUrl: '/battles/cosmoids/poguin_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/poguin_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
@@ -328,8 +328,8 @@ export const DORMATEE: CosmoidTemplate = {
   iconImg: '/UI/Icons/dormatee_icon.png',
   journalEntry:
     'While it sleeps, its whiskers link the dreams of every creature resting nearby. It often wakes to find an entire lagoon napping beside it.',
-  spriteUrl: '/battles/cosmoids/dormatee_down.png',
-  battleSpriteUrl: '/battles/cosmoids/dormatee_left.png',
+  spriteUrl: '/battles/cosmoids/dormatee_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/dormatee_left.webp',
   movementId: 'lizard',
   // Existing placeholder attacks until Dormatee's custom dream techniques are selected.
   learnableAttacks: [
@@ -354,13 +354,67 @@ export const YOKODILLO: CosmoidTemplate = {
   iconImg: '/UI/Icons/yokodillo_icon.png',
   journalEntry:
     'It braces with an eager grin and refuses to budge. Once a rival finally moves it, Yokodillo curls into a ball and rolls back much farther than intended.',
-  spriteUrl: '/battles/cosmoids/yokodillo_down.png',
-  battleSpriteUrl: '/battles/cosmoids/yokodillo_left.png',
+  spriteUrl: '/battles/cosmoids/yokodillo_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/yokodillo_left.webp',
   movementId: 'lizard',
   // Existing physical attacks until Yokodillo's custom sumo techniques are selected.
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
     { level: 6, attackId: 'QUICK_ATTACK' },
+  ],
+};
+
+export const AGUANA: CosmoidTemplate = {
+  id: 'aguana',
+  name: 'Aguana',
+  type: ElementType.WATER,
+  baseStats: {
+    hp: 48,
+    attack: 58,
+    defense: 52,
+    specialAttack: 55,
+    specialDefense: 58,
+    speed: 72,
+  },
+  baseExperience: 65,
+  iconImg: '/UI/Icons/aguana_icon.webp',
+  journalEntry:
+    'It makes brief dives to graze on algae growing beneath the waves. Its hooked claws grip slippery rocks, keeping it from being swept away before it must return to shore and warm itself.',
+  spriteUrl: '/battles/cosmoids/aguana_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/aguana_left.webp',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'SCRATCH' },
+    { level: 5, attackId: 'WATER_GUN' },
+    { level: 10, attackId: 'DEEPWATER_GRIP' },
+  ],
+  evolutionNodes: [{ level: 16, evolutionDefId: 'nautiguan' }],
+};
+
+export const NAUTIGUAN: CosmoidTemplate = {
+  id: 'nautiguan',
+  name: 'Nautiguan',
+  type: ElementType.WATER,
+  baseStats: {
+    hp: 88,
+    attack: 82,
+    defense: 92,
+    specialAttack: 72,
+    specialDefense: 84,
+    speed: 30,
+  },
+  baseExperience: 96,
+  iconImg: '/UI/Icons/nautiguan_icon.webp',
+  journalEntry:
+    "Its greater strength and heat-retaining body allow it to graze in deeper water for much longer. It spits excess salt collected from seawater, so sailors often gather the crystals for the ship's salt reserves.",
+  spriteUrl: '/battles/cosmoids/nautiguan_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/nautiguan_left.webp',
+  movementId: 'lizard',
+  learnableAttacks: [
+    { level: 1, attackId: 'SCRATCH' },
+    { level: 5, attackId: 'WATER_GUN' },
+    { level: 10, attackId: 'DEEPWATER_GRIP' },
+    { level: 16, attackId: 'BUBBLE_BEAM' },
   ],
 };
 
@@ -381,8 +435,8 @@ export const BRAMFRIT: CosmoidTemplate = {
   journalImg: '/UI/Journal/bramfrit_journal.webp',
   journalEntry:
     'A fiery spirit burns beneath its dense fleece. Before charging a wall, it bows, retreats exactly three paces, and waits as if expecting the obstacle to answer.',
-  spriteUrl: '/battles/cosmoids/bramfrit_down.png',
-  battleSpriteUrl: '/battles/cosmoids/bramfrit_left.png',
+  spriteUrl: '/battles/cosmoids/bramfrit_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/bramfrit_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
@@ -407,8 +461,8 @@ export const SEPIPPET: CosmoidTemplate = {
   journalImg: '/UI/Journal/sepippet_journal.webp',
   journalEntry:
     'Its mantle projects convincing silhouettes while its ribbonlike arms slip through narrow gaps. It often ruins the illusion by waving proudly before the trick is finished.',
-  spriteUrl: '/battles/cosmoids/sepippet_down.png',
-  battleSpriteUrl: '/battles/cosmoids/sepippet_left.png',
+  spriteUrl: '/battles/cosmoids/sepippet_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/sepippet_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
@@ -433,8 +487,8 @@ export const PARLET: CosmoidTemplate = {
   journalImg: '/UI/Journal/parlet_journal.webp',
   journalEntry:
     'It rearranges the colors across its broad scales like a living palette. The moment it notices one imperfect patch, it starts the entire design again.',
-  spriteUrl: '/battles/cosmoids/parlet_down.png',
-  battleSpriteUrl: '/battles/cosmoids/parlet_left.png',
+  spriteUrl: '/battles/cosmoids/parlet_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/parlet_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
@@ -460,8 +514,8 @@ export const CORROGOON: CosmoidTemplate = {
   journalImg: '/UI/Journal/corrogoon_journal.webp',
   journalEntry:
     'It gathers mineral grit with its shovel-like pedipalps, saturates it with acidic spray, and lashes the abrasive mixture from its tail fan.',
-  spriteUrl: '/battles/cosmoids/corrogoon_down.png',
-  battleSpriteUrl: '/battles/cosmoids/corrogoon_left.png',
+  spriteUrl: '/battles/cosmoids/corrogoon_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/corrogoon_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'PINCH' },
@@ -488,8 +542,8 @@ export const BUFFLORA: CosmoidTemplate = {
   journalImg: '/UI/Journal/bufflora_journal.webp',
   journalEntry:
     'Nicknamed cave flowers, they sleep in damp caverns by day and emerge after dark to drink from blossoms. They especially favor poisonous species avoided by other pollinators.',
-  spriteUrl: '/battles/cosmoids/bufflora_down.png',
-  battleSpriteUrl: '/battles/cosmoids/bufflora_left.png',
+  spriteUrl: '/battles/cosmoids/bufflora_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/bufflora_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
@@ -517,8 +571,8 @@ export const MAROPHIS: CosmoidTemplate = {
   journalImg: '/UI/Journal/marophis_journal.webp',
   journalEntry:
     'It waits deep underwater in a loose hook-shaped coil. A precise body feint startles prey toward its mouth while the colors across its crown slowly cool as its stored breath runs low.',
-  spriteUrl: '/battles/cosmoids/marophis_down.png',
-  battleSpriteUrl: '/battles/cosmoids/marophis_left.png',
+  spriteUrl: '/battles/cosmoids/marophis_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/marophis_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'NIBBLE' },
@@ -546,8 +600,8 @@ export const BETTLE: CosmoidTemplate = {
   journalImg: '/UI/Journal/bettle_journal.webp',
   journalEntry:
     'It allows rivals one free strike against its ironclad back. If the blow leaves no mark, Beetadel drums its mandibles in triumph.',
-  spriteUrl: '/battles/cosmoids/bettle_down.png',
-  battleSpriteUrl: '/battles/cosmoids/bettle_left.png',
+  spriteUrl: '/battles/cosmoids/bettle_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/bettle_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'PINCH' },
@@ -573,8 +627,8 @@ export const BUG_STAGE_1: CosmoidTemplate = {
     speed: 10,
   },
   baseExperience: 53,
-  spriteUrl: '/battles/cosmoids/bug_1_left_1.png',
-  battleSpriteUrl: '/battles/cosmoids/bug_1_left_1.png',
+  spriteUrl: '/battles/cosmoids/bug_1_left_1.webp',
+  battleSpriteUrl: '/battles/cosmoids/bug_1_left_1.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
@@ -600,8 +654,8 @@ export const BUG_STAGE_2: CosmoidTemplate = {
     speed: 10,
   },
   baseExperience: 85,
-  spriteUrl: '/bug-2-basic-normal-neutral-skin-1.png',
-  battleSpriteUrl: '/battles/cosmoids/bug-2-basic-normal-neutral-skin-1.png',
+  spriteUrl: '/bug-2-basic-normal-neutral-skin-1.webp',
+  battleSpriteUrl: '/battles/cosmoids/bug-2-basic-normal-neutral-skin-1.webp',
   battleScale: 1.25,
   movementId: 'lizard',
   learnableAttacks: [
@@ -628,8 +682,8 @@ export const BUG_STAGE_3: CosmoidTemplate = {
     speed: 20,
   },
   baseExperience: 140,
-  spriteUrl: '/bug-2-basic-normal-neutral-skin-1.png',
-  battleSpriteUrl: '/battles/cosmoids/moth-basic-normal-neutral-skin-1.png',
+  spriteUrl: '/bug-2-basic-normal-neutral-skin-1.webp',
+  battleSpriteUrl: '/battles/cosmoids/moth-basic-normal-neutral-skin-1.webp',
   battleScale: 0.85,
   movementId: 'lizard',
   learnableAttacks: [
@@ -657,8 +711,8 @@ export const STARTER_CRAB: CosmoidTemplate = {
   journalImg: '/UI/Journal/palmit_journal.webp',
   journalEntry:
     'A freshwater crab that uses a hollow coconut as a boat. Its shell keeps the salty sea away while it drifts between islands.',
-  spriteUrl: '/battles/cosmoids/palmit_down_1.png',
-  battleSpriteUrl: '/battles/cosmoids/palmit_down_1.png',
+  spriteUrl: '/battles/cosmoids/palmit_down_1.webp',
+  battleSpriteUrl: '/battles/cosmoids/palmit_down_1.webp',
   learnableAttacks: [
     { level: 1, attackId: 'PINCH' },
     { level: 6, attackId: 'COIR_SNARE' },
@@ -685,8 +739,8 @@ export const CARAPENTER: CosmoidTemplate = {
   journalImg: '/UI/Journal/carapenter_journal.webp',
   journalEntry:
     'After outgrowing its coconut, it shapes driftwood into a sturdy mallet. Its layered husk-like shell lets it brave short swims in seawater while repairing damaged ships.',
-  spriteUrl: '/battles/cosmoids/carapenter_down.png',
-  battleSpriteUrl: '/battles/cosmoids/carapenter_left.png',
+  spriteUrl: '/battles/cosmoids/carapenter_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/carapenter_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'PINCH' },
@@ -709,12 +763,12 @@ export const STARTER_IGUANA: CosmoidTemplate = {
     speed: 75,
   },
   baseExperience: 62,
-  spriteUrl: '/battles/cosmoids/fueguana_left_1_v3.png',
+  spriteUrl: '/battles/cosmoids/fueguana_left_1_v3.webp',
   iconImg: '/UI/Icons/fueguana_icon.png',
   journalImg: '/UI/Journal/fueguana_journal.webp',
   journalEntry:
     'It sneaks aboard pirate ships to devour gunpowder and set the decks ablaze. If grabbed by the tail, it leaves it behind as a surprise that explodes moments later!',
-  battleSpriteUrl: '/battles/cosmoids/fueguana_left_1_v3.png',
+  battleSpriteUrl: '/battles/cosmoids/fueguana_left_1_v3.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'SCRATCH' },
@@ -737,12 +791,12 @@ export const VELOCINDER: CosmoidTemplate = {
     speed: 90,
   },
   baseExperience: 90,
-  spriteUrl: '/battles/cosmoids/velocinder_down.png',
+  spriteUrl: '/battles/cosmoids/velocinder_down.webp',
   iconImg: '/UI/Icons/velocinder_icon.png',
   journalImg: '/UI/Journal/velocinder_journal.webp',
   journalEntry:
     'Once it learns to balance on its hind legs, it becomes fast enough to race a lit cannon fuse. Its thorny tail sprays sparks around every sharp turn.',
-  battleSpriteUrl: '/battles/cosmoids/velocinder_left.png',
+  battleSpriteUrl: '/battles/cosmoids/velocinder_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'SCRATCH' },
@@ -768,8 +822,8 @@ export const STARTER_MONKEY: CosmoidTemplate = {
   journalImg: '/UI/Journal/monkeg_journal.webp',
   journalEntry:
     'A shy Cosmoid that hides inside barrels to travel unseen. Its long tail trails in the water like a rudder, steering it safely across the sea.',
-  spriteUrl: '/battles/cosmoids/monkeg_down_1_v2.png',
-  battleSpriteUrl: '/battles/cosmoids/monkeg_down_1_v2.png',
+  spriteUrl: '/battles/cosmoids/monkeg_down_1_v2.webp',
+  battleSpriteUrl: '/battles/cosmoids/monkeg_down_1_v2.webp',
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
     { level: 8, attackId: 'BARREL_BASH' },
@@ -795,8 +849,8 @@ export const MACASK: CosmoidTemplate = {
   journalImg: '/UI/Journal/macask_journal.webp',
   journalEntry:
     'It carries the heaviest supplies in the barrel on its back. The shifting load strengthens its body and teaches it to keep its footing on even the roughest seas.',
-  spriteUrl: '/battles/cosmoids/macask_down.png',
-  battleSpriteUrl: '/battles/cosmoids/macask_left.png',
+  spriteUrl: '/battles/cosmoids/macask_down.webp',
+  battleSpriteUrl: '/battles/cosmoids/macask_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
@@ -830,6 +884,8 @@ export const COSMOID_TEMPLATES: Record<string, CosmoidTemplate> = {
   [POGUIN.id]: POGUIN,
   [DORMATEE.id]: DORMATEE,
   [YOKODILLO.id]: YOKODILLO,
+  [AGUANA.id]: AGUANA,
+  [NAUTIGUAN.id]: NAUTIGUAN,
   [BRAMFRIT.id]: BRAMFRIT,
   [SEPIPPET.id]: SEPIPPET,
   [PARLET.id]: PARLET,

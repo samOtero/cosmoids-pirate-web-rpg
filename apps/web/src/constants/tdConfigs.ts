@@ -9,7 +9,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   senticle: {
     default: {
-      url: '/battles/cosmoids/senticle_left_1.png',
+      url: '/battles/cosmoids/senticle_left_1.webp',
       scale: 0.39,
       offsetY: -31,
       shadowOffsetY: -8,
@@ -18,7 +18,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -65,
     },
     left: {
-      url: '/battles/cosmoids/senticle_left_1.png',
+      url: '/battles/cosmoids/senticle_left_1.webp',
       scale: 0.39,
       offsetY: -31,
       shadowOffsetY: -8,
@@ -26,7 +26,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowScaleY: 0.7,
     },
     right: {
-      url: '/battles/cosmoids/senticle_left_1.png',
+      url: '/battles/cosmoids/senticle_left_1.webp',
       scale: 0.39,
       offsetY: -31,
       shadowOffsetY: -8,
@@ -35,7 +35,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       flipX: true,
     },
     up: {
-      url: '/battles/cosmoids/senticle_up_1.png',
+      url: '/battles/cosmoids/senticle_up_1.webp',
       scale: 0.39,
       offsetY: -31,
       shadowOffsetY: -8,
@@ -43,7 +43,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowScaleY: 0.7,
     },
     down: {
-      url: '/battles/cosmoids/senticle_down_1.png',
+      url: '/battles/cosmoids/senticle_down_1.webp',
       scale: 0.39,
       offsetY: -31,
       shadowOffsetY: -8,
@@ -53,26 +53,26 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   bug_stage_1: {
     default: {
-      url: '/battles/cosmoids/bug_1_left_1.png',
+      url: '/battles/cosmoids/bug_1_left_1.webp',
       scale: 0.34,
       shadowScaleX: 1.2,
       shadowOffsetY: 7,
     },
     right: {
-      url: '/battles/cosmoids/bug_1_left_1.png',
+      url: '/battles/cosmoids/bug_1_left_1.webp',
       scale: 0.34,
       shadowScaleX: 1.2,
       shadowOffsetY: 7,
       flipX: true,
     },
     up: {
-      url: '/battles/cosmoids/bug_1_up_1.png',
+      url: '/battles/cosmoids/bug_1_up_1.webp',
       scale: 0.44,
       shadowScaleX: 1.05,
       shadowOffsetY: 7,
     },
     down: {
-      url: '/battles/cosmoids/bug_1_down_1.png',
+      url: '/battles/cosmoids/bug_1_down_1.webp',
       scale: 0.44,
       shadowScaleX: 1.05,
       shadowOffsetY: 7,
@@ -80,7 +80,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   bug_stage_2: {
     default: {
-      url: '/battles/cosmoids/bug-2-basic-normal-neutral-skin-1.png',
+      url: '/battles/cosmoids/bug-2-basic-normal-neutral-skin-1.webp',
       scale: 0.15,
       shadowScaleX: 1.2,
       shadowOffsetY: 52,
@@ -101,7 +101,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   bug_stage_3: {
     default: {
-      url: '/battles/cosmoids/moth-basic-normal-neutral-skin-1.png',
+      url: '/battles/cosmoids/moth-basic-normal-neutral-skin-1.webp',
       scale: 0.11,
       flipX: true,
       shadowOffsetY: 1,
@@ -110,7 +110,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowScaleX: 1.95,
     },
     left: {
-      url: '/battles/cosmoids/moth-basic-normal-neutral-skin-1.png',
+      url: '/battles/cosmoids/moth-basic-normal-neutral-skin-1.webp',
       scale: 0.11,
       shadowOffsetY: 1,
       offsetY: -56,
@@ -119,7 +119,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       flipX: true,
     },
     right: {
-      url: '/battles/cosmoids/moth-basic-normal-neutral-skin-1.png',
+      url: '/battles/cosmoids/moth-basic-normal-neutral-skin-1.webp',
       scale: 0.11,
       shadowOffsetY: 1,
       offsetY: -56,
@@ -128,7 +128,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       flipX: false,
     },
     up: {
-      url: '/battles/cosmoids/bug_3_up_1.png',
+      url: '/battles/cosmoids/bug_3_up_1.webp',
       scale: 0.11,
       shadowOffsetY: 1,
       offsetY: -56,
@@ -136,7 +136,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowScaleX: 1.95,
     },
     down: {
-      url: '/battles/cosmoids/bug_3_down_1.png',
+      url: '/battles/cosmoids/bug_3_down_1.webp',
       scale: 0.11,
       shadowOffsetY: 1,
       offsetY: -56,
@@ -146,7 +146,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   starter_crab: {
     default: {
-      url: '/battles/cosmoids/palmit_down_1.png',
+      url: '/battles/cosmoids/palmit_down_1.webp',
       scale: 0.47,
       shadowScaleX: 1.25,
       shadowOffsetX: 5,
@@ -158,7 +158,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetX: -2,
       shadowOffsetY: 7,
       flipX: false,
-      url: '/battles/cosmoids/palmit_left_1.png',
+      url: '/battles/cosmoids/palmit_left_1.webp',
       offsetX: -3,
     },
     right: {
@@ -167,11 +167,11 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetX: -2,
       shadowOffsetY: 7,
       flipX: true,
-      url: '/battles/cosmoids/palmit_left_1.png',
+      url: '/battles/cosmoids/palmit_left_1.webp',
       offsetX: 3,
     },
     up: {
-      url: '/battles/cosmoids/palmit_up_1.png',
+      url: '/battles/cosmoids/palmit_up_1.webp',
       scale: 0.47,
       offsetY: -3,
       shadowOffsetY: 8,
@@ -186,7 +186,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   carapenter: {
     default: {
-      url: '/battles/cosmoids/carapenter_left.png',
+      url: '/battles/cosmoids/carapenter_left.webp',
       scale: 0.34,
       offsetY: -32,
       shadowScaleX: 2.4,
@@ -195,7 +195,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -96,
     },
     left: {
-      url: '/battles/cosmoids/carapenter_left.png',
+      url: '/battles/cosmoids/carapenter_left.webp',
       scale: 0.34,
       offsetY: -32,
       shadowScaleX: 2.4,
@@ -204,7 +204,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -96,
     },
     right: {
-      url: '/battles/cosmoids/carapenter_left.png',
+      url: '/battles/cosmoids/carapenter_left.webp',
       scale: 0.34,
       flipX: true,
       offsetY: -32,
@@ -214,7 +214,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -96,
     },
     up: {
-      url: '/battles/cosmoids/carapenter_up.png',
+      url: '/battles/cosmoids/carapenter_up.webp',
       scale: 0.52,
       offsetY: -37,
       shadowScaleX: 2.05,
@@ -223,7 +223,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -108,
     },
     down: {
-      url: '/battles/cosmoids/carapenter_down.png',
+      url: '/battles/cosmoids/carapenter_down.webp',
       scale: 0.52,
       offsetY: -23,
       shadowScaleX: 2.05,
@@ -234,7 +234,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   starter_iguana: {
     default: {
-      url: '/battles/cosmoids/fueguana_left_1_v3.png',
+      url: '/battles/cosmoids/fueguana_left_1_v3.webp',
       scale: 0.65,
       shadowScaleX: 1.9,
       shadowScaleY: 0.6,
@@ -258,14 +258,14 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       flipX: true,
     },
     up: {
-      url: '/battles/cosmoids/fueguana_up_1_v3.png',
+      url: '/battles/cosmoids/fueguana_up_1_v3.webp',
       scale: 0.65,
       offsetX: -11,
       shadowOffsetY: 5,
       shadowScaleX: 1.15,
     },
     down: {
-      url: '/battles/cosmoids/fueguana_down_1_v3.png',
+      url: '/battles/cosmoids/fueguana_down_1_v3.webp',
       scale: 0.65,
       shadowOffsetX: -3,
       offsetX: 10,
@@ -274,7 +274,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   velocinder: {
     default: {
-      url: '/battles/cosmoids/velocinder_left.png',
+      url: '/battles/cosmoids/velocinder_left.webp',
       scale: 0.5,
       offsetY: -47,
       shadowScaleX: 4.3,
@@ -283,7 +283,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -96,
     },
     left: {
-      url: '/battles/cosmoids/velocinder_left.png',
+      url: '/battles/cosmoids/velocinder_left.webp',
       scale: 0.5,
       offsetY: -47,
       shadowScaleX: 4.3,
@@ -292,7 +292,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -96,
     },
     right: {
-      url: '/battles/cosmoids/velocinder_left.png',
+      url: '/battles/cosmoids/velocinder_left.webp',
       scale: 0.5,
       offsetY: -47,
       shadowScaleX: 4.3,
@@ -302,7 +302,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       flipX: true,
     },
     up: {
-      url: '/battles/cosmoids/velocinder_up.png',
+      url: '/battles/cosmoids/velocinder_up.webp',
       scale: 0.65,
       offsetY: -62,
       shadowScaleX: 2.25,
@@ -312,7 +312,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       offsetX: 13,
     },
     down: {
-      url: '/battles/cosmoids/velocinder_down.png',
+      url: '/battles/cosmoids/velocinder_down.webp',
       scale: 0.58,
       offsetY: -62,
       shadowScaleX: 1.75,
@@ -323,7 +323,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   starter_monkey: {
     default: {
-      url: '/battles/cosmoids/monkeg_down_1_v2.png',
+      url: '/battles/cosmoids/monkeg_down_1_v2.webp',
       scale: 0.46,
       shadowScaleX: 1.4,
       shadowOffsetX: -2,
@@ -338,7 +338,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetX: -2,
       shadowOffsetY: 16,
       flipX: false,
-      url: '/battles/cosmoids/monkeg_left_1_v2.png',
+      url: '/battles/cosmoids/monkeg_left_1_v2.webp',
       offsetY: -12,
       offsetX: 3,
     },
@@ -348,12 +348,12 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetX: -2,
       shadowOffsetY: 16,
       flipX: true,
-      url: '/battles/cosmoids/monkeg_left_1_v2.png',
+      url: '/battles/cosmoids/monkeg_left_1_v2.webp',
       offsetY: -12,
       offsetX: 3,
     },
     up: {
-      url: '/battles/cosmoids/monkeg_up_1_v2.png',
+      url: '/battles/cosmoids/monkeg_up_1_v2.webp',
       scale: 0.46,
       offsetY: -12,
       offsetX: -4,
@@ -558,7 +558,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   map_1: {
     default: {
-      url: '/battles/units/map_1.png',
+      url: '/battles/units/map_1.webp',
       scale: 0.27,
       shadowScaleX: 1.15,
       shadowOffsetY: 1,
@@ -566,7 +566,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   coin_1: {
     default: {
-      url: '/battles/units/coin_1.png',
+      url: '/battles/units/coin_1.webp',
       scale: 0.08,
       shadowScaleX: 0.85,
       shadowOffsetY: 1,
@@ -574,7 +574,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   rebuilt_boat: {
     default: {
-      url: '/battles/units/rebuilt_boat.png',
+      url: '/battles/units/rebuilt_boat.webp',
       scale: 0.25,
       offsetY: -112,
       shadowScaleX: 0,
@@ -585,7 +585,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   food_supplies: {
     default: {
-      url: '/battles/units/food_supplies.png',
+      url: '/battles/units/food_supplies.webp',
       scale: 0.045,
       offsetY: -23,
       shadowScaleX: 0.85,
@@ -703,7 +703,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   note_1: {
     default: {
-      url: '/battles/units/note_1.png',
+      url: '/battles/units/note_1.webp',
       scale: 0.1,
       shadowScaleX: 0.9,
       shadowOffsetY: -6,
@@ -716,7 +716,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   attack_scratch_1: {
     default: {
-      url: '/battles/attacks/scratch.png',
+      url: '/battles/attacks/scratch.webp',
       scale: 0.27,
       shadowScaleX: 1.15,
       shadowOffsetY: 1,
@@ -739,7 +739,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
         impactProgress: 0.56,
         layers: [
           {
-            url: '/battles/attacks/mallet_smash.png',
+            url: '/battles/attacks/mallet_smash.webp',
             anchorX: 0.5,
             anchorY: 0.48,
             keyframes: [
@@ -804,7 +804,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
         durationMs: 440,
         layers: [
           {
-            url: '/battles/attacks/mallet_smash.png',
+            url: '/battles/attacks/mallet_smash.webp',
             anchorX: 0.5,
             anchorY: 0.48,
             keyframes: [
@@ -1003,7 +1003,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
         durationMs: 500,
         layers: [
           {
-            url: '/battles/attacks/nibble_top_teeth.png',
+            url: '/battles/attacks/nibble_top_teeth.webp',
             keyframes: [
               {
                 progress: 0,
@@ -1053,7 +1053,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
             ],
           },
           {
-            url: '/battles/attacks/nibble_bottom_teeth.png',
+            url: '/battles/attacks/nibble_bottom_teeth.webp',
             keyframes: [
               {
                 progress: 0,
@@ -1116,7 +1116,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
         durationMs: 600,
         layers: [
           {
-            url: '/battles/attacks/nibble_top_teeth.png',
+            url: '/battles/attacks/nibble_top_teeth.webp',
             keyframes: [
               {
                 progress: 0,
@@ -1174,7 +1174,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
             ],
           },
           {
-            url: '/battles/attacks/nibble_bottom_teeth.png',
+            url: '/battles/attacks/nibble_bottom_teeth.webp',
             keyframes: [
               {
                 progress: 0,
@@ -1237,7 +1237,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   mouse_1: {
     default: {
-      url: '/battles/cosmoids/mouse_1_left_1_25.png',
+      url: '/battles/cosmoids/mouse_1_left_1_25.webp',
       scale: 0.48,
       shadowScaleX: 1.2,
       shadowOffsetY: -1,
@@ -1247,7 +1247,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -62,
     },
     right: {
-      url: '/battles/cosmoids/mouse_1_left_1_25.png',
+      url: '/battles/cosmoids/mouse_1_left_1_25.webp',
       scale: 0.48,
       shadowScaleX: 1.2,
       shadowOffsetY: 10,
@@ -1258,14 +1258,14 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       flipX: true,
     },
     up: {
-      url: '/battles/cosmoids/mouse_1_up_1_25.png',
+      url: '/battles/cosmoids/mouse_1_up_1_25.webp',
       scale: 0.48,
       shadowScaleX: 1.05,
       shadowOffsetY: -1,
       offsetY: -18,
     },
     down: {
-      url: '/battles/cosmoids/mouse_1_down_1_25.png',
+      url: '/battles/cosmoids/mouse_1_down_1_25.webp',
       scale: 0.48,
       shadowScaleX: 1.05,
       shadowOffsetY: -3,
@@ -1274,7 +1274,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   harlequill: {
     default: {
-      url: '/battles/cosmoids/bird_1_left_1_25.png',
+      url: '/battles/cosmoids/bird_1_left_1_25.webp',
       scale: 0.41,
       shadowScaleX: 1.2,
       shadowOffsetY: 10,
@@ -1284,7 +1284,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -62,
     },
     right: {
-      url: '/battles/cosmoids/bird_1_left_1_25.png',
+      url: '/battles/cosmoids/bird_1_left_1_25.webp',
       scale: 0.41,
       shadowScaleX: 1.2,
       shadowOffsetY: 10,
@@ -1295,14 +1295,14 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       flipX: true,
     },
     up: {
-      url: '/battles/cosmoids/bird_1_up_1_25.png',
+      url: '/battles/cosmoids/bird_1_up_1_25.webp',
       scale: 0.41,
       shadowScaleX: 1.05,
       shadowOffsetY: 7,
       offsetY: -14,
     },
     down: {
-      url: '/battles/cosmoids/bird_1_down_1_25.png',
+      url: '/battles/cosmoids/bird_1_down_1_25.webp',
       scale: 0.41,
       shadowScaleX: 1.05,
       shadowOffsetY: 7,
@@ -1311,7 +1311,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   mopup: {
     default: {
-      url: '/battles/cosmoids/mopup_left.png',
+      url: '/battles/cosmoids/mopup_left.webp',
       scale: 0.3,
       offsetY: -26,
       shadowScaleX: 1.65,
@@ -1320,7 +1320,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -58,
     },
     left: {
-      url: '/battles/cosmoids/mopup_left.png',
+      url: '/battles/cosmoids/mopup_left.webp',
       scale: 0.3,
       offsetY: -26,
       shadowScaleX: 1.65,
@@ -1329,7 +1329,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -58,
     },
     right: {
-      url: '/battles/cosmoids/mopup_left.png',
+      url: '/battles/cosmoids/mopup_left.webp',
       scale: 0.3,
       flipX: true,
       offsetY: -26,
@@ -1339,7 +1339,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -58,
     },
     up: {
-      url: '/battles/cosmoids/mopup_up.png',
+      url: '/battles/cosmoids/mopup_up.webp',
       scale: 0.32,
       offsetY: -25,
       shadowScaleX: 1.05,
@@ -1348,7 +1348,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -68,
     },
     down: {
-      url: '/battles/cosmoids/mopup_down.png',
+      url: '/battles/cosmoids/mopup_down.webp',
       scale: 0.32,
       offsetY: -28,
       shadowScaleX: 1.05,
@@ -1359,7 +1359,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   caffiqui: {
     default: {
-      url: '/battles/cosmoids/caffiqui_left.png',
+      url: '/battles/cosmoids/caffiqui_left.webp',
       scale: 0.33,
       offsetY: -27,
       shadowScaleX: 1.15,
@@ -1368,7 +1368,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -68,
     },
     left: {
-      url: '/battles/cosmoids/caffiqui_left.png',
+      url: '/battles/cosmoids/caffiqui_left.webp',
       scale: 0.33,
       offsetY: -27,
       shadowScaleX: 1.15,
@@ -1377,7 +1377,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -68,
     },
     right: {
-      url: '/battles/cosmoids/caffiqui_left.png',
+      url: '/battles/cosmoids/caffiqui_left.webp',
       scale: 0.33,
       flipX: true,
       offsetY: -27,
@@ -1387,7 +1387,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -68,
     },
     up: {
-      url: '/battles/cosmoids/caffiqui_up.png',
+      url: '/battles/cosmoids/caffiqui_up.webp',
       scale: 0.33,
       offsetY: -27,
       shadowScaleX: 1.05,
@@ -1396,7 +1396,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -68,
     },
     down: {
-      url: '/battles/cosmoids/caffiqui_down.png',
+      url: '/battles/cosmoids/caffiqui_down.webp',
       scale: 0.33,
       offsetY: -27,
       shadowScaleX: 1.05,
@@ -1407,7 +1407,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   snoutasco: {
     default: {
-      url: '/battles/cosmoids/snoutasco_left.png',
+      url: '/battles/cosmoids/snoutasco_left.webp',
       scale: 0.66,
       offsetY: -61,
       shadowScaleX: 3.7,
@@ -1418,7 +1418,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       offsetX: 14,
     },
     left: {
-      url: '/battles/cosmoids/snoutasco_left.png',
+      url: '/battles/cosmoids/snoutasco_left.webp',
       scale: 0.66,
       offsetY: -61,
       shadowScaleX: 3.7,
@@ -1429,7 +1429,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       offsetX: 14,
     },
     right: {
-      url: '/battles/cosmoids/snoutasco_left.png',
+      url: '/battles/cosmoids/snoutasco_left.webp',
       flipX: true,
       scale: 0.66,
       offsetY: -61,
@@ -1441,7 +1441,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       offsetX: 14,
     },
     up: {
-      url: '/battles/cosmoids/snoutasco_up.png',
+      url: '/battles/cosmoids/snoutasco_up.webp',
       scale: 0.49,
       offsetY: -12,
       shadowScaleX: 1.05,
@@ -1452,7 +1452,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetX: -1,
     },
     down: {
-      url: '/battles/cosmoids/snoutasco_down.png',
+      url: '/battles/cosmoids/snoutasco_down.webp',
       scale: 0.49,
       offsetY: -39,
       shadowScaleX: 1.25,
@@ -1465,7 +1465,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   bettle: {
     default: {
-      url: '/battles/cosmoids/bettle_left.png',
+      url: '/battles/cosmoids/bettle_left.webp',
       scale: 0.53,
       offsetY: -34,
       shadowScaleX: 3.25,
@@ -1474,7 +1474,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -99,
     },
     left: {
-      url: '/battles/cosmoids/bettle_left.png',
+      url: '/battles/cosmoids/bettle_left.webp',
       scale: 0.53,
       offsetY: -34,
       shadowScaleX: 3.25,
@@ -1483,7 +1483,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -99,
     },
     right: {
-      url: '/battles/cosmoids/bettle_left.png',
+      url: '/battles/cosmoids/bettle_left.webp',
       flipX: true,
       scale: 0.53,
       offsetY: -34,
@@ -1493,7 +1493,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -99,
     },
     up: {
-      url: '/battles/cosmoids/bettle_up.png',
+      url: '/battles/cosmoids/bettle_up.webp',
       scale: 0.87,
       offsetY: -22,
       shadowScaleX: 2.15,
@@ -1502,7 +1502,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -100,
     },
     down: {
-      url: '/battles/cosmoids/bettle_down.png',
+      url: '/battles/cosmoids/bettle_down.webp',
       scale: 0.87,
       offsetY: -22,
       shadowScaleX: 2.4,
@@ -1513,7 +1513,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   sonarion: {
     default: {
-      url: '/battles/cosmoids/sonarion_left.png',
+      url: '/battles/cosmoids/sonarion_left.webp',
       scale: 0.48,
       offsetY: -24,
       shadowScaleX: 2.45,
@@ -1523,7 +1523,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetX: -5,
     },
     left: {
-      url: '/battles/cosmoids/sonarion_left.png',
+      url: '/battles/cosmoids/sonarion_left.webp',
       scale: 0.48,
       offsetY: -24,
       shadowScaleX: 2.45,
@@ -1533,7 +1533,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetX: -5,
     },
     right: {
-      url: '/battles/cosmoids/sonarion_left.png',
+      url: '/battles/cosmoids/sonarion_left.webp',
       scale: 0.48,
       offsetY: -24,
       shadowScaleX: 2.45,
@@ -1544,7 +1544,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       flipX: true,
     },
     up: {
-      url: '/battles/cosmoids/sonarion_up.png',
+      url: '/battles/cosmoids/sonarion_up.webp',
       scale: 0.48,
       offsetY: -24,
       shadowScaleX: 1.1,
@@ -1555,7 +1555,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       offsetX: 5,
     },
     down: {
-      url: '/battles/cosmoids/sonarion_down.png',
+      url: '/battles/cosmoids/sonarion_down.webp',
       scale: 0.48,
       offsetY: -24,
       shadowScaleX: 1.35,
@@ -1568,7 +1568,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   resonarion: {
     default: {
-      url: '/battles/cosmoids/resonarion_left.png',
+      url: '/battles/cosmoids/resonarion_left.webp',
       scale: 0.65,
       offsetY: -42,
       shadowScaleX: 3.4,
@@ -1579,7 +1579,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       offsetX: 16,
     },
     left: {
-      url: '/battles/cosmoids/resonarion_left.png',
+      url: '/battles/cosmoids/resonarion_left.webp',
       scale: 0.65,
       offsetY: -42,
       shadowScaleX: 3.4,
@@ -1590,7 +1590,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       offsetX: 16,
     },
     right: {
-      url: '/battles/cosmoids/resonarion_left.png',
+      url: '/battles/cosmoids/resonarion_left.webp',
       scale: 0.65,
       offsetY: -42,
       shadowScaleX: 3.4,
@@ -1602,7 +1602,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       flipX: true,
     },
     up: {
-      url: '/battles/cosmoids/resonarion_up.png',
+      url: '/battles/cosmoids/resonarion_up.webp',
       scale: 0.65,
       offsetY: -34,
       shadowScaleX: 1.3,
@@ -1612,7 +1612,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       offsetX: 14,
     },
     down: {
-      url: '/battles/cosmoids/resonarion_down.png',
+      url: '/battles/cosmoids/resonarion_down.webp',
       scale: 0.65,
       offsetY: -34,
       shadowScaleX: 1.5,
@@ -1624,7 +1624,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   tigrevel: {
     default: {
-      url: '/battles/cosmoids/tigrevel_left.png',
+      url: '/battles/cosmoids/tigrevel_left.webp',
       scale: 0.42,
       offsetY: -38,
       shadowScaleX: 2.75,
@@ -1633,7 +1633,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -96,
     },
     left: {
-      url: '/battles/cosmoids/tigrevel_left.png',
+      url: '/battles/cosmoids/tigrevel_left.webp',
       scale: 0.42,
       offsetY: -38,
       shadowScaleX: 2.75,
@@ -1642,7 +1642,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -96,
     },
     right: {
-      url: '/battles/cosmoids/tigrevel_left.png',
+      url: '/battles/cosmoids/tigrevel_left.webp',
       scale: 0.42,
       flipX: true,
       offsetY: -38,
@@ -1652,7 +1652,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -96,
     },
     up: {
-      url: '/battles/cosmoids/tigrevel_up.png',
+      url: '/battles/cosmoids/tigrevel_up.webp',
       scale: 0.42,
       offsetY: -39,
       shadowScaleX: 1.7,
@@ -1661,7 +1661,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -108,
     },
     down: {
-      url: '/battles/cosmoids/tigrevel_down.png',
+      url: '/battles/cosmoids/tigrevel_down.webp',
       scale: 0.42,
       offsetY: -39,
       shadowScaleX: 1.7,
@@ -1672,7 +1672,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   tigrevel_netted: {
     default: {
-      url: '/battles/cosmoids/tigrevel_netted.png',
+      url: '/battles/cosmoids/tigrevel_netted.webp',
       scale: 0.13,
       offsetY: -42,
       shadowScaleX: 3.1,
@@ -1681,7 +1681,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -112,
     },
     idle: {
-      url: '/battles/cosmoids/tigrevel_netted.png',
+      url: '/battles/cosmoids/tigrevel_netted.webp',
       scale: 0.13,
       offsetY: -42,
       shadowScaleX: 3.1,
@@ -1690,7 +1690,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -112,
     },
     carried: {
-      url: '/battles/cosmoids/tigrevel_netted.png',
+      url: '/battles/cosmoids/tigrevel_netted.webp',
       scale: 0.13,
       offsetY: 0,
       shadowScaleX: 0,
@@ -1698,7 +1698,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -112,
     },
     left: {
-      url: '/battles/cosmoids/tigrevel_netted.png',
+      url: '/battles/cosmoids/tigrevel_netted.webp',
       scale: 0.13,
       offsetY: -42,
       shadowScaleX: 3.1,
@@ -1707,7 +1707,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -112,
     },
     right: {
-      url: '/battles/cosmoids/tigrevel_netted.png',
+      url: '/battles/cosmoids/tigrevel_netted.webp',
       scale: 0.13,
       offsetY: -42,
       shadowScaleX: 3.1,
@@ -1716,7 +1716,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -112,
     },
     up: {
-      url: '/battles/cosmoids/tigrevel_netted.png',
+      url: '/battles/cosmoids/tigrevel_netted.webp',
       scale: 0.13,
       offsetY: -42,
       shadowScaleX: 3.1,
@@ -1725,7 +1725,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -112,
     },
     down: {
-      url: '/battles/cosmoids/tigrevel_netted.png',
+      url: '/battles/cosmoids/tigrevel_netted.webp',
       scale: 0.13,
       offsetY: -42,
       shadowScaleX: 3.1,
@@ -1736,7 +1736,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   voltusk: {
     default: {
-      url: '/battles/cosmoids/voltusk_left.png',
+      url: '/battles/cosmoids/voltusk_left.webp',
       scale: 0.52,
       offsetY: -70,
       shadowScaleX: 2.5,
@@ -1744,7 +1744,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -152,
     },
     left: {
-      url: '/battles/cosmoids/voltusk_left.png',
+      url: '/battles/cosmoids/voltusk_left.webp',
       scale: 0.52,
       offsetY: -70,
       shadowScaleX: 2.5,
@@ -1752,7 +1752,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -152,
     },
     right: {
-      url: '/battles/cosmoids/voltusk_left.png',
+      url: '/battles/cosmoids/voltusk_left.webp',
       scale: 0.52,
       flipX: true,
       offsetY: -70,
@@ -1761,7 +1761,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -152,
     },
     up: {
-      url: '/battles/cosmoids/voltusk_up.png',
+      url: '/battles/cosmoids/voltusk_up.webp',
       scale: 0.52,
       offsetY: -65,
       shadowScaleX: 2,
@@ -1769,7 +1769,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -148,
     },
     down: {
-      url: '/battles/cosmoids/voltusk_down.png',
+      url: '/battles/cosmoids/voltusk_down.webp',
       scale: 0.52,
       offsetY: -68,
       shadowScaleX: 2.2,
@@ -1779,7 +1779,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   poguin: {
     default: {
-      url: '/battles/cosmoids/poguin_left.png',
+      url: '/battles/cosmoids/poguin_left.webp',
       scale: 0.28,
       offsetY: -34,
       shadowScaleX: 1.55,
@@ -1788,7 +1788,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -89,
     },
     left: {
-      url: '/battles/cosmoids/poguin_left.png',
+      url: '/battles/cosmoids/poguin_left.webp',
       scale: 0.28,
       offsetY: -34,
       shadowScaleX: 1.55,
@@ -1797,7 +1797,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -89,
     },
     right: {
-      url: '/battles/cosmoids/poguin_left.png',
+      url: '/battles/cosmoids/poguin_left.webp',
       flipX: true,
       scale: 0.28,
       offsetY: -34,
@@ -1807,7 +1807,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -89,
     },
     up: {
-      url: '/battles/cosmoids/poguin_up.png',
+      url: '/battles/cosmoids/poguin_up.webp',
       scale: 0.28,
       offsetY: -35,
       shadowScaleX: 1.35,
@@ -1816,7 +1816,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -89,
     },
     down: {
-      url: '/battles/cosmoids/poguin_down.png',
+      url: '/battles/cosmoids/poguin_down.webp',
       scale: 0.28,
       offsetY: -32,
       shadowScaleX: 1.45,
@@ -1827,7 +1827,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   dormatee: {
     default: {
-      url: '/battles/cosmoids/dormatee_left.png',
+      url: '/battles/cosmoids/dormatee_left.webp',
       scale: 0.38,
       offsetY: -42,
       shadowScaleX: 2,
@@ -1836,7 +1836,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -106,
     },
     left: {
-      url: '/battles/cosmoids/dormatee_left.png',
+      url: '/battles/cosmoids/dormatee_left.webp',
       scale: 0.38,
       offsetY: -42,
       shadowScaleX: 2,
@@ -1845,7 +1845,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -106,
     },
     right: {
-      url: '/battles/cosmoids/dormatee_left.png',
+      url: '/battles/cosmoids/dormatee_left.webp',
       scale: 0.38,
       flipX: true,
       offsetY: -42,
@@ -1855,7 +1855,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -106,
     },
     up: {
-      url: '/battles/cosmoids/dormatee_up.png',
+      url: '/battles/cosmoids/dormatee_up.webp',
       scale: 0.38,
       offsetY: -47,
       shadowScaleX: 1.55,
@@ -1864,7 +1864,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -112,
     },
     down: {
-      url: '/battles/cosmoids/dormatee_down.png',
+      url: '/battles/cosmoids/dormatee_down.webp',
       scale: 0.38,
       offsetY: -47,
       shadowScaleX: 1.55,
@@ -1875,7 +1875,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   yokodillo: {
     default: {
-      url: '/battles/cosmoids/yokodillo_left.png',
+      url: '/battles/cosmoids/yokodillo_left.webp',
       scale: 0.38,
       offsetY: -42,
       shadowScaleX: 2.15,
@@ -1884,7 +1884,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -105,
     },
     left: {
-      url: '/battles/cosmoids/yokodillo_left.png',
+      url: '/battles/cosmoids/yokodillo_left.webp',
       scale: 0.38,
       offsetY: -42,
       shadowScaleX: 2.15,
@@ -1893,7 +1893,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -105,
     },
     right: {
-      url: '/battles/cosmoids/yokodillo_left.png',
+      url: '/battles/cosmoids/yokodillo_left.webp',
       scale: 0.38,
       flipX: true,
       offsetY: -42,
@@ -1903,7 +1903,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -105,
     },
     up: {
-      url: '/battles/cosmoids/yokodillo_up.png',
+      url: '/battles/cosmoids/yokodillo_up.webp',
       scale: 0.38,
       offsetY: -44,
       shadowScaleX: 1.65,
@@ -1912,7 +1912,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -108,
     },
     down: {
-      url: '/battles/cosmoids/yokodillo_down.png',
+      url: '/battles/cosmoids/yokodillo_down.webp',
       scale: 0.38,
       offsetY: -44,
       shadowScaleX: 1.65,
@@ -1921,9 +1921,105 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -108,
     },
   },
+  aguana: {
+    default: {
+      url: '/battles/cosmoids/aguana_left.webp',
+      scale: 0.34,
+      offsetY: -28,
+      shadowScaleX: 2,
+      shadowScaleY: 0.58,
+      shadowOffsetY: -5,
+      healthBarOffsetY: -75,
+    },
+    left: {
+      url: '/battles/cosmoids/aguana_left.webp',
+      scale: 0.34,
+      offsetY: -28,
+      shadowScaleX: 2,
+      shadowScaleY: 0.58,
+      shadowOffsetY: -5,
+      healthBarOffsetY: -75,
+    },
+    right: {
+      url: '/battles/cosmoids/aguana_left.webp',
+      scale: 0.34,
+      flipX: true,
+      offsetY: -28,
+      shadowScaleX: 2,
+      shadowScaleY: 0.58,
+      shadowOffsetY: -5,
+      healthBarOffsetY: -75,
+    },
+    up: {
+      url: '/battles/cosmoids/aguana_up.webp',
+      scale: 0.34,
+      offsetY: -36,
+      shadowScaleX: 1.3,
+      shadowScaleY: 0.62,
+      shadowOffsetY: -5,
+      healthBarOffsetY: -96,
+    },
+    down: {
+      url: '/battles/cosmoids/aguana_down.webp',
+      scale: 0.34,
+      offsetY: -36,
+      shadowScaleX: 1.3,
+      shadowScaleY: 0.62,
+      shadowOffsetY: -5,
+      healthBarOffsetY: -96,
+    },
+  },
+  nautiguan: {
+    default: {
+      url: '/battles/cosmoids/nautiguan_left.webp',
+      scale: 0.36,
+      offsetY: -45,
+      shadowScaleX: 2.25,
+      shadowScaleY: 0.72,
+      shadowOffsetY: -6,
+      healthBarOffsetY: -118,
+    },
+    left: {
+      url: '/battles/cosmoids/nautiguan_left.webp',
+      scale: 0.36,
+      offsetY: -45,
+      shadowScaleX: 2.25,
+      shadowScaleY: 0.72,
+      shadowOffsetY: -6,
+      healthBarOffsetY: -118,
+    },
+    right: {
+      url: '/battles/cosmoids/nautiguan_left.webp',
+      scale: 0.36,
+      flipX: true,
+      offsetY: -45,
+      shadowScaleX: 2.25,
+      shadowScaleY: 0.72,
+      shadowOffsetY: -6,
+      healthBarOffsetY: -118,
+    },
+    up: {
+      url: '/battles/cosmoids/nautiguan_up.webp',
+      scale: 0.36,
+      offsetY: -52,
+      shadowScaleX: 1.75,
+      shadowScaleY: 0.75,
+      shadowOffsetY: -6,
+      healthBarOffsetY: -128,
+    },
+    down: {
+      url: '/battles/cosmoids/nautiguan_down.webp',
+      scale: 0.36,
+      offsetY: -52,
+      shadowScaleX: 1.75,
+      shadowScaleY: 0.75,
+      shadowOffsetY: -6,
+      healthBarOffsetY: -128,
+    },
+  },
   bramfrit: {
     default: {
-      url: '/battles/cosmoids/bramfrit_left.png',
+      url: '/battles/cosmoids/bramfrit_left.webp',
       scale: 0.42,
       offsetY: -38,
       shadowScaleX: 3,
@@ -1932,7 +2028,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -98,
     },
     left: {
-      url: '/battles/cosmoids/bramfrit_left.png',
+      url: '/battles/cosmoids/bramfrit_left.webp',
       scale: 0.42,
       offsetY: -38,
       shadowScaleX: 3,
@@ -1941,7 +2037,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -98,
     },
     right: {
-      url: '/battles/cosmoids/bramfrit_left.png',
+      url: '/battles/cosmoids/bramfrit_left.webp',
       scale: 0.42,
       flipX: true,
       offsetY: -38,
@@ -1951,7 +2047,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -98,
     },
     up: {
-      url: '/battles/cosmoids/bramfrit_up.png',
+      url: '/battles/cosmoids/bramfrit_up.webp',
       scale: 0.42,
       offsetY: -39,
       shadowScaleX: 1.9,
@@ -1960,7 +2056,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -108,
     },
     down: {
-      url: '/battles/cosmoids/bramfrit_down.png',
+      url: '/battles/cosmoids/bramfrit_down.webp',
       scale: 0.42,
       offsetY: -39,
       shadowScaleX: 1.9,
@@ -1971,7 +2067,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   sepippet: {
     default: {
-      url: '/battles/cosmoids/sepippet_left.png',
+      url: '/battles/cosmoids/sepippet_left.webp',
       scale: 0.5,
       offsetY: -60,
       shadowScaleX: 2,
@@ -1980,7 +2076,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -100,
     },
     left: {
-      url: '/battles/cosmoids/sepippet_left.png',
+      url: '/battles/cosmoids/sepippet_left.webp',
       scale: 0.5,
       offsetY: -60,
       shadowScaleX: 2,
@@ -1989,7 +2085,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -100,
     },
     right: {
-      url: '/battles/cosmoids/sepippet_left.png',
+      url: '/battles/cosmoids/sepippet_left.webp',
       scale: 0.5,
       offsetY: -60,
       shadowScaleX: 2,
@@ -1999,7 +2095,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       flipX: true,
     },
     up: {
-      url: '/battles/cosmoids/sepippet_up.png',
+      url: '/battles/cosmoids/sepippet_up.webp',
       scale: 0.5,
       offsetY: -69,
       shadowScaleX: 1.65,
@@ -2008,7 +2104,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -100,
     },
     down: {
-      url: '/battles/cosmoids/sepippet_down.png',
+      url: '/battles/cosmoids/sepippet_down.webp',
       scale: 0.5,
       offsetY: -62,
       shadowScaleX: 1.65,
@@ -2019,7 +2115,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   parlet: {
     default: {
-      url: '/battles/cosmoids/parlet_left.png',
+      url: '/battles/cosmoids/parlet_left.webp',
       scale: 0.38,
       offsetY: -36,
       shadowScaleX: 2.2,
@@ -2028,7 +2124,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -91,
     },
     left: {
-      url: '/battles/cosmoids/parlet_left.png',
+      url: '/battles/cosmoids/parlet_left.webp',
       scale: 0.38,
       offsetY: -36,
       shadowScaleX: 2.2,
@@ -2037,7 +2133,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -91,
     },
     right: {
-      url: '/battles/cosmoids/parlet_left.png',
+      url: '/battles/cosmoids/parlet_left.webp',
       scale: 0.38,
       flipX: true,
       offsetY: -36,
@@ -2047,7 +2143,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -91,
     },
     up: {
-      url: '/battles/cosmoids/parlet_up.png',
+      url: '/battles/cosmoids/parlet_up.webp',
       scale: 0.38,
       offsetY: -38,
       shadowScaleX: 1.45,
@@ -2056,7 +2152,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -102,
     },
     down: {
-      url: '/battles/cosmoids/parlet_down.png',
+      url: '/battles/cosmoids/parlet_down.webp',
       scale: 0.38,
       offsetY: -38,
       shadowScaleX: 1.45,
@@ -2067,7 +2163,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   corrogoon: {
     default: {
-      url: '/battles/cosmoids/corrogoon_left.png',
+      url: '/battles/cosmoids/corrogoon_left.webp',
       scale: 0.38,
       offsetY: -38,
       shadowScaleX: 2.8,
@@ -2076,7 +2172,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -99,
     },
     left: {
-      url: '/battles/cosmoids/corrogoon_left.png',
+      url: '/battles/cosmoids/corrogoon_left.webp',
       scale: 0.38,
       offsetY: -38,
       shadowScaleX: 2.8,
@@ -2085,7 +2181,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -99,
     },
     right: {
-      url: '/battles/cosmoids/corrogoon_left.png',
+      url: '/battles/cosmoids/corrogoon_left.webp',
       scale: 0.38,
       flipX: true,
       offsetY: -38,
@@ -2095,7 +2191,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -99,
     },
     up: {
-      url: '/battles/cosmoids/corrogoon_up.png',
+      url: '/battles/cosmoids/corrogoon_up.webp',
       scale: 0.38,
       offsetY: -42,
       shadowScaleX: 1.7,
@@ -2104,7 +2200,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -111,
     },
     down: {
-      url: '/battles/cosmoids/corrogoon_down.png',
+      url: '/battles/cosmoids/corrogoon_down.webp',
       scale: 0.38,
       offsetY: -42,
       shadowScaleX: 1.8,
@@ -2115,7 +2211,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   bufflora: {
     default: {
-      url: '/battles/cosmoids/bufflora_left.png',
+      url: '/battles/cosmoids/bufflora_left.webp',
       scale: 0.32,
       offsetY: -25,
       shadowScaleX: 1.8,
@@ -2124,7 +2220,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -82,
     },
     left: {
-      url: '/battles/cosmoids/bufflora_left.png',
+      url: '/battles/cosmoids/bufflora_left.webp',
       scale: 0.32,
       offsetY: -25,
       shadowScaleX: 1.8,
@@ -2133,7 +2229,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -82,
     },
     right: {
-      url: '/battles/cosmoids/bufflora_left.png',
+      url: '/battles/cosmoids/bufflora_left.webp',
       scale: 0.32,
       flipX: true,
       offsetY: -25,
@@ -2143,7 +2239,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -82,
     },
     up: {
-      url: '/battles/cosmoids/bufflora_up.png',
+      url: '/battles/cosmoids/bufflora_up.webp',
       scale: 0.32,
       offsetY: -25,
       shadowScaleX: 1.15,
@@ -2152,7 +2248,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -88,
     },
     down: {
-      url: '/battles/cosmoids/bufflora_down.png',
+      url: '/battles/cosmoids/bufflora_down.webp',
       scale: 0.32,
       offsetY: -25,
       shadowScaleX: 1.15,
@@ -2163,7 +2259,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   marophis: {
     default: {
-      url: '/battles/cosmoids/marophis_left.png',
+      url: '/battles/cosmoids/marophis_left.webp',
       scale: 0.34,
       offsetY: -31,
       shadowScaleX: 2.3,
@@ -2172,7 +2268,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -78,
     },
     left: {
-      url: '/battles/cosmoids/marophis_left.png',
+      url: '/battles/cosmoids/marophis_left.webp',
       scale: 0.34,
       offsetY: -31,
       shadowScaleX: 2.3,
@@ -2181,7 +2277,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -78,
     },
     right: {
-      url: '/battles/cosmoids/marophis_left.png',
+      url: '/battles/cosmoids/marophis_left.webp',
       scale: 0.34,
       flipX: true,
       offsetY: -31,
@@ -2191,7 +2287,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -78,
     },
     up: {
-      url: '/battles/cosmoids/marophis_up.png',
+      url: '/battles/cosmoids/marophis_up.webp',
       scale: 0.36,
       offsetY: -37,
       shadowScaleX: 1.1,
@@ -2200,7 +2296,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -101,
     },
     down: {
-      url: '/battles/cosmoids/marophis_down.png',
+      url: '/battles/cosmoids/marophis_down.webp',
       scale: 0.36,
       offsetY: -37,
       shadowScaleX: 1.4,
@@ -2211,7 +2307,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   macask: {
     default: {
-      url: '/battles/cosmoids/macask_left.png',
+      url: '/battles/cosmoids/macask_left.webp',
       scale: 0.5,
       offsetY: -48,
       shadowScaleX: 3.75,
@@ -2220,7 +2316,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -100,
     },
     left: {
-      url: '/battles/cosmoids/macask_left.png',
+      url: '/battles/cosmoids/macask_left.webp',
       scale: 0.5,
       offsetY: -48,
       shadowScaleX: 3.75,
@@ -2229,7 +2325,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -100,
     },
     right: {
-      url: '/battles/cosmoids/macask_left.png',
+      url: '/battles/cosmoids/macask_left.webp',
       scale: 0.5,
       offsetY: -48,
       shadowScaleX: 3.75,
@@ -2239,7 +2335,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       flipX: true,
     },
     up: {
-      url: '/battles/cosmoids/macask_up.png',
+      url: '/battles/cosmoids/macask_up.webp',
       scale: 0.5,
       offsetY: -38,
       shadowScaleX: 2.05,
@@ -2248,7 +2344,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -110,
     },
     down: {
-      url: '/battles/cosmoids/macask_down.png',
+      url: '/battles/cosmoids/macask_down.webp',
       scale: 0.5,
       offsetY: -38,
       shadowScaleX: 2.15,
@@ -2261,7 +2357,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   },
   zapybara: {
     default: {
-      url: '/battles/cosmoids/zapybara_left.png',
+      url: '/battles/cosmoids/zapybara_left.webp',
       scale: 0.36,
       offsetY: -27,
       shadowScaleX: 1.8,
@@ -2270,7 +2366,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -68,
     },
     left: {
-      url: '/battles/cosmoids/zapybara_left.png',
+      url: '/battles/cosmoids/zapybara_left.webp',
       scale: 0.36,
       offsetY: -27,
       shadowScaleX: 1.8,
@@ -2279,7 +2375,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -68,
     },
     right: {
-      url: '/battles/cosmoids/zapybara_left.png',
+      url: '/battles/cosmoids/zapybara_left.webp',
       scale: 0.36,
       flipX: true,
       offsetY: -27,
@@ -2289,7 +2385,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -68,
     },
     up: {
-      url: '/battles/cosmoids/zapybara_up.png',
+      url: '/battles/cosmoids/zapybara_up.webp',
       scale: 0.36,
       offsetY: -26,
       shadowScaleX: 1.2,
@@ -2298,7 +2394,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       healthBarOffsetY: -72,
     },
     down: {
-      url: '/battles/cosmoids/zapybara_down.png',
+      url: '/battles/cosmoids/zapybara_down.webp',
       scale: 0.36,
       offsetY: -27,
       shadowScaleX: 1.2,

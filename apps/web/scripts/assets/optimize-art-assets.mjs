@@ -230,6 +230,130 @@ const categories = {
       smartSubsample: true,
     },
   },
+  'creature-icons': {
+    sourceDirectory: path.join(
+      repositoryRoot,
+      'art-source',
+      'creatures',
+      'icons',
+    ),
+    outputDirectory: path.join(webRoot, 'public', 'UI', 'Icons'),
+    sourceExtension: '.png',
+    outputExtension: '.webp',
+    files: ['aguana_icon.png', 'nautiguan_icon.png'],
+    resize: {
+      width: 160,
+      height: 160,
+      fit: 'contain',
+      kernel: sharp.kernel.lanczos3,
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    },
+    webp: {
+      quality: 90,
+      alphaQuality: 100,
+      effort: 6,
+      smartSubsample: true,
+    },
+  },
+  'battle-cosmoids': {
+    sourceDirectory: path.join(
+      repositoryRoot,
+      'art-source',
+      'creatures',
+      'directional-sprites',
+    ),
+    outputDirectory: path.join(webRoot, 'public', 'battles', 'cosmoids'),
+    sourceExtension: '.png',
+    outputExtension: '.webp',
+    webp: {
+      quality: 90,
+      alphaQuality: 100,
+      effort: 6,
+      smartSubsample: true,
+    },
+  },
+  'battle-attacks': {
+    sourceDirectory: path.join(
+      repositoryRoot,
+      'art-source',
+      'effects',
+      'attacks',
+    ),
+    outputDirectory: path.join(webRoot, 'public', 'battles', 'attacks'),
+    sourceExtension: '.png',
+    outputExtension: '.webp',
+    webp: {
+      quality: 90,
+      alphaQuality: 100,
+      effort: 6,
+      smartSubsample: true,
+    },
+  },
+  'battle-units': {
+    sourceDirectory: path.join(
+      repositoryRoot,
+      'art-source',
+      'props',
+      'units',
+    ),
+    outputDirectory: path.join(webRoot, 'public', 'battles', 'units'),
+    sourceExtension: '.png',
+    outputExtension: '.webp',
+    webp: {
+      quality: 90,
+      alphaQuality: 100,
+      effort: 6,
+      smartSubsample: true,
+    },
+  },
+  'battle-structures': {
+    sourceDirectory: path.join(
+      repositoryRoot,
+      'art-source',
+      'props',
+      'structures',
+    ),
+    outputDirectory: path.join(webRoot, 'public', 'battles', 'structures'),
+    sourceExtension: '.png',
+    outputExtension: '.webp',
+    webp: {
+      quality: 90,
+      alphaQuality: 100,
+      effort: 6,
+      smartSubsample: true,
+    },
+  },
+  'title-art': {
+    sourceDirectory: path.join(repositoryRoot, 'art-source', 'title'),
+    outputDirectory: path.join(webRoot, 'public', 'title'),
+    sourceExtension: '.png',
+    outputExtension: '.webp',
+    files: ['four-at-the-bow.png'],
+    webp: {
+      quality: 90,
+      alphaQuality: 100,
+      effort: 6,
+      smartSubsample: true,
+    },
+  },
+  'root-creature-art': {
+    sourceDirectory: path.join(
+      repositoryRoot,
+      'art-source',
+      'creatures',
+      'directional-sprites',
+    ),
+    outputDirectory: path.join(webRoot, 'public'),
+    sourceExtension: '.png',
+    outputExtension: '.webp',
+    files: ['bug-2-basic-normal-neutral-skin-1.png'],
+    webp: {
+      quality: 90,
+      alphaQuality: 100,
+      effort: 6,
+      smartSubsample: true,
+    },
+  },
 };
 
 function formatBytes(bytes) {
@@ -350,9 +474,16 @@ async function optimizeCategory(categoryName) {
   );
 }
 
-const requestedCategory = process.argv[2] ?? 'journal';
+const requestedCategories = process.argv.slice(2);
+if (requestedCategories.length === 0) requestedCategories.push('journal');
 
-optimizeCategory(requestedCategory).catch((error) => {
+async function optimizeCategories() {
+  for (const categoryName of requestedCategories) {
+    await optimizeCategory(categoryName);
+  }
+}
+
+optimizeCategories().catch((error) => {
   console.error(error instanceof Error ? error.message : error);
   process.exitCode = 1;
 });

@@ -10,10 +10,10 @@ export type PrisonGatePreviewState =
   | 'rubble';
 
 export const PRISON_GATE_TEXTURES: Record<PrisonGatePreviewState, string> = {
-  intact: '/battles/structures/bramfrit_gate_intact.png',
-  damaged: '/battles/structures/bramfrit_gate_damaged.png',
-  critical: '/battles/structures/bramfrit_gate_critical.png',
-  rubble: '/battles/structures/bramfrit_gate_rubble.png',
+  intact: '/battles/structures/bramfrit_gate_intact.webp',
+  damaged: '/battles/structures/bramfrit_gate_damaged.webp',
+  critical: '/battles/structures/bramfrit_gate_critical.webp',
+  rubble: '/battles/structures/bramfrit_gate_rubble.webp',
 };
 
 export const DEFAULT_PRISON_GATE_VISUAL_LAYOUT: TDStructureVisualLayout = {

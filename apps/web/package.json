@@ -27,6 +27,11 @@
     "assets:optimize:level-backgrounds": "node scripts/assets/optimize-art-assets.mjs level-backgrounds",
     "assets:optimize:starter-art": "node scripts/assets/optimize-art-assets.mjs starter-art",
     "assets:optimize:battle-characters": "node scripts/assets/optimize-art-assets.mjs battle-characters",
+    "assets:optimize:creature-icons": "node scripts/assets/optimize-art-assets.mjs creature-icons",
+    "assets:optimize:battle-cosmoids": "node scripts/assets/optimize-art-assets.mjs battle-cosmoids",
+    "assets:optimize:battle-support": "node scripts/assets/optimize-art-assets.mjs battle-attacks battle-units battle-structures",
+    "assets:optimize:title-art": "node scripts/assets/optimize-art-assets.mjs title-art",
+    "assets:optimize:root-creature-art": "node scripts/assets/optimize-art-assets.mjs root-creature-art",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },

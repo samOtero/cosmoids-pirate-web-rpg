@@ -27,17 +27,17 @@
       "height": 160
     },
     "left": {
-      "url": "/battles/cosmoids/caffiqui_left.png",
+      "url": "/battles/cosmoids/caffiqui_left.webp",
       "width": 168,
       "height": 220
     },
     "up": {
-      "url": "/battles/cosmoids/caffiqui_up.png",
+      "url": "/battles/cosmoids/caffiqui_up.webp",
       "width": 160,
       "height": 220
     },
     "down": {
-      "url": "/battles/cosmoids/caffiqui_down.png",
+      "url": "/battles/cosmoids/caffiqui_down.webp",
       "width": 160,
       "height": 220
     }

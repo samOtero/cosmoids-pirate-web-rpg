@@ -78,7 +78,7 @@ Opening Parlet's cell reveals its personality through an immediate act of compos
 - **Selection date:** August 30, 2026
 - **Name selected:** Parlet (_parrotfish_ + _palette_)
 - **Concept-art file:** `docs/cosmoids/images/parlet-concept.png`
-- **Production assets:** `apps/web/public/UI/Icons/parlet_icon.png` and `apps/web/public/battles/cosmoids/parlet_{left,up,down}.png`
+- **Production assets:** `apps/web/public/UI/Icons/parlet_icon.png` and `apps/web/public/battles/cosmoids/parlet_{left,up,down}.webp`
 - **Creature manifest:** `apps/web/src/content/creatures/parlet.json`
 - **Image status:** Cleaned approved direction and production game assets implemented; exploratory curved sand trail removed
 - **Implementation status:** Registered Water-type game Cosmoid with a Level 5 captive-ally route, persistent mosaic-current battlefield support, and synchronized gate damage

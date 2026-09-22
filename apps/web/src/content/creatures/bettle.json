@@ -28,17 +28,17 @@
       "height": 160
     },
     "left": {
-      "url": "/battles/cosmoids/bettle_left.png",
+      "url": "/battles/cosmoids/bettle_left.webp",
       "width": 310,
       "height": 205
     },
     "up": {
-      "url": "/battles/cosmoids/bettle_up.png",
+      "url": "/battles/cosmoids/bettle_up.webp",
       "width": 160,
       "height": 200
     },
     "down": {
-      "url": "/battles/cosmoids/bettle_down.png",
+      "url": "/battles/cosmoids/bettle_down.webp",
       "width": 160,
       "height": 200
     }

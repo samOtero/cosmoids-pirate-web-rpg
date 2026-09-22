@@ -48,9 +48,9 @@ Generated with the built-in image-generation tool. The approved `voltusk-concept
 | Asset | Transparent PNG | Dimensions |
 | --- | --- | --- |
 | Icon | [voltusk_icon.png](../../../../apps/web/public/UI/Icons/voltusk_icon.png) | 160 x 160 |
-| Left / mirrored right | [voltusk_left.png](../../../../apps/web/public/battles/cosmoids/voltusk_left.png) | 340 x 311 |
-| Front / down | [voltusk_down.png](../../../../apps/web/public/battles/cosmoids/voltusk_down.png) | 300 x 300 |
-| Rear / up | [voltusk_up.png](../../../../apps/web/public/battles/cosmoids/voltusk_up.png) | 246 x 300 |
+| Left / mirrored right | [voltusk_left.png](../../../../apps/web/public/battles/cosmoids/voltusk_left.webp) | 340 x 311 |
+| Front / down | [voltusk_down.png](../../../../apps/web/public/battles/cosmoids/voltusk_down.webp) | 300 x 300 |
+| Rear / up | [voltusk_up.png](../../../../apps/web/public/battles/cosmoids/voltusk_up.webp) | 246 x 300 |
 
 The built-in image tool prepared each approved preview for extraction with the prompt direction: replace only the pale background with a uniform magenta key; preserve identity, pose, palette, markings, framing, and shading. For the icon, composite the faded tusk tips into the key so extraction preserves fading opacity. Direct-transparency attempts with a painted checkerboard or colored fringe were rejected. The imagegen chroma-key helper extracted actual alpha, followed by proportional Lanczos resizing. No API/CLI image-generation fallback was used.
 

@@ -3,8 +3,8 @@ import type { Projectile } from '@/engine/tower-defense/types';
 import type { AttackDefinition } from '@/engine/tower-defense/attacks/types';
 
 export const BARREL_BOWLING_ASSETS = {
-  horizontal: '/battles/attacks/barrel_bowling_horizontal.png',
-  vertical: '/battles/attacks/barrel_bowling_vertical.png',
+  horizontal: '/battles/attacks/barrel_bowling_horizontal.webp',
+  vertical: '/battles/attacks/barrel_bowling_vertical.webp',
 };
 
 export function createBarrelBowlingVisual(container: Container) {

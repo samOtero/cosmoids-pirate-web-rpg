@@ -4,8 +4,8 @@ Generated with the built-in imagegen tool using the imagegen skill. No API/CLI f
 
 ## Shipped sprites
 
-- `apps/web/public/battles/attacks/barrel_bowling_horizontal.png`: end-on rolling view, 1254 × 1254 RGBA PNG.
-- `apps/web/public/battles/attacks/barrel_bowling_vertical.png`: broadside rolling view, 1536 × 1024 RGBA PNG. The initial version had an opaque checkerboard and was rejected; the final built-in edit has transparent edges.
+- `apps/web/public/battles/attacks/barrel_bowling_horizontal.webp`: end-on rolling view, 1254 × 1254 transparent WebP.
+- `apps/web/public/battles/attacks/barrel_bowling_vertical.webp`: broadside rolling view, 1536 × 1024 transparent WebP. The initial version had an opaque checkerboard and was rejected; the final built-in edit has transparent edges.
 
 The renderer selects views based on the barrel's direction, spins the horizontal view, and uses a subtle broadside rolling motion for vertical movement. Cosmetic wake and terminal splash are drawn in Pixi.
 

@@ -81,7 +81,7 @@ describe('Siphon Lash', () => {
       effects: [{ type: 'DRAIN', chance: 1, value: 0.5 }],
       projectileVisual: {
         type: 'NECTAR_TONGUE',
-        spriteUrl: '/battles/attacks/nectar_siphon.png',
+        spriteUrl: '/battles/attacks/nectar_siphon.webp',
       },
     });
   });

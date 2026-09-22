@@ -7,6 +7,8 @@ description: Develop and document a Cosmoid or evolution family when a specific 
 
 Turn fascination with a real animal into a coherent Cosmoid species or evolution family. Let the organism's most surprising biology lead the concept. Keep the species premise separate from the nature or personality of individual creatures.
 
+Before saving or integrating raster art intended for the app, follow the `Art source and deployment workflow` in the root `AGENTS.md`: retain its full-quality master under `art-source/`, create its runtime derivative with the configured optimizer, and never reference `art-source/` at runtime. Documentation-only concept images remain under `docs/` and must not be copied into `apps/web/public` by this workflow.
+
 This workflow is deliberately separate from `design-cosmoid-concepts`. Do not modify, replace, or silently import that workflow's mandatory character-nucleus or cross-domain-fusion requirements.
 
 ## Preserve the central distinction
