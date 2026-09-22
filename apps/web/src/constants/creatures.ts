@@ -352,6 +352,7 @@ export const YOKODILLO: CosmoidTemplate = {
   },
   baseExperience: 80,
   iconImg: '/UI/Icons/yokodillo_icon.png',
+  journalImg: '/UI/Journal/yokodillo_journal.webp',
   journalEntry:
     'It braces with an eager grin and refuses to budge. Once a rival finally moves it, Yokodillo curls into a ball and rolls back much farther than intended.',
   spriteUrl: '/battles/cosmoids/yokodillo_down.webp',
@@ -378,6 +379,7 @@ export const AGUANA: CosmoidTemplate = {
   },
   baseExperience: 65,
   iconImg: '/UI/Icons/aguana_icon.webp',
+  journalImg: '/UI/Journal/aguana_journal.webp',
   journalEntry:
     'It makes brief dives to graze on algae growing beneath the waves. Its hooked claws grip slippery rocks, keeping it from being swept away before it must return to shore and warm itself.',
   spriteUrl: '/battles/cosmoids/aguana_down.webp',
@@ -405,6 +407,7 @@ export const NAUTIGUAN: CosmoidTemplate = {
   },
   baseExperience: 96,
   iconImg: '/UI/Icons/nautiguan_icon.webp',
+  journalImg: '/UI/Journal/nautiguan_journal.webp',
   journalEntry:
     "Its greater strength and heat-retaining body allow it to graze in deeper water for much longer. It spits excess salt collected from seawater, so sailors often gather the crystals for the ship's salt reserves.",
   spriteUrl: '/battles/cosmoids/nautiguan_down.webp',

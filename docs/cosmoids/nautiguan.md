@@ -1,6 +1,6 @@
 # Nautiguan
 
-> Final name and base visual identity approved September 21, 2026. Production game assets and integration completed September 22, 2026; journal artwork remains open.
+> Final name and base visual identity approved September 21, 2026. Production game assets, integration, and journal artwork completed September 22, 2026.
 
 ![Nautiguan concept art](./images/nautiguan-concept.png)
 
@@ -96,7 +96,9 @@ The exact economics, prevalence, handling method, and story use of this salt-col
 - **Gameplay implementation:** Pure Water type with a slow, durable adult stat profile and `SCRATCH`, `WATER_GUN`, `DEEPWATER_GRIP`, and `BUBBLE_BEAM`. It is the level-16 evolution of Aguana.
 - **Story placement:** Evolution-only within the current Level 6 family integration; wild Nautiguan placement remains open.
 - **Manifest:** [`apps/web/src/content/creatures/nautiguan.json`](../../apps/web/src/content/creatures/nautiguan.json)
-- **Production status:** Integrated into the creature registry, evolution data, tower-defense visuals, and creature manifest. Journal scene and journal artwork remain open.
+- **Journal observation:** In strong underwater currents, a mature Nautiguan braces itself against the flow like a living breakwater while a young Aguana clings to the shelter of its flank. The adult looks back to check on the juvenile as loose seaweed and bubbles stream past them.
+- **Journal artwork:** [`art-source/creatures/journal/nautiguan_journal.png`](../../art-source/creatures/journal/nautiguan_journal.png), published at `/UI/Journal/nautiguan_journal.webp`.
+- **Production status:** Integrated into the creature registry, evolution data, tower-defense visuals, journal, and creature manifest.
 
 ## Open Decisions
 
@@ -104,6 +106,5 @@ The exact economics, prevalence, handling method, and story use of this salt-col
 - Mechanical treatment of salt-spitting, anchoring, tail power, heat retention, and reversible size change
 - Wild habitat distribution, rarity, capture rules, and direct story placement
 - How common the shipboard salt-harvesting relationship is
-- Journal scene and journal artwork
 
 Individual natures or personality variants are intentionally outside this species-concept record.

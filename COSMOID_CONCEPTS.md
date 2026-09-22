@@ -23,7 +23,7 @@ Last consolidated: September 21, 2026
 - **Core concept:** A jovial armadillo brawler that plants itself in a sumo stance, welcomes an opponent's strongest shove, then curls into a rolling countercharge when finally moved.
 - **Visual identity:** A huge cream-bellied round torso inside layered brown armadillo armor, broad raised palms, a cheerful grin, and two stout feet firmly planted in a low, wide stance.
 - **Story placement:** Proposed Level 7 wildlife for the relaxed no-objective, cannot-lose island stop, where it turns stretching and friendly sparring into playful pushing contests.
-- **Status:** Production-integrated with a game icon, directional battle art, Fighting element support, gameplay data, and a dated manifest. Custom sumo techniques, journal art, and Level 7 runtime placement remain open.
+- **Status:** Production-integrated with a game icon, directional battle art, Fighting element support, gameplay data, a dated manifest, and approved journal artwork showing its unexpectedly gentle bark-lifting foraging behavior. Custom sumo techniques and Level 7 runtime placement remain open.
 - **Dedicated record and concept art:** [`docs/cosmoids/yokodillo.md`](./docs/cosmoids/yokodillo.md)
 
 ### Poguin — The Hopping Penguin Cosmoid
@@ -78,7 +78,7 @@ Last consolidated: September 21, 2026
 - **Core concept:** A nimble marine-iguana Cosmoid that makes brief dives for algae and uses oversized hooked claws to cling to slippery rocks against the surf.
 - **Entry:** It makes brief dives to graze on algae growing beneath the waves. Its hooked claws grip slippery rocks, keeping it from being swept away before it must return to shore and warm itself.
 - **Visual identity:** A long, low coral-and-indigo juvenile with four widely spread clawed feet, an enormous paddle tail, a smooth back, and only a few small salt nubs around the nostrils and front brow.
-- **Status:** Standalone identity approved September 21, 2026 and production-integrated September 22, 2026 with an icon, directional battle art, gameplay data, level-16 evolution, and capturable Level 6 encounters. Journal art remains open.
+- **Status:** Standalone identity approved September 21, 2026 and production-integrated September 22, 2026 with an icon, directional battle art, gameplay data, level-16 evolution, capturable Level 6 encounters, and approved journal artwork showing its relaxed belly-up warming behavior.
 - **Dedicated record and concept art:** [`docs/cosmoids/aguana.md`](./docs/cosmoids/aguana.md)
 
 #### Nautiguan — The Salt-Crowned Cosmoid
@@ -90,7 +90,7 @@ Last consolidated: September 21, 2026
 - **Entry:** Its greater strength and heat-retaining body allow it to graze in deeper water for much longer. It spits excess salt collected from seawater, so sailors often bring one aboard and gather the crystals to replenish the ship's salt reserves.
 - **Visual identity:** A squat coral-and-indigo adult with a huge rounded torso, four powerful clawed limbs, a high curved paddle tail, and a dramatic white salt-crystal crown and dorsal fringe.
 - **Gameplay direction:** The integrated move set emphasizes water attacks and gripping; reversible size change, a dedicated tail move, and salt-spitting remain future mechanical directions.
-- **Status:** Standalone identity approved September 21, 2026 and production-integrated September 22, 2026 with an icon, directional battle art, gameplay data, and its role as Aguana's level-16 evolution. Wild placement and journal art remain open.
+- **Status:** Standalone identity approved September 21, 2026 and production-integrated September 22, 2026 with an icon, directional battle art, gameplay data, its role as Aguana's level-16 evolution, and approved underwater journal artwork showing a young Aguana clinging to its sheltered flank in a strong current. Wild placement remains open.
 - **Dedicated record and concept art:** [`docs/cosmoids/nautiguan.md`](./docs/cosmoids/nautiguan.md)
 
 ### Monkeg — The Stowaway Cosmoid

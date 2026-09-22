@@ -1,6 +1,6 @@
 # Yokodillo
 
-> Final name and standalone visual identity approved September 18, 2026. Production icon, directional battle assets, Fighting element support, species registration, gameplay defaults, and manifest were completed the same day. Level 7 runtime integration and custom techniques remain pending.
+> Final name and standalone visual identity approved September 18, 2026. Production icon, directional battle assets, Fighting element support, species registration, gameplay defaults, and manifest were completed the same day. Journal artwork was completed September 22, 2026; Level 7 runtime integration and custom techniques remain pending.
 
 ![Yokodillo concept art](./images/yokodillo-concept.png)
 
@@ -80,12 +80,14 @@ Yokodillo was conceived to read clearly as a self-contained single-stage creatur
 - **Directional identity revision:** On September 19, 2026, all three battle sprites were rebuilt to restore the approved concept's short muzzle, compact ears, oversized palms, broad armor plates, dark shoulder collar, three-band belly, grounded stance, and compact tail.
 - **Gameplay status:** Registered as a pure Fighting-type bulky physical creature with temporary existing attacks (`TACKLE` and `QUICK_ATTACK`) until its custom sumo techniques are selected.
 - **Story status:** Reserved for Level 7 in the creature manifest; runtime placement awaits implementation of the level.
+- **Journal observation:** Yokodillo settles its great belly close to the ground and uses its broad hands with unexpected delicacy, lifting loose bark to inspect the insects sheltering beneath it.
+- **Journal artwork:** [`art-source/creatures/journal/yokodillo_journal.png`](../../art-source/creatures/journal/yokodillo_journal.png), published at `/UI/Journal/yokodillo_journal.webp`.
+- **Journal artwork approval:** September 22, 2026
 
 ## Open Decisions
 
 - Exact Level 7 placement, encounter presentation, rarity, and capture behavior
 - Custom attacks, special abilities, and final balance tuning
 - Final island name and any local environmental storytelling
-- Habitat, diet, ecology, and journal entry
+- Broader habitat, diet, ecology, and any future revision of the journal entry
 - Final scale and whether it remains single-stage or joins an evolution family
-- Journal artwork

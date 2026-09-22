@@ -1,6 +1,6 @@
 # Aguana
 
-> Final name and base visual identity approved September 21, 2026. Production game assets and integration completed September 22, 2026; journal artwork remains open.
+> Final name and base visual identity approved September 21, 2026. Production game assets, integration, and journal artwork completed September 22, 2026.
 
 ![Aguana concept art](./images/aguana-concept.png)
 
@@ -89,13 +89,14 @@ These are approved sources of possible abilities and attacks, not defined mechan
 - **Production assets:** Tight portrait icon plus left, up, and down directional battle sprites, with PNG masters under `art-source/creatures` and transparency-preserving WebP derivatives in `apps/web/public`.
 - **Gameplay implementation:** Pure Water type with a fast juvenile stat profile, `SCRATCH`, `WATER_GUN`, and `DEEPWATER_GRIP`; evolves into Nautiguan at level 16.
 - **Story placement:** Capturable level-8 Aguana appear in both Level 6 waves on the center lane.
+- **Journal observation:** After a short dive, Aguana may stretch belly-up across a sun-warmed tidal rock with its head reclined and all four feet loose. The unusually vulnerable pose shows how completely it relaxes when it feels safe enough to recover its warmth.
+- **Journal artwork:** [`art-source/creatures/journal/aguana_journal.png`](../../art-source/creatures/journal/aguana_journal.png) -> `/UI/Journal/aguana_journal.webp`
 - **Manifest:** [`apps/web/src/content/creatures/aguana.json`](../../apps/web/src/content/creatures/aguana.json)
-- **Production status:** Integrated into the creature registry, tower-defense visuals, Level 6 encounter data, and creature manifest. Journal scene and journal artwork remain open.
+- **Production status:** Integrated into the creature registry, journal, tower-defense visuals, Level 6 encounter data, and creature manifest.
 
 ## Open Decisions
 
 - How growing and shrinking would manifest mechanically, if used
 - Broader habitat distribution and rarity beyond the Level 6 encounter
-- Journal scene and journal artwork
 
 Individual natures or personality variants are intentionally outside this species-concept record.
