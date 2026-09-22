@@ -160,6 +160,7 @@ export const ZAPYBARA: CosmoidTemplate = {
   },
   baseExperience: 65,
   iconImg: '/UI/Icons/zapybara_icon.png',
+  journalImg: '/UI/Journal/zapybara_journal.webp',
   spriteUrl: '/battles/cosmoids/zapybara_down.webp',
   battleSpriteUrl: '/battles/cosmoids/zapybara_left.webp',
   movementId: 'lizard',
@@ -326,6 +327,7 @@ export const DORMATEE: CosmoidTemplate = {
   },
   baseExperience: 82,
   iconImg: '/UI/Icons/dormatee_icon.png',
+  journalImg: '/UI/Journal/dormatee_journal.webp',
   journalEntry:
     'While it sleeps, its whiskers link the dreams of every creature resting nearby. It often wakes to find an entire lagoon napping beside it.',
   spriteUrl: '/battles/cosmoids/dormatee_down.webp',

@@ -13,7 +13,7 @@ Last consolidated: September 21, 2026
 - **Core concept:** A rare Psychic manatee whose naps calm an entire lagoon by linking nearby sleeping minds through its dense tactile whiskers.
 - **Visual identity:** A round blue-lavender manatee curled into a floating resting pose, with a broad paddle tail, dense pearl-tipped whisker fan, and exactly one pearly dream orb.
 - **Story placement:** Proposed rare wildlife encounter for Level 7's no-objective, cannot-lose island stop. The player may catch it or leave it sleeping in a sheltered lagoon.
-- **Status:** Final name and standalone identity approved September 18, 2026. Icon, directional battle assets, Psychic element support, species registration, gameplay defaults, and manifest are implemented; custom dream techniques and Level 7 runtime integration remain pending.
+- **Status:** Final name and standalone identity approved September 18, 2026. Icon, directional battle assets, Psychic element support, species registration, gameplay defaults, manifest, and approved journal artwork showing its circle of sleeping lagoon fish are implemented; custom dream techniques and Level 7 runtime integration remain pending.
 - **Dedicated record and concept art:** [`docs/cosmoids/dormatee.md`](./docs/cosmoids/dormatee.md)
 
 ### Yokodillo — The Sumo Armadillo Cosmoid
@@ -313,6 +313,8 @@ Several alternate concepts and typings are being considered for an alligator gar
 - **Core concept:** An electric capybara that uses an immense static charge to float like a storm cloud.
 - **Entry idea:** Its fur is so dry and dense that simply moving causes an extreme static buildup. It stores enough electricity to constantly repel the ground, allowing it to float through the air.
 - **Behavior note:** They travel in packs of hundreds, resembling clouds in the sky and creating unnatural thunderstorms when annoyed.
+- **Journal observation:** Viewed from the marsh below, dozens of relaxed Zapybara drift close together until their rounded golden-and-charcoal bodies and the mist between them resemble one enormous sunlit cloud.
+- **Status:** Production game assets and creature registration are implemented. Approved journal artwork showing its airborne cloud-herd behavior was completed September 22, 2026; final journal prose and broader species documentation remain open.
 
 ### Petroqui
 

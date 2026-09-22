@@ -1,6 +1,6 @@
 # Dormatee
 
-> Updated September 18, 2026. The name, standalone visual identity, Psychic typing, icon, directional battle assets, species registration, and initial gameplay defaults are complete. Custom dream techniques and the Level 7 encounter remain open.
+> Updated September 22, 2026. The name, standalone visual identity, Psychic typing, icon, directional battle assets, species registration, initial gameplay defaults, and journal artwork are complete. Custom dream techniques and the Level 7 encounter remain open.
 
 ![Dormatee concept art](./images/dormatee-concept.png)
 
@@ -94,6 +94,7 @@ Production assets:
 - `apps/web/public/battles/cosmoids/dormatee_left.webp` — 360x240 left-facing sprite; the right-facing view mirrors this asset.
 - `apps/web/public/battles/cosmoids/dormatee_down.webp` — 200x275 direct-front sprite.
 - `apps/web/public/battles/cosmoids/dormatee_up.webp` — 200x275 direct-rear sprite.
+- `apps/web/public/UI/Journal/dormatee_journal.webp` — 1024x1024 naturalist journal observation.
 - `apps/web/src/content/creatures/dormatee.json` — dated creature manifest and planned Level 7 placement record.
 
 ## Creation Record
@@ -105,7 +106,10 @@ Production assets:
 - **Visual selection:** Psychic concept 6, refined into a standalone resting manatee; the final revision removed the unintended crease line across its belly.
 - **Image status:** Approved standalone concept, copied unchanged from the final generated source. Production assets were generated as identity-preserving directional derivatives.
 - **Production asset sources:** Icon `exec-9c0c5e92-76fe-4674-b729-6889d070d482.png`; left `exec-68fb2e45-f7ac-49c3-9afe-97b0b80a9464.png`; down `exec-1106f397-6c1c-4fe7-9cc4-3f192e3090ba.png`; up `exec-18a4e4da-2a29-45ec-baef-8f257a6757b2.png`.
-- **Production status:** Icon, left/down/up battle sprites, Psychic element support, species registry entry, directional configuration, gameplay defaults, focused Psychic test, and dated creature manifest are implemented. Right-facing visuals mirror the left sprite. Level 7 and custom dream attacks remain planned.
+- **Journal observation:** Viewed from above in a quiet shallow lagoon, Dormatee rests belly-up while five small fish sleep in a loose circle around its whisker fan. The gathering shows that nearby wildlife feels safe inside its shared dream.
+- **Journal artwork:** [`art-source/creatures/journal/dormatee_journal.png`](../../art-source/creatures/journal/dormatee_journal.png), published at `/UI/Journal/dormatee_journal.webp`.
+- **Journal artwork approval:** September 22, 2026
+- **Production status:** Icon, left/down/up battle sprites, journal artwork, Psychic element support, species registry entry, directional configuration, gameplay defaults, focused Psychic test, and dated creature manifest are implemented. Right-facing visuals mirror the left sprite. Level 7 and custom dream attacks remain planned.
 - **Provisional scale:** Approximately 1.4 meters long was suggested during concept development but is not yet locked.
 
 ## Open Decisions
@@ -118,4 +122,3 @@ Production assets:
 - Decide whether Dormatee is a single-stage species or belongs to an evolutionary family.
 - Lock its physical size, broader habitat, diet, distribution, and ecology beyond the quiet lagoon premise.
 - Define Level 7's map, optional interactions, creature roster, and exit flow without compromising its no-objective, cannot-lose structure.
-- Create journal artwork through the dedicated journal-art workflow when requested.
