@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import { COSMOID_TEMPLATES } from '@/constants/creatures';
+import { LEVEL_7_INTRO } from '@/constants/dialogs/level7Intro';
+import { LEVEL_7_WIN } from '@/constants/dialogs/level7Win';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { LEVEL_ORDER, TD_LEVELS } from '@/constants/tdLevels';
 import { FOREST_LEVEL } from '@/constants/tdLevels/forestLevel';
 import { LEVEL_4 } from '@/constants/tdLevels/level4';
+import { LEVEL_7 } from '@/constants/tdLevels/level7';
 import { VANE_LEVEL } from '@/constants/tdLevels/vaneLevel';
 import {
   TD_CREATURE_DEFS,
@@ -16,6 +19,7 @@ import {
   resolvePlayerCreature,
 } from '@/utils/resolvePlayerCreature';
 import {
+  BackgroundImageKey,
   DialogContext,
   StoryProgression,
   TDLevelContext,
@@ -49,6 +53,137 @@ describe('Tower defense rules', () => {
     expect(VANE_LEVEL.backgroundUrl).toBe(
       '/battles/bg/bg_coastal_island_battle_path_level_3.webp'
     );
+  });
+
+  it('sets up Level 7 as a single-screen, cannot-lose wildlife visit', () => {
+    const definitions = new Map(
+      LEVEL_7.waveEnemyDefinitions.map((definition) => [
+        definition.id,
+        definition,
+      ])
+    );
+    const landGroup = LEVEL_7.waves[0].groups[0];
+    const waterGroup = LEVEL_7.waves[0].groups[1];
+    const engine = new TowerDefenseEngine(LEVEL_7);
+
+    expect(LEVEL_7).toMatchObject({
+      backgroundUrl: '/battles/bg/bg_level_7_red_sandstone_shore.webp',
+      backgroundScale: 1,
+      cannotLose: true,
+      closeCompletesLevel: true,
+    });
+    expect(LEVEL_7.paths).toHaveLength(2);
+    expect(LEVEL_7.paths[0].every((point) => point.y <= 43)).toBe(true);
+    expect(LEVEL_7.paths[1].every((point) => point.y >= 68)).toBe(true);
+    expect(LEVEL_7.environmentUnits).toEqual([
+      {
+        tdConfigId: 'tigrevel_shore_leave',
+        position: { x: 50, y: 22 },
+      },
+      {
+        tdConfigId: 'kip_shore_leave',
+        position: { x: 80, y: 17 },
+      },
+      {
+        tdConfigId: 'maribel_shore_leave',
+        position: { x: 10, y: 42 },
+      },
+      {
+        tdConfigId: 'caleb_shore_leave',
+        position: { x: 91, y: 55 },
+      },
+    ]);
+    expect(CREATURE_TD_CONFIGS.tigrevel_shore_leave.default.url).toBe(
+      '/battles/cosmoids/tigrevel_sleeping.webp'
+    );
+    expect(CREATURE_TD_CONFIGS.kip_shore_leave.default.url).toBe(
+      '/battles/characters/kip_journaling.webp'
+    );
+    expect(CREATURE_TD_CONFIGS.maribel_shore_leave.default.url).toBe(
+      '/battles/characters/maribel_navigating.webp'
+    );
+    expect(CREATURE_TD_CONFIGS.caleb_shore_leave.default.url).toBe(
+      '/battles/characters/caleb_skipping_stones.webp'
+    );
+    expect(definitions.get(landGroup.enemyDefinitionId)?.creatureId).toBe(
+      'yokodillo'
+    );
+    expect(landGroup).toMatchObject({ pathIndex: 0 });
+    expect(landGroup).not.toHaveProperty('turnAroundAtEnd');
+    expect(definitions.get(waterGroup.enemyDefinitionId)?.creatureId).toBe(
+      'dormatee'
+    );
+    expect(waterGroup).toMatchObject({ pathIndex: 1 });
+    expect(waterGroup).not.toHaveProperty('turnAroundAtEnd');
+    expect(engine.cannotLose).toBe(true);
+    engine.destroy();
+  });
+
+  it('moves the Level 7 intro from the cramped boat to the new landfall art', () => {
+    expect(LEVEL_7_INTRO.backgroundImageKey).toBe(
+      BackgroundImageKey.LEVEL_6_CRAMPED_CREW_DEPARTURE
+    );
+    expect(
+      LEVEL_7_INTRO.sequence.slice(0, 3).every(
+        (line) => line.backgroundImageKey === undefined
+      )
+    ).toBe(true);
+    expect(
+      LEVEL_7_INTRO.sequence.slice(3).map((line) => line.backgroundImageKey)
+    ).toEqual([
+      BackgroundImageKey.LEVEL_7_LANDFALL,
+      BackgroundImageKey.LEVEL_7_LANDFALL,
+    ]);
+  });
+
+  it('uses the late-afternoon departure art throughout the Level 7 ending', () => {
+    expect(LEVEL_7_WIN.backgroundImageKey).toBe(
+      BackgroundImageKey.LEVEL_7_DEPARTURE
+    );
+    expect(
+      LEVEL_7_WIN.sequence.every(
+        (line) => line.backgroundImageKey === undefined
+      )
+    ).toBe(true);
+  });
+
+  it('unlocks and completes Level 7 through its single peaceful ending', () => {
+    expect(LEVEL_ORDER[6]).toMatchObject({
+      context: TDLevelContext.LEVEL_7,
+      name: 'Shore Leave',
+      requiredProgression: StoryProgression.DEFEAT_LEVEL_6,
+    });
+    expect(TD_LEVELS[TDLevelContext.LEVEL_6].winEvents[0]).toEqual({
+      type: 'SET_STORY_PROGRESSION',
+      payload: { progression: StoryProgression.DEFEAT_LEVEL_6 },
+      autoProceed: true,
+    });
+    expect(TD_LEVELS[TDLevelContext.LEVEL_7]).toMatchObject({
+      levelData: LEVEL_7,
+      journalCompletion: {
+        progression: StoryProgression.COMPLETE_LEVEL_7,
+        seenSpeciesIds: ['dormatee', 'yokodillo'],
+      },
+      introEvents: [
+        {
+          type: 'SHOW_DIALOG',
+          payload: { context: DialogContext.LEVEL_7_INTRO },
+        },
+      ],
+      winEvents: [
+        {
+          type: 'SET_STORY_PROGRESSION',
+          payload: { progression: StoryProgression.COMPLETE_LEVEL_7 },
+          autoProceed: true,
+        },
+        {
+          type: 'SHOW_DIALOG',
+          payload: { context: DialogContext.LEVEL_7_WIN },
+        },
+        { type: 'GO_TO_LEVEL_SELECT' },
+      ],
+      loseEvents: [{ type: 'GO_TO_LEVEL_SELECT' }],
+    });
   });
 
   it('derives one life from each capture objective', () => {

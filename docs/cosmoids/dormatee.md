@@ -1,6 +1,6 @@
 # Dormatee
 
-> Updated September 22, 2026. The name, standalone visual identity, Psychic typing, icon, directional battle assets, species registration, initial gameplay defaults, and journal artwork are complete. Custom dream techniques and the Level 7 encounter remain open.
+> Updated September 23, 2026. The name, standalone visual identity, Psychic typing, icon, directional battle assets, species registration, journal artwork, Level 7 encounter, and first custom dream technique are complete.
 
 ![Dormatee concept art](./images/dormatee-concept.png)
 
@@ -59,7 +59,7 @@ Preserve the reference's proportions, facial structure, appendage count, palette
 
 Level 7 is intended as a relaxing island stop where the crew stretches their legs. It has no required objective and no loss condition; the player is free to explore, encounter wildlife, and catch creatures without an urgent conflict driving the visit.
 
-Dormatee is proposed as one of the level's rarer discoveries, most naturally found in the quietest sheltered lagoon. Its presence should reinforce the level's restful tone rather than introduce a villain, crisis, or mandatory challenge. The player may catch it or leave it sleeping. Exact spawning, rarity, capture tuning, and any optional environmental interaction remain undecided.
+Dormatee appears in the broad sheltered water across the foreground on its own aquatic route. Its presence reinforces the level's restful tone rather than introducing a villain, crisis, or mandatory challenge. The player may catch it or leave it undisturbed. Further rarity, capture tuning, and optional environmental interaction remain undecided.
 
 ## Provisional Gameplay Ideas
 
@@ -76,6 +76,14 @@ The ideas below are brainstorming candidates, not approved attacks, abilities, o
 
 One possible initial kit is Body Rush, Dream Pearl, Dream Network, and Deep Rest, with Shared Reverie reserved as a later signature technique. This combination is only a reference package; individual ideas may be selected, revised, combined, or discarded later.
 
+## Approved Technique: Shared Slumber
+
+Shared Slumber is a non-damaging Psychic area-control move learned at level 8. Dormatee falls asleep for a committed six seconds and puts every eligible creature within its normal attack radius to sleep for up to the same duration. Dormatee cannot attack during its sleep, even if the player changes its selected move, moves it to another placement, removes it from the battlefield, or places it back before the six seconds end. Removed creatures retain their live tower object in the undeployed reserve rather than being recreated, so the sleep commitment, health, cooldowns, and other runtime state remain intact.
+
+A sleeping enemy cannot move or pick up an objective. The opening 0.75 seconds are guaranteed; after that, each directly damaging attack has a 20% chance to wake that target. A multi-hit move rolls only once for the overall attack, while poison and burn damage continue without making wake checks. Dormatee always sleeps for the full duration regardless of how early its targets awaken. Naturally or prematurely awakened targets resist sleep from every Dormatee for eight seconds. Structures and status-immune enemies are ineligible.
+
+The move has a ten-second simulation-clock cooldown beginning on activation. Attack-speed modifiers do not shorten it. This distinguishes Shared Slumber from Deepwater Grip: the latter guarantees four seconds of damaging single-target control, whereas Shared Slumber trades damage and reliability for broad control and a longer self-commitment.
+
 ## Production Integration
 
 Dormatee is registered as the game's first Psychic-type species. Psychic has its own UI and battle-effect colors, and its initial type interactions follow the familiar creature-battling relationships currently supported by the game's type roster: Psychic is strong against Poison, resisted by Psychic and Steel, and ineffective against Dark; Bug and Dark are strong against Psychic.
@@ -85,8 +93,8 @@ The current gameplay values establish Dormatee as a very slow, specially defensi
 - **Base stats:** HP 86, Attack 42, Defense 70, Special Attack 76, Special Defense 90, Speed 18.
 - **Base experience:** 82.
 - **Movement profile:** Existing `lizard` profile as an integration default pending bespoke floating movement.
-- **Placeholder attacks:** Body Rush (`TACKLE`) at level 1 and String Shot (`STRING_SHOT`) at level 4. String Shot temporarily represents a whisker-based slowing option; neither move locks the final Psychic kit.
-- **Story placement:** Recorded as a planned rare Level 7 encounter. No Level 7 runtime configuration or wave placement exists yet, so Dormatee has not been inserted into another level as a substitute.
+- **Learnset:** Body Rush (`TACKLE`) at level 1, String Shot (`STRING_SHOT`) at level 4, and Shared Slumber (`SHARED_SLUMBER`) at level 8. String Shot remains a temporary whisker-based slowing option.
+- **Story placement:** Integrated into Level 7 as optional aquatic wildlife on a dedicated open-water route.
 
 Production assets:
 
@@ -109,15 +117,14 @@ Production assets:
 - **Journal observation:** Viewed from above in a quiet shallow lagoon, Dormatee rests belly-up while five small fish sleep in a loose circle around its whisker fan. The gathering shows that nearby wildlife feels safe inside its shared dream.
 - **Journal artwork:** [`art-source/creatures/journal/dormatee_journal.png`](../../art-source/creatures/journal/dormatee_journal.png), published at `/UI/Journal/dormatee_journal.webp`.
 - **Journal artwork approval:** September 22, 2026
-- **Production status:** Icon, left/down/up battle sprites, journal artwork, Psychic element support, species registry entry, directional configuration, gameplay defaults, focused Psychic test, and dated creature manifest are implemented. Right-facing visuals mirror the left sprite. Level 7 and custom dream attacks remain planned.
+- **Production status:** Icon, left/down/up battle sprites, journal artwork, Psychic element support, species registry entry, directional configuration, Shared Slumber, focused tests, and dated creature manifest are implemented. Right-facing visuals mirror the left sprite. Additional custom dream attacks remain open.
 - **Provisional scale:** Approximately 1.4 meters long was suggested during concept development but is not yet locked.
 
 ## Open Decisions
 
 - Decide Dormatee's exact rarity, spawn conditions, and capture tuning in Level 7.
-- Decide whether the shared-dream premise receives a gameplay effect or remains primarily behavioral and narrative.
-- Select, revise, combine, or reject the provisional gameplay ideas before implementing any attacks or abilities.
-- Replace or approve the placeholder attacks after selecting Dormatee's final dream techniques.
+- Select, revise, combine, or reject the remaining provisional gameplay ideas before implementing additional attacks or abilities.
+- Replace or approve String Shot after selecting the rest of Dormatee's dream techniques.
 - Tune the initial stats, scale, offsets, movement, animation needs, and broader battle role during Level 7 development.
 - Decide whether Dormatee is a single-stage species or belongs to an evolutionary family.
 - Lock its physical size, broader habitat, diet, distribution, and ecology beyond the quiet lagoon premise.

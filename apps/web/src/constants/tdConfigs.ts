@@ -604,6 +604,17 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowScaleY: 0.7,
     },
   },
+  caleb_shore_leave: {
+    default: {
+      url: '/battles/characters/caleb_skipping_stones.webp',
+      scale: 0.13,
+      flipX: true,
+      offsetY: -72,
+      shadowScaleX: 3.4,
+      shadowScaleY: 0.7,
+      shadowOffsetY: -5,
+    },
+  },
   kip_battle: {
     default: {
       url: '/battles/characters/kip_battle.webp',
@@ -614,6 +625,26 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowOffsetY: -19,
       offsetY: -87,
       healthBarOffsetY: -5,
+    },
+  },
+  kip_shore_leave: {
+    default: {
+      url: '/battles/characters/kip_journaling.webp',
+      scale: 0.13,
+      offsetY: -82,
+      shadowScaleX: 3.4,
+      shadowScaleY: 0.7,
+      shadowOffsetY: -4,
+    },
+  },
+  maribel_shore_leave: {
+    default: {
+      url: '/battles/characters/maribel_navigating.webp',
+      scale: 0.13,
+      offsetY: -90,
+      shadowScaleX: 3,
+      shadowScaleY: 0.7,
+      shadowOffsetY: -4,
     },
   },
   captain_vane_battle: {
@@ -965,6 +996,14 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       vfxAnimation: {
         type: 'TOXIC_POLLEN',
         durationMs: 900,
+      },
+    },
+  },
+  attack_shiko_quake_1: {
+    default: {
+      vfxAnimation: {
+        type: 'SHIKO_QUAKE',
+        durationMs: 650,
       },
     },
   },
@@ -1668,6 +1707,16 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       shadowScaleY: 0.8,
       shadowOffsetY: -5,
       healthBarOffsetY: -108,
+    },
+  },
+  tigrevel_shore_leave: {
+    default: {
+      url: '/battles/cosmoids/tigrevel_sleeping.webp',
+      scale: 0.16,
+      offsetY: -58,
+      shadowScaleX: 6,
+      shadowScaleY: 1.1,
+      shadowOffsetY: 2,
     },
   },
   tigrevel_netted: {

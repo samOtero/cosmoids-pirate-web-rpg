@@ -214,6 +214,15 @@ export default function TowerDefenseScreen({
     }
   };
 
+  const completeLevel = () => {
+    if (hasEndedRef.current) return;
+    hasEndedRef.current = true;
+    setIsPlaying(false);
+    saveTowerProgress();
+    setOutroState('win');
+    finishAnalytics('win');
+  };
+
   useEffect(() => {
     if (introState === 'message') {
       const t = setTimeout(() => setIntroState('ready'), 1000);
@@ -421,7 +430,11 @@ export default function TowerDefenseScreen({
       // 2. Sync essential UI state (could throttle this for more perf)
       if (engineRef.current.lives !== uiLives) {
         setUiLives(engineRef.current.lives);
-        if (engineRef.current.lives <= 0 && !hasEndedRef.current) {
+        if (
+          engineRef.current.lives <= 0 &&
+          !engineRef.current.cannotLose &&
+          !hasEndedRef.current
+        ) {
           hasEndedRef.current = true;
           setIsPlaying(false);
           saveTowerProgress();
@@ -791,13 +804,19 @@ export default function TowerDefenseScreen({
                 s
               </span>
             )}
-          <span
-            className={`rounded border border-red-900/50 bg-slate-900 px-2 py-1 text-center font-mono text-sm text-red-400 shadow-inner lg:flex-none lg:px-3 lg:py-1 lg:text-base ${
-              levelData.introMessage ? 'flex-none' : 'flex-1'
-            }`}
-          >
-            Lives: {uiLives}
-          </span>
+          {levelData.cannotLose ? (
+            <span className="rounded border border-emerald-700/50 bg-slate-900 px-2 py-1 text-center text-sm font-bold text-emerald-300 shadow-inner lg:px-3 lg:py-1 lg:text-base">
+              No defeat
+            </span>
+          ) : (
+            <span
+              className={`rounded border border-red-900/50 bg-slate-900 px-2 py-1 text-center font-mono text-sm text-red-400 shadow-inner lg:flex-none lg:px-3 lg:py-1 lg:text-base ${
+                levelData.introMessage ? 'flex-none' : 'flex-1'
+              }`}
+            >
+              Lives: {uiLives}
+            </span>
+          )}
           <button
             onClick={() => {
               if (introState === 'none') setIsPlaying(!isPlaying);
@@ -809,8 +828,12 @@ export default function TowerDefenseScreen({
           </button>
           <button
             onClick={() => {
-              finishAnalytics('quit');
-              onClose();
+              if (levelData.closeCompletesLevel) {
+                completeLevel();
+              } else {
+                finishAnalytics('quit');
+                onClose();
+              }
             }}
             className="rounded bg-red-600 px-3 py-1 text-sm font-bold hover:bg-red-500 lg:px-4 lg:py-2 lg:text-base"
           >

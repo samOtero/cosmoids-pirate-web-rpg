@@ -7,6 +7,7 @@ import { hasActiveSpeedBoost, hasActiveSpeedSlow } from '../speedModifiers';
 import { applyAttackSpeedBuff } from '../attackSpeedModifiers';
 import { RollingBarrelBehavior } from './rollingBarrel';
 import { ConstrictionBehavior } from './deepwaterGrip';
+import { SharedSlumberBehavior } from './sharedSlumber';
 
 const MAX_PROJECTILES_PER_PATTERN = 12;
 
@@ -424,6 +425,52 @@ export const PoisonAoeBehavior: AttackBehavior = {
   },
 };
 
+export const ShikoQuakeBehavior: AttackBehavior = {
+  canExecute(engine, source, attackDef): boolean {
+    return engine.enemies.some(
+      (enemy) =>
+        engine.isEnemyTargetable(enemy) &&
+        engine.isPositionInTowerRange(
+          source.position,
+          enemy.position,
+          attackDef.rangeIndex
+        )
+    );
+  },
+
+  execute(engine, source, attackDef): void {
+    const targets = engine.enemies.filter(
+      (enemy) =>
+        engine.isEnemyTargetable(enemy) &&
+        engine.isPositionInTowerRange(
+          source.position,
+          enemy.position,
+          attackDef.rangeIndex
+        )
+    );
+    if (targets.length === 0) return;
+
+    for (const enemy of targets) {
+      EffectProcessor.applyDamageAndEffects(engine, source, enemy, attackDef);
+      if (enemy.hp <= 0) engine.emitEnemyDefeated(enemy, source);
+    }
+
+    if (attackDef.visualEffectConfigId) {
+      const configId = attackDef.visualEffectConfigId;
+      const vfxConfig = CREATURE_TD_CONFIGS[configId]?.default?.vfxAnimation;
+      engine.visualEffects.push({
+        id: `vfx_shiko_quake_${source.id}_${engine.elapsedTimeMs}_${Math.random()}`,
+        configId,
+        position: { ...source.position },
+        durationMs: vfxConfig?.durationMs ?? 650,
+        elapsedMs: 0,
+        facingDirection: source.facingDirection,
+        rangeIndex: engine.getTowerAttackRange(attackDef.rangeIndex),
+      });
+    }
+  },
+};
+
 export const SupportAuraBehavior: AttackBehavior = {
   canExecute(engine, source, attackDef) {
     // Open with the howl as soon as enemies arrive, without wasting it between waves.
@@ -540,6 +587,8 @@ export const RepairSupportBehavior: AttackBehavior = {
 };
 
 export const AttackBehaviorRegistry: Record<string, AttackBehavior> = {
+  SHARED_SLUMBER: SharedSlumberBehavior,
+  SHIKO_QUAKE: ShikoQuakeBehavior,
   CONSTRICTION: ConstrictionBehavior,
   ROLLING_BARREL: RollingBarrelBehavior,
   PROJECTILE: ProjectileBehavior,

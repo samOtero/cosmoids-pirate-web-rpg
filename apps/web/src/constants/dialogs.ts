@@ -21,4 +21,6 @@ export * from './dialogs/level6Intro';
 export * from './dialogs/level6CursedIntermission';
 export * from './dialogs/level6Win';
 export * from './dialogs/level6Lose';
+export * from './dialogs/level7Intro';
+export * from './dialogs/level7Win';
 export * from './dialogs/foundBerry';

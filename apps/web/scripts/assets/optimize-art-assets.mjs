@@ -67,6 +67,8 @@ const categories = {
       'bg_level_6_net_throw.png',
       'bg_level_6_tigrevel_claims_boat.png',
       'bg_level_6_tigrevel_netted.png',
+      'bg_level_7_departure.png',
+      'bg_level_7_landfall.png',
       'island_1_wip.png',
     ],
     resize: {
@@ -146,6 +148,7 @@ const categories = {
       'bg_first_island_forest_battle_2.png',
       'bg_level_5_ironbell_prison_layered_v2.png',
       'bg_level_6_three_lane_compact_v1.png',
+      'bg_level_7_red_sandstone_shore.png',
       'bg_market_level_4.png',
     ],
     webp: {
@@ -201,6 +204,7 @@ const categories = {
     outputExtension: '.webp',
     files: [
       'caleb_battle.png',
+      'caleb_skipping_stones.png',
       'caleb_carried_1.png',
       'caleb_down_1.png',
       'caleb_left_1.png',
@@ -209,6 +213,7 @@ const categories = {
       'commander_strake_battle.png',
       'grandpa_battle.png',
       'kip_battle.png',
+      'kip_journaling.png',
       'kip_carried_1.png',
       'kip_down_1.png',
       'kip_left_1.png',
@@ -218,6 +223,7 @@ const categories = {
       'maribel_down_1.png',
       'maribel_idle_1.png',
       'maribel_left_1.png',
+      'maribel_navigating.png',
       'maribel_up_1.png',
       'navy_guard_battle.png',
       'pirate_grunt_battle.png',

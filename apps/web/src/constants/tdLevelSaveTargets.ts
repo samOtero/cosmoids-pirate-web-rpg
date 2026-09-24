@@ -37,6 +37,10 @@ export const TD_LEVEL_SAVE_TARGETS: Record<TDLevelContext, TDLevelSaveTarget> =
       fileName: 'level6',
       exportName: 'LEVEL_6',
     },
+    [TDLevelContext.LEVEL_7]: {
+      fileName: 'level7',
+      exportName: 'LEVEL_7',
+    },
     [TDLevelContext.CHALLENGE_FIRST_LEVEL]: {
       fileName: 'challengeFirstLevel',
       exportName: 'CHALLENGE_FIRST_LEVEL',

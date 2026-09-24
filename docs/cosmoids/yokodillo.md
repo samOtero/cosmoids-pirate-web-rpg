@@ -1,6 +1,6 @@
 # Yokodillo
 
-> Final name and standalone visual identity approved September 18, 2026. Production icon, directional battle assets, Fighting element support, species registration, gameplay defaults, and manifest were completed the same day. Journal artwork was completed September 22, 2026; Level 7 runtime integration and custom techniques remain pending.
+> Final name and standalone visual identity approved September 18, 2026. Production icon, directional battle assets, Fighting element support, species registration, gameplay defaults, and manifest were completed the same day. Journal artwork and Level 7 runtime integration were completed September 22, 2026; its first custom technique was added September 23, 2026.
 
 ![Yokodillo concept art](./images/yokodillo-concept.png)
 
@@ -61,13 +61,19 @@ The approved standalone concept image is the authority for Yokodillo's future as
 
 ## Level 7 Story and Encounter Intent
 
-Yokodillo is proposed for Level 7, a relaxing no-objective island stop that the player cannot lose. The crew has gone ashore to stretch their legs, and Yokodillo turns that same impulse into friendly pushing games and rolling contests. It can share the island's creature roster with Dormatee, providing lively physical comedy against Dormatee's tranquil Psychic presence.
+Yokodillo appears on Level 7's folded inland route, a relaxing no-objective island stop that the player cannot lose. The crew has gone ashore to stretch their legs, and Yokodillo turns that same impulse into friendly pushing games and rolling contests. It shares the island's creature roster with Dormatee, providing lively physical comedy against Dormatee's tranquil Psychic presence.
 
 The island's final name, Yokodillo's exact location, spawn rate, capture flow, and any scripted interaction remain open.
 
 ## Evolution and Scale Intent
 
 Yokodillo was conceived to read clearly as a self-contained single-stage creature, but its evolutionary status has not been locked. An approximate height near 0.8 metres was discussed as an early scale cue and remains provisional.
+
+## Approved Technique: Shiko Quake
+
+Shiko Quake is a close-range physical Fighting attack learned at level 10. Yokodillo performs a sumo leg raise and forcefully stamps the ground, sending a circular impact wave through every enemy within a radius of 22. The move has 35 power and a 2.4-second cooldown. Eligible creatures receive a guaranteed 0.35-second stagger; status-immune structures still take damage but are not staggered.
+
+The deliberately brief, reliable interruption rewards placing the slow, durable Yokodillo near crowded path sections without letting it hold an entire wave in place. Its vector effect uses warm cream and ochre shockwave rings with dark radiating ground cracks, communicating a physical Fighting impact rather than a magical Ground attack.
 
 ## Creation Record
 
@@ -78,8 +84,8 @@ Yokodillo was conceived to read clearly as a self-contained single-stage creatur
 - **Image status:** Preserved unchanged from the user-approved standalone render.
 - **Production assets:** `yokodillo_icon.png`, `yokodillo_left.png`, `yokodillo_up.png`, and `yokodillo_down.png`
 - **Directional identity revision:** On September 19, 2026, all three battle sprites were rebuilt to restore the approved concept's short muzzle, compact ears, oversized palms, broad armor plates, dark shoulder collar, three-band belly, grounded stance, and compact tail.
-- **Gameplay status:** Registered as a pure Fighting-type bulky physical creature with temporary existing attacks (`TACKLE` and `QUICK_ATTACK`) until its custom sumo techniques are selected.
-- **Story status:** Reserved for Level 7 in the creature manifest; runtime placement awaits implementation of the level.
+- **Gameplay status:** Registered as a pure Fighting-type bulky physical creature with Body Rush (`TACKLE`) at level 1, Dart (`QUICK_ATTACK`) at level 6, and its custom area technique Shiko Quake (`SHIKO_QUAKE`) at level 10.
+- **Story status:** Integrated into Level 7 as optional wildlife on the folded inland route.
 - **Journal observation:** Yokodillo settles its great belly close to the ground and uses its broad hands with unexpected delicacy, lifting loose bark to inspect the insects sheltering beneath it.
 - **Journal artwork:** [`art-source/creatures/journal/yokodillo_journal.png`](../../art-source/creatures/journal/yokodillo_journal.png), published at `/UI/Journal/yokodillo_journal.webp`.
 - **Journal artwork approval:** September 22, 2026
@@ -87,7 +93,7 @@ Yokodillo was conceived to read clearly as a self-contained single-stage creatur
 ## Open Decisions
 
 - Exact Level 7 placement, encounter presentation, rarity, and capture behavior
-- Custom attacks, special abilities, and final balance tuning
+- Additional custom attacks, special abilities, and final balance tuning
 - Final island name and any local environmental storytelling
 - Broader habitat, diet, ecology, and any future revision of the journal entry
 - Final scale and whether it remains single-stage or joins an evolution family

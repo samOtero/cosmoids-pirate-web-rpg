@@ -129,6 +129,8 @@ export interface AttackDefinition {
     | 'BEAM'
     | 'SUPPORT_AURA'
     | 'REPAIR_SUPPORT'
+    | 'SHARED_SLUMBER'
+    | 'SHIKO_QUAKE'
     | 'ROLLING_BARREL'
     | 'CONSTRICTION'
     | 'INSTANT_MELEE';

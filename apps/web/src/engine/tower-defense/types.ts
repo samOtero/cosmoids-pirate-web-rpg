@@ -376,6 +376,10 @@ export interface TDLevelData {
   };
   surviveUntil?: number; // Win after surviving for this many seconds
   lives?: number; // Default is 3 if not provided, or overridden by captureUnits length
+  /** Prevents enemies reaching the goal from reducing lives. */
+  cannotLose?: boolean;
+  /** Treats leaving through the Close button as a successful completion. */
+  closeCompletesLevel?: boolean;
   enemyHpMultiplier?: number; // Defaults to 1 if not provided
   /** Scales every player tower's attack/support reach for this level. Defaults to 1. */
   towerRangeMultiplier?: number;
@@ -447,6 +451,8 @@ export interface Tower extends BaseTDUnit {
     expiresAtMs: number;
     nextPulseAtMs: number;
   };
+  /** Absolute simulation time until Dormatee's committed sleep ends. */
+  sharedSlumberUntilMs?: number;
   creature: PlayerCreature; // The singular source of truth for level, xp, and attacks
   lastAttackTime: number; // Deprecate or keep for generic attacks
   currentAttack: number;
@@ -469,7 +475,7 @@ export interface Tower extends BaseTDUnit {
 }
 
 export interface StatusCondition {
-  type: 'BURN' | 'POISON' | 'STUN' | 'DRENCHED';
+  type: 'BURN' | 'POISON' | 'STUN' | 'DRENCHED' | 'SLEEP';
   durationMs: number;
   tickDamage?: number;
   lastTickTime?: number;
@@ -477,11 +483,15 @@ export interface StatusCondition {
   stackCount?: number;
   /** Per-stack damage retained while a stacking status is active. */
   damagePerStack?: number;
+  /** Simulation time before direct damage may wake a sleeping target. */
+  wakeChecksAfterMs?: number;
 }
 
 export interface Enemy extends BaseTDUnit {
   constrictedByTowerId?: string;
   constrictionResistantUntilMs?: number;
+  /** Shared immunity window applied whenever this enemy wakes from sleep. */
+  sleepResistantUntilMs?: number;
   /** Shared by all Hot Streak users. No timer; consumed on the third hit. */
   fuseRushMarks?: number;
   definitionId: string;

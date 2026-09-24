@@ -14,6 +14,32 @@ const ATTACK_RANGES = {
 };
 
 export const ATTACK_DEFS: Record<string, AttackDefinition> = {
+  SHARED_SLUMBER: {
+    id: 'SHARED_SLUMBER',
+    name: 'Shared Slumber',
+    description:
+      'Dormatee sleeps for 6 seconds and puts every eligible enemy in range to sleep for up to 6 seconds. Direct attacks can wake targets after a brief guaranteed rest; awakened targets resist sleep for 8 seconds.',
+    type: ElementType.PSYCHIC,
+    category: 'special',
+    power: 0,
+    cooldownMs: 10000,
+    rangeIndex: ATTACK_RANGES.NORMAL,
+    behaviorType: 'SHARED_SLUMBER',
+  },
+  SHIKO_QUAKE: {
+    id: 'SHIKO_QUAKE',
+    name: 'Shiko Quake',
+    description:
+      'Yokodillo stamps the ground, damaging every enemy in a short radius and staggering eligible creatures for 0.35 seconds.',
+    type: ElementType.FIGHTING,
+    category: 'physical',
+    power: 35,
+    cooldownMs: 2400,
+    rangeIndex: 22,
+    behaviorType: 'SHIKO_QUAKE',
+    effects: [{ type: 'STUN', chance: 1, value: 350 }],
+    visualEffectConfigId: 'attack_shiko_quake_1',
+  },
   DEEPWATER_GRIP: {
     id: 'DEEPWATER_GRIP',
     name: 'Deepwater Grip',

@@ -9,6 +9,7 @@ import { FOREST_LEVEL } from './forestLevel';
 import { LEVEL_4 } from './level4';
 import { LEVEL_5 } from './level5';
 import { LEVEL_6 } from './level6';
+import { LEVEL_7 } from './level7';
 import { VANE_LEVEL } from './vaneLevel';
 import {
   CHALLENGE_FIRST_LEVEL,
@@ -223,6 +224,11 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
     ],
     winEvents: [
       {
+        type: 'SET_STORY_PROGRESSION',
+        payload: { progression: StoryProgression.DEFEAT_LEVEL_6 },
+        autoProceed: true,
+      },
+      {
         type: 'SHOW_DIALOG',
         payload: { context: DialogContext.LEVEL_6_WIN },
       },
@@ -235,6 +241,40 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
         type: 'SHOW_DIALOG',
         payload: { context: DialogContext.LEVEL_6_LOSE },
       },
+      {
+        type: 'GO_TO_LEVEL_SELECT',
+      },
+    ],
+  },
+  [TDLevelContext.LEVEL_7]: {
+    levelData: LEVEL_7,
+    journalCompletion: {
+      progression: StoryProgression.COMPLETE_LEVEL_7,
+      seenSpeciesIds: ['dormatee', 'yokodillo'],
+    },
+    introEvents: [
+      {
+        type: 'SHOW_DIALOG',
+        payload: {
+          context: DialogContext.LEVEL_7_INTRO,
+        },
+      },
+    ],
+    winEvents: [
+      {
+        type: 'SET_STORY_PROGRESSION',
+        payload: { progression: StoryProgression.COMPLETE_LEVEL_7 },
+        autoProceed: true,
+      },
+      {
+        type: 'SHOW_DIALOG',
+        payload: { context: DialogContext.LEVEL_7_WIN },
+      },
+      {
+        type: 'GO_TO_LEVEL_SELECT',
+      },
+    ],
+    loseEvents: [
       {
         type: 'GO_TO_LEVEL_SELECT',
       },
@@ -313,6 +353,13 @@ export const LEVEL_ORDER: LevelInfo[] = [
     name: 'Officer Confrontation (WIP)',
     description: 'Stop the Navy from dragging Tigrevel back into captivity.',
     requiredProgression: StoryProgression.DEFEAT_LEVEL_5,
+  },
+  {
+    context: TDLevelContext.LEVEL_7,
+    name: 'Shore Leave',
+    description:
+      'Explore a peaceful red-sandstone shore and meet its wildlife.',
+    requiredProgression: StoryProgression.DEFEAT_LEVEL_6,
   },
 ];
 

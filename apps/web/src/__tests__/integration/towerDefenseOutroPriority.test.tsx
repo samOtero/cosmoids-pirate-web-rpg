@@ -47,6 +47,7 @@ vi.mock('@/engine/tower-defense/TowerDefenseEngine', () => {
     playerSelectedAttacks = {};
     playerSelectedTargetingModes = {};
     disableCapture = true;
+    cannotLose = false;
     private didFinish = false;
 
     constructor() {
@@ -182,6 +183,38 @@ describe('tower-defense outro priority', () => {
 
     act(() => vi.advanceTimersByTime(1000));
     expect(screen.getByText('GO!')).not.toHaveClass('animate-bounce');
+  });
+
+  it('treats Close as a win when the level opts into successful closing', () => {
+    const onWin = vi.fn();
+    const onClose = vi.fn();
+
+    render(
+      <TowerDefenseScreen
+        levelData={{
+          paths: [],
+          placementSpots: [],
+          waveEnemyDefinitions: [],
+          waves: [],
+          cannotLose: true,
+          closeCompletesLevel: true,
+        }}
+        onClose={onClose}
+        onWin={onWin}
+      />
+    );
+
+    expect(screen.getByText('No defeat')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Return to boat' })
+    ).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+
+    expect(screen.getByText('You Win!')).toBeInTheDocument();
+    expect(screen.queryByText('Setting Sail!')).not.toBeInTheDocument();
+    expect(onClose).not.toHaveBeenCalled();
+    act(() => vi.advanceTimersByTime(3000));
+    expect(onWin).toHaveBeenCalledOnce();
   });
 
   it('renders Tower Defense in header (hidden on mobile) when no introMessage is provided', () => {

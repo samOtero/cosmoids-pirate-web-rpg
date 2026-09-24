@@ -154,5 +154,9 @@ export const BACKGROUND_IMAGES: Record<BackgroundImageKey, string> = {
     '/bg_level_6_tigrevel_claims_boat.webp',
   [BackgroundImageKey.LEVEL_6_CRAMPED_CREW_DEPARTURE]:
     '/bg_level_6_cramped_crew_departure.webp',
+  [BackgroundImageKey.LEVEL_7_LANDFALL]: '/bg_level_7_landfall.webp',
+  [BackgroundImageKey.LEVEL_7_DEPARTURE]: '/bg_level_7_departure.webp',
+  [BackgroundImageKey.LEVEL_7_RED_SANDSTONE_SHORE]:
+    '/battles/bg/bg_level_7_red_sandstone_shore.webp',
   [BackgroundImageKey.DEFAULT]: '/bg_caleb_house_1.webp',
 };

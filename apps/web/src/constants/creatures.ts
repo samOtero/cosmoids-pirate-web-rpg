@@ -333,10 +333,10 @@ export const DORMATEE: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/dormatee_down.webp',
   battleSpriteUrl: '/battles/cosmoids/dormatee_left.webp',
   movementId: 'lizard',
-  // Existing placeholder attacks until Dormatee's custom dream techniques are selected.
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
     { level: 4, attackId: 'STRING_SHOT' },
+    { level: 8, attackId: 'SHARED_SLUMBER' },
   ],
 };
 
@@ -364,6 +364,7 @@ export const YOKODILLO: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
     { level: 6, attackId: 'QUICK_ATTACK' },
+    { level: 10, attackId: 'SHIKO_QUAKE' },
   ],
 };
 

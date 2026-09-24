@@ -17,6 +17,7 @@ export enum TDLevelContext {
   LEVEL_4 = 'LEVEL_4',
   LEVEL_5 = 'LEVEL_5',
   LEVEL_6 = 'LEVEL_6',
+  LEVEL_7 = 'LEVEL_7',
   CHALLENGE_FIRST_LEVEL = 'CHALLENGE_FIRST_LEVEL',
   CHALLENGE_FIRST_LEVEL_NO_CAPTURE = 'CHALLENGE_FIRST_LEVEL_NO_CAPTURE',
 }
@@ -152,6 +153,9 @@ export enum BackgroundImageKey {
   LEVEL_6_TIGREVEL_NETTED = 'Level_6_Tigrevel_Netted',
   LEVEL_6_TIGREVEL_CLAIMS_BOAT = 'Level_6_Tigrevel_Claims_Boat',
   LEVEL_6_CRAMPED_CREW_DEPARTURE = 'Level_6_Cramped_Crew_Departure',
+  LEVEL_7_LANDFALL = 'Level_7_Landfall',
+  LEVEL_7_DEPARTURE = 'Level_7_Departure',
+  LEVEL_7_RED_SANDSTONE_SHORE = 'Level_7_Red_Sandstone_Shore',
   DEFAULT = 'default',
 }
 
@@ -173,6 +177,8 @@ export const StoryProgression = {
   DEFEAT_BUG_STAGE_2: 4,
   DEFEAT_LEVEL_4: 5,
   DEFEAT_LEVEL_5: 6,
+  DEFEAT_LEVEL_6: 7,
+  COMPLETE_LEVEL_7: 8,
 } as const;
 
 export type StoryProgressionValue =
@@ -206,6 +212,7 @@ export interface VFXAnimationConfig {
     | 'STRING_SHOT'
     | 'WIND_GUST'
     | 'TOXIC_POLLEN'
+    | 'SHIKO_QUAKE'
     | 'HOWL'
     | 'RALLY_HOWL'
     | 'SHIPSHAPE_HEAL'
@@ -441,6 +448,8 @@ export enum DialogContext {
   LEVEL_6_INTRO = 'LEVEL_6_INTRO',
   LEVEL_6_WIN = 'LEVEL_6_WIN',
   LEVEL_6_LOSE = 'LEVEL_6_LOSE',
+  LEVEL_7_INTRO = 'LEVEL_7_INTRO',
+  LEVEL_7_WIN = 'LEVEL_7_WIN',
   STARTER_BATTLE_LOSE = 'STARTER_BATTLE_LOSE',
   NEW_PLAYER_WELCOME_DIALOG_PART_2 = 'NEW_PLAYER_WELCOME_DIALOG_PART_2',
   GAME_INTRO_AFTER_STARTER = 'GAME_INTRO_AFTER_STARTER',

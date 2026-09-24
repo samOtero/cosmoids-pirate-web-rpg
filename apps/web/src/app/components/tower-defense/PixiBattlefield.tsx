@@ -1158,6 +1158,72 @@ function drawWindGust(container: PIXI.Container) {
   container.addChild(streaks);
 }
 
+function drawShikoQuake(container: PIXI.Container) {
+  const groundFlash = new PIXI.Graphics();
+  groundFlash.label = 'shiko_quake_ground';
+  container.addChild(groundFlash);
+
+  const rings = new PIXI.Graphics();
+  rings.label = 'shiko_quake_rings';
+  container.addChild(rings);
+
+  const cracks = new PIXI.Graphics();
+  cracks.label = 'shiko_quake_cracks';
+  container.addChild(cracks);
+}
+
+function updateShikoQuake(
+  container: PIXI.Container,
+  progress: number,
+  maxRadius: number
+) {
+  const groundFlash = container.getChildByLabel('shiko_quake_ground') as
+    | PIXI.Graphics
+    | undefined;
+  const rings = container.getChildByLabel('shiko_quake_rings') as
+    | PIXI.Graphics
+    | undefined;
+  const cracks = container.getChildByLabel('shiko_quake_cracks') as
+    | PIXI.Graphics
+    | undefined;
+  const expansion = 1 - Math.pow(1 - progress, 3.2);
+  const radius = Math.max(3, maxRadius * expansion);
+  const fade = 1 - Math.max(0, (progress - 0.62) / 0.38);
+
+  if (groundFlash) {
+    groundFlash.clear();
+    groundFlash.circle(0, 0, radius * 0.72);
+    groundFlash.fill({ color: 0xd6a35f, alpha: 0.16 * fade });
+  }
+
+  if (rings) {
+    rings.clear();
+    rings.circle(0, 0, radius);
+    rings.stroke({ color: 0xf5d29c, width: 6, alpha: 0.82 * fade });
+    rings.circle(0, 0, radius * 0.72);
+    rings.stroke({ color: 0x8b5e34, width: 3, alpha: 0.72 * fade });
+  }
+
+  if (cracks) {
+    cracks.clear();
+    for (let index = 0; index < 12; index += 1) {
+      const angle = (index / 12) * Math.PI * 2 + (index % 2) * 0.12;
+      const inner = radius * (0.2 + (index % 3) * 0.08);
+      const middle = radius * (0.52 + (index % 2) * 0.08);
+      const outer = radius * (0.74 + (index % 4) * 0.06);
+      cracks.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner);
+      cracks.lineTo(
+        Math.cos(angle + 0.08) * middle,
+        Math.sin(angle + 0.08) * middle
+      );
+      cracks.lineTo(Math.cos(angle) * outer, Math.sin(angle) * outer);
+    }
+    cracks.stroke({ color: 0x5b3a25, width: 2.5, alpha: 0.7 * fade });
+  }
+
+  container.alpha = fade;
+}
+
 function drawHowl(container: PIXI.Container) {
   const rings = new PIXI.Graphics();
   rings.label = 'howl_rings';
@@ -4647,6 +4713,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 drawWindGust(container);
               } else if (animConfig?.type === 'TOXIC_POLLEN') {
                 drawToxicPollen(container);
+              } else if (animConfig?.type === 'SHIKO_QUAKE') {
+                drawShikoQuake(container);
               } else if (animConfig?.type === 'HOWL') {
                 drawHowl(container);
               } else if (animConfig?.type === 'HARDEN') {
@@ -4806,6 +4874,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             } else if (animConfig?.type === 'TOXIC_POLLEN') {
               const radius = (TD_BASE_HEIGHT * (vfx.rangeIndex ?? 20)) / 100;
               updateToxicPollen(container, progress, radius);
+            } else if (animConfig?.type === 'SHIKO_QUAKE') {
+              const radius = (TD_BASE_HEIGHT * (vfx.rangeIndex ?? 22)) / 100;
+              updateShikoQuake(container, progress, radius);
             } else if (animConfig?.type === 'HOWL') {
               const radius = (TD_BASE_HEIGHT * (vfx.rangeIndex ?? 11)) / 100;
               updateHowl(container, progress, radius);

@@ -42,6 +42,10 @@ import {
 import { EffectProcessor } from './attacks/EffectProcessor';
 import { updateRollingBarrel } from './attacks/rollingBarrel';
 import { releaseDeepwaterGrip, updateDeepwaterGrips } from './attacks/deepwaterGrip';
+import {
+  isSleeping,
+  wakeFromSharedSlumber,
+} from './attacks/sharedSlumber';
 import { getAttackSpeedMultiplier } from './attackSpeedModifiers';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { TDWave, TDWaveGroup, Point } from './types';
@@ -329,6 +333,8 @@ export class TowerDefenseEngine {
   private progression = new TDProgressionManager(this, this.events);
 
   public roster: PlayerCreature[] = [];
+  /** Runtime tower objects retained while their creatures are off the battlefield. */
+  private reserveTowers = new Map<string, Tower>();
 
   // Wave Management State
   public waves: TDWave[] = [];
@@ -352,6 +358,7 @@ export class TowerDefenseEngine {
   public enemyHpMultiplier: number = 1;
   public towerRangeMultiplier: number = 1;
   public disableCapture: boolean = false;
+  public cannotLose: boolean = false;
   public resonantEvolution?: TDResonantEvolutionConfig;
   public towerRecovery?: TDTowerRecoveryConfig;
   private cursedPhase?: TDLevelData['cursedPhase'];
@@ -430,6 +437,7 @@ export class TowerDefenseEngine {
       ? Math.max(0, levelData.towerRangeMultiplier!)
       : 1;
     this.disableCapture = levelData.disableCapture ?? false;
+    this.cannotLose = levelData.cannotLose ?? false;
     this.resonantEvolution = levelData.resonantEvolution;
     this.towerRecovery = levelData.towerRecovery
       ? structuredClone(levelData.towerRecovery)
@@ -711,7 +719,7 @@ export class TowerDefenseEngine {
       // Handle status conditions
       if (enemy.statusConditions.length > 0) {
         enemy.statusConditions.forEach((status) => {
-          if (status.type === 'STUN') {
+          if (status.type === 'STUN' || status.type === 'SLEEP') {
             moveSpeed = 0; // cannot move while stunned
           } else if (status.type === 'BURN' || status.type === 'POISON') {
             if (status.tickDamage && time - (status.lastTickTime || 0) > 1000) {
@@ -736,6 +744,14 @@ export class TowerDefenseEngine {
           }
           status.durationMs -= deltaMs;
         });
+
+        if (
+          enemy.statusConditions.some(
+            (status) => status.type === 'SLEEP' && status.durationMs <= 0
+          )
+        ) {
+          wakeFromSharedSlumber(this, enemy);
+        }
 
         // Clean up expired
         enemy.statusConditions = enemy.statusConditions.filter(
@@ -960,10 +976,12 @@ export class TowerDefenseEngine {
         }
       });
 
-      this.lives -= livesToLose;
-      if (this.lives <= 0 && this.lives !== -1) {
-        // We'll let the UI handle game over messaging by watching the lives count
-        this.lives = 0;
+      if (!this.cannotLose) {
+        this.lives -= livesToLose;
+        if (this.lives <= 0 && this.lives !== -1) {
+          // We'll let the UI handle game over messaging by watching the lives count
+          this.lives = 0;
+        }
       }
 
       // Enemies that reached the end take their held unit with them.
@@ -1021,6 +1039,7 @@ export class TowerDefenseEngine {
         for (const enemy of newEnemies) {
           if (enemy.kind === 'structure') continue;
           if (enemy.heldCaptureUnitId) continue;
+          if (isSleeping(enemy)) continue;
           const enemyDefinition = enemy.waveEnemyDefinitionId
             ? this.waveEnemyDefinitions[enemy.waveEnemyDefinitionId]
             : undefined;
@@ -1084,7 +1103,12 @@ export class TowerDefenseEngine {
         tower.damageFlashTimerMs -= deltaMs;
         if (tower.damageFlashTimerMs < 0) tower.damageFlashTimerMs = 0;
       }
-      if (tower.deepwaterGrip || tower.hp <= 0) return;
+      if (
+        tower.deepwaterGrip ||
+        (tower.sharedSlumberUntilMs ?? 0) > this.elapsedTimeMs ||
+        tower.hp <= 0
+      )
+        return;
       const attackInstance =
         tower.equippedAttacksRuntime[tower.selectedAttackIndex];
       if (!attackInstance) return;
@@ -1095,7 +1119,8 @@ export class TowerDefenseEngine {
       const usesSimulationCooldown =
         attackDef.behaviorType === 'SUPPORT_AURA' ||
         attackDef.behaviorType === 'REPAIR_SUPPORT' ||
-        attackDef.behaviorType === 'CONSTRICTION';
+        attackDef.behaviorType === 'CONSTRICTION' ||
+        attackDef.behaviorType === 'SHARED_SLUMBER';
       const isReady = usesSimulationCooldown
         ? this.elapsedTimeMs >= (attackInstance.readyAtMs ?? 0)
         : time - attackInstance.lastFiredTime >
@@ -3014,11 +3039,16 @@ export class TowerDefenseEngine {
     }
   }
 
+  private moveTowerToReserve(tower: Tower): void {
+    releaseDeepwaterGrip(this, tower);
+    this.towers = this.towers.filter((candidate) => candidate.id !== tower.id);
+    this.reserveTowers.set(tower.creature.id, tower);
+  }
+
   public removeTower(creatureId: string) {
     const tower = this.towers.find((t) => t.creature.id === creatureId);
     if (tower?.isFixed) return false;
-    if (tower) releaseDeepwaterGrip(this, tower);
-    this.towers = this.towers.filter((t) => t.creature.id !== creatureId);
+    if (tower) this.moveTowerToReserve(tower);
     return true;
   }
 
@@ -3065,12 +3095,17 @@ export class TowerDefenseEngine {
     if (targetTower) {
       if (targetTower.isFixed) return false;
       // Remove whatever tower was there previously, taking its spot
-      releaseDeepwaterGrip(this, targetTower);
-      this.towers = this.towers.filter((t) => t.id !== targetTower.id);
+      this.moveTowerToReserve(targetTower);
     }
 
-    const tower = this.createTower(creature, x, y);
+    const reservedTower = this.reserveTowers.get(creature.id);
+    const tower = reservedTower ?? this.createTower(creature, x, y);
     if (!tower) return false;
+    if (reservedTower) {
+      this.reserveTowers.delete(creature.id);
+      tower.position = { x, y };
+      tower.facingDirection = 'down';
+    }
     this.towers.push(tower);
     this.queueTowerRecoveryFeed(tower);
     return true;

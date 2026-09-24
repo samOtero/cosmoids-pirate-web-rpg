@@ -5,6 +5,7 @@ import { ElementType } from '@/types/baseGame';
 import { startDamageFlash } from '../damageFlash';
 import { applyPersistentSpeedSlow } from '../speedModifiers';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
+import { tryWakeFromDirectDamage } from './sharedSlumber';
 
 export const DRENCHED_DURATION_MS = 4000;
 export const DRENCHED_DAMAGE_MULTIPLIER = 1.5;
@@ -311,6 +312,12 @@ export class EffectProcessor {
         durationMs: 1000,
         elapsedMs: 0,
       });
+    }
+
+    // Multi-hit effects recurse through this method; only the first resolved
+    // hit gets a wake roll so one attack cannot roll several times.
+    if (damageDealt > 0 && hitCount === 1) {
+      tryWakeFromDirectDamage(engine, target);
     }
 
     attackDef.effects

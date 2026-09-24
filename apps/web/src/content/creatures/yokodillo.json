@@ -23,6 +23,10 @@
     {
       "level": 6,
       "attackId": "QUICK_ATTACK"
+    },
+    {
+      "level": 10,
+      "attackId": "SHIKO_QUAKE"
     }
   ],
   "assets": {
