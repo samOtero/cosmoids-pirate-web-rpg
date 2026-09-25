@@ -74,20 +74,23 @@ const createEnemy = (): Enemy => ({
 });
 
 describe('Husk Shot', () => {
-  it('is Palmit and Carapenter’s level-one move while Coir Snare stays at level 6', () => {
-    expect(getDefaultAttacksForLevel(STARTER_CRAB, 5)).toEqual([
+  it('unlocks at level 6 after Pinch, before Coir Snare at level 9', () => {
+    expect(getDefaultAttacksForLevel(STARTER_CRAB, 5)).toEqual(['PINCH']);
+    expect(getDefaultAttacksForLevel(STARTER_CRAB, 6)).toEqual([
+      'PINCH',
       'COIR_SNAP',
     ]);
     expect(STARTER_CRAB.learnableAttacks).toContainEqual({
-      level: 6,
+      level: 9,
       attackId: 'COIR_SNARE',
     });
-    expect(CARAPENTER.learnableAttacks.slice(0, 2)).toEqual([
-      { level: 1, attackId: 'COIR_SNAP' },
-      { level: 6, attackId: 'COIR_SNARE' },
+    expect(CARAPENTER.learnableAttacks.slice(0, 3)).toEqual([
+      { level: 1, attackId: 'PINCH' },
+      { level: 6, attackId: 'COIR_SNAP' },
+      { level: 9, attackId: 'COIR_SNARE' },
     ]);
     expect(TowerDefenseEngine.getDefaultAttacks('starter_crab')).toEqual([
-      'COIR_SNAP',
+      'PINCH',
     ]);
   });
 

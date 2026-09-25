@@ -118,7 +118,7 @@ describe('test profile templates', () => {
         expect.objectContaining({
           speciesId: 'starter_iguana',
           level: 7,
-          equippedAttacks: ['FIRE_CLAW'],
+          equippedAttacks: ['SCRATCH', 'FIRE_CLAW'],
         }),
         expect.objectContaining({
           speciesId: 'mouse_1',

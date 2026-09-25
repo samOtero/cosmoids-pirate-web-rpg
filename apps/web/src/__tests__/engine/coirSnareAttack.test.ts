@@ -16,7 +16,7 @@ const createPalmitTower = (): Tower => ({
   creature: {
     id: 'palmit',
     speciesId: 'starter_crab',
-    level: 6,
+    level: 9,
     xp: 0,
     equippedAttacks: ['COIR_SNARE'],
     isShiny: false,
@@ -55,12 +55,12 @@ const createEnemy = (): Enemy => ({
 });
 
 describe('Coir Snare', () => {
-  it('is learned by Palmit at level 6', () => {
+  it('is learned by Palmit at level 9', () => {
     expect(
       STARTER_CRAB.learnableAttacks.find(
         (attack) => attack.attackId === 'COIR_SNARE'
       )
-    ).toEqual({ level: 6, attackId: 'COIR_SNARE' });
+    ).toEqual({ level: 9, attackId: 'COIR_SNARE' });
   });
 
   it('uses a physical Grass-type coir bola visual', () => {

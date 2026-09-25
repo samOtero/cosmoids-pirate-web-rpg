@@ -17,6 +17,6 @@ describe('tower attack loadouts', () => {
       equippedAttacks: [],
     });
 
-    expect(attacks).toEqual(['FIRE_CLAW']);
+    expect(attacks).toEqual(['SCRATCH']);
   });
 });

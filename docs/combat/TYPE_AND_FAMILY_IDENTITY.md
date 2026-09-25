@@ -35,6 +35,22 @@ A **signature move** is part of a family's identity and is not distributed as
 an ordinary TM. Other families may share its type and broad focus without
 receiving its unique mechanic.
 
+## Starter onboarding pattern
+
+Each starter begins with one simple, reliable Normal-type attack. At level 6,
+it learns its first typed signature move, introducing both the family's combat
+identity and the move-learning and loadout-swapping systems through a clear
+upgrade moment.
+
+- Palmit: Pinch, then Husk Shot at level 6.
+- Fueguana: Claw, then Kindle Claw at level 6.
+- Monkeg: Body Rush, then Barrel Bash at level 6.
+
+Later natural moves should deepen or broaden that identity rather than compete
+with the level-6 introduction. The evolved form retains the same early
+learnset so newly created or inspected evolved creatures communicate the same
+family progression.
+
 ## The four identity layers
 
 ### 1. Move type owns the type focus

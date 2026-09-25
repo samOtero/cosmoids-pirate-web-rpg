@@ -315,8 +315,8 @@ export class TowerDefenseEngine {
 
   public static getDefaultAttacks(speciesId: string): string[] {
     const defaultAttacks: string[] = [];
-    if (speciesId === 'starter_crab') defaultAttacks.push('COIR_SNAP');
-    else if (speciesId === 'starter_iguana') defaultAttacks.push('FIRE_CLAW');
+    if (speciesId === 'starter_crab') defaultAttacks.push('PINCH');
+    else if (speciesId === 'starter_iguana') defaultAttacks.push('SCRATCH');
     else if (speciesId === 'starter_monkey') defaultAttacks.push('TACKLE');
     else if (speciesId === 'mouse_1') defaultAttacks.push('NIBBLE');
     else if (speciesId === 'harlequill') defaultAttacks.push('PECK');

@@ -60,22 +60,23 @@ function battle() {
 }
 
 describe('Kindle Claw', () => {
-  it('replaces Claw as Fueguana’s starting attack without removing Claw', () => {
-    expect(getDefaultAttacksForLevel(STARTER_IGUANA, 5)).toEqual([
+  it('unlocks at level 6 after Fueguana starts with Claw', () => {
+    expect(getDefaultAttacksForLevel(STARTER_IGUANA, 5)).toEqual(['SCRATCH']);
+    expect(getDefaultAttacksForLevel(STARTER_IGUANA, 6)).toEqual([
+      'SCRATCH',
       'FIRE_CLAW',
     ]);
-    expect(STARTER_IGUANA.learnableAttacks[0]).toEqual({
-      level: 1,
-      attackId: 'FIRE_CLAW',
-    });
-    expect(VELOCINDER.learnableAttacks[0]).toEqual({
-      level: 1,
-      attackId: 'FIRE_CLAW',
-    });
+    expect(STARTER_IGUANA.learnableAttacks.slice(0, 2)).toEqual([
+      { level: 1, attackId: 'SCRATCH' },
+      { level: 6, attackId: 'FIRE_CLAW' },
+    ]);
+    expect(VELOCINDER.learnableAttacks.slice(0, 2)).toEqual([
+      { level: 1, attackId: 'SCRATCH' },
+      { level: 6, attackId: 'FIRE_CLAW' },
+    ]);
     expect(TowerDefenseEngine.getDefaultAttacks('starter_iguana')).toEqual([
-      'FIRE_CLAW',
+      'SCRATCH',
     ]);
-    expect(ATTACK_DEFS.SCRATCH).toBeDefined();
   });
 
   it('uses the approved physical Fire stats and warmed scratch treatment', () => {

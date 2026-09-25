@@ -720,8 +720,9 @@ export const STARTER_CRAB: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/palmit_down_1.webp',
   battleSpriteUrl: '/battles/cosmoids/palmit_down_1.webp',
   learnableAttacks: [
-    { level: 1, attackId: 'COIR_SNAP' },
-    { level: 6, attackId: 'COIR_SNARE' },
+    { level: 1, attackId: 'PINCH' },
+    { level: 6, attackId: 'COIR_SNAP' },
+    { level: 9, attackId: 'COIR_SNARE' },
     { level: 16, attackId: 'SHIPSHAPE' },
     { level: 16, attackId: 'MALLET_SMASH' },
   ],
@@ -749,8 +750,9 @@ export const CARAPENTER: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/carapenter_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'COIR_SNAP' },
-    { level: 6, attackId: 'COIR_SNARE' },
+    { level: 1, attackId: 'PINCH' },
+    { level: 6, attackId: 'COIR_SNAP' },
+    { level: 9, attackId: 'COIR_SNARE' },
     { level: 16, attackId: 'SHIPSHAPE' },
     { level: 16, attackId: 'MALLET_SMASH' },
   ],
@@ -777,7 +779,8 @@ export const STARTER_IGUANA: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/fueguana_left_1_v3.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'FIRE_CLAW' },
+    { level: 1, attackId: 'SCRATCH' },
+    { level: 6, attackId: 'FIRE_CLAW' },
     { level: 9, attackId: 'EMBER' },
     { level: 16, attackId: 'FUSE_RUSH' },
   ],
@@ -805,7 +808,8 @@ export const VELOCINDER: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/velocinder_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'FIRE_CLAW' },
+    { level: 1, attackId: 'SCRATCH' },
+    { level: 6, attackId: 'FIRE_CLAW' },
     { level: 9, attackId: 'EMBER' },
     { level: 16, attackId: 'FUSE_RUSH' },
   ],
