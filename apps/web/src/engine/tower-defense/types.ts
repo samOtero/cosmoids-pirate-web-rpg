@@ -725,6 +725,8 @@ export interface Projectile {
   visualScale?: number;
   /** Kindle Claw Heat captured at launch for its dash and trail treatment. */
   fireClawHeatStacks?: number;
+  /** Prevents Loose End's one permitted follow-up from chaining again. */
+  looseEndFollowUp?: boolean;
   target: Point;
   facingDirection?: 'up' | 'down' | 'left' | 'right';
   /** Dash attacks can remain at their impact point until their hit VFX ends. */

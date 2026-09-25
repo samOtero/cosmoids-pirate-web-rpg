@@ -460,6 +460,29 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     visualEffectConfigId: 'attack_nibble_1',
     isDashAttack: true,
   },
+  LOOSE_END: {
+    id: 'LOOSE_END',
+    name: 'Loose End',
+    description:
+      'Throws a compact rope knot. If the hit defeats its target, the loose line jumps once to the nearest enemy within range for another full-power hit.',
+    type: ElementType.NORMAL,
+    category: 'physical',
+    power: 50,
+    cooldownMs: ATTACK_COOLDOWNS.HEAVY,
+    rangeIndex: ATTACK_RANGES.NORMAL,
+    behaviorType: 'PROJECTILE',
+    projectileSpeed: 1.4,
+    projectileVisual: {
+      type: 'STRING_COIL',
+      shadowColor: 0x4b3525,
+      fiberColor: 0xc89b65,
+      highlightColor: 0xf7dfb1,
+      sparkColor: 0xf4f1ea,
+    },
+    looseEnd: {
+      followUpRadius: 40,
+    },
+  },
   CHOMP: {
     id: 'CHOMP',
     name: 'Chomp',

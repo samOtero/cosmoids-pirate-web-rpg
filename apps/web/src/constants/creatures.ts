@@ -44,7 +44,7 @@ export const MOUSE_1: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'NIBBLE' },
     { level: 4, attackId: 'QUICK_ATTACK' },
-    { level: 14, attackId: 'CHOMP' },
+    { level: 14, attackId: 'LOOSE_END' },
   ],
 };
 

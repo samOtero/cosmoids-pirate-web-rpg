@@ -44,6 +44,7 @@ import { updateRollingBarrel } from './attacks/rollingBarrel';
 import { releaseDeepwaterGrip, updateDeepwaterGrips } from './attacks/deepwaterGrip';
 import { resetFireClawHeat, updateFireClawHeat } from './attacks/fireClaw';
 import { pushBarrelBashSecondaryTargets } from './attacks/barrelBash';
+import { launchLooseEndFollowUp } from './attacks/looseEnd';
 import {
   isSleeping,
   wakeFromSharedSlumber,
@@ -1293,6 +1294,7 @@ export class TowerDefenseEngine {
           if (p.attackDefinitionId && sourceTower) {
             const attackDef = ATTACK_DEFS[p.attackDefinitionId];
             if (attackDef) {
+              const targetWasAlive = target.hp > 0;
               if (attackDef.adaptiveTargetedAoe) {
                 resolveAdaptiveTargetedAoeImpact(
                   this,
@@ -1308,6 +1310,13 @@ export class TowerDefenseEngine {
                   attackDef
                 );
                 pushBarrelBashSecondaryTargets(this, target, attackDef);
+              }
+              if (
+                targetWasAlive &&
+                target.hp <= 0 &&
+                !p.looseEndFollowUp
+              ) {
+                launchLooseEndFollowUp(this, sourceTower, target, attackDef);
               }
 
               if (

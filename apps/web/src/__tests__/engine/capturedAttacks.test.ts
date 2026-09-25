@@ -5,7 +5,7 @@ describe('captured creature attacks', () => {
   it.each([
     { level: 3, attacks: ['NIBBLE'] },
     { level: 4, attacks: ['NIBBLE', 'QUICK_ATTACK'] },
-    { level: 14, attacks: ['NIBBLE', 'QUICK_ATTACK', 'CHOMP'] },
+    { level: 14, attacks: ['NIBBLE', 'QUICK_ATTACK', 'LOOSE_END'] },
   ])('equips attacks unlocked at level $level', ({ level, attacks }) => {
     const engine = new TowerDefenseEngine({
       paths: [

@@ -130,6 +130,10 @@ export interface AttackDefinition {
     radiusIndex: number;
     distance: number;
   };
+  /** On a knockout, launches one full-power follow-up at a nearby enemy. */
+  looseEnd?: {
+    followUpRadius: number;
+  };
   rollingBarrel?: {
     lobDurationMs: number;
     rollDistance: number;
