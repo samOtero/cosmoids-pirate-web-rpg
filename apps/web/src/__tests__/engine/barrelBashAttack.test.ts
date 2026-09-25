@@ -1,16 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { STARTER_MONKEY } from '@/constants/creatures';
+import { MACASK, STARTER_MONKEY } from '@/constants/creatures';
 import { ProjectileBehavior } from '@/engine/tower-defense/attacks/behaviors';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
-import {
-  DRENCHED_DAMAGE_MULTIPLIER,
-  DRENCHED_DURATION_MS,
-  EffectProcessor,
-} from '@/engine/tower-defense/attacks/EffectProcessor';
-import { AttackDefinition } from '@/engine/tower-defense/attacks/types';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
-import { Enemy, Tower } from '@/engine/tower-defense/types';
+import type { Enemy, Tower } from '@/engine/tower-defense/types';
 import { ElementType } from '@/types/baseGame';
 
 const levelData = {
@@ -29,7 +23,7 @@ const createMonkegTower = (): Tower => ({
   creature: {
     id: 'monkeg',
     speciesId: 'starter_monkey',
-    level: 8,
+    level: 6,
     xp: 0,
     equippedAttacks: ['BARREL_BASH'],
     isShiny: false,
@@ -48,11 +42,11 @@ const createMonkegTower = (): Tower => ({
   targetingMode: 'closest',
 });
 
-const createEnemy = (drenched = false): Enemy => ({
-  id: `enemy_${drenched ? 'wet' : 'dry'}`,
+const createEnemy = (id: string, x: number): Enemy => ({
+  id,
   definitionId: 'mouse_1',
   level: 5,
-  position: { x: 10, y: 0 },
+  position: { x, y: 0 },
   hp: 100,
   maxHp: 100,
   speed: 0,
@@ -60,9 +54,7 @@ const createEnemy = (drenched = false): Enemy => ({
   currentSpecialAttack: 10,
   currentDefense: 40,
   currentSpecialDefense: 40,
-  statusConditions: drenched
-    ? [{ type: 'DRENCHED', durationMs: DRENCHED_DURATION_MS }]
-    : [],
+  statusConditions: [],
   currentWaypointIndex: 1,
   pathIndex: 0,
   facingDirection: 'right',
@@ -74,12 +66,16 @@ afterEach(() => {
 });
 
 describe('Barrel Bash', () => {
-  it("replaces Spurt in Monkeg's level-8 learnset", () => {
+  it("is Monkeg's level-6 signature move and remains in Macask's learnset", () => {
     expect(
       STARTER_MONKEY.learnableAttacks.find(
         (attack) => attack.attackId === 'BARREL_BASH'
       )
-    ).toEqual({ level: 8, attackId: 'BARREL_BASH' });
+    ).toEqual({ level: 6, attackId: 'BARREL_BASH' });
+    expect(MACASK.learnableAttacks).toContainEqual({
+      level: 6,
+      attackId: 'BARREL_BASH',
+    });
     expect(
       STARTER_MONKEY.learnableAttacks.some(
         (attack) => attack.attackId === 'WATER_GUN'
@@ -87,103 +83,50 @@ describe('Barrel Bash', () => {
     ).toBe(false);
   });
 
-  it('is a physical Water dash with a charge trail and splash impact', () => {
+  it('is a slower, stronger physical Water dash with a guaranteed secondary push', () => {
     expect(ATTACK_DEFS.BARREL_BASH).toMatchObject({
       type: ElementType.WATER,
       category: 'physical',
       power: 40,
-      cooldownMs: 1000,
+      cooldownMs: 1200,
       projectileSpeed: 1.15,
       isDashAttack: true,
       dashTrailType: 'WATER',
       visualEffectConfigId: 'attack_barrel_bash_1',
-      effects: [{ type: 'DRENCHED', chance: 0.25, value: 4000 }],
+      secondaryImpactPush: { radiusIndex: 12, distance: 8 },
     });
+    expect(ATTACK_DEFS.BARREL_BASH.effects).toBeUndefined();
   });
 
-  it('hits once, applies Drenched, and creates its impact effect', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
+  it('damages only the primary target and pushes nearby secondary enemies backward', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
     const engine = new TowerDefenseEngine(levelData);
     const monkeg = createMonkegTower();
-    const enemy = createEnemy();
+    const primary = createEnemy('primary', 10);
+    const nearby = createEnemy('nearby', 18);
+    const distant = createEnemy('distant', 30);
     engine.towers = [monkeg];
-    engine.enemies = [enemy];
+    engine.enemies = [primary, nearby, distant];
 
     ProjectileBehavior.execute(engine, monkeg, ATTACK_DEFS.BARREL_BASH);
     expect(engine.projectiles).toHaveLength(1);
+    expect(engine.projectiles[0].targetId).toBe(primary.id);
     engine.tick(0, 200);
 
-    expect(enemy.statusConditions).toContainEqual({
-      type: 'DRENCHED',
-      durationMs: DRENCHED_DURATION_MS,
-    });
-    expect(
-      enemy.statusConditions.filter((status) => status.type === 'DRENCHED')
-    ).toHaveLength(1);
+    expect(primary.hp).toBeLessThan(primary.maxHp);
+    expect(primary.position).toEqual({ x: 10, y: 0 });
+    expect(primary.statusConditions).toEqual([]);
+    expect(nearby.hp).toBe(nearby.maxHp);
+    expect(nearby.position.x).toBeCloseTo(10);
+    expect(distant.hp).toBe(distant.maxHp);
+    expect(distant.position).toEqual({ x: 30, y: 0 });
     expect(engine.visualEffects).toContainEqual(
       expect.objectContaining({
         configId: 'attack_barrel_bash_1',
-        targetId: enemy.id,
+        targetId: primary.id,
         durationMs: 400,
       })
     );
-    engine.destroy();
-  });
-});
-
-describe('Drenched', () => {
-  const damageFrom = (type: ElementType, drenched: boolean) => {
-    const engine = new TowerDefenseEngine(levelData);
-    const source = createMonkegTower();
-    const target = createEnemy(drenched);
-    const attack: AttackDefinition = {
-      id: `TEST_${type}`,
-      name: 'Test',
-      type,
-      category: 'special',
-      power: 60,
-      cooldownMs: 800,
-      rangeIndex: 25,
-      behaviorType: 'PROJECTILE',
-    };
-    EffectProcessor.applyDamageAndEffects(engine, source, target, attack);
-    engine.destroy();
-    return target.maxHp - target.hp;
-  };
-
-  it('increases Water and Electric damage by 1.5x without affecting other types', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
-
-    const dryWater = damageFrom(ElementType.WATER, false);
-    const wetWater = damageFrom(ElementType.WATER, true);
-    const dryElectric = damageFrom(ElementType.ELECTRIC, false);
-    const wetElectric = damageFrom(ElementType.ELECTRIC, true);
-    const dryNormal = damageFrom(ElementType.NORMAL, false);
-    const wetNormal = damageFrom(ElementType.NORMAL, true);
-
-    expect(DRENCHED_DAMAGE_MULTIPLIER).toBe(1.5);
-    expect(wetWater).toBeGreaterThan(dryWater);
-    expect(wetElectric).toBeGreaterThan(dryElectric);
-    expect(wetNormal).toBe(dryNormal);
-  });
-
-  it('refreshes Drenched instead of stacking it', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
-    const engine = new TowerDefenseEngine(levelData);
-    const source = createMonkegTower();
-    const target = createEnemy(true);
-    target.statusConditions[0].durationMs = 200;
-
-    EffectProcessor.applyDamageAndEffects(
-      engine,
-      source,
-      target,
-      ATTACK_DEFS.BARREL_BASH
-    );
-
-    expect(
-      target.statusConditions.filter((status) => status.type === 'DRENCHED')
-    ).toEqual([{ type: 'DRENCHED', durationMs: DRENCHED_DURATION_MS }]);
     engine.destroy();
   });
 });

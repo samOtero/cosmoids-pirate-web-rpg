@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DORMATEE } from '@/constants/creatures';
+import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { AttackBehaviorRegistry } from '@/engine/tower-defense/attacks/behaviors';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
@@ -87,10 +88,15 @@ describe('Shared Slumber', () => {
       cooldownMs: 10000,
       rangeIndex: 40,
       behaviorType: 'SHARED_SLUMBER',
+      visualEffectConfigId: 'attack_shared_slumber_1',
     });
-    expect(AttackBehaviorRegistry.SHARED_SLUMBER).toBe(
-      SharedSlumberBehavior
-    );
+    expect(AttackBehaviorRegistry.SHARED_SLUMBER).toBe(SharedSlumberBehavior);
+    expect(
+      CREATURE_TD_CONFIGS.attack_shared_slumber_1.default.vfxAnimation
+    ).toEqual({ type: 'SHARED_SLUMBER', durationMs: 800 });
+    expect(
+      CREATURE_TD_CONFIGS.attack_shared_slumber_wake_1.default.vfxAnimation
+    ).toEqual({ type: 'SHARED_SLUMBER_WAKE', durationMs: 360 });
   });
 
   it('sleeps every eligible enemy in range and commits Dormatee for six seconds', () => {
@@ -103,11 +109,7 @@ describe('Shared Slumber', () => {
     const distant = createEnemy('distant', 90);
     engine.enemies = [target, second, immune, structure, distant];
 
-    SharedSlumberBehavior.execute(
-      engine,
-      source,
-      ATTACK_DEFS.SHARED_SLUMBER
-    );
+    SharedSlumberBehavior.execute(engine, source, ATTACK_DEFS.SHARED_SLUMBER);
 
     expect(source.sharedSlumberUntilMs).toBe(SHARED_SLUMBER_DURATION_MS);
     expect(isSleeping(target)).toBe(true);
@@ -116,6 +118,14 @@ describe('Shared Slumber', () => {
     expect(isSleeping(structure)).toBe(false);
     expect(isSleeping(distant)).toBe(false);
     expect(target.hp).toBe(target.maxHp);
+    expect(engine.visualEffects).toContainEqual(
+      expect.objectContaining({
+        configId: 'attack_shared_slumber_1',
+        durationMs: 800,
+        rangeIndex: 40,
+        targetIds: ['target', 'second'],
+      })
+    );
   });
 
   it('keeps the same sleeping tower object through attack changes, movement, removal, and replacement', () => {
@@ -143,11 +153,7 @@ describe('Shared Slumber', () => {
   it('allows direct damage to wake a target after the guaranteed opening and grants resistance', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     const { engine, source, target } = battle();
-    SharedSlumberBehavior.execute(
-      engine,
-      source,
-      ATTACK_DEFS.SHARED_SLUMBER
-    );
+    SharedSlumberBehavior.execute(engine, source, ATTACK_DEFS.SHARED_SLUMBER);
 
     EffectProcessor.applyDamageAndEffects(
       engine,
@@ -167,6 +173,13 @@ describe('Shared Slumber', () => {
     expect(isSleeping(target)).toBe(false);
     expect(target.sleepResistantUntilMs).toBe(
       750 + SHARED_SLUMBER_RESISTANCE_MS
+    );
+    expect(engine.visualEffects).toContainEqual(
+      expect.objectContaining({
+        configId: 'attack_shared_slumber_wake_1',
+        durationMs: 360,
+        targetId: target.id,
+      })
     );
     expect(
       SharedSlumberBehavior.canExecute(

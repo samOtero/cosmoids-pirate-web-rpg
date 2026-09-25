@@ -82,6 +82,8 @@ Shared Slumber is a non-damaging Psychic area-control move learned at level 8. D
 
 A sleeping enemy cannot move or pick up an objective. The opening 0.75 seconds are guaranteed; after that, each directly damaging attack has a 20% chance to wake that target. A multi-hit move rolls only once for the overall attack, while poison and burn damage continue without making wake checks. Dormatee always sleeps for the full duration regardless of how early its targets awaken. Naturally or prematurely awakened targets resist sleep from every Dormatee for eight seconds. Structures and status-immune enemies are ineligible.
 
+The visual treatment centers on Dormatee's pearly dream orb rather than a projectile. On activation, the orb rises above Dormatee as a soft lavender pulse fills the attack radius and curved psychic wisps briefly connect it to each affected creature. Dormatee and sleeping enemies then receive persistent dream bubbles, a gentle breathing motion, and a pale Psychic tint for the duration of their sleep. Waking pops the bubble into solid lavender sparkles, while the eight-second resistance window is shown with a small crossed crescent badge beside the health bar.
+
 The move has a ten-second simulation-clock cooldown beginning on activation. Attack-speed modifiers do not shorten it. This distinguishes Shared Slumber from Deepwater Grip: the latter guarantees four seconds of damaging single-target control, whereas Shared Slumber trades damage and reliability for broad control and a longer self-commitment.
 
 ## Production Integration

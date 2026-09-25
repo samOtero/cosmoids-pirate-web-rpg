@@ -110,6 +110,26 @@ export interface AttackDefinition {
     hitsToTrigger: number;
     damageMultiplier: number;
   };
+  /** Per-caster hit cycle used by Palmit's deterministic coir bind. */
+  coirSnapCombo?: {
+    hitsToBind: number;
+    bindDurationMs: number;
+    bindVisualEffectConfigId: string;
+    /** Projectile scale for each hit in the cycle, ordered from first to bind. */
+    projectileScales: number[];
+  };
+  /** Persistent, per-caster Heat built by successful Kindle Claw hits. */
+  fireClawHeat?: {
+    maxStacks: number;
+    damageBonusPerStack: number;
+    lullBeforeDecayMs: number;
+    decayIntervalMs: number;
+  };
+  /** Pushes nearby secondary enemies against their movement when the primary hit lands. */
+  secondaryImpactPush?: {
+    radiusIndex: number;
+    distance: number;
+  };
   rollingBarrel?: {
     lobDurationMs: number;
     rollDistance: number;

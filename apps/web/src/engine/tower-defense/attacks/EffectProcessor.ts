@@ -6,6 +6,10 @@ import { startDamageFlash } from '../damageFlash';
 import { applyPersistentSpeedSlow } from '../speedModifiers';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { tryWakeFromDirectDamage } from './sharedSlumber';
+import {
+  getFireClawDamageMultiplier,
+  registerSuccessfulFireClawHit,
+} from './fireClaw';
 
 export const DRENCHED_DURATION_MS = 4000;
 export const DRENCHED_DAMAGE_MULTIPLIER = 1.5;
@@ -245,6 +249,15 @@ export class EffectProcessor {
           : Math.max(1, finalDamage)
         : 0;
 
+    if (finalDamage > 0 && attackDef.fireClawHeat) {
+      finalDamage = Math.max(
+        1,
+        Math.floor(
+          finalDamage * getFireClawDamageMultiplier(source, attackDef)
+        )
+      );
+    }
+
     let fuseFinisher = false;
     if (finalDamage > 0 && attackDef.fuseRushCombo) {
       const combo = attackDef.fuseRushCombo;
@@ -265,6 +278,26 @@ export class EffectProcessor {
           CREATURE_TD_CONFIGS[configId].default.vfxAnimation!.durationMs!,
         elapsedMs: 0,
       });
+    }
+
+    let coirSnapBind = false;
+    if (
+      finalDamage > 0 &&
+      hitCount === 1 &&
+      attackDef.coirSnapCombo
+    ) {
+      const combo = attackDef.coirSnapCombo;
+      const nextHits = (source.coirSnapHits ?? 0) + 1;
+      coirSnapBind = nextHits >= combo.hitsToBind;
+      source.coirSnapHits = coirSnapBind ? 0 : nextHits;
+    }
+
+    if (finalDamage > 0 && hitCount === 1 && attackDef.fireClawHeat) {
+      registerSuccessfulFireClawHit(
+        source,
+        attackDef,
+        engine.elapsedTimeMs
+      );
     }
 
     // Reaching an enemy with an attack counts as participating in its defeat,
@@ -318,6 +351,36 @@ export class EffectProcessor {
     // hit gets a wake roll so one attack cannot roll several times.
     if (damageDealt > 0 && hitCount === 1) {
       tryWakeFromDirectDamage(engine, target);
+    }
+
+    if (
+      coirSnapBind &&
+      attackDef.coirSnapCombo &&
+      target.hp > 0 &&
+      !target.immuneToStatusEffects
+    ) {
+      const combo = attackDef.coirSnapCombo;
+      target.statusConditions.push({
+        type: 'STUN',
+        durationMs: combo.bindDurationMs,
+      });
+      engine.floatingTexts.push({
+        id: `ft_coir_bind_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+        text: 'Bound!',
+        position: { ...target.position },
+        color: 0xa3e635,
+        scale: 0.8,
+        durationMs: 800,
+        elapsedMs: 0,
+      });
+      engine.visualEffects.push({
+        id: `vfx_coir_bind_${target.id}_${engine.elapsedTimeMs}_${Math.random()}`,
+        configId: combo.bindVisualEffectConfigId,
+        position: { ...target.position },
+        targetId: target.id,
+        durationMs: combo.bindDurationMs,
+        elapsedMs: 0,
+      });
     }
 
     attackDef.effects

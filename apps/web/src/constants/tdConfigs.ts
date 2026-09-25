@@ -759,6 +759,21 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       offsetY: -19,
     },
   },
+  attack_fire_claw_1: {
+    default: {
+      url: '/battles/attacks/scratch.webp',
+      scale: 0.27,
+      tint: 0xff8a3d,
+      shadowScaleX: 1.15,
+      shadowOffsetY: 1,
+      vfxAnimation: {
+        type: 'WIPE_LINEAR',
+        maskRotation: 0.7853981633974483,
+        maskSize: 200,
+      },
+      offsetY: -19,
+    },
+  },
   attack_mallet_smash_1: {
     default: {
       scale: 0.4,
@@ -999,11 +1014,27 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       },
     },
   },
+  attack_shared_slumber_1: {
+    default: {
+      vfxAnimation: {
+        type: 'SHARED_SLUMBER',
+        durationMs: 800,
+      },
+    },
+  },
+  attack_shared_slumber_wake_1: {
+    default: {
+      vfxAnimation: {
+        type: 'SHARED_SLUMBER_WAKE',
+        durationMs: 360,
+      },
+    },
+  },
   attack_shiko_quake_1: {
     default: {
       vfxAnimation: {
         type: 'SHIKO_QUAKE',
-        durationMs: 650,
+        durationMs: 420,
       },
     },
   },

@@ -22,6 +22,7 @@ import {
   TDInitialView,
   TDOpeningPan,
   TDStructureSpriteLayout,
+  Tower,
 } from '@/engine/tower-defense/types';
 import { interpolateKeyframes } from '@/utils/animationUtils';
 import {
@@ -41,7 +42,10 @@ import {
   resolvePrisonGateVisualLayout,
 } from '@/utils/tdStructureVisuals';
 import { drawRallyHowlRings, updateRallyIndicator } from './rallyHowlVisuals';
-import { updateDeepwaterBreath, updateDeepwaterCoils } from './deepwaterGripVisuals';
+import {
+  updateDeepwaterBreath,
+  updateDeepwaterCoils,
+} from './deepwaterGripVisuals';
 import {
   createBarrelBowlingVisual,
   updateBarrelBowlingVisual,
@@ -75,6 +79,8 @@ export const WEAKENED_THRESHOLD = 0.9;
 
 const CARRIED_WORLD_DEPTH_OFFSET = 0.01;
 const DRAGGED_WORLD_DEPTH = 1_000_000_000;
+const FIRE_CLAW_TOWER_TINTS = [0xffffff, 0xfff1dc, 0xffddb0, 0xffc27a];
+const FIRE_CLAW_DASH_TINTS = [0xffd5a3, 0xffbd73, 0xff9f43, 0xff7a1a];
 
 function updateLaneHopVisual(
   container: PIXI.Container,
@@ -104,8 +110,8 @@ function updateLaneHopVisual(
     marker.fill({ color: 0xfacc15, alpha: 0.14 });
     marker.stroke({ color: 0xfde047, alpha: 0.9, width: 2 });
     marker.position.set(
-      ((hop.destination.x - enemy.position.x) / 100) * screenW / finalScale,
-      ((hop.destination.y - enemy.position.y) / 100) * screenH / finalScale
+      (((hop.destination.x - enemy.position.x) / 100) * screenW) / finalScale,
+      (((hop.destination.y - enemy.position.y) / 100) * screenH) / finalScale
     );
     const pulse = 0.9 + Math.sin(hop.elapsedMs * 0.012) * 0.12;
     marker.scale.set(pulse);
@@ -1158,18 +1164,158 @@ function drawWindGust(container: PIXI.Container) {
   container.addChild(streaks);
 }
 
+function drawSharedSlumberCast(container: PIXI.Container) {
+  const pulse = new PIXI.Graphics();
+  pulse.label = 'shared_slumber_pulse';
+  container.addChild(pulse);
+
+  const links = new PIXI.Graphics();
+  links.label = 'shared_slumber_links';
+  container.addChild(links);
+
+  const orb = new PIXI.Graphics();
+  orb.label = 'shared_slumber_orb';
+  container.addChild(orb);
+}
+
+function updateSharedSlumberCast(
+  container: PIXI.Container,
+  progress: number,
+  maxRadius: number,
+  targetOffsets: Point[]
+) {
+  const pulse = container.getChildByLabel('shared_slumber_pulse') as
+    | PIXI.Graphics
+    | undefined;
+  const links = container.getChildByLabel('shared_slumber_links') as
+    | PIXI.Graphics
+    | undefined;
+  const orb = container.getChildByLabel('shared_slumber_orb') as
+    | PIXI.Graphics
+    | undefined;
+  const entrance = Math.min(1, progress / 0.24);
+  const expansion = 1 - Math.pow(1 - Math.min(1, progress / 0.62), 3);
+  const fade = 1 - Math.max(0, (progress - 0.68) / 0.32);
+  const radius = Math.max(4, maxRadius * expansion);
+  const orbY = -28 - 34 * entrance + Math.sin(progress * Math.PI * 3) * 2;
+
+  if (pulse) {
+    pulse.clear();
+    pulse.ellipse(0, 7, radius, radius * 0.48);
+    pulse.fill({ color: 0xa78bfa, alpha: 0.12 * fade });
+    pulse.ellipse(0, 7, radius * 0.64, radius * 0.3);
+    pulse.fill({ color: 0xf5d0fe, alpha: 0.16 * fade });
+  }
+
+  if (links) {
+    links.clear();
+    const linkFade = Math.min(1, progress / 0.18) * fade;
+    targetOffsets.forEach((target, index) => {
+      const endX = target.x * expansion;
+      const endY = target.y * expansion - 18;
+      const controlX = endX * 0.5 + (index % 2 === 0 ? -8 : 8);
+      const controlY = Math.min(orbY, endY) - 22 - (index % 3) * 4;
+      links.moveTo(0, orbY);
+      links.quadraticCurveTo(controlX, controlY, endX, endY);
+      links.stroke({
+        color: index % 2 === 0 ? 0xf0abfc : 0xc4b5fd,
+        alpha: 0.74 * linkFade,
+        width: 2.4,
+        cap: 'round',
+      });
+      links.circle(endX, endY, 3.2);
+      links.fill({ color: 0xfdf4ff, alpha: 0.92 * linkFade });
+    });
+  }
+
+  if (orb) {
+    orb.clear();
+    orb.circle(0, orbY, 14 * entrance);
+    orb.fill({ color: 0xe9d5ff, alpha: 0.96 * fade });
+    orb.stroke({ color: 0xfdf4ff, alpha: fade, width: 2.2 });
+    orb.circle(-4, orbY - 4, 4 * entrance);
+    orb.fill({ color: 0xffffff, alpha: 0.82 * fade });
+    for (let index = 0; index < 4; index += 1) {
+      const angle = progress * Math.PI * 2 + (index / 4) * Math.PI * 2;
+      const distance = 21 + index * 2;
+      orb.circle(
+        Math.cos(angle) * distance,
+        orbY + Math.sin(angle) * distance * 0.62,
+        1.8 + (index % 2)
+      );
+      orb.fill({ color: 0xf0abfc, alpha: 0.72 * fade });
+    }
+  }
+
+  container.alpha = fade;
+}
+
+function drawSharedSlumberWake(container: PIXI.Container) {
+  const bubble = new PIXI.Graphics();
+  bubble.label = 'shared_slumber_wake_bubble';
+  container.addChild(bubble);
+
+  const sparkles = new PIXI.Graphics();
+  sparkles.label = 'shared_slumber_wake_sparkles';
+  container.addChild(sparkles);
+}
+
+function updateSharedSlumberWake(container: PIXI.Container, progress: number) {
+  const bubble = container.getChildByLabel('shared_slumber_wake_bubble') as
+    | PIXI.Graphics
+    | undefined;
+  const sparkles = container.getChildByLabel('shared_slumber_wake_sparkles') as
+    | PIXI.Graphics
+    | undefined;
+  const pop = Math.min(1, progress / 0.38);
+  const fade = 1 - Math.max(0, (progress - 0.55) / 0.45);
+
+  if (bubble) {
+    bubble.clear();
+    bubble.circle(0, -34, 14 + pop * 7);
+    bubble.fill({ color: 0xe9d5ff, alpha: 0.34 * (1 - pop) });
+    bubble.stroke({
+      color: 0xfdf4ff,
+      alpha: 0.9 * (1 - pop),
+      width: 2.4,
+    });
+  }
+
+  if (sparkles) {
+    sparkles.clear();
+    for (let index = 0; index < 8; index += 1) {
+      const angle = (index / 8) * Math.PI * 2 + 0.2;
+      const distance = 8 + 28 * pop;
+      const x = Math.cos(angle) * distance;
+      const y = -34 + Math.sin(angle) * distance * 0.7;
+      const size = 2 + (index % 3) * 0.8;
+      sparkles.poly([x, y - size, x + size, y, x, y + size, x - size, y]);
+      sparkles.fill({
+        color: index % 2 === 0 ? 0xf0abfc : 0xc4b5fd,
+        alpha: 0.9 * fade,
+      });
+    }
+  }
+
+  container.alpha = fade;
+}
+
 function drawShikoQuake(container: PIXI.Container) {
-  const groundFlash = new PIXI.Graphics();
-  groundFlash.label = 'shiko_quake_ground';
-  container.addChild(groundFlash);
+  const impactDisc = new PIXI.Graphics();
+  impactDisc.label = 'shiko_quake_disc';
+  container.addChild(impactDisc);
 
-  const rings = new PIXI.Graphics();
-  rings.label = 'shiko_quake_rings';
-  container.addChild(rings);
+  const impactStar = new PIXI.Graphics();
+  impactStar.label = 'shiko_quake_star';
+  container.addChild(impactStar);
 
-  const cracks = new PIXI.Graphics();
-  cracks.label = 'shiko_quake_cracks';
-  container.addChild(cracks);
+  const dust = new PIXI.Graphics();
+  dust.label = 'shiko_quake_dust';
+  container.addChild(dust);
+
+  const debris = new PIXI.Graphics();
+  debris.label = 'shiko_quake_debris';
+  container.addChild(debris);
 }
 
 function updateShikoQuake(
@@ -1177,51 +1323,139 @@ function updateShikoQuake(
   progress: number,
   maxRadius: number
 ) {
-  const groundFlash = container.getChildByLabel('shiko_quake_ground') as
+  const impactDisc = container.getChildByLabel('shiko_quake_disc') as
     | PIXI.Graphics
     | undefined;
-  const rings = container.getChildByLabel('shiko_quake_rings') as
+  const impactStar = container.getChildByLabel('shiko_quake_star') as
     | PIXI.Graphics
     | undefined;
-  const cracks = container.getChildByLabel('shiko_quake_cracks') as
+  const dust = container.getChildByLabel('shiko_quake_dust') as
     | PIXI.Graphics
     | undefined;
-  const expansion = 1 - Math.pow(1 - progress, 3.2);
+  const debris = container.getChildByLabel('shiko_quake_debris') as
+    | PIXI.Graphics
+    | undefined;
+  const expansion = 1 - Math.pow(1 - progress, 3.5);
   const radius = Math.max(3, maxRadius * expansion);
-  const fade = 1 - Math.max(0, (progress - 0.62) / 0.38);
+  const fade = 1 - Math.max(0, (progress - 0.58) / 0.42);
 
-  if (groundFlash) {
-    groundFlash.clear();
-    groundFlash.circle(0, 0, radius * 0.72);
-    groundFlash.fill({ color: 0xd6a35f, alpha: 0.16 * fade });
+  if (impactDisc) {
+    impactDisc.clear();
+    impactDisc.ellipse(0, 5, radius, radius * 0.48);
+    impactDisc.fill({ color: 0xc98b47, alpha: 0.2 * fade });
+    impactDisc.ellipse(0, 5, radius * 0.58, radius * 0.27);
+    impactDisc.fill({ color: 0xf5d29c, alpha: 0.24 * fade });
   }
 
-  if (rings) {
-    rings.clear();
-    rings.circle(0, 0, radius);
-    rings.stroke({ color: 0xf5d29c, width: 6, alpha: 0.82 * fade });
-    rings.circle(0, 0, radius * 0.72);
-    rings.stroke({ color: 0x8b5e34, width: 3, alpha: 0.72 * fade });
-  }
-
-  if (cracks) {
-    cracks.clear();
-    for (let index = 0; index < 12; index += 1) {
-      const angle = (index / 12) * Math.PI * 2 + (index % 2) * 0.12;
-      const inner = radius * (0.2 + (index % 3) * 0.08);
-      const middle = radius * (0.52 + (index % 2) * 0.08);
-      const outer = radius * (0.74 + (index % 4) * 0.06);
-      cracks.moveTo(Math.cos(angle) * inner, Math.sin(angle) * inner);
-      cracks.lineTo(
-        Math.cos(angle + 0.08) * middle,
-        Math.sin(angle + 0.08) * middle
+  if (impactStar) {
+    impactStar.clear();
+    const starPoints: number[] = [];
+    for (let index = 0; index < 16; index += 1) {
+      const angle = -Math.PI / 2 + (index / 16) * Math.PI * 2;
+      const pointRadius = radius * (index % 2 === 0 ? 0.48 : 0.2);
+      starPoints.push(
+        Math.cos(angle) * pointRadius,
+        3 + Math.sin(angle) * pointRadius * 0.55
       );
-      cracks.lineTo(Math.cos(angle) * outer, Math.sin(angle) * outer);
     }
-    cracks.stroke({ color: 0x5b3a25, width: 2.5, alpha: 0.7 * fade });
+    impactStar.poly(starPoints);
+    impactStar.fill({ color: 0xffedc7, alpha: 0.88 * fade });
+  }
+
+  if (dust) {
+    dust.clear();
+    for (let index = 0; index < 14; index += 1) {
+      const angle = (index / 14) * Math.PI * 2;
+      const distance = radius * (0.56 + (index % 3) * 0.12);
+      const size = Math.max(2, radius * (0.045 + (index % 4) * 0.012));
+      dust.circle(
+        Math.cos(angle) * distance,
+        5 + Math.sin(angle) * distance * 0.48,
+        size
+      );
+      dust.fill({
+        color: index % 2 === 0 ? 0xe8bc79 : 0xf8dfb3,
+        alpha: (0.58 + (index % 3) * 0.1) * fade,
+      });
+    }
+  }
+
+  if (debris) {
+    debris.clear();
+    for (let index = 0; index < 8; index += 1) {
+      const angle = (index / 8) * Math.PI * 2 + 0.2;
+      const distance = radius * (0.48 + progress * 0.34);
+      const x = Math.cos(angle) * distance;
+      const y = 4 + Math.sin(angle) * distance * 0.48 - progress * 10;
+      const size = 2.5 + (index % 3) * 1.2;
+      debris.poly([x, y - size, x + size, y, x, y + size, x - size, y]);
+      debris.fill({ color: 0x7a4b2b, alpha: 0.78 * fade });
+    }
   }
 
   container.alpha = fade;
+}
+
+function updateShikoQuakeTowerPose(
+  sprite: PIXI.Sprite,
+  shadow: PIXI.Graphics,
+  tower: Tower,
+  elapsedTimeMs: number
+) {
+  sprite.rotation = 0;
+  shadow.alpha = 1;
+  shadow.scale.y = 1;
+  const state = tower.shikoQuake;
+  if (!state) return;
+
+  const side =
+    tower.facingDirection === 'left' || tower.facingDirection === 'up' ? -1 : 1;
+  const baseX = sprite.x;
+  const baseY = sprite.y;
+  const baseScaleX = sprite.scale.x;
+  const baseScaleY = sprite.scale.y;
+  const baseShadowScaleX = shadow.scale.x;
+
+  if (elapsedTimeMs < state.impactAtMs) {
+    const windupDuration = state.impactAtMs - state.startedAtMs;
+    const progress = Math.max(
+      0,
+      Math.min(1, (elapsedTimeMs - state.startedAtMs) / windupDuration)
+    );
+    if (progress < 0.56) {
+      const anticipation = 1 - Math.pow(1 - progress / 0.56, 2);
+      sprite.x = baseX + side * 5 * anticipation;
+      sprite.y = baseY + 4 * anticipation;
+      sprite.rotation = side * 0.12 * anticipation;
+      sprite.scale.x = baseScaleX * (1 + 0.04 * anticipation);
+      sprite.scale.y = baseScaleY * (1 - 0.05 * anticipation);
+    } else {
+      const hopProgress = (progress - 0.56) / 0.44;
+      const hopHeight = Math.sin(hopProgress * Math.PI) * 13;
+      sprite.x = baseX + side * 5 * (1 - hopProgress);
+      sprite.y = baseY + 4 * (1 - hopProgress) - hopHeight;
+      sprite.rotation = side * 0.12 * (1 - hopProgress);
+      shadow.alpha = 1 - Math.sin(hopProgress * Math.PI) * 0.45;
+      shadow.scale.x =
+        baseShadowScaleX * (1 - Math.sin(hopProgress * Math.PI) * 0.22);
+      shadow.scale.y = 1 - Math.sin(hopProgress * Math.PI) * 0.28;
+    }
+    return;
+  }
+
+  const recoveryDuration = state.endsAtMs - state.impactAtMs;
+  const recovery = Math.max(
+    0,
+    Math.min(1, (elapsedTimeMs - state.impactAtMs) / recoveryDuration)
+  );
+  const squash = Math.max(0, 1 - recovery / 0.32);
+  const settle = Math.exp(-4.5 * recovery) * Math.sin(recovery * Math.PI * 3);
+  sprite.y = baseY + 6 * squash - 2 * settle;
+  sprite.rotation = -side * 0.04 * squash;
+  sprite.scale.x = baseScaleX * (1 + 0.11 * squash);
+  sprite.scale.y = baseScaleY * (1 - 0.15 * squash);
+  shadow.scale.x = baseShadowScaleX * (1 + 0.12 * squash);
+  shadow.scale.y = 1 + 0.08 * squash;
 }
 
 function drawHowl(container: PIXI.Container) {
@@ -1847,6 +2081,185 @@ function updatePoisonIndicator(
     stackText.visible = stackCount > 1;
     stackText.text = stackCount > 1 ? `×${stackCount}` : '';
   }
+}
+
+function createDreamBubbleIndicator(label: string) {
+  const indicator = new PIXI.Container();
+  indicator.label = label;
+
+  const bubble = new PIXI.Graphics();
+  bubble.circle(0, 0, 13);
+  bubble.fill({ color: 0xe9d5ff, alpha: 0.9 });
+  bubble.stroke({ color: 0xffffff, alpha: 0.96, width: 2 });
+  bubble.circle(-4, -4, 3.5);
+  bubble.fill({ color: 0xffffff, alpha: 0.76 });
+  bubble.circle(-12, 12, 4.2);
+  bubble.fill({ color: 0xd8b4fe, alpha: 0.82 });
+  bubble.circle(-18, 18, 2.5);
+  bubble.fill({ color: 0xc4b5fd, alpha: 0.72 });
+  indicator.addChild(bubble);
+
+  const text = new PIXI.Text({
+    text: 'Z',
+    style: {
+      fontFamily: 'Arial, sans-serif',
+      fontSize: 13,
+      fontWeight: 'bold',
+      fill: 0x6d28d9,
+      stroke: { color: 0xfdf4ff, width: 1.5 },
+    },
+  });
+  text.anchor.set(0.5);
+  text.position.set(1, 1);
+  indicator.addChild(text);
+  return indicator;
+}
+
+function getStatusIndicatorOffsetY(configId: string, enemy: Enemy) {
+  const tdConfigMap = CREATURE_TD_CONFIGS[configId] || {
+    default: { scale: 1 },
+  };
+  const tdConfig = tdConfigMap[enemy.facingDirection] || tdConfigMap.default;
+  return (
+    tdConfig.healthBarOffsetY ?? tdConfigMap.default?.healthBarOffsetY ?? -40
+  );
+}
+
+function updateSleepIndicator(
+  container: PIXI.Container,
+  enemy: Enemy,
+  sprite: PIXI.Sprite,
+  configId: string,
+  elapsedTimeMs: number
+) {
+  const isAsleep = enemy.statusConditions.some(
+    (status) => status.type === 'SLEEP'
+  );
+  let indicator = container.getChildByLabel('sleepIndicator') as
+    | PIXI.Container
+    | undefined;
+
+  if (!isAsleep) {
+    if (indicator) {
+      container.removeChild(indicator);
+      indicator.destroy({ children: true });
+    }
+    return;
+  }
+
+  if ((enemy.damageFlashTimerMs ?? 0) <= 0) sprite.tint = 0xddd6fe;
+  const breathing = Math.sin(elapsedTimeMs / 360);
+  sprite.y += 2.5 + breathing * 1.2;
+  sprite.rotation += breathing * 0.018;
+
+  if (!indicator) {
+    indicator = createDreamBubbleIndicator('sleepIndicator');
+    container.addChild(indicator);
+  }
+
+  const hpOffsetY = getStatusIndicatorOffsetY(configId, enemy);
+  indicator.position.set(29, hpOffsetY - 16 + breathing * 2);
+  const pulse = 1 + Math.sin(elapsedTimeMs / 240) * 0.055;
+  indicator.scale.set(pulse);
+  indicator.alpha = 0.9 + Math.sin(elapsedTimeMs / 310) * 0.1;
+}
+
+function createSleepResistanceIndicator() {
+  const indicator = new PIXI.Container();
+  indicator.label = 'sleepResistanceIndicator';
+
+  const badge = new PIXI.Graphics();
+  badge.circle(0, 0, 10);
+  badge.fill({ color: 0x312e81, alpha: 0.92 });
+  badge.stroke({ color: 0xa78bfa, alpha: 0.95, width: 1.8 });
+  badge.circle(-1.5, -0.5, 5.8);
+  badge.fill({ color: 0xddd6fe, alpha: 0.95 });
+  badge.circle(1.4, -2.5, 5.2);
+  badge.fill({ color: 0x312e81, alpha: 1 });
+  badge.moveTo(-5, -6);
+  badge.lineTo(5, 6);
+  badge.stroke({ color: 0xf0abfc, alpha: 0.96, width: 2.2 });
+  indicator.addChild(badge);
+  return indicator;
+}
+
+function updateSleepResistanceIndicator(
+  container: PIXI.Container,
+  enemy: Enemy,
+  configId: string,
+  elapsedTimeMs: number
+) {
+  const remainingMs = (enemy.sleepResistantUntilMs ?? 0) - elapsedTimeMs;
+  const isAsleep = enemy.statusConditions.some(
+    (status) => status.type === 'SLEEP'
+  );
+  let indicator = container.getChildByLabel('sleepResistanceIndicator') as
+    | PIXI.Container
+    | undefined;
+
+  if (remainingMs <= 0 || isAsleep) {
+    if (indicator) {
+      container.removeChild(indicator);
+      indicator.destroy({ children: true });
+    }
+    return;
+  }
+
+  if (!indicator) {
+    indicator = createSleepResistanceIndicator();
+    container.addChild(indicator);
+  }
+
+  const hpOffsetY = getStatusIndicatorOffsetY(configId, enemy);
+  indicator.position.set(29, hpOffsetY - 14);
+  const pulse = 1 + Math.sin(elapsedTimeMs / 300) * 0.04;
+  indicator.scale.set(pulse);
+  indicator.alpha = Math.min(0.9, Math.max(0.28, remainingMs / 700));
+}
+
+function updateSharedSlumberTowerVisual(
+  container: PIXI.Container,
+  sprite: PIXI.Sprite,
+  shadow: PIXI.Graphics,
+  tower: Tower,
+  elapsedTimeMs: number
+) {
+  const isSleeping = (tower.sharedSlumberUntilMs ?? 0) > elapsedTimeMs;
+  let indicator = container.getChildByLabel('sharedSlumberTowerIndicator') as
+    | PIXI.Container
+    | undefined;
+
+  if (!isSleeping) {
+    if (indicator) {
+      container.removeChild(indicator);
+      indicator.destroy({ children: true });
+    }
+    return;
+  }
+
+  const breathing = Math.sin(elapsedTimeMs / 420);
+  sprite.y += 3.5 + breathing * 1.5;
+  sprite.rotation += breathing * 0.022;
+  sprite.scale.y *= 0.975;
+  shadow.scale.x *= 1.04 + breathing * 0.02;
+  if ((tower.damageFlashTimerMs ?? 0) <= 0) sprite.tint = 0xede9fe;
+
+  if (!indicator) {
+    indicator = createDreamBubbleIndicator('sharedSlumberTowerIndicator');
+    indicator.scale.set(1.18);
+    container.addChild(indicator);
+  }
+
+  const tdConfigMap = CREATURE_TD_CONFIGS[tower.creature.speciesId] || {
+    default: { scale: 1 },
+  };
+  const tdConfig = tdConfigMap[tower.facingDirection] || tdConfigMap.default;
+  const hpOffsetY =
+    tdConfig.healthBarOffsetY ?? tdConfigMap.default?.healthBarOffsetY ?? -40;
+  indicator.position.set(31, hpOffsetY - 20 + breathing * 2.5);
+  const pulse = 1.18 + Math.sin(elapsedTimeMs / 280) * 0.07;
+  indicator.scale.set(pulse);
+  indicator.alpha = 0.92 + Math.sin(elapsedTimeMs / 330) * 0.08;
 }
 
 const TYPE_COLORS: Record<ElementType, number> = {
@@ -3377,8 +3790,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             for (const hauler of haulers) {
               const linkTarget = hauler.captureHaulLinkTargetEnemyId
                 ? engine.enemies.find(
-                    (enemy) =>
-                      enemy.id === hauler.captureHaulLinkTargetEnemyId
+                    (enemy) => enemy.id === hauler.captureHaulLinkTargetEnemyId
                   )
                 : captureUnit;
               if (!linkTarget) continue;
@@ -3473,7 +3885,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
             // Make it render above the enemy if held (enemy might be index 1 or so, we'll just push to top)
             if (capUnit.heldByEnemyId) {
-              worldLayer.setChildIndex(container, worldLayer.children.length - 1);
+              worldLayer.setChildIndex(
+                container,
+                worldLayer.children.length - 1
+              );
             }
 
             const sprite = container.getChildByLabel('cap_sprite') as
@@ -3658,6 +4073,26 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                   if (!isDestroyed) tsprite.texture = t;
                 }
               );
+              const heatStacks = Math.min(
+                3,
+                Math.max(0, tower.fireClawHeat?.stacks ?? 0)
+              );
+              if (heatStacks > 0 && (tower.damageFlashTimerMs ?? 0) <= 0) {
+                tsprite.tint = FIRE_CLAW_TOWER_TINTS[heatStacks];
+              }
+              updateShikoQuakeTowerPose(
+                tsprite,
+                shadow,
+                tower,
+                engine.elapsedTimeMs
+              );
+              updateSharedSlumberTowerVisual(
+                container,
+                tsprite,
+                shadow,
+                tower,
+                engine.elapsedTimeMs
+              );
 
               // Fade tower if it's currently performing a Tackle attack
               const isTackling = engine.projectiles.some(
@@ -3711,11 +4146,19 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             });
 
             const grippedTarget = tower.deepwaterGrip
-              ? engine.enemies.find((enemy) => enemy.id === tower.deepwaterGrip!.targetId)
+              ? engine.enemies.find(
+                  (enemy) => enemy.id === tower.deepwaterGrip!.targetId
+                )
               : undefined;
             if (grippedTarget) {
-              container.x = offsetX + (grippedTarget.position.x / 100) * screenW + 32 * finalScale;
-              container.y = offsetY + (grippedTarget.position.y / 100) * screenH - 5 * finalScale;
+              container.x =
+                offsetX +
+                (grippedTarget.position.x / 100) * screenW +
+                32 * finalScale;
+              container.y =
+                offsetY +
+                (grippedTarget.position.y / 100) * screenH -
+                5 * finalScale;
             }
             updateDeepwaterBreath(container, tower, engine.elapsedTimeMs);
             if (isDashing) {
@@ -3728,10 +4171,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             } else {
               updateContainerWorldDepth(
                 container,
-                getTDUnitGroundContactOffset(
-                  tower,
-                  tower.creature.speciesId
-                )
+                getTDUnitGroundContactOffset(tower, tower.creature.speciesId)
               );
             }
           }
@@ -4190,8 +4630,14 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 : undefined
             );
             updateScouredIndicator(container, enemy, engine.elapsedTimeMs);
-            updateDeepwaterCoils(container, enemy,
-              engine.towers.find((tower) => tower.id === enemy.constrictedByTowerId), engine.elapsedTimeMs);
+            updateDeepwaterCoils(
+              container,
+              enemy,
+              engine.towers.find(
+                (tower) => tower.id === enemy.constrictedByTowerId
+              ),
+              engine.elapsedTimeMs
+            );
             updateFuseRushMarks(
               container,
               enemy.fuseRushMarks ?? 0,
@@ -4249,6 +4695,19 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                   esprite,
                   enemy.tdConfigId ?? enemy.definitionId,
                   app.ticker.deltaTime
+                );
+                updateSleepIndicator(
+                  container,
+                  enemy,
+                  esprite,
+                  enemy.tdConfigId ?? enemy.definitionId,
+                  engine.elapsedTimeMs
+                );
+                updateSleepResistanceIndicator(
+                  container,
+                  enemy,
+                  enemy.tdConfigId ?? enemy.definitionId,
+                  engine.elapsedTimeMs
                 );
               }
             }
@@ -4582,8 +5041,20 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 const travelX = proj.target.x - proj.position.x;
                 const travelY = proj.target.y - proj.position.y;
                 trail.rotation = Math.atan2(travelY, travelX);
+                const heatStacks = Math.min(
+                  3,
+                  Math.max(0, proj.fireClawHeatStacks ?? 0)
+                );
+                const baseAlpha =
+                  proj.fireClawHeatStacks === undefined
+                    ? 0.92
+                    : 0.72 + heatStacks * 0.08;
                 trail.alpha =
-                  0.92 + Math.sin(app.ticker.lastTime * 0.018) * 0.08;
+                  baseAlpha + Math.sin(app.ticker.lastTime * 0.018) * 0.08;
+                trail.scale.y =
+                  proj.fireClawHeatStacks === undefined
+                    ? 1
+                    : 0.75 + heatStacks * 0.12;
               }
 
               const psprite = container.getChildByLabel('proj_sprite') as
@@ -4618,7 +5089,14 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                   if (def.dashTrailType === 'WATER') {
                     psprite.tint = 0x7dd3fc;
                   } else if (def.dashTrailType === 'FIRE') {
-                    psprite.tint = 0xffd5a3;
+                    const heatStacks = Math.min(
+                      3,
+                      Math.max(0, proj.fireClawHeatStacks ?? 0)
+                    );
+                    psprite.tint =
+                      proj.fireClawHeatStacks === undefined
+                        ? 0xffd5a3
+                        : FIRE_CLAW_DASH_TINTS[heatStacks];
                   }
                   shadow.visible = false; // Keep shadow hidden
                 }
@@ -4713,6 +5191,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 drawWindGust(container);
               } else if (animConfig?.type === 'TOXIC_POLLEN') {
                 drawToxicPollen(container);
+              } else if (animConfig?.type === 'SHARED_SLUMBER') {
+                drawSharedSlumberCast(container);
+              } else if (animConfig?.type === 'SHARED_SLUMBER_WAKE') {
+                drawSharedSlumberWake(container);
               } else if (animConfig?.type === 'SHIKO_QUAKE') {
                 drawShikoQuake(container);
               } else if (animConfig?.type === 'HOWL') {
@@ -4874,6 +5356,29 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             } else if (animConfig?.type === 'TOXIC_POLLEN') {
               const radius = (TD_BASE_HEIGHT * (vfx.rangeIndex ?? 20)) / 100;
               updateToxicPollen(container, progress, radius);
+            } else if (animConfig?.type === 'SHARED_SLUMBER') {
+              const radius = (TD_BASE_HEIGHT * (vfx.rangeIndex ?? 40)) / 100;
+              const targetOffsets = (vfx.targetIds ?? [])
+                .map((targetId) =>
+                  engine.enemies.find((enemy) => enemy.id === targetId)
+                )
+                .filter((enemy): enemy is Enemy => Boolean(enemy))
+                .map((enemy) => ({
+                  x:
+                    (((enemy.position.x - vfx.position.x) / 100) * screenW) /
+                    Math.max(finalScale, 0.001),
+                  y:
+                    (((enemy.position.y - vfx.position.y) / 100) * screenH) /
+                    Math.max(finalScale, 0.001),
+                }));
+              updateSharedSlumberCast(
+                container,
+                progress,
+                radius,
+                targetOffsets
+              );
+            } else if (animConfig?.type === 'SHARED_SLUMBER_WAKE') {
+              updateSharedSlumberWake(container, progress);
             } else if (animConfig?.type === 'SHIKO_QUAKE') {
               const radius = (TD_BASE_HEIGHT * (vfx.rangeIndex ?? 22)) / 100;
               updateShikoQuake(container, progress, radius);

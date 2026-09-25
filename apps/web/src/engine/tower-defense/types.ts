@@ -1,8 +1,4 @@
-import {
-  Creature,
-  ElementType,
-  PlayerCreature,
-} from '@/types/baseGame';
+import { Creature, ElementType, PlayerCreature } from '@/types/baseGame';
 import type { DialogConfig } from '@/types/baseGame';
 import type { AttackInstance } from './attacks/types';
 
@@ -453,6 +449,15 @@ export interface Tower extends BaseTDUnit {
   };
   /** Absolute simulation time until Dormatee's committed sleep ends. */
   sharedSlumberUntilMs?: number;
+  /** Wind-up, impact, and recovery state for Yokodillo's stationary stomp. */
+  shikoQuake?: {
+    attackDefinitionId: string;
+    startedAtMs: number;
+    impactAtMs: number;
+    endsAtMs: number;
+    origin: Point;
+    hasImpacted: boolean;
+  };
   creature: PlayerCreature; // The singular source of truth for level, xp, and attacks
   lastAttackTime: number; // Deprecate or keep for generic attacks
   currentAttack: number;
@@ -465,6 +470,13 @@ export interface Tower extends BaseTDUnit {
     multiplier: number;
     appliedAtMs: number;
     expiresAtMs: number;
+  };
+  /** Successful Husk Shot hits made by this tower in its current bind cycle. */
+  coirSnapHits?: number;
+  /** Kindle Claw stays warm between targets until combat lulls or the tower moves. */
+  fireClawHeat?: {
+    stacks: number;
+    nextDecayAtMs: number;
   };
   selectedAttackIndex: number;
   targetingMode?: TowerTargetingMode;
@@ -711,6 +723,8 @@ export interface Projectile {
   /** Defaults to true. False marks a follow-up projectile as visual-only. */
   dealsDamage?: boolean;
   visualScale?: number;
+  /** Kindle Claw Heat captured at launch for its dash and trail treatment. */
+  fireClawHeatStacks?: number;
   target: Point;
   facingDirection?: 'up' | 'down' | 'left' | 'right';
   /** Dash attacks can remain at their impact point until their hit VFX ends. */
@@ -741,5 +755,6 @@ export interface VisualEffect {
   dashProjectileId?: string;
   facingDirection?: 'up' | 'down' | 'left' | 'right';
   targetId?: string; // If attached to moving unit
+  targetIds?: string[]; // Optional actor set for linked area effects
   rangeIndex?: number; // Optional battlefield radius for area effects
 }

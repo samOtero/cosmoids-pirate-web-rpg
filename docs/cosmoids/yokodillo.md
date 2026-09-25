@@ -73,7 +73,9 @@ Yokodillo was conceived to read clearly as a self-contained single-stage creatur
 
 Shiko Quake is a close-range physical Fighting attack learned at level 10. Yokodillo performs a sumo leg raise and forcefully stamps the ground, sending a circular impact wave through every enemy within a radius of 22. The move has 35 power and a 2.4-second cooldown. Eligible creatures receive a guaranteed 0.35-second stagger; status-immune structures still take damage but are not staggered.
 
-The deliberately brief, reliable interruption rewards placing the slow, durable Yokodillo near crowded path sections without letting it hold an entire wave in place. Its vector effect uses warm cream and ochre shockwave rings with dark radiating ground cracks, communicating a physical Fighting impact rather than a magical Ground attack.
+The deliberately brief, reliable interruption rewards placing the slow, durable Yokodillo near crowded path sections without letting it hold an entire wave in place. Its 0.7-second attack animation acts directly on Yokodillo's tower sprite: it leans sideways to load its weight, makes a small hop, then lands in a squash before settling back into its normal pose. Damage and stagger resolve on the 0.36-second slam frame rather than at the start of the wind-up. Moving, replacing, or removing Yokodillo before impact cancels the pending slam.
+
+The ground effect avoids thin concentric rings and branching line cracks, which became visually noisy at gameplay scale. The approved treatment uses filled ochre impact discs, a crisp cream impact star, rounded dust puffs, and solid dirt chunks moving outward. These shapes communicate a heavy physical Fighting impact without reading as a magical Ground attack.
 
 ## Creation Record
 

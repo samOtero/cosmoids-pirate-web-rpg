@@ -720,7 +720,7 @@ export const STARTER_CRAB: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/palmit_down_1.webp',
   battleSpriteUrl: '/battles/cosmoids/palmit_down_1.webp',
   learnableAttacks: [
-    { level: 1, attackId: 'PINCH' },
+    { level: 1, attackId: 'COIR_SNAP' },
     { level: 6, attackId: 'COIR_SNARE' },
     { level: 16, attackId: 'SHIPSHAPE' },
     { level: 16, attackId: 'MALLET_SMASH' },
@@ -749,7 +749,7 @@ export const CARAPENTER: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/carapenter_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'PINCH' },
+    { level: 1, attackId: 'COIR_SNAP' },
     { level: 6, attackId: 'COIR_SNARE' },
     { level: 16, attackId: 'SHIPSHAPE' },
     { level: 16, attackId: 'MALLET_SMASH' },
@@ -777,7 +777,7 @@ export const STARTER_IGUANA: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/fueguana_left_1_v3.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'SCRATCH' },
+    { level: 1, attackId: 'FIRE_CLAW' },
     { level: 9, attackId: 'EMBER' },
     { level: 16, attackId: 'FUSE_RUSH' },
   ],
@@ -805,7 +805,7 @@ export const VELOCINDER: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/velocinder_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'SCRATCH' },
+    { level: 1, attackId: 'FIRE_CLAW' },
     { level: 9, attackId: 'EMBER' },
     { level: 16, attackId: 'FUSE_RUSH' },
   ],
@@ -832,7 +832,7 @@ export const STARTER_MONKEY: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/monkeg_down_1_v2.webp',
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
-    { level: 8, attackId: 'BARREL_BASH' },
+    { level: 6, attackId: 'BARREL_BASH' },
     { level: 16, attackId: 'BARREL_BOWLING' },
   ],
   evolutionNodes: [{ level: 16, evolutionDefId: 'macask' }],
@@ -860,7 +860,7 @@ export const MACASK: CosmoidTemplate = {
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
-    { level: 8, attackId: 'BARREL_BASH' },
+    { level: 6, attackId: 'BARREL_BASH' },
     { level: 16, attackId: 'BARREL_BOWLING' },
   ],
 };

@@ -84,10 +84,10 @@ describe('Shiko Quake', () => {
     expect(AttackBehaviorRegistry.SHIKO_QUAKE).toBe(ShikoQuakeBehavior);
     expect(
       CREATURE_TD_CONFIGS.attack_shiko_quake_1.default.vfxAnimation
-    ).toEqual({ type: 'SHIKO_QUAKE', durationMs: 650 });
+    ).toEqual({ type: 'SHIKO_QUAKE', durationMs: 420 });
   });
 
-  it('damages and staggers every eligible creature in range', () => {
+  it('damages and staggers every eligible creature on the slam frame', () => {
     const { engine, source } = battle();
     const first = createEnemy('first', 45);
     const second = createEnemy('second', 58);
@@ -95,6 +95,18 @@ describe('Shiko Quake', () => {
     engine.enemies = [first, second, distant];
 
     ShikoQuakeBehavior.execute(engine, source, ATTACK_DEFS.SHIKO_QUAKE);
+
+    expect(source.shikoQuake).toMatchObject({
+      startedAtMs: 0,
+      impactAtMs: 360,
+      endsAtMs: 700,
+      hasImpacted: false,
+    });
+    expect(first.hp).toBe(first.maxHp);
+    engine.tick(359, 359);
+    expect(first.hp).toBe(first.maxHp);
+    expect(engine.visualEffects).toEqual([]);
+    engine.tick(360, 1);
 
     for (const target of [first, second]) {
       expect(target.hp).toBeLessThan(target.maxHp);
@@ -106,6 +118,25 @@ describe('Shiko Quake', () => {
     }
     expect(distant.hp).toBe(distant.maxHp);
     expect(distant.statusConditions).toEqual([]);
+    expect(source.shikoQuake?.hasImpacted).toBe(true);
+  });
+
+  it('starts from Yokodillo’s normal attack loop and remains committed through impact', () => {
+    const { engine, source } = battle();
+    const target = createEnemy('target', 50);
+    engine.enemies = [target];
+
+    engine.tick(2500, 16);
+    expect(source.shikoQuake).toMatchObject({
+      startedAtMs: 16,
+      impactAtMs: 376,
+      hasImpacted: false,
+    });
+    expect(target.hp).toBe(target.maxHp);
+
+    engine.tick(2860, 360);
+    expect(source.shikoQuake?.hasImpacted).toBe(true);
+    expect(target.hp).toBeLessThan(target.maxHp);
   });
 
   it('damages status-immune structures without staggering them and emits one radius effect', () => {
@@ -116,6 +147,7 @@ describe('Shiko Quake', () => {
     engine.enemies = [structure];
 
     ShikoQuakeBehavior.execute(engine, source, ATTACK_DEFS.SHIKO_QUAKE);
+    engine.tick(360, 360);
 
     expect(structure.hp).toBeLessThan(structure.maxHp);
     expect(structure.statusConditions).toEqual([]);
@@ -124,7 +156,21 @@ describe('Shiko Quake', () => {
         configId: 'attack_shiko_quake_1',
         position: source.position,
         rangeIndex: 22,
+        durationMs: 420,
       })
     );
+  });
+
+  it('cancels a pending slam when Yokodillo is moved off its origin', () => {
+    const { engine, source } = battle();
+    const target = createEnemy('target', 45);
+    engine.enemies = [target];
+    ShikoQuakeBehavior.execute(engine, source, ATTACK_DEFS.SHIKO_QUAKE);
+
+    engine.placeTower(source.creature.id, 42, 50);
+    expect(source.shikoQuake).toBeUndefined();
+    engine.tick(500, 500);
+    expect(target.hp).toBe(target.maxHp);
+    expect(target.statusConditions).toEqual([]);
   });
 });

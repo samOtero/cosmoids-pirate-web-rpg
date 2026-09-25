@@ -212,6 +212,8 @@ export interface VFXAnimationConfig {
     | 'STRING_SHOT'
     | 'WIND_GUST'
     | 'TOXIC_POLLEN'
+    | 'SHARED_SLUMBER'
+    | 'SHARED_SLUMBER_WAKE'
     | 'SHIKO_QUAKE'
     | 'HOWL'
     | 'RALLY_HOWL'
@@ -238,6 +240,7 @@ export interface VFXAnimationConfig {
 export interface UnitSpriteConfig {
   url?: string;
   scale?: number;
+  tint?: number;
   flipX?: boolean;
   flipY?: boolean;
   shadowScaleX?: number;

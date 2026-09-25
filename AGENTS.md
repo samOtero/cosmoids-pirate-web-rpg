@@ -30,6 +30,13 @@
 - Creature icons should be tight head-and-face portraits. Show only a minimal amount of neck when needed; do not include shoulders, chest, forelegs, or torso. Follow the framing of the existing Fueguana, Monkeg, Palmit, and Senticle icons rather than Mopup.
 - Keep full-quality creature masters as transparent PNGs under `art-source/` when PNG is the appropriate editable source format. Ship transparency-preserving WebP derivatives and preserve the dimensions declared by their creature manifest unless the integration is intentionally updated.
 
+## Tower combat direction
+
+- Read `docs/combat/TYPE_AND_FAMILY_IDENTITY.md` before designing or revising player attacks, active abilities, family traits, creature combat identities, learnsets, TM-style move teaching, type mechanics, or broad tower-defense balance.
+- Treat the move's type as the source of its type-focused behavior. A move retains its authored reach, targeting, utility, and other mechanics when learned by an off-type creature; creature typing instead governs affinity, natural access, and defensive matchups.
+- Preserve a separate family identity through signature mechanics, stats, learnsets, limitations, evolution development, and only when needed an inherent family trait. Ordinary TMs must not transfer another family's complete identity.
+- Do not treat the current creature stats, learnsets, attacks, abilities, or type-effectiveness values as approved merely because they are implemented. Audit them separately against the combat direction.
+
 ## Kip's journal sketch direction
 
 - For any new, replacement, or missing Cosmoid journal image, use `.agents/skills/create-cosmoid-journal-art/SKILL.md` for the complete concept, approval, generation, inspection, and integration workflow.

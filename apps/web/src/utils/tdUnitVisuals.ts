@@ -60,6 +60,9 @@ export function applyTDUnitTransforms(
     sprite.scale.y = tdConfig.flipY ? -baseScale : baseScale;
     sprite.x = tdConfig.offsetX ?? 0;
     sprite.y = tdConfig.offsetY ?? 0;
+    // Animation poses such as sleep sway are additive and must not leak into
+    // the unit's next normal frame.
+    sprite.rotation = 0;
 
     const shadowOffsetX = tdConfig.shadowOffsetX ?? 0;
     const shadowOffsetY = tdConfig.shadowOffsetY ?? 0;
@@ -156,7 +159,7 @@ export function applyTDUnitTransforms(
       0,
     ];
   } else {
-    sprite.tint = 0xffffff;
+    sprite.tint = tdConfig.tint ?? 0xffffff;
     if (sprite.filters) {
       const currentFilters = Array.isArray(sprite.filters)
         ? [...sprite.filters]

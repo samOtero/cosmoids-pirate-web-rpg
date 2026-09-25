@@ -102,6 +102,18 @@ describe('unit sprite transitions', () => {
     expect(load).toHaveBeenCalledOnce();
   });
 
+  it('clears temporary pose rotation when the normal layout is reapplied', async () => {
+    mockTextureLoad().mockResolvedValue(walking());
+    const { sprite, update } = createVisuals();
+    update('left');
+    await Promise.resolve();
+
+    sprite.rotation = 0.25;
+    update('left');
+
+    expect(sprite.rotation).toBe(0);
+  });
+
   it('ignores an obsolete load even when the unit returns to the same URL', async () => {
     const oldWalk = deferredTexture();
     const pendingIdle = deferredTexture();

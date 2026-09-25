@@ -6,6 +6,7 @@ const ATTACK_COOLDOWNS = {
   QUICK: 400,
   FAST: 600,
   HEAVY: 1000,
+  SLOW: 1200,
   CONTROL: 1600,
 };
 
@@ -25,6 +26,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     cooldownMs: 10000,
     rangeIndex: ATTACK_RANGES.NORMAL,
     behaviorType: 'SHARED_SLUMBER',
+    visualEffectConfigId: 'attack_shared_slumber_1',
   },
   SHIKO_QUAKE: {
     id: 'SHIKO_QUAKE',
@@ -111,6 +113,28 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     projectileSpeed: 1,
     visualEffectConfigId: 'attack_scratch_1',
     isDashAttack: true,
+  },
+  FIRE_CLAW: {
+    id: 'FIRE_CLAW',
+    name: 'Kindle Claw',
+    description:
+      'Rakes the target with a kindling claw. Successful hits build persistent Heat, increasing Kindle Claw damage by 20% per stack up to three stacks. Heat cools during a lull and is lost when the user moves.',
+    type: ElementType.FIRE,
+    category: 'physical',
+    power: 20,
+    cooldownMs: ATTACK_COOLDOWNS.NORMAL,
+    rangeIndex: ATTACK_RANGES.NORMAL,
+    behaviorType: 'PROJECTILE',
+    projectileSpeed: 1,
+    visualEffectConfigId: 'attack_fire_claw_1',
+    isDashAttack: true,
+    dashTrailType: 'FIRE',
+    fireClawHeat: {
+      maxStacks: 3,
+      damageBonusPerStack: 0.2,
+      lullBeforeDecayMs: 3000,
+      decayIntervalMs: 2000,
+    },
   },
   VINE_WHIP: {
     id: 'VINE_WHIP',
@@ -233,17 +257,48 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
   BARREL_BASH: {
     id: 'BARREL_BASH',
     name: 'Barrel Bash',
+    description:
+      'Smashes one target with its barrel. The impact pushes other nearby enemies backward without damaging them.',
     type: ElementType.WATER,
     category: 'physical',
     power: 40,
-    cooldownMs: ATTACK_COOLDOWNS.HEAVY,
+    cooldownMs: ATTACK_COOLDOWNS.SLOW,
     rangeIndex: ATTACK_RANGES.NORMAL,
     behaviorType: 'PROJECTILE',
     projectileSpeed: 1.15,
-    effects: [{ type: 'DRENCHED', chance: 0.25, value: 4000 }],
+    secondaryImpactPush: {
+      radiusIndex: 12,
+      distance: 8,
+    },
     visualEffectConfigId: 'attack_barrel_bash_1',
     isDashAttack: true,
     dashTrailType: 'WATER',
+  },
+  COIR_SNAP: {
+    id: 'COIR_SNAP',
+    name: 'Husk Shot',
+    description:
+      'Fires a compact shot of coconut husk fiber. Every third successful hit tightens into a coir snare that binds its target for 0.5 seconds.',
+    type: ElementType.GRASS,
+    category: 'physical',
+    power: 25,
+    cooldownMs: 900,
+    rangeIndex: ATTACK_RANGES.NORMAL,
+    behaviorType: 'PROJECTILE',
+    projectileSpeed: 1.35,
+    projectileVisual: {
+      type: 'COIR_BOLA',
+      shadowColor: 0x4a2c1a,
+      fiberColor: 0xb7793f,
+      highlightColor: 0xe7b96c,
+      sparkColor: 0x84cc16,
+    },
+    coirSnapCombo: {
+      hitsToBind: 3,
+      bindDurationMs: 500,
+      bindVisualEffectConfigId: 'attack_coir_snare_1',
+      projectileScales: [0.72, 0.86, 1],
+    },
   },
   COIR_SNARE: {
     id: 'COIR_SNARE',

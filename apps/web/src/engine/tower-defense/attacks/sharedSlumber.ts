@@ -6,6 +6,8 @@ export const SHARED_SLUMBER_DURATION_MS = 6000;
 export const SHARED_SLUMBER_GUARANTEED_MS = 750;
 export const SHARED_SLUMBER_WAKE_CHANCE = 0.2;
 export const SHARED_SLUMBER_RESISTANCE_MS = 8000;
+const SHARED_SLUMBER_CAST_VFX_MS = 800;
+const SHARED_SLUMBER_WAKE_VFX_MS = 360;
 
 export function isSleeping(enemy: Enemy): boolean {
   return enemy.statusConditions.some((status) => status.type === 'SLEEP');
@@ -48,6 +50,14 @@ export function wakeFromSharedSlumber(
   );
 
   if (showText && enemy.hp > 0) {
+    engine.visualEffects.push({
+      id: `vfx_shared_slumber_wake_${enemy.id}_${engine.elapsedTimeMs}_${Math.random()}`,
+      configId: 'attack_shared_slumber_wake_1',
+      position: { ...enemy.position },
+      durationMs: SHARED_SLUMBER_WAKE_VFX_MS,
+      elapsedMs: 0,
+      targetId: enemy.id,
+    });
     engine.floatingTexts.push({
       id: `ft_awake_${enemy.id}_${engine.elapsedTimeMs}_${Math.random()}`,
       text: 'Awake!',
@@ -97,12 +107,24 @@ export const SharedSlumberBehavior: AttackBehavior = {
     source.sharedSlumberUntilMs =
       engine.elapsedTimeMs + SHARED_SLUMBER_DURATION_MS;
 
+    if (attackDef.visualEffectConfigId) {
+      engine.visualEffects.push({
+        id: `vfx_shared_slumber_${source.id}_${engine.elapsedTimeMs}_${Math.random()}`,
+        configId: attackDef.visualEffectConfigId,
+        position: { ...source.position },
+        durationMs: SHARED_SLUMBER_CAST_VFX_MS,
+        elapsedMs: 0,
+        facingDirection: source.facingDirection,
+        rangeIndex: engine.getTowerAttackRange(attackDef.rangeIndex),
+        targetIds: targets.map((enemy) => enemy.id),
+      });
+    }
+
     for (const enemy of targets) {
       enemy.statusConditions.push({
         type: 'SLEEP',
         durationMs: SHARED_SLUMBER_DURATION_MS,
-        wakeChecksAfterMs:
-          engine.elapsedTimeMs + SHARED_SLUMBER_GUARANTEED_MS,
+        wakeChecksAfterMs: engine.elapsedTimeMs + SHARED_SLUMBER_GUARANTEED_MS,
       });
       enemy.damagedByTowerIds.add(source.id);
       engine.floatingTexts.push({

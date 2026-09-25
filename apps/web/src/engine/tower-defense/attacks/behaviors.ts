@@ -8,6 +8,7 @@ import { applyAttackSpeedBuff } from '../attackSpeedModifiers';
 import { RollingBarrelBehavior } from './rollingBarrel';
 import { ConstrictionBehavior } from './deepwaterGrip';
 import { SharedSlumberBehavior } from './sharedSlumber';
+import { ShikoQuakeBehavior } from './shikoQuake';
 
 const MAX_PROJECTILES_PER_PATTERN = 12;
 
@@ -100,6 +101,12 @@ export const ProjectileBehavior: AttackBehavior = {
         : 1;
       const directionX = distance > 0 ? dx / distance : 0;
       const directionY = distance > 0 ? dy / distance : 0;
+      const coirSnapScales = attackDef.coirSnapCombo?.projectileScales;
+      const coirSnapScale = coirSnapScales
+        ? (coirSnapScales[
+            Math.min(source.coirSnapHits ?? 0, coirSnapScales.length - 1)
+          ] ?? 1)
+        : 1;
 
       for (let index = 0; index < projectileCount; index += 1) {
         const spacing = (pattern?.spacing ?? 0) * index;
@@ -117,7 +124,10 @@ export const ProjectileBehavior: AttackBehavior = {
           speed: attackDef.projectileSpeed || 1,
           damage: attackDef.power,
           dealsDamage: pattern?.damageMode !== 'FIRST_ONLY' || index === 0,
-          visualScale: pattern?.scales[index] ?? 1,
+          visualScale: (pattern?.scales[index] ?? 1) * coirSnapScale,
+          fireClawHeatStacks: attackDef.fireClawHeat
+            ? (source.fireClawHeat?.stacks ?? 0)
+            : undefined,
           target: { ...enemyTarget.position },
           facingDirection,
         });
@@ -425,52 +435,6 @@ export const PoisonAoeBehavior: AttackBehavior = {
   },
 };
 
-export const ShikoQuakeBehavior: AttackBehavior = {
-  canExecute(engine, source, attackDef): boolean {
-    return engine.enemies.some(
-      (enemy) =>
-        engine.isEnemyTargetable(enemy) &&
-        engine.isPositionInTowerRange(
-          source.position,
-          enemy.position,
-          attackDef.rangeIndex
-        )
-    );
-  },
-
-  execute(engine, source, attackDef): void {
-    const targets = engine.enemies.filter(
-      (enemy) =>
-        engine.isEnemyTargetable(enemy) &&
-        engine.isPositionInTowerRange(
-          source.position,
-          enemy.position,
-          attackDef.rangeIndex
-        )
-    );
-    if (targets.length === 0) return;
-
-    for (const enemy of targets) {
-      EffectProcessor.applyDamageAndEffects(engine, source, enemy, attackDef);
-      if (enemy.hp <= 0) engine.emitEnemyDefeated(enemy, source);
-    }
-
-    if (attackDef.visualEffectConfigId) {
-      const configId = attackDef.visualEffectConfigId;
-      const vfxConfig = CREATURE_TD_CONFIGS[configId]?.default?.vfxAnimation;
-      engine.visualEffects.push({
-        id: `vfx_shiko_quake_${source.id}_${engine.elapsedTimeMs}_${Math.random()}`,
-        configId,
-        position: { ...source.position },
-        durationMs: vfxConfig?.durationMs ?? 650,
-        elapsedMs: 0,
-        facingDirection: source.facingDirection,
-        rangeIndex: engine.getTowerAttackRange(attackDef.rangeIndex),
-      });
-    }
-  },
-};
-
 export const SupportAuraBehavior: AttackBehavior = {
   canExecute(engine, source, attackDef) {
     // Open with the howl as soon as enemies arrive, without wasting it between waves.
@@ -599,3 +563,5 @@ export const AttackBehaviorRegistry: Record<string, AttackBehavior> = {
   SUPPORT_AURA: SupportAuraBehavior,
   REPAIR_SUPPORT: RepairSupportBehavior,
 };
+
+export { ShikoQuakeBehavior };

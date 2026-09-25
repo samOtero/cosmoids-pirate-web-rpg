@@ -42,10 +42,16 @@ import {
 import { EffectProcessor } from './attacks/EffectProcessor';
 import { updateRollingBarrel } from './attacks/rollingBarrel';
 import { releaseDeepwaterGrip, updateDeepwaterGrips } from './attacks/deepwaterGrip';
+import { resetFireClawHeat, updateFireClawHeat } from './attacks/fireClaw';
+import { pushBarrelBashSecondaryTargets } from './attacks/barrelBash';
 import {
   isSleeping,
   wakeFromSharedSlumber,
 } from './attacks/sharedSlumber';
+import {
+  cancelShikoQuake,
+  updateShikoQuakes,
+} from './attacks/shikoQuake';
 import { getAttackSpeedMultiplier } from './attackSpeedModifiers';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { TDWave, TDWaveGroup, Point } from './types';
@@ -309,8 +315,8 @@ export class TowerDefenseEngine {
 
   public static getDefaultAttacks(speciesId: string): string[] {
     const defaultAttacks: string[] = [];
-    if (speciesId === 'starter_crab') defaultAttacks.push('PINCH');
-    else if (speciesId === 'starter_iguana') defaultAttacks.push('SCRATCH');
+    if (speciesId === 'starter_crab') defaultAttacks.push('COIR_SNAP');
+    else if (speciesId === 'starter_iguana') defaultAttacks.push('FIRE_CLAW');
     else if (speciesId === 'starter_monkey') defaultAttacks.push('TACKLE');
     else if (speciesId === 'mouse_1') defaultAttacks.push('NIBBLE');
     else if (speciesId === 'harlequill') defaultAttacks.push('PECK');
@@ -1098,13 +1104,16 @@ export class TowerDefenseEngine {
     // Towers attack
     // Target selection must see captures/despawns from this frame.
     this.enemies = newEnemies;
+    updateShikoQuakes(this, newTowers, newEnemies);
     newTowers.forEach((tower) => {
+      updateFireClawHeat(tower, ATTACK_DEFS.FIRE_CLAW, this.elapsedTimeMs);
       if (tower.damageFlashTimerMs) {
         tower.damageFlashTimerMs -= deltaMs;
         if (tower.damageFlashTimerMs < 0) tower.damageFlashTimerMs = 0;
       }
       if (
         tower.deepwaterGrip ||
+        tower.shikoQuake ||
         (tower.sharedSlumberUntilMs ?? 0) > this.elapsedTimeMs ||
         tower.hp <= 0
       )
@@ -1258,6 +1267,7 @@ export class TowerDefenseEngine {
               resolveAdaptiveTargetedAoeImpact(this, source, dashDef, target, false);
             } else {
               EffectProcessor.applyDamageAndEffects(this, source, target, dashDef);
+              pushBarrelBashSecondaryTargets(this, target, dashDef);
               if (target.hp <= 0) this.emitEnemyDefeated(target, source);
             }
           }
@@ -1297,6 +1307,7 @@ export class TowerDefenseEngine {
                   target,
                   attackDef
                 );
+                pushBarrelBashSecondaryTargets(this, target, attackDef);
               }
 
               if (
@@ -3041,6 +3052,8 @@ export class TowerDefenseEngine {
 
   private moveTowerToReserve(tower: Tower): void {
     releaseDeepwaterGrip(this, tower);
+    cancelShikoQuake(tower);
+    resetFireClawHeat(tower);
     this.towers = this.towers.filter((candidate) => candidate.id !== tower.id);
     this.reserveTowers.set(tower.creature.id, tower);
   }
@@ -3072,6 +3085,10 @@ export class TowerDefenseEngine {
 
       if (targetTower) {
         if (targetTower.isFixed) return false;
+        cancelShikoQuake(targetTower);
+        cancelShikoQuake(existingTower);
+        resetFireClawHeat(targetTower);
+        resetFireClawHeat(existingTower);
         releaseDeepwaterGrip(this, targetTower);
         // Swap positions
         targetTower.position = {
@@ -3083,6 +3100,8 @@ export class TowerDefenseEngine {
         existingTower.facingDirection = 'down';
       } else {
         // Move
+        cancelShikoQuake(existingTower);
+        resetFireClawHeat(existingTower);
         existingTower.position = { x, y };
         existingTower.facingDirection = 'down';
       }
@@ -3786,27 +3805,27 @@ export class TowerDefenseEngine {
     return multiplier;
   }
 
-  private pushEnemyAgainstMovement(
-    enemy: Enemy,
-    current: ObjectiveAllyCurrent
-  ): void {
+  public pushEnemyAgainstMovement(enemy: Enemy, pushDistance: number): void {
+    const path = this.paths[enemy.pathIndex];
+    if (
+      enemy.kind === 'structure' ||
+      enemy.laneHopState?.phase === 'airborne' ||
+      !path ||
+      path.length < 2
+    ) {
+      return;
+    }
+
     const projection = projectPointOntoPath(
       enemy.position,
-      current.path,
+      path,
       this.aspectRatio
     );
     if (!projection) return;
 
-    const totalProgress = current.path
-      .slice(1)
-      .reduce(
-        (total, point, index) =>
-          total +
-          getPathSegmentLength(current.path[index], point, this.aspectRatio),
-        0
-      );
+    const totalProgress = getPathLength(path, this.aspectRatio);
     const normalizedPush =
-      current.pushDistance /
+      pushDistance /
       (Math.max(this.aspectRatio, Number.EPSILON) * this.backgroundScale);
     const pushedProgress = Math.max(
       0,
@@ -3816,24 +3835,15 @@ export class TowerDefenseEngine {
       )
     );
     enemy.position = getPointAtPathProgress(
-      current.path,
+      path,
       pushedProgress,
       this.aspectRatio
     );
-
-    let cumulativeProgress = 0;
-    let segmentEndIndex = current.path.length - 1;
-    for (let index = 1; index < current.path.length; index++) {
-      cumulativeProgress += getPathSegmentLength(
-        current.path[index - 1],
-        current.path[index],
-        this.aspectRatio
-      );
-      if (pushedProgress <= cumulativeProgress) {
-        segmentEndIndex = index;
-        break;
-      }
-    }
+    const segmentEndIndex = getWaypointIndexAfterPathProgress(
+      path,
+      pushedProgress,
+      this.aspectRatio
+    );
     enemy.currentWaypointIndex = enemy.isMovingBackward
       ? Math.max(0, segmentEndIndex - 1)
       : segmentEndIndex;
@@ -3855,7 +3865,7 @@ export class TowerDefenseEngine {
           !pushedEnemyIds.has(enemy.id) &&
           this.isEnemyInsideObjectiveCurrent(enemy, current)
         ) {
-          this.pushEnemyAgainstMovement(enemy, current);
+          this.pushEnemyAgainstMovement(enemy, current.pushDistance);
           pushedEnemyIds.add(enemy.id);
         }
       }
