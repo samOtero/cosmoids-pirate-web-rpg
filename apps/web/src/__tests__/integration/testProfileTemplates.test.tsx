@@ -70,7 +70,7 @@ describe('test profile templates', () => {
       expect.objectContaining({
         speciesId: 'harlequill',
         level: 5,
-        equippedAttacks: ['PECK', 'WIND_GUST'],
+        equippedAttacks: ['PECK', 'FUNNY_DANCE'],
       }),
     ]);
   });

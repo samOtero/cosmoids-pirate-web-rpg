@@ -211,6 +211,8 @@ export interface VFXAnimationConfig {
     | 'COIR_SNARE'
     | 'STRING_SHOT'
     | 'WIND_GUST'
+    | 'FUNNY_DANCE'
+    | 'FLYING_COLORS'
     | 'TOXIC_POLLEN'
     | 'SHARED_SLUMBER'
     | 'SHARED_SLUMBER_WAKE'

@@ -86,7 +86,7 @@ describe('Loose End', () => {
       rangeIndex: 40,
       projectileSpeed: 1.4,
       projectileVisual: { type: 'STRING_COIL' },
-      looseEnd: { followUpRadius: 24 },
+      looseEnd: { followUpRadius: 40 },
     });
   });
 

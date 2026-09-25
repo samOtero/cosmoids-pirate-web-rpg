@@ -128,6 +128,8 @@ export const ProjectileBehavior: AttackBehavior = {
           fireClawHeatStacks: attackDef.fireClawHeat
             ? (source.fireClawHeat?.stacks ?? 0)
             : undefined,
+          flyingColorsHitIds: attackDef.flyingColors ? [] : undefined,
+          flyingColorsHitPositions: attackDef.flyingColors ? [] : undefined,
           target: { ...enemyTarget.position },
           facingDirection,
         });
@@ -300,6 +302,108 @@ export function resolveAdaptiveTargetedAoeImpact(
     });
   }
 }
+
+export const FunnyDanceBehavior: AttackBehavior = {
+  canExecute(
+    engine: TowerDefenseEngine,
+    source: Tower,
+    attackDef: AttackDefinition
+  ): boolean {
+    return engine.enemies.some(
+      (enemy) =>
+        engine.isEnemyTargetable(enemy) &&
+        engine.isPositionInTowerRange(
+          source.position,
+          enemy.position,
+          attackDef.rangeIndex
+        ) &&
+        Boolean(enemy.heldCaptureUnitId) &&
+        !enemy.hasBeenWindDisarmed
+    );
+  },
+
+  execute(
+    engine: TowerDefenseEngine,
+    source: Tower,
+    attackDef: AttackDefinition
+  ): void {
+    const pickupLockMs = attackDef.itemPickupLockMs ?? 2000;
+    const danceDurationMs = 900;
+    const reactionDurationMs = 650;
+    const affectedEnemyIds: string[] = [];
+
+    source.funnyDance = {
+      startedAtMs: engine.elapsedTimeMs,
+      endsAtMs: engine.elapsedTimeMs + danceDurationMs,
+    };
+
+    engine.enemies.forEach((enemy) => {
+      if (
+        !engine.isEnemyTargetable(enemy) ||
+        enemy.kind === 'structure' ||
+        !engine.isPositionInTowerRange(
+          source.position,
+          enemy.position,
+          attackDef.rangeIndex
+        )
+      ) {
+        return;
+      }
+
+      affectedEnemyIds.push(enemy.id);
+      enemy.itemPickupBlockedUntilMs = Math.max(
+        enemy.itemPickupBlockedUntilMs ?? 0,
+        engine.elapsedTimeMs + pickupLockMs
+      );
+      enemy.funnyDanceReaction = {
+        startedAtMs: engine.elapsedTimeMs,
+        endsAtMs: engine.elapsedTimeMs + reactionDurationMs,
+      };
+
+      if (!enemy.heldCaptureUnitId || enemy.hasBeenWindDisarmed) return;
+
+      const carriedUnit = engine.captureUnits.find(
+        (unit) => unit.id === enemy.heldCaptureUnitId
+      );
+      if (
+        !carriedUnit ||
+        (carriedUnit.heldByEnemyId !== enemy.id &&
+          !carriedUnit.groupHauling)
+      ) {
+        return;
+      }
+
+      engine.dropCaptureUnit(enemy);
+      enemy.hasBeenWindDisarmed = true;
+      enemy.damagedByTowerIds.add(source.id);
+
+      engine.floatingTexts.push({
+        id: `ft_drop_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+        text: 'Dropped!',
+        position: { ...enemy.position },
+        color: 0xf4c76b,
+        scale: 0.85,
+        durationMs: 900,
+        elapsedMs: 0,
+      });
+    });
+
+    if (attackDef.visualEffectConfigId) {
+      const configMap = CREATURE_TD_CONFIGS[attackDef.visualEffectConfigId];
+      const vfxConfig = configMap?.default?.vfxAnimation;
+      engine.visualEffects.push({
+        id: `vfx_${Date.now()}_${Math.random()}`,
+        configId: attackDef.visualEffectConfigId,
+        position: { ...source.position },
+        durationMs: vfxConfig?.durationMs ?? 750,
+        elapsedMs: 0,
+        facingDirection: source.facingDirection,
+        rangeIndex: engine.getTowerAttackRange(attackDef.rangeIndex),
+        targetIds: affectedEnemyIds,
+      });
+    }
+  },
+};
 
 export const InstantAoeBehavior: AttackBehavior = {
   canExecute(
@@ -558,6 +662,7 @@ export const AttackBehaviorRegistry: Record<string, AttackBehavior> = {
   PROJECTILE: ProjectileBehavior,
   INSTANT_MELEE: InstantMeleeBehavior,
   INSTANT_AOE: InstantAoeBehavior,
+  FUNNY_DANCE: FunnyDanceBehavior,
   ADAPTIVE_TARGETED_AOE: AdaptiveTargetedAoeBehavior,
   POISON_AOE: PoisonAoeBehavior,
   SUPPORT_AURA: SupportAuraBehavior,

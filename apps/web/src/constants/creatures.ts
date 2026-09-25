@@ -70,8 +70,8 @@ export const BIRD_1: CosmoidTemplate = {
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'PECK' },
-    { level: 5, attackId: 'WIND_GUST' },
-    { level: 9, attackId: 'QUICK_ATTACK' },
+    { level: 5, attackId: 'FUNNY_DANCE' },
+    { level: 9, attackId: 'FLYING_COLORS' },
   ],
 };
 

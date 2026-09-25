@@ -913,6 +913,39 @@ function drawSailcutterProjectile(
   container.addChild(lowerBlade);
 }
 
+type FlyingColorsTrailPoint = { x: number; y: number; time: number };
+
+const FLYING_COLORS_TRAIL_LIFETIME_MS = 260;
+const FLYING_COLORS_TRAIL_PALETTE = [0xfb7185, 0x38bdf8, 0x4ade80];
+
+function drawFlyingColorsTrail(
+  graphics: PIXI.Graphics,
+  points: FlyingColorsTrailPoint[],
+  now: number,
+  color: number
+) {
+  graphics.clear();
+  for (let index = 1; index < points.length; index += 1) {
+    const from = points[index - 1];
+    const to = points[index];
+    const fade = Math.max(
+      0,
+      1 - (now - from.time) / FLYING_COLORS_TRAIL_LIFETIME_MS
+    );
+    graphics.moveTo(from.x, from.y);
+    graphics.lineTo(to.x, to.y);
+    graphics.stroke({ color, width: 5.5, alpha: 0.16 * fade, cap: 'round' });
+    graphics.moveTo(from.x, from.y);
+    graphics.lineTo(to.x, to.y);
+    graphics.stroke({
+      color: 0xfff7ed,
+      width: 1.4,
+      alpha: 0.48 * fade,
+      cap: 'round',
+    });
+  }
+}
+
 function drawWaterDashTrail(trail: PIXI.Graphics) {
   const streaks = [
     { y: -16, length: 58, width: 7, color: 0x7dd3fc },
@@ -1162,6 +1195,20 @@ function drawWindGust(container: PIXI.Container) {
   const streaks = new PIXI.Graphics();
   streaks.label = 'wind_gust_streaks';
   container.addChild(streaks);
+}
+
+function drawFunnyDance(container: PIXI.Container) {
+  const haze = new PIXI.Graphics();
+  haze.label = 'funny_dance_haze';
+  container.addChild(haze);
+
+  const motionLines = new PIXI.Graphics();
+  motionLines.label = 'funny_dance_motion_lines';
+  container.addChild(motionLines);
+
+  const notes = new PIXI.Graphics();
+  notes.label = 'funny_dance_notes';
+  container.addChild(notes);
 }
 
 function drawSharedSlumberCast(container: PIXI.Container) {
@@ -1573,6 +1620,136 @@ function updateWindGust(
 
   container.rotation = progress * 0.32;
   container.alpha = opacity;
+}
+
+function updateFunnyDance(
+  container: PIXI.Container,
+  progress: number,
+  maxRadius: number
+) {
+  const haze = container.getChildByLabel('funny_dance_haze') as
+    | PIXI.Graphics
+    | undefined;
+  const motionLines = container.getChildByLabel(
+    'funny_dance_motion_lines'
+  ) as PIXI.Graphics | undefined;
+  const notes = container.getChildByLabel('funny_dance_notes') as
+    | PIXI.Graphics
+    | undefined;
+  const entrance = Math.min(1, progress / 0.24);
+  const expansion = 1 - Math.pow(1 - entrance, 3);
+  const fade = 1 - Math.max(0, (progress - 0.7) / 0.3);
+  const radius = Math.max(4, maxRadius * expansion);
+  const palette = [0xfb7185, 0xfacc15, 0x4ade80, 0x38bdf8, 0xc084fc];
+
+  if (haze) {
+    haze.clear();
+    haze.circle(0, 0, radius * 0.92);
+    haze.fill({ color: 0xfdf4ff, alpha: 0.075 * fade });
+    haze.circle(0, 0, radius * 0.58);
+    haze.fill({ color: 0xfef3c7, alpha: 0.08 * fade });
+  }
+
+  if (motionLines) {
+    motionLines.clear();
+    for (let index = 0; index < 15; index += 1) {
+      const angle = (index / 15) * Math.PI * 2 + progress * 1.8;
+      const distance = radius * (0.28 + (index % 5) * 0.13);
+      const length = 10 + (index % 4) * 4;
+      const x = Math.cos(angle) * distance;
+      const y = Math.sin(angle) * distance * 0.72;
+      const tangentX = -Math.sin(angle) * length;
+      const tangentY = Math.cos(angle) * length * 0.72;
+      motionLines.moveTo(x - tangentX, y - tangentY);
+      motionLines.quadraticCurveTo(
+        x + Math.cos(angle) * 7,
+        y + Math.sin(angle) * 5,
+        x + tangentX,
+        y + tangentY
+      );
+      motionLines.stroke({
+        color: palette[index % palette.length],
+        width: 2.4,
+        alpha: 0.76 * fade,
+        cap: 'round',
+      });
+    }
+  }
+
+  if (notes) {
+    notes.clear();
+    for (let index = 0; index < 12; index += 1) {
+      const angle = index * 2.399 + progress * (1.8 + (index % 3) * 0.3);
+      const distance = radius * (0.2 + (index % 6) * 0.12);
+      const bob = Math.sin(progress * Math.PI * 5 + index) * 4;
+      const x = Math.cos(angle) * distance;
+      const y = Math.sin(angle) * distance * 0.7 - 8 - progress * 10 + bob;
+      const size = 2.8 + (index % 3) * 0.6;
+      const color = palette[(index + 2) % palette.length];
+
+      notes.ellipse(x, y, size * 1.25, size);
+      notes.fill({ color, alpha: 0.94 * fade });
+      notes.moveTo(x + size, y - 1);
+      notes.lineTo(x + size, y - 10 - size);
+      notes.stroke({ color, width: 2.2, alpha: 0.94 * fade, cap: 'round' });
+      if (index % 2 === 0) {
+        notes.moveTo(x + size, y - 10 - size);
+        notes.quadraticCurveTo(
+          x + size + 7,
+          y - 9 - size,
+          x + size + 6,
+          y - 4 - size
+        );
+        notes.stroke({
+          color,
+          width: 2.2,
+          alpha: 0.94 * fade,
+          cap: 'round',
+        });
+      }
+    }
+  }
+
+  container.alpha = fade;
+}
+
+function drawFlyingColorsImpact(container: PIXI.Container) {
+  const burst = new PIXI.Graphics();
+  burst.label = 'flying_colors_burst';
+  container.addChild(burst);
+}
+
+function updateFlyingColorsImpact(container: PIXI.Container, progress: number) {
+  const burst = container.getChildByLabel('flying_colors_burst') as
+    | PIXI.Graphics
+    | undefined;
+  if (!burst) return;
+
+  const palette = [0xfb7185, 0xfacc15, 0x4ade80, 0x38bdf8, 0xc084fc];
+  const radius = 3 + progress * 18;
+  const fade = 1 - progress;
+  burst.clear();
+  burst.circle(0, 0, 4 + progress * 2);
+  burst.fill({ color: 0xfff7ed, alpha: 0.55 * fade });
+  for (let index = 0; index < 5; index += 1) {
+    const angle = (index / 5) * Math.PI * 2 + progress * 0.35;
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle) * radius * 0.72;
+    const tipX = x + Math.cos(angle) * 7;
+    const tipY = y + Math.sin(angle) * 7;
+    const sideX = -Math.sin(angle) * 2.5;
+    const sideY = Math.cos(angle) * 2.5;
+    burst.moveTo(x + sideX, y + sideY);
+    burst.quadraticCurveTo(tipX, tipY, x - sideX, y - sideY);
+    burst.quadraticCurveTo(
+      x - Math.cos(angle) * 3,
+      y - Math.sin(angle) * 3,
+      x + sideX,
+      y + sideY
+    );
+    burst.fill({ color: palette[index % palette.length], alpha: 0.8 * fade });
+  }
+  container.alpha = fade;
 }
 
 function drawToxicPollen(container: PIXI.Container) {
@@ -2262,6 +2439,42 @@ function updateSharedSlumberTowerVisual(
   indicator.alpha = 0.92 + Math.sin(elapsedTimeMs / 330) * 0.08;
 }
 
+function updateFunnyDanceTowerPose(
+  sprite: PIXI.Sprite,
+  tower: Tower,
+  elapsedTimeMs: number
+) {
+  const dance = tower.funnyDance;
+  if (!dance || elapsedTimeMs >= dance.endsAtMs) return;
+
+  const durationMs = Math.max(1, dance.endsAtMs - dance.startedAtMs);
+  const progress = Math.max(
+    0,
+    Math.min(1, (elapsedTimeMs - dance.startedAtMs) / durationMs)
+  );
+  const envelope = Math.sin(progress * Math.PI);
+  const sway = Math.sin(progress * Math.PI * 8);
+  sprite.rotation += sway * 0.23 * envelope;
+  sprite.y -= Math.abs(sway) * 2.5 * envelope;
+}
+
+function updateFunnyDanceEnemyPose(
+  sprite: PIXI.Sprite,
+  enemy: Enemy,
+  elapsedTimeMs: number
+) {
+  const reaction = enemy.funnyDanceReaction;
+  if (!reaction || elapsedTimeMs >= reaction.endsAtMs) return;
+
+  const durationMs = Math.max(1, reaction.endsAtMs - reaction.startedAtMs);
+  const progress = Math.max(
+    0,
+    Math.min(1, (elapsedTimeMs - reaction.startedAtMs) / durationMs)
+  );
+  const envelope = Math.sin(progress * Math.PI);
+  sprite.rotation += Math.sin(progress * Math.PI * 6) * 0.1 * envelope;
+}
+
 const TYPE_COLORS: Record<ElementType, number> = {
   [ElementType.WATER]: 0x3b82f6,
   [ElementType.FIRE]: 0xef4444,
@@ -2882,6 +3095,11 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         await PIXI.Assets.load(bgUrl);
         if (isDestroyed) return;
 
+        const flyingColorsVisual = ATTACK_DEFS.FLYING_COLORS.projectileVisual;
+        if (flyingColorsVisual?.type === 'FLYING_COLORS') {
+          void PIXI.Assets.load(flyingColorsVisual.spriteUrl);
+        }
+
         const bgSprite = PIXI.Sprite.from(bgUrl);
         backgroundLayer.addChild(bgSprite);
         const mosaicCurrentGraphics = new PIXI.Graphics();
@@ -3038,6 +3256,14 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         const destroyedStructureSprites = new Map<string, PIXI.Container>();
         const captureUnitSprites = new Map<string, PIXI.Container>();
         const projectileSprites = new Map<string, PIXI.Container>();
+        const flyingColorsTrails = new Map<
+          string,
+          {
+            graphics: PIXI.Graphics;
+            points: FlyingColorsTrailPoint[];
+            color: number;
+          }
+        >();
         const vfxSprites = new Map<string, PIXI.Container>();
         const floatingTextSprites = new Map<string, PIXI.Text>();
         const recoveryFeedSprites = new Map<string, PIXI.Container>();
@@ -4093,6 +4319,11 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 tower,
                 engine.elapsedTimeMs
               );
+              updateFunnyDanceTowerPose(
+                tsprite,
+                tower,
+                engine.elapsedTimeMs
+              );
 
               // Fade tower if it's currently performing a Tackle attack
               const isTackling = engine.projectiles.some(
@@ -4616,6 +4847,11 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 screenH,
                 finalScale
               );
+              updateFunnyDanceEnemyPose(
+                esprite,
+                enemy,
+                engine.elapsedTimeMs
+              );
             }
 
             renderHealthBar(
@@ -4807,6 +5043,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           }
 
           // --- Render Projectiles ---
+          const trailNow = performance.now();
           const currentProjIds = new Set(engine.projectiles.map((p) => p.id));
           for (const [id, container] of projectileSprites.entries()) {
             if (!currentProjIds.has(id)) {
@@ -4911,6 +5148,35 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                   def.projectileVisual.windColor,
                   def.projectileVisual.highlightColor
                 );
+              } else if (def?.projectileVisual?.type === 'FLYING_COLORS') {
+                const feather = new PIXI.Sprite();
+                feather.label = 'flying_colors_feather';
+                feather.anchor.set(0.5);
+                feather.visible = false;
+                container.addChild(feather);
+                void PIXI.Assets.load(def.projectileVisual.spriteUrl).then(
+                  (texture) => {
+                    if (feather.destroyed) return;
+                    feather.texture = texture as PIXI.Texture;
+                    feather.width = 48;
+                    feather.height = 24;
+                    feather.visible = true;
+                  }
+                );
+
+                const graphics = new PIXI.Graphics();
+                graphics.label = 'flying_colors_trail';
+                graphics.eventMode = 'none';
+                airFxLayer.addChild(graphics);
+                flyingColorsTrails.set(proj.id, {
+                  graphics,
+                  points: [],
+                  color:
+                    FLYING_COLORS_TRAIL_PALETTE[
+                      (proj.flyingColorsHitIds?.length ?? 0) %
+                        FLYING_COLORS_TRAIL_PALETTE.length
+                    ],
+                });
               } else {
                 const g = new PIXI.Graphics();
                 g.label = 'proj_graphics';
@@ -5002,6 +5268,37 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 (28 - easedProgress * 56) * finalScale;
               container.alpha = Math.min(1, lickProgress / 0.16);
               container.rotation = 0;
+            } else if (def?.projectileVisual?.type === 'FLYING_COLORS') {
+              const travelX = proj.target.x - proj.position.x;
+              const travelY = proj.target.y - proj.position.y;
+              const direction = Math.atan2(travelY, travelX);
+              const progress = getElectricAttackFlightProgress(
+                proj.origin ?? proj.position,
+                proj.position,
+                proj.target
+              );
+              const arc = Math.sin(progress * Math.PI) * 10 * finalScale;
+              const side = (proj.flyingColorsHitIds?.length ?? 0) % 2 ? -1 : 1;
+              container.x -= Math.sin(direction) * arc * side;
+              container.y += Math.cos(direction) * arc * side;
+              container.rotation = direction +
+                Math.sin(engine.elapsedTimeMs / 85) * 0.07;
+
+              const trail = flyingColorsTrails.get(proj.id);
+              if (trail) {
+                const last = trail.points[trail.points.length - 1];
+                if (
+                  !last ||
+                  Math.hypot(container.x - last.x, container.y - last.y) > 2
+                ) {
+                  trail.points.push({
+                    x: container.x,
+                    y: container.y,
+                    time: trailNow,
+                  });
+                  if (trail.points.length > 24) trail.points.shift();
+                }
+              }
             } else if (
               def?.projectileVisual?.type === 'FLAME' ||
               def?.projectileVisual?.type === 'WATER_STREAM' ||
@@ -5104,6 +5401,25 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             }
           }
 
+          for (const [id, trail] of flyingColorsTrails) {
+            trail.points = trail.points.filter(
+              (point) =>
+                trailNow - point.time < FLYING_COLORS_TRAIL_LIFETIME_MS
+            );
+            if (!currentProjIds.has(id) && trail.points.length < 2) {
+              airFxLayer.removeChild(trail.graphics);
+              trail.graphics.destroy();
+              flyingColorsTrails.delete(id);
+              continue;
+            }
+            drawFlyingColorsTrail(
+              trail.graphics,
+              trail.points,
+              trailNow,
+              trail.color
+            );
+          }
+
           // --- Render Visual Effects ---
           const currentVfxIds = new Set(engine.visualEffects.map((v) => v.id));
           for (const [id, container] of vfxSprites.entries()) {
@@ -5189,6 +5505,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 container.addChild(rings);
               } else if (animConfig?.type === 'WIND_GUST') {
                 drawWindGust(container);
+              } else if (animConfig?.type === 'FUNNY_DANCE') {
+                drawFunnyDance(container);
+              } else if (animConfig?.type === 'FLYING_COLORS') {
+                drawFlyingColorsImpact(container);
               } else if (animConfig?.type === 'TOXIC_POLLEN') {
                 drawToxicPollen(container);
               } else if (animConfig?.type === 'SHARED_SLUMBER') {
@@ -5353,6 +5673,11 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             } else if (animConfig?.type === 'WIND_GUST') {
               const radius = (TD_BASE_HEIGHT * (vfx.rangeIndex ?? 20)) / 100;
               updateWindGust(container, progress, radius);
+            } else if (animConfig?.type === 'FUNNY_DANCE') {
+              const radius = (TD_BASE_HEIGHT * (vfx.rangeIndex ?? 60)) / 100;
+              updateFunnyDance(container, progress, radius);
+            } else if (animConfig?.type === 'FLYING_COLORS') {
+              updateFlyingColorsImpact(container, progress);
             } else if (animConfig?.type === 'TOXIC_POLLEN') {
               const radius = (TD_BASE_HEIGHT * (vfx.rangeIndex ?? 20)) / 100;
               updateToxicPollen(container, progress, radius);

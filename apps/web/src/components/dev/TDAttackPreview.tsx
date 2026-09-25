@@ -246,7 +246,9 @@ export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
       'attack-preview-tower',
       attackOptions.findIndex((attack) => attack.id === towerAttackId)
     );
-    if (towerAttackId === 'WIND_GUST') armWindGustTarget(engine);
+    if (towerAttackId === 'WIND_GUST' || towerAttackId === 'FUNNY_DANCE') {
+      armWindGustTarget(engine);
+    }
   }, [engine, towerAttackId]);
 
   useEffect(() => {
@@ -279,7 +281,7 @@ export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
     const animate = (time: number) => {
       if (previousTime !== null) {
         engine.tick(time, Math.min(time - previousTime, 50));
-        if (towerAttackId === 'WIND_GUST') {
+        if (towerAttackId === 'WIND_GUST' || towerAttackId === 'FUNNY_DANCE') {
           armWindGustTarget(engine);
         }
       }

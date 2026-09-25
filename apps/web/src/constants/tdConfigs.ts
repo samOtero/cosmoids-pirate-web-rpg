@@ -1006,6 +1006,22 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       },
     },
   },
+  attack_funny_dance_1: {
+    default: {
+      vfxAnimation: {
+        type: 'FUNNY_DANCE',
+        durationMs: 900,
+      },
+    },
+  },
+  attack_flying_colors_1: {
+    default: {
+      vfxAnimation: {
+        type: 'FLYING_COLORS',
+        durationMs: 360,
+      },
+    },
+  },
   attack_toxic_pollen_1: {
     default: {
       vfxAnimation: {

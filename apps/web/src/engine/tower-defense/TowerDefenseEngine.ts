@@ -45,6 +45,7 @@ import { releaseDeepwaterGrip, updateDeepwaterGrips } from './attacks/deepwaterG
 import { resetFireClawHeat, updateFireClawHeat } from './attacks/fireClaw';
 import { pushBarrelBashSecondaryTargets } from './attacks/barrelBash';
 import { launchLooseEndFollowUp } from './attacks/looseEnd';
+import { launchFlyingColorsFollowUp } from './attacks/flyingColors';
 import {
   isSleeping,
   wakeFromSharedSlumber,
@@ -1317,6 +1318,15 @@ export class TowerDefenseEngine {
                 !p.looseEndFollowUp
               ) {
                 launchLooseEndFollowUp(this, sourceTower, target, attackDef);
+              }
+              if (targetWasAlive && attackDef.flyingColors) {
+                launchFlyingColorsFollowUp(
+                  this,
+                  sourceTower,
+                  target,
+                  p,
+                  attackDef
+                );
               }
 
               if (

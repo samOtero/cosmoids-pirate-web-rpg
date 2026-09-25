@@ -478,6 +478,11 @@ export interface Tower extends BaseTDUnit {
     stacks: number;
     nextDecayAtMs: number;
   };
+  /** Brief side-to-side performance pose while casting Funny Dance. */
+  funnyDance?: {
+    startedAtMs: number;
+    endsAtMs: number;
+  };
   selectedAttackIndex: number;
   targetingMode?: TowerTargetingMode;
   isFixed?: boolean;
@@ -545,10 +550,15 @@ export interface Enemy extends BaseTDUnit {
   heldCaptureUnitId?: string; // ID of the CaptureUnit they are holding
   /** Enemy this cooperative hauler's rope connects to; omitted for Tigrevel anchors. */
   captureHaulLinkTargetEnemyId?: string;
-  /** Permanent guard: Wind Gust can force this enemy to drop an item only once. */
+  /** Permanent guard: objective-disarming moves can force this enemy to drop only once. */
   hasBeenWindDisarmed?: boolean;
-  /** While active, this enemy cannot pick up capture units; other enemies still can. */
+  /** While active, this enemy cannot pick up capture units. */
   itemPickupBlockedUntilMs?: number;
+  /** Short wobble response to Funny Dance; movement continues during the reaction. */
+  funnyDanceReaction?: {
+    startedAtMs: number;
+    endsAtMs: number;
+  };
   turnAroundAtEnd?: boolean;
   isMovingBackward?: boolean;
   uncapturable?: boolean;
@@ -727,6 +737,10 @@ export interface Projectile {
   fireClawHeatStacks?: number;
   /** Prevents Loose End's one permitted follow-up from chaining again. */
   looseEndFollowUp?: boolean;
+  /** Targets already struck by this Flying Colors projectile chain. */
+  flyingColorsHitIds?: string[];
+  /** Impact positions stay available for route scoring after defeated targets despawn. */
+  flyingColorsHitPositions?: Point[];
   target: Point;
   facingDirection?: 'up' | 'down' | 'left' | 'right';
   /** Dash attacks can remain at their impact point until their hit VFX ends. */

@@ -70,6 +70,10 @@ export type ProjectileVisual =
   | {
       type: 'NECTAR_TONGUE';
       spriteUrl: string;
+    }
+  | {
+      type: 'FLYING_COLORS';
+      spriteUrl: string;
     };
 
 export interface AdaptiveTargetedAoeConfig {
@@ -134,6 +138,11 @@ export interface AttackDefinition {
   looseEnd?: {
     followUpRadius: number;
   };
+  /** Unconditional, distinct-target hops from each impact. */
+  flyingColors?: {
+    maxTargets: number;
+    hopRange: number;
+  };
   rollingBarrel?: {
     lobDurationMs: number;
     rollDistance: number;
@@ -148,6 +157,7 @@ export interface AttackDefinition {
   behaviorType:
     | 'PROJECTILE'
     | 'INSTANT_AOE'
+    | 'FUNNY_DANCE'
     | 'ADAPTIVE_TARGETED_AOE'
     | 'POISON_AOE'
     | 'BEAM'
