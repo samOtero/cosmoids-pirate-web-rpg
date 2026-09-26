@@ -42,7 +42,7 @@ describe('Rally Howl lab preview', () => {
       (move) => move.definitionId === 'RALLY_HOWL'
     )!;
     expect(buff?.multiplier).toBe(1.2);
-    expect(howlRuntime.readyAtMs).toBe(12001);
+    expect(howlRuntime.readyAtMs).toBe(20001);
     fireEvent.change(screen.getByLabelText('Active attack'), {
       target: { value: 'STATIC_YIP' },
     });
@@ -55,7 +55,7 @@ describe('Rally Howl lab preview', () => {
       target: { value: 'RALLY_HOWL' },
     });
     engine.tick(17, 16);
-    expect(howlRuntime.readyAtMs).toBe(12001);
+    expect(howlRuntime.readyAtMs).toBe(20001);
     expect(tower.attackSpeedBuff).toBe(buff);
   });
 

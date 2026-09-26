@@ -619,7 +619,7 @@ export const BETTLE: CosmoidTemplate = {
 export const BUG_STAGE_1: CosmoidTemplate = {
   id: 'bug_stage_1',
   name: 'Sailkworm',
-  type: ElementType.GRASS,
+  type: ElementType.BUG,
   iconImg: '/UI/Icons/buglet_icon.png',
   journalImg: '/UI/Journal/buglet_journal.webp',
   journalEntry:
@@ -646,7 +646,7 @@ export const BUG_STAGE_1: CosmoidTemplate = {
 export const BUG_STAGE_2: CosmoidTemplate = {
   id: 'bug_stage_2',
   name: 'Cocoonot',
-  type: ElementType.GRASS,
+  type: ElementType.BUG,
   iconImg: '/UI/Icons/bugitor_icon.png',
   journalImg: '/UI/Journal/bugitor_journal.webp',
   journalEntry:
@@ -667,6 +667,7 @@ export const BUG_STAGE_2: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' }, // Replace Bug Bite with TACKLE since BUG_BITE is not in ATTACK_DEFS
     { level: 1, attackId: 'STRING_SHOT' },
+    { level: 7, attackId: 'RIGGING_NEST' },
   ],
   evolutionNodes: [{ level: 10, evolutionDefId: 'bug_stage_3' }],
 };
@@ -674,7 +675,8 @@ export const BUG_STAGE_2: CosmoidTemplate = {
 export const BUG_STAGE_3: CosmoidTemplate = {
   id: 'bug_stage_3',
   name: 'Mainscale',
-  type: ElementType.GRASS,
+  type: ElementType.BUG,
+  secondaryType: ElementType.FLYING,
   iconImg: '/UI/Icons/moth_icon.png',
   journalImg: '/UI/Journal/moth_journal.webp',
   journalEntry:
@@ -695,6 +697,7 @@ export const BUG_STAGE_3: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
     { level: 1, attackId: 'STRING_SHOT' },
+    { level: 7, attackId: 'RIGGING_NEST' },
     { level: 10, attackId: 'SAILCUTTER' },
   ],
 };

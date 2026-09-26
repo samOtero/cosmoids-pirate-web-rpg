@@ -511,6 +511,8 @@ export interface Enemy extends BaseTDUnit {
   sleepResistantUntilMs?: number;
   /** Shared by all Hot Streak users. No timer; consumed on the third hit. */
   fuseRushMarks?: number;
+  /** Per-Mainscale Wind Mark expirations, keyed by the marking tower. */
+  sailcutterMarks?: Record<string, number>;
   definitionId: string;
   kind?: 'creature' | 'structure';
   /** Visual configuration used by structure enemies. */
@@ -644,6 +646,35 @@ export interface ObjectiveAllyShadow extends BaseTDUnit {
   attackRange: number;
   nextAttackAtMs: number;
   attackTargetPosition?: Point;
+  attackVisualUntilMs?: number;
+}
+
+/** Persistent, untargetable knot created by Rigging Nest. */
+export interface RiggingNest {
+  id: string;
+  ownerTowerId: string;
+  position: Point;
+  ownerOrigin: Point;
+  createdAtMs: number;
+  expiresAtMs: number;
+  nextSpawnAtMs: number;
+  spawnCount: number;
+}
+
+/** Short-lived allied attacker released by a Rigging Nest. */
+export interface RiggingThreadling {
+  id: string;
+  ownerTowerId: string;
+  attackDefinitionId: string;
+  ownerOrigin: Point;
+  nestPosition: Point;
+  position: Point;
+  facingDirection: 'up' | 'down' | 'left' | 'right';
+  spawnedAtMs: number;
+  expiresAtMs: number;
+  nextAttackAtMs: number;
+  attacksRemaining: number;
+  targetId?: string;
   attackVisualUntilMs?: number;
 }
 

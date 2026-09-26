@@ -77,13 +77,17 @@ describe('Rally Howl', () => {
       type: ElementType.NORMAL,
       power: 0,
       behaviorType: 'SUPPORT_AURA',
-      cooldownMs: 12000,
+      cooldownMs: 20000,
       rangeIndex: 40,
-      supportBuff: { attackSpeedMultiplier: 1.2, durationMs: 5000 },
+      supportBuff: {
+        attackSpeedMultiplier: 1.2,
+        durationMs: 15000,
+        global: true,
+      },
     });
   });
 
-  it('buffs self and living allies within the radius, without damage or movement changes', () => {
+  it('buffs self and every living teammate regardless of distance, without damage or movement changes', () => {
     const engine = createEngine();
     const [caster, near, boundary, far, dead] = engine.towers;
     near.speedSlowMultiplier = 0.5;
@@ -92,10 +96,9 @@ describe('Rally Howl', () => {
       if (event.type === 'ATTACK_DAMAGE_DEALT') damage(event);
     });
     SupportAuraBehavior.execute(engine, caster, ATTACK_DEFS.RALLY_HOWL);
-    for (const recipient of [caster, near, boundary])
+    for (const recipient of [caster, near, boundary, far])
       expect(getAttackSpeedMultiplier(recipient, 0)).toBe(1.2);
-    for (const excluded of [far, dead])
-      expect(excluded.attackSpeedBuff).toBeUndefined();
+    expect(dead.attackSpeedBuff).toBeUndefined();
     expect(getActiveSpeedMultiplier(near, 0)).toBe(0.5);
     expect(getActiveSpeedMultiplier(caster, 0)).toBe(1);
     expect(engine.enemies[0]).not.toHaveProperty('attackSpeedBuff');
@@ -109,12 +112,14 @@ describe('Rally Howl', () => {
     });
   });
 
-  it('expires exactly after five seconds, with 20% faster cadence rather than 20% less cooldown', () => {
+  it('expires exactly after fifteen seconds, with 20% faster cadence rather than 20% less cooldown', () => {
     const engine = createEngine();
     const caster = engine.towers[0];
     SupportAuraBehavior.execute(engine, caster, ATTACK_DEFS.RALLY_HOWL);
-    expect(800 / getAttackSpeedMultiplier(caster, 4999)).toBeCloseTo(666.6667);
-    expect(getAttackSpeedMultiplier(caster, 5000)).toBe(1);
+    expect(800 / getAttackSpeedMultiplier(caster, 14999)).toBeCloseTo(
+      666.6667
+    );
+    expect(getAttackSpeedMultiplier(caster, 15000)).toBe(1);
   });
 
   it('refreshes from another howl without stacking the multiplier or duration', () => {
@@ -126,12 +131,12 @@ describe('Rally Howl', () => {
     expect(caster.attackSpeedBuff).toEqual({
       multiplier: 1.2,
       appliedAtMs: 2000,
-      expiresAtMs: 7000,
+      expiresAtMs: 17000,
     });
     expect(near.attackSpeedBuff?.multiplier).toBe(1.2);
   });
 
-  it('snapshots recipients: leaving range or losing the caster does not remove the buff', () => {
+  it('snapshots global recipients: repositioning or losing the caster does not remove the buff', () => {
     const engine = createEngine();
     const [caster, near, , far] = engine.towers;
     SupportAuraBehavior.execute(engine, caster, ATTACK_DEFS.RALLY_HOWL);
@@ -139,7 +144,7 @@ describe('Rally Howl', () => {
     far.position = { x: 40, y: 50 };
     engine.towers = engine.towers.filter((tower) => tower !== caster);
     expect(getAttackSpeedMultiplier(near, 3000)).toBe(1.2);
-    expect(getAttackSpeedMultiplier(far, 3000)).toBe(1);
+    expect(getAttackSpeedMultiplier(far, 3000)).toBe(1.2);
   });
 
   it('waits for combat and is immediately ready for the opening howl', () => {
@@ -158,8 +163,8 @@ describe('Rally Howl', () => {
       isInvulnerable: true,
     });
     engine.tick(2, 1);
-    expect(engine.towers[0].attackSpeedBuff?.expiresAtMs).toBe(5002);
-    expect(engine.towers[0].equippedAttacksRuntime[0].readyAtMs).toBe(12002);
+    expect(engine.towers[0].attackSpeedBuff?.expiresAtMs).toBe(15002);
+    expect(engine.towers[0].equippedAttacksRuntime[0].readyAtMs).toBe(20002);
   });
 
   it('preserves the buff and the full cooldown when swapping away and back', () => {
@@ -177,13 +182,13 @@ describe('Rally Howl', () => {
     engine.setTowerAttack('caster', 0);
     engine.tick(1000, 333);
     expect(caster.equippedAttacksRuntime[0]).toBe(howlRuntime);
-    expect(howlRuntime.readyAtMs).toBe(12001);
+    expect(howlRuntime.readyAtMs).toBe(20001);
     expect(caster.attackSpeedBuff).toBe(buff);
-    engine.tick(12000, 11000);
-    expect(howlRuntime.readyAtMs).toBe(12001);
-    engine.tick(12001, 1);
-    expect(howlRuntime.readyAtMs).toBe(24001);
-    expect(caster.attackSpeedBuff?.expiresAtMs).toBe(17001);
+    engine.tick(20000, 19000);
+    expect(howlRuntime.readyAtMs).toBe(20001);
+    engine.tick(20001, 1);
+    expect(howlRuntime.readyAtMs).toBe(40001);
+    expect(caster.attackSpeedBuff?.expiresAtMs).toBe(35001);
   });
 
   it('does not shorten the support cooldown with attack speed or wall-clock jumps', () => {
@@ -193,9 +198,9 @@ describe('Rally Howl', () => {
     engine.tick(1, 1);
     applyAttackSpeedBuff(caster, 2, 20000, engine.elapsedTimeMs);
     engine.tick(1_000_000, 16);
-    expect(caster.equippedAttacksRuntime[0].readyAtMs).toBe(12001);
-    engine.tick(1_000_001, 11983);
-    expect(caster.equippedAttacksRuntime[0].readyAtMs).toBe(12001);
+    expect(caster.equippedAttacksRuntime[0].readyAtMs).toBe(20001);
+    engine.tick(1_000_001, 19983);
+    expect(caster.equippedAttacksRuntime[0].readyAtMs).toBe(20001);
   });
 
   it('returns damaging attacks to their ordinary cadence after the buff expires', () => {
@@ -204,11 +209,11 @@ describe('Rally Howl', () => {
     const caster = engine.towers[0];
     engine.tick(1, 1);
     engine.setTowerAttack('caster', 1);
-    caster.equippedAttacksRuntime[1].lastFiredTime = 4301;
+    caster.equippedAttacksRuntime[1].lastFiredTime = 14301;
     const shot = vi.spyOn(ProjectileBehavior, 'execute');
-    engine.tick(5001, 5000);
+    engine.tick(15001, 15000);
     expect(shot).not.toHaveBeenCalled();
-    engine.tick(5102, 101);
+    engine.tick(15102, 101);
     expect(shot).toHaveBeenCalledTimes(1);
   });
 

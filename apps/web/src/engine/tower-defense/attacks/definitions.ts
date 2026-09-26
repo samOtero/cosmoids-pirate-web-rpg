@@ -12,6 +12,7 @@ const ATTACK_COOLDOWNS = {
 
 const ATTACK_RANGES = {
   NORMAL: 40,
+  LONG: 55,
 };
 
 export const ATTACK_DEFS: Record<string, AttackDefinition> = {
@@ -41,6 +42,38 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     behaviorType: 'SHIKO_QUAKE',
     effects: [{ type: 'STUN', chance: 1, value: 350 }],
     visualEffectConfigId: 'attack_shiko_quake_1',
+  },
+  RIGGING_NEST: {
+    id: 'RIGGING_NEST',
+    name: 'Rigging Nest',
+    description:
+      'Ties a coir nest beside the user for 10 seconds. It releases five tiny threadlings that pursue nearby enemies and bite up to three times each.',
+    type: ElementType.BUG,
+    category: 'special',
+    power: 15,
+    cooldownMs: 12000,
+    rangeIndex: ATTACK_RANGES.NORMAL,
+    behaviorType: 'RIGGING_NEST',
+    riggingNest: {
+      durationMs: 10000,
+      firstSpawnDelayMs: 1000,
+      spawnIntervalMs: 2000,
+      maxSpawns: 5,
+      maxActiveThreadlings: 2,
+      threadlingLifetimeMs: 3200,
+      threadlingMoveSpeed: 32,
+      threadlingAttackIntervalMs: 900,
+      threadlingMaxAttacks: 3,
+      threadlingBiteRange: 2.6,
+      offset: { x: 3.5, y: 2.5 },
+      nestSpriteUrl: '/UI/Icons/bugitor_icon.png',
+      threadlingSpriteUrls: {
+        left: '/battles/cosmoids/bug_1_left_1.webp',
+        right: '/battles/cosmoids/bug_1_left_1.webp',
+        up: '/battles/cosmoids/bug_1_up_1.webp',
+        down: '/battles/cosmoids/bug_1_down_1.webp',
+      },
+    },
   },
   DEEPWATER_GRIP: {
     id: 'DEEPWATER_GRIP',
@@ -335,13 +368,15 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
   FUNNY_DANCE: {
     id: 'FUNNY_DANCE',
     name: 'Funny Dance',
+    description:
+      'Performs an entertaining dance that startles carrying enemies within range into dropping their objectives.',
     type: ElementType.NORMAL,
     category: 'special',
     power: 0,
     cooldownMs: ATTACK_COOLDOWNS.CONTROL,
     rangeIndex: 60,
     behaviorType: 'FUNNY_DANCE',
-    itemPickupLockMs: 2000,
+    itemPickupLockMs: 2500,
     visualEffectConfigId: 'attack_funny_dance_1',
   },
   FLYING_COLORS: {
@@ -378,30 +413,44 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
   SAILCUTTER: {
     id: 'SAILCUTTER',
     name: 'Sailcutter',
+    description:
+      'Throws three long-range wind cutters at different enemies. Each hit Wind-Marks its target for 4 seconds, guiding threadlings to it with greater speed and bite damage.',
     type: ElementType.FLYING,
     category: 'special',
-    power: 50,
-    cooldownMs: ATTACK_COOLDOWNS.NORMAL,
-    rangeIndex: ATTACK_RANGES.NORMAL,
-    behaviorType: 'PROJECTILE',
-    projectileSpeed: 1.45,
+    power: 35,
+    cooldownMs: 4000,
+    rangeIndex: ATTACK_RANGES.LONG,
+    behaviorType: 'SAILCUTTER',
+    projectileSpeed: 1.65,
     projectileVisual: {
       type: 'SAILCUTTER',
       shadowColor: 0x50758a,
       windColor: 0xbcecff,
       highlightColor: 0xffffff,
     },
+    sailcutter: {
+      projectileCount: 3,
+      markDurationMs: 4000,
+      threadlingMoveSpeedMultiplier: 1.6,
+      threadlingDamageMultiplier: 1.35,
+    },
   },
   RALLY_HOWL: {
     id: 'RALLY_HOWL',
     name: 'Rally Howl',
+    description:
+      'Rallies teammates for 15 seconds, increasing their attack speed by 20%.',
     type: ElementType.NORMAL,
     category: 'special',
     power: 0,
-    cooldownMs: 12000,
+    cooldownMs: 20000,
     rangeIndex: ATTACK_RANGES.NORMAL,
     behaviorType: 'SUPPORT_AURA',
-    supportBuff: { attackSpeedMultiplier: 1.2, durationMs: 5000 },
+    supportBuff: {
+      attackSpeedMultiplier: 1.2,
+      durationMs: 15000,
+      global: true,
+    },
     visualEffectConfigId: 'attack_rally_howl_1',
   },
   // Lightning-bolt attack used by Voltusk; distinct from Razcall's Static Yip.
@@ -543,7 +592,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
   STRING_SHOT: {
     id: 'STRING_SHOT',
     name: 'String Shot',
-    type: ElementType.GRASS,
+    type: ElementType.BUG,
     category: 'special',
     power: 0,
     cooldownMs: ATTACK_COOLDOWNS.CONTROL,

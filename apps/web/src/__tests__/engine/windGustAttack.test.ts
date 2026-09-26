@@ -95,12 +95,12 @@ describe('Funny Dance', () => {
       power: 0,
       rangeIndex: 60,
       behaviorType: 'FUNNY_DANCE',
-      itemPickupLockMs: 2000,
+      itemPickupLockMs: 2500,
       visualEffectConfigId: 'attack_funny_dance_1',
     });
   });
 
-  it('drops fresh carriers and distracts every enemy in range', () => {
+  it('only affects carrying enemies and locks pickup only for the disarmed carriers', () => {
     const engine = new TowerDefenseEngine(levelData);
     const carrierOne = createEnemy('carrier_one', 10, 'coin_one');
     const carrierTwo = createEnemy('carrier_two', 18, 'sack_one');
@@ -135,18 +135,16 @@ describe('Funny Dance', () => {
     expect(unlockedReceiver.damagedByTowerIds).toEqual(new Set());
     expect(carrierOne).toMatchObject({
       hasBeenWindDisarmed: true,
-      itemPickupBlockedUntilMs: 2000,
+      itemPickupBlockedUntilMs: 2500,
       funnyDanceReaction: { startedAtMs: 0, endsAtMs: 650 },
     });
     expect(carrierTwo).toMatchObject({
       hasBeenWindDisarmed: true,
-      itemPickupBlockedUntilMs: 2000,
+      itemPickupBlockedUntilMs: 2500,
       funnyDanceReaction: { startedAtMs: 0, endsAtMs: 650 },
     });
-    expect(unlockedReceiver).toMatchObject({
-      itemPickupBlockedUntilMs: 2000,
-      funnyDanceReaction: { startedAtMs: 0, endsAtMs: 650 },
-    });
+    expect(unlockedReceiver).not.toHaveProperty('funnyDanceReaction');
+    expect(unlockedReceiver).not.toHaveProperty('itemPickupBlockedUntilMs');
     expect(farCarrier).not.toHaveProperty('funnyDanceReaction');
     expect(harlequill.funnyDance).toEqual({
       startedAtMs: 0,
@@ -158,18 +156,20 @@ describe('Funny Dance', () => {
         configId: 'attack_funny_dance_1',
         position: { x: 0, y: 0 },
         rangeIndex: 60,
-        targetIds: ['carrier_one', 'carrier_two', 'receiver'],
+        targetIds: ['carrier_one', 'carrier_two'],
       })
     );
 
     engine.tick(0, 16);
 
-    expect(unlockedReceiver.heldCaptureUnitId).toBeUndefined();
-    expect(coin.heldByEnemyId).toBeUndefined();
+    // CarrierOne is blocked for 2500ms, but unlockedReceiver was not locked, so receiver picks up coin
+    expect(carrierOne.heldCaptureUnitId).toBeUndefined();
+    expect(unlockedReceiver.heldCaptureUnitId).toBe(coin.id);
+    expect(coin.heldByEnemyId).toBe(unlockedReceiver.id);
     engine.destroy();
   });
 
-  it('restores pickup after the lock but never forces the same enemy to drop twice', () => {
+  it('restores pickup after the lock and never forces or locks the same enemy twice', () => {
     const engine = new TowerDefenseEngine(levelData);
     const carrier = createEnemy('carrier', 10, 'coin_one');
     const coin = createCaptureUnit('coin_one', 10, carrier.id);
@@ -178,10 +178,16 @@ describe('Funny Dance', () => {
     engine.captureUnits = [coin];
 
     FunnyDanceBehavior.execute(engine, harlequill, ATTACK_DEFS.FUNNY_DANCE);
+    expect(carrier.heldCaptureUnitId).toBeUndefined();
+    expect(coin.heldByEnemyId).toBeUndefined();
+    expect(carrier.hasBeenWindDisarmed).toBe(true);
+    expect(carrier.itemPickupBlockedUntilMs).toBe(2500);
+
     engine.tick(0, 1000);
     expect(carrier.heldCaptureUnitId).toBeUndefined();
 
-    engine.tick(1000, 1001);
+    // After 2500ms expiration, carrier re-acquires the coin
+    engine.tick(1500, 1501);
     expect(carrier.heldCaptureUnitId).toBe(coin.id);
     expect(coin.heldByEnemyId).toBe(carrier.id);
     expect(
@@ -192,9 +198,11 @@ describe('Funny Dance', () => {
       )
     ).toBe(false);
 
+    // Second execution must not disarm or re-lock carrier
     FunnyDanceBehavior.execute(engine, harlequill, ATTACK_DEFS.FUNNY_DANCE);
     expect(carrier.heldCaptureUnitId).toBe(coin.id);
     expect(coin.heldByEnemyId).toBe(carrier.id);
+    expect(carrier.itemPickupBlockedUntilMs).toBe(2500);
     engine.destroy();
   });
 });

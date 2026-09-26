@@ -32,6 +32,8 @@ import {
   TowerRecoveryFeed,
   TDTowerRecoveryConfig,
   DestroyedStructureVisual,
+  RiggingNest,
+  RiggingThreadling,
 } from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
 import { startDamageFlash } from './damageFlash';
@@ -54,6 +56,7 @@ import {
   cancelShikoQuake,
   updateShikoQuakes,
 } from './attacks/shikoQuake';
+import { updateRiggingNests } from './attacks/riggingNest';
 import { getAttackSpeedMultiplier } from './attackSpeedModifiers';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { TDWave, TDWaveGroup, Point } from './types';
@@ -304,6 +307,8 @@ export class TowerDefenseEngine {
   public floatingTexts: FloatingText[] = [];
   public objectiveAllies: ObjectiveAlly[] = [];
   public objectiveAllyShadows: ObjectiveAllyShadow[] = [];
+  public riggingNests: RiggingNest[] = [];
+  public riggingThreadlings: RiggingThreadling[] = [];
   public objectiveAllyCurrents: ObjectiveAllyCurrent[] = [];
   public objectiveAllyAcidShots: ObjectiveAllyAcidShot[] = [];
   public enemyGroundOrbs: EnemyGroundOrb[] = [];
@@ -1131,7 +1136,8 @@ export class TowerDefenseEngine {
         attackDef.behaviorType === 'SUPPORT_AURA' ||
         attackDef.behaviorType === 'REPAIR_SUPPORT' ||
         attackDef.behaviorType === 'CONSTRICTION' ||
-        attackDef.behaviorType === 'SHARED_SLUMBER';
+        attackDef.behaviorType === 'SHARED_SLUMBER' ||
+        attackDef.behaviorType === 'RIGGING_NEST';
       const isReady = usesSimulationCooldown
         ? this.elapsedTimeMs >= (attackInstance.readyAtMs ?? 0)
         : time - attackInstance.lastFiredTime >
@@ -1168,6 +1174,8 @@ export class TowerDefenseEngine {
         }
       }
     });
+
+    updateRiggingNests(this, newTowers, deltaMs);
 
     this.processEnemyGroundOrbs();
     this.processTowerRecovery();

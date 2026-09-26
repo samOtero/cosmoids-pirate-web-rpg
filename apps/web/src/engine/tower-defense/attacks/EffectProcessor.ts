@@ -10,6 +10,7 @@ import {
   getFireClawDamageMultiplier,
   registerSuccessfulFireClawHit,
 } from './fireClaw';
+import { applySailcutterMark } from './sailcutter';
 
 export const DRENCHED_DURATION_MS = 4000;
 export const DRENCHED_DAMAGE_MULTIPLIER = 1.5;
@@ -160,7 +161,8 @@ export class EffectProcessor {
     source: Tower,
     target: Enemy,
     attackDef: AttackDefinition,
-    hitCount: number = 1
+    hitCount: number = 1,
+    damageMultiplier: number = 1
   ) {
     // Multiple projectiles can arrive in one tick; dead targets cannot build combos.
     if (target.hp <= 0) return;
@@ -258,6 +260,10 @@ export class EffectProcessor {
       );
     }
 
+    if (finalDamage > 0 && damageMultiplier !== 1) {
+      finalDamage = Math.max(1, Math.floor(finalDamage * damageMultiplier));
+    }
+
     let fuseFinisher = false;
     if (finalDamage > 0 && attackDef.fuseRushCombo) {
       const combo = attackDef.fuseRushCombo;
@@ -345,6 +351,10 @@ export class EffectProcessor {
         durationMs: 1000,
         elapsedMs: 0,
       });
+    }
+
+    if (attackDef.sailcutter) {
+      applySailcutterMark(engine, source, target, attackDef);
     }
 
     // Multi-hit effects recurse through this method; only the first resolved
@@ -539,7 +549,8 @@ export class EffectProcessor {
                   source,
                   target,
                   attackDef,
-                  hitCount + 1
+                  hitCount + 1,
+                  damageMultiplier
                 );
               }
               break;

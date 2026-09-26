@@ -13,7 +13,7 @@ import {
 } from '@/constants/creatures';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { TDEvent } from '@/engine/tower-defense/events/TDEventBus';
-import { PlayerCreature } from '@/types/baseGame';
+import { ElementType, PlayerCreature } from '@/types/baseGame';
 
 function createEngine(speciesId: string, level: number, xp: number) {
   const creature: PlayerCreature = {
@@ -44,6 +44,15 @@ function grantBattleExperience(engine: TowerDefenseEngine) {
 }
 
 describe('Bug evolution progression', () => {
+  it('stays Bug-type until Mainscale adds Flying', () => {
+    expect(BUG_STAGE_1.type).toBe(ElementType.BUG);
+    expect(BUG_STAGE_1.secondaryType).toBeUndefined();
+    expect(BUG_STAGE_2.type).toBe(ElementType.BUG);
+    expect(BUG_STAGE_2.secondaryType).toBeUndefined();
+    expect(BUG_STAGE_3.type).toBe(ElementType.BUG);
+    expect(BUG_STAGE_3.secondaryType).toBe(ElementType.FLYING);
+  });
+
   it('defines the level 7 and level 10 evolution thresholds', () => {
     expect(BUG_STAGE_1.evolutionNodes).toEqual([
       { level: 7, evolutionDefId: 'bug_stage_2' },

@@ -103,6 +103,7 @@ export interface AttackDefinition {
   supportBuff?: {
     attackSpeedMultiplier: number;
     durationMs: number;
+    global?: boolean;
   };
   adaptiveTargetedAoe?: AdaptiveTargetedAoeConfig;
   repairSupport?: {
@@ -154,6 +155,27 @@ export interface AttackDefinition {
     pulseIntervalMs: number;
     resistanceMs: number;
   };
+  riggingNest?: {
+    durationMs: number;
+    firstSpawnDelayMs: number;
+    spawnIntervalMs: number;
+    maxSpawns: number;
+    maxActiveThreadlings: number;
+    threadlingLifetimeMs: number;
+    threadlingMoveSpeed: number;
+    threadlingAttackIntervalMs: number;
+    threadlingMaxAttacks: number;
+    threadlingBiteRange: number;
+    offset: { x: number; y: number };
+    nestSpriteUrl: string;
+    threadlingSpriteUrls: Record<'up' | 'down' | 'left' | 'right', string>;
+  };
+  sailcutter?: {
+    projectileCount: number;
+    markDurationMs: number;
+    threadlingMoveSpeedMultiplier: number;
+    threadlingDamageMultiplier: number;
+  };
   behaviorType:
     | 'PROJECTILE'
     | 'INSTANT_AOE'
@@ -167,6 +189,8 @@ export interface AttackDefinition {
     | 'SHIKO_QUAKE'
     | 'ROLLING_BARREL'
     | 'CONSTRICTION'
+    | 'RIGGING_NEST'
+    | 'SAILCUTTER'
     | 'INSTANT_MELEE';
   effects?: AttackEffect[];
   visualEffectConfigId?: string; // which tdConfig to use for a visual effect

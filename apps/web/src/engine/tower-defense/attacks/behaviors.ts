@@ -9,6 +9,8 @@ import { RollingBarrelBehavior } from './rollingBarrel';
 import { ConstrictionBehavior } from './deepwaterGrip';
 import { SharedSlumberBehavior } from './sharedSlumber';
 import { ShikoQuakeBehavior } from './shikoQuake';
+import { RiggingNestBehavior } from './riggingNest';
+import { SailcutterBehavior } from './sailcutter';
 
 const MAX_PROJECTILES_PER_PATTERN = 12;
 
@@ -312,6 +314,7 @@ export const FunnyDanceBehavior: AttackBehavior = {
     return engine.enemies.some(
       (enemy) =>
         engine.isEnemyTargetable(enemy) &&
+        enemy.kind !== 'structure' &&
         engine.isPositionInTowerRange(
           source.position,
           enemy.position,
@@ -345,22 +348,12 @@ export const FunnyDanceBehavior: AttackBehavior = {
           source.position,
           enemy.position,
           attackDef.rangeIndex
-        )
+        ) ||
+        !enemy.heldCaptureUnitId ||
+        enemy.hasBeenWindDisarmed
       ) {
         return;
       }
-
-      affectedEnemyIds.push(enemy.id);
-      enemy.itemPickupBlockedUntilMs = Math.max(
-        enemy.itemPickupBlockedUntilMs ?? 0,
-        engine.elapsedTimeMs + pickupLockMs
-      );
-      enemy.funnyDanceReaction = {
-        startedAtMs: engine.elapsedTimeMs,
-        endsAtMs: engine.elapsedTimeMs + reactionDurationMs,
-      };
-
-      if (!enemy.heldCaptureUnitId || enemy.hasBeenWindDisarmed) return;
 
       const carriedUnit = engine.captureUnits.find(
         (unit) => unit.id === enemy.heldCaptureUnitId
@@ -373,8 +366,17 @@ export const FunnyDanceBehavior: AttackBehavior = {
         return;
       }
 
+      affectedEnemyIds.push(enemy.id);
+      enemy.funnyDanceReaction = {
+        startedAtMs: engine.elapsedTimeMs,
+        endsAtMs: engine.elapsedTimeMs + reactionDurationMs,
+      };
+
       engine.dropCaptureUnit(enemy);
       enemy.hasBeenWindDisarmed = true;
+      if (!enemy.itemPickupBlockedUntilMs) {
+        enemy.itemPickupBlockedUntilMs = engine.elapsedTimeMs + pickupLockMs;
+      }
       enemy.damagedByTowerIds.add(source.id);
 
       engine.floatingTexts.push({
@@ -554,11 +556,12 @@ export const SupportAuraBehavior: AttackBehavior = {
     for (const ally of engine.towers) {
       if (
         ally.hp <= 0 ||
-        !engine.isPositionInTowerRange(
-          source.position,
-          ally.position,
-          attackDef.rangeIndex
-        )
+        (!buff.global &&
+          !engine.isPositionInTowerRange(
+            source.position,
+            ally.position,
+            attackDef.rangeIndex
+          ))
       )
         continue;
       applyAttackSpeedBuff(
@@ -667,6 +670,8 @@ export const AttackBehaviorRegistry: Record<string, AttackBehavior> = {
   POISON_AOE: PoisonAoeBehavior,
   SUPPORT_AURA: SupportAuraBehavior,
   REPAIR_SUPPORT: RepairSupportBehavior,
+  RIGGING_NEST: RiggingNestBehavior,
+  SAILCUTTER: SailcutterBehavior,
 };
 
-export { ShikoQuakeBehavior };
+export { RiggingNestBehavior, SailcutterBehavior, ShikoQuakeBehavior };

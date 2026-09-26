@@ -55,6 +55,7 @@ import {
   drawFuseRushTrail,
   updateFuseRushMarks,
 } from './fuseRushVisuals';
+import { updateSailcutterMark } from './sailcutterVisuals';
 import {
   drawPhysicalDefenseShield,
   drawShipshapeHealing,
@@ -2518,6 +2519,27 @@ function updatePrisonGateTexture(
   );
 }
 
+function updateRasterAttackSprite(
+  sprite: UrlTrackedSprite,
+  url: string,
+  width: number,
+  height: number,
+  flipX = false
+) {
+  if (sprite.currentUrl !== url) {
+    sprite.currentUrl = url;
+    void PIXI.Assets.load(url).then((texture) => {
+      if (!sprite.destroyed && sprite.currentUrl === url) {
+        sprite.texture = texture as PIXI.Texture;
+      }
+    });
+  }
+  sprite.anchor.set(0.5);
+  sprite.width = width;
+  sprite.height = height;
+  sprite.scale.x = Math.abs(sprite.scale.x) * (flipX ? -1 : 1);
+}
+
 function updatePrisonGateVisual(container: PIXI.Container, enemy: Enemy) {
   let gate = container.getChildByLabel('prisonGate') as
     | UrlTrackedSprite
@@ -3099,6 +3121,15 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         if (flyingColorsVisual?.type === 'FLYING_COLORS') {
           void PIXI.Assets.load(flyingColorsVisual.spriteUrl);
         }
+        const riggingNestVisual = ATTACK_DEFS.RIGGING_NEST.riggingNest;
+        if (riggingNestVisual) {
+          for (const url of new Set([
+            riggingNestVisual.nestSpriteUrl,
+            ...Object.values(riggingNestVisual.threadlingSpriteUrls),
+          ])) {
+            void PIXI.Assets.load(url);
+          }
+        }
 
         const bgSprite = PIXI.Sprite.from(bgUrl);
         backgroundLayer.addChild(bgSprite);
@@ -3253,6 +3284,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         const environmentUnitSprites = new Map<string, PIXI.Container>();
         const objectiveAllySprites = new Map<string, PIXI.Container>();
         const objectiveAllyShadowSprites = new Map<string, PIXI.Container>();
+        const riggingNestSprites = new Map<string, PIXI.Container>();
+        const riggingThreadlingSprites = new Map<string, PIXI.Container>();
         const destroyedStructureSprites = new Map<string, PIXI.Container>();
         const captureUnitSprites = new Map<string, PIXI.Container>();
         const projectileSprites = new Map<string, PIXI.Container>();
@@ -3960,6 +3993,125 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               container,
               getTDUnitGroundContactOffset(projection, projection.tdConfigId)
             );
+          }
+
+          const riggingVisual = ATTACK_DEFS.RIGGING_NEST.riggingNest;
+          if (riggingVisual) {
+            const currentNestIds = new Set(
+              engine.riggingNests.map((nest) => nest.id)
+            );
+            for (const [id, container] of riggingNestSprites) {
+              if (!currentNestIds.has(id)) {
+                worldLayer.removeChild(container);
+                container.destroy({ children: true });
+                riggingNestSprites.delete(id);
+              }
+            }
+            for (const nest of engine.riggingNests) {
+              let container = riggingNestSprites.get(nest.id);
+              if (!container) {
+                container = new PIXI.Container();
+                container.eventMode = 'none';
+                const shadow = new PIXI.Graphics();
+                shadow.label = 'riggingNestShadow';
+                container.addChild(shadow);
+                const sprite = new PIXI.Sprite() as UrlTrackedSprite;
+                sprite.label = 'riggingNestSprite';
+                container.addChild(sprite);
+                worldLayer.addChild(container);
+                riggingNestSprites.set(nest.id, container);
+              }
+
+              const responsiveScale = app.screen.height / TD_BASE_HEIGHT;
+              const renderScale = zoom * responsiveScale;
+              container.position.set(
+                offsetX + (nest.position.x / 100) * screenW,
+                offsetY + (nest.position.y / 100) * screenH
+              );
+              container.scale.set(renderScale);
+              const shadow = container.getChildByLabel(
+                'riggingNestShadow'
+              ) as PIXI.Graphics;
+              shadow.clear();
+              shadow.ellipse(0, 3, 23, 7);
+              shadow.fill({ color: 0x000000, alpha: 0.32 });
+              const sprite = container.getChildByLabel(
+                'riggingNestSprite'
+              ) as UrlTrackedSprite;
+              updateRasterAttackSprite(
+                sprite,
+                riggingVisual.nestSpriteUrl,
+                58,
+                58
+              );
+              sprite.y = -25;
+              const remainingMs = nest.expiresAtMs - engine.elapsedTimeMs;
+              container.alpha = Math.max(0, Math.min(1, remainingMs / 240));
+              updateContainerWorldDepth(container, { x: 0, y: 3 });
+            }
+
+            const currentThreadlingIds = new Set(
+              engine.riggingThreadlings.map((threadling) => threadling.id)
+            );
+            for (const [id, container] of riggingThreadlingSprites) {
+              if (!currentThreadlingIds.has(id)) {
+                worldLayer.removeChild(container);
+                container.destroy({ children: true });
+                riggingThreadlingSprites.delete(id);
+              }
+            }
+            for (const threadling of engine.riggingThreadlings) {
+              let container = riggingThreadlingSprites.get(threadling.id);
+              if (!container) {
+                container = new PIXI.Container();
+                container.eventMode = 'none';
+                const shadow = new PIXI.Graphics();
+                shadow.label = 'threadlingShadow';
+                container.addChild(shadow);
+                const sprite = new PIXI.Sprite() as UrlTrackedSprite;
+                sprite.label = 'threadlingSprite';
+                container.addChild(sprite);
+                worldLayer.addChild(container);
+                riggingThreadlingSprites.set(threadling.id, container);
+              }
+
+              const responsiveScale = app.screen.height / TD_BASE_HEIGHT;
+              const renderScale = zoom * responsiveScale;
+              container.position.set(
+                offsetX + (threadling.position.x / 100) * screenW,
+                offsetY + (threadling.position.y / 100) * screenH
+              );
+              container.scale.set(renderScale);
+              const shadow = container.getChildByLabel(
+                'threadlingShadow'
+              ) as PIXI.Graphics;
+              shadow.clear();
+              shadow.ellipse(0, 2, 13, 4);
+              shadow.fill({ color: 0x000000, alpha: 0.27 });
+              const sprite = container.getChildByLabel(
+                'threadlingSprite'
+              ) as UrlTrackedSprite;
+              const horizontal =
+                threadling.facingDirection === 'left' ||
+                threadling.facingDirection === 'right';
+              updateRasterAttackSprite(
+                sprite,
+                riggingVisual.threadlingSpriteUrls[threadling.facingDirection],
+                horizontal ? 34 : 29,
+                horizontal ? 26 : 29,
+                threadling.facingDirection === 'right'
+              );
+              const isBiting =
+                (threadling.attackVisualUntilMs ?? 0) > engine.elapsedTimeMs;
+              const bob = Math.sin(
+                (engine.elapsedTimeMs - threadling.spawnedAtMs) / 115
+              );
+              sprite.y = -11 + bob * 1.2 - (isBiting ? 2 : 0);
+              if (isBiting) sprite.scale.y *= 1.08;
+              const remainingMs = threadling.expiresAtMs - engine.elapsedTimeMs;
+              container.alpha = Math.max(0, Math.min(1, remainingMs / 180));
+              updateContainerWorldDepth(container, { x: 0, y: 2 });
+            }
           }
 
           // Persistent rubble is separate from dead targetable structures.
@@ -4879,6 +5031,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               enemy.fuseRushMarks ?? 0,
               engine.elapsedTimeMs
             );
+            updateSailcutterMark(container, enemy, engine.elapsedTimeMs);
             if (enemy.kind !== 'structure') {
               updateSparkles(container, enemy, app.ticker.deltaTime);
               updateSpeedBoostIndicator(

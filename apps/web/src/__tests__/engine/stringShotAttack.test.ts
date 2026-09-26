@@ -7,6 +7,7 @@ import { EffectProcessor } from '@/engine/tower-defense/attacks/EffectProcessor'
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { getActiveSpeedMultiplier } from '@/engine/tower-defense/speedModifiers';
 import { Enemy, Tower } from '@/engine/tower-defense/types';
+import { ElementType } from '@/types/baseGame';
 
 const createBugletTower = (): Tower => ({
   id: 'buglet_tower',
@@ -59,6 +60,7 @@ describe('String Shot', () => {
       attackId: 'STRING_SHOT',
     });
     expect(ATTACK_DEFS.STRING_SHOT).toMatchObject({
+      type: ElementType.BUG,
       power: 0,
       projectileVisual: {
         type: 'STRING_COIL',
