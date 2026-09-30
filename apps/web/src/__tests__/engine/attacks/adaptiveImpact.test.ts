@@ -1,16 +1,17 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { CARAPENTER } from '@/constants/creatures';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { AdaptiveTargetedAoeBehavior } from '@/engine/tower-defense/attacks/behaviors';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { getActiveSpeedMultiplier } from '@/engine/tower-defense/speedModifiers';
-import { ElementType } from '@/types/baseGame';
+
+installAttackFixtures();
 
 afterEach(() => vi.restoreAllMocks());
 
-const hammerAnimation = CREATURE_TD_CONFIGS.attack_mallet_smash_1.default.vfxAnimation!;
+const hammerAnimation =
+  CREATURE_TD_CONFIGS.attack_mallet_smash_1.default.vfxAnimation!;
 const contactMs = hammerAnimation.durationMs! * hammerAnimation.impactProgress!;
 
 function createBattle() {
@@ -55,43 +56,17 @@ function addTarget(engine: TowerDefenseEngine, id: string, x: number) {
   return target;
 }
 
-describe('Mallet Smash', () => {
-  it('replaces Carapenter\'s placeholder move as its level-16 evolution attack', () => {
-    expect(CARAPENTER.learnableAttacks).toContainEqual({
-      level: 16,
-      attackId: 'MALLET_SMASH',
-    });
-    expect(CARAPENTER.learnableAttacks).not.toContainEqual({
-      level: 12,
-      attackId: 'VINE_WHIP',
-    });
-    expect(ATTACK_DEFS.MALLET_SMASH).toMatchObject({
-      type: ElementType.GRASS,
-      category: 'physical',
-      power: 50,
-      cooldownMs: 1200,
-      projectileSpeed: 1,
-      behaviorType: 'ADAPTIVE_TARGETED_AOE',
-      effects: [{ type: 'SPEED_SLOW', chance: 0.3, value: 0.8 }],
-      adaptiveTargetedAoe: {
-        radiusIndex: 12,
-        singleTargetPower: 75,
-        singleTargetEffects: [
-          { type: 'SPEED_SLOW', chance: 1, value: 0.5 },
-        ],
-      },
-      visualEffectConfigId: 'attack_mallet_smash_1',
-      isDashAttack: true,
-      dashImpactHoldMs: 520,
-    });
-  });
-
+describe('Adaptive area impact', () => {
   it('stops short, keeps the hammer on the target, and deals damage exactly at contact', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.99);
     const { engine, tower } = createBattle();
     const target = addTarget(engine, 'isolated', 30);
     try {
-      AdaptiveTargetedAoeBehavior.execute(engine, tower, ATTACK_DEFS.MALLET_SMASH);
+      AdaptiveTargetedAoeBehavior.execute(
+        engine,
+        tower,
+        ATTACK_FIXTURES.MALLET_SMASH
+      );
       engine.tick(0, 100);
       expect(engine.projectiles[0].position.x).toBeGreaterThan(0);
       expect(engine.projectiles[0].position.x).toBeLessThan(14);
@@ -144,32 +119,47 @@ describe('Mallet Smash', () => {
     { x: 0, y: 30, aspect: 1 },
     { x: 0, y: -30, aspect: 1 },
     { x: 15, y: 10, aspect: 16 / 9 },
-  ])('keeps a consistent gap on approach to $x, $y at aspect $aspect', ({ x, y, aspect }) => {
-    const { engine, tower } = createBattle();
-    engine.setAspectRatio(aspect);
-    const target = addTarget(engine, 'target', x);
-    target.position.y = y;
-    try {
-      AdaptiveTargetedAoeBehavior.execute(engine, tower, ATTACK_DEFS.MALLET_SMASH);
-      engine.tick(0, 250);
-      const dash = engine.projectiles[0];
-      expect(dash.hasImpacted).toBe(true);
-      expect(engine.getAttackDistance(dash.position, target.position)).toBeCloseTo(16);
-      target.position.x += 2;
-      target.position.y += 1;
-      engine.tick(0, 16);
-      expect(engine.getAttackDistance(dash.position, target.position)).toBeCloseTo(16);
-      expect(engine.visualEffects[0].position).toEqual(target.position);
-    } finally {
-      engine.destroy();
+  ])(
+    'keeps a consistent gap on approach to $x, $y at aspect $aspect',
+    ({ x, y, aspect }) => {
+      const { engine, tower } = createBattle();
+      engine.setAspectRatio(aspect);
+      const target = addTarget(engine, 'target', x);
+      target.position.y = y;
+      try {
+        AdaptiveTargetedAoeBehavior.execute(
+          engine,
+          tower,
+          ATTACK_FIXTURES.MALLET_SMASH
+        );
+        engine.tick(0, 250);
+        const dash = engine.projectiles[0];
+        expect(dash.hasImpacted).toBe(true);
+        expect(
+          engine.getAttackDistance(dash.position, target.position)
+        ).toBeCloseTo(16);
+        target.position.x += 2;
+        target.position.y += 1;
+        engine.tick(0, 16);
+        expect(
+          engine.getAttackDistance(dash.position, target.position)
+        ).toBeCloseTo(16);
+        expect(engine.visualEffects[0].position).toEqual(target.position);
+      } finally {
+        engine.destroy();
+      }
     }
-  });
+  );
 
   it('does not dash past or back away from an already nearby enemy', () => {
     const { engine, tower } = createBattle();
     addTarget(engine, 'nearby', 10);
     try {
-      AdaptiveTargetedAoeBehavior.execute(engine, tower, ATTACK_DEFS.MALLET_SMASH);
+      AdaptiveTargetedAoeBehavior.execute(
+        engine,
+        tower,
+        ATTACK_FIXTURES.MALLET_SMASH
+      );
       engine.tick(0, 16);
       expect(engine.projectiles[0].position).toEqual(tower.position);
     } finally {
@@ -181,7 +171,11 @@ describe('Mallet Smash', () => {
     const { engine, tower } = createBattle();
     const target = addTarget(engine, 'removed', 10);
     try {
-      AdaptiveTargetedAoeBehavior.execute(engine, tower, ATTACK_DEFS.MALLET_SMASH);
+      AdaptiveTargetedAoeBehavior.execute(
+        engine,
+        tower,
+        ATTACK_FIXTURES.MALLET_SMASH
+      );
       engine.tick(0, 16);
       engine.enemies = [];
       engine.tick(0, 400);
@@ -205,7 +199,7 @@ describe('Mallet Smash', () => {
       AdaptiveTargetedAoeBehavior.execute(
         engine,
         tower,
-        ATTACK_DEFS.MALLET_SMASH
+        ATTACK_FIXTURES.MALLET_SMASH
       );
       engine.tick(0, 400);
 
@@ -231,12 +225,12 @@ describe('Mallet Smash', () => {
       AdaptiveTargetedAoeBehavior.execute(
         singleBattle.engine,
         singleBattle.tower,
-        ATTACK_DEFS.MALLET_SMASH
+        ATTACK_FIXTURES.MALLET_SMASH
       );
       AdaptiveTargetedAoeBehavior.execute(
         crowdBattle.engine,
         crowdBattle.tower,
-        ATTACK_DEFS.MALLET_SMASH
+        ATTACK_FIXTURES.MALLET_SMASH
       );
       singleBattle.engine.tick(0, 400);
       crowdBattle.engine.tick(0, 400);

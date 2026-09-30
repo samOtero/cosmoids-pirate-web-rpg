@@ -1,18 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { BUG_STAGE_3 } from '@/constants/creatures';
-import {
-  AttackBehaviorRegistry,
-  SailcutterBehavior,
-} from '@/engine/tower-defense/attacks/behaviors';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+
+import { SailcutterBehavior } from '@/engine/tower-defense/attacks/behaviors';
+import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
 import { EffectProcessor } from '@/engine/tower-defense/attacks/EffectProcessor';
 import { updateRiggingNests } from '@/engine/tower-defense/attacks/riggingNest';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
-import type {
-  Enemy,
-  RiggingThreadling,
-} from '@/engine/tower-defense/types';
-import { ElementType } from '@/types/baseGame';
+import type { Enemy, RiggingThreadling } from '@/engine/tower-defense/types';
+
+installAttackFixtures();
 
 const engines: TowerDefenseEngine[] = [];
 
@@ -92,35 +87,7 @@ function createThreadling(
   };
 }
 
-describe('Sailcutter', () => {
-  it('defines the long-range three-target Wind Mark volley', () => {
-    expect(
-      BUG_STAGE_3.learnableAttacks.find(
-        (attack) => attack.attackId === 'SAILCUTTER'
-      )
-    ).toEqual({ level: 10, attackId: 'SAILCUTTER' });
-    expect(ATTACK_DEFS.SAILCUTTER).toMatchObject({
-      name: 'Sailcutter',
-      type: ElementType.FLYING,
-      category: 'special',
-      power: 35,
-      cooldownMs: 4000,
-      rangeIndex: 55,
-      behaviorType: 'SAILCUTTER',
-      sailcutter: {
-        projectileCount: 3,
-        markDurationMs: 4000,
-        threadlingMoveSpeedMultiplier: 1.6,
-        threadlingDamageMultiplier: 1.35,
-      },
-    });
-    expect(AttackBehaviorRegistry.SAILCUTTER).toBe(SailcutterBehavior);
-    expect(ATTACK_DEFS.SAILCUTTER.projectileVisual).toMatchObject({
-      type: 'SAILCUTTER',
-    });
-    expect(ATTACK_DEFS.SAILCUTTER.visualEffectConfigId).toBeUndefined();
-  });
-
+describe('Marking volleys', () => {
   it('launches at most three projectiles toward three unique targets', () => {
     const { engine, source } = battle();
     engine.enemies = [
@@ -130,10 +97,12 @@ describe('Sailcutter', () => {
       createEnemy('four', 56),
     ];
 
-    SailcutterBehavior.execute(engine, source, ATTACK_DEFS.SAILCUTTER);
+    SailcutterBehavior.execute(engine, source, ATTACK_FIXTURES.SAILCUTTER);
 
     expect(engine.projectiles).toHaveLength(3);
-    expect(new Set(engine.projectiles.map((shot) => shot.targetId)).size).toBe(3);
+    expect(new Set(engine.projectiles.map((shot) => shot.targetId)).size).toBe(
+      3
+    );
   });
 
   it('fires only one cutter when one target exists and resolves without impact VFX', () => {
@@ -142,7 +111,7 @@ describe('Sailcutter', () => {
     const target = createEnemy('solo', 44);
     engine.enemies = [target];
 
-    SailcutterBehavior.execute(engine, source, ATTACK_DEFS.SAILCUTTER);
+    SailcutterBehavior.execute(engine, source, ATTACK_FIXTURES.SAILCUTTER);
     expect(engine.projectiles).toHaveLength(1);
     expect(engine.projectiles[0]).toMatchObject({
       attackDefinitionId: 'SAILCUTTER',
@@ -168,7 +137,7 @@ describe('Sailcutter', () => {
       engine,
       source,
       target,
-      ATTACK_DEFS.SAILCUTTER
+      ATTACK_FIXTURES.SAILCUTTER
     );
     expect(target.sailcutterMarks?.[source.id]).toBe(4000);
 
@@ -177,7 +146,7 @@ describe('Sailcutter', () => {
       engine,
       source,
       target,
-      ATTACK_DEFS.SAILCUTTER
+      ATTACK_FIXTURES.SAILCUTTER
     );
     expect(target.sailcutterMarks?.[source.id]).toBe(5200);
   });
@@ -196,9 +165,9 @@ describe('Sailcutter', () => {
 
     updateRiggingNests(engine, [source], 100);
 
-    expect(new Set(engine.riggingThreadlings.map((unit) => unit.targetId))).toEqual(
-      new Set(['first-mark', 'second-mark'])
-    );
+    expect(
+      new Set(engine.riggingThreadlings.map((unit) => unit.targetId))
+    ).toEqual(new Set(['first-mark', 'second-mark']));
     for (const threadling of engine.riggingThreadlings) {
       expect(threadling.position.x).toBeCloseTo(48.62, 2);
     }
@@ -215,7 +184,7 @@ describe('Sailcutter', () => {
       engine,
       source,
       baseline,
-      ATTACK_DEFS.RIGGING_NEST
+      ATTACK_FIXTURES.RIGGING_NEST
     );
     const baselineDamage = baseline.maxHp - baseline.hp;
 

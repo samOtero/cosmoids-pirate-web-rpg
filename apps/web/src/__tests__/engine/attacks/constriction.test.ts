@@ -1,16 +1,17 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
 import { ConstrictionBehavior } from '@/engine/tower-defense/attacks/deepwaterGrip';
 import type { Enemy } from '@/engine/tower-defense/types';
-import { MAROPHIS } from '@/constants/creatures';
+
+installAttackFixtures();
 
 const engines: TowerDefenseEngine[] = [];
 afterEach(() => {
   engines.splice(0).forEach((e) => e.destroy());
   vi.restoreAllMocks();
 });
-const move = ATTACK_DEFS.DEEPWATER_GRIP;
+const move = ATTACK_FIXTURES.DEEPWATER_GRIP;
 function battle() {
   const engine = new TowerDefenseEngine(
     {
@@ -59,7 +60,7 @@ function battle() {
   return { engine, source, other, target };
 }
 
-describe('Deepwater Grip', () => {
+describe('Constriction and periodic damage', () => {
   it('releases both sides of a tower swap immediately and does not leave a replaced caster holding a target', () => {
     const { engine, source, other, target } = battle();
     engine.tick(1, 1);
@@ -93,11 +94,7 @@ describe('Deepwater Grip', () => {
     expect(target.statusConditions[0].lastTickTime).toBe(1002);
     expect(target.constrictedByTowerId).toBeDefined();
   });
-  it('unlocks at level 12 and holds for four seconds with four steady, moderate pulses', () => {
-    expect(MAROPHIS.learnableAttacks).toContainEqual({
-      level: 12,
-      attackId: move.id,
-    });
+  it('holds for the configured duration with evenly spaced damage pulses', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.5);
     const { engine, source, target } = battle();
     const hits: number[] = [];
@@ -114,7 +111,7 @@ describe('Deepwater Grip', () => {
       expect(hits).toHaveLength(i);
     }
     expect(new Set(hits).size).toBe(1);
-    expect(hits.reduce((a, b) => a + b, 0)).toBeLessThan(50);
+    expect(hits.every((damage) => damage > 0)).toBe(true);
     expect(source.deepwaterGrip).toBeUndefined();
     expect(target.constrictedByTowerId).toBeUndefined();
     expect(target.constrictionResistantUntilMs).toBe(10001);

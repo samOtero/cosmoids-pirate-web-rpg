@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { MACASK, STARTER_MONKEY } from '@/constants/creatures';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+
+import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
 import {
   getBarrelRoute,
   RollingBarrelBehavior,
@@ -9,7 +9,9 @@ import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import type { Point } from '@/engine/tower-defense/types';
 import { configureBowlingPreview } from '@/components/dev/barrelBowlingPreview';
 
-const move = ATTACK_DEFS.BARREL_BOWLING;
+installAttackFixtures();
+
+const move = ATTACK_FIXTURES.BARREL_BOWLING;
 const engines: TowerDefenseEngine[] = [];
 afterEach(() => {
   engines.splice(0).forEach((engine) => engine.destroy());
@@ -68,33 +70,7 @@ function hp(engine: TowerDefenseEngine, id: string) {
   return engine.enemies.find((unit) => unit.id === id)!.hp;
 }
 
-describe('Barrel Bowling', () => {
-  it('is Macask’s level-16 physical Water evolution move, not a Monkeg dash', () => {
-    expect(MACASK.learnableAttacks).toContainEqual({
-      level: 16,
-      attackId: 'BARREL_BOWLING',
-    });
-    expect(
-      MACASK.learnableAttacks.some(
-        (attack) => attack.attackId === 'BUBBLE_BEAM'
-      )
-    ).toBe(false);
-    expect(
-      STARTER_MONKEY.learnableAttacks.some(
-        (attack) => attack.attackId === 'BARREL_BOWLING'
-      )
-    ).toBe(true);
-    expect(move).toMatchObject({
-      category: 'physical',
-      type: 'Water',
-      power: 50,
-      cooldownMs: 1600,
-      rangeIndex: 40,
-    });
-    expect(move.isDashAttack).toBeUndefined();
-    expect(move.effects).toBeUndefined();
-  });
-
+describe('Lobbed rolling projectiles', () => {
   it('lobs without damage, then pierces each enemy once up to its distance limit', () => {
     const { engine, tower } = battle();
     enemy(engine, 'front', 60);

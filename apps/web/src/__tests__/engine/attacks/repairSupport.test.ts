@@ -1,18 +1,20 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
 import {
   getShipshapeTarget,
   RepairSupportBehavior,
 } from '@/engine/tower-defense/attacks/behaviors';
-import { STARTER_CRAB, CARAPENTER } from '@/constants/creatures';
+import { STARTER_CRAB } from '@/constants/creatures';
 import { calculateStat } from '@/utils/resolvePlayerCreature';
+
+installAttackFixtures();
 
 const engines: TowerDefenseEngine[] = [];
 afterEach(() => {
   engines.splice(0).forEach((engine) => engine.destroy());
 });
-const move = ATTACK_DEFS.SHIPSHAPE;
+const move = ATTACK_FIXTURES.SHIPSHAPE;
 function battle() {
   const engine = new TowerDefenseEngine(
     {
@@ -54,19 +56,7 @@ function battle() {
   return { engine, caster, ally, far, dead };
 }
 
-describe('Shipshape', () => {
-  it('matches Palmit’s level-16 and Carapenter’s level-16 learnsets', () => {
-    for (const [template, level] of [
-      [STARTER_CRAB, 16],
-      [CARAPENTER, 16],
-    ] as const) {
-      expect(template.learnableAttacks).toContainEqual({
-        level,
-        attackId: 'SHIPSHAPE',
-      });
-    }
-  });
-
+describe('Healing and defensive support', () => {
   it('selects by missing health percentage, excludes dead/out-of-range allies, and favors allies on ties', () => {
     const { engine, caster, ally, far } = battle();
     caster.maxHp = 200;

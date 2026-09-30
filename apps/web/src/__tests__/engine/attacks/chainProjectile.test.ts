@@ -1,12 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { BIRD_1 } from '@/constants/creatures';
 import { ProjectileBehavior } from '@/engine/tower-defense/attacks/behaviors';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import type { Enemy } from '@/engine/tower-defense/types';
-import { ElementType } from '@/types/baseGame';
-import { getDefaultAttacksForLevel } from '@/utils/resolvePlayerCreature';
+
+installAttackFixtures();
 
 const engines: TowerDefenseEngine[] = [];
 
@@ -27,7 +26,12 @@ function createBattle() {
   };
   const engine = new TowerDefenseEngine(
     {
-      paths: [[{ x: 0, y: 0 }, { x: 100, y: 0 }]],
+      paths: [
+        [
+          { x: 0, y: 0 },
+          { x: 100, y: 0 },
+        ],
+      ],
       placementSpots: [],
       waves: [],
     },
@@ -42,11 +46,7 @@ function createBattle() {
   return { engine, tower };
 }
 
-function addEnemy(
-  engine: TowerDefenseEngine,
-  id: string,
-  y: number
-): Enemy {
+function addEnemy(engine: TowerDefenseEngine, id: string, y: number): Enemy {
   const enemy = engine.spawnPreviewEnemy({
     id,
     creatureId: 'senticle',
@@ -59,31 +59,7 @@ function addEnemy(
   return enemy;
 }
 
-describe('Flying Colors', () => {
-  it('replaces Dart in Harlequill’s new learnset with the agreed stats', () => {
-    expect(getDefaultAttacksForLevel(BIRD_1, 9)).toEqual([
-      'PECK',
-      'FUNNY_DANCE',
-      'FLYING_COLORS',
-    ]);
-    expect(BIRD_1.learnableAttacks).not.toContainEqual({
-      level: 9,
-      attackId: 'QUICK_ATTACK',
-    });
-    expect(ATTACK_DEFS.QUICK_ATTACK).toBeDefined();
-    expect(ATTACK_DEFS.FLYING_COLORS).toMatchObject({
-      type: ElementType.FLYING,
-      category: 'special',
-      power: 30,
-      cooldownMs: 1200,
-      rangeIndex: 50,
-      projectileSpeed: 1.4,
-      projectileVisual: { type: 'FLYING_COLORS' },
-      flyingColors: { maxTargets: 3, hopRange: 40 },
-      visualEffectConfigId: 'attack_flying_colors_1',
-    });
-  });
-
+describe('Distinct-target projectile chains', () => {
   it('hits three unique spread-out targets without a knockout or tower-range requirement on hops', () => {
     const { engine, tower } = createBattle();
     const first = addEnemy(engine, 'first', 0);
@@ -92,8 +68,10 @@ describe('Flying Colors', () => {
     const fartherDeadEnd = addEnemy(engine, 'dead_end', -35);
     const fourth = addEnemy(engine, 'fourth', 95);
 
-    expect(engine.isPositionInTowerRange(tower.position, routeThird.position, 50)).toBe(false);
-    ProjectileBehavior.execute(engine, tower, ATTACK_DEFS.FLYING_COLORS);
+    expect(
+      engine.isPositionInTowerRange(tower.position, routeThird.position, 50)
+    ).toBe(false);
+    ProjectileBehavior.execute(engine, tower, ATTACK_FIXTURES.FLYING_COLORS);
     expect(engine.projectiles[0].targetId).toBe(first.id);
 
     engine.tick(0, 200);
@@ -127,7 +105,7 @@ describe('Flying Colors', () => {
     const first = addEnemy(engine, 'first', 0);
     const far = addEnemy(engine, 'far', 60);
 
-    ProjectileBehavior.execute(engine, tower, ATTACK_DEFS.FLYING_COLORS);
+    ProjectileBehavior.execute(engine, tower, ATTACK_FIXTURES.FLYING_COLORS);
     engine.tick(0, 200);
 
     expect(first.hp).toBeLessThan(first.maxHp);
@@ -142,7 +120,7 @@ describe('Flying Colors', () => {
     const second = addEnemy(engine, 'second', 25);
     const third = addEnemy(engine, 'third', 60);
 
-    ProjectileBehavior.execute(engine, tower, ATTACK_DEFS.FLYING_COLORS);
+    ProjectileBehavior.execute(engine, tower, ATTACK_FIXTURES.FLYING_COLORS);
     engine.tick(0, 200);
     expect(first.hp).toBeLessThanOrEqual(0);
     expect(engine.projectiles[0].targetId).toBe(second.id);

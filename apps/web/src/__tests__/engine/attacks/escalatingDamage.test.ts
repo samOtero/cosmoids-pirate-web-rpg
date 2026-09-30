@@ -1,16 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { STARTER_IGUANA, VELOCINDER } from '@/constants/creatures';
-import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
+
 import { ProjectileBehavior } from '@/engine/tower-defense/attacks/behaviors';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
 import { EffectProcessor } from '@/engine/tower-defense/attacks/EffectProcessor';
 import { updateFireClawHeat } from '@/engine/tower-defense/attacks/fireClaw';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
-import { ElementType } from '@/types/baseGame';
-import { getDefaultAttacksForLevel } from '@/utils/resolvePlayerCreature';
+
+installAttackFixtures();
 
 const engines: TowerDefenseEngine[] = [];
-const move = ATTACK_DEFS.FIRE_CLAW;
+const move = ATTACK_FIXTURES.FIRE_CLAW;
 
 afterEach(() => {
   engines.splice(0).forEach((engine) => engine.destroy());
@@ -59,50 +58,7 @@ function battle() {
   return { engine, tower, target };
 }
 
-describe('Kindle Claw', () => {
-  it('unlocks at level 6 after Fueguana starts with Claw', () => {
-    expect(getDefaultAttacksForLevel(STARTER_IGUANA, 5)).toEqual(['SCRATCH']);
-    expect(getDefaultAttacksForLevel(STARTER_IGUANA, 6)).toEqual([
-      'SCRATCH',
-      'FIRE_CLAW',
-    ]);
-    expect(STARTER_IGUANA.learnableAttacks.slice(0, 2)).toEqual([
-      { level: 1, attackId: 'SCRATCH' },
-      { level: 6, attackId: 'FIRE_CLAW' },
-    ]);
-    expect(VELOCINDER.learnableAttacks.slice(0, 2)).toEqual([
-      { level: 1, attackId: 'SCRATCH' },
-      { level: 6, attackId: 'FIRE_CLAW' },
-    ]);
-    expect(TowerDefenseEngine.getDefaultAttacks('starter_iguana')).toEqual([
-      'SCRATCH',
-    ]);
-  });
-
-  it('uses the approved physical Fire stats and warmed scratch treatment', () => {
-    expect(move).toMatchObject({
-      name: 'Kindle Claw',
-      type: ElementType.FIRE,
-      category: 'physical',
-      power: 20,
-      cooldownMs: 800,
-      rangeIndex: 40,
-      isDashAttack: true,
-      dashTrailType: 'FIRE',
-      visualEffectConfigId: 'attack_fire_claw_1',
-      fireClawHeat: {
-        maxStacks: 3,
-        damageBonusPerStack: 0.2,
-        lullBeforeDecayMs: 3000,
-        decayIntervalMs: 2000,
-      },
-    });
-    expect(CREATURE_TD_CONFIGS.attack_fire_claw_1.default).toMatchObject({
-      url: '/battles/attacks/scratch.webp',
-      tint: 0xff8a3d,
-    });
-  });
-
+describe('Escalating damage and decay', () => {
   it('warms across targets, caps at three stacks, and applies Heat to later hits', () => {
     const { engine, tower, target } = battle();
     const secondTarget = engine.spawnPreviewEnemy({

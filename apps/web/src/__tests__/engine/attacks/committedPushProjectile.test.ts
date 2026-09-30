@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { AGUANA, NAUTIGUAN } from '@/constants/creatures';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import { installAttackFixtures } from './fixtures';
 import { updateWakeWhips } from '@/engine/tower-defense/attacks/wakeWhip';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
-import { ElementType } from '@/types/baseGame';
+
+installAttackFixtures();
 
 const engines: TowerDefenseEngine[] = [];
 
@@ -48,38 +48,7 @@ function createBattle() {
   return { engine, tower: engine.towers[0], target };
 }
 
-describe('Wake Whip', () => {
-  it('is the Aguana family level-5 physical Water move', () => {
-    expect(ATTACK_DEFS.WAKE_WHIP).toMatchObject({
-      name: 'Wake Whip',
-      type: ElementType.WATER,
-      category: 'physical',
-      power: 40,
-      cooldownMs: 1000,
-      behaviorType: 'WAKE_WHIP',
-      projectileVisual: {
-        type: 'WAKE_WHIP',
-        spriteUrl: '/battles/attacks/wake_whip_wave.webp',
-      },
-      wakeWhip: {
-        windupMs: 520,
-        recoveryMs: 150,
-        pushDistance: 4,
-        warmPushDistance: 7,
-      },
-    });
-    for (const species of [AGUANA, NAUTIGUAN]) {
-      expect(species.learnableAttacks).toContainEqual({
-        level: 5,
-        attackId: 'WAKE_WHIP',
-      });
-      expect(species.learnableAttacks).not.toContainEqual({
-        level: 5,
-        attackId: 'WATER_GUN',
-      });
-    }
-  });
-
+describe('Committed projectile push', () => {
   it('faces its target, commits through the waggle, and launches one empowered wake', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     const { engine, tower, target } = createBattle();

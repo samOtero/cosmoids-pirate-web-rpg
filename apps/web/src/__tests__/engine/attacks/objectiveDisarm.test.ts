@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { BIRD_1, BUFFLORA } from '@/constants/creatures';
 import {
   FunnyDanceBehavior,
   InstantAoeBehavior,
 } from '@/engine/tower-defense/attacks/behaviors';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { CaptureUnit, Enemy, Tower } from '@/engine/tower-defense/types';
-import { ElementType } from '@/types/baseGame';
+
+installAttackFixtures();
 
 const levelData = {
   paths: [
@@ -84,22 +84,7 @@ const createCaptureUnit = (
   heldByEnemyId,
 });
 
-describe('Funny Dance', () => {
-  it('is Harlequill\'s long-range Normal utility move', () => {
-    expect(
-      BIRD_1.learnableAttacks.find((attack) => attack.attackId === 'FUNNY_DANCE')
-    ).toEqual({ level: 5, attackId: 'FUNNY_DANCE' });
-    expect(ATTACK_DEFS.FUNNY_DANCE).toMatchObject({
-      name: 'Funny Dance',
-      type: ElementType.NORMAL,
-      power: 0,
-      rangeIndex: 60,
-      behaviorType: 'FUNNY_DANCE',
-      itemPickupLockMs: 2500,
-      visualEffectConfigId: 'attack_funny_dance_1',
-    });
-  });
-
+describe('Objective disarm with a committed reaction', () => {
   it('only affects carrying enemies and locks pickup only for the disarmed carriers', () => {
     const engine = new TowerDefenseEngine(levelData);
     const carrierOne = createEnemy('carrier_one', 10, 'coin_one');
@@ -113,11 +98,7 @@ describe('Funny Dance', () => {
     engine.captureUnits = [coin, sack, farCoin];
     const harlequill = createHarlequillTower();
 
-    FunnyDanceBehavior.execute(
-      engine,
-      harlequill,
-      ATTACK_DEFS.FUNNY_DANCE
-    );
+    FunnyDanceBehavior.execute(engine, harlequill, ATTACK_FIXTURES.FUNNY_DANCE);
 
     expect(carrierOne.heldCaptureUnitId).toBeUndefined();
     expect(carrierTwo.heldCaptureUnitId).toBeUndefined();
@@ -125,12 +106,8 @@ describe('Funny Dance', () => {
     expect(sack.heldByEnemyId).toBeUndefined();
     expect(farCarrier.heldCaptureUnitId).toBe(farCoin.id);
     expect(farCoin.heldByEnemyId).toBe(farCarrier.id);
-    expect(carrierOne.damagedByTowerIds).toEqual(
-      new Set(['harlequill_tower'])
-    );
-    expect(carrierTwo.damagedByTowerIds).toEqual(
-      new Set(['harlequill_tower'])
-    );
+    expect(carrierOne.damagedByTowerIds).toEqual(new Set(['harlequill_tower']));
+    expect(carrierTwo.damagedByTowerIds).toEqual(new Set(['harlequill_tower']));
     expect(farCarrier.damagedByTowerIds).toEqual(new Set());
     expect(unlockedReceiver.damagedByTowerIds).toEqual(new Set());
     expect(carrierOne).toMatchObject({
@@ -177,7 +154,7 @@ describe('Funny Dance', () => {
     engine.enemies = [carrier];
     engine.captureUnits = [coin];
 
-    FunnyDanceBehavior.execute(engine, harlequill, ATTACK_DEFS.FUNNY_DANCE);
+    FunnyDanceBehavior.execute(engine, harlequill, ATTACK_FIXTURES.FUNNY_DANCE);
     expect(carrier.heldCaptureUnitId).toBeUndefined();
     expect(coin.heldByEnemyId).toBeUndefined();
     expect(carrier.hasBeenWindDisarmed).toBe(true);
@@ -194,12 +171,12 @@ describe('Funny Dance', () => {
       FunnyDanceBehavior.canExecute(
         engine,
         harlequill,
-        ATTACK_DEFS.FUNNY_DANCE
+        ATTACK_FIXTURES.FUNNY_DANCE
       )
     ).toBe(false);
 
     // Second execution must not disarm or re-lock carrier
-    FunnyDanceBehavior.execute(engine, harlequill, ATTACK_DEFS.FUNNY_DANCE);
+    FunnyDanceBehavior.execute(engine, harlequill, ATTACK_FIXTURES.FUNNY_DANCE);
     expect(carrier.heldCaptureUnitId).toBe(coin.id);
     expect(coin.heldByEnemyId).toBe(carrier.id);
     expect(carrier.itemPickupBlockedUntilMs).toBe(2500);
@@ -207,22 +184,7 @@ describe('Funny Dance', () => {
   });
 });
 
-describe('Wind Gust', () => {
-  it('remains Bufflora\'s Flying move with its original range and visuals', () => {
-    expect(
-      BUFFLORA.learnableAttacks.find((attack) => attack.attackId === 'WIND_GUST')
-    ).toEqual({ level: 4, attackId: 'WIND_GUST' });
-    expect(ATTACK_DEFS.WIND_GUST).toMatchObject({
-      name: 'Wind Gust',
-      type: ElementType.FLYING,
-      power: 0,
-      rangeIndex: 40,
-      behaviorType: 'INSTANT_AOE',
-      itemPickupLockMs: 2000,
-      visualEffectConfigId: 'attack_wind_gust_1',
-    });
-  });
-
+describe('Area objective disarm', () => {
   it('only blocks the enemies it makes drop an objective', () => {
     const engine = new TowerDefenseEngine(levelData);
     const carrier = createEnemy('carrier', 10, 'coin_one');
@@ -232,7 +194,7 @@ describe('Wind Gust', () => {
     engine.enemies = [carrier, bystander];
     engine.captureUnits = [coin];
 
-    InstantAoeBehavior.execute(engine, tower, ATTACK_DEFS.WIND_GUST);
+    InstantAoeBehavior.execute(engine, tower, ATTACK_FIXTURES.WIND_GUST);
 
     expect(carrier).toMatchObject({
       hasBeenWindDisarmed: true,

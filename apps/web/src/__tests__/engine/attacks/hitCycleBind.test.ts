@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { CARAPENTER, STARTER_CRAB } from '@/constants/creatures';
+
 import { ProjectileBehavior } from '@/engine/tower-defense/attacks/behaviors';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
 import { EffectProcessor } from '@/engine/tower-defense/attacks/EffectProcessor';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { Enemy, Tower } from '@/engine/tower-defense/types';
-import { ElementType } from '@/types/baseGame';
-import { getDefaultAttacksForLevel } from '@/utils/resolvePlayerCreature';
+
+installAttackFixtures();
 
 const engines: TowerDefenseEngine[] = [];
 
@@ -73,45 +73,7 @@ const createEnemy = (): Enemy => ({
   damagedByTowerIds: new Set(),
 });
 
-describe('Husk Shot', () => {
-  it('unlocks at level 6 after Pinch, before Coir Snare at level 9', () => {
-    expect(getDefaultAttacksForLevel(STARTER_CRAB, 5)).toEqual(['PINCH']);
-    expect(getDefaultAttacksForLevel(STARTER_CRAB, 6)).toEqual([
-      'PINCH',
-      'COIR_SNAP',
-    ]);
-    expect(STARTER_CRAB.learnableAttacks).toContainEqual({
-      level: 9,
-      attackId: 'COIR_SNARE',
-    });
-    expect(CARAPENTER.learnableAttacks.slice(0, 3)).toEqual([
-      { level: 1, attackId: 'PINCH' },
-      { level: 6, attackId: 'COIR_SNAP' },
-      { level: 9, attackId: 'COIR_SNARE' },
-    ]);
-    expect(TowerDefenseEngine.getDefaultAttacks('starter_crab')).toEqual([
-      'PINCH',
-    ]);
-  });
-
-  it('is a lighter physical Grass attack that reuses Coir Snare’s projectile art', () => {
-    expect(ATTACK_DEFS.COIR_SNAP).toMatchObject({
-      name: 'Husk Shot',
-      type: ElementType.GRASS,
-      category: 'physical',
-      power: 25,
-      cooldownMs: 900,
-      rangeIndex: 40,
-      projectileVisual: ATTACK_DEFS.COIR_SNARE.projectileVisual,
-      coirSnapCombo: {
-        hitsToBind: 3,
-        bindDurationMs: 500,
-        bindVisualEffectConfigId: 'attack_coir_snare_1',
-        projectileScales: [0.72, 0.86, 1],
-      },
-    });
-  });
-
+describe('Per-caster hit cycle and bind', () => {
   it('cycles one, two, bind, one successful hits per Palmit', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.99);
     const engine = createEngine();
@@ -123,7 +85,7 @@ describe('Husk Shot', () => {
         engine,
         palmit,
         enemy,
-        ATTACK_DEFS.COIR_SNAP
+        ATTACK_FIXTURES.COIR_SNAP
       );
       expect(palmit.coirSnapHits).toBe(progress);
     }
@@ -157,11 +119,15 @@ describe('Husk Shot', () => {
       [2, 1],
     ] as const) {
       firstPalmit.coirSnapHits = progress;
-      ProjectileBehavior.execute(engine, firstPalmit, ATTACK_DEFS.COIR_SNAP);
+      ProjectileBehavior.execute(
+        engine,
+        firstPalmit,
+        ATTACK_FIXTURES.COIR_SNAP
+      );
       expect(engine.projectiles.at(-1)?.visualScale).toBe(expectedScale);
     }
 
-    ProjectileBehavior.execute(engine, secondPalmit, ATTACK_DEFS.COIR_SNAP);
+    ProjectileBehavior.execute(engine, secondPalmit, ATTACK_FIXTURES.COIR_SNAP);
     expect(engine.projectiles.at(-1)?.visualScale).toBe(0.72);
   });
 });

@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { MOUSE_1 } from '@/constants/creatures';
 import { ProjectileBehavior } from '@/engine/tower-defense/attacks/behaviors';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import type { Enemy } from '@/engine/tower-defense/types';
-import { ElementType } from '@/types/baseGame';
+
+installAttackFixtures();
 
 const engines: TowerDefenseEngine[] = [];
 
@@ -64,39 +64,14 @@ function addEnemy(
   return enemy;
 }
 
-describe('Loose End', () => {
-  it('replaces Chomp in Knotia’s learnset without deleting the legacy attack', () => {
-    expect(MOUSE_1.learnableAttacks).toContainEqual({
-      level: 14,
-      attackId: 'LOOSE_END',
-    });
-    expect(
-      MOUSE_1.learnableAttacks.some((attack) => attack.attackId === 'CHOMP')
-    ).toBe(false);
-    expect(ATTACK_DEFS.CHOMP).toBeDefined();
-  });
-
-  it('uses the approved physical Normal stats and rope-knot projectile', () => {
-    expect(ATTACK_DEFS.LOOSE_END).toMatchObject({
-      name: 'Loose End',
-      type: ElementType.NORMAL,
-      category: 'physical',
-      power: 50,
-      cooldownMs: 1000,
-      rangeIndex: 40,
-      projectileSpeed: 1.4,
-      projectileVisual: { type: 'STRING_COIL' },
-      looseEnd: { followUpRadius: 40 },
-    });
-  });
-
+describe('Knockout follow-up projectiles', () => {
   it('jumps once from a defeated target to the nearest enemy within 24 units', () => {
     const { engine, tower } = createBattle();
     const primary = addEnemy(engine, 'primary', 10, 1);
     const nearest = addEnemy(engine, 'nearest', 33, 1);
     const outsideInitialRadius = addEnemy(engine, 'outside', 36, 100);
 
-    ProjectileBehavior.execute(engine, tower, ATTACK_DEFS.LOOSE_END);
+    ProjectileBehavior.execute(engine, tower, ATTACK_FIXTURES.LOOSE_END);
     engine.tick(0, 200);
 
     expect(primary.hp).toBeLessThanOrEqual(0);
@@ -120,7 +95,7 @@ describe('Loose End', () => {
     const primary = addEnemy(engine, 'primary', 10, 500);
     addEnemy(engine, 'nearby', 20, 500);
 
-    ProjectileBehavior.execute(engine, tower, ATTACK_DEFS.LOOSE_END);
+    ProjectileBehavior.execute(engine, tower, ATTACK_FIXTURES.LOOSE_END);
     engine.tick(0, 200);
 
     expect(primary.hp).toBeLessThan(primary.maxHp);

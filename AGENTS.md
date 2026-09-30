@@ -41,6 +41,9 @@
 
 ## Tower combat direction
 
+- Organize attack tests by shared mechanics (projectiles, damage categories, status, targeting, cooldowns, and distinct lifecycle behaviors), not by individual move names. Use controlled test inputs independent of production tuning; do not synchronize test fixtures when balancing a move.
+- Preserve useful edge-case coverage for distinct mechanics such as chaining, summons, combos, and interruptions. Registry checks should discover current attacks and validate behavior/asset references without copying powers, ranges, cooldowns, or learn levels. Run `pnpm test:attacks` and `pnpm verify:quick` after changes.
+
 - Read `docs/combat/TYPE_AND_FAMILY_IDENTITY.md` before designing or revising player attacks, active abilities, family traits, creature combat identities, learnsets, TM-style move teaching, type mechanics, or broad tower-defense balance.
 - Treat the move's type as the source of its type-focused behavior. A move retains its authored reach, targeting, utility, and other mechanics when learned by an off-type creature; creature typing instead governs affinity, natural access, and defensive matchups.
 - Preserve a separate family identity through signature mechanics, stats, learnsets, limitations, evolution development, and only when needed an inherent family trait. Ordinary TMs must not transfer another family's complete identity.

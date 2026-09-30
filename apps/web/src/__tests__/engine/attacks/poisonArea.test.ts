@@ -1,19 +1,17 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { BUFFLORA } from '@/constants/creatures';
-import {
-  AttackBehaviorRegistry,
-  PoisonAoeBehavior,
-} from '@/engine/tower-defense/attacks/behaviors';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import { PoisonAoeBehavior } from '@/engine/tower-defense/attacks/behaviors';
+import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { Enemy, Tower } from '@/engine/tower-defense/types';
-import { ElementType } from '@/types/baseGame';
+
 import {
   findPoison,
   TOXIC_POLLEN_POISON_ID,
   VENOM_SPRAY_POISON_ID,
 } from '@/engine/tower-defense/poison';
+
+installAttackFixtures();
 
 const levelData = {
   paths: [
@@ -89,34 +87,7 @@ const createEnemy = (
 
 afterEach(() => vi.restoreAllMocks());
 
-describe('Toxic Pollen', () => {
-  it('stores a 40-power damage budget in a distinct Poison area debuff', () => {
-    expect(BUFFLORA.learnableAttacks).toContainEqual({
-      level: 8,
-      attackId: 'TOXIC_POLLEN',
-    });
-    expect(ATTACK_DEFS.TOXIC_POLLEN).toMatchObject({
-      type: ElementType.POISON,
-      category: 'special',
-      power: 0,
-      cooldownMs: 2400,
-      rangeIndex: 40,
-      behaviorType: 'POISON_AOE',
-      effects: [
-        {
-          type: 'POISON',
-          chance: 1,
-          poisonId: TOXIC_POLLEN_POISON_ID,
-          totalPower: 40,
-          durationMs: 5000,
-          tickCount: 5,
-        },
-      ],
-      visualEffectConfigId: 'attack_toxic_pollen_1',
-    });
-    expect(AttackBehaviorRegistry.POISON_AOE).toBe(PoisonAoeBehavior);
-  });
-
+describe('Area poison budgets', () => {
   it('requires a living, non-immune target without Toxic Pollen in range', () => {
     const engine = new TowerDefenseEngine(levelData);
     const source = createBuffloraTower();
@@ -130,7 +101,7 @@ describe('Toxic Pollen', () => {
     ];
 
     expect(
-      PoisonAoeBehavior.canExecute(engine, source, ATTACK_DEFS.TOXIC_POLLEN)
+      PoisonAoeBehavior.canExecute(engine, source, ATTACK_FIXTURES.TOXIC_POLLEN)
     ).toBe(false);
 
     engine.enemies.push(
@@ -140,7 +111,7 @@ describe('Toxic Pollen', () => {
     );
 
     expect(
-      PoisonAoeBehavior.canExecute(engine, source, ATTACK_DEFS.TOXIC_POLLEN)
+      PoisonAoeBehavior.canExecute(engine, source, ATTACK_FIXTURES.TOXIC_POLLEN)
     ).toBe(true);
     engine.destroy();
   });
@@ -168,7 +139,7 @@ describe('Toxic Pollen', () => {
       outOfRange,
     ];
 
-    PoisonAoeBehavior.execute(engine, source, ATTACK_DEFS.TOXIC_POLLEN);
+    PoisonAoeBehavior.execute(engine, source, ATTACK_FIXTURES.TOXIC_POLLEN);
 
     for (const target of [first, second, alreadyVenomed]) {
       expect(target.hp).toBe(100);
@@ -198,12 +169,12 @@ describe('Toxic Pollen', () => {
         configId: 'attack_toxic_pollen_1',
         position: source.position,
         durationMs: 900,
-        rangeIndex: ATTACK_DEFS.TOXIC_POLLEN.rangeIndex,
+        rangeIndex: ATTACK_FIXTURES.TOXIC_POLLEN.rangeIndex,
       })
     );
 
     const visualEffectCount = engine.visualEffects.length;
-    PoisonAoeBehavior.execute(engine, source, ATTACK_DEFS.TOXIC_POLLEN);
+    PoisonAoeBehavior.execute(engine, source, ATTACK_FIXTURES.TOXIC_POLLEN);
 
     expect(first.statusConditions).toHaveLength(1);
     expect(second.statusConditions).toHaveLength(1);
@@ -211,7 +182,7 @@ describe('Toxic Pollen', () => {
     expect(alreadyVenomed.statusConditions).toHaveLength(2);
     expect(engine.visualEffects).toHaveLength(visualEffectCount);
     expect(
-      PoisonAoeBehavior.canExecute(engine, source, ATTACK_DEFS.TOXIC_POLLEN)
+      PoisonAoeBehavior.canExecute(engine, source, ATTACK_FIXTURES.TOXIC_POLLEN)
     ).toBe(false);
 
     engine.enemies = [first];

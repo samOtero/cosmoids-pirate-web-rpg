@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { SONARION, RESONARION } from '@/constants/creatures';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+
+import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
 import {
   ProjectileBehavior,
   SupportAuraBehavior,
@@ -11,8 +11,8 @@ import {
 } from '@/engine/tower-defense/attackSpeedModifiers';
 import { getActiveSpeedMultiplier } from '@/engine/tower-defense/speedModifiers';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
-import type { TDEvent } from '@/engine/tower-defense/events/TDEventBus';
-import { ElementType } from '@/types/baseGame';
+
+installAttackFixtures();
 
 const engines: TowerDefenseEngine[] = [];
 afterEach(() => {
@@ -64,29 +64,7 @@ function createEngine(withTarget = true, level = 14) {
   return engine;
 }
 
-describe('Rally Howl', () => {
-  it('unlocks a damage-free Normal support move at level 14 for the Razcall line', () => {
-    for (const species of [SONARION, RESONARION]) {
-      expect(
-        species.learnableAttacks.filter(
-          (move) => move.attackId === 'RALLY_HOWL'
-        )
-      ).toEqual([{ level: 14, attackId: 'RALLY_HOWL' }]);
-    }
-    expect(ATTACK_DEFS.RALLY_HOWL).toMatchObject({
-      type: ElementType.NORMAL,
-      power: 0,
-      behaviorType: 'SUPPORT_AURA',
-      cooldownMs: 20000,
-      rangeIndex: 40,
-      supportBuff: {
-        attackSpeedMultiplier: 1.2,
-        durationMs: 15000,
-        global: true,
-      },
-    });
-  });
-
+describe('Support aura and simulation cooldowns', () => {
   it('buffs self and every living teammate regardless of distance, without damage or movement changes', () => {
     const engine = createEngine();
     const [caster, near, boundary, far, dead] = engine.towers;
@@ -95,7 +73,7 @@ describe('Rally Howl', () => {
     engine.events.subscribe((event) => {
       if (event.type === 'ATTACK_DAMAGE_DEALT') damage(event);
     });
-    SupportAuraBehavior.execute(engine, caster, ATTACK_DEFS.RALLY_HOWL);
+    SupportAuraBehavior.execute(engine, caster, ATTACK_FIXTURES.RALLY_HOWL);
     for (const recipient of [caster, near, boundary, far])
       expect(getAttackSpeedMultiplier(recipient, 0)).toBe(1.2);
     expect(dead.attackSpeedBuff).toBeUndefined();
@@ -115,19 +93,17 @@ describe('Rally Howl', () => {
   it('expires exactly after fifteen seconds, with 20% faster cadence rather than 20% less cooldown', () => {
     const engine = createEngine();
     const caster = engine.towers[0];
-    SupportAuraBehavior.execute(engine, caster, ATTACK_DEFS.RALLY_HOWL);
-    expect(800 / getAttackSpeedMultiplier(caster, 14999)).toBeCloseTo(
-      666.6667
-    );
+    SupportAuraBehavior.execute(engine, caster, ATTACK_FIXTURES.RALLY_HOWL);
+    expect(800 / getAttackSpeedMultiplier(caster, 14999)).toBeCloseTo(666.6667);
     expect(getAttackSpeedMultiplier(caster, 15000)).toBe(1);
   });
 
   it('refreshes from another howl without stacking the multiplier or duration', () => {
     const engine = createEngine();
     const [caster, near] = engine.towers;
-    SupportAuraBehavior.execute(engine, caster, ATTACK_DEFS.RALLY_HOWL);
+    SupportAuraBehavior.execute(engine, caster, ATTACK_FIXTURES.RALLY_HOWL);
     engine.elapsedTimeMs = 2000;
-    SupportAuraBehavior.execute(engine, near, ATTACK_DEFS.RALLY_HOWL);
+    SupportAuraBehavior.execute(engine, near, ATTACK_FIXTURES.RALLY_HOWL);
     expect(caster.attackSpeedBuff).toEqual({
       multiplier: 1.2,
       appliedAtMs: 2000,
@@ -139,7 +115,7 @@ describe('Rally Howl', () => {
   it('snapshots global recipients: repositioning or losing the caster does not remove the buff', () => {
     const engine = createEngine();
     const [caster, near, , far] = engine.towers;
-    SupportAuraBehavior.execute(engine, caster, ATTACK_DEFS.RALLY_HOWL);
+    SupportAuraBehavior.execute(engine, caster, ATTACK_FIXTURES.RALLY_HOWL);
     near.position = { x: 95, y: 95 };
     far.position = { x: 40, y: 50 };
     engine.towers = engine.towers.filter((tower) => tower !== caster);
@@ -215,37 +191,5 @@ describe('Rally Howl', () => {
     expect(shot).not.toHaveBeenCalled();
     engine.tick(15102, 101);
     expect(shot).toHaveBeenCalledTimes(1);
-  });
-
-  it('learns Rally Howl at the level cap without replacing Static Yip', () => {
-    const engine = createEngine(false, 13);
-    const caster = engine.towers[0];
-    caster.creature.equippedAttacks = ['NIBBLE', 'QUICK_ATTACK', 'STATIC_YIP'];
-    caster.equippedAttacksRuntime = caster.creature.equippedAttacks.map(
-      (definitionId) => ({ definitionId, lastFiredTime: 0 })
-    );
-    caster.creature.xp = 14 ** 3 - 13 ** 3;
-    const events: TDEvent[] = [];
-    engine.events.subscribe((event) => events.push(event));
-    engine.events.emit({
-      type: 'ENEMY_DIED',
-      enemyId: 'defeated',
-      enemyDefinitionId: 'bug_stage_1',
-      enemyLevel: 1,
-      participantTowerIds: [caster.id],
-    });
-    expect(caster.creature.level).toBe(14);
-    expect(caster.creature.equippedAttacks).toEqual([
-      'NIBBLE',
-      'QUICK_ATTACK',
-      'STATIC_YIP',
-      'RALLY_HOWL',
-    ]);
-    expect(events).toContainEqual(
-      expect.objectContaining({
-        type: 'TOWER_LEARNED_ATTACK',
-        attackDefId: 'RALLY_HOWL',
-      })
-    );
   });
 });

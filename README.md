@@ -191,12 +191,21 @@ learnsets. `pnpm test:creatures` discovers every species from the runtime regist
 and checks attack/evolution references, shipped artwork, and directional visuals.
 Creation history lives in documentation; see [creature provenance](docs/art/CREATURE_PROVENANCE.md).
 
+Attack tests in `apps/web/src/__tests__/engine/attacks` exercise shared mechanics
+with controlled inputs: projectile hits, physical/special damage, status,
+targeting, cooldowns, and distinct behaviors such as chaining and summons.
+Their fixtures are independent of production tuning; balancing a move does not
+require updating expected copies of its settings. Registry checks discover all
+current attacks and validate behavior and asset references. Run `pnpm test:attacks`
+for this focused suite.
+
 ## Scripts
 - `pnpm verify:quick` - Run the fast local verification suite
 - `pnpm typecheck` - Check TypeScript without emitting files
 - `pnpm lint` - Run the complete ESLint suite
 - `pnpm test:unit` - Run non-Storybook Vitest tests once
 - `pnpm test:creatures` - Validate every runtime creature's integration
+- `pnpm test:attacks` - Check shared attack mechanics and registry integration
 - `pnpm test run` - Run all tests once
 - `pnpm test:ui` - Visual test runner
 - `pnpm test:coverage` - Coverage report

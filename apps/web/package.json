@@ -19,6 +19,7 @@
     "test:e2e:headed": "playwright test --headed",
     "validate:dialogs": "vitest run src/__tests__/integration/dialogConfig.test.ts --project=unit",
     "test:creatures": "vitest run src/__tests__/integration/creatureRegistry.test.ts --project=unit",
+    "test:attacks": "vitest run src/__tests__/engine/attacks src/__tests__/integration/attackRegistry.test.ts --project=unit",
     "assets:optimize": "node scripts/assets/optimize-art-assets.mjs",
     "assets:optimize:journals": "node scripts/assets/optimize-art-assets.mjs journal",
     "assets:optimize:story-backgrounds": "node scripts/assets/optimize-art-assets.mjs story-backgrounds",

@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { YOKODILLO } from '@/constants/creatures';
-import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
+
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
-import { AttackBehaviorRegistry } from '@/engine/tower-defense/attacks/behaviors';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+
+import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
 import { PalmSlamBehavior } from '@/engine/tower-defense/attacks/palmSlam';
 import type { Enemy } from '@/engine/tower-defense/types';
-import { ElementType } from '@/types/baseGame';
+
+installAttackFixtures();
 
 const engines: TowerDefenseEngine[] = [];
 
@@ -63,43 +63,14 @@ function battle() {
   return { engine, source: engine.towers[0] };
 }
 
-describe('Palm Slam', () => {
-  it('replaces Yokodillo’s level-six Dart with a heavy physical Fighting move', () => {
-    expect(YOKODILLO.learnableAttacks).toContainEqual({
-      level: 6,
-      attackId: 'PALM_SLAM',
-    });
-    expect(YOKODILLO.learnableAttacks).not.toContainEqual({
-      level: 6,
-      attackId: 'QUICK_ATTACK',
-    });
-    expect(ATTACK_DEFS.PALM_SLAM).toMatchObject({
-      name: 'Palm Slam',
-      type: ElementType.FIGHTING,
-      category: 'physical',
-      power: 95,
-      cooldownMs: 3000,
-      rangeIndex: ATTACK_DEFS.TACKLE.rangeIndex,
-      behaviorType: 'PALM_SLAM',
-      effects: [{ type: 'STUN', chance: 1, value: 650 }],
-      visualEffectConfigId: 'attack_palm_slam_1',
-    });
-    expect(AttackBehaviorRegistry.PALM_SLAM).toBe(PalmSlamBehavior);
-    expect(CREATURE_TD_CONFIGS.attack_palm_slam_1.default.vfxAnimation).toEqual(
-      {
-        type: 'PALM_SLAM',
-        durationMs: 360,
-      }
-    );
-  });
-
+describe('Committed melee impact', () => {
   it('strikes just one target after a 0.6-second wind-up and stays committed', () => {
     const { engine, source } = battle();
     const first = createEnemy('first', 45);
     const second = createEnemy('second', 55);
     engine.enemies = [first, second];
 
-    PalmSlamBehavior.execute(engine, source, ATTACK_DEFS.PALM_SLAM);
+    PalmSlamBehavior.execute(engine, source, ATTACK_FIXTURES.PALM_SLAM);
     expect(source.palmSlam).toMatchObject({
       impactAtMs: 600,
       endsAtMs: 900,
@@ -137,7 +108,7 @@ describe('Palm Slam', () => {
     const first = createEnemy('first', 55);
     const second = createEnemy('second', 48);
     engine.enemies = [first, second];
-    PalmSlamBehavior.execute(engine, source, ATTACK_DEFS.PALM_SLAM);
+    PalmSlamBehavior.execute(engine, source, ATTACK_FIXTURES.PALM_SLAM);
     expect(source.palmSlam?.targetId).toBe('first');
 
     first.hp = 0;
@@ -179,7 +150,7 @@ describe('Palm Slam', () => {
     structure.immuneToStatusEffects = true;
     engine.enemies = [structure];
 
-    PalmSlamBehavior.execute(engine, source, ATTACK_DEFS.PALM_SLAM);
+    PalmSlamBehavior.execute(engine, source, ATTACK_FIXTURES.PALM_SLAM);
     engine.tick(600, 600);
 
     expect(structure.hp).toBeLessThan(structure.maxHp);
@@ -190,7 +161,7 @@ describe('Palm Slam', () => {
     const { engine, source } = battle();
     const target = createEnemy('target', 45);
     engine.enemies = [target];
-    PalmSlamBehavior.execute(engine, source, ATTACK_DEFS.PALM_SLAM);
+    PalmSlamBehavior.execute(engine, source, ATTACK_FIXTURES.PALM_SLAM);
 
     engine.placeTower(source.creature.id, 42, 50);
     expect(source.palmSlam).toBeUndefined();

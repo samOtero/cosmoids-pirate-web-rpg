@@ -1,16 +1,16 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { BUFFLORA } from '@/constants/creatures';
 import { ProjectileBehavior } from '@/engine/tower-defense/attacks/behaviors';
 import { EffectProcessor } from '@/engine/tower-defense/attacks/EffectProcessor';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
 import {
   TOXIC_POLLEN_POISON_ID,
   VENOM_SPRAY_POISON_ID,
 } from '@/engine/tower-defense/poison';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { Enemy, Tower } from '@/engine/tower-defense/types';
-import { ElementType } from '@/types/baseGame';
+
+installAttackFixtures();
 
 const levelData = {
   paths: [
@@ -68,34 +68,7 @@ const createEnemy = (): Enemy => ({
 
 afterEach(() => vi.restoreAllMocks());
 
-describe('Siphon Lash', () => {
-  it("replaces Vine Whip in Bufflora's level-12 slot", () => {
-    expect(BUFFLORA.learnableAttacks).toContainEqual({
-      level: 12,
-      attackId: 'NECTAR_SIPHON',
-    });
-    expect(BUFFLORA.learnableAttacks).not.toContainEqual({
-      level: 12,
-      attackId: 'VINE_WHIP',
-    });
-    expect(ATTACK_DEFS.NECTAR_SIPHON).toMatchObject({
-      type: ElementType.GRASS,
-      category: 'special',
-      power: 40,
-      cooldownMs: 800,
-      behaviorType: 'PROJECTILE',
-      poisonPayoff: {
-        damageMultiplier: 1.5,
-        prioritizePoisonedTargets: true,
-      },
-      effects: [{ type: 'DRAIN', chance: 1, value: 0.5 }],
-      projectileVisual: {
-        type: 'NECTAR_TONGUE',
-        spriteUrl: '/battles/attacks/nectar_siphon.webp',
-      },
-    });
-  });
-
+describe('Drain and poison payoff', () => {
   it('heals Bufflora for half the actual damage dealt', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     const engine = new TowerDefenseEngine(levelData);
@@ -108,7 +81,7 @@ describe('Siphon Lash', () => {
       engine,
       source,
       target,
-      ATTACK_DEFS.NECTAR_SIPHON
+      ATTACK_FIXTURES.NECTAR_SIPHON
     );
 
     const damageDealt = startingTargetHp - target.hp;
@@ -162,7 +135,7 @@ describe('Siphon Lash', () => {
         engine,
         source,
         target,
-        ATTACK_DEFS.NECTAR_SIPHON
+        ATTACK_FIXTURES.NECTAR_SIPHON
       );
     }
 
@@ -205,7 +178,7 @@ describe('Siphon Lash', () => {
     };
     engine.enemies = [closerUnpoisoned, fartherPoisoned];
 
-    ProjectileBehavior.execute(engine, source, ATTACK_DEFS.NECTAR_SIPHON);
+    ProjectileBehavior.execute(engine, source, ATTACK_FIXTURES.NECTAR_SIPHON);
 
     expect(engine.projectiles).toHaveLength(1);
     expect(engine.projectiles[0].targetId).toBe(fartherPoisoned.id);
@@ -224,7 +197,7 @@ describe('Siphon Lash', () => {
       engine,
       source,
       target,
-      ATTACK_DEFS.NECTAR_SIPHON
+      ATTACK_FIXTURES.NECTAR_SIPHON
     );
 
     expect(target.hp).toBeLessThanOrEqual(0);
@@ -243,7 +216,7 @@ describe('Siphon Lash', () => {
       engine,
       source,
       target,
-      ATTACK_DEFS.NECTAR_SIPHON
+      ATTACK_FIXTURES.NECTAR_SIPHON
     );
 
     expect(target.hp).toBe(target.maxHp);

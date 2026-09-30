@@ -1,14 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { YOKODILLO } from '@/constants/creatures';
-import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
+
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
-import {
-  AttackBehaviorRegistry,
-  ShikoQuakeBehavior,
-} from '@/engine/tower-defense/attacks/behaviors';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import { ShikoQuakeBehavior } from '@/engine/tower-defense/attacks/behaviors';
+import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
 import type { Enemy } from '@/engine/tower-defense/types';
-import { ElementType } from '@/types/baseGame';
+
+installAttackFixtures();
 
 const engines: TowerDefenseEngine[] = [];
 
@@ -65,29 +62,7 @@ function battle() {
   return { engine, source: engine.towers[0] };
 }
 
-describe('Shiko Stomp', () => {
-  it('is Yokodillo’s level-ten physical Fighting area move', () => {
-    expect(YOKODILLO.learnableAttacks).toContainEqual({
-      level: 10,
-      attackId: 'SHIKO_QUAKE',
-    });
-    expect(ATTACK_DEFS.SHIKO_QUAKE).toMatchObject({
-      name: 'Shiko Stomp',
-      type: ElementType.FIGHTING,
-      category: 'physical',
-      power: 35,
-      cooldownMs: 2400,
-      rangeIndex: ATTACK_DEFS.TACKLE.rangeIndex,
-      behaviorType: 'SHIKO_QUAKE',
-      effects: [{ type: 'STUN', chance: 1, value: 350 }],
-      visualEffectConfigId: 'attack_shiko_quake_1',
-    });
-    expect(AttackBehaviorRegistry.SHIKO_QUAKE).toBe(ShikoQuakeBehavior);
-    expect(
-      CREATURE_TD_CONFIGS.attack_shiko_quake_1.default.vfxAnimation
-    ).toEqual({ type: 'SHIKO_QUAKE', durationMs: 420 });
-  });
-
+describe('Committed area impact', () => {
   it('damages and staggers up to three eligible creatures on the slam frame', () => {
     const { engine, source } = battle();
     const first = createEnemy('first', 45);
@@ -96,7 +71,7 @@ describe('Shiko Stomp', () => {
     const distant = createEnemy('distant', 90);
     engine.enemies = [first, second, third, distant];
 
-    ShikoQuakeBehavior.execute(engine, source, ATTACK_DEFS.SHIKO_QUAKE);
+    ShikoQuakeBehavior.execute(engine, source, ATTACK_FIXTURES.SHIKO_QUAKE);
 
     expect(source.shikoQuake).toMatchObject({
       startedAtMs: 0,
@@ -135,7 +110,7 @@ describe('Shiko Stomp', () => {
     );
     engine.enemies = targets;
 
-    ShikoQuakeBehavior.execute(engine, source, ATTACK_DEFS.SHIKO_QUAKE);
+    ShikoQuakeBehavior.execute(engine, source, ATTACK_FIXTURES.SHIKO_QUAKE);
     engine.tick(359, 359);
     engine.tick(360, 1);
 
@@ -179,7 +154,7 @@ describe('Shiko Stomp', () => {
     structure.immuneToStatusEffects = true;
     engine.enemies = [structure];
 
-    ShikoQuakeBehavior.execute(engine, source, ATTACK_DEFS.SHIKO_QUAKE);
+    ShikoQuakeBehavior.execute(engine, source, ATTACK_FIXTURES.SHIKO_QUAKE);
     engine.tick(360, 360);
 
     expect(structure.hp).toBeLessThan(structure.maxHp);
@@ -198,7 +173,7 @@ describe('Shiko Stomp', () => {
     const { engine, source } = battle();
     const target = createEnemy('target', 45);
     engine.enemies = [target];
-    ShikoQuakeBehavior.execute(engine, source, ATTACK_DEFS.SHIKO_QUAKE);
+    ShikoQuakeBehavior.execute(engine, source, ATTACK_FIXTURES.SHIKO_QUAKE);
 
     engine.placeTower(source.creature.id, 42, 50);
     expect(source.shikoQuake).toBeUndefined();

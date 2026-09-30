@@ -19,6 +19,7 @@
     "test:e2e:headed": "pnpm --filter @cosmoids/web test:e2e:headed",
     "validate:dialogs": "pnpm --filter @cosmoids/web validate:dialogs",
     "test:creatures": "pnpm --filter @cosmoids/web test:creatures",
+    "test:attacks": "pnpm --filter @cosmoids/web test:attacks",
     "assets:optimize": "pnpm --filter @cosmoids/web assets:optimize",
     "assets:optimize:journals": "pnpm --filter @cosmoids/web assets:optimize:journals",
     "assets:optimize:story-backgrounds": "pnpm --filter @cosmoids/web assets:optimize:story-backgrounds",

@@ -5,7 +5,7 @@ import {
   MAX_POISON_STACKS,
   POISON_DURATION_MS,
 } from '@/engine/tower-defense/attacks/EffectProcessor';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { Enemy, Tower } from '@/engine/tower-defense/types';
 import {
@@ -14,6 +14,8 @@ import {
   TOXIC_POLLEN_POISON_ID,
   VENOM_SPRAY_POISON_ID,
 } from '@/engine/tower-defense/poison';
+
+installAttackFixtures();
 
 const levelData = {
   paths: [
@@ -71,27 +73,7 @@ const createEnemy = (): Enemy => ({
 
 afterEach(() => vi.restoreAllMocks());
 
-describe('Venom Spray', () => {
-  it('uses one 50% stacking-poison roll per cast', () => {
-    expect(ATTACK_DEFS.VENOM_SPRAY).toMatchObject({
-      projectilePattern: {
-        count: 5,
-        damageMode: 'FIRST_ONLY',
-      },
-      effects: [
-        {
-          type: 'STACKING_POISON',
-          chance: 0.5,
-          maxStacks: 5,
-          poisonId: VENOM_SPRAY_POISON_ID,
-          durationMs: 5000,
-          tickCount: 5,
-          damagePerTickRatio: 0.05,
-        },
-      ],
-    });
-  });
-
+describe('Stacking poison', () => {
   it('deals immediate damage and applies a successful poison roll', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     const engine = new TowerDefenseEngine(levelData);
@@ -102,7 +84,7 @@ describe('Venom Spray', () => {
       engine,
       source,
       target,
-      ATTACK_DEFS.VENOM_SPRAY
+      ATTACK_FIXTURES.VENOM_SPRAY
     );
 
     expect(target.hp).toBeLessThan(target.maxHp);
@@ -133,7 +115,7 @@ describe('Venom Spray', () => {
       engine,
       source,
       target,
-      ATTACK_DEFS.VENOM_SPRAY
+      ATTACK_FIXTURES.VENOM_SPRAY
     );
 
     expect(target.hp).toBe(target.maxHp);
@@ -160,7 +142,7 @@ describe('Venom Spray', () => {
         engine,
         source,
         target,
-        ATTACK_DEFS.VENOM_SPRAY
+        ATTACK_FIXTURES.VENOM_SPRAY
       );
 
       expect(target.statusConditions).toHaveLength(1);
@@ -179,7 +161,7 @@ describe('Venom Spray', () => {
       engine,
       source,
       target,
-      ATTACK_DEFS.VENOM_SPRAY
+      ATTACK_FIXTURES.VENOM_SPRAY
     );
 
     expect(target.statusConditions).toHaveLength(1);
@@ -213,7 +195,7 @@ describe('Venom Spray', () => {
       engine,
       source,
       target,
-      ATTACK_DEFS.VENOM_SPRAY
+      ATTACK_FIXTURES.VENOM_SPRAY
     );
 
     expect(target.hp).toBeLessThan(target.maxHp);
@@ -249,7 +231,7 @@ describe('Venom Spray', () => {
       engine,
       source,
       target,
-      ATTACK_DEFS.VENOM_SPRAY
+      ATTACK_FIXTURES.VENOM_SPRAY
     );
 
     expect(target.statusConditions).toHaveLength(2);
@@ -280,14 +262,14 @@ describe('Venom Spray', () => {
       engine,
       source,
       target,
-      ATTACK_DEFS.VENOM_SPRAY
+      ATTACK_FIXTURES.VENOM_SPRAY
     );
     source.currentSpecialAttack = 200;
     EffectProcessor.applyDamageAndEffects(
       engine,
       source,
       target,
-      ATTACK_DEFS.VENOM_SPRAY
+      ATTACK_FIXTURES.VENOM_SPRAY
     );
 
     expect(findPoison(target, VENOM_SPRAY_POISON_ID)).toMatchObject({

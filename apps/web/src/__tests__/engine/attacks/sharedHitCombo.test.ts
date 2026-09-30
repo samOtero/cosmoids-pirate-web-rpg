@@ -1,13 +1,14 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { STARTER_IGUANA, VELOCINDER } from '@/constants/creatures';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+
+import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
 import { EffectProcessor } from '@/engine/tower-defense/attacks/EffectProcessor';
 import { ProjectileBehavior } from '@/engine/tower-defense/attacks/behaviors';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
-import { ElementType } from '@/types/baseGame';
+
+installAttackFixtures();
 
 const engines: TowerDefenseEngine[] = [];
-const move = ATTACK_DEFS.FUSE_RUSH;
+const move = ATTACK_FIXTURES.FUSE_RUSH;
 afterEach(() => {
   engines.splice(0).forEach((engine) => engine.destroy());
   vi.restoreAllMocks();
@@ -60,37 +61,7 @@ function battle() {
   return { engine, first, second, target };
 }
 
-describe('Hot Streak', () => {
-  it('is Velocinder’s physical Fire evolution move, replacing the stage-two placeholder', () => {
-    expect(VELOCINDER.learnableAttacks).toContainEqual({
-      level: 16,
-      attackId: 'FUSE_RUSH',
-    });
-    expect(
-      VELOCINDER.learnableAttacks?.some(
-        (move) => move.attackId === 'QUICK_ATTACK'
-      )
-    ).toBe(false);
-    expect(
-      STARTER_IGUANA.learnableAttacks?.some(
-        (move) => move.attackId === 'FUSE_RUSH'
-      )
-    ).toBe(true);
-    expect(move).toMatchObject({
-      type: ElementType.FIRE,
-      category: 'physical',
-      power: 45,
-      name: 'Hot Streak',
-      cooldownMs: 800,
-      behaviorType: 'PROJECTILE',
-      isDashAttack: true,
-      dashTrailType: 'FIRE',
-      fuseRushCombo: { hitsToTrigger: 3, damageMultiplier: 2 },
-    });
-    expect(move.effects).toBeUndefined();
-    expect(move.adaptiveTargetedAoe).toBeUndefined();
-  });
-
+describe('Shared target hit combos', () => {
   it('cycles one, two, detonation, one and doubles resolved damage without AOE or statuses', () => {
     const { engine, first, target } = battle();
     const nearby = engine.spawnPreviewEnemy({
@@ -106,8 +77,13 @@ describe('Hot Streak', () => {
       damages.push(hp - target.hp);
       expect(target.fuseRushMarks).toBe(marks);
     }
-    // Physical Fire STAB, level 16, 45 power, 50 Attack / 40 Defense.
-    expect(damages).toEqual([16, 16, 32, 16]);
+    expect(damages[0]).toBeGreaterThan(0);
+    expect(damages).toEqual([
+      damages[0],
+      damages[0],
+      damages[0] * 2,
+      damages[0],
+    ]);
     expect(nearby.hp).toBe(nearbyHp);
     expect(nearby.fuseRushMarks).toBeUndefined();
     expect(target.statusConditions).toEqual([]);
@@ -122,7 +98,9 @@ describe('Hot Streak', () => {
   it('shares marks and uses the finishing tower’s Attack rather than the setup tower’s', () => {
     const { engine, first, second, target } = battle();
     EffectProcessor.applyDamageAndEffects(engine, first, target, move);
+    const setupHp = target.hp;
     EffectProcessor.applyDamageAndEffects(engine, first, target, move);
+    const setupDamage = setupHp - target.hp;
     second.currentAttack = 100;
     const hp = target.hp;
     EffectProcessor.applyDamageAndEffects(engine, second, target, move);
@@ -130,7 +108,7 @@ describe('Hot Streak', () => {
     const afterFinisher = target.hp;
     EffectProcessor.applyDamageAndEffects(engine, second, target, move);
     expect(finisher).toBe((afterFinisher - target.hp) * 2);
-    expect(finisher).toBeGreaterThan(32);
+    expect(finisher).toBeGreaterThan(setupDamage * 2);
     expect(target.damagedByTowerIds).toEqual(new Set([first.id, second.id]));
   });
 
@@ -143,7 +121,7 @@ describe('Hot Streak', () => {
       engine,
       first,
       target,
-      ATTACK_DEFS.SCRATCH
+      ATTACK_FIXTURES.SCRATCH
     );
     engine.placeTower('first', 5, 5);
     engine.tick(0, 600000);

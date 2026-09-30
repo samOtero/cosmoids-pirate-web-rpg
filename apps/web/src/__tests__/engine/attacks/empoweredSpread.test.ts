@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { AGUANA, NAUTIGUAN } from '@/constants/creatures';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
 import { disarmSaltSpitTarget } from '@/engine/tower-defense/attacks/saltSpit';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import type { CaptureUnit, Enemy } from '@/engine/tower-defense/types';
-import { ElementType } from '@/types/baseGame';
+
+installAttackFixtures();
 
 const engines: TowerDefenseEngine[] = [];
 
@@ -71,32 +71,7 @@ function giveObjective(engine: TowerDefenseEngine, enemy: Enemy): CaptureUnit {
   return objective;
 }
 
-describe('Salt Spit', () => {
-  it('is Nautiguan’s level-16 physical Water move', () => {
-    expect(NAUTIGUAN.learnableAttacks).toContainEqual({
-      level: 16,
-      attackId: 'SALT_SPIT',
-    });
-    expect(AGUANA.learnableAttacks).not.toContainEqual({
-      level: 16,
-      attackId: 'SALT_SPIT',
-    });
-    expect(ATTACK_DEFS.SALT_SPIT).toMatchObject({
-      type: ElementType.WATER,
-      category: 'physical',
-      power: 30,
-      cooldownMs: 2400,
-      behaviorType: 'SALT_SPIT',
-      saltSpit: { warmProjectileCount: 3 },
-      itemPickupLockMs: 2500,
-      effects: [{ type: 'STUN', chance: 1, value: 500 }],
-      projectileVisual: {
-        type: 'SALT_SPIT',
-        spriteUrl: '/battles/attacks/salt_spit_crystals.webp',
-      },
-    });
-  });
-
+describe('Empowered projectile spreads', () => {
   it('fires one projectile cold and up to three full-strength projectiles at unique targets while warm', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     const cold = createBattle();
@@ -154,7 +129,7 @@ describe('Salt Spit', () => {
 
     targets[0].heldCaptureUnitId = objectives[0].id;
     objectives[0].heldByEnemyId = targets[0].id;
-    disarmSaltSpitTarget(engine, targets[0], ATTACK_DEFS.SALT_SPIT);
+    disarmSaltSpitTarget(engine, targets[0], ATTACK_FIXTURES.SALT_SPIT);
     expect(targets[0].heldCaptureUnitId).toBe(objectives[0].id);
     expect(objectives[0].heldByEnemyId).toBe(targets[0].id);
 
