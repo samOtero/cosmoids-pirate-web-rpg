@@ -37,19 +37,19 @@ export const LEVEL_7: TDLevelData = {
   environmentUnits: [
     {
       tdConfigId: 'tigrevel_shore_leave',
-      position: { x: 50, y: 22 },
+      position: { x: 49.03, y: 21.97 },
     },
     {
       tdConfigId: 'kip_shore_leave',
-      position: { x: 80, y: 17 },
+      position: { x: 78.29, y: 21.13 },
     },
     {
       tdConfigId: 'maribel_shore_leave',
-      position: { x: 10, y: 42 },
+      position: { x: 11.92, y: 41.59 },
     },
     {
       tdConfigId: 'caleb_shore_leave',
-      position: { x: 91, y: 55 },
+      position: { x: 88.99, y: 56.39 },
     },
   ],
   waveEnemyDefinitions: [

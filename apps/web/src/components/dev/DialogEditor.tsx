@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { useEditorSource } from './useEditorSource';
+import EditorSourceStatus from './EditorSourceStatus';
 import * as dialogs from '@/constants/dialogs';
 import {
   DialogConfig,
@@ -87,14 +89,14 @@ function JsonEditor({
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex h-full flex-col">
       <textarea
-        className={`flex-1 bg-slate-950 font-mono text-xs p-2 focus:outline-none resize-none ${error ? 'border-red-500 border' : ''}`}
+        className={`flex-1 resize-none bg-slate-950 p-2 font-mono text-xs focus:outline-none ${error ? 'border border-red-500' : ''}`}
         value={text}
         onChange={handleChange}
         spellCheck={false}
       />
-      {error && <div className="text-red-400 text-xs p-1">{error}</div>}
+      {error && <div className="p-1 text-xs text-red-400">{error}</div>}
     </div>
   );
 }
@@ -111,6 +113,14 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
   // We initialize this when a dialog is selected
   const [workingConfig, setWorkingConfig] = useState<DialogConfig | null>(null);
   const [isDirty, setIsDirty] = useState(false);
+  const source = useEditorSource<DialogConfig>(
+    'dialog',
+    selectedDialogKey === 'NEW_DIALOG' ? null : selectedDialogKey,
+    (config) => {
+      setWorkingConfig(config);
+      setIsDirty(false);
+    }
+  );
 
   // UI State
   const [selectedLineIndex, setSelectedLineIndex] = useState<number>(0);
@@ -220,7 +230,11 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
 
     try {
       setIsSaving(true);
-      const fileName = overrideData?.fileName || newDialogData.fileName;
+      const fileName =
+        overrideData?.fileName ||
+        (selectedDialogKey === 'NEW_DIALOG'
+          ? newDialogData.fileName
+          : undefined);
       const dialogName = overrideData?.varName || newDialogData.varName;
 
       // Validation for new dialogs
@@ -230,28 +244,18 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
         return;
       }
 
-      // If saving an existing dialog, we need its original filename if possible,
-      // but our API currently relies on the user providing it or us inferring it.
-      // The current API contract seems to assume we pass everything.
-      // Wait, existing usage passed `varName: selectedDialogKey`. The API likely looks up the file or overwrites.
-      // Let's stick to the previous pattern:
-
       const payload = {
         fileName: fileName,
         dialogName: dialogName || selectedDialogKey,
         config: workingConfig,
       };
 
-      const res = await fetch('/api/dialogs/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to save');
-      }
+      await source.save(
+        '/api/dialogs/save',
+        payload,
+        workingConfig,
+        selectedDialogKey === 'NEW_DIALOG'
+      );
 
       alert('Saved successfully! The app may reload.');
       setIsDirty(false);
@@ -271,10 +275,6 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
     if (selectedDialogKey === 'NEW_DIALOG') {
       setShowNewDialogModal(true);
     } else {
-      // We don't have the original filename easily available in the list
-      // unless we parse it out or the API handles lookup by Export Name.
-      // Assuming the previous implementation `executeSave({ varName: selectedDialogKey })` worked,
-      // we'll do the same. The API likely finds the file containing the varName.
       executeSave({ varName: selectedDialogKey || '' });
     }
   };
@@ -284,16 +284,11 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
     if (!confirm(`Delete "${selectedDialogKey}"?`)) return;
 
     try {
-      const res = await fetch('/api/dialogs/delete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dialogKey: selectedDialogKey }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to delete');
-      }
+      await source.save(
+        '/api/dialogs/delete',
+        { dialogKey: selectedDialogKey },
+        null
+      );
 
       alert('Deleted.');
       setSelectedDialogKey(null);
@@ -312,10 +307,10 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
     if (!line) return <div>No line selected</div>;
 
     return (
-      <div className="flex flex-col gap-4 p-4 overflow-y-auto h-full pb-20">
+      <div className="flex h-full flex-col gap-4 overflow-y-auto p-4 pb-20">
         {/* Core Line Info */}
-        <div className="bg-slate-800 p-4 rounded border border-slate-700">
-          <h4 className="text-cyan-400 text-xs font-bold uppercase mb-2">
+        <div className="rounded border border-slate-700 bg-slate-800 p-4">
+          <h4 className="mb-2 text-xs font-bold text-cyan-400 uppercase">
             Text Content
           </h4>
           <textarea
@@ -323,10 +318,10 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
             onChange={(e) =>
               updateLine(selectedLineIndex, { ...line, text: e.target.value })
             }
-            className="w-full h-24 bg-slate-900 border border-slate-600 rounded p-2 text-sm text-slate-200 focus:border-cyan-500 focus:outline-none"
+            className="h-24 w-full rounded border border-slate-600 bg-slate-900 p-2 text-sm text-slate-200 focus:border-cyan-500 focus:outline-none"
           />
           <div className="mt-2">
-            <label className="text-xs text-slate-400 mr-2">
+            <label className="mr-2 text-xs text-slate-400">
               Line ID (Optional):
             </label>
             <input
@@ -334,12 +329,12 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
               onChange={(e) =>
                 updateLine(selectedLineIndex, { ...line, id: e.target.value })
               }
-              className="bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs text-slate-200 w-40"
+              className="w-40 rounded border border-slate-600 bg-slate-900 px-2 py-1 text-xs text-slate-200"
               placeholder="unique-id"
             />
           </div>
           <div className="mt-2">
-            <label className="text-xs text-slate-400 mr-2">Layout:</label>
+            <label className="mr-2 text-xs text-slate-400">Layout:</label>
             <select
               value={line.layout || 'default'}
               onChange={(e) =>
@@ -348,7 +343,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                   layout: e.target.value as DialogLayout,
                 })
               }
-              className="bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs text-slate-200"
+              className="rounded border border-slate-600 bg-slate-900 px-2 py-1 text-xs text-slate-200"
             >
               {LAYOUT_OPTIONS.map((opt) => (
                 <option key={opt} value={opt}>
@@ -360,9 +355,9 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Portraits */}
-        <div className="bg-slate-800 p-4 rounded border border-slate-700">
-          <div className="flex justify-between items-center mb-2">
-            <h4 className="text-cyan-400 text-xs font-bold uppercase">
+        <div className="rounded border border-slate-700 bg-slate-800 p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <h4 className="text-xs font-bold text-cyan-400 uppercase">
               Portraits
             </h4>
             <button
@@ -372,7 +367,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                   portraits: [...line.portraits, { ...DEFAULT_PORTRAIT }],
                 })
               }
-              className="text-xs bg-cyan-700 px-2 py-1 rounded text-white hover:bg-cyan-600"
+              className="rounded bg-cyan-700 px-2 py-1 text-xs text-white hover:bg-cyan-600"
             >
               + Add Portrait
             </button>
@@ -382,7 +377,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
             {line.portraits.map((portrait, pIdx) => (
               <div
                 key={pIdx}
-                className="bg-slate-900 p-2 rounded flex flex-col gap-2 relative border border-slate-700/50"
+                className="relative flex flex-col gap-2 rounded border border-slate-700/50 bg-slate-900 p-2"
               >
                 <button
                   onClick={() => {
@@ -394,14 +389,14 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                       portraits: newPortraits,
                     });
                   }}
-                  className="absolute top-1 right-1 text-red-500 hover:text-red-400 text-xs px-1"
+                  className="absolute top-1 right-1 px-1 text-xs text-red-500 hover:text-red-400"
                 >
                   ✕
                 </button>
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-xs text-slate-500 mb-1">
+                    <label className="mb-1 block text-xs text-slate-500">
                       Character
                     </label>
                     <select
@@ -419,7 +414,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                           portraits: newPortraits,
                         });
                       }}
-                      className="w-full bg-slate-950 border border-slate-700 rounded p-1 text-xs"
+                      className="w-full rounded border border-slate-700 bg-slate-950 p-1 text-xs"
                     >
                       {SPEAKER_OPTIONS.map((opt) => (
                         <option key={opt} value={opt}>
@@ -429,7 +424,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs text-slate-500 mb-1">
+                    <label className="mb-1 block text-xs text-slate-500">
                       Display Name
                     </label>
                     <input
@@ -445,11 +440,11 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                           portraits: newPortraits,
                         });
                       }}
-                      className="w-full bg-slate-950 border border-slate-700 rounded p-1 text-xs"
+                      className="w-full rounded border border-slate-700 bg-slate-950 p-1 text-xs"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-slate-500 mb-1">
+                    <label className="mb-1 block text-xs text-slate-500">
                       Size
                     </label>
                     <select
@@ -465,17 +460,17 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                           portraits: newPortraits,
                         });
                       }}
-                      className="w-full bg-slate-950 border border-slate-700 rounded p-1 text-xs"
+                      className="w-full rounded border border-slate-700 bg-slate-950 p-1 text-xs"
                     >
                       <option value="normal">Normal</option>
                       <option value="wide">Wide</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs text-slate-500 mb-1">
+                    <label className="mb-1 block text-xs text-slate-500">
                       Orientation
                     </label>
-                    <div className="flex items-center h-7 mt-1">
+                    <div className="mt-1 flex h-7 items-center">
                       <input
                         type="checkbox"
                         checked={!!portrait.flipped}
@@ -490,19 +485,24 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                             portraits: newPortraits,
                           });
                         }}
-                        className="rounded border-slate-700 bg-slate-950 text-cyan-600 focus:ring-cyan-500 h-4 w-4 cursor-pointer"
+                        className="h-4 w-4 cursor-pointer rounded border-slate-700 bg-slate-950 text-cyan-600 focus:ring-cyan-500"
                       />
-                      <span className="text-xs text-slate-400 ml-2 cursor-pointer" onClick={() => {
-                        const newPortraits = [...line.portraits];
-                        newPortraits[pIdx] = {
-                          ...portrait,
-                          flipped: !portrait.flipped,
-                        };
-                        updateLine(selectedLineIndex, {
-                          ...line,
-                          portraits: newPortraits,
-                        });
-                      }}>Flip Horizontally</span>
+                      <span
+                        className="ml-2 cursor-pointer text-xs text-slate-400"
+                        onClick={() => {
+                          const newPortraits = [...line.portraits];
+                          newPortraits[pIdx] = {
+                            ...portrait,
+                            flipped: !portrait.flipped,
+                          };
+                          updateLine(selectedLineIndex, {
+                            ...line,
+                            portraits: newPortraits,
+                          });
+                        }}
+                      >
+                        Flip Horizontally
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -517,9 +517,9 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Buttons */}
-        <div className="bg-slate-800 p-4 rounded border border-slate-700">
-          <div className="flex justify-between items-center mb-2">
-            <h4 className="text-cyan-400 text-xs font-bold uppercase">
+        <div className="rounded border border-slate-700 bg-slate-800 p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <h4 className="text-xs font-bold text-cyan-400 uppercase">
               Response Buttons
             </h4>
             <button
@@ -532,7 +532,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                   ],
                 })
               }
-              className="text-xs bg-cyan-700 px-2 py-1 rounded text-white hover:bg-cyan-600"
+              className="rounded bg-cyan-700 px-2 py-1 text-xs text-white hover:bg-cyan-600"
             >
               + Add Button
             </button>
@@ -542,7 +542,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
             {line.buttons?.map((btn, bIdx) => (
               <div
                 key={bIdx}
-                className="bg-slate-900 p-2 rounded flex flex-col gap-2 relative border border-slate-700/50"
+                className="relative flex flex-col gap-2 rounded border border-slate-700/50 bg-slate-900 p-2"
               >
                 <button
                   onClick={() => {
@@ -554,14 +554,14 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                       buttons: newButtons,
                     });
                   }}
-                  className="absolute top-1 right-1 text-red-500 hover:text-red-400 text-xs px-1"
+                  className="absolute top-1 right-1 px-1 text-xs text-red-500 hover:text-red-400"
                 >
                   ✕
                 </button>
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-xs text-slate-500 mb-1">
+                    <label className="mb-1 block text-xs text-slate-500">
                       Label
                     </label>
                     <input
@@ -574,11 +574,11 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                           buttons: newButtons,
                         });
                       }}
-                      className="w-full bg-slate-950 border border-slate-700 rounded p-1 text-xs"
+                      className="w-full rounded border border-slate-700 bg-slate-950 p-1 text-xs"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-slate-500 mb-1">
+                    <label className="mb-1 block text-xs text-slate-500">
                       Type (Color)
                     </label>
                     <select
@@ -594,7 +594,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                           buttons: newButtons,
                         });
                       }}
-                      className="w-full bg-slate-950 border border-slate-700 rounded p-1 text-xs"
+                      className="w-full rounded border border-slate-700 bg-slate-950 p-1 text-xs"
                     >
                       {BUTTON_TYPE_OPTIONS.map((opt) => (
                         <option key={opt} value={opt}>
@@ -604,7 +604,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs text-slate-500 mb-1">
+                    <label className="mb-1 block text-xs text-slate-500">
                       Jump to Line ID
                     </label>
                     <input
@@ -620,12 +620,12 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                           buttons: newButtons,
                         });
                       }}
-                      className="w-full bg-slate-950 border border-slate-700 rounded p-1 text-xs"
+                      className="w-full rounded border border-slate-700 bg-slate-950 p-1 text-xs"
                       placeholder="Optional ID"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-slate-500 mb-1">
+                    <label className="mb-1 block text-xs text-slate-500">
                       Action Type
                     </label>
                     <select
@@ -652,7 +652,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                           buttons: newButtons,
                         });
                       }}
-                      className="w-full bg-slate-950 border border-slate-700 rounded p-1 text-xs"
+                      className="w-full rounded border border-slate-700 bg-slate-950 p-1 text-xs"
                     >
                       <option value="">(None)</option>
                       {ACTION_TYPE_OPTIONS.map((opt) => (
@@ -677,22 +677,23 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur text-white font-sans">
-      <div className="w-full h-full flex overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 font-sans text-white backdrop-blur">
+      <EditorSourceStatus source={source} onClose={onClose} />
+      <div className="flex h-full w-full overflow-hidden">
         {/* PANEL 1: Dialog List (Left) */}
-        <div className="w-64 border-r border-slate-800 bg-slate-900 flex flex-col">
-          <div className="p-3 border-b border-slate-800 flex justify-between items-center bg-slate-950">
-            <h2 className="font-bold text-sm text-slate-300">Dialogs</h2>
+        <div className="flex w-64 flex-col border-r border-slate-800 bg-slate-900">
+          <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950 p-3">
+            <h2 className="text-sm font-bold text-slate-300">Dialogs</h2>
             <div className="flex gap-1">
               <button
                 onClick={handleCreateNew}
-                className="text-xs bg-cyan-700 hover:bg-cyan-600 px-2 py-1 rounded text-white"
+                className="rounded bg-cyan-700 px-2 py-1 text-xs text-white hover:bg-cyan-600"
               >
                 + New
               </button>
               <button
                 onClick={onClose}
-                className="text-slate-500 hover:text-white px-2"
+                className="px-2 text-slate-500 hover:text-white"
               >
                 ✕
               </button>
@@ -703,7 +704,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
               <button
                 key={key}
                 onClick={() => handleSelectDialog(key)}
-                className={`w-full text-left px-3 py-2 rounded text-xs font-mono mb-1 truncate transition-colors ${
+                className={`mb-1 w-full truncate rounded px-3 py-2 text-left font-mono text-xs transition-colors ${
                   selectedDialogKey === key
                     ? 'bg-cyan-900 text-cyan-100'
                     : 'text-slate-400 hover:bg-slate-800'
@@ -716,9 +717,9 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* PANEL 2: Sequence Inspector (Middle) */}
-        <div className="w-80 border-r border-slate-800 bg-slate-900 flex flex-col">
-          <div className="p-3 border-b border-slate-800 bg-slate-950">
-            <h3 className="font-bold text-xs text-slate-400 uppercase tracking-wider mb-2">
+        <div className="flex w-80 flex-col border-r border-slate-800 bg-slate-900">
+          <div className="border-b border-slate-800 bg-slate-950 p-3">
+            <h3 className="mb-2 text-xs font-bold tracking-wider text-slate-400 uppercase">
               Sequence Inspector
             </h3>
             {/* Global Settings for Dialog */}
@@ -733,7 +734,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                       backgroundImageKey: e.target.value as BackgroundImageKey,
                     })
                   }
-                  className="w-full bg-slate-800 border border-slate-700 rounded text-xs p-1 mt-1 text-slate-300"
+                  className="mt-1 w-full rounded border border-slate-700 bg-slate-800 p-1 text-xs text-slate-300"
                 >
                   {BACKGROUND_OPTIONS.map((opt) => (
                     <option key={opt} value={opt}>
@@ -745,39 +746,39 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
             )}
           </div>
 
-          <div className="flex-1 overflow-y-auto p-2 space-y-1">
+          <div className="flex-1 space-y-1 overflow-y-auto p-2">
             {workingConfig ? (
               workingConfig.sequence.map((line, idx) => (
                 <div
                   key={idx}
                   onClick={() => setSelectedLineIndex(idx)}
-                  className={`p-2 rounded border cursor-pointer relative group ${
+                  className={`group relative cursor-pointer rounded border p-2 ${
                     selectedLineIndex === idx
-                      ? 'bg-slate-800 border-cyan-600/50'
-                      : 'bg-slate-900 border-slate-800 hover:bg-slate-800'
+                      ? 'border-cyan-600/50 bg-slate-800'
+                      : 'border-slate-800 bg-slate-900 hover:bg-slate-800'
                   }`}
                 >
-                  <div className="flex justify-between items-start mb-1">
-                    <span className="text-[10px] text-slate-500 font-mono">
+                  <div className="mb-1 flex items-start justify-between">
+                    <span className="font-mono text-[10px] text-slate-500">
                       #{idx}
                     </span>
                     {line.id && (
-                      <span className="text-[10px] bg-purple-900/50 text-purple-200 px-1 rounded">
+                      <span className="rounded bg-purple-900/50 px-1 text-[10px] text-purple-200">
                         {line.id}
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-slate-300 line-clamp-2">
+                  <p className="line-clamp-2 text-xs text-slate-300">
                     {line.text}
                   </p>
 
-                  <div className="absolute right-1 top-1 hidden group-hover:flex gap-1">
+                  <div className="absolute top-1 right-1 hidden gap-1 group-hover:flex">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         moveLine(idx, -1);
                       }}
-                      className="p-1 hover:text-cyan-400 text-slate-600"
+                      className="p-1 text-slate-600 hover:text-cyan-400"
                     >
                       ▲
                     </button>
@@ -786,7 +787,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                         e.stopPropagation();
                         moveLine(idx, 1);
                       }}
-                      className="p-1 hover:text-cyan-400 text-slate-600"
+                      className="p-1 text-slate-600 hover:text-cyan-400"
                     >
                       ▼
                     </button>
@@ -795,7 +796,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                         e.stopPropagation();
                         deleteLine(idx);
                       }}
-                      className="p-1 hover:text-red-400 text-slate-600"
+                      className="p-1 text-slate-600 hover:text-red-400"
                     >
                       ✕
                     </button>
@@ -803,17 +804,17 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                 </div>
               ))
             ) : (
-              <div className="text-center text-slate-600 text-xs mt-10">
+              <div className="mt-10 text-center text-xs text-slate-600">
                 Select a dialog
               </div>
             )}
           </div>
 
           {workingConfig && (
-            <div className="p-2 border-t border-slate-800">
+            <div className="border-t border-slate-800 p-2">
               <button
                 onClick={addLine}
-                className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 rounded border border-slate-700 flex justify-center items-center gap-2"
+                className="flex w-full items-center justify-center gap-2 rounded border border-slate-700 bg-slate-800 py-2 text-xs text-slate-300 hover:bg-slate-700"
               >
                 <span>+ Add Line</span>
               </button>
@@ -822,16 +823,16 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* PANEL 3: Workspace (Right) */}
-        <div className="flex-1 flex flex-col bg-black min-w-0 transition-all duration-300">
+        <div className="flex min-w-0 flex-1 flex-col bg-black transition-all duration-300">
           {/* Visual Preview (Top) */}
           <div
-            className={`${isEditorCollapsed ? 'flex-1' : 'h-1/2'} relative border-b border-slate-800 overflow-hidden bg-gray-900 transition-all duration-300`}
+            className={`${isEditorCollapsed ? 'flex-1' : 'h-1/2'} relative overflow-hidden border-b border-slate-800 bg-gray-900 transition-all duration-300`}
           >
-            <div className="absolute top-2 left-2 z-20 bg-black/50 px-2 py-1 rounded text-[10px] text-slate-400 font-mono uppercase">
+            <div className="absolute top-2 left-2 z-20 rounded bg-black/50 px-2 py-1 font-mono text-[10px] text-slate-400 uppercase">
               Preview Mode
             </div>
             {workingConfig && (
-              <div className="w-full h-full transform scale-90 origin-center">
+              <div className="h-full w-full origin-center scale-90 transform">
                 {' '}
                 {/* Slight scale down to fit ui comfortably */}
                 <DialogScreen
@@ -851,7 +852,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
               </div>
             )}
             {!workingConfig && (
-              <div className="w-full h-full flex items-center justify-center text-slate-600">
+              <div className="flex h-full w-full items-center justify-center text-slate-600">
                 No Preview
               </div>
             )}
@@ -859,34 +860,34 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
 
           {/* Editor (Bottom) */}
           <div
-            className={`${isEditorCollapsed ? 'h-10' : 'h-1/2'} flex flex-col min-h-0 bg-slate-900 transition-all duration-300`}
+            className={`${isEditorCollapsed ? 'h-10' : 'h-1/2'} flex min-h-0 flex-col bg-slate-900 transition-all duration-300`}
           >
             {/* Toolbar */}
-            <div className="h-10 border-b border-slate-800 flex items-center justify-between px-4 bg-slate-950 shrink-0">
+            <div className="flex h-10 shrink-0 items-center justify-between border-b border-slate-800 bg-slate-950 px-4">
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setIsEditorCollapsed(!isEditorCollapsed)}
-                  className="text-slate-500 hover:text-white mr-2"
+                  className="mr-2 text-slate-500 hover:text-white"
                   title={
                     isEditorCollapsed ? 'Expand Editor' : 'Minimize Editor'
                   }
                 >
                   {isEditorCollapsed ? '▲' : '▼'}
                 </button>
-                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                <h3 className="text-xs font-bold tracking-wider text-slate-400 uppercase">
                   Line Editor
                 </h3>
                 {!isEditorCollapsed && (
-                  <div className="flex bg-slate-900 rounded p-0.5 border border-slate-800">
+                  <div className="flex rounded border border-slate-800 bg-slate-900 p-0.5">
                     <button
                       onClick={() => setShowJsonMode(false)}
-                      className={`px-3 py-1 text-[10px] rounded ${!showJsonMode ? 'bg-cyan-700 text-white' : 'text-slate-500 hover:text-slate-300'}`}
+                      className={`rounded px-3 py-1 text-[10px] ${!showJsonMode ? 'bg-cyan-700 text-white' : 'text-slate-500 hover:text-slate-300'}`}
                     >
                       Visual
                     </button>
                     <button
                       onClick={() => setShowJsonMode(true)}
-                      className={`px-3 py-1 text-[10px] rounded ${showJsonMode ? 'bg-cyan-700 text-white' : 'text-slate-500 hover:text-slate-300'}`}
+                      className={`rounded px-3 py-1 text-[10px] ${showJsonMode ? 'bg-cyan-700 text-white' : 'text-slate-500 hover:text-slate-300'}`}
                     >
                       JSON
                     </button>
@@ -896,21 +897,21 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
 
               <div className="flex items-center gap-2">
                 {isDirty && (
-                  <span className="text-xs text-orange-400 italic mr-2">
+                  <span className="mr-2 text-xs text-orange-400 italic">
                     Unsaved Changes
                   </span>
                 )}
                 <button
                   onClick={handleSave}
                   disabled={isSaving || !workingConfig}
-                  className="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded flex items-center gap-2 disabled:opacity-50"
+                  className="flex items-center gap-2 rounded bg-cyan-600 px-4 py-1.5 text-xs font-bold text-white hover:bg-cyan-500 disabled:opacity-50"
                 >
                   {isSaving ? 'Saving...' : 'Save Dialog'}
                 </button>
                 {selectedDialogKey && selectedDialogKey !== 'NEW_DIALOG' && (
                   <button
                     onClick={handleDelete}
-                    className="px-3 py-1.5 bg-red-900/30 hover:bg-red-900/50 text-red-400 text-xs rounded border border-red-900/50"
+                    className="rounded border border-red-900/50 bg-red-900/30 px-3 py-1.5 text-xs text-red-400 hover:bg-red-900/50"
                   >
                     Delete
                   </button>
@@ -920,7 +921,7 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
 
             {/* Edit Content */}
             {!isEditorCollapsed && (
-              <div className="flex-1 min-h-0">
+              <div className="min-h-0 flex-1">
                 {showJsonMode ? (
                   <div className="h-full p-4">
                     <JsonEditor
@@ -943,13 +944,13 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
       {/* Save As Modal */}
       {showNewDialogModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80">
-          <div className="bg-slate-800 p-6 rounded border border-slate-600 w-96 shadow-2xl">
-            <h3 className="font-bold text-lg mb-4 text-white">
+          <div className="w-96 rounded border border-slate-600 bg-slate-800 p-6 shadow-2xl">
+            <h3 className="mb-4 text-lg font-bold text-white">
               Save New Dialog
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs uppercase text-slate-400 font-bold mb-1">
+                <label className="mb-1 block text-xs font-bold text-slate-400 uppercase">
                   Filename
                 </label>
                 <input
@@ -961,11 +962,11 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                     }))
                   }
                   placeholder="e.g. introSequence"
-                  className="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded text-slate-200 focus:border-cyan-500 focus:outline-none"
+                  className="w-full rounded border border-slate-700 bg-slate-900 px-3 py-2 text-slate-200 focus:border-cyan-500 focus:outline-none"
                 />
               </div>
               <div>
-                <label className="block text-xs uppercase text-slate-400 font-bold mb-1">
+                <label className="mb-1 block text-xs font-bold text-slate-400 uppercase">
                   Variable Name (Export)
                 </label>
                 <input
@@ -977,20 +978,20 @@ export default function DialogEditor({ onClose }: { onClose: () => void }) {
                     }))
                   }
                   placeholder="e.g. INTRO_SEQUENCE"
-                  className="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded text-slate-200 focus:border-cyan-500 focus:outline-none"
+                  className="w-full rounded border border-slate-700 bg-slate-900 px-3 py-2 text-slate-200 focus:border-cyan-500 focus:outline-none"
                 />
               </div>
             </div>
-            <div className="flex justify-end gap-2 mt-6">
+            <div className="mt-6 flex justify-end gap-2">
               <button
                 onClick={() => setShowNewDialogModal(false)}
-                className="px-4 py-2 text-slate-400 hover:text-white text-sm"
+                className="px-4 py-2 text-sm text-slate-400 hover:text-white"
               >
                 Cancel
               </button>
               <button
                 onClick={() => executeSave()}
-                className="px-4 py-2 bg-cyan-600 text-white rounded hover:bg-cyan-500 font-bold text-sm"
+                className="rounded bg-cyan-600 px-4 py-2 text-sm font-bold text-white hover:bg-cyan-500"
               >
                 Save
               </button>

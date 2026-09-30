@@ -7,6 +7,13 @@
 - Game filesystem paths are under `apps/web/src` and `apps/web/public`. Browser asset URLs remain rooted at `/` (for example, `/UI/Icons/...`). Treat older external skill references to root `src/` or `public/` as paths under `apps/web`.
 - Keep the workspace lockfile, Git hooks, narrative documents, `docs/`, and repository skills at the root. Local web environment variables belong in `apps/web/.env.local`.
 
+## Development editor persistence
+
+- Editors that write authored TypeScript must use the shared `useEditorSource` / `editorSourceService` protocol described in `docs/development/EDITOR_SAVES.md`.
+- Preserve untouched source expressions, comments, imports, helpers, sibling exports, and fields the editor does not expose. Never find declaration boundaries with regular expressions, evaluate source with `eval`, or reconstruct entire files from JSON.
+- Require a loaded source revision, reject stale saves without discarding the draft, and use the repository Prettier configuration and staged file replacements.
+- Test shared save behavior with controlled inputs; discover current registry entries to check source loading without mirroring content values in fixtures.
+
 ## Art source and deployment workflow
 
 - Read `art-source/README.md` before adding, replacing, moving, or generating raster artwork intended for the app.

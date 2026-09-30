@@ -1,141 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
-import { getTDLevelSaveTarget } from '@/constants/tdLevelSaveTargets';
+import { editorRouteError } from '@/utils/editorSourceResponse';
 
 export async function POST(req: NextRequest) {
-  try {
-    const { fileName, levelName, levelContext, config } = await req.json();
-
-    if (!levelName || !config) {
-      return NextResponse.json(
-        { error: 'Missing required fields (levelName, config)' },
-        { status: 400 }
-      );
-    }
-
-    const levelsDir = path.join(process.cwd(), 'src', 'constants', 'tdLevels');
-    const indexPath = path.join(
-      process.cwd(),
-      'src',
-      'constants',
-      'tdLevels.ts'
-    );
-
-    const registeredTarget = levelContext
-      ? getTDLevelSaveTarget(levelContext)
-      : undefined;
-
-    if (levelContext && !registeredTarget) {
-      return NextResponse.json(
-        { error: `Unknown level context: ${levelContext}` },
-        { status: 400 }
-      );
-    }
-
-    const targetExportName = registeredTarget?.exportName ?? levelName;
-    let targetFileName = registeredTarget?.fileName ?? fileName;
-
-    if (!/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(targetExportName)) {
-      return NextResponse.json(
-        { error: 'Level name must be a valid TypeScript identifier.' },
-        { status: 400 }
-      );
-    }
-
-    if (
-      !registeredTarget &&
-      (!targetFileName || targetFileName === levelName)
-    ) {
-      try {
-        const files = await fs.readdir(levelsDir);
-        for (const file of files) {
-          const filePath = path.join(levelsDir, file);
-          const content = await fs.readFile(filePath, 'utf-8');
-
-          if (
-            content.includes(`export const ${targetExportName}:`) ||
-            content.includes(`export const ${targetExportName} =`)
-          ) {
-            targetFileName = file.replace(/\.ts$/, '');
-            break;
-          }
-        }
-      } catch (err) {
-        console.error('Error finding existing level file:', err);
-      }
-    }
-
-    if (!targetFileName) {
-      targetFileName = targetExportName; // Fallback to using the exported variable name as filename
-    }
-
-    if (!targetFileName) {
-      return NextResponse.json(
-        { error: 'Filename not provided.' },
-        { status: 400 }
-      );
-    }
-
-    // Sanitize filename
-    const sanitizedFileName = targetFileName.replace(/[^a-zA-Z0-9_-]/g, '');
-    const filePath = path.join(levelsDir, `${sanitizedFileName}.ts`);
-
-    // Format JSON
-    const jsonString = JSON.stringify(config, null, 2);
-    const newExportStr = `export const ${targetExportName}: TDLevelData = ${jsonString};`;
-
-    let fileContent = '';
-
-    try {
-      fileContent = await fs.readFile(filePath, 'utf-8');
-
-      const exportStartMarker = `export const ${targetExportName}`;
-
-      if (fileContent.includes(exportStartMarker)) {
-        // Find existing export and replace
-        const looseRegex = new RegExp(
-          `export const ${targetExportName}[\\s\\S]*?(?=(export const|$))`
-        );
-        fileContent = fileContent.replace(looseRegex, newExportStr + '\n\n');
-      } else {
-        // Append
-        fileContent += `\n\n${newExportStr}`;
-      }
-    } catch {
-      // File doesn't exist, create fresh
-      fileContent = `import { TDLevelData } from "@/engine/tower-defense/types";\n\n${newExportStr}\n`;
-    }
-
-    // Write back to file
-    await fs.writeFile(filePath, fileContent, 'utf-8');
-
-    // Existing levels are already reachable through TD_LEVELS. New standalone
-    // levels still need a barrel export so they can be registered afterward.
-    if (!registeredTarget) {
-      try {
-        const indexContent = await fs.readFile(indexPath, 'utf-8');
-        const exportStatement = `export * from './tdLevels/${sanitizedFileName}';`;
-
-        if (!indexContent.includes(exportStatement)) {
-          await fs.appendFile(indexPath, `\n${exportStatement}`);
-        }
-      } catch {
-        // create index if not exist
-        await fs.writeFile(
-          indexPath,
-          `export * from './tdLevels/${sanitizedFileName}';\n`,
-          'utf-8'
-        );
-      }
-    }
-
-    return NextResponse.json({ success: true, path: filePath });
-  } catch (error) {
-    console.error('Error saving level:', error);
+  if (process.env.NODE_ENV !== 'development')
     return NextResponse.json(
-      { error: 'Failed to save level data' },
-      { status: 500 }
+      { error: 'Only available in development.' },
+      { status: 403 }
     );
+  try {
+    const { saveEditorSource } = await import('@/utils/editorSourceService');
+    const { levelContext, levelName, fileName, config, source } =
+      await req.json();
+    return NextResponse.json(
+      await saveEditorSource(
+        'level',
+        levelContext ?? levelName,
+        config,
+        source,
+        fileName
+      )
+    );
+  } catch (error) {
+    return editorRouteError(error);
   }
 }

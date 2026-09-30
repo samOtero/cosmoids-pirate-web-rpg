@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { useEditorSource } from './useEditorSource';
+import EditorSourceStatus from './EditorSourceStatus';
 import PixiTDLevelEditor, {
   PointType,
   TDLevelEditorStructure,
@@ -19,7 +21,6 @@ import { TDLevelContext } from '@/types/baseGame';
 import {
   cloneTDLevelDraft,
   createEmptyTDLevelDraft,
-  prepareTDLevelDraftForSave,
   validateTDLevelDraft,
 } from '@/utils/tdLevelDraft';
 import { resolveTDInitialView } from '@/utils/tdInitialView';
@@ -53,6 +54,11 @@ const STRUCTURE_SPRITE_FIELDS = [
 export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
   const [selectedLevelKey, setSelectedLevelKey] = useState<string | null>(null);
   const [draft, setDraft] = useState<TDLevelData>(createEmptyTDLevelDraft);
+  const source = useEditorSource<TDLevelData>(
+    'level',
+    selectedLevelKey === 'NEW_LEVEL' ? null : selectedLevelKey,
+    setDraft
+  );
   const [activePathIndex, setActivePathIndex] = useState(0);
   const [deleteMode, setDeleteMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -171,6 +177,8 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
     x: number,
     y: number
   ) => {
+    x = Number(x.toFixed(2));
+    y = Number(y.toFixed(2));
     if (type === 'PATH') {
       setDraft((previousDraft) => {
         const nextPaths = [...previousDraft.paths];
@@ -335,29 +343,27 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
 
     setIsSaving(true);
     try {
-      const data = prepareTDLevelDraftForSave(draft);
+      const data = cloneTDLevelDraft(draft);
 
-      const res = await fetch('/api/dev/td-levels/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      await source.save(
+        '/api/dev/td-levels/save',
+        {
           levelContext:
             selectedLevelKey === 'NEW_LEVEL' ? undefined : selectedLevelKey,
           levelName: nameToSave,
           fileName: nameToSave,
           config: data,
-        }),
-      });
-
-      if (!res.ok) {
-        throw new Error('Failed to save level');
-      }
+        },
+        data,
+        selectedLevelKey === 'NEW_LEVEL'
+      );
 
       alert('Saved successfully!');
       setShowNewModal(false);
+      if (selectedLevelKey === 'NEW_LEVEL') setSelectedLevelKey(nameToSave);
     } catch (err) {
       console.error(err);
-      alert('Error saving level');
+      alert(err instanceof Error ? err.message : 'Error saving level');
     } finally {
       setIsSaving(false);
     }
@@ -480,6 +486,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 z-9998 flex flex-col bg-slate-900">
+      <EditorSourceStatus source={source} onClose={onClose} />
       {/* New Level Modal */}
       {showNewModal && (
         <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">

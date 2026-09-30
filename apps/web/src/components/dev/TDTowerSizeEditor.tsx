@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useEditorSource } from './useEditorSource';
+import EditorSourceStatus from './EditorSourceStatus';
 import * as PIXI from 'pixi.js';
 import * as CREATURES from '@/constants/creatures';
 import { Creature } from '@/types/baseGame';
@@ -82,6 +84,11 @@ export default function TDTowerSizeEditor({
   );
 
   const activeConfig = currentTdConfig[selectedDirection] || {};
+  const source = useEditorSource(
+    'visuals',
+    selectedConfigKey,
+    setCurrentTdConfig
+  );
   const scale = activeConfig.scale ?? 1;
   const shadowScaleX = activeConfig.shadowScaleX ?? 1;
   const shadowScaleY = activeConfig.shadowScaleY ?? 1;
@@ -172,22 +179,17 @@ export default function TDTowerSizeEditor({
       // Create a clean copy to save
       const configToSave = JSON.parse(JSON.stringify(currentTdConfig));
 
-      const res = await fetch('/api/dev/save-creature-position', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      await source.save(
+        '/api/dev/save-creature-position',
+        {
           creatureId: selectedConfigKey,
           tdConfig: configToSave,
-        }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setStatusMsg(`✅ Saved ${selectedConfigKey}!`);
-      } else {
-        setStatusMsg(`❌ ${data.error}`);
-      }
+        },
+        configToSave
+      );
+      setStatusMsg(`✅ Saved ${selectedConfigKey}!`);
     } catch (err) {
-      setStatusMsg('❌ Network error');
+      setStatusMsg(err instanceof Error ? err.message : 'Network error');
     } finally {
       setSaving(false);
     }
@@ -330,32 +332,33 @@ export default function TDTowerSizeEditor({
   }, [selectedConfigKey, creature?.battleSpriteUrl, creature?.spriteUrl]);
 
   return (
-    <div className="fixed inset-0 z-9999 flex flex-col bg-black/95 text-white font-sans">
+    <div className="fixed inset-0 z-9999 flex flex-col bg-black/95 font-sans text-white">
+      <EditorSourceStatus source={source} onClose={onClose} />
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2 bg-slate-950 border-b border-slate-700 shrink-0">
-        <h2 className="font-bold text-sm text-slate-300">
+      <div className="flex shrink-0 items-center justify-between border-b border-slate-700 bg-slate-950 px-4 py-2">
+        <h2 className="text-sm font-bold text-slate-300">
           TD Tower Size Editor
         </h2>
         <button
           onClick={onClose}
-          className="px-3 py-1 text-slate-400 hover:text-white hover:bg-slate-700 rounded transition"
+          className="rounded px-3 py-1 text-slate-400 transition hover:bg-slate-700 hover:text-white"
         >
           ✕
         </button>
       </div>
 
-      <div className="flex flex-1 min-h-0">
+      <div className="flex min-h-0 flex-1">
         {/* Controls Panel */}
-        <div className="w-72 shrink-0 bg-slate-900 border-r border-slate-700 overflow-y-auto p-3 space-y-4">
+        <div className="w-72 shrink-0 space-y-4 overflow-y-auto border-r border-slate-700 bg-slate-900 p-3">
           {/* Config Picker */}
           <div className="space-y-1">
-            <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">
+            <label className="text-[10px] font-bold tracking-wider text-slate-500 uppercase">
               TD Config ID
             </label>
             <select
               value={selectedIndex}
               onChange={(e) => handleConfigChange(Number(e.target.value))}
-              className="w-full bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-cyan-500"
+              className="w-full rounded border border-slate-600 bg-slate-800 px-2 py-1.5 text-xs text-slate-300 focus:border-cyan-500 focus:outline-none"
             >
               {ALL_CONFIG_KEYS.map((key, i) => (
                 <option key={key} value={i}>
@@ -367,13 +370,13 @@ export default function TDTowerSizeEditor({
 
           {/* Direction Picker */}
           <div className="space-y-1">
-            <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">
+            <label className="text-[10px] font-bold tracking-wider text-slate-500 uppercase">
               Direction Config
             </label>
             <select
               value={selectedDirection}
               onChange={(e) => setSelectedDirection(e.target.value as any)}
-              className="w-full bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-cyan-500"
+              className="w-full rounded border border-slate-600 bg-slate-800 px-2 py-1.5 text-xs text-slate-300 focus:border-cyan-500 focus:outline-none"
             >
               {['default', 'up', 'down', 'left', 'right'].map((dir) => (
                 <option key={dir} value={dir}>
@@ -383,14 +386,14 @@ export default function TDTowerSizeEditor({
             </select>
           </div>
 
-          <div className="space-y-1 pt-2 border-t border-slate-700">
-            <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">
+          <div className="space-y-1 border-t border-slate-700 pt-2">
+            <label className="text-[10px] font-bold tracking-wider text-slate-500 uppercase">
               Sprite Image
             </label>
             <select
               value={spriteUrl}
               onChange={(e) => updateActiveConfig({ url: e.target.value })}
-              className="w-full bg-slate-800 border border-slate-600 rounded px-2 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-cyan-500"
+              className="w-full rounded border border-slate-600 bg-slate-800 px-2 py-1.5 text-xs text-slate-300 focus:border-cyan-500 focus:outline-none"
             >
               <option value="">-- Inherit Base Sprite --</option>
               {BATTLE_SPRITES.map((url) => (
@@ -409,8 +412,8 @@ export default function TDTowerSizeEditor({
           </div>
 
           {/* Sliders */}
-          <div className="space-y-3 pt-2 border-t border-slate-700">
-            <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">
+          <div className="space-y-3 border-t border-slate-700 pt-2">
+            <label className="text-[10px] font-bold tracking-wider text-slate-500 uppercase">
               Tower Sprite Scale
             </label>
 
@@ -430,28 +433,28 @@ export default function TDTowerSizeEditor({
                 onChange={(e) =>
                   updateActiveConfig({ scale: Number(e.target.value) })
                 }
-                className="w-full accent-cyan-500 h-2"
+                className="h-2 w-full accent-cyan-500"
               />
             </div>
 
             {/* Flip X Toggle */}
-            <div className="flex items-center justify-between text-[10px] text-slate-400 mt-2">
-              <span className="font-bold uppercase text-slate-500 tracking-wider">
+            <div className="mt-2 flex items-center justify-between text-[10px] text-slate-400">
+              <span className="font-bold tracking-wider text-slate-500 uppercase">
                 Flip Sprite X
               </span>
               <button
                 onClick={() => updateActiveConfig({ flipX: !flipX })}
-                className={`px-3 py-1 rounded text-xs transition border ${flipX ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/50' : 'bg-slate-800 border-slate-600 text-slate-400'}`}
+                className={`rounded border px-3 py-1 text-xs transition ${flipX ? 'border-cyan-500/50 bg-cyan-500/20 text-cyan-400' : 'border-slate-600 bg-slate-800 text-slate-400'}`}
               >
                 {flipX ? 'ON' : 'OFF'}
               </button>
             </div>
 
             {/* Shadow Scale X */}
-            <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider block mt-4">
+            <label className="mt-4 block text-[10px] font-bold tracking-wider text-slate-500 uppercase">
               Tower Shadow Shape
             </label>
-            <div className="space-y-0.5 mt-2">
+            <div className="mt-2 space-y-0.5">
               <div className="flex justify-between text-[10px] text-slate-400">
                 <span>Scale X (Default is 1)</span>
                 <span className="font-mono text-cyan-400">
@@ -467,11 +470,11 @@ export default function TDTowerSizeEditor({
                 onChange={(e) =>
                   updateActiveConfig({ shadowScaleX: Number(e.target.value) })
                 }
-                className="w-full accent-cyan-500 h-2"
+                className="h-2 w-full accent-cyan-500"
               />
             </div>
             {/* Shadow Scale Y */}
-            <div className="space-y-0.5 mt-2">
+            <div className="mt-2 space-y-0.5">
               <div className="flex justify-between text-[10px] text-slate-400">
                 <span>Scale Y (Default is 1)</span>
                 <span className="font-mono text-cyan-400">
@@ -487,11 +490,11 @@ export default function TDTowerSizeEditor({
                 onChange={(e) =>
                   updateActiveConfig({ shadowScaleY: Number(e.target.value) })
                 }
-                className="w-full accent-cyan-500 h-2"
+                className="h-2 w-full accent-cyan-500"
               />
             </div>
             {/* Shadow Offset X */}
-            <div className="space-y-0.5 mt-2">
+            <div className="mt-2 space-y-0.5">
               <div className="flex justify-between text-[10px] text-slate-400">
                 <span>Offset X (Default is 0)</span>
                 <span className="font-mono text-cyan-400">
@@ -507,11 +510,11 @@ export default function TDTowerSizeEditor({
                 onChange={(e) =>
                   updateActiveConfig({ shadowOffsetX: Number(e.target.value) })
                 }
-                className="w-full accent-cyan-500 h-2"
+                className="h-2 w-full accent-cyan-500"
               />
             </div>
             {/* Shadow Offset Y */}
-            <div className="space-y-0.5 mt-2">
+            <div className="mt-2 space-y-0.5">
               <div className="flex justify-between text-[10px] text-slate-400">
                 <span>Offset Y (Default is 0)</span>
                 <span className="font-mono text-cyan-400">
@@ -527,12 +530,12 @@ export default function TDTowerSizeEditor({
                 onChange={(e) =>
                   updateActiveConfig({ shadowOffsetY: Number(e.target.value) })
                 }
-                className="w-full accent-cyan-500 h-2"
+                className="h-2 w-full accent-cyan-500"
               />
             </div>
 
             {/* Sprite Offset X */}
-            <div className="space-y-0.5 mt-2">
+            <div className="mt-2 space-y-0.5">
               <div className="flex justify-between text-[10px] text-slate-400">
                 <span>Sprite Offset X (Default is 0)</span>
                 <span className="font-mono text-cyan-400">{offsetX}px</span>
@@ -546,11 +549,11 @@ export default function TDTowerSizeEditor({
                 onChange={(e) =>
                   updateActiveConfig({ offsetX: Number(e.target.value) })
                 }
-                className="w-full accent-cyan-500 h-2"
+                className="h-2 w-full accent-cyan-500"
               />
             </div>
             {/* Sprite Offset Y */}
-            <div className="space-y-0.5 mt-2">
+            <div className="mt-2 space-y-0.5">
               <div className="flex justify-between text-[10px] text-slate-400">
                 <span>Sprite Offset Y (Default is 0)</span>
                 <span className="font-mono text-cyan-400">{offsetY}px</span>
@@ -564,11 +567,11 @@ export default function TDTowerSizeEditor({
                 onChange={(e) =>
                   updateActiveConfig({ offsetY: Number(e.target.value) })
                 }
-                className="w-full accent-cyan-500 h-2"
+                className="h-2 w-full accent-cyan-500"
               />
             </div>
             {/* Health Bar Offset Y */}
-            <div className="space-y-0.5 mt-2">
+            <div className="mt-2 space-y-0.5">
               <div className="flex justify-between text-[10px] text-slate-400">
                 <span>Health Bar Offset Y (Default is -40)</span>
                 <span className="font-mono text-cyan-400">
@@ -586,50 +589,50 @@ export default function TDTowerSizeEditor({
                     healthBarOffsetY: Number(e.target.value),
                   })
                 }
-                className="w-full accent-cyan-500 h-2"
+                className="h-2 w-full accent-cyan-500"
               />
             </div>
           </div>
 
           {/* Save Button */}
-          <div className="pt-2 border-t border-slate-700 space-y-2">
+          <div className="space-y-2 border-t border-slate-700 pt-2">
             <button
               onClick={handleSave}
               disabled={saving}
-              className="w-full bg-green-700 hover:bg-green-600 disabled:bg-slate-700 disabled:text-slate-500 px-3 py-2 rounded text-xs font-bold text-white transition"
+              className="w-full rounded bg-green-700 px-3 py-2 text-xs font-bold text-white transition hover:bg-green-600 disabled:bg-slate-700 disabled:text-slate-500"
             >
               {saving ? 'Saving...' : 'Save to creatures.ts'}
             </button>
             {statusMsg && (
-              <p className="text-[10px] text-center">{statusMsg}</p>
+              <p className="text-center text-[10px]">{statusMsg}</p>
             )}
           </div>
 
           {/* Current Values Display */}
-          <div className="pt-2 border-t border-slate-700">
-            <label className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">
+          <div className="border-t border-slate-700 pt-2">
+            <label className="text-[10px] font-bold tracking-wider text-slate-500 uppercase">
               Current Values
             </label>
-            <pre className="mt-1 bg-slate-950 border border-slate-700 rounded p-2 text-[10px] text-cyan-300 font-mono whitespace-pre-wrap overflow-x-auto">
+            <pre className="mt-1 overflow-x-auto rounded border border-slate-700 bg-slate-950 p-2 font-mono text-[10px] whitespace-pre-wrap text-cyan-300">
               {JSON.stringify(currentTdConfig, null, 2)}
             </pre>
           </div>
         </div>
 
         {/* Preview Area — PIXI Canvas */}
-        <div className="flex-1 relative overflow-hidden flex items-center justify-center bg-slate-950">
+        <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-slate-950">
           <div ref={containerRef} className="absolute inset-0" />
 
           {/* Crosshair Guide */}
-          <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center">
-            <div className="w-full h-px bg-cyan-700/50 absolute top-1/2 -translate-y-1/2" />
-            <div className="h-full w-px bg-cyan-700/50 absolute left-1/2 -translate-x-1/2" />
+          <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
+            <div className="absolute top-1/2 h-px w-full -translate-y-1/2 bg-cyan-700/50" />
+            <div className="absolute left-1/2 h-full w-px -translate-x-1/2 bg-cyan-700/50" />
           </div>
 
           {/* Info Overlay */}
-          <div className="absolute top-3 left-3 z-30 bg-black/80 backdrop-blur-sm rounded px-2 py-1 shadow border border-slate-700">
+          <div className="absolute top-3 left-3 z-30 rounded border border-slate-700 bg-black/80 px-2 py-1 shadow backdrop-blur-sm">
             <p className="text-[10px] text-slate-300">
-              <span className="text-red-400 font-bold">Red Box</span> = Base
+              <span className="font-bold text-red-400">Red Box</span> = Base
               80x80 size.
             </p>
           </div>

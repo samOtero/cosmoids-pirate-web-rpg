@@ -15,6 +15,7 @@
 **/out/
 **/coverage/
 **/*.tsbuildinfo
+**/*.editor-tmp
 *.log
 
 # Locally installed dependencies and caches

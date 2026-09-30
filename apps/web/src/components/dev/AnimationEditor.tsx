@@ -1,9 +1,15 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { useEditorSource } from './useEditorSource';
+import EditorSourceStatus from './EditorSourceStatus';
 import { ANIMATIONS } from '@/constants/animations';
 import { SENTICLE } from '@/constants/creatures';
-import { AnimationDefinition, AnimationKeyframe } from '@/types/animation';
+import {
+  AnimationDefinition,
+  AnimationKeyframe,
+  AnimationMap,
+} from '@/types/animation';
 import { generateKeyframesCss } from '@/utils/animationUtils';
 import { Creature } from '@/types/baseGame';
 import * as allCreatures from '@/constants/creatures';
@@ -45,28 +51,27 @@ function KeyframeTimeline({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex justify-between items-center">
-        <label className="text-xs font-bold uppercase text-slate-500">
+      <div className="flex items-center justify-between">
+        <label className="text-xs font-bold text-slate-500 uppercase">
           Timeline
         </label>
         <button
           onClick={onAdd}
-          className="text-xs bg-cyan-700 hover:bg-cyan-600 px-2 py-1 rounded text-white"
+          className="rounded bg-cyan-700 px-2 py-1 text-xs text-white hover:bg-cyan-600"
         >
           + Add Keyframe
         </button>
       </div>
-      <div className="relative h-12 bg-slate-800 rounded w-full flex items-center px-4">
-        <div className="absolute left-4 right-4 h-1 bg-slate-700 top-1/2 -translate-y-1/2" />
+      <div className="relative flex h-12 w-full items-center rounded bg-slate-800 px-4">
+        <div className="absolute top-1/2 right-4 left-4 h-1 -translate-y-1/2 bg-slate-700" />
         {sorted.map((kf) => (
           <div
             key={kf.percent}
-            className={`absolute w-3 h-3 rounded-full cursor-pointer transform -translate-x-1.5 transition-all
-              ${
-                selectedPercent === kf.percent
-                  ? 'bg-cyan-400 scale-125 border-white border'
-                  : 'bg-slate-400 hover:bg-slate-200'
-              }`}
+            className={`absolute h-3 w-3 -translate-x-1.5 transform cursor-pointer rounded-full transition-all ${
+              selectedPercent === kf.percent
+                ? 'scale-125 border border-white bg-cyan-400'
+                : 'bg-slate-400 hover:bg-slate-200'
+            }`}
             style={{ left: `calc(${kf.percent}% * 0.94 + 3%)` }} // basic visual adjustment
             onClick={() => onSelect(kf.percent)}
             title={`${kf.percent}%`}
@@ -81,7 +86,17 @@ function KeyframeTimeline({
 
 export default function AnimationEditor({ onClose }: { onClose: () => void }) {
   // State
-  const [animations, setAnimations] = useState(ANIMATIONS);
+  const [animations, setAnimations] = useState(() =>
+    structuredClone(ANIMATIONS)
+  );
+  const source = useEditorSource<AnimationMap>(
+    'animations',
+    'ANIMATIONS',
+    (config) => {
+      setAnimations(config);
+      setIsDirty(false);
+    }
+  );
   const [selectedAnimId, setSelectedAnimId] = useState<string | null>(null);
   const [selectedCreatureId, setSelectedCreatureId] = useState<string>(
     SENTICLE.id
@@ -92,17 +107,15 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
 
   // Derived
   const activeAnim = selectedAnimId ? animations[selectedAnimId] : null;
-  
+
   const creatureList = useMemo(() => {
     return Object.values(allCreatures).filter(
-      (c): c is import('@/types/baseGame').CosmoidTemplate => 
+      (c): c is import('@/types/baseGame').CosmoidTemplate =>
         typeof c === 'object' && c !== null && 'baseStats' in c
     );
   }, []);
 
-  const activeCreature = creatureList.find(
-    (c) => c.id === selectedCreatureId
-  );
+  const activeCreature = creatureList.find((c) => c.id === selectedCreatureId);
   const activeKeyframe = activeAnim?.keyframes.find(
     (k) => k.percent === selectedPercent
   );
@@ -200,29 +213,26 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
 
   const handleSave = async () => {
     try {
-      const res = await fetch('/api/animations/save', {
-        method: 'POST',
-        body: JSON.stringify({ animations }),
-      });
-      if (!res.ok) throw new Error('Failed to save');
+      await source.save('/api/animations/save', { animations }, animations);
       setIsDirty(false);
       alert('Saved!');
     } catch (e) {
-      alert('Error saving');
+      alert(e instanceof Error ? e.message : 'Error saving');
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur text-white font-sans">
-      <div className="w-full h-full flex overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 font-sans text-white backdrop-blur">
+      <EditorSourceStatus source={source} onClose={onClose} />
+      <div className="flex h-full w-full overflow-hidden">
         {/* SIDEBAR */}
-        <div className="w-64 border-r border-slate-800 bg-slate-900 flex flex-col">
-          <div className="p-3 border-b border-slate-800 flex justify-between items-center bg-slate-950">
-            <h2 className="font-bold text-sm text-slate-300">Animations</h2>
+        <div className="flex w-64 flex-col border-r border-slate-800 bg-slate-900">
+          <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950 p-3">
+            <h2 className="text-sm font-bold text-slate-300">Animations</h2>
             <div className="flex gap-1">
               <button
                 onClick={handleCreate}
-                className="text-xs bg-cyan-700 px-2 py-1 rounded hover:bg-cyan-600"
+                className="rounded bg-cyan-700 px-2 py-1 text-xs hover:bg-cyan-600"
               >
                 + New
               </button>
@@ -243,7 +253,7 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
                   // Actually, if we switch we don't lose data because `animations` state holds it.
                   // So we don't need to warn.
                 }}
-                className={`w-full text-left px-3 py-2 rounded text-xs font-mono mb-1 ${
+                className={`mb-1 w-full rounded px-3 py-2 text-left font-mono text-xs ${
                   selectedAnimId === anim.id
                     ? 'bg-cyan-900 text-cyan-100'
                     : 'text-slate-400 hover:bg-slate-800'
@@ -253,10 +263,10 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
               </button>
             ))}
           </div>
-          <div className="p-2 border-t border-slate-800">
+          <div className="border-t border-slate-800 p-2">
             <button
               onClick={handleSave}
-              className={`w-full py-2 rounded text-xs font-bold ${
+              className={`w-full rounded py-2 text-xs font-bold ${
                 isDirty
                   ? 'bg-green-600 text-white hover:bg-green-500'
                   : 'bg-slate-800 text-slate-500'
@@ -270,20 +280,20 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
 
         {/* WORKSPACE */}
         {activeAnim ? (
-          <div className="flex-1 flex gap-0">
+          <div className="flex flex-1 gap-0">
             {/* MIDDLE: Properties */}
-            <div className="w-80 bg-slate-900 border-r border-slate-800 flex flex-col p-4 overflow-y-auto">
-              <h3 className="text-xs font-bold text-slate-400 uppercase mb-4">
+            <div className="flex w-80 flex-col overflow-y-auto border-r border-slate-800 bg-slate-900 p-4">
+              <h3 className="mb-4 text-xs font-bold text-slate-400 uppercase">
                 Properties
               </h3>
 
               {/* General Settings */}
-              <div className="mb-6 space-y-3 p-3 bg-slate-800 rounded border border-slate-700">
+              <div className="mb-6 space-y-3 rounded border border-slate-700 bg-slate-800 p-3">
                 <label className="text-xs font-bold text-cyan-400 uppercase">
                   Global Settings
                 </label>
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">
+                  <label className="mb-1 block text-[10px] text-slate-500">
                     ID (Unique)
                   </label>
                   <input
@@ -298,11 +308,11 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
                       setSelectedAnimId(newId);
                       setIsDirty(true);
                     }}
-                    className="w-full bg-slate-950 border border-slate-600 rounded px-2 py-1 text-xs"
+                    className="w-full rounded border border-slate-600 bg-slate-950 px-2 py-1 text-xs"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">
+                  <label className="mb-1 block text-[10px] text-slate-500">
                     Duration (sec)
                   </label>
                   <input
@@ -313,17 +323,17 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
                       const val = parseFloat(e.target.value);
                       updateAnim({ duration: isNaN(val) ? 0 : val });
                     }}
-                    className="w-full bg-slate-950 border border-slate-600 rounded px-2 py-1 text-xs"
+                    className="w-full rounded border border-slate-600 bg-slate-950 px-2 py-1 text-xs"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] text-slate-500 mb-1">
+                  <label className="mb-1 block text-[10px] text-slate-500">
                     Easing
                   </label>
                   <select
                     value={activeAnim.easing}
                     onChange={(e) => updateAnim({ easing: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-600 rounded px-2 py-1 text-xs"
+                    className="w-full rounded border border-slate-600 bg-slate-950 px-2 py-1 text-xs"
                   >
                     <option value="linear">linear</option>
                     <option value="ease">ease</option>
@@ -347,8 +357,8 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
 
               {/* Keyframe Editor */}
               {activeKeyframe ? (
-                <div className="space-y-3 p-3 bg-slate-800 rounded border border-slate-700">
-                  <div className="flex justify-between items-center">
+                <div className="space-y-3 rounded border border-slate-700 bg-slate-800 p-3">
+                  <div className="flex items-center justify-between">
                     <label className="text-xs font-bold text-cyan-400 uppercase">
                       Keyframe @ {activeKeyframe.percent}%
                     </label>
@@ -373,7 +383,7 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
                           const val = parseFloat(e.target.value);
                           updateKeyframe({ scaleX: isNaN(val) ? 1 : val });
                         }}
-                        className="w-full bg-slate-950 border border-slate-600 rounded px-1 py-1 text-xs"
+                        className="w-full rounded border border-slate-600 bg-slate-950 px-1 py-1 text-xs"
                       />
                     </div>
                     <div>
@@ -388,7 +398,7 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
                           const val = parseFloat(e.target.value);
                           updateKeyframe({ scaleY: isNaN(val) ? 1 : val });
                         }}
-                        className="w-full bg-slate-950 border border-slate-600 rounded px-1 py-1 text-xs"
+                        className="w-full rounded border border-slate-600 bg-slate-950 px-1 py-1 text-xs"
                       />
                     </div>
                     <div>
@@ -403,7 +413,7 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
                           const val = parseFloat(e.target.value);
                           updateKeyframe({ y: isNaN(val) ? 0 : val });
                         }}
-                        className="w-full bg-slate-950 border border-slate-600 rounded px-1 py-1 text-xs"
+                        className="w-full rounded border border-slate-600 bg-slate-950 px-1 py-1 text-xs"
                       />
                     </div>
                     <div>
@@ -418,7 +428,7 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
                           const val = parseFloat(e.target.value);
                           updateKeyframe({ x: isNaN(val) ? 0 : val });
                         }}
-                        className="w-full bg-slate-950 border border-slate-600 rounded px-1 py-1 text-xs"
+                        className="w-full rounded border border-slate-600 bg-slate-950 px-1 py-1 text-xs"
                       />
                     </div>
                     <div>
@@ -433,7 +443,7 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
                           const val = parseFloat(e.target.value);
                           updateKeyframe({ rotate: isNaN(val) ? 0 : val });
                         }}
-                        className="w-full bg-slate-950 border border-slate-600 rounded px-1 py-1 text-xs"
+                        className="w-full rounded border border-slate-600 bg-slate-950 px-1 py-1 text-xs"
                       />
                     </div>
                     <div>
@@ -462,7 +472,7 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
                           updateAnim({ keyframes: newKeyframes });
                           setSelectedPercent(p);
                         }}
-                        className="w-full bg-slate-950 border border-slate-600 rounded px-1 py-1 text-xs"
+                        className="w-full rounded border border-slate-600 bg-slate-950 px-1 py-1 text-xs"
                       />
                     </div>
                   </div>
@@ -475,13 +485,13 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
             </div>
 
             {/* RIGHT: Preview */}
-            <div className="flex-1 bg-black/50 flex flex-col">
-              <div className="p-4 border-b border-slate-800 flex justify-between items-center">
+            <div className="flex flex-1 flex-col bg-black/50">
+              <div className="flex items-center justify-between border-b border-slate-800 p-4">
                 <h3 className="text-xs font-bold text-slate-400">Preview</h3>
                 <select
                   value={selectedCreatureId}
                   onChange={(e) => setSelectedCreatureId(e.target.value)}
-                  className="bg-slate-900 border border-slate-700 text-xs px-2 py-1 rounded w-48"
+                  className="w-48 rounded border border-slate-700 bg-slate-900 px-2 py-1 text-xs"
                 >
                   {creatureList.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -490,7 +500,7 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
                   ))}
                 </select>
               </div>
-              <div className="flex-1 flex items-center justify-center relative overflow-hidden bg-[url('/battle-backgrounds/shores_of_eternity.png')] bg-cover bg-center">
+              <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-[url('/battle-backgrounds/shores_of_eternity.png')] bg-cover bg-center">
                 {/* Creature */}
                 {activeCreature && (
                   <div
@@ -515,7 +525,7 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
             </div>
           </div>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-slate-500">
+          <div className="flex flex-1 items-center justify-center text-slate-500">
             Select an animation to edit
           </div>
         )}
