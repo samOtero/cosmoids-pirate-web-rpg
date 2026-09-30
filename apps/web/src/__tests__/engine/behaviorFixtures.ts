@@ -4,17 +4,25 @@ import {
   ENEMY_ABILITY_DEFS,
   type EnemyAbilityDefinition,
 } from '@/engine/tower-defense/enemyAbilities';
-import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
+import {
+  TD_CREATURE_DEFS,
+  TowerDefenseEngine,
+} from '@/engine/tower-defense/TowerDefenseEngine';
+import { createWildCreature } from '@/utils/resolvePlayerCreature';
 import {
   ElementType,
   type CosmoidTemplate,
   type PlayerCreature,
 } from '@/types/baseGame';
-import type { TDLevelData } from '@/engine/tower-defense/types';
+import type {
+  TDCreatureMetadata,
+  TDLevelData,
+} from '@/engine/tower-defense/types';
 
 const engines: TowerDefenseEngine[] = [];
 const speciesOriginals = new Map<string, CosmoidTemplate | undefined>();
 const abilityOriginals = new Map<string, EnemyAbilityDefinition | undefined>();
+const metadataOriginals = new Map<string, TDCreatureMetadata | undefined>();
 afterEach(() => {
   engines.splice(0).forEach((engine) => engine.destroy());
   for (const [id, original] of speciesOriginals) {
@@ -27,6 +35,11 @@ afterEach(() => {
   }
   speciesOriginals.clear();
   abilityOriginals.clear();
+  for (const [id, original] of metadataOriginals) {
+    if (original) TD_CREATURE_DEFS[id] = original;
+    else delete TD_CREATURE_DEFS[id];
+  }
+  metadataOriginals.clear();
 });
 
 // Controlled inputs for engine mechanics. These are not copies of authored data.
@@ -62,6 +75,24 @@ export function ability<T extends EnemyAbilityDefinition>(fixture: T): T {
   if (!abilityOriginals.has(fixture.id))
     abilityOriginals.set(fixture.id, ENEMY_ABILITY_DEFS[fixture.id]);
   ENEMY_ABILITY_DEFS[fixture.id] = fixture;
+  return fixture;
+}
+
+export function battleSpecies(
+  id: string,
+  overrides: Partial<CosmoidTemplate> = {}
+) {
+  const fixture = species(id, overrides);
+  if (!metadataOriginals.has(id))
+    metadataOriginals.set(id, TD_CREATURE_DEFS[id]);
+  TD_CREATURE_DEFS[id] = {
+    baseCreature: createWildCreature(id, 1),
+    evolutionNodes: fixture.evolutionNodes,
+    attackUnlocks: fixture.learnableAttacks.map(({ level, attackId }) => ({
+      level,
+      attackDefId: attackId,
+    })),
+  };
   return fixture;
 }
 

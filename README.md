@@ -206,6 +206,13 @@ enemy abilities' balance settings. Enemy-ability registry checks discover curren
 abilities and level references automatically. Run `pnpm test:progression` for
 these checks.
 
+Visual and level registry tests discover current content and check shipped assets,
+usable routes, and valid references. Controlled behavior tests cover image-loading
+transitions, capture restrictions, elemental matchups and affinity, and journal
+milestone unlocks. They do not freeze scene coordinates, art scales, species typing,
+or story sightings. Journal checks validate all supplied notes; notes remain optional
+while creatures are being developed. Run `pnpm test:content` for these checks.
+
 ## Scripts
 - `pnpm verify:quick` - Run the fast local verification suite
 - `pnpm typecheck` - Check TypeScript without emitting files
@@ -214,6 +221,7 @@ these checks.
 - `pnpm test:creatures` - Validate every runtime creature's integration
 - `pnpm test:attacks` - Check shared attack mechanics and registry integration
 - `pnpm test:progression` - Check evolution and enemy-ability mechanics and integration
+- `pnpm test:content` - Check visuals, levels, elemental combat, and journal behavior
 - `pnpm test run` - Run all tests once
 - `pnpm test:ui` - Visual test runner
 - `pnpm test:coverage` - Coverage report

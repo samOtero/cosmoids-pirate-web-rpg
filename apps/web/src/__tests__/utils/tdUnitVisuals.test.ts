@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Assets, Graphics, Sprite, Texture, TextureSource } from 'pixi.js';
 import {
   applyTDUnitTransforms,
@@ -6,6 +6,33 @@ import {
 } from '@/utils/tdUnitVisuals';
 import type { BaseTDUnit } from '@/engine/tower-defense/types';
 import type { UnitVisuals } from '@/types/baseGame';
+import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
+
+const configId = 'test_visual_transitions';
+const walkConfig = {
+  url: '/test-walk.webp',
+  scale: 0.25,
+  offsetY: -20,
+  shadowOffsetX: 4,
+  shadowOffsetY: -5,
+};
+const idleConfig = {
+  url: '/test-idle.webp',
+  scale: 0.6,
+  offsetY: -12,
+  shadowOffsetX: 2,
+  shadowOffsetY: -3,
+};
+let original: UnitVisuals | undefined;
+beforeEach(() => {
+  original = CREATURE_TD_CONFIGS[configId];
+  CREATURE_TD_CONFIGS[configId] = {
+    default: walkConfig,
+    left: walkConfig,
+    right: { ...walkConfig, flipX: true },
+    idle: idleConfig,
+  };
+});
 
 function mockTextureLoad() {
   // Select Pixi's single-texture overload rather than its asset-bundle overload.
@@ -27,7 +54,7 @@ function createVisuals() {
   const sprite = new Sprite();
   const shadow = new Graphics();
   const unit: BaseTDUnit = {
-    id: 'caleb',
+    id: 'test_unit',
     position: { x: 50, y: 50 },
     facingDirection: 'left',
     hp: 1,
@@ -38,7 +65,7 @@ function createVisuals() {
       unit,
       sprite,
       shadow,
-      'caleb_capture',
+      configId,
       undefined,
       (texture) => {
         sprite.texture = texture;
@@ -49,14 +76,18 @@ function createVisuals() {
 }
 
 const walking = () =>
-  new Texture({ source: new TextureSource({ width: 1024, height: 1536 }) });
+  new Texture({ source: new TextureSource({ width: 80, height: 120 }) });
 const idle = () =>
-  new Texture({ source: new TextureSource({ width: 172, height: 249 }) });
+  new Texture({ source: new TextureSource({ width: 40, height: 50 }) });
 
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  if (original) CREATURE_TD_CONFIGS[configId] = original;
+  else delete CREATURE_TD_CONFIGS[configId];
+  vi.restoreAllMocks();
+});
 
 describe('unit sprite transitions', () => {
-  it('keeps Caleb at walking size until the idle image and layout can switch together', async () => {
+  it('keeps the prior texture and layout until the new pose is ready', async () => {
     const walkTexture = walking();
     const idleTexture = idle();
     const pendingIdle = deferredTexture();
@@ -67,22 +98,22 @@ describe('unit sprite transitions', () => {
 
     update('left');
     await Promise.resolve();
-    expect(sprite.height).toBeCloseTo(1536 * 0.12);
+    expect(sprite.height).toBeCloseTo(walkTexture.height * walkConfig.scale);
     const redrawShadow = vi.spyOn(shadow, 'clear');
 
     update('idle');
     update('idle');
     expect(load).toHaveBeenCalledTimes(2);
     expect(sprite.texture).toBe(walkTexture);
-    expect(sprite.height).toBeCloseTo(1536 * 0.12);
-    expect(sprite.y).toBe(-87);
+    expect(sprite.height).toBeCloseTo(walkTexture.height * walkConfig.scale);
+    expect(sprite.y).toBe(walkConfig.offsetY);
     expect(redrawShadow).not.toHaveBeenCalled();
 
     pendingIdle.resolve(idleTexture);
     await Promise.resolve();
     expect(sprite.texture).toBe(idleTexture);
-    expect(sprite.height).toBeCloseTo(249 * 0.68);
-    expect(sprite.y).toBe(-95);
+    expect(sprite.height).toBeCloseTo(idleTexture.height * idleConfig.scale);
+    expect(sprite.y).toBe(idleConfig.offsetY);
     expect(redrawShadow).toHaveBeenCalledOnce();
   });
 
@@ -95,10 +126,10 @@ describe('unit sprite transitions', () => {
     pending.resolve(walking());
     await Promise.resolve();
     expect(load).toHaveBeenCalledOnce();
-    expect(sprite.scale.x).toBe(-0.12);
+    expect(sprite.scale.x).toBe(-walkConfig.scale);
 
     update('left');
-    expect(sprite.scale.x).toBe(0.12);
+    expect(sprite.scale.x).toBe(walkConfig.scale);
     expect(load).toHaveBeenCalledOnce();
   });
 
@@ -134,8 +165,8 @@ describe('unit sprite transitions', () => {
     oldWalk.resolve(walking());
     await Promise.resolve();
     expect(sprite.texture).toBe(currentTexture);
-    expect(sprite.scale.x).toBe(-0.12);
-    expect(sprite.height).toBeCloseTo(1536 * 0.12);
+    expect(sprite.scale.x).toBe(-walkConfig.scale);
+    expect(sprite.height).toBeCloseTo(currentTexture.height * walkConfig.scale);
   });
 
   it('does not commit a pending image after the sprite is destroyed', async () => {
@@ -154,26 +185,26 @@ describe('unit sprite transitions', () => {
 describe('unit ground contact', () => {
   it('uses the active visual state shadow as the depth anchor', () => {
     const unit: BaseTDUnit = {
-      id: 'caleb',
+      id: 'test_unit',
       position: { x: 50, y: 50 },
       facingDirection: 'left',
       hp: 1,
       maxHp: 1,
     };
 
-    const walkingContact = getTDUnitGroundContactOffset(
-      unit,
-      'caleb_capture'
+    const walkingContact = getTDUnitGroundContactOffset(unit, configId);
+    expect(walkingContact.x).toBe(walkConfig.shadowOffsetX);
+    expect(walkingContact.y).toBeCloseTo(
+      30 * walkConfig.scale + walkConfig.shadowOffsetY
     );
-    expect(walkingContact.x).toBe(0);
-    expect(walkingContact.y).toBeCloseTo(-9.4);
 
-    const idleContact = getTDUnitGroundContactOffset(
-      unit,
-      'caleb_capture',
-      'idle'
+    const idleContact = getTDUnitGroundContactOffset(unit, configId, 'idle');
+    expect(idleContact.x).toBe(idleConfig.shadowOffsetX);
+    expect(idleContact.y).toBeCloseTo(
+      30 * idleConfig.scale + idleConfig.shadowOffsetY
     );
-    expect(idleContact.x).toBe(0);
-    expect(idleContact.y).toBeCloseTo(-11.6);
+    expect(getTDUnitGroundContactOffset(unit, configId, 'right').x).toBe(
+      -walkingContact.x
+    );
   });
 });

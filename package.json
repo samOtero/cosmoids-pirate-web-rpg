@@ -21,6 +21,7 @@
     "test:creatures": "pnpm --filter @cosmoids/web test:creatures",
     "test:attacks": "pnpm --filter @cosmoids/web test:attacks",
     "test:progression": "pnpm --filter @cosmoids/web test:progression",
+    "test:content": "pnpm --filter @cosmoids/web test:content",
     "assets:optimize": "pnpm --filter @cosmoids/web assets:optimize",
     "assets:optimize:journals": "pnpm --filter @cosmoids/web assets:optimize:journals",
     "assets:optimize:story-backgrounds": "pnpm --filter @cosmoids/web assets:optimize:story-backgrounds",

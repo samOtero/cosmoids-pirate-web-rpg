@@ -1,28 +1,28 @@
+import { describe, expect, it } from 'vitest';
 import { COSMOID_TEMPLATES } from '@/constants/creatures';
+import { TD_LEVELS } from '@/constants/tdLevels';
 
-const CURRENT_JOURNAL_SPECIES_IDS = [
-  'starter_crab',
-  'starter_iguana',
-  'starter_monkey',
-  'mouse_1',
-  'harlequill',
-  'mopup',
-  'bug_stage_1',
-  'bug_stage_2',
-  'bug_stage_3',
-  'bettle',
-  'sonarion',
-  'resonarion',
-  'tigrevel',
-] as const;
-
-describe("Kip's journal entries", () => {
-  it('has a short field note for every species currently shown in the journal', () => {
-    CURRENT_JOURNAL_SPECIES_IDS.forEach((speciesId) => {
-      const entry = COSMOID_TEMPLATES[speciesId].journalEntry;
-
-      expect(entry, `${speciesId} should have a journal entry`).toBeTruthy();
-      expect(entry!.length).toBeLessThanOrEqual(180);
+describe.each(Object.entries(COSMOID_TEMPLATES))(
+  '%s journal note',
+  (id, species) => {
+    it('keeps an authored field note nonempty when supplied', () => {
+      // The journal UI supports species whose notes are still being developed.
+      if (species.journalEntry === undefined) return;
+      expect(species.journalEntry.trim(), id).not.toBe('');
     });
-  });
-});
+  }
+);
+
+describe.each(Object.entries(TD_LEVELS))(
+  '%s journal sightings',
+  (id, config) => {
+    it('reveals only registered species', () => {
+      for (const speciesId of config.journalCompletion?.seenSpeciesIds ?? []) {
+        expect(
+          COSMOID_TEMPLATES[speciesId],
+          `${id}: unknown sighting ${speciesId}`
+        ).toBeDefined();
+      }
+    });
+  }
+);

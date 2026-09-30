@@ -21,6 +21,7 @@
     "test:creatures": "vitest run src/__tests__/integration/creatureRegistry.test.ts --project=unit",
     "test:attacks": "vitest run src/__tests__/engine/attacks src/__tests__/integration/attackRegistry.test.ts --project=unit",
     "test:progression": "vitest run src/__tests__/engine/evolutionProgression.test.ts src/__tests__/engine/enemyAbilities.test.ts src/__tests__/engine/groundOrbAbility.test.ts src/__tests__/integration/enemyAbilityRegistry.test.ts --project=unit",
+    "test:content": "vitest run src/__tests__/integration/visualRegistry.test.ts src/__tests__/integration/levelRegistry.test.ts src/__tests__/engine/levelRules.test.ts src/__tests__/engine/attacks/elementalCombat.test.ts src/__tests__/utils/tdUnitVisuals.test.ts src/__tests__/utils/cosmoidJournal.test.ts src/__tests__/constants/creatureJournalEntries.test.ts --project=unit",
     "assets:optimize": "node scripts/assets/optimize-art-assets.mjs",
     "assets:optimize:journals": "node scripts/assets/optimize-art-assets.mjs journal",
     "assets:optimize:story-backgrounds": "node scripts/assets/optimize-art-assets.mjs story-backgrounds",

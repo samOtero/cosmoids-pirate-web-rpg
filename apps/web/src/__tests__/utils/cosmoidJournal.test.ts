@@ -1,13 +1,35 @@
+import { describe, expect, it, vi } from 'vitest';
 import {
   getCapturedSpeciesIds,
   getJournalSeenSpeciesIds,
 } from '@/utils/cosmoidJournal';
-import { Profile, StoryProgression } from '@/types/baseGame';
+import { type Profile, StoryProgression } from '@/types/baseGame';
 
-function createProfile(overrides: Partial<Profile> = {}): Profile {
+vi.mock('@/constants/tdLevels', async () => {
+  const { StoryProgression: milestones } = await import('@/types/baseGame');
+  return {
+    TD_LEVELS: {
+      first: {
+        journalCompletion: {
+          progression: milestones.DEFEAT_FIRST_BATTLE,
+          seenSpeciesIds: ['test_seen_first', 'test_shared'],
+        },
+      },
+      second: {
+        journalCompletion: {
+          progression: milestones.DEFEAT_BUG_STAGE_1,
+          seenSpeciesIds: ['test_shared', 'test_seen_second'],
+        },
+      },
+      unfinished: {},
+    },
+  };
+});
+
+function profile(overrides: Partial<Profile> = {}): Profile {
   return {
     id: 0,
-    name: 'Caleb',
+    name: 'Test player',
     lastPlayed: 0,
     creatures: [],
     storageCreatures: [],
@@ -18,94 +40,72 @@ function createProfile(overrides: Partial<Profile> = {}): Profile {
   };
 }
 
-describe("Kip's Journal derivation", () => {
-  it('uses each completed level to derive sightings', () => {
-    expect(
-      Array.from(
-        getJournalSeenSpeciesIds(
-          createProfile({
-            storyProgression: StoryProgression.DEFEAT_FIRST_BATTLE,
-          })
-        )
-      )
-    ).toEqual([]);
+function owned(speciesId: string) {
+  return {
+    id: speciesId,
+    speciesId,
+    level: 5,
+    xp: 0,
+    equippedAttacks: [],
+    isShiny: false,
+  };
+}
 
-    expect(
-      Array.from(
-        getJournalSeenSpeciesIds(
-          createProfile({
-            storyProgression: StoryProgression.DEFEAT_BUG_STAGE_1,
-          })
-        )
-      )
-    ).toEqual(['mouse_1', 'harlequill', 'mopup']);
-
-    expect(
-      Array.from(
-        getJournalSeenSpeciesIds(
-          createProfile({
-            storyProgression: StoryProgression.DEFEAT_BUG_STAGE_2,
-          })
-        )
-      )
-    ).toEqual(['mouse_1', 'harlequill', 'mopup', 'bug_stage_1', 'bettle']);
-
-    expect(
-      Array.from(
-        getJournalSeenSpeciesIds(
-          createProfile({
-            storyProgression: StoryProgression.DEFEAT_LEVEL_4,
-          })
-        )
-      )
-    ).toEqual([
-      'mouse_1',
-      'harlequill',
-      'mopup',
-      'bug_stage_1',
-      'bettle',
-      'sonarion',
-      'resonarion',
-    ]);
+describe('journal derivation', () => {
+  it('reveals completed milestones, deduplicates sightings, and ignores unfinished levels', () => {
+    expect([
+      ...getJournalSeenSpeciesIds(
+        profile({ storyProgression: StoryProgression.PICK_STARTER })
+      ),
+    ]).toEqual([]);
+    expect([
+      ...getJournalSeenSpeciesIds(
+        profile({ storyProgression: StoryProgression.DEFEAT_FIRST_BATTLE })
+      ),
+    ]).toEqual(['test_seen_first', 'test_shared']);
+    expect([
+      ...getJournalSeenSpeciesIds(
+        profile({ storyProgression: StoryProgression.DEFEAT_BUG_STAGE_1 })
+      ),
+    ]).toEqual(['test_seen_first', 'test_shared', 'test_seen_second']);
+    expect([
+      ...getJournalSeenSpeciesIds(
+        profile({ storyProgression: StoryProgression.COMPLETE_LEVEL_7 })
+      ),
+    ]).toEqual(['test_seen_first', 'test_shared', 'test_seen_second']);
   });
 
-  it('does not invent evolution history for a legacy profile', () => {
-    const profile = createProfile({
-      creatures: [
-        {
-          id: 'captured-bugitor',
-          speciesId: 'bug_stage_2',
-          level: 8,
-          xp: 0,
-          equippedAttacks: ['TACKLE'],
-          isShiny: false,
-        },
-      ],
+  it('includes party and storage species without inventing past evolutionary forms', () => {
+    const legacy = profile({
+      creatures: [owned('test_evolved')],
+      storageCreatures: [owned('test_stored')],
     });
-
-    expect(Array.from(getCapturedSpeciesIds(profile))).toEqual(['bug_stage_2']);
-    expect(getJournalSeenSpeciesIds(profile).has('bug_stage_1')).toBe(false);
+    expect([...getCapturedSpeciesIds(legacy)]).toEqual([
+      'test_evolved',
+      'test_stored',
+    ]);
+    expect(getJournalSeenSpeciesIds(legacy).has('test_pre_evolution')).toBe(
+      false
+    );
   });
 
-  it('retains captured forms that are no longer currently owned', () => {
-    const profile = createProfile({
-      creatures: [
-        {
-          id: 'evolved-bug',
-          speciesId: 'bug_stage_3',
-          level: 10,
-          xp: 0,
-          equippedAttacks: ['TACKLE'],
-          isShiny: false,
-        },
-      ],
-      capturedSpeciesIds: ['bug_stage_1', 'bug_stage_2', 'bug_stage_3'],
+  it('retains capture history alongside current ownership and story sightings', () => {
+    const saved = profile({
+      creatures: [owned('test_current')],
+      capturedSpeciesIds: ['test_released', 'test_current'],
+      storyProgression: StoryProgression.DEFEAT_FIRST_BATTLE,
     });
-
-    expect(Array.from(getCapturedSpeciesIds(profile))).toEqual([
-      'bug_stage_1',
-      'bug_stage_2',
-      'bug_stage_3',
+    expect([...getCapturedSpeciesIds(saved)]).toEqual([
+      'test_released',
+      'test_current',
     ]);
+    expect(getJournalSeenSpeciesIds(saved)).toEqual(
+      new Set([
+        'test_released',
+        'test_current',
+        'test_seen_first',
+        'test_shared',
+      ])
+    );
   });
 });
