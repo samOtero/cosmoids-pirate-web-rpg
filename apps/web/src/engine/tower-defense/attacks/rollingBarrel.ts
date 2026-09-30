@@ -166,7 +166,10 @@ function hitAlongSegment(
       engine,
       barrel.sourceSnapshot,
       enemy,
-      attackDef
+      attackDef,
+      1,
+      1,
+      projectile.warmthDamageMultiplier
     );
     if (enemy.hp <= 0) engine.emitEnemyDefeated(enemy, barrel.sourceSnapshot);
   }

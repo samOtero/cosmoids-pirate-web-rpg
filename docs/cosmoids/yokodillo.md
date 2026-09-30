@@ -41,7 +41,7 @@ Yokodillo's wood-toned shell, playful challenge behavior, belly-first shove, and
 
 Yokodillo plants both feet, lifts its palms, and invites another Cosmoid to push with all its strength. When it is finally displaced, it laughs, curls into an armored ball, and barrels back across the clearing—often overshooting its partner and rolling into the brush beyond.
 
-This vignette defines the creature's temperament and visual action, but it does not yet lock a named attack or gameplay mechanic.
+This vignette defines the creature's temperament and visual action; its named combat techniques are documented below.
 
 ## Visual Direction and Identity Lock
 
@@ -69,13 +69,19 @@ The island's final name, Yokodillo's exact location, spawn rate, capture flow, a
 
 Yokodillo was conceived to read clearly as a self-contained single-stage creature, but its evolutionary status has not been locked. An approximate height near 0.8 metres was discussed as an early scale cue and remains provisional.
 
-## Approved Technique: Shiko Quake
+## Approved Technique: Palm Slam
 
-Shiko Quake is a close-range physical Fighting attack learned at level 10. Yokodillo performs a sumo leg raise and forcefully stamps the ground, sending a circular impact wave through every enemy within a radius of 22. The move has 35 power and a 2.4-second cooldown. Eligible creatures receive a guaranteed 0.35-second stagger; status-immune structures still take damage but are not staggered.
+Palm Slam is a single-target physical Fighting attack learned at level 6. Yokodillo plants its feet and winds up for 0.6 seconds before striking one enemy for 95 power and a guaranteed 0.65-second stagger. It has a 3-second cooldown and the standard attack reach of 40, matching Body Rush. Status-immune structures still take damage without being staggered.
 
-The deliberately brief, reliable interruption rewards placing the slow, durable Yokodillo near crowded path sections without letting it hold an entire wave in place. Its 0.7-second attack animation acts directly on Yokodillo's tower sprite: it leans sideways to load its weight, makes a small hop, then lands in a squash before settling back into its normal pose. Damage and stagger resolve on the 0.36-second slam frame rather than at the start of the wind-up. Moving, replacing, or removing Yokodillo before impact cancels the pending slam.
+The hit occurs at the end of the wind-up, not on activation. Yokodillo stays committed through a 0.9-second animation; changing the selected attack cannot skip the recovery. If its original target disappears or leaves reach, the blow can connect with one other target in range. Moving, replacing, or removing Yokodillo cancels a pending hit. The compact warm palm-impact effect appears on the struck enemy and does not create a ground shockwave.
 
-The ground effect avoids thin concentric rings and branching line cracks, which became visually noisy at gameplay scale. The approved treatment uses filled ochre impact discs, a crisp cream impact star, rounded dust puffs, and solid dirt chunks moving outward. These shapes communicate a heavy physical Fighting impact without reading as a magical Ground attack.
+## Approved Technique: Shiko Stomp
+
+Shiko Stomp is a physical Fighting attack learned at level 10. Yokodillo performs a sumo leg raise and forcefully stamps the ground, sending a circular impact wave with the standard attack reach of 40. It hits up to three eligible enemies in the tower's targeting order, each for full 35 power and a guaranteed 0.35-second stagger. It has a 2.4-second cooldown; status-immune structures still take damage but are not staggered. Its internal `SHIKO_QUAKE` ID remains unchanged for saved loadouts.
+
+The deliberately brief, three-target interruption rewards placing the slow, durable Yokodillo near crowded path sections without letting it hold an entire wave in place. Its 0.7-second attack animation acts directly on Yokodillo's tower sprite: it leans sideways to load its weight, makes a small hop, then lands in a squash before settling back into its normal pose. Damage and stagger resolve on the 0.36-second slam frame rather than at the start of the wind-up. Moving, replacing, or removing Yokodillo before impact cancels the pending slam.
+
+The ground effect avoids thin concentric rings and branching line cracks, which became visually noisy at gameplay scale. It uses filled ochre impact discs, a crisp cream impact star, rounded dust puffs, and solid dirt chunks moving outward. Each enemy actually struck receives a separate cream-and-ochre hit flash so the three-target limit remains clear even when the broad wave reaches more enemies. These shapes communicate a heavy physical Fighting impact without reading as a magical Ground attack.
 
 ## Creation Record
 
@@ -86,7 +92,7 @@ The ground effect avoids thin concentric rings and branching line cracks, which 
 - **Image status:** Preserved unchanged from the user-approved standalone render.
 - **Production assets:** `yokodillo_icon.png`, `yokodillo_left.png`, `yokodillo_up.png`, and `yokodillo_down.png`
 - **Directional identity revision:** On September 19, 2026, all three battle sprites were rebuilt to restore the approved concept's short muzzle, compact ears, oversized palms, broad armor plates, dark shoulder collar, three-band belly, grounded stance, and compact tail.
-- **Gameplay status:** Registered as a pure Fighting-type bulky physical creature with Body Rush (`TACKLE`) at level 1, Dart (`QUICK_ATTACK`) at level 6, and its custom area technique Shiko Quake (`SHIKO_QUAKE`) at level 10.
+- **Gameplay status:** Registered as a pure Fighting-type bulky physical creature with Body Rush (`TACKLE`) at level 1, Palm Slam (`PALM_SLAM`) at level 6, and Shiko Stomp (`SHIKO_QUAKE`) at level 10.
 - **Story status:** Integrated into Level 7 as optional wildlife on the folded inland route.
 - **Journal observation:** Yokodillo settles its great belly close to the ground and uses its broad hands with unexpected delicacy, lifting loose bark to inspect the insects sheltering beneath it.
 - **Journal artwork:** [`art-source/creatures/journal/yokodillo_journal.png`](../../art-source/creatures/journal/yokodillo_journal.png), published at `/UI/Journal/yokodillo_journal.webp`.
@@ -95,7 +101,7 @@ The ground effect avoids thin concentric rings and branching line cracks, which 
 ## Open Decisions
 
 - Exact Level 7 placement, encounter presentation, rarity, and capture behavior
-- Additional custom attacks, special abilities, and final balance tuning
+- Additional later-level attacks, special abilities, and final balance tuning
 - Final island name and any local environmental storytelling
 - Broader habitat, diet, ecology, and any future revision of the journal entry
 - Final scale and whether it remains single-stage or joins an evolution family

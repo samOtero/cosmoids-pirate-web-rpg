@@ -974,6 +974,40 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       },
     },
   },
+  attack_grumble_launch_1: {
+    default: {
+      vfxAnimation: {
+        type: 'GRUMBLE_LAUNCH',
+        durationMs: 160,
+      },
+    },
+  },
+  attack_grumble_1: {
+    default: {
+      offsetY: -24,
+      vfxAnimation: {
+        type: 'GRUMBLE',
+        durationMs: 240,
+      },
+    },
+  },
+  attack_reverie_orb_launch_1: {
+    default: {
+      vfxAnimation: {
+        type: 'REVERIE_ORB_LAUNCH',
+        durationMs: 180,
+      },
+    },
+  },
+  attack_reverie_orb_1: {
+    default: {
+      offsetY: -24,
+      vfxAnimation: {
+        type: 'REVERIE_ORB',
+        durationMs: 320,
+      },
+    },
+  },
   attack_coir_snare_1: {
     default: {
       vfxAnimation: {
@@ -1051,6 +1085,24 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       vfxAnimation: {
         type: 'SHIKO_QUAKE',
         durationMs: 420,
+      },
+    },
+  },
+  attack_shiko_quake_hit_1: {
+    default: {
+      offsetY: -24,
+      vfxAnimation: {
+        type: 'SHIKO_QUAKE_HIT',
+        durationMs: 300,
+      },
+    },
+  },
+  attack_palm_slam_1: {
+    default: {
+      offsetY: -24,
+      vfxAnimation: {
+        type: 'PALM_SLAM',
+        durationMs: 360,
       },
     },
   },
@@ -1769,6 +1821,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
   tigrevel_netted: {
     default: {
       url: '/battles/cosmoids/tigrevel_netted.webp',
+      flipX: true,
       scale: 0.13,
       offsetY: -42,
       shadowScaleX: 3.1,
@@ -1778,6 +1831,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
     },
     idle: {
       url: '/battles/cosmoids/tigrevel_netted.webp',
+      flipX: true,
       scale: 0.13,
       offsetY: -42,
       shadowScaleX: 3.1,
@@ -1787,6 +1841,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
     },
     carried: {
       url: '/battles/cosmoids/tigrevel_netted.webp',
+      flipX: true,
       scale: 0.13,
       offsetY: 0,
       shadowScaleX: 0,
@@ -1795,6 +1850,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
     },
     left: {
       url: '/battles/cosmoids/tigrevel_netted.webp',
+      flipX: true,
       scale: 0.13,
       offsetY: -42,
       shadowScaleX: 3.1,
@@ -1804,6 +1860,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
     },
     right: {
       url: '/battles/cosmoids/tigrevel_netted.webp',
+      flipX: true,
       scale: 0.13,
       offsetY: -42,
       shadowScaleX: 3.1,
@@ -1813,6 +1870,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
     },
     up: {
       url: '/battles/cosmoids/tigrevel_netted.webp',
+      flipX: true,
       scale: 0.13,
       offsetY: -42,
       shadowScaleX: 3.1,
@@ -1822,6 +1880,7 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
     },
     down: {
       url: '/battles/cosmoids/tigrevel_netted.webp',
+      flipX: true,
       scale: 0.13,
       offsetY: -42,
       shadowScaleX: 3.1,

@@ -1,6 +1,6 @@
 import { ElementType } from '@/types/baseGame';
 import { TowerDefenseEngine } from '../TowerDefenseEngine';
-import { Tower } from '../types';
+import { PoisonId, Tower } from '../types';
 
 export interface AttackEffect {
   type:
@@ -17,6 +17,15 @@ export interface AttackEffect {
   value?: number; // e.g., how many times to multi-hit, or duration of stun
   /** Maximum number of stacks for effects that accumulate. */
   maxStacks?: number;
+  /** Attack-specific poison identity; different IDs may coexist on one target. */
+  poisonId?: PoisonId;
+  /** Damage-formula power resolved into a poison budget instead of direct damage. */
+  totalPower?: number;
+  /** Authored poison lifetime and pulse count. */
+  durationMs?: number;
+  tickCount?: number;
+  /** Fraction of the triggering direct hit dealt by each stack on every tick. */
+  damagePerTickRatio?: number;
 }
 
 export interface ProjectilePattern {
@@ -37,6 +46,18 @@ export type ProjectileVisual =
       highlightColor: number;
     }
   | {
+      type: 'GRUMBLE';
+      outerColor: number;
+      innerColor: number;
+      highlightColor: number;
+    }
+  | {
+      type: 'REVERIE_ORB';
+      outerColor: number;
+      innerColor: number;
+      highlightColor: number;
+    }
+  | {
       type: 'FLAME';
       outerColor: number;
       innerColor: number;
@@ -46,6 +67,14 @@ export type ProjectileVisual =
       outerColor: number;
       innerColor: number;
       highlightColor: number;
+    }
+  | {
+      type: 'WAKE_WHIP';
+      spriteUrl: string;
+    }
+  | {
+      type: 'SALT_SPIT';
+      spriteUrl: string;
     }
   | {
       type: 'COIR_BOLA';
@@ -130,6 +159,11 @@ export interface AttackDefinition {
     lullBeforeDecayMs: number;
     decayIntervalMs: number;
   };
+  /** Optional payoff for attacks that feed on, but do not alter, Poison conditions. */
+  poisonPayoff?: {
+    damageMultiplier: number;
+    prioritizePoisonedTargets?: boolean;
+  };
   /** Pushes nearby secondary enemies against their movement when the primary hit lands. */
   secondaryImpactPush?: {
     radiusIndex: number;
@@ -176,6 +210,15 @@ export interface AttackDefinition {
     threadlingMoveSpeedMultiplier: number;
     threadlingDamageMultiplier: number;
   };
+  wakeWhip?: {
+    windupMs: number;
+    recoveryMs: number;
+    pushDistance: number;
+    warmPushDistance: number;
+  };
+  saltSpit?: {
+    warmProjectileCount: number;
+  };
   behaviorType:
     | 'PROJECTILE'
     | 'INSTANT_AOE'
@@ -184,13 +227,17 @@ export interface AttackDefinition {
     | 'POISON_AOE'
     | 'BEAM'
     | 'SUPPORT_AURA'
+    | 'WARMTH_SUPPORT'
     | 'REPAIR_SUPPORT'
     | 'SHARED_SLUMBER'
     | 'SHIKO_QUAKE'
+    | 'PALM_SLAM'
     | 'ROLLING_BARREL'
     | 'CONSTRICTION'
     | 'RIGGING_NEST'
     | 'SAILCUTTER'
+    | 'WAKE_WHIP'
+    | 'SALT_SPIT'
     | 'INSTANT_MELEE';
   effects?: AttackEffect[];
   visualEffectConfigId?: string; // which tdConfig to use for a visual effect

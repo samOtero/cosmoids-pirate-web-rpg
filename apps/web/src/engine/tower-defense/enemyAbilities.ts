@@ -33,7 +33,8 @@ export type EnemyAbilityDefinition =
       cooldownMs: number;
       projectileTravelMs: number;
       aimDurationMs: number;
-      maxHpDamageFraction: number;
+      paralysisDurationMs: number;
+      paralysisAttackSpeedMultiplier: number;
       impactRadius: number;
       targetCount: number;
       cursedTargetCount?: number;
@@ -84,7 +85,8 @@ export const ENEMY_ABILITY_DEFS: Record<string, EnemyAbilityDefinition> = {
     cooldownMs: 4500,
     projectileTravelMs: 1400,
     aimDurationMs: 350,
-    maxHpDamageFraction: 0.25,
+    paralysisDurationMs: 5000,
+    paralysisAttackSpeedMultiplier: 0.65,
     impactRadius: 4,
     targetCount: 1,
     cursedTargetCount: 3,

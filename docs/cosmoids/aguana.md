@@ -69,9 +69,16 @@ The family may also express reversible growth and shrinkage during changing food
 
 ## General Gameplay Direction
 
-These are approved sources of possible abilities and attacks, not defined mechanics:
+The family now uses **Warmth**, a persistent 0-100% battle resource based on the marine iguana's need to warm on land between cold-water dives.
 
-- Growth and shrinkage in response to food scarcity or environmental pressure
+- Aguana begins each battle at 0% Warmth.
+- After a non-Water move has been active for one full second, Aguana gains 10% Warmth; it continues gaining 10% for each additional second. Switching between non-Water moves preserves this timer, while selecting a Water move stops generation and resets the one-second delay. Warmth does not otherwise decay.
+- Any amount of Warmth grants Aguana's damaging Water moves their full 40% damage bonus. Each Water attack activation then drains 10% Warmth once, regardless of how many projectiles, targets, hits, or delayed pulses it produces.
+- `SUNBATHE` is a level-4 Normal utility move with a persistent 45-second cooldown. It fills Warmth to 100% and grants **Sun-Soaked**: the next empowered Water activation does not drain its usual 10%. Only one Sun-Soaked use may be held, and Sunbathe cannot be wasted while both the full meter and boon are already present.
+- A radial sun indicator beside Aguana shows its current Warmth. Water selection changes the badge's frame to blue, while Sun-Soaked adds a pulsing outer halo.
+
+`WAKE_WHIP` is the family's approved level-5 physical Water attack. Aguana keeps facing its target, waggles its broad paddle tail, and throws a narrow wake forward. The wake lightly pushes its target backward; active Warmth supplies the family's standard damage bonus and increases the push. The remaining Water attacks are placeholders while the family's later lane-shaping options are designed. Approved biological sources for that next pass include:
+
 - Hooked claws that anchor the creature against movement or currents
 - A paddle tail used for propulsion and forceful strikes
 - Salt expulsion, which becomes much more prominent after evolution
@@ -87,7 +94,7 @@ These are approved sources of possible abilities and attacks, not defined mechan
 - **Family:** Aguana -> Nautiguan
 - **Production date:** September 22, 2026
 - **Production assets:** Tight portrait icon plus left, up, and down directional battle sprites, with PNG masters under `art-source/creatures` and transparency-preserving WebP derivatives in `apps/web/public`.
-- **Gameplay implementation:** Pure Water type with a fast juvenile stat profile, `SCRATCH`, `WATER_GUN`, and `DEEPWATER_GRIP`; evolves into Nautiguan at level 16.
+- **Gameplay implementation:** Pure Water type with a fast juvenile stat profile and the Warmth family resource. Its current learnset is `SCRATCH`, `SUNBATHE`, `WAKE_WHIP`, and provisional `DEEPWATER_GRIP`; evolves into Nautiguan at level 16. Wake Whip establishes the family's physical paddle-tail offense, while the later Water move and base stats still await redesign.
 - **Story placement:** Capturable level-8 Aguana appear in both Level 6 waves on the center lane.
 - **Journal observation:** After a short dive, Aguana may stretch belly-up across a sun-warmed tidal rock with its head reclined and all four feet loose. The unusually vulnerable pose shows how completely it relaxes when it feels safe enough to recover its warmth.
 - **Journal artwork:** [`art-source/creatures/journal/aguana_journal.png`](../../art-source/creatures/journal/aguana_journal.png) -> `/UI/Journal/aguana_journal.webp`
@@ -96,7 +103,9 @@ These are approved sources of possible abilities and attacks, not defined mechan
 
 ## Open Decisions
 
-- How growing and shrinking would manifest mechanically, if used
+- Replacement for provisional `DEEPWATER_GRIP` and any additional Warmth interaction it receives
+- Final stat spread after the attack kit is approved
+- Whether reversible shrinking should remain lore-only or appear in a later mechanic
 - Broader habitat distribution and rarity beyond the Level 6 encounter
 
 Individual natures or personality variants are intentionally outside this species-concept record.

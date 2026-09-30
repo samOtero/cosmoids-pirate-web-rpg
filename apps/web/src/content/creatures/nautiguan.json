@@ -17,9 +17,10 @@
   "movementId": "lizard",
   "learnableAttacks": [
     { "level": 1, "attackId": "SCRATCH" },
-    { "level": 5, "attackId": "WATER_GUN" },
+    { "level": 4, "attackId": "SUNBATHE" },
+    { "level": 5, "attackId": "WAKE_WHIP" },
     { "level": 10, "attackId": "DEEPWATER_GRIP" },
-    { "level": 16, "attackId": "BUBBLE_BEAM" }
+    { "level": 16, "attackId": "SALT_SPIT" }
   ],
   "assets": {
     "icon": {

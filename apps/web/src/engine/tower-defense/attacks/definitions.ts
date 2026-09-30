@@ -8,6 +8,7 @@ const ATTACK_COOLDOWNS = {
   HEAVY: 1000,
   SLOW: 1200,
   CONTROL: 1600,
+  SUPER_SLOW: 2400,
 };
 
 const ATTACK_RANGES = {
@@ -16,6 +17,18 @@ const ATTACK_RANGES = {
 };
 
 export const ATTACK_DEFS: Record<string, AttackDefinition> = {
+  SUNBATHE: {
+    id: 'SUNBATHE',
+    name: 'Sunbathe',
+    description:
+      'Fills Warmth to 100% and becomes Sun-Soaked, so the next empowered Water attack does not drain Warmth.',
+    type: ElementType.NORMAL,
+    category: 'special',
+    power: 0,
+    cooldownMs: 45000,
+    rangeIndex: ATTACK_RANGES.NORMAL,
+    behaviorType: 'WARMTH_SUPPORT',
+  },
   SHARED_SLUMBER: {
     id: 'SHARED_SLUMBER',
     name: 'Shared Slumber',
@@ -31,17 +44,31 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
   },
   SHIKO_QUAKE: {
     id: 'SHIKO_QUAKE',
-    name: 'Shiko Quake',
+    name: 'Shiko Stomp',
     description:
-      'Yokodillo stamps the ground, damaging every enemy in a short radius and staggering eligible creatures for 0.35 seconds.',
+      'Yokodillo stamps the ground, damaging up to three enemies in range and staggering eligible creatures for 0.35 seconds.',
     type: ElementType.FIGHTING,
     category: 'physical',
     power: 35,
     cooldownMs: 2400,
-    rangeIndex: 22,
+    rangeIndex: ATTACK_RANGES.NORMAL,
     behaviorType: 'SHIKO_QUAKE',
     effects: [{ type: 'STUN', chance: 1, value: 350 }],
     visualEffectConfigId: 'attack_shiko_quake_1',
+  },
+  PALM_SLAM: {
+    id: 'PALM_SLAM',
+    name: 'Palm Slam',
+    description:
+      'Plants its feet, then strikes one nearby enemy with a heavy palm blow that staggers for 0.65 seconds.',
+    type: ElementType.FIGHTING,
+    category: 'physical',
+    power: 95,
+    cooldownMs: 3000,
+    rangeIndex: ATTACK_RANGES.NORMAL,
+    behaviorType: 'PALM_SLAM',
+    effects: [{ type: 'STUN', chance: 1, value: 650 }],
+    visualEffectConfigId: 'attack_palm_slam_1',
   },
   RIGGING_NEST: {
     id: 'RIGGING_NEST',
@@ -183,9 +210,11 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
   NECTAR_SIPHON: {
     id: 'NECTAR_SIPHON',
     name: 'Siphon Lash',
+    description:
+      'Drains half the damage dealt as health. Against a target suffering from any poison, it deals more damage.',
     type: ElementType.GRASS,
     category: 'special',
-    power: 30,
+    power: 40,
     cooldownMs: ATTACK_COOLDOWNS.NORMAL,
     rangeIndex: ATTACK_RANGES.NORMAL,
     behaviorType: 'PROJECTILE',
@@ -193,6 +222,10 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     projectileVisual: {
       type: 'NECTAR_TONGUE',
       spriteUrl: '/battles/attacks/nectar_siphon.webp',
+    },
+    poisonPayoff: {
+      damageMultiplier: 1.5,
+      prioritizePoisonedTargets: true,
     },
     effects: [{ type: 'DRAIN', chance: 1, value: 0.5 }],
   },
@@ -263,9 +296,54 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
       highlightColor: 0xbae6fd,
     },
   },
+  WAKE_WHIP: {
+    id: 'WAKE_WHIP',
+    name: 'Wake Whip',
+    description:
+      'Waggles its paddle tail while facing the target, launching a narrow wake that pushes the target backward. Warmth strengthens both the hit and the push.',
+    type: ElementType.WATER,
+    category: 'physical',
+    power: 40,
+    cooldownMs: 1000,
+    rangeIndex: ATTACK_RANGES.NORMAL,
+    behaviorType: 'WAKE_WHIP',
+    projectileSpeed: 1.35,
+    projectileVisual: {
+      type: 'WAKE_WHIP',
+      spriteUrl: '/battles/attacks/wake_whip_wave.webp',
+    },
+    wakeWhip: {
+      windupMs: 520,
+      recoveryMs: 150,
+      pushDistance: 4,
+      warmPushDistance: 7,
+    },
+  },
+  SALT_SPIT: {
+    id: 'SALT_SPIT',
+    name: 'Salt Spit',
+    description:
+      'Fires salt crystals that stun briefly and make a carrier drop its objective once. With Warmth, fires at up to three different enemies at full strength.',
+    type: ElementType.WATER,
+    category: 'physical',
+    power: 30,
+    cooldownMs: 2400,
+    rangeIndex: ATTACK_RANGES.NORMAL,
+    behaviorType: 'SALT_SPIT',
+    projectileSpeed: 1.4,
+    projectileVisual: {
+      type: 'SALT_SPIT',
+      spriteUrl: '/battles/attacks/salt_spit_crystals.webp',
+    },
+    saltSpit: { warmProjectileCount: 3 },
+    itemPickupLockMs: 2500,
+    effects: [{ type: 'STUN', chance: 1, value: 500 }],
+  },
   VENOM_SPRAY: {
     id: 'VENOM_SPRAY',
     name: 'Venom Spray',
+    description:
+      'Deals direct damage with a 50% chance to add a five-second venom stack. Each stack deals 5% of its triggering hit per poison pulse, up to five stacks.',
     type: ElementType.POISON,
     category: 'special',
     power: 35,
@@ -285,7 +363,17 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
       innerColor: 0xc084fc,
       highlightColor: 0xd9f99d,
     },
-    effects: [{ type: 'STACKING_POISON', chance: 0.25, maxStacks: 5 }],
+    effects: [
+      {
+        type: 'STACKING_POISON',
+        chance: 0.5,
+        maxStacks: 5,
+        poisonId: 'VENOM_SPRAY',
+        durationMs: 5000,
+        tickCount: 5,
+        damagePerTickRatio: 0.05,
+      },
+    ],
   },
   BARREL_BASH: {
     id: 'BARREL_BASH',
@@ -401,13 +489,24 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
   TOXIC_POLLEN: {
     id: 'TOXIC_POLLEN',
     name: 'Toxic Pollen',
+    description:
+      'Blankets every eligible enemy in range with a distinct five-second pollen poison. Its 40-power damage is dealt entirely across five poison pulses.',
     type: ElementType.POISON,
     category: 'special',
     power: 0,
-    cooldownMs: ATTACK_COOLDOWNS.CONTROL,
+    cooldownMs: ATTACK_COOLDOWNS.SUPER_SLOW,
     rangeIndex: ATTACK_RANGES.NORMAL,
     behaviorType: 'POISON_AOE',
-    effects: [{ type: 'POISON', chance: 1 }],
+    effects: [
+      {
+        type: 'POISON',
+        chance: 1,
+        poisonId: 'TOXIC_POLLEN',
+        totalPower: 40,
+        durationMs: 5000,
+        tickCount: 5,
+      },
+    ],
     visualEffectConfigId: 'attack_toxic_pollen_1',
   },
   SAILCUTTER: {
@@ -491,6 +590,46 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     },
     launchVisualEffectConfigId: 'attack_static_yip_launch_1',
     visualEffectConfigId: 'attack_static_yip_1',
+  },
+  GRUMBLE: {
+    id: 'GRUMBLE',
+    name: 'Grumble',
+    type: ElementType.NORMAL,
+    category: 'special',
+    power: 35,
+    cooldownMs: 1200,
+    rangeIndex: ATTACK_RANGES.NORMAL,
+    behaviorType: 'PROJECTILE',
+    projectileSpeed: 1.3,
+    projectileVisual: {
+      type: 'GRUMBLE',
+      outerColor: 0x8974a8,
+      innerColor: 0xd3bfe6,
+      highlightColor: 0xfff0df,
+    },
+    launchVisualEffectConfigId: 'attack_grumble_launch_1',
+    visualEffectConfigId: 'attack_grumble_1',
+  },
+  REVERIE_ORB: {
+    id: 'REVERIE_ORB',
+    name: 'Reverie Orb',
+    description:
+      'Conjures a slowly drifting pearl of psychic energy that damages one target.',
+    type: ElementType.PSYCHIC,
+    category: 'special',
+    power: 65,
+    cooldownMs: 2500,
+    rangeIndex: ATTACK_RANGES.NORMAL,
+    behaviorType: 'PROJECTILE',
+    projectileSpeed: 0.65,
+    projectileVisual: {
+      type: 'REVERIE_ORB',
+      outerColor: 0x9c83cb,
+      innerColor: 0xe9d5ff,
+      highlightColor: 0xfff8f2,
+    },
+    launchVisualEffectConfigId: 'attack_reverie_orb_launch_1',
+    visualEffectConfigId: 'attack_reverie_orb_1',
   },
   BUBBLE_BEAM: {
     id: 'BUBBLE_BEAM',

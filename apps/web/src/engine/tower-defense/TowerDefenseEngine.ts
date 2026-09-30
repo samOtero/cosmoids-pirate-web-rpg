@@ -31,6 +31,7 @@ import {
   EnemyGroundOrb,
   TowerRecoveryFeed,
   TDTowerRecoveryConfig,
+  TDBalancedLaneHopConfig,
   DestroyedStructureVisual,
   RiggingNest,
   RiggingThreadling,
@@ -42,22 +43,38 @@ import {
   resolveAdaptiveTargetedAoeImpact,
 } from './attacks/behaviors';
 import { EffectProcessor } from './attacks/EffectProcessor';
+import { consumeScheduledPoisonTicks } from './poison';
+import {
+  consumeWaterActivationWarmth,
+  createWarmthState,
+  getWarmthWaterDamageMultiplier,
+  isWarmthFamilyTower,
+  updatePassiveWarmth,
+} from './warmth';
 import { updateRollingBarrel } from './attacks/rollingBarrel';
-import { releaseDeepwaterGrip, updateDeepwaterGrips } from './attacks/deepwaterGrip';
+import {
+  releaseDeepwaterGrip,
+  updateDeepwaterGrips,
+} from './attacks/deepwaterGrip';
 import { resetFireClawHeat, updateFireClawHeat } from './attacks/fireClaw';
 import { pushBarrelBashSecondaryTargets } from './attacks/barrelBash';
 import { launchLooseEndFollowUp } from './attacks/looseEnd';
 import { launchFlyingColorsFollowUp } from './attacks/flyingColors';
-import {
-  isSleeping,
-  wakeFromSharedSlumber,
-} from './attacks/sharedSlumber';
-import {
-  cancelShikoQuake,
-  updateShikoQuakes,
-} from './attacks/shikoQuake';
+import { isSleeping, wakeFromSharedSlumber } from './attacks/sharedSlumber';
+import { cancelShikoQuake, updateShikoQuakes } from './attacks/shikoQuake';
+import { cancelPalmSlam, updatePalmSlams } from './attacks/palmSlam';
 import { updateRiggingNests } from './attacks/riggingNest';
-import { getAttackSpeedMultiplier } from './attackSpeedModifiers';
+import {
+  cancelWakeWhip,
+  pushWakeWhipTarget,
+  updateWakeWhips,
+} from './attacks/wakeWhip';
+import { disarmSaltSpitTarget } from './attacks/saltSpit';
+import {
+  applyTowerParalysis,
+  getAttackSpeedMultiplier,
+  getParalyzedStepMs,
+} from './attackSpeedModifiers';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { TDWave, TDWaveGroup, Point } from './types';
 import { TDEventBus } from './events/TDEventBus';
@@ -362,6 +379,7 @@ export class TowerDefenseEngine {
   public hasFinishedAllWaves: boolean = false;
   public hasDestroyedVictoryStructure: boolean = false;
   private lastSpawnTime: number = 0;
+  private balancedHopTieCount: number = 0;
 
   public playerSelectedAttacks: Record<string, number> = {};
   public playerSelectedTargetingModes: Record<string, TowerTargetingMode> = {};
@@ -417,9 +435,7 @@ export class TowerDefenseEngine {
     this.authoredPaths = rawPaths.map((path) =>
       path.map((point) => ({ ...point }))
     );
-    this.paths = rawPaths.map((path) =>
-      path.map((point) => ({ ...point }))
-    );
+    this.paths = rawPaths.map((path) => path.map((point) => ({ ...point })));
     this.placementSpots = levelData.placementSpots || [];
     this.safePlacementSpotIndices = new Set(
       levelData.safePlacementSpotIndices ?? []
@@ -486,6 +502,7 @@ export class TowerDefenseEngine {
         tdConfigId: eu.tdConfigId,
         position: { x: eu.position.x, y: eu.position.y },
         facingDirection: eu.facingDirection || 'down',
+        visualState: eu.visualState,
         hp: 1,
         maxHp: 1,
       }));
@@ -670,6 +687,11 @@ export class TowerDefenseEngine {
 
     this.processEnemyAbilities(newEnemies);
     const constrictedMs = updateDeepwaterGrips(this, newEnemies, deltaMs);
+    for (const captureUnit of this.captureUnits) {
+      if (captureUnit.groupHauling && captureUnit.heldByEnemyId) {
+        this.reconcileCaptureHaulChain(captureUnit, newEnemies);
+      }
+    }
 
     // Update enemies
     newEnemies.forEach((enemy) => {
@@ -703,6 +725,48 @@ export class TowerDefenseEngine {
       moveSpeed *= heldCaptureUnit
         ? this.getCaptureHaulingSpeedMultiplier(heldCaptureUnit)
         : 1;
+      const regroupTarget = enemy.captureHaulRegroupTargetId
+        ? this.captureUnits.find(
+            (captureUnit) =>
+              captureUnit.id === enemy.captureHaulRegroupTargetId
+          )
+        : undefined;
+      if (enemy.captureHaulRegroupTargetId && !regroupTarget) {
+        enemy.captureHaulRegroupTargetId = undefined;
+      }
+      if (regroupTarget && !enemy.heldCaptureUnitId) {
+        const path = this.paths[enemy.pathIndex] ?? [];
+        const enemyProgress = projectPointOntoPath(
+          enemy.position,
+          path,
+          this.aspectRatio
+        )?.progress;
+        const pickupPosition = this.getCapturePickupPosition(
+          regroupTarget,
+          enemy
+        );
+        const pickupProgress = projectPointOntoPath(
+          pickupPosition,
+          path,
+          this.aspectRatio
+        )?.progress;
+        if (enemyProgress !== undefined && pickupProgress !== undefined) {
+          const nextWaypoint = getWaypointIndexAfterPathProgress(
+            path,
+            enemyProgress,
+            this.aspectRatio
+          );
+          enemy.isMovingBackward = pickupProgress < enemyProgress;
+          enemy.currentWaypointIndex = enemy.isMovingBackward
+            ? Math.max(0, nextWaypoint - 1)
+            : nextWaypoint;
+        }
+        if (
+          this.getPositionDistanceSq(enemy.position, pickupPosition) <= 125
+        ) {
+          moveSpeed = 0;
+        }
+      }
       const resonantTarget = enemy.resonantEvolutionTargetCaptureUnitId
         ? this.captureUnits.find(
             (captureUnit) =>
@@ -734,6 +798,32 @@ export class TowerDefenseEngine {
         enemy.statusConditions.forEach((status) => {
           if (status.type === 'STUN' || status.type === 'SLEEP') {
             moveSpeed = 0; // cannot move while stunned
+            status.durationMs -= deltaMs;
+          } else if (
+            status.type === 'POISON' &&
+            status.nextTickAtMs !== undefined
+          ) {
+            const damagePulses = consumeScheduledPoisonTicks(
+              status,
+              this.elapsedTimeMs
+            );
+            damagePulses.forEach((damage, pulseIndex) => {
+              if (!enemy.isInvulnerable && enemy.hp > 0) {
+                enemy.hp -= damage;
+              }
+              startDamageFlash(enemy, ElementType.POISON);
+
+              this.floatingTexts.push({
+                id: `ft_tick_${this.elapsedTimeMs}_${pulseIndex}_${Math.random()
+                  .toString(36)
+                  .substring(7)}`,
+                text: Math.ceil(damage).toString(),
+                position: { ...enemy.position },
+                color: 0xccffcc,
+                durationMs: 1000,
+                elapsedMs: 0,
+              });
+            });
           } else if (status.type === 'BURN' || status.type === 'POISON') {
             if (status.tickDamage && time - (status.lastTickTime || 0) > 1000) {
               if (!enemy.isInvulnerable) {
@@ -754,8 +844,10 @@ export class TowerDefenseEngine {
                 elapsedMs: 0,
               });
             }
+            status.durationMs -= deltaMs;
+          } else {
+            status.durationMs -= deltaMs;
           }
-          status.durationMs -= deltaMs;
         });
 
         if (
@@ -792,33 +884,71 @@ export class TowerDefenseEngine {
         const normalizedProgress =
           pathLength > 0 && projection ? projection.progress / pathLength : 0;
         if (
-          normalizedProgress >= Math.max(0, Math.min(1, laneHop.triggerProgress))
+          normalizedProgress >=
+          Math.max(0, Math.min(1, laneHop.triggerProgress))
         ) {
-          const targetPath = this.paths[laneHop.targetPathIndex];
-          const targetLength = getPathLength(targetPath ?? [], this.aspectRatio);
-          if (
-            targetPath &&
-            targetPath.length >= 2 &&
-            laneHop.targetPathIndex !== enemy.pathIndex &&
-            targetLength > 0
-          ) {
-            const targetProgress = normalizedProgress * targetLength;
-            laneHop.phase = 'windup';
-            laneHop.elapsedMs = 0;
-            laneHop.fromPathIndex = enemy.pathIndex;
-            laneHop.fromPosition = { ...enemy.position };
-            laneHop.destination = getPointAtPathProgress(
-              targetPath,
-              targetProgress,
+          let shouldJump = true;
+          if (laneHop.balanceDecisionIndex !== undefined) {
+            const balanceConfig = enemy.waveEnemyDefinitionId
+              ? this.waveEnemyDefinitions[enemy.waveEnemyDefinitionId]
+                  ?.balancedLaneHop
+              : undefined;
+            if (!balanceConfig) {
+              laneHop.phase = 'landed';
+              shouldJump = false;
+            } else if (
+              !this.shouldBalanceLaneHop(
+                enemy,
+                newEnemies,
+                balanceConfig,
+                normalizedProgress
+              )
+            ) {
+              if (laneHop.balanceDecisionIndex === 0) {
+                laneHop.balanceDecisionIndex = 1;
+                laneHop.triggerProgress =
+                  balanceConfig.triggerProgresses[1];
+              } else {
+                laneHop.phase = 'landed';
+              }
+              shouldJump = false;
+            } else {
+              laneHop.targetPathIndex = balanceConfig.pathIndices.find(
+                (pathIndex) => pathIndex !== enemy.pathIndex
+              ) ?? enemy.pathIndex;
+            }
+          }
+          if (shouldJump) {
+            const targetPath = this.paths[laneHop.targetPathIndex];
+            const targetLength = getPathLength(
+              targetPath ?? [],
               this.aspectRatio
             );
-            laneHop.destinationWaypointIndex = getWaypointIndexAfterPathProgress(
-              targetPath,
-              targetProgress,
-              this.aspectRatio
-            );
-          } else {
-            laneHop.phase = 'landed';
+            if (
+              targetPath &&
+              targetPath.length >= 2 &&
+              laneHop.targetPathIndex !== enemy.pathIndex &&
+              targetLength > 0
+            ) {
+              const targetProgress = normalizedProgress * targetLength;
+              laneHop.phase = 'windup';
+              laneHop.elapsedMs = 0;
+              laneHop.fromPathIndex = enemy.pathIndex;
+              laneHop.fromPosition = { ...enemy.position };
+              laneHop.destination = getPointAtPathProgress(
+                targetPath,
+                targetProgress,
+                this.aspectRatio
+              );
+              laneHop.destinationWaypointIndex =
+                getWaypointIndexAfterPathProgress(
+                  targetPath,
+                  targetProgress,
+                  this.aspectRatio
+                );
+            } else {
+              laneHop.phase = 'landed';
+            }
           }
         }
       }
@@ -895,7 +1025,7 @@ export class TowerDefenseEngine {
         moveSpeed > 0 &&
         timeScale > 0 &&
         ((!enemy.isMovingBackward &&
-            enemy.currentWaypointIndex < activePath.length) ||
+          enemy.currentWaypointIndex < activePath.length) ||
           (enemy.isMovingBackward && enemy.currentWaypointIndex >= 0))
       ) {
         const targetPoint = activePath[enemy.currentWaypointIndex];
@@ -1009,6 +1139,7 @@ export class TowerDefenseEngine {
               if (enemy.heldCaptureUnitId !== removedCaptureUnitId) return;
               enemy.heldCaptureUnitId = undefined;
               enemy.captureHaulLinkTargetEnemyId = undefined;
+              enemy.captureHaulRegroupTargetId = undefined;
             });
             this.captureUnits = this.captureUnits.filter(
               (unit) => unit.id !== removedCaptureUnitId
@@ -1080,6 +1211,7 @@ export class TowerDefenseEngine {
             // within ~20 units
             cu.heldByEnemyId = enemy.id;
             enemy.heldCaptureUnitId = cu.id;
+            enemy.captureHaulRegroupTargetId = undefined;
             enemy.resonantEvolutionTargetCaptureUnitId = undefined;
             cu.returnHomeAvailableAtMs = undefined;
 
@@ -1104,6 +1236,7 @@ export class TowerDefenseEngine {
       }
 
       if (cu.heldByEnemyId && cu.groupHauling) {
+        this.reconcileCaptureHaulChain(cu, newEnemies);
         this.attachCaptureHaulAssistants(cu, newEnemies);
       }
     }
@@ -1111,33 +1244,54 @@ export class TowerDefenseEngine {
     // Towers attack
     // Target selection must see captures/despawns from this frame.
     this.enemies = newEnemies;
-    updateShikoQuakes(this, newTowers, newEnemies);
+    updateShikoQuakes(this, newTowers);
+    updatePalmSlams(this, newTowers, newEnemies);
+    updateWakeWhips(this, newTowers);
     newTowers.forEach((tower) => {
       updateFireClawHeat(tower, ATTACK_DEFS.FIRE_CLAW, this.elapsedTimeMs);
       if (tower.damageFlashTimerMs) {
         tower.damageFlashTimerMs -= deltaMs;
         if (tower.damageFlashTimerMs < 0) tower.damageFlashTimerMs = 0;
       }
+      const attackInstance =
+        tower.equippedAttacksRuntime[tower.selectedAttackIndex];
+      const attackDef = attackInstance
+        ? ATTACK_DEFS[attackInstance.definitionId]
+        : undefined;
+      updatePassiveWarmth(tower, attackDef, deltaMs);
       if (
         tower.deepwaterGrip ||
         tower.shikoQuake ||
+        tower.palmSlam ||
+        tower.wakeWhip ||
         (tower.sharedSlumberUntilMs ?? 0) > this.elapsedTimeMs ||
         tower.hp <= 0
       )
         return;
-      const attackInstance =
-        tower.equippedAttacksRuntime[tower.selectedAttackIndex];
       if (!attackInstance) return;
-
-      const attackDef = ATTACK_DEFS[attackInstance.definitionId];
       if (!attackDef) return;
 
       const usesSimulationCooldown =
         attackDef.behaviorType === 'SUPPORT_AURA' ||
+        attackDef.behaviorType === 'WARMTH_SUPPORT' ||
         attackDef.behaviorType === 'REPAIR_SUPPORT' ||
         attackDef.behaviorType === 'CONSTRICTION' ||
         attackDef.behaviorType === 'SHARED_SLUMBER' ||
         attackDef.behaviorType === 'RIGGING_NEST';
+      if (
+        usesSimulationCooldown &&
+        (attackInstance.readyAtMs ?? 0) > this.elapsedTimeMs - deltaMs &&
+        tower.paralysis
+      ) {
+        attackInstance.readyAtMs =
+          (attackInstance.readyAtMs ?? 0) +
+          getParalyzedStepMs(
+            tower,
+            this.elapsedTimeMs - deltaMs,
+            this.elapsedTimeMs
+          ) *
+            (1 - tower.paralysis.attackSpeedMultiplier);
+      }
       const isReady = usesSimulationCooldown
         ? this.elapsedTimeMs >= (attackInstance.readyAtMs ?? 0)
         : time - attackInstance.lastFiredTime >
@@ -1164,7 +1318,28 @@ export class TowerDefenseEngine {
         const behavior = AttackBehaviorRegistry[attackDef.behaviorType];
 
         if (behavior && behavior.canExecute(this, tower, attackDef)) {
+          const warmthDamageMultiplier = getWarmthWaterDamageMultiplier(
+            tower,
+            attackDef
+          );
+          const firstNewProjectileIndex = this.projectiles.length;
           behavior.execute(this, tower, attackDef);
+          if (warmthDamageMultiplier > 1) {
+            for (
+              let projectileIndex = firstNewProjectileIndex;
+              projectileIndex < this.projectiles.length;
+              projectileIndex += 1
+            ) {
+              const projectile = this.projectiles[projectileIndex];
+              if (
+                projectile.sourceId === tower.id &&
+                projectile.attackDefinitionId === attackDef.id
+              ) {
+                projectile.warmthDamageMultiplier = warmthDamageMultiplier;
+              }
+            }
+            consumeWaterActivationWarmth(tower);
+          }
           attackInstance.lastFiredTime = time;
           if (usesSimulationCooldown) {
             // Stored on the move, not the selected slot or buff: swapping cannot reset it.
@@ -1203,7 +1378,8 @@ export class TowerDefenseEngine {
         ? ATTACK_DEFS[p.attackDefinitionId]
         : undefined;
       const dashVisual = dashDef?.visualEffectConfigId
-        ? CREATURE_TD_CONFIGS[dashDef.visualEffectConfigId]?.default?.vfxAnimation
+        ? CREATURE_TD_CONFIGS[dashDef.visualEffectConfigId]?.default
+            ?.vfxAnimation
         : undefined;
       if (
         dashDef?.isDashAttack &&
@@ -1220,9 +1396,10 @@ export class TowerDefenseEngine {
           // Approach from the caster's side, stopping short even on wide maps.
           const origin = p.origin ?? source.position;
           const distance = this.getAttackDistance(origin, target.position);
-          const backoff = distance > 0
-            ? Math.min(1, (dashDef.dashStopRange ?? 0) / distance)
-            : 0;
+          const backoff =
+            distance > 0
+              ? Math.min(1, (dashDef.dashStopRange ?? 0) / distance)
+              : 0;
           const stopOffset = {
             x: (origin.x - target.position.x) * backoff,
             y: (origin.y - target.position.y) * backoff,
@@ -1241,12 +1418,14 @@ export class TowerDefenseEngine {
             return;
           }
 
-          const travelMs = p.speed > 0 ? (travelDistance / p.speed) * 16.666 : 0;
+          const travelMs =
+            p.speed > 0 ? (travelDistance / p.speed) * 16.666 : 0;
           p.position = stopPoint;
           p.dashTargetOffset = stopOffset;
           p.hasImpacted = true;
           p.impactElapsedMs = Math.max(0, deltaMs - travelMs);
-          p.impactHoldDurationMs = dashVisual.durationMs ?? dashDef.dashImpactHoldMs;
+          p.impactHoldDurationMs =
+            dashVisual.durationMs ?? dashDef.dashImpactHoldMs;
           p.speed = 0;
           this.visualEffects.push({
             id: `vfx_dash_${p.id}`,
@@ -1274,9 +1453,24 @@ export class TowerDefenseEngine {
           p.impactDamageApplied = true;
           if (source && target && target.hp > 0 && p.dealsDamage !== false) {
             if (dashDef.adaptiveTargetedAoe) {
-              resolveAdaptiveTargetedAoeImpact(this, source, dashDef, target, false);
+              resolveAdaptiveTargetedAoeImpact(
+                this,
+                source,
+                dashDef,
+                target,
+                false,
+                p.warmthDamageMultiplier
+              );
             } else {
-              EffectProcessor.applyDamageAndEffects(this, source, target, dashDef);
+              EffectProcessor.applyDamageAndEffects(
+                this,
+                source,
+                target,
+                dashDef,
+                1,
+                1,
+                p.warmthDamageMultiplier
+              );
               pushBarrelBashSecondaryTargets(this, target, dashDef);
               if (target.hp <= 0) this.emitEnemyDefeated(target, source);
             }
@@ -1309,22 +1503,32 @@ export class TowerDefenseEngine {
                   this,
                   sourceTower,
                   attackDef,
-                  target
+                  target,
+                  true,
+                  p.warmthDamageMultiplier
                 );
               } else {
                 EffectProcessor.applyDamageAndEffects(
                   this,
                   sourceTower,
                   target,
-                  attackDef
+                  attackDef,
+                  1,
+                  1,
+                  p.warmthDamageMultiplier
+                );
+                if (attackDef.saltSpit) {
+                  disarmSaltSpitTarget(this, target, attackDef);
+                }
+                pushWakeWhipTarget(
+                  this,
+                  target,
+                  attackDef,
+                  p.warmthDamageMultiplier
                 );
                 pushBarrelBashSecondaryTargets(this, target, attackDef);
               }
-              if (
-                targetWasAlive &&
-                target.hp <= 0 &&
-                !p.looseEndFollowUp
-              ) {
+              if (targetWasAlive && target.hp <= 0 && !p.looseEndFollowUp) {
                 launchLooseEndFollowUp(this, sourceTower, target, attackDef);
               }
               if (targetWasAlive && attackDef.flyingColors) {
@@ -1887,7 +2091,8 @@ export class TowerDefenseEngine {
           spawnsRemaining: nextGroup.count + countIncrease,
           lastSpawnTime: 0,
           delayTimer: (nextGroup.delayBeforeGroupMs || 0) + waveDelay,
-          isWaitingForDelay: (nextGroup.delayBeforeGroupMs || 0) + waveDelay > 0,
+          isWaitingForDelay:
+            (nextGroup.delayBeforeGroupMs || 0) + waveDelay > 0,
         });
         this.nextGroupIndexToStart++;
       } else {
@@ -1966,6 +2171,65 @@ export class TowerDefenseEngine {
     }
   }
 
+  private shouldBalanceLaneHop(
+    enemy: Enemy,
+    enemies: Enemy[],
+    config: TDBalancedLaneHopConfig,
+    decisionProgress: number
+  ): boolean {
+    const otherPathIndex = config.pathIndices.find(
+      (pathIndex) => pathIndex !== enemy.pathIndex
+    );
+    if (otherPathIndex === undefined) return false;
+
+    let currentLaneCount = 0;
+    let otherLaneCount = 0;
+    for (const candidate of enemies) {
+      if (
+        candidate.id === enemy.id ||
+        candidate.hp <= 0 ||
+        candidate.definitionId !== enemy.definitionId
+      ) {
+        continue;
+      }
+      const committedPathIndex =
+        candidate.laneHopState?.phase === 'windup' ||
+        candidate.laneHopState?.phase === 'airborne'
+          ? candidate.laneHopState.targetPathIndex
+          : candidate.pathIndex;
+      if (!config.pathIndices.includes(committedPathIndex)) continue;
+
+      const candidatePath = this.paths[candidate.pathIndex] ?? [];
+      const candidatePathLength = getPathLength(
+        candidatePath,
+        this.aspectRatio
+      );
+      const candidateProjection = projectPointOntoPath(
+        candidate.position,
+        candidatePath,
+        this.aspectRatio
+      );
+      if (
+        !candidate.heldCaptureUnitId &&
+        (!candidateProjection ||
+          candidatePathLength <= 0 ||
+          candidateProjection.progress / candidatePathLength <
+            decisionProgress)
+      ) {
+        continue;
+      }
+
+      if (committedPathIndex === enemy.pathIndex) currentLaneCount++;
+      else if (committedPathIndex === otherPathIndex) otherLaneCount++;
+    }
+
+    if (otherLaneCount < currentLaneCount) return true;
+    if (otherLaneCount > currentLaneCount) return false;
+    // Equal lanes alternate so the jump remains visible without randomness.
+    this.balancedHopTieCount++;
+    return this.balancedHopTieCount % 2 === 1;
+  }
+
   private spawnEnemyFromDef(
     waveEnemyDefinitionId: string,
     time: number,
@@ -2025,6 +2289,25 @@ export class TowerDefenseEngine {
     const abilityDefinition = abilityDefinitionId
       ? ENEMY_ABILITY_DEFS[abilityDefinitionId]
       : undefined;
+    const balanceConfig = !laneHop
+      ? waveEnemyDefinition.balancedLaneHop
+      : undefined;
+    const balanceTargetPathIndex = balanceConfig?.pathIndices.includes(pathIndex)
+      ? balanceConfig.pathIndices.find((index) => index !== pathIndex)
+      : undefined;
+    const automaticLaneHop =
+      balanceConfig &&
+      balanceTargetPathIndex !== undefined &&
+      (this.paths[balanceTargetPathIndex]?.length ?? 0) >= 2
+        ? {
+            targetPathIndex: balanceTargetPathIndex,
+            triggerProgress: balanceConfig.triggerProgresses[0],
+            windupMs: balanceConfig.windupMs,
+            durationMs: balanceConfig.durationMs,
+            arcHeight: balanceConfig.arcHeight,
+          }
+        : undefined;
+    const initialLaneHop = laneHop ?? automaticLaneHop;
     const newEnemy: Enemy = {
       id: `enemy_${time}_${Math.random().toString(36).substring(7)}`,
       definitionId: definitionId,
@@ -2069,11 +2352,12 @@ export class TowerDefenseEngine {
       isShiny,
       isCursed,
       weakenedThreshold: waveEnemyDefinition.weakenedThreshold,
-      laneHopState: laneHop
+      laneHopState: initialLaneHop
         ? {
-            ...laneHop,
+            ...initialLaneHop,
             phase: 'approaching',
             elapsedMs: 0,
+            balanceDecisionIndex: automaticLaneHop ? 0 : undefined,
           }
         : undefined,
       abilityRuntime: abilityDefinition
@@ -2220,7 +2504,9 @@ export class TowerDefenseEngine {
           launchedAtMs: this.elapsedTimeMs,
           impactAtMs: this.elapsedTimeMs + ability.projectileTravelMs,
           expiresAtMs: this.elapsedTimeMs + ability.projectileTravelMs + 450,
-          maxHpDamageFraction: ability.maxHpDamageFraction,
+          paralysisDurationMs: ability.paralysisDurationMs,
+          paralysisAttackSpeedMultiplier:
+            ability.paralysisAttackSpeedMultiplier,
           impactRadius: ability.impactRadius,
         });
       });
@@ -2408,29 +2694,20 @@ export class TowerDefenseEngine {
         continue;
       }
 
-      const damage = Math.min(
-        impactedTower.hp,
-        Math.max(1, Math.floor(impactedTower.maxHp * orb.maxHpDamageFraction))
+      applyTowerParalysis(
+        impactedTower,
+        orb.paralysisAttackSpeedMultiplier,
+        orb.paralysisDurationMs,
+        this.elapsedTimeMs
       );
-      impactedTower.hp -= damage;
-      startDamageFlash(impactedTower, ElementType.ELECTRIC);
       this.floatingTexts.push({
-        id: `ft_orb_damage_${orb.id}`,
-        text: damage.toString(),
+        id: `ft_orb_paralysis_${orb.id}`,
+        text: 'PARALYZED!',
         position: { ...impactedTower.position },
         color: 0xfde047,
-        scale: 1.1,
+        scale: 0.9,
         durationMs: 1000,
         elapsedMs: 0,
-      });
-      this.events.emit({
-        type: 'TOWER_DAMAGED',
-        towerId: impactedTower.id,
-        creatureId: impactedTower.creature.id,
-        sourceEnemyId: orb.sourceEnemyId,
-        damage,
-        hp: impactedTower.hp,
-        maxHp: impactedTower.maxHp,
       });
     }
 
@@ -2698,15 +2975,123 @@ export class TowerDefenseEngine {
     if (!config) return captureUnit.carrierSpeedMultiplier ?? 1;
 
     const haulerCount = this.enemies.filter(
-      (enemy) =>
-        enemy.hp > 0 && enemy.heldCaptureUnitId === captureUnit.id
+      (enemy) => enemy.hp > 0 && enemy.heldCaptureUnitId === captureUnit.id
     ).length;
     return Math.min(
       config.maxSpeedMultiplier,
       config.baseSpeedMultiplier +
-        Math.max(0, haulerCount - 1) *
-          config.speedMultiplierPerAdditionalHauler
+        Math.max(0, haulerCount - 1) * config.speedMultiplierPerAdditionalHauler
     );
+  }
+
+  private detachCaptureHauler(enemy: Enemy, captureUnit: CaptureUnit): void {
+    if (enemy.heldCaptureUnitId !== captureUnit.id) return;
+    enemy.heldCaptureUnitId = undefined;
+    enemy.captureHaulLinkTargetEnemyId = undefined;
+    enemy.captureHaulRegroupTargetId = captureUnit.id;
+    enemy.itemPickupBlockedUntilMs = Math.max(
+      enemy.itemPickupBlockedUntilMs ?? 0,
+      this.elapsedTimeMs + 1000
+    );
+    if (enemy.hp <= 0) return;
+
+    // A loose Poguin goes back toward Tigrevel instead of pulling an empty rope.
+    enemy.isMovingBackward = false;
+    const path = this.paths[enemy.pathIndex] ?? [];
+    const projection = projectPointOntoPath(
+      enemy.position,
+      path,
+      this.aspectRatio
+    );
+    enemy.currentWaypointIndex = getWaypointIndexAfterPathProgress(
+      path,
+      projection?.progress ?? 0,
+      this.aspectRatio
+    );
+    enemy.facingDirection = 'right';
+    this.floatingTexts.push({
+      id: `ft_haul_broken_${captureUnit.id}_${enemy.id}_${this.elapsedTimeMs}`,
+      text: 'Rope broke!',
+      position: { ...enemy.position },
+      color: 0xf4c76b,
+      scale: 0.8,
+      durationMs: 850,
+      elapsedMs: 0,
+    });
+  }
+
+  private reconcileCaptureHaulChain(
+    captureUnit: CaptureUnit,
+    enemies: Enemy[]
+  ): void {
+    const config = captureUnit.groupHauling;
+    if (!config) return;
+    const haulers = enemies.filter(
+      (enemy) => enemy.hp > 0 && enemy.heldCaptureUnitId === captureUnit.id
+    );
+    const anchorDistanceSq = 125;
+    const isNearCapture = (enemy: Enemy) =>
+      this.getPositionDistanceSq(
+        enemy.position,
+        this.getCapturePickupPosition(captureUnit, enemy)
+      ) <= anchorDistanceSq;
+    let lead = haulers.find(
+      (enemy) => enemy.id === captureUnit.heldByEnemyId && isNearCapture(enemy)
+    );
+    if (!lead) {
+      lead = haulers
+        .filter(isNearCapture)
+        .sort(
+          (a, b) =>
+            this.getCaptureDistanceSq(a, captureUnit) -
+            this.getCaptureDistanceSq(b, captureUnit)
+        )[0];
+      captureUnit.heldByEnemyId = lead?.id;
+      if (lead) lead.captureHaulLinkTargetEnemyId = undefined;
+    }
+
+    if (!lead) {
+      haulers.forEach((hauler) =>
+        this.detachCaptureHauler(hauler, captureUnit)
+      );
+      if (captureUnit.returnHome) {
+        captureUnit.returnHome.pathIndex =
+          captureUnit.haulPathIndex ?? captureUnit.returnHome.pathIndex;
+      }
+      captureUnit.returnHomeAvailableAtMs =
+        this.elapsedTimeMs + (captureUnit.returnHome?.delayMs ?? 0);
+      return;
+    }
+
+    const connected = new Set<string>([lead.id]);
+    for (const hauler of haulers) {
+      if (!hauler.captureHaulLinkTargetEnemyId && isNearCapture(hauler)) {
+        connected.add(hauler.id);
+      }
+    }
+    const joinRadiusSq = config.joinRadius * config.joinRadius;
+    let foundConnection = true;
+    while (foundConnection) {
+      foundConnection = false;
+      for (const hauler of haulers) {
+        if (connected.has(hauler.id)) continue;
+        const parent = haulers.find(
+          (candidate) => candidate.id === hauler.captureHaulLinkTargetEnemyId
+        );
+        if (
+          parent &&
+          connected.has(parent.id) &&
+          this.getPositionDistanceSq(hauler.position, parent.position) <=
+            joinRadiusSq
+        ) {
+          connected.add(hauler.id);
+          foundConnection = true;
+        }
+      }
+    }
+    haulers
+      .filter((hauler) => !connected.has(hauler.id))
+      .forEach((hauler) => this.detachCaptureHauler(hauler, captureUnit));
   }
 
   private attachCaptureHaulAssistants(
@@ -2717,8 +3102,7 @@ export class TowerDefenseEngine {
     if (!config) return;
 
     const connectedHaulers = enemies.filter(
-      (enemy) =>
-        enemy.hp > 0 && enemy.heldCaptureUnitId === captureUnit.id
+      (enemy) => enemy.hp > 0 && enemy.heldCaptureUnitId === captureUnit.id
     );
     if (connectedHaulers.length === 0) return;
 
@@ -2751,6 +3135,7 @@ export class TowerDefenseEngine {
 
       enemy.heldCaptureUnitId = captureUnit.id;
       enemy.captureHaulLinkTargetEnemyId = nearestHauler?.id;
+      enemy.captureHaulRegroupTargetId = undefined;
       enemy.resonantEvolutionTargetCaptureUnitId = undefined;
       if (enemy.turnAroundAtEnd && !enemy.isMovingBackward) {
         enemy.isMovingBackward = true;
@@ -2782,41 +3167,10 @@ export class TowerDefenseEngine {
 
     if (droppedUnit.groupHauling) {
       const wasLeadHauler = droppedUnit.heldByEnemyId === enemy.id;
-      enemy.heldCaptureUnitId = undefined;
-      enemy.captureHaulLinkTargetEnemyId = undefined;
-
-      const remainingHaulers = this.enemies.filter(
-        (candidate) =>
-          candidate.id !== enemy.id &&
-          candidate.hp > 0 &&
-          candidate.heldCaptureUnitId === droppedUnit.id
-      );
-      if (remainingHaulers.length > 0) {
-        const replacementLead = wasLeadHauler
-          ? remainingHaulers.sort(
-              (a, b) =>
-                this.getPositionDistanceSq(a.position, droppedUnit.position) -
-                this.getPositionDistanceSq(b.position, droppedUnit.position)
-            )[0]
-          : this.enemies.find(
-              (candidate) => candidate.id === droppedUnit.heldByEnemyId
-            );
-        if (replacementLead) {
-          if (wasLeadHauler) {
-            droppedUnit.heldByEnemyId = replacementLead.id;
-            replacementLead.captureHaulLinkTargetEnemyId = undefined;
-          }
-          remainingHaulers.forEach((hauler) => {
-            if (hauler.captureHaulLinkTargetEnemyId === enemy.id) {
-              hauler.captureHaulLinkTargetEnemyId = replacementLead.id;
-            }
-          });
-          droppedUnit.returnHomeAvailableAtMs = undefined;
-          return droppedUnit;
-        }
-      }
-
-      if (!wasLeadHauler) return droppedUnit;
+      this.detachCaptureHauler(enemy, droppedUnit);
+      if (wasLeadHauler) droppedUnit.heldByEnemyId = undefined;
+      this.reconcileCaptureHaulChain(droppedUnit, this.enemies);
+      return droppedUnit;
     } else if (droppedUnit.heldByEnemyId !== enemy.id) {
       return undefined;
     }
@@ -3080,6 +3434,8 @@ export class TowerDefenseEngine {
   private moveTowerToReserve(tower: Tower): void {
     releaseDeepwaterGrip(this, tower);
     cancelShikoQuake(tower);
+    cancelPalmSlam(tower);
+    cancelWakeWhip(tower);
     resetFireClawHeat(tower);
     this.towers = this.towers.filter((candidate) => candidate.id !== tower.id);
     this.reserveTowers.set(tower.creature.id, tower);
@@ -3114,6 +3470,10 @@ export class TowerDefenseEngine {
         if (targetTower.isFixed) return false;
         cancelShikoQuake(targetTower);
         cancelShikoQuake(existingTower);
+        cancelPalmSlam(targetTower);
+        cancelPalmSlam(existingTower);
+        cancelWakeWhip(targetTower);
+        cancelWakeWhip(existingTower);
         resetFireClawHeat(targetTower);
         resetFireClawHeat(existingTower);
         releaseDeepwaterGrip(this, targetTower);
@@ -3128,6 +3488,8 @@ export class TowerDefenseEngine {
       } else {
         // Move
         cancelShikoQuake(existingTower);
+        cancelPalmSlam(existingTower);
+        cancelWakeWhip(existingTower);
         resetFireClawHeat(existingTower);
         existingTower.position = { x, y };
         existingTower.facingDirection = 'down';
@@ -3189,7 +3551,7 @@ export class TowerDefenseEngine {
 
     const attacks = TowerDefenseEngine.getEquippedAttacks(creature);
 
-    return {
+    const tower: Tower = {
       id: `tower_${Date.now()}_${Math.random().toString(36).substring(7)}`,
       creature: creature,
       position: { x, y },
@@ -3217,6 +3579,8 @@ export class TowerDefenseEngine {
       isFixed,
       receivesExperience,
     };
+    if (isWarmthFamilyTower(tower)) tower.warmth = createWarmthState();
+    return tower;
   }
 
   public setTowerAttack(creatureId: string, attackIndex: number) {

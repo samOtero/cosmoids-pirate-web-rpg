@@ -65,18 +65,19 @@ function battle() {
   return { engine, source: engine.towers[0] };
 }
 
-describe('Shiko Quake', () => {
+describe('Shiko Stomp', () => {
   it('is Yokodillo’s level-ten physical Fighting area move', () => {
     expect(YOKODILLO.learnableAttacks).toContainEqual({
       level: 10,
       attackId: 'SHIKO_QUAKE',
     });
     expect(ATTACK_DEFS.SHIKO_QUAKE).toMatchObject({
+      name: 'Shiko Stomp',
       type: ElementType.FIGHTING,
       category: 'physical',
       power: 35,
       cooldownMs: 2400,
-      rangeIndex: 22,
+      rangeIndex: ATTACK_DEFS.TACKLE.rangeIndex,
       behaviorType: 'SHIKO_QUAKE',
       effects: [{ type: 'STUN', chance: 1, value: 350 }],
       visualEffectConfigId: 'attack_shiko_quake_1',
@@ -87,12 +88,13 @@ describe('Shiko Quake', () => {
     ).toEqual({ type: 'SHIKO_QUAKE', durationMs: 420 });
   });
 
-  it('damages and staggers every eligible creature on the slam frame', () => {
+  it('damages and staggers up to three eligible creatures on the slam frame', () => {
     const { engine, source } = battle();
     const first = createEnemy('first', 45);
     const second = createEnemy('second', 58);
-    const distant = createEnemy('distant', 70);
-    engine.enemies = [first, second, distant];
+    const third = createEnemy('third', 75);
+    const distant = createEnemy('distant', 90);
+    engine.enemies = [first, second, third, distant];
 
     ShikoQuakeBehavior.execute(engine, source, ATTACK_DEFS.SHIKO_QUAKE);
 
@@ -108,7 +110,7 @@ describe('Shiko Quake', () => {
     expect(engine.visualEffects).toEqual([]);
     engine.tick(360, 1);
 
-    for (const target of [first, second]) {
+    for (const target of [first, second, third]) {
       expect(target.hp).toBeLessThan(target.maxHp);
       expect(target.statusConditions).toContainEqual({
         type: 'STUN',
@@ -119,6 +121,37 @@ describe('Shiko Quake', () => {
     expect(distant.hp).toBe(distant.maxHp);
     expect(distant.statusConditions).toEqual([]);
     expect(source.shikoQuake?.hasImpacted).toBe(true);
+    expect(
+      engine.visualEffects
+        .filter((effect) => effect.configId === 'attack_shiko_quake_hit_1')
+        .map((effect) => effect.targetId)
+    ).toEqual(['third', 'second', 'first']);
+  });
+
+  it('caps a crowded stomp at three targets in the selected targeting order', () => {
+    const { engine, source } = battle();
+    const targets = [45, 50, 55, 60, 75].map((x) =>
+      createEnemy(`enemy-${x}`, x)
+    );
+    engine.enemies = targets;
+
+    ShikoQuakeBehavior.execute(engine, source, ATTACK_DEFS.SHIKO_QUAKE);
+    engine.tick(359, 359);
+    engine.tick(360, 1);
+
+    expect(
+      targets.filter((enemy) => enemy.hp < enemy.maxHp).map((enemy) => enemy.id)
+    ).toEqual(['enemy-55', 'enemy-60', 'enemy-75']);
+    expect(
+      engine.visualEffects
+        .filter((effect) => effect.configId === 'attack_shiko_quake_hit_1')
+        .map((effect) => effect.targetId)
+    ).toEqual(['enemy-75', 'enemy-60', 'enemy-55']);
+    expect(
+      engine.visualEffects.filter(
+        (effect) => effect.configId === 'attack_shiko_quake_1'
+      )
+    ).toHaveLength(1);
   });
 
   it('starts from Yokodillo’s normal attack loop and remains committed through impact', () => {
@@ -155,7 +188,7 @@ describe('Shiko Quake', () => {
       expect.objectContaining({
         configId: 'attack_shiko_quake_1',
         position: source.position,
-        rangeIndex: 22,
+        rangeIndex: 40,
         durationMs: 420,
       })
     );

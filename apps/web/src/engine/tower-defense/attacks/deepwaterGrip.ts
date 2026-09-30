@@ -3,6 +3,7 @@ import type { Enemy, Tower } from '../types';
 import type { AttackBehavior, AttackDefinition } from './types';
 import { ATTACK_DEFS } from './definitions';
 import { EffectProcessor } from './EffectProcessor';
+import { getWarmthWaterDamageMultiplier } from '../warmth';
 
 function eligible(engine: TowerDefenseEngine, enemy: Enemy) {
   return (
@@ -51,6 +52,7 @@ export const ConstrictionBehavior: AttackBehavior = {
       startedAtMs: engine.elapsedTimeMs,
       expiresAtMs: engine.elapsedTimeMs + config.durationMs,
       nextPulseAtMs: engine.elapsedTimeMs + config.pulseIntervalMs,
+      warmthDamageMultiplier: getWarmthWaterDamageMultiplier(source, def),
     };
     target.constrictedByTowerId = source.id;
     target.damagedByTowerIds.add(source.id);
@@ -116,7 +118,15 @@ export function updateDeepwaterGrips(
       grip.nextPulseAtMs <= Math.min(engine.elapsedTimeMs, grip.expiresAtMs) &&
       target.hp > 0
     ) {
-      EffectProcessor.applyDamageAndEffects(engine, source, target, def);
+      EffectProcessor.applyDamageAndEffects(
+        engine,
+        source,
+        target,
+        def,
+        1,
+        1,
+        grip.warmthDamageMultiplier
+      );
       grip.nextPulseAtMs += def.constriction!.pulseIntervalMs;
     }
     if (target.hp <= 0 || engine.elapsedTimeMs >= grip.expiresAtMs) {

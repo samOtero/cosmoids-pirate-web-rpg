@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { LEVEL_6 } from '@/constants/tdLevels/level6';
+import { getAttackSpeedMultiplier } from '@/engine/tower-defense/attackSpeedModifiers';
 import { ENEMY_ABILITY_DEFS } from '@/engine/tower-defense/enemyAbilities';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import type { PlayerCreature } from '@/types/baseGame';
@@ -59,19 +60,21 @@ function createEngine(creatureIds: string[]) {
 }
 
 describe('Voltusk Electric Orb enemy ability', () => {
-  it('is assigned to stationary Level 6 Voltusk with the recovery placements safe', () => {
+  it('is assigned to stationary Level 6 Voltusk without recovery placements', () => {
     expect(ENEMY_ABILITY_DEFS.VOLTUSK_ELECTRIC_ORB).toMatchObject({
       type: 'TOWER_GROUND_ORB',
       initialCooldownMs: 2500,
       cooldownMs: 4500,
       projectileTravelMs: 1400,
       aimDurationMs: 350,
-      maxHpDamageFraction: 0.25,
+      paralysisDurationMs: 5000,
+      paralysisAttackSpeedMultiplier: 0.65,
       impactRadius: 4,
       targetCount: 1,
       cursedTargetCount: 3,
     });
-    expect(LEVEL_6.safePlacementSpotIndices).toEqual([3, 5]);
+    expect(LEVEL_6.safePlacementSpotIndices).toBeUndefined();
+    expect(LEVEL_6.towerRecovery).toBeUndefined();
     expect(
       LEVEL_6.waveEnemyDefinitions.find(
         (definition) => definition.id === 'level_6_voltusk'
@@ -125,7 +128,7 @@ describe('Voltusk Electric Orb enemy ability', () => {
     expect(tower.hp).toBe(startingHp);
   });
 
-  it('damages whichever tower occupies the marked location on impact', () => {
+  it('paralyzes whichever tower occupies the marked location on impact for five seconds', () => {
     const engine = createEngine(['original-target', 'replacement']);
     const damageEvents: unknown[] = [];
     engine.events.subscribe((event) => {
@@ -149,24 +152,52 @@ describe('Voltusk Electric Orb enemy ability', () => {
     engine.tick(0, 1);
 
     expect(originalTarget.hp).toBe(originalHp);
-    expect(replacement.hp).toBe(
-      replacementHp - Math.floor(replacement.maxHp * 0.25)
-    );
-    expect(replacement.damageFlashTimerMs).toBeGreaterThan(0);
+    expect(replacement.hp).toBe(replacementHp);
+    expect(replacement.paralysis).toEqual({
+      attackSpeedMultiplier: 0.65,
+      appliedAtMs: 3900,
+      expiresAtMs: 8900,
+    });
+    expect(getAttackSpeedMultiplier(replacement, 8899)).toBe(0.65);
+    expect(getAttackSpeedMultiplier(replacement, 8900)).toBe(1);
     expect(engine.floatingTexts).toContainEqual(
       expect.objectContaining({
-        text: Math.floor(replacement.maxHp * 0.25).toString(),
+        text: 'PARALYZED!',
         position: { x: 25, y: 20 },
       })
     );
-    expect(damageEvents).toContainEqual(
-      expect.objectContaining({
-        towerId: replacement.id,
-        creatureId: 'replacement',
-        sourceEnemyId: 'voltusk',
-        damage: Math.floor(replacement.maxHp * 0.25),
-      })
-    );
+    expect(damageEvents).toHaveLength(0);
+  });
+
+  it('refreshes paralysis on a repeat hit without stacking the slowdown', () => {
+    const engine = createEngine(['target']);
+    expect(engine.placeTower('target', 25, 20)).toBe(true);
+    const tower = engine.towers[0];
+
+    engine.tick(0, 2500);
+    engine.tick(0, 1400);
+    expect(tower.paralysis?.expiresAtMs).toBe(8900);
+    engine.tick(0, 3100);
+    engine.tick(0, 1400);
+
+    expect(tower.paralysis?.expiresAtMs).toBe(13400);
+    expect(getAttackSpeedMultiplier(tower, 8400)).toBe(0.65);
+    expect(getAttackSpeedMultiplier(tower, 13400)).toBe(1);
+  });
+
+  it('slows simulation-based move cooldowns while paralysis is active', () => {
+    const engine = createEngine(['target']);
+    expect(engine.placeTower('target', 25, 20)).toBe(true);
+    const tower = engine.towers[0];
+    engine.tick(0, 2500);
+    engine.tick(0, 1400);
+
+    const attack = tower.equippedAttacksRuntime[0];
+    attack.definitionId = 'RALLY_HOWL';
+    attack.readyAtMs = 20000;
+    engine.tick(0, 1000);
+
+    expect(attack.readyAtMs).toBe(20350);
   });
 
   it('marks up to three distinct occupied combat spots while cursed', () => {

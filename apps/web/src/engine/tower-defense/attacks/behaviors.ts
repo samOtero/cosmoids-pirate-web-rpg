@@ -5,12 +5,17 @@ import { EffectProcessor } from './EffectProcessor';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { hasActiveSpeedBoost, hasActiveSpeedSlow } from '../speedModifiers';
 import { applyAttackSpeedBuff } from '../attackSpeedModifiers';
+import { applySunbathe, canSunbathe } from '../warmth';
 import { RollingBarrelBehavior } from './rollingBarrel';
 import { ConstrictionBehavior } from './deepwaterGrip';
 import { SharedSlumberBehavior } from './sharedSlumber';
 import { ShikoQuakeBehavior } from './shikoQuake';
+import { PalmSlamBehavior } from './palmSlam';
 import { RiggingNestBehavior } from './riggingNest';
 import { SailcutterBehavior } from './sailcutter';
+import { WakeWhipBehavior } from './wakeWhip';
+import { SaltSpitBehavior } from './saltSpit';
+import { findPoison, hasAnyPoison, TOXIC_POLLEN_POISON_ID } from '../poison';
 
 const MAX_PROJECTILES_PER_PATTERN = 12;
 
@@ -58,12 +63,28 @@ export const ProjectileBehavior: AttackBehavior = {
     source: Tower,
     attackDef: AttackDefinition
   ): void {
-    const targetEnemy = engine.getTargetForTower(
+    const standardTarget = engine.getTargetForTower(
       source,
       attackDef.rangeIndex,
       source.targetingMode || 'first',
       (enemy) => isEligibleProjectileTarget(engine, enemy, attackDef)
     );
+    const preservesFocusedStructure =
+      standardTarget?.kind === 'structure' &&
+      standardTarget.id === engine.focusedStructureId;
+    const preferredPoisonedTarget =
+      attackDef.poisonPayoff?.prioritizePoisonedTargets &&
+      !preservesFocusedStructure
+        ? engine.getTargetForTower(
+            source,
+            attackDef.rangeIndex,
+            source.targetingMode || 'first',
+            (enemy) =>
+              isEligibleProjectileTarget(engine, enemy, attackDef) &&
+              hasAnyPoison(enemy)
+          )
+        : null;
+    const targetEnemy = preferredPoisonedTarget ?? standardTarget;
 
     if (targetEnemy) {
       const enemyTarget = targetEnemy;
@@ -254,7 +275,8 @@ export function resolveAdaptiveTargetedAoeImpact(
   source: Tower,
   attackDef: AttackDefinition,
   primaryTarget: Enemy,
-  showVisualEffect = true
+  showVisualEffect = true,
+  warmthDamageMultiplier?: number
 ): void {
   const config = attackDef.adaptiveTargetedAoe;
   if (!config) return;
@@ -282,7 +304,10 @@ export function resolveAdaptiveTargetedAoeImpact(
       engine,
       source,
       enemy,
-      resolvedAttack
+      resolvedAttack,
+      1,
+      1,
+      warmthDamageMultiplier
     );
     if (enemy.hp <= 0) {
       engine.emitEnemyDefeated(enemy, source);
@@ -360,8 +385,7 @@ export const FunnyDanceBehavior: AttackBehavior = {
       );
       if (
         !carriedUnit ||
-        (carriedUnit.heldByEnemyId !== enemy.id &&
-          !carriedUnit.groupHauling)
+        (carriedUnit.heldByEnemyId !== enemy.id && !carriedUnit.groupHauling)
       ) {
         return;
       }
@@ -452,8 +476,7 @@ export const InstantAoeBehavior: AttackBehavior = {
       );
       if (
         !carriedUnit ||
-        (carriedUnit.heldByEnemyId !== enemy.id &&
-          !carriedUnit.groupHauling)
+        (carriedUnit.heldByEnemyId !== enemy.id && !carriedUnit.groupHauling)
       ) {
         return;
       }
@@ -499,7 +522,7 @@ function isEligiblePoisonAoeTarget(
   return (
     engine.isEnemyTargetable(enemy) &&
     !enemy.immuneToStatusEffects &&
-    !enemy.statusConditions.some((status) => status.type === 'POISON') &&
+    !findPoison(enemy, TOXIC_POLLEN_POISON_ID) &&
     engine.isPositionInTowerRange(
       source.position,
       enemy.position,
@@ -588,6 +611,25 @@ export const SupportAuraBehavior: AttackBehavior = {
   },
 };
 
+export const WarmthSupportBehavior: AttackBehavior = {
+  canExecute(_engine, source) {
+    return source.hp > 0 && canSunbathe(source);
+  },
+  execute(engine, source) {
+    const result = applySunbathe(source);
+    if (!result.grantedSunSoaked && result.warmthGained <= 0) return;
+    engine.floatingTexts.push({
+      id: `ft_sunbathe_${source.id}_${engine.elapsedTimeMs}_${Math.random()}`,
+      text: 'Warmth 100% + Sun-Soaked!',
+      position: { ...source.position },
+      color: 0xfff0a6,
+      scale: 1.05,
+      durationMs: 1100,
+      elapsedMs: 0,
+    });
+  },
+};
+
 export function getShipshapeTarget(
   engine: TowerDefenseEngine,
   source: Tower,
@@ -634,7 +676,10 @@ export const RepairSupportBehavior: AttackBehavior = {
     );
     recipient.hp += healed;
     const previousMultiplier = recipient.defenseBoostMultiplier ?? 1;
-    const nextMultiplier = Math.max(previousMultiplier, repair.defenseMultiplier);
+    const nextMultiplier = Math.max(
+      previousMultiplier,
+      repair.defenseMultiplier
+    );
     // currentDefense is the combat stat; the multiplier also drives its badge.
     recipient.currentDefense *= nextMultiplier / previousMultiplier;
     recipient.defenseBoostMultiplier = nextMultiplier;
@@ -650,7 +695,8 @@ export const RepairSupportBehavior: AttackBehavior = {
         position: { ...recipient.position },
         targetId: recipient.id,
         durationMs:
-          CREATURE_TD_CONFIGS[configId]?.default?.vfxAnimation?.durationMs ?? 900,
+          CREATURE_TD_CONFIGS[configId]?.default?.vfxAnimation?.durationMs ??
+          900,
         elapsedMs: 0,
       });
     }
@@ -660,6 +706,7 @@ export const RepairSupportBehavior: AttackBehavior = {
 export const AttackBehaviorRegistry: Record<string, AttackBehavior> = {
   SHARED_SLUMBER: SharedSlumberBehavior,
   SHIKO_QUAKE: ShikoQuakeBehavior,
+  PALM_SLAM: PalmSlamBehavior,
   CONSTRICTION: ConstrictionBehavior,
   ROLLING_BARREL: RollingBarrelBehavior,
   PROJECTILE: ProjectileBehavior,
@@ -669,9 +716,12 @@ export const AttackBehaviorRegistry: Record<string, AttackBehavior> = {
   ADAPTIVE_TARGETED_AOE: AdaptiveTargetedAoeBehavior,
   POISON_AOE: PoisonAoeBehavior,
   SUPPORT_AURA: SupportAuraBehavior,
+  WARMTH_SUPPORT: WarmthSupportBehavior,
   REPAIR_SUPPORT: RepairSupportBehavior,
   RIGGING_NEST: RiggingNestBehavior,
   SAILCUTTER: SailcutterBehavior,
+  WAKE_WHIP: WakeWhipBehavior,
+  SALT_SPIT: SaltSpitBehavior,
 };
 
 export { RiggingNestBehavior, SailcutterBehavior, ShikoQuakeBehavior };

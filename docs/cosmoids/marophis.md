@@ -95,7 +95,7 @@ If an evolutionary line is added later, it should advance or complicate the rela
 
 Marophis is introduced as one capturable level-8 wild enemy on the right-hand approach in Level 5's current placeholder wave. Its slower movement and high special defense support the patient deep-diver concept without adding creature-specific engine behavior.
 
-Its learnset begins with Nibble at level 1 and Spurt at level 4. At level 8 it learns Venom Spray, a direct-damage special Poison attack with a chance to apply a five-second stacking poison. Each successful application increases the poison's damage up to five stacks; further applications refresh its duration. At level 12 it learns Deepwater Grip. A dedicated prey-feint mechanic remains a possible future addition.
+Its learnset begins with Nibble at level 1 and Spurt at level 4. At level 8 it learns Venom Spray, a direct-damage special Poison attack with one 50% poison roll per cast. A successful roll adds a five-second venom stack whose per-pulse potency is 5% of that cast's resolved direct damage, rounded to the nearest point with a minimum of one. Venom can hold up to five independently resolved stacks; another successful application at the cap refreshes its duration without adding a sixth stack. Its distinct venom poison can coexist with Toxic Pollen. At level 12 it learns Deepwater Grip. A dedicated prey-feint mechanic remains a possible future addition.
 
 ### Deepwater Grip
 
@@ -119,7 +119,7 @@ The initial procedural visual places Marophis beside the target with smooth navy
 - **Creature manifest:** `apps/web/src/content/creatures/marophis.json`
 - **Image status:** Approved standalone visual identity, production game assets, and naturalist journal art implemented
 - **Implementation status:** Registered Poison/Water Cosmoid; introduced as one capturable level-8 wild enemy in Level 5's current placeholder wave
-- **Initial gameplay profile:** Special-defense specialist; starts with Nibble, learns Spurt at level 4, Venom Spray at level 8, and Bubble Beam at level 14
+- **Initial gameplay profile:** Special-defense specialist; starts with Nibble, learns Spurt at level 4, learns the 50%-proc stacking-poison attack Venom Spray at level 8, and learns Deepwater Grip at level 12
 
 ## Open Decisions
 

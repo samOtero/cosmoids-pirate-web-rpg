@@ -334,8 +334,8 @@ export const DORMATEE: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/dormatee_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'TACKLE' },
-    { level: 4, attackId: 'STRING_SHOT' },
+    { level: 1, attackId: 'GRUMBLE' },
+    { level: 4, attackId: 'REVERIE_ORB' },
     { level: 8, attackId: 'SHARED_SLUMBER' },
   ],
 };
@@ -360,10 +360,9 @@ export const YOKODILLO: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/yokodillo_down.webp',
   battleSpriteUrl: '/battles/cosmoids/yokodillo_left.webp',
   movementId: 'lizard',
-  // Existing physical attacks until Yokodillo's custom sumo techniques are selected.
   learnableAttacks: [
     { level: 1, attackId: 'TACKLE' },
-    { level: 6, attackId: 'QUICK_ATTACK' },
+    { level: 6, attackId: 'PALM_SLAM' },
     { level: 10, attackId: 'SHIKO_QUAKE' },
   ],
 };
@@ -390,7 +389,8 @@ export const AGUANA: CosmoidTemplate = {
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'SCRATCH' },
-    { level: 5, attackId: 'WATER_GUN' },
+    { level: 4, attackId: 'SUNBATHE' },
+    { level: 5, attackId: 'WAKE_WHIP' },
     { level: 10, attackId: 'DEEPWATER_GRIP' },
   ],
   evolutionNodes: [{ level: 16, evolutionDefId: 'nautiguan' }],
@@ -418,9 +418,10 @@ export const NAUTIGUAN: CosmoidTemplate = {
   movementId: 'lizard',
   learnableAttacks: [
     { level: 1, attackId: 'SCRATCH' },
-    { level: 5, attackId: 'WATER_GUN' },
+    { level: 4, attackId: 'SUNBATHE' },
+    { level: 5, attackId: 'WAKE_WHIP' },
     { level: 10, attackId: 'DEEPWATER_GRIP' },
-    { level: 16, attackId: 'BUBBLE_BEAM' },
+    { level: 16, attackId: 'SALT_SPIT' },
   ],
 };
 

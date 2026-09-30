@@ -11,6 +11,13 @@ import {
   registerSuccessfulFireClawHit,
 } from './fireClaw';
 import { applySailcutterMark } from './sailcutter';
+import {
+  findPoison,
+  hasAnyPoison,
+  TOXIC_POLLEN_POISON_ID,
+  VENOM_SPRAY_POISON_ID,
+} from '../poison';
+import { getWarmthWaterDamageMultiplier } from '../warmth';
 
 export const DRENCHED_DURATION_MS = 4000;
 export const DRENCHED_DAMAGE_MULTIPLIER = 1.5;
@@ -162,12 +169,17 @@ export class EffectProcessor {
     target: Enemy,
     attackDef: AttackDefinition,
     hitCount: number = 1,
-    damageMultiplier: number = 1
+    damageMultiplier: number = 1,
+    warmthDamageMultiplier?: number
   ) {
     // Multiple projectiles can arrive in one tick; dead targets cannot build combos.
     if (target.hp <= 0) return;
     const level = source.creature.level;
-    const power = attackDef.power;
+    const power =
+      attackDef.power *
+      (attackDef.poisonPayoff && hasAnyPoison(target)
+        ? attackDef.poisonPayoff.damageMultiplier
+        : 1);
 
     // Physical/Special split: pick the right attack and defense stats
     const attack =
@@ -254,10 +266,15 @@ export class EffectProcessor {
     if (finalDamage > 0 && attackDef.fireClawHeat) {
       finalDamage = Math.max(
         1,
-        Math.floor(
-          finalDamage * getFireClawDamageMultiplier(source, attackDef)
-        )
+        Math.floor(finalDamage * getFireClawDamageMultiplier(source, attackDef))
       );
+    }
+
+    const warmthMultiplier =
+      warmthDamageMultiplier ??
+      getWarmthWaterDamageMultiplier(source, attackDef);
+    if (finalDamage > 0 && warmthMultiplier !== 1) {
+      finalDamage = Math.max(1, Math.floor(finalDamage * warmthMultiplier));
     }
 
     if (finalDamage > 0 && damageMultiplier !== 1) {
@@ -287,11 +304,7 @@ export class EffectProcessor {
     }
 
     let coirSnapBind = false;
-    if (
-      finalDamage > 0 &&
-      hitCount === 1 &&
-      attackDef.coirSnapCombo
-    ) {
+    if (finalDamage > 0 && hitCount === 1 && attackDef.coirSnapCombo) {
       const combo = attackDef.coirSnapCombo;
       const nextHits = (source.coirSnapHits ?? 0) + 1;
       coirSnapBind = nextHits >= combo.hitsToBind;
@@ -299,11 +312,7 @@ export class EffectProcessor {
     }
 
     if (finalDamage > 0 && hitCount === 1 && attackDef.fireClawHeat) {
-      registerSuccessfulFireClawHit(
-        source,
-        attackDef,
-        engine.elapsedTimeMs
-      );
+      registerSuccessfulFireClawHit(source, attackDef, engine.elapsedTimeMs);
     }
 
     // Reaching an enemy with an attack counts as participating in its defeat,
@@ -431,6 +440,48 @@ export class EffectProcessor {
               });
               break;
             case 'POISON': {
+              if (effect.poisonId === TOXIC_POLLEN_POISON_ID) {
+                if (findPoison(target, TOXIC_POLLEN_POISON_ID)) break;
+
+                const totalPower = effect.totalPower ?? 0;
+                const durationMs = effect.durationMs ?? POISON_DURATION_MS;
+                const tickCount = Math.max(1, effect.tickCount ?? 5);
+                const poisonBaseDamage =
+                  Math.floor(
+                    Math.floor(
+                      (Math.floor((2 * level) / 5 + 2) * totalPower * attack) /
+                        defense
+                    ) / 50
+                  ) + 2;
+                const totalDamage =
+                  totalPower > 0 && effectivenessMultiplier > 0
+                    ? Math.max(
+                        1,
+                        Math.floor(
+                          poisonBaseDamage *
+                            stabMultiplier *
+                            combinedEffectiveness *
+                            randomModifier
+                        )
+                      )
+                    : 0;
+                if (totalDamage <= 0) break;
+
+                const tickIntervalMs = durationMs / tickCount;
+                target.statusConditions.push({
+                  type: 'POISON',
+                  poisonId: TOXIC_POLLEN_POISON_ID,
+                  durationMs,
+                  tickDamage: Math.ceil(totalDamage / tickCount),
+                  remainingDamage: totalDamage,
+                  ticksRemaining: tickCount,
+                  tickIntervalMs,
+                  nextTickAtMs: engine.elapsedTimeMs + tickIntervalMs,
+                  expiresAtMs: engine.elapsedTimeMs + durationMs,
+                });
+                break;
+              }
+
               const poisonTickDamage = Math.max(1, finalDamage * 0.05);
               target.statusConditions.push({
                 type: 'POISON',
@@ -443,44 +494,69 @@ export class EffectProcessor {
               break;
             }
             case 'STACKING_POISON': {
+              // Immortal targets in the Attack & Ability Lab do not lose HP,
+              // but a resolved damaging hit should still preview its on-hit
+              // venom application and potency.
+              if (finalDamage <= 0) break;
+
               const maxStacks = effect.maxStacks ?? MAX_POISON_STACKS;
-              const newDamagePerStack = Math.max(1, finalDamage * 0.05);
-              const existing = target.statusConditions.find(
-                (status) => status.type === 'POISON'
+              const poisonId = effect.poisonId ?? VENOM_SPRAY_POISON_ID;
+              const durationMs = effect.durationMs ?? POISON_DURATION_MS;
+              const tickCount = Math.max(1, effect.tickCount ?? 5);
+              const tickIntervalMs = durationMs / tickCount;
+              const newStackPotency = Math.max(
+                1,
+                Math.round(finalDamage * (effect.damagePerTickRatio ?? 0.05))
               );
+              const existing = findPoison(target, poisonId);
 
               if (existing) {
                 const currentStacks = Math.max(1, existing.stackCount ?? 1);
-                const nextStacks = Math.min(maxStacks, currentStacks + 1);
-                const damagePerStack = Math.max(
+                const fallbackPotency = Math.max(
+                  1,
                   existing.damagePerStack ??
-                    existing.tickDamage ??
-                    newDamagePerStack,
-                  newDamagePerStack
+                    (existing.tickDamage ?? 1) / currentStacks
                 );
-                existing.stackCount = nextStacks;
-                existing.damagePerStack = damagePerStack;
-                existing.tickDamage = damagePerStack * nextStacks;
-                existing.durationMs = POISON_DURATION_MS;
+                const stackPotencies = existing.stackPotencies
+                  ? [...existing.stackPotencies]
+                  : Array.from(
+                      { length: currentStacks },
+                      () => fallbackPotency
+                    );
+                if (stackPotencies.length < maxStacks) {
+                  stackPotencies.push(newStackPotency);
+                }
+
+                existing.stackPotencies = stackPotencies;
+                existing.stackCount = stackPotencies.length;
+                existing.tickDamage = stackPotencies.reduce(
+                  (total, potency) => total + potency,
+                  0
+                );
+                existing.durationMs = durationMs;
+                existing.tickIntervalMs = tickIntervalMs;
+                existing.nextTickAtMs ??= engine.elapsedTimeMs + tickIntervalMs;
+                existing.expiresAtMs = engine.elapsedTimeMs + durationMs;
               } else {
                 target.statusConditions.push({
                   type: 'POISON',
-                  durationMs: POISON_DURATION_MS,
-                  tickDamage: newDamagePerStack,
-                  lastTickTime: 0,
+                  poisonId,
+                  durationMs,
+                  tickDamage: newStackPotency,
                   stackCount: 1,
-                  damagePerStack: newDamagePerStack,
+                  stackPotencies: [newStackPotency],
+                  tickIntervalMs,
+                  nextTickAtMs: engine.elapsedTimeMs + tickIntervalMs,
+                  expiresAtMs: engine.elapsedTimeMs + durationMs,
                 });
               }
 
-              const poison = target.statusConditions.find(
-                (status) => status.type === 'POISON'
-              );
+              const poison = findPoison(target, poisonId);
               engine.floatingTexts.push({
                 id: `ft_poison_${Date.now()}_${Math.random()
                   .toString(36)
                   .substring(7)}`,
-                text: `Poison ×${poison?.stackCount ?? 1}`,
+                text: `Venom ×${poison?.stackCount ?? 1}`,
                 position: { ...target.position },
                 color: 0xe879f9,
                 scale: 0.8,
@@ -550,7 +626,8 @@ export class EffectProcessor {
                   target,
                   attackDef,
                   hitCount + 1,
-                  damageMultiplier
+                  damageMultiplier,
+                  warmthDamageMultiplier
                 );
               }
               break;

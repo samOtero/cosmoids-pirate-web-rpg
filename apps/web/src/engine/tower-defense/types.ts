@@ -70,6 +70,16 @@ export interface TDLaneHopConfig {
   arcHeight: number;
 }
 
+export interface TDBalancedLaneHopConfig {
+  /** The two eligible side lanes; the objective lane is excluded. */
+  pathIndices: [number, number];
+  /** Two shared opportunities to switch to the less occupied lane. */
+  triggerProgresses: [number, number];
+  windupMs: number;
+  durationMs: number;
+  arcHeight: number;
+}
+
 /** A uniquely configurable enemy variant that wave groups can reuse. */
 export interface TDWaveEnemyDefinition {
   id: string;
@@ -89,6 +99,8 @@ export interface TDWaveEnemyDefinition {
   specialDefenseMultiplier?: number;
   /** References an enemy-only ability definition. */
   abilityId?: string;
+  /** Automatic one-time lane switch at either shared crossing point. */
+  balancedLaneHop?: TDBalancedLaneHopConfig;
   /** HP ratio (0 to 1) at or below which this enemy is considered weakened for capture. Defaults to 0.9. */
   weakenedThreshold?: number;
   /**
@@ -249,6 +261,8 @@ export interface BaseTDUnit {
 
 export interface EnvironmentUnit extends BaseTDUnit {
   tdConfigId: string;
+  /** Optional fixed visual for a stationary scene character. */
+  visualState?: 'idle';
   speed?: number; // In world units per second, if moving
   path?: Point[]; // Ordered list of waypoints to follow
   currentWaypointIndex?: number;
@@ -390,6 +404,7 @@ export interface TDLevelData {
     tdConfigId: string;
     position: Point;
     facingDirection?: 'up' | 'down' | 'left' | 'right';
+    visualState?: 'idle';
   }[];
   captureUnits?: CaptureUnitDefinition[];
   resonantEvolution?: TDResonantEvolutionConfig;
@@ -438,6 +453,15 @@ export type TowerTargetingMode =
   | 'lowest-hp-percent'
   | 'highest-hp-percent';
 
+export interface TowerWarmthState {
+  /** Aguana-family resource, clamped from 0 to 100 in 10-point steps. */
+  value: number;
+  /** The next empowered Water activation does not drain the meter. */
+  sunSoaked: boolean;
+  /** Time accumulated toward the next passive tick while a non-Water move is active. */
+  nonWaterActiveMs: number;
+}
+
 export interface Tower extends BaseTDUnit {
   deepwaterGrip?: {
     targetId: string;
@@ -446,6 +470,8 @@ export interface Tower extends BaseTDUnit {
     startedAtMs: number;
     expiresAtMs: number;
     nextPulseAtMs: number;
+    /** Warmth bonus captured when the constriction began. */
+    warmthDamageMultiplier?: number;
   };
   /** Absolute simulation time until Dormatee's committed sleep ends. */
   sharedSlumberUntilMs?: number;
@@ -457,6 +483,28 @@ export interface Tower extends BaseTDUnit {
     endsAtMs: number;
     origin: Point;
     hasImpacted: boolean;
+  };
+  /** Stationary, single-target wind-up and recovery for Yokodillo's palm blow. */
+  palmSlam?: {
+    attackDefinitionId: string;
+    targetId: string;
+    startedAtMs: number;
+    impactAtMs: number;
+    endsAtMs: number;
+    origin: Point;
+    hasImpacted: boolean;
+  };
+  /** Committed facing-forward waggle windup for Aguana's paddle-tail attack. */
+  wakeWhip?: {
+    attackDefinitionId: string;
+    targetId: string;
+    targetPosition: Point;
+    attackFacingDirection: 'up' | 'down' | 'left' | 'right';
+    startedAtMs: number;
+    launchAtMs: number;
+    endsAtMs: number;
+    warmthDamageMultiplier: number;
+    launched: boolean;
   };
   creature: PlayerCreature; // The singular source of truth for level, xp, and attacks
   lastAttackTime: number; // Deprecate or keep for generic attacks
@@ -471,6 +519,12 @@ export interface Tower extends BaseTDUnit {
     appliedAtMs: number;
     expiresAtMs: number;
   };
+  /** Voltusk's temporary Electric interference with this tower's attack cadence. */
+  paralysis?: {
+    attackSpeedMultiplier: number;
+    appliedAtMs: number;
+    expiresAtMs: number;
+  };
   /** Successful Husk Shot hits made by this tower in its current bind cycle. */
   coirSnapHits?: number;
   /** Kindle Claw stays warm between targets until combat lulls or the tower moves. */
@@ -478,6 +532,8 @@ export interface Tower extends BaseTDUnit {
     stacks: number;
     nextDecayAtMs: number;
   };
+  /** Aguana-family heat retained on land and carried into Water attacks. */
+  warmth?: TowerWarmthState;
   /** Brief side-to-side performance pose while casting Funny Dance. */
   funnyDance?: {
     startedAtMs: number;
@@ -491,15 +547,28 @@ export interface Tower extends BaseTDUnit {
   recoveryFeedAvailableAtMs?: number;
 }
 
+export type PoisonId = 'TOXIC_POLLEN' | 'VENOM_SPRAY';
+
 export interface StatusCondition {
   type: 'BURN' | 'POISON' | 'STUN' | 'DRENCHED' | 'SLEEP';
   durationMs: number;
+  /** Identifies independently coexisting poison debuffs while preserving POISON as a shared category. */
+  poisonId?: PoisonId;
   tickDamage?: number;
   lastTickTime?: number;
+  /** Absolute simulation times used by deterministic poison schedules. */
+  nextTickAtMs?: number;
+  expiresAtMs?: number;
+  tickIntervalMs?: number;
+  /** Toxic Pollen spends an exact resolved damage budget over a fixed number of ticks. */
+  remainingDamage?: number;
+  ticksRemaining?: number;
   /** Current intensity for status effects that support stacking. */
   stackCount?: number;
   /** Per-stack damage retained while a stacking status is active. */
   damagePerStack?: number;
+  /** Venom Spray retains the independently resolved potency of every stack. */
+  stackPotencies?: number[];
   /** Simulation time before direct damage may wake a sleeping target. */
   wakeChecksAfterMs?: number;
 }
@@ -552,6 +621,8 @@ export interface Enemy extends BaseTDUnit {
   heldCaptureUnitId?: string; // ID of the CaptureUnit they are holding
   /** Enemy this cooperative hauler's rope connects to; omitted for Tigrevel anchors. */
   captureHaulLinkTargetEnemyId?: string;
+  /** A disconnected hauler follows this objective until it can reconnect. */
+  captureHaulRegroupTargetId?: string;
   /** Permanent guard: objective-disarming moves can force this enemy to drop only once. */
   hasBeenWindDisarmed?: boolean;
   /** While active, this enemy cannot pick up capture units. */
@@ -564,10 +635,12 @@ export interface Enemy extends BaseTDUnit {
   turnAroundAtEnd?: boolean;
   isMovingBackward?: boolean;
   uncapturable?: boolean;
-  /** Runtime state for an authored, one-time switch between enemy paths. */
+  /** Runtime state for a one-time switch between enemy paths. */
   laneHopState?: TDLaneHopConfig & {
     phase: 'approaching' | 'windup' | 'airborne' | 'landed';
     elapsedMs: number;
+    /** Present when this hauler decides between two shared crossing points. */
+    balanceDecisionIndex?: 0 | 1;
     fromPathIndex?: number;
     fromPosition?: Point;
     destination?: Point;
@@ -714,7 +787,8 @@ export interface EnemyGroundOrb {
   launchedAtMs: number;
   impactAtMs: number;
   expiresAtMs: number;
-  maxHpDamageFraction: number;
+  paralysisDurationMs: number;
+  paralysisAttackSpeedMultiplier: number;
   impactRadius: number;
   impactedAtMs?: number;
 }
@@ -761,6 +835,8 @@ export interface Projectile {
   launchFacingDirection?: 'up' | 'down' | 'left' | 'right';
   speed: number;
   damage: number;
+  /** Warmth bonus captured when this attack activation launched. */
+  warmthDamageMultiplier?: number;
   /** Defaults to true. False marks a follow-up projectile as visual-only. */
   dealsDamage?: boolean;
   visualScale?: number;

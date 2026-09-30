@@ -5,14 +5,13 @@ import { LEVEL_6_CURSED_INTERMISSION } from '@/constants/dialogs/level6CursedInt
  * First playable three-corridor slice for the Level 6 officer confrontation.
  *
  * Poguin use the upper and lower lanes while Tigrevel is synchronized to the
- * unobstructed center track. Mari waits in the upper-left recovery alcove while
- * Voltusk occupies the raised upper-right dais. Voltusk bombards combat spots
- * with dodgeable electric orbs. Poguin cooperatively haul Tigrevel through
- * steel-rope chains. Before they attach, Poguin make one telegraphed hop to
- * the opposite Poguin lane and cannot be newly targeted while airborne.
- * Mari feeds injured towers on the two safe upper-left recovery spots. At 30%
- * health, Voltusk pauses the fight for a short story intermission, gains the
- * cursed aura, and begins marking up to three distinct orb targets per attack.
+ * unobstructed center track. Mari waits in the upper-left alcove while Voltusk
+ * occupies the raised upper-right dais. Voltusk aims dodgeable electric orbs
+ * that briefly paralyze towers, slowing their attacks. Poguin haul Tigrevel through
+ * steel-rope chains. Before they attach, Poguin can balance the two side lanes
+ * at either shared crossing point and cannot be newly targeted while airborne.
+ * At 30% health, Voltusk pauses the fight for a short story intermission, gains
+ * the cursed aura, and marks up to three distinct orb targets per attack.
  * Final encounter balance remains in progress.
  */
 export const LEVEL_6: TDLevelData = {
@@ -139,16 +138,8 @@ export const LEVEL_6: TDLevelData = {
       y: 19.13,
     },
     {
-      x: 11.22,
-      y: 25.09,
-    },
-    {
       x: 25,
       y: 66,
-    },
-    {
-      x: 24.98,
-      y: 24.85,
     },
     {
       x: 34,
@@ -211,24 +202,6 @@ export const LEVEL_6: TDLevelData = {
       y: 66,
     },
   ],
-  safePlacementSpotIndices: [3, 5],
-  towerRecovery: {
-    placementSpotIndices: [3, 5],
-    healerPosition: {
-      x: 18,
-      y: 14,
-    },
-    healerIdleFacingDirection: 'down',
-    healFraction: 0.35,
-    feedingIntervalMs: 8000,
-    tutorial: {
-      triggerHealthFraction: 0.75,
-      speakerName: 'Mari',
-      portraitUrl: '/dialog/maribel_determined.webp',
-      message: "They're hurt! Bring them here—I packed food!",
-      instruction: 'Drag the injured Cosmoid onto a glowing recovery spot.',
-    },
-  },
   cursedPhase: {
     enemyDefinitionId: 'level_6_voltusk',
     triggerHealthFraction: 0.3,
@@ -259,6 +232,7 @@ export const LEVEL_6: TDLevelData = {
       },
       tdConfigId: 'maribel_capture',
       facingDirection: 'down',
+      visualState: 'idle',
     },
     {
       position: {
@@ -298,6 +272,10 @@ export const LEVEL_6: TDLevelData = {
       },
       tdConfigId: 'tigrevel_netted',
       haulPathIndex: 1,
+      returnHome: {
+        pathIndex: 1,
+        speed: 1,
+      },
       groupHauling: {
         eligibleCreatureId: 'poguin',
         joinRadius: 12,
@@ -314,6 +292,13 @@ export const LEVEL_6: TDLevelData = {
       level: 8,
       speedMultiplier: 1.25,
       hpMultiplier: 1.25,
+      balancedLaneHop: {
+        pathIndices: [0, 2],
+        triggerProgresses: [0.35, 0.65],
+        windupMs: 650,
+        durationMs: 600,
+        arcHeight: 58,
+      },
     },
     {
       id: 'level_6_voltusk',
@@ -347,13 +332,6 @@ export const LEVEL_6: TDLevelData = {
           pathIndex: 0,
           turnAroundAtEnd: true,
           uncapturable: true,
-          laneHop: {
-            targetPathIndex: 2,
-            triggerProgress: 0.34,
-            windupMs: 650,
-            durationMs: 600,
-            arcHeight: 58,
-          },
         },
         {
           enemyDefinitionId: 'level_6_poguin',
@@ -364,13 +342,6 @@ export const LEVEL_6: TDLevelData = {
           turnAroundAtEnd: true,
           concurrentWithPrevious: true,
           uncapturable: true,
-          laneHop: {
-            targetPathIndex: 0,
-            triggerProgress: 0.66,
-            windupMs: 650,
-            durationMs: 600,
-            arcHeight: 58,
-          },
         },
         {
           enemyDefinitionId: 'level_6_aguana',
@@ -403,13 +374,6 @@ export const LEVEL_6: TDLevelData = {
           turnAroundAtEnd: true,
           concurrentWithPrevious: true,
           uncapturable: true,
-          laneHop: {
-            targetPathIndex: 0,
-            triggerProgress: 0.5,
-            windupMs: 500,
-            durationMs: 550,
-            arcHeight: 62,
-          },
         },
         {
           enemyDefinitionId: 'level_6_aguana',

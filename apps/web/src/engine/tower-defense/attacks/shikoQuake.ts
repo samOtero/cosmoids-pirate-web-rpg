@@ -7,6 +7,8 @@ import type { AttackBehavior, AttackDefinition } from './types';
 
 export const SHIKO_QUAKE_IMPACT_MS = 360;
 export const SHIKO_QUAKE_TOTAL_MS = 700;
+export const SHIKO_STOMP_MAX_TARGETS = 3;
+const SHIKO_STOMP_HIT_VFX_ID = 'attack_shiko_quake_hit_1';
 
 function hasTargetInRange(
   engine: TowerDefenseEngine,
@@ -48,11 +50,10 @@ export function cancelShikoQuake(source: Tower): void {
   source.shikoQuake = undefined;
 }
 
-/** Resolves the AOE on the slam frame rather than when the wind-up begins. */
+/** Resolves at most three prioritized hits on the slam frame. */
 export function updateShikoQuakes(
   engine: TowerDefenseEngine,
-  towers: Tower[],
-  enemies: Enemy[]
+  towers: Tower[]
 ): void {
   for (const source of towers) {
     const state = source.shikoQuake;
@@ -74,19 +75,33 @@ export function updateShikoQuakes(
 
     if (!state.hasImpacted && engine.elapsedTimeMs >= state.impactAtMs) {
       state.hasImpacted = true;
-      const targets = enemies.filter(
-        (enemy) =>
-          engine.isEnemyTargetable(enemy) &&
-          engine.isPositionInAttackRange(
-            source.position,
-            enemy.position,
-            engine.getTowerAttackRange(attackDef.rangeIndex)
-          )
-      );
+      const targets: Enemy[] = [];
+      const selectedIds = new Set<string>();
+      while (targets.length < SHIKO_STOMP_MAX_TARGETS) {
+        const target = engine.getTargetForTower(
+          source,
+          attackDef.rangeIndex,
+          source.targetingMode || 'first',
+          (enemy) => !selectedIds.has(enemy.id)
+        );
+        if (!target) break;
+        targets.push(target);
+        selectedIds.add(target.id);
+      }
 
       for (const enemy of targets) {
         EffectProcessor.applyDamageAndEffects(engine, source, enemy, attackDef);
         if (enemy.hp <= 0) engine.emitEnemyDefeated(enemy, source);
+        const hitConfig =
+          CREATURE_TD_CONFIGS[SHIKO_STOMP_HIT_VFX_ID]?.default?.vfxAnimation;
+        engine.visualEffects.push({
+          id: `vfx_shiko_hit_${source.id}_${enemy.id}_${engine.elapsedTimeMs}_${Math.random()}`,
+          configId: SHIKO_STOMP_HIT_VFX_ID,
+          position: { ...enemy.position },
+          durationMs: hitConfig?.durationMs ?? 300,
+          elapsedMs: 0,
+          targetId: enemy.id,
+        });
       }
 
       if (attackDef.visualEffectConfigId) {

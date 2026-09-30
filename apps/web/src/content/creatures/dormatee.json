@@ -18,11 +18,11 @@
   "learnableAttacks": [
     {
       "level": 1,
-      "attackId": "TACKLE"
+      "attackId": "GRUMBLE"
     },
     {
       "level": 4,
-      "attackId": "STRING_SHOT"
+      "attackId": "REVERIE_ORB"
     },
     {
       "level": 8,

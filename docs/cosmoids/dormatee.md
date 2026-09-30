@@ -63,18 +63,16 @@ Dormatee appears in the broad sheltered water across the foreground on its own a
 
 ## Provisional Gameplay Ideas
 
-The ideas below are brainstorming candidates, not approved attacks, abilities, or implementation requirements. Their shared direction is a very slow, bulky Psychic support and control role: Dormatee influences a battle by resting, calming allies, and gradually making enemies drowsy rather than by dealing overwhelming direct damage.
+The ideas below are brainstorming candidates, not approved attacks, abilities, or implementation requirements. The developing family direction is a slow, bulky Psychic special attacker with a control option: Dormatee can deal deliberate ranged damage or commit to resting and disrupting enemy timing.
 
 - **Dream Network:** Psychic attacks apply stacks of Drowsy. Drowsy slows an enemy's movement and attacks; enough stacks briefly put it to sleep. A recently awakened target would receive temporary resistance to prevent continuous sleep-locking, while bosses could resist sleep but retain the slowdown.
-- **Dream Pearl:** Dormatee releases its single pearly orb for moderate Psychic damage and applies multiple Drowsy stacks to one target.
 - **Whisker Wave:** Its sensory whiskers send a short Psychic ripple through a group, dealing light damage and applying Drowsy to each affected enemy.
 - **Deep Rest:** Dormatee curls up and stops attacking for several seconds, restores some health, and sends calming pulses that slow nearby enemies. It gains a temporary protective barrier when it wakes.
 - **Shared Reverie:** Dormatee links several enemies inside one dream so that part of the damage dealt to any linked target echoes to the others as Psychic damage.
 - **Gentle Presence:** A passive calming aura slightly reduces damage received by nearby allies.
 - **Startled Awakening:** If Dormatee is struck during Deep Rest, its dream orb bursts, pushes nearby enemies away, and wakes it immediately.
-- **Body Rush:** A possible basic Normal attack that uses Dormatee's heavy floating body and gives it a simple option outside its Psychic techniques.
 
-One possible initial kit is Body Rush, Dream Pearl, Dream Network, and Deep Rest, with Shared Reverie reserved as a later signature technique. This combination is only a reference package; individual ideas may be selected, revised, combined, or discarded later.
+Dream Network, Whisker Wave, Deep Rest, and Shared Reverie remain brainstorming candidates; Grumble, Reverie Orb, and Shared Slumber are the currently approved moves. Reverie Orb is a direct-damage attack and does not apply the provisional Drowsy mechanic.
 
 ## Approved Technique: Shared Slumber
 
@@ -90,12 +88,14 @@ The move has a ten-second simulation-clock cooldown beginning on activation. Att
 
 Dormatee is registered as the game's first Psychic-type species. Psychic has its own UI and battle-effect colors, and its initial type interactions follow the familiar creature-battling relationships currently supported by the game's type roster: Psychic is strong against Poison, resisted by Psychic and Steel, and ineffective against Dark; Bug and Dark are strong against Psychic.
 
-The current gameplay values establish Dormatee as a very slow, specially defensive support-oriented species without committing to the provisional dream mechanics:
+The current gameplay values remain provisional while Dormatee's bulky special-attacker role is developed:
 
 - **Base stats:** HP 86, Attack 42, Defense 70, Special Attack 76, Special Defense 90, Speed 18.
 - **Base experience:** 82.
 - **Movement profile:** Existing `lizard` profile as an integration default pending bespoke floating movement.
-- **Learnset:** Body Rush (`TACKLE`) at level 1, String Shot (`STRING_SHOT`) at level 4, and Shared Slumber (`SHARED_SLUMBER`) at level 8. String Shot remains a temporary whisker-based slowing option.
+- **Learnset:** Grumble (`GRUMBLE`) at level 1, Reverie Orb (`REVERIE_ORB`) at level 4, and Shared Slumber (`SHARED_SLUMBER`) at level 8.
+- **Grumble:** 35-power Normal special projectile, 1200 ms cooldown, standard range, 1.3 projectile speed. A soft cream-and-lavender circular sound pulse travels from Dormatee's mouth and fades into a circular impact pulse. It has no status effect.
+- **Reverie Orb:** 65-power Psychic special projectile, 2500 ms cooldown, standard range, 0.65 projectile speed. A conjured pearly copy drifts from the orb's position on Dormatee's directional sprite, following one gentle crest-and-trough wave before a lavender impact pulse. The visual wave tapers to zero at launch and impact; it does not change collision or damage. It has no status effect.
 - **Story placement:** Integrated into Level 7 as optional aquatic wildlife on a dedicated open-water route.
 
 Production assets:
@@ -119,14 +119,13 @@ Production assets:
 - **Journal observation:** Viewed from above in a quiet shallow lagoon, Dormatee rests belly-up while five small fish sleep in a loose circle around its whisker fan. The gathering shows that nearby wildlife feels safe inside its shared dream.
 - **Journal artwork:** [`art-source/creatures/journal/dormatee_journal.png`](../../art-source/creatures/journal/dormatee_journal.png), published at `/UI/Journal/dormatee_journal.webp`.
 - **Journal artwork approval:** September 22, 2026
-- **Production status:** Icon, left/down/up battle sprites, journal artwork, Psychic element support, species registry entry, directional configuration, Shared Slumber, focused tests, and dated creature manifest are implemented. Right-facing visuals mirror the left sprite. Additional custom dream attacks remain open.
+- **Production status:** Icon, left/down/up battle sprites, journal artwork, Psychic element support, species registry entry, directional configuration, Grumble, Reverie Orb, Shared Slumber, focused tests, and dated creature manifest are implemented. Right-facing visuals mirror the left sprite. Later dream techniques remain open.
 - **Provisional scale:** Approximately 1.4 meters long was suggested during concept development but is not yet locked.
 
 ## Open Decisions
 
 - Decide Dormatee's exact rarity, spawn conditions, and capture tuning in Level 7.
 - Select, revise, combine, or reject the remaining provisional gameplay ideas before implementing additional attacks or abilities.
-- Replace or approve String Shot after selecting the rest of Dormatee's dream techniques.
 - Tune the initial stats, scale, offsets, movement, animation needs, and broader battle role during Level 7 development.
 - Decide whether Dormatee is a single-stage species or belongs to an evolutionary family.
 - Lock its physical size, broader habitat, diet, distribution, and ecology beyond the quiet lagoon premise.

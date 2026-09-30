@@ -1,6 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { MAROPHIS } from '@/constants/creatures';
 import {
   EffectProcessor,
   MAX_POISON_STACKS,
@@ -9,7 +8,12 @@ import {
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { Enemy, Tower } from '@/engine/tower-defense/types';
-import { ElementType } from '@/types/baseGame';
+import {
+  findPoison,
+  hasAnyPoison,
+  TOXIC_POLLEN_POISON_ID,
+  VENOM_SPRAY_POISON_ID,
+} from '@/engine/tower-defense/poison';
 
 const levelData = {
   paths: [
@@ -68,6 +72,26 @@ const createEnemy = (): Enemy => ({
 afterEach(() => vi.restoreAllMocks());
 
 describe('Venom Spray', () => {
+  it('uses one 50% stacking-poison roll per cast', () => {
+    expect(ATTACK_DEFS.VENOM_SPRAY).toMatchObject({
+      projectilePattern: {
+        count: 5,
+        damageMode: 'FIRST_ONLY',
+      },
+      effects: [
+        {
+          type: 'STACKING_POISON',
+          chance: 0.5,
+          maxStacks: 5,
+          poisonId: VENOM_SPRAY_POISON_ID,
+          durationMs: 5000,
+          tickCount: 5,
+          damagePerTickRatio: 0.05,
+        },
+      ],
+    });
+  });
+
   it('deals immediate damage and applies a successful poison roll', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     const engine = new TowerDefenseEngine(levelData);
@@ -85,14 +109,40 @@ describe('Venom Spray', () => {
     expect(target.statusConditions).toEqual([
       {
         type: 'POISON',
+        poisonId: VENOM_SPRAY_POISON_ID,
         durationMs: POISON_DURATION_MS,
         tickDamage: 1,
-        lastTickTime: 0,
         stackCount: 1,
-        damagePerStack: 1,
+        stackPotencies: [1],
+        tickIntervalMs: 1000,
+        nextTickAtMs: 1000,
+        expiresAtMs: 5000,
       },
     ]);
-    expect(engine.floatingTexts.at(-1)?.text).toBe('Poison ×1');
+    expect(engine.floatingTexts.at(-1)?.text).toBe('Venom ×1');
+    engine.destroy();
+  });
+
+  it('applies venom to an immortal Attack & Ability Lab target without reducing its HP', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const engine = new TowerDefenseEngine(levelData);
+    const source = createMarophisTower();
+    const target = { ...createEnemy(), isInvulnerable: true };
+
+    EffectProcessor.applyDamageAndEffects(
+      engine,
+      source,
+      target,
+      ATTACK_DEFS.VENOM_SPRAY
+    );
+
+    expect(target.hp).toBe(target.maxHp);
+    expect(findPoison(target, VENOM_SPRAY_POISON_ID)).toMatchObject({
+      stackCount: 1,
+      stackPotencies: [1],
+      tickDamage: 1,
+    });
+    expect(engine.floatingTexts.at(-1)?.text).toBe('Venom ×1');
     engine.destroy();
   });
 
@@ -103,7 +153,7 @@ describe('Venom Spray', () => {
     const target = createEnemy();
 
     for (let stack = 1; stack <= MAX_POISON_STACKS; stack += 1) {
-      const existingPoison = target.statusConditions[0];
+      const existingPoison = findPoison(target, VENOM_SPRAY_POISON_ID);
       if (existingPoison) existingPoison.durationMs = 100;
 
       EffectProcessor.applyDamageAndEffects(
@@ -116,9 +166,10 @@ describe('Venom Spray', () => {
       expect(target.statusConditions).toHaveLength(1);
       expect(target.statusConditions[0]).toMatchObject({
         type: 'POISON',
+        poisonId: VENOM_SPRAY_POISON_ID,
         durationMs: POISON_DURATION_MS,
         stackCount: stack,
-        damagePerStack: 1,
+        stackPotencies: Array.from({ length: stack }, () => 1),
         tickDamage: stack,
       });
     }
@@ -135,24 +186,27 @@ describe('Venom Spray', () => {
     expect(target.statusConditions[0]).toMatchObject({
       durationMs: POISON_DURATION_MS,
       stackCount: MAX_POISON_STACKS,
-      damagePerStack: 1,
+      stackPotencies: Array.from({ length: MAX_POISON_STACKS }, () => 1),
       tickDamage: MAX_POISON_STACKS,
     });
     engine.destroy();
   });
 
   it('does not add a stack or refresh duration when the poison roll fails', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.5);
+    vi.spyOn(Math, 'random').mockReturnValue(0.51);
     const engine = new TowerDefenseEngine(levelData);
     const source = createMarophisTower();
     const target = createEnemy();
     target.statusConditions.push({
       type: 'POISON',
+      poisonId: VENOM_SPRAY_POISON_ID,
       durationMs: 900,
       tickDamage: 2,
-      lastTickTime: 0,
       stackCount: 2,
-      damagePerStack: 1,
+      stackPotencies: [1, 1],
+      tickIntervalMs: 1000,
+      nextTickAtMs: 1000,
+      expiresAtMs: 900,
     });
 
     EffectProcessor.applyDamageAndEffects(
@@ -169,8 +223,78 @@ describe('Venom Spray', () => {
       tickDamage: 2,
     });
     expect(
-      engine.floatingTexts.some((text) => text.text.startsWith('Poison ×'))
+      engine.floatingTexts.some((text) => text.text.startsWith('Venom ×'))
     ).toBe(false);
+    engine.destroy();
+  });
+
+  it('coexists with Toxic Pollen while remaining visible to universal poison checks', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const engine = new TowerDefenseEngine(levelData);
+    const source = createMarophisTower();
+    const target = createEnemy();
+    target.statusConditions.push({
+      type: 'POISON',
+      poisonId: TOXIC_POLLEN_POISON_ID,
+      durationMs: 5000,
+      tickDamage: 1,
+      remainingDamage: 5,
+      ticksRemaining: 5,
+      tickIntervalMs: 1000,
+      nextTickAtMs: 1000,
+      expiresAtMs: 5000,
+    });
+
+    EffectProcessor.applyDamageAndEffects(
+      engine,
+      source,
+      target,
+      ATTACK_DEFS.VENOM_SPRAY
+    );
+
+    expect(target.statusConditions).toHaveLength(2);
+    expect(findPoison(target, TOXIC_POLLEN_POISON_ID)).toBeDefined();
+    expect(findPoison(target, VENOM_SPRAY_POISON_ID)).toMatchObject({
+      stackCount: 1,
+      stackPotencies: [1],
+    });
+    expect(hasAnyPoison(target)).toBe(true);
+
+    const hpAfterImpact = target.hp;
+    engine.enemies = [target];
+    for (let tick = 1; tick <= 5; tick += 1) {
+      engine.tick(tick * 1000, 1000);
+    }
+    expect(target.hp).toBe(hpAfterImpact - 10);
+    expect(target.statusConditions).toHaveLength(0);
+    engine.destroy();
+  });
+
+  it('records each successful stack using the potency of its own direct hit', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const engine = new TowerDefenseEngine(levelData);
+    const source = createMarophisTower();
+    const target = createEnemy();
+
+    EffectProcessor.applyDamageAndEffects(
+      engine,
+      source,
+      target,
+      ATTACK_DEFS.VENOM_SPRAY
+    );
+    source.currentSpecialAttack = 200;
+    EffectProcessor.applyDamageAndEffects(
+      engine,
+      source,
+      target,
+      ATTACK_DEFS.VENOM_SPRAY
+    );
+
+    expect(findPoison(target, VENOM_SPRAY_POISON_ID)).toMatchObject({
+      stackCount: 2,
+      stackPotencies: [1, 5],
+      tickDamage: 6,
+    });
     engine.destroy();
   });
 });

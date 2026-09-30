@@ -69,9 +69,14 @@ The evolution is intentionally communicated through changed proportions, foragin
 
 ## General Gameplay Direction
 
-These are approved sources of possible abilities and attacks, not defined mechanics:
+Nautiguan retains Aguana's **Warmth** family resource: a persistent radial 0-100% meter. After a non-Water move has remained active for one full second, it gains 10% Warmth per second; changing to a Water move stops generation and resets that delay. Switching between non-Water moves preserves the timer, and stored Warmth does not otherwise decay.
 
-- Growth and shrinkage in response to food scarcity or environmental pressure
+Any amount of Warmth grants its damaging Water attacks the full 40% damage bonus. A Water attack drains 10% once per activation after capturing that bonus, regardless of its projectile, target, hit, or pulse count. The level-4 `SUNBATHE` utility move fills the meter and grants **Sun-Soaked** on a persistent 45-second cooldown; Sun-Soaked makes the next empowered Water activation free. The adult's Water attacks will be designed later to develop this same resource through stronger or broader lane-shaping payoffs rather than adding another resource.
+
+The approved level-5 `WAKE_WHIP` is a physical Water attack driven by the family's paddle tail. Nautiguan faces its target, waggles the tail, and launches a narrow wake that pushes the target backward; Warmth strengthens both damage and displacement. At level 16, `SALT_SPIT` replaces the placeholder Bubble Beam: Nautiguan fires physical salt-crystal projectiles that briefly stun. At 0% Warmth it fires at one target; with any Warmth it fires at up to three different targets. Each projectile deals full damage and can make an eligible carrier drop its objective once, with a short pickup lock. One volley drains 10% Warmth regardless of how many projectiles launch, and Sun-Soaked can waive that drain.
+
+Approved biological sources for that next move-design pass include:
+
 - Powerful anchoring claws
 - A broad paddle tail used for propulsion and heavy strikes
 - Directed salt expulsion or salt-spitting
@@ -93,7 +98,7 @@ The exact economics, prevalence, handling method, and story use of this salt-col
 - **Family:** Aguana -> Nautiguan
 - **Production date:** September 22, 2026
 - **Production assets:** Tight portrait icon plus left, up, and down directional battle sprites, with PNG masters under `art-source/creatures` and transparency-preserving WebP derivatives in `apps/web/public`.
-- **Gameplay implementation:** Pure Water type with a slow, durable adult stat profile and `SCRATCH`, `WATER_GUN`, `DEEPWATER_GRIP`, and `BUBBLE_BEAM`. It is the level-16 evolution of Aguana.
+- **Gameplay implementation:** Pure Water type with the Warmth family resource and a provisional slow, durable adult stat profile. Its current learnset is `SCRATCH`, `SUNBATHE`, `WAKE_WHIP`, provisional `DEEPWATER_GRIP`, and `SALT_SPIT`. Wake Whip and Salt Spit are the approved physical Water attacks; Deepwater Grip and the final stat spread still await redesign. It is the level-16 evolution of Aguana.
 - **Story placement:** Evolution-only within the current Level 6 family integration; wild Nautiguan placement remains open.
 - **Manifest:** [`apps/web/src/content/creatures/nautiguan.json`](../../apps/web/src/content/creatures/nautiguan.json)
 - **Journal observation:** In strong underwater currents, a mature Nautiguan braces itself against the flow like a living breakwater while a young Aguana clings to the shelter of its flank. The adult looks back to check on the juvenile as loose seaweed and bubbles stream past them.
@@ -103,7 +108,9 @@ The exact economics, prevalence, handling method, and story use of this salt-col
 ## Open Decisions
 
 - Exact physical scale and diving limits in Cosmoids lore
-- Mechanical treatment of salt-spitting, anchoring, tail power, heat retention, and reversible size change
+- Replacement for provisional `DEEPWATER_GRIP` and final adult Warmth balance
+- Final stat spread after the attack kit is approved
+- Mechanical treatment of anchoring and reversible size change
 - Wild habitat distribution, rarity, capture rules, and direct story placement
 - How common the shipboard salt-harvesting relationship is
 
