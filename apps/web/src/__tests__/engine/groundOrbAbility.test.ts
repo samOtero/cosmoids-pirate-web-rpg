@@ -1,22 +1,34 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-import { LEVEL_6 } from '@/constants/tdLevels/level6';
 import { getAttackSpeedMultiplier } from '@/engine/tower-defense/attackSpeedModifiers';
-import { ENEMY_ABILITY_DEFS } from '@/engine/tower-defense/enemyAbilities';
-import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
-import type { PlayerCreature } from '@/types/baseGame';
 
-const engines: TowerDefenseEngine[] = [];
+import { ability, battle, species } from './behaviorFixtures';
+import { BackgroundImageKey, type PlayerCreature } from '@/types/baseGame';
 
-afterEach(() => {
-  engines.forEach((engine) => engine.destroy());
-  engines.length = 0;
+// Fixed inputs for the ground-target/paralysis mechanic, independent of production tuning.
+beforeEach(() => {
+  species('test_orb_tower');
+  species('test_orb_caster');
+  ability({
+    id: 'TEST_GROUND_ORB',
+    type: 'TOWER_GROUND_ORB',
+    initialCooldownMs: 2500,
+    cooldownMs: 4500,
+    projectileTravelMs: 1400,
+    aimDurationMs: 350,
+    paralysisDurationMs: 5000,
+    paralysisAttackSpeedMultiplier: 0.65,
+    impactRadius: 4,
+    targetCount: 1,
+    cursedTargetCount: 3,
+    visualEffectConfigId: 'attack_spark_launch_1',
+  });
 });
 
 function createCreature(id: string): PlayerCreature {
   return {
     id,
-    speciesId: 'mopup',
+    speciesId: 'test_orb_tower',
     level: 8,
     xp: 0,
     equippedAttacks: ['TACKLE'],
@@ -27,7 +39,7 @@ function createCreature(id: string): PlayerCreature {
 }
 
 function createEngine(creatureIds: string[]) {
-  const engine = new TowerDefenseEngine(
+  const engine = battle(
     {
       paths: [
         [
@@ -42,49 +54,23 @@ function createEngine(creatureIds: string[]) {
         { x: 25, y: 80 },
       ],
       safePlacementSpotIndices: [3],
-      waves: [],
+      waves: [{ id: 'test_empty_wave', groups: [] }],
     },
     creatureIds.map(createCreature)
   );
-  engines.push(engine);
   engine.spawnPreviewEnemy({
-    id: 'voltusk',
-    creatureId: 'voltusk',
+    id: 'test_orb_caster',
+    creatureId: 'test_orb_caster',
     level: 10,
     position: { x: 50, y: 10 },
-    abilityId: 'VOLTUSK_ELECTRIC_ORB',
+    abilityId: 'TEST_GROUND_ORB',
     isInvulnerable: true,
     manualAbilityOnly: false,
   });
   return engine;
 }
 
-describe('Voltusk Electric Orb enemy ability', () => {
-  it('is assigned to stationary Level 6 Voltusk without recovery placements', () => {
-    expect(ENEMY_ABILITY_DEFS.VOLTUSK_ELECTRIC_ORB).toMatchObject({
-      type: 'TOWER_GROUND_ORB',
-      initialCooldownMs: 2500,
-      cooldownMs: 4500,
-      projectileTravelMs: 1400,
-      aimDurationMs: 350,
-      paralysisDurationMs: 5000,
-      paralysisAttackSpeedMultiplier: 0.65,
-      impactRadius: 4,
-      targetCount: 1,
-      cursedTargetCount: 3,
-    });
-    expect(LEVEL_6.safePlacementSpotIndices).toBeUndefined();
-    expect(LEVEL_6.towerRecovery).toBeUndefined();
-    expect(
-      LEVEL_6.waveEnemyDefinitions.find(
-        (definition) => definition.id === 'level_6_voltusk'
-      )
-    ).toMatchObject({
-      stationaryPosition: { x: 85, y: 14 },
-      abilityId: 'VOLTUSK_ELECTRIC_ORB',
-    });
-  });
-
+describe('Ground-targeted projectiles and paralysis', () => {
   it('snapshots an occupied combat spot and misses after its tower moves to safety', () => {
     const engine = createEngine(['dodger']);
     expect(engine.placeTower('dodger', 25, 20)).toBe(true);
@@ -97,7 +83,7 @@ describe('Voltusk Electric Orb enemy ability', () => {
     expect(engine.enemies[0].facingDirection).toBe('left');
     expect(engine.enemyGroundOrbs).toContainEqual(
       expect.objectContaining({
-        sourceEnemyId: 'voltusk',
+        sourceEnemyId: 'test_orb_caster',
         sourcePosition: { x: 50, y: 10 },
         targetPosition: { x: 25, y: 20 },
         launchedAtMs: 2500,
@@ -220,8 +206,8 @@ describe('Voltusk Electric Orb enemy ability', () => {
     ).toEqual(new Set(['25,20', '45,20', '65,20']));
   });
 
-  it('triggers the Level 6 cursed phase once at 30% health', () => {
-    const engine = new TowerDefenseEngine({
+  it('requests a cursed phase once at the configured health threshold', () => {
+    const engine = battle({
       paths: [
         [
           { x: 0, y: 50 },
@@ -229,19 +215,26 @@ describe('Voltusk Electric Orb enemy ability', () => {
         ],
       ],
       placementSpots: [],
-      waves: [],
-      cursedPhase: LEVEL_6.cursedPhase,
+      waves: [{ id: 'test_empty_wave', groups: [] }],
+      cursedPhase: {
+        enemyDefinitionId: 'test_cursed_caster',
+        triggerHealthFraction: 0.3,
+        intermission: {
+          backgroundImageKey: BackgroundImageKey.ISLAND_1,
+          sequence: [],
+        },
+        transformationLineIndex: 0,
+      },
     });
-    engines.push(engine);
     const voltusk = engine.spawnPreviewEnemy({
       id: 'phase-voltusk',
-      creatureId: 'voltusk',
+      creatureId: 'test_orb_caster',
       level: 10,
       position: { x: 50, y: 10 },
-      abilityId: 'VOLTUSK_ELECTRIC_ORB',
+      abilityId: 'TEST_GROUND_ORB',
       manualAbilityOnly: true,
     })!;
-    voltusk.waveEnemyDefinitionId = 'level_6_voltusk';
+    voltusk.waveEnemyDefinitionId = 'test_cursed_caster';
     const phaseEvents: unknown[] = [];
     engine.events.subscribe((event) => {
       if (event.type === 'CURSED_PHASE_TRIGGERED') phaseEvents.push(event);
@@ -256,7 +249,7 @@ describe('Voltusk Electric Orb enemy ability', () => {
     expect(phaseEvents).toEqual([
       expect.objectContaining({
         enemyId: 'phase-voltusk',
-        enemyDefinitionId: 'voltusk',
+        enemyDefinitionId: 'test_orb_caster',
       }),
     ]);
     expect(voltusk.isCursed).not.toBe(true);

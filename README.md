@@ -199,6 +199,13 @@ require updating expected copies of its settings. Registry checks discover all
 current attacks and validate behavior and asset references. Run `pnpm test:attacks`
 for this focused suite.
 
+Evolution and enemy-ability tests also use controlled species and ability inputs.
+They cover progression choices, event order, buffs, activation limits, and
+ground-targeted projectiles without fixing real creatures' evolution levels or
+enemy abilities' balance settings. Enemy-ability registry checks discover current
+abilities and level references automatically. Run `pnpm test:progression` for
+these checks.
+
 ## Scripts
 - `pnpm verify:quick` - Run the fast local verification suite
 - `pnpm typecheck` - Check TypeScript without emitting files
@@ -206,6 +213,7 @@ for this focused suite.
 - `pnpm test:unit` - Run non-Storybook Vitest tests once
 - `pnpm test:creatures` - Validate every runtime creature's integration
 - `pnpm test:attacks` - Check shared attack mechanics and registry integration
+- `pnpm test:progression` - Check evolution and enemy-ability mechanics and integration
 - `pnpm test run` - Run all tests once
 - `pnpm test:ui` - Visual test runner
 - `pnpm test:coverage` - Coverage report
