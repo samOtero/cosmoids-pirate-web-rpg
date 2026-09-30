@@ -100,10 +100,10 @@ The exact economics, prevalence, handling method, and story use of this salt-col
 - **Production assets:** Tight portrait icon plus left, up, and down directional battle sprites, with PNG masters under `art-source/creatures` and transparency-preserving WebP derivatives in `apps/web/public`.
 - **Gameplay implementation:** Pure Water type with the Warmth family resource and a provisional slow, durable adult stat profile. Its current learnset is `SCRATCH`, `SUNBATHE`, `WAKE_WHIP`, provisional `DEEPWATER_GRIP`, and `SALT_SPIT`. Wake Whip and Salt Spit are the approved physical Water attacks; Deepwater Grip and the final stat spread still await redesign. It is the level-16 evolution of Aguana.
 - **Story placement:** Evolution-only within the current Level 6 family integration; wild Nautiguan placement remains open.
-- **Manifest:** [`apps/web/src/content/creatures/nautiguan.json`](../../apps/web/src/content/creatures/nautiguan.json)
+- **Creation provenance:** [historical integration record](../art/CREATURE_PROVENANCE.md)
 - **Journal observation:** In strong underwater currents, a mature Nautiguan braces itself against the flow like a living breakwater while a young Aguana clings to the shelter of its flank. The adult looks back to check on the juvenile as loose seaweed and bubbles stream past them.
 - **Journal artwork:** [`art-source/creatures/journal/nautiguan_journal.png`](../../art-source/creatures/journal/nautiguan_journal.png), published at `/UI/Journal/nautiguan_journal.webp`.
-- **Production status:** Integrated into the creature registry, evolution data, tower-defense visuals, journal, and creature manifest.
+- **Production status:** Integrated into the creature registry, evolution data, tower-defense visuals, journal, and creation record.
 
 ## Open Decisions
 

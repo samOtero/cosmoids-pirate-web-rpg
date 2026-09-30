@@ -98,8 +98,8 @@ The family now uses **Warmth**, a persistent 0-100% battle resource based on the
 - **Story placement:** Capturable level-8 Aguana appear in both Level 6 waves on the center lane.
 - **Journal observation:** After a short dive, Aguana may stretch belly-up across a sun-warmed tidal rock with its head reclined and all four feet loose. The unusually vulnerable pose shows how completely it relaxes when it feels safe enough to recover its warmth.
 - **Journal artwork:** [`art-source/creatures/journal/aguana_journal.png`](../../art-source/creatures/journal/aguana_journal.png) -> `/UI/Journal/aguana_journal.webp`
-- **Manifest:** [`apps/web/src/content/creatures/aguana.json`](../../apps/web/src/content/creatures/aguana.json)
-- **Production status:** Integrated into the creature registry, journal, tower-defense visuals, Level 6 encounter data, and creature manifest.
+- **Creation provenance:** [historical integration record](../art/CREATURE_PROVENANCE.md)
+- **Production status:** Integrated into the creature registry, journal, tower-defense visuals, Level 6 encounter data, and creation record.
 
 ## Open Decisions
 

@@ -2,7 +2,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Graphics, Sprite } from 'pixi.js';
 import { DORMATEE } from '@/constants/creatures';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
-import dormateeManifest from '@/content/creatures/dormatee.json';
 import {
   drawReverieOrbProjectile,
   getDormateeOrbSocket,
@@ -63,9 +62,6 @@ describe('Reverie Orb', () => {
       { level: 4, attackId: 'REVERIE_ORB' },
       { level: 8, attackId: 'SHARED_SLUMBER' },
     ]);
-    expect(dormateeManifest.learnableAttacks).toEqual(
-      DORMATEE.learnableAttacks
-    );
     expect(ATTACK_DEFS.REVERIE_ORB).toMatchObject({
       name: 'Reverie Orb',
       type: ElementType.PSYCHIC,

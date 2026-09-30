@@ -105,7 +105,7 @@ Production assets:
 - `apps/web/public/battles/cosmoids/dormatee_down.webp` — 200x275 direct-front sprite.
 - `apps/web/public/battles/cosmoids/dormatee_up.webp` — 200x275 direct-rear sprite.
 - `apps/web/public/UI/Journal/dormatee_journal.webp` — 1024x1024 naturalist journal observation.
-- `apps/web/src/content/creatures/dormatee.json` — dated creature manifest and planned Level 7 placement record.
+- **Creation provenance:** [historical integration record](../art/CREATURE_PROVENANCE.md)
 
 ## Creation Record
 
@@ -119,7 +119,7 @@ Production assets:
 - **Journal observation:** Viewed from above in a quiet shallow lagoon, Dormatee rests belly-up while five small fish sleep in a loose circle around its whisker fan. The gathering shows that nearby wildlife feels safe inside its shared dream.
 - **Journal artwork:** [`art-source/creatures/journal/dormatee_journal.png`](../../art-source/creatures/journal/dormatee_journal.png), published at `/UI/Journal/dormatee_journal.webp`.
 - **Journal artwork approval:** September 22, 2026
-- **Production status:** Icon, left/down/up battle sprites, journal artwork, Psychic element support, species registry entry, directional configuration, Grumble, Reverie Orb, Shared Slumber, focused tests, and dated creature manifest are implemented. Right-facing visuals mirror the left sprite. Later dream techniques remain open.
+- **Production status:** Icon, left/down/up battle sprites, journal artwork, Psychic element support, species registry entry, directional configuration, Grumble, Reverie Orb, Shared Slumber, focused tests, and creation records are implemented. Right-facing visuals mirror the left sprite. Later dream techniques remain open.
 - **Provisional scale:** Approximately 1.4 meters long was suggested during concept development but is not yet locked.
 
 ## Open Decisions

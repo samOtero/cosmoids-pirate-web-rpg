@@ -116,7 +116,7 @@ The initial procedural visual places Marophis beside the target with smooth navy
 - **Game icon:** `apps/web/public/UI/Icons/marophis_icon.png`
 - **Directional battle art:** `apps/web/public/battles/cosmoids/marophis_left.webp`, `marophis_up.png`, and `marophis_down.png`
 - **Journal art:** `apps/web/public/UI/Journal/marophis_journal.png` — resting in a loose horizontal coil while breathing from a flooded-cavern air pocket
-- **Creature manifest:** `apps/web/src/content/creatures/marophis.json`
+- **Creation provenance:** [historical integration record](../art/CREATURE_PROVENANCE.md)
 - **Image status:** Approved standalone visual identity, production game assets, and naturalist journal art implemented
 - **Implementation status:** Registered Poison/Water Cosmoid; introduced as one capturable level-8 wild enemy in Level 5's current placeholder wave
 - **Initial gameplay profile:** Special-defense specialist; starts with Nibble, learns Spurt at level 4, learns the 50%-proc stacking-poison attack Venom Spray at level 8, and learns Deepwater Grip at level 12

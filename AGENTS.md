@@ -15,7 +15,7 @@
 - Check for an existing canonical master before adding a file. Do not keep duplicate source masters under different names or in both `art-source/` and `apps/web/public`.
 - Generate runtime derivatives through `apps/web/scripts/assets/optimize-art-assets.mjs` by running the matching root `pnpm assets:optimize:<category>` command documented in `art-source/README.md`. Add a clearly named optimizer category and root forwarding script when a new asset class needs different export settings.
 - Prefer transparency-preserving WebP for runtime raster art. Use a runtime PNG only when a documented platform or technical constraint requires it; source masters may remain PNG or another appropriate lossless/editable format.
-- Preserve exact source dimensions for Pixi-dependent assets such as directional sprites, level backgrounds, attacks, units, structures, and configured battle characters. Do not resize an integrated gameplay texture unless its dependent geometry, manifests, and tests are intentionally updated together.
+- Preserve exact source dimensions for Pixi-dependent assets such as directional sprites, level backgrounds, attacks, units, structures, and configured battle characters. Do not resize an integrated gameplay texture unless its dependent geometry, runtime configuration, and behavior tests are intentionally updated together.
 - Reuse the established quality, resize, and alpha settings for the asset category. Do not silently lower export quality merely to reduce deployment size.
 - When a runtime filename or format changes, update every application, manifest, test, development-tool, CSS, and documentation reference. Do not leave stale asset URLs or compatibility copies in `public`.
 - Inspect transparent runtime derivatives directly and composited over a representative game background at the configured gameplay scale. Check edges, alpha, crop, dimensions, and visual quality before removing a previous runtime file.
@@ -28,7 +28,16 @@
 - Render new and updated directional Cosmoid battle assets as smooth painted 2D game illustrations, not pixel art. Use `apps/web/public/battles/cosmoids/fueguana_left_1_v3.webp`, `fueguana_up_1_v3.webp`, and `fueguana_down_1_v3.webp` as the primary finish references.
 - Use clean antialiased outlines and controlled painted/cel shading. Avoid visible pixel blocks, dithering, jagged stair-step edges, and nearest-neighbor styling.
 - Creature icons should be tight head-and-face portraits. Show only a minimal amount of neck when needed; do not include shoulders, chest, forelegs, or torso. Follow the framing of the existing Fueguana, Monkeg, Palmit, and Senticle icons rather than Mopup.
-- Keep full-quality creature masters as transparent PNGs under `art-source/` when PNG is the appropriate editable source format. Ship transparency-preserving WebP derivatives and preserve the dimensions declared by their creature manifest unless the integration is intentionally updated.
+- Keep full-quality creature masters as transparent PNGs under `art-source/` when PNG is the appropriate editable source format. Ship transparency-preserving WebP derivatives and preserve the integrated source dimensions unless the dependent geometry and runtime configuration are intentionally updated.
+
+## Creature data and test ownership
+
+- `apps/web/src/constants/creatures.ts` is the sole authored source for species stats, typing, experience, learnsets, and evolution requirements. `tdConfigs.ts` owns battle visual configuration, and level registries own encounter placement.
+- Do not create creature manifests, duplicate gameplay JSON, or expected-value fixtures that mirror these registries. This repository rule overrides older creature-skill instructions to create or validate manifests.
+- Test all registered species directly with `pnpm test:creatures`: validate attack and evolution references, shipped asset paths, and usable directional visual configuration. Discover species from the registry so new creatures receive the checks automatically.
+- Generic content tests must not freeze exact names, stats, learn levels, filenames, sprite dimensions, or scales. Use current registry values as inputs to behavior tests; assert outcomes and relationships. Exact values belong in a test only when they are essential to the mechanic being tested, not merely a copy of current balance tuning.
+- Keep creation dates, approved source-image records, and art inspection notes in documentation. They are historical records, not a second gameplay specification. See `docs/art/CREATURE_PROVENANCE.md`.
+- When adding or updating creatures, run `pnpm test:creatures` and `pnpm verify:quick`, plus focused tests for changed mechanics. Inspect dimensions and transparency through the art workflow when artwork changes; do not encode a second asset inventory in manifests.
 
 ## Tower combat direction
 

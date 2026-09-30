@@ -117,7 +117,7 @@ On the cursed path, exploitative handlers can take advantage of Macask's refusal
 - **Final ID:** `macask`
 - **Concept-art file:** `docs/cosmoids/images/macask-concept.png`
 - **Image status:** Approved standalone visual identity reference; tail-tip cargo removed before approval
-- **Implementation status:** Production icon, directional battle art, manifest, registry entry, reused attack set, stats, level-12 evolution from Monkeg, and a capturable level-10 Level 5 encounter implemented. Journal art and both final branches remain open.
+- **Implementation status:** Production icon, directional battle art, creation record, registry entry, reused attack set, stats, level-12 evolution from Monkeg, and a capturable level-10 Level 5 encounter implemented. Journal art and both final branches remain open.
 
 ## Open Decisions
 

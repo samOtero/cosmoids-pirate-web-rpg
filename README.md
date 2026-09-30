@@ -180,16 +180,23 @@ For a fast, non-browser verification pass after making a change, run:
 pnpm verify:quick
 ```
 
-This checks TypeScript, validates dialogs and creature manifests, and runs the
+This checks TypeScript and runs dialog validation, creature registry checks, and the
 Vitest unit and integration projects without the browser-based Storybook
 project. Run `pnpm lint` separately while the existing lint backlog is being
 cleaned up.
+
+Creature gameplay data is authored in `apps/web/src/constants/creatures.ts`.
+There are no duplicate creature manifests to synchronize when tuning stats or
+learnsets. `pnpm test:creatures` discovers every species from the runtime registry
+and checks attack/evolution references, shipped artwork, and directional visuals.
+Creation history lives in documentation; see [creature provenance](docs/art/CREATURE_PROVENANCE.md).
 
 ## Scripts
 - `pnpm verify:quick` - Run the fast local verification suite
 - `pnpm typecheck` - Check TypeScript without emitting files
 - `pnpm lint` - Run the complete ESLint suite
 - `pnpm test:unit` - Run non-Storybook Vitest tests once
+- `pnpm test:creatures` - Validate every runtime creature's integration
 - `pnpm test run` - Run all tests once
 - `pnpm test:ui` - Visual test runner
 - `pnpm test:coverage` - Coverage report

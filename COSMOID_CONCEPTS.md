@@ -13,7 +13,7 @@ Last consolidated: September 21, 2026
 - **Core concept:** A rare Psychic manatee whose naps calm an entire lagoon by linking nearby sleeping minds through its dense tactile whiskers.
 - **Visual identity:** A round blue-lavender manatee curled into a floating resting pose, with a broad paddle tail, dense pearl-tipped whisker fan, and exactly one pearly dream orb.
 - **Story placement:** Proposed rare wildlife encounter for Level 7's no-objective, cannot-lose island stop. The player may catch it or leave it sleeping in a sheltered lagoon.
-- **Status:** Final name and standalone identity approved September 18, 2026. Icon, directional battle assets, Psychic element support, species registration, gameplay defaults, manifest, and approved journal artwork showing its circle of sleeping lagoon fish are implemented; custom dream techniques and Level 7 runtime integration remain pending.
+- **Status:** Final name and standalone identity approved September 18, 2026. Icon, directional battle assets, Psychic element support, species registration, gameplay defaults, creation record, and approved journal artwork showing its circle of sleeping lagoon fish are implemented; custom dream techniques and Level 7 runtime integration remain pending.
 - **Dedicated record and concept art:** [`docs/cosmoids/dormatee.md`](./docs/cosmoids/dormatee.md)
 
 ### Yokodillo — The Sumo Armadillo Cosmoid
@@ -23,7 +23,7 @@ Last consolidated: September 21, 2026
 - **Core concept:** A jovial armadillo brawler that plants itself in a sumo stance, welcomes an opponent's strongest shove, then curls into a rolling countercharge when finally moved.
 - **Visual identity:** A huge cream-bellied round torso inside layered brown armadillo armor, broad raised palms, a cheerful grin, and two stout feet firmly planted in a low, wide stance.
 - **Story placement:** Proposed Level 7 wildlife for the relaxed no-objective, cannot-lose island stop, where it turns stretching and friendly sparring into playful pushing contests.
-- **Status:** Production-integrated with a game icon, directional battle art, Fighting element support, gameplay data, a dated manifest, and approved journal artwork showing its unexpectedly gentle bark-lifting foraging behavior. Custom sumo techniques and Level 7 runtime placement remain open.
+- **Status:** Production-integrated with a game icon, directional battle art, Fighting element support, gameplay data, a creation record, and approved journal artwork showing its unexpectedly gentle bark-lifting foraging behavior. Custom sumo techniques and Level 7 runtime placement remain open.
 - **Dedicated record and concept art:** [`docs/cosmoids/yokodillo.md`](./docs/cosmoids/yokodillo.md)
 
 ### Poguin — The Hopping Penguin Cosmoid
@@ -170,7 +170,7 @@ These are earlier-stage seeds and alternate directions that have not yet been co
 - **Typing:** Poison/Ground
 - **Core concept:** A vinegaroon-inspired prisoner whose acidic secretion carries corrosion-promoting microbes. It saturates loose grit with the secretion and lashes the abrasive slurry from its fan-shaped tail to help break Tigrevel's steel gate in Level 5.
 - **Name concept:** Corrosion or corrode + vinegaroon, connecting its animal basis to its metal-scouring behavior.
-- **Status:** Creature assets, Poison/Ground typing, registry entry, and manifest implemented; Level 5 captive-ally behavior remains planned.
+- **Status:** Creature assets, Poison/Ground typing, registry entry, and creation record implemented; Level 5 captive-ally behavior remains planned.
 - **Dedicated record and concept art:** [`docs/cosmoids/corrogoon.md`](./docs/cosmoids/corrogoon.md)
 
 ### Bramfrit — The Courtly Battering Ram
@@ -178,7 +178,7 @@ These are earlier-stage seeds and alternate directions that have not yet been co
 - **Typing:** Fire
 - **Core concept:** A proud bighorn-ram prisoner whose squared spiral horns align into one heated battering face. It bows, retreats exactly three paces, scratches a glowing starting line, and waits for a gate to accept its formal challenge before charging.
 - **Name concept:** Battering ram + ifrit, expressing a siege creature animated by a fiery spirit.
-- **Status:** Creature assets, registry entry, and manifest implemented; Level 5 captive-ally behavior remains planned.
+- **Status:** Creature assets, registry entry, and creation record implemented; Level 5 captive-ally behavior remains planned.
 - **Dedicated record and concept art:** [`docs/cosmoids/bramfrit.md`](./docs/cosmoids/bramfrit.md)
 
 ### Sepippet — The Shadow-Stage Infiltrator
@@ -187,7 +187,7 @@ These are earlier-stage seeds and alternate directions that have not yet been co
 - **Core concept:** A theatrical cuttlefish prisoner whose chromatophore mantle projects false Navy guards while its broad arms flatten into articulated shadows, slip through the gate's seams, and remove its internal locking pieces.
 - **Character hook:** An accomplished illusionist that desperately wants to appear mysterious, but one excitable arm always waves at the audience and reveals the trick.
 - **Name concept:** _Sepia_ + _puppet_, connecting its cuttlefish biology to its shadow-puppet performances.
-- **Status:** Creature assets, registry entry, Dark typing, and manifest implemented; Level 5 captive-ally behavior remains planned.
+- **Status:** Creature assets, registry entry, Dark typing, and creation record implemented; Level 5 captive-ally behavior remains planned.
 - **Dedicated record and concept art:** [`docs/cosmoids/sepippet.md`](./docs/cosmoids/sepippet.md)
 
 ### Parlet — The Restless Reef Artist
@@ -196,7 +196,7 @@ These are earlier-stage seeds and alternate directions that have not yet been co
 - **Core concept:** A proud parrotfish whose broad overlapping scales rearrange their colors into living mosaic patterns. Every finished design lasts only until Parlet notices one imperfect patch and starts revising it again.
 - **Character hook:** A gifted artist that is physically incapable of deciding its own work is finished.
 - **Name concept:** _Parrotfish_ + _palette_, connecting its animal basis with the living colors across its body.
-- **Status:** Creature assets, registry entry, Water typing, and manifest implemented; Level 5 captive-ally behavior remains planned.
+- **Status:** Creature assets, registry entry, Water typing, and creation record implemented; Level 5 captive-ally behavior remains planned.
 - **Dedicated record and concept art:** [`docs/cosmoids/parlet.md`](./docs/cosmoids/parlet.md)
 
 ### Water Sloth

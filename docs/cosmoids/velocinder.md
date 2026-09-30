@@ -125,7 +125,7 @@ The middle evolution remains morally and visually neutral. On a future noble rou
 - **Concept-art file:** `docs/cosmoids/images/velocinder-concept.png`
 - **Image status:** Approved standalone visual identity reference supplied by the user
 - **Journal-entry status:** Approved working entry recorded above
-- **Implementation status:** Production-integrated with a tight portrait icon, left/up/down battle art, creature manifest, registry and tower-defense configs, Fueguana's level-16 evolution logic, reused attacks, tuned stage-two stats, and a capturable Level 5 encounter
+- **Implementation status:** Production-integrated with a tight portrait icon, left/up/down battle art, creation record, registry and tower-defense configs, Fueguana's level-16 evolution logic, reused attacks, tuned stage-two stats, and a capturable Level 5 encounter
 
 ## Open Decisions
 

@@ -167,7 +167,7 @@ The broader prisoner roster has explored Poison, Dark, Water, Rock, Ground, and 
 ### Bramfrit implementation status
 
 - The icon, left-facing, upward-facing, and downward-facing game assets are complete.
-- Bramfrit is registered as a Fire-type Cosmoid with a dated creature manifest.
+- Bramfrit is registered as a Fire-type Cosmoid with a runtime species definition.
 - Its Level 5 prisoner definition remains excluded from enemy waves because the captive is represented by the objective-ally system.
 - Its lower-left side-cell gate is implemented as a selectable Steel structure with painted transparent PNG states for intact, bent, heavily damaged, and persistent broken-rubble visuals.
 - Destroying the side gate releases Bramfrit once, clears gate focus, shows a release callout, and sends Bramfrit along a fixed route toward the main cell.
@@ -176,7 +176,7 @@ The broader prisoner roster has explored Poison, Dark, Water, Rock, Ground, and 
 ### Corrogoon implementation status
 
 - The icon, left-facing, upward-facing, and downward-facing game assets are complete.
-- Corrogoon is registered as a Poison/Ground Cosmoid with a dated creature manifest.
+- Corrogoon is registered as a Poison/Ground Cosmoid with a runtime species definition.
 - Its Level 5 prisoner definition is registered but intentionally excluded from enemy waves.
 - Its optional lower-right cell gate is implemented with the shared damage-state images.
 - Destroying the gate sends Corrogoon along the mirrored right-side route toward Tigrevel's cell.
@@ -197,7 +197,7 @@ The broader prisoner roster has explored Poison, Dark, Water, Rock, Ground, and 
 ### Parlet implementation status
 
 - The icon, left-facing, upward-facing, and downward-facing game assets are complete.
-- Parlet is registered as a Water-type Cosmoid with a dated creature manifest.
+- Parlet is registered as a Water-type Cosmoid with a runtime species definition.
 - Its Level 5 prisoner definition remains excluded from enemy waves because the captive is represented by the objective-ally system.
 - Its optional right-side cell gate is implemented with the shared damage-state images.
 - Destroying the gate sends Parlet along an authored route toward Tigrevel's cell.

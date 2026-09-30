@@ -18,7 +18,6 @@
     "test:e2e:ui": "pnpm --filter @cosmoids/web test:e2e:ui",
     "test:e2e:headed": "pnpm --filter @cosmoids/web test:e2e:headed",
     "validate:dialogs": "pnpm --filter @cosmoids/web validate:dialogs",
-    "validate:creature-manifests": "pnpm --filter @cosmoids/web validate:creature-manifests",
     "test:creatures": "pnpm --filter @cosmoids/web test:creatures",
     "assets:optimize": "pnpm --filter @cosmoids/web assets:optimize",
     "assets:optimize:journals": "pnpm --filter @cosmoids/web assets:optimize:journals",

@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DORMATEE } from '@/constants/creatures';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
-import dormateeManifest from '@/content/creatures/dormatee.json';
 import { ProjectileBehavior } from '@/engine/tower-defense/attacks/behaviors';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
@@ -68,10 +67,6 @@ describe('Grumble', () => {
 
   it('replaces Dormatee’s level-1 Body Rush with a plain Normal special projectile', () => {
     expect(DORMATEE.learnableAttacks[0]).toEqual({
-      level: 1,
-      attackId: 'GRUMBLE',
-    });
-    expect(dormateeManifest.learnableAttacks[0]).toEqual({
       level: 1,
       attackId: 'GRUMBLE',
     });

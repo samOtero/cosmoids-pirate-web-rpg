@@ -1,6 +1,6 @@
 # Voltusk production-art review
 
-> September 6, 2026. All four normal-form previews approved by the user before transparent-background work. Final transparent PNGs, creature registration, directional visuals, and the dated manifest are complete. Level 6 encounter implementation remains pending.
+> September 6, 2026. All four normal-form previews approved by the user before transparent-background work. Final transparent PNGs, creature registration, directional visuals, and the creation record are complete. Level 6 encounter implementation remains pending.
 
 [Approved concept and identity checklist](../../voltusk.md)
 
@@ -62,6 +62,6 @@ The first icon and rear previews are retained as revision history. The left and 
 
 The source review copies were verified against their generated source hashes. Each final PNG has real RGBA transparency, four fully transparent corners, non-empty opaque subject coverage, and partially transparent antialiased edges. The icon retains the tusk fade as alpha. Exports were inspected against light and dark backgrounds and at their configured game display scale (0.52 for battle sprites); no visible chroma fringe remains. The final contact sheet shows the exports and their reduced game-scale appearance; it is an inspection composite, not an in-engine screenshot.
 
-The species and directional configurations are registered, with Body Rush and Spark reused from the existing attack catalog. The [manifest](../../../../apps/web/src/content/creatures/voltusk.json) records actual dimensions and planned Level 6 boss placement. No Level 5 wave introduction was substituted. Level 6 remains a locked placeholder; encounter mechanics, cursed-phase visuals, capture availability, and final balance require further design.
+The species and directional configurations are registered, with Body Rush and Spark reused from the existing attack catalog. The [creation provenance](../../../art/CREATURE_PROVENANCE.md) preserves the original integration date and source-image record. Asset dimensions are recorded in this review; the planned Level 6 boss placement is described in the creature design document. No Level 5 wave introduction was substituted. Level 6 remains a locked placeholder; encounter mechanics, cursed-phase visuals, capture availability, and final balance require further design.
 
-Validation on September 6, 2026: all 10 creature manifests validated, all 21 creature integration tests and 10 focused attack tests passed, and TypeScript checking passed. Image checks confirmed manifest dimensions and real alpha. The existing Spark test now checks that Spark remains separate from the Razcall family learnsets, allowing Voltusk to use it without changing attack behavior.
+Validation on September 6, 2026: all 10 then-current creature manifests validated (this historical validation system has since been retired), all 21 creature integration tests and 10 focused attack tests passed, and TypeScript checking passed. Image checks confirmed the recorded asset dimensions and real alpha. The existing Spark test now checks that Spark remains separate from the Razcall family learnsets, allowing Voltusk to use it without changing attack behavior.

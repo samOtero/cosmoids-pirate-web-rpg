@@ -1,6 +1,6 @@
 # Corrogoon
 
-> Concept record finalized August 30, 2026. Corrogoon's production game assets, creature registry entry, manifest, Level 5 prisoner definition, and captive-ally behavior are implemented.
+> Concept record finalized August 30, 2026. Corrogoon's production game assets, creature registry entry, creation record, Level 5 prisoner definition, and captive-ally behavior are implemented.
 
 ![Corrogoon concept art](./images/corrogoon-concept.png)
 
@@ -86,7 +86,7 @@ This makes Corrogoon valuable without making it the sole solution: every captive
 - **Concept-art file:** `docs/cosmoids/images/corrogoon-concept.png`
 - **Game icon:** `apps/web/public/UI/Icons/corrogoon_icon.png`
 - **Directional battle art:** `apps/web/public/battles/cosmoids/corrogoon_left.webp`, `corrogoon_up.png`, and `corrogoon_down.png`
-- **Creature manifest:** `apps/web/src/content/creatures/corrogoon.json`
+- **Creation provenance:** [historical integration record](../art/CREATURE_PROVENANCE.md)
 - **Image status:** Approved standalone visual identity and production game assets implemented
 - **Initial gameplay profile:** Poison/Ground type; slow armored bruiser; starts with Pinch, learns Tackle at level 4, and learns Nibble at level 7
 

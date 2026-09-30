@@ -1,6 +1,6 @@
 # Yokodillo
 
-> Final name and standalone visual identity approved September 18, 2026. Production icon, directional battle assets, Fighting element support, species registration, gameplay defaults, and manifest were completed the same day. Journal artwork and Level 7 runtime integration were completed September 22, 2026; its first custom technique was added September 23, 2026.
+> Final name and standalone visual identity approved September 18, 2026. Production icon, directional battle assets, Fighting element support, species registration, gameplay defaults, and creation record were completed the same day. Journal artwork and Level 7 runtime integration were completed September 22, 2026; its first custom technique was added September 23, 2026.
 
 ![Yokodillo concept art](./images/yokodillo-concept.png)
 

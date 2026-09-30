@@ -130,7 +130,7 @@ On the cursed path, Carapenter pushes its seawater training too far and begins t
 - **Image status:** Approved standalone visual identity reference; stray emphasis ticks removed before approval
 - **Game icon:** `apps/web/public/UI/Icons/carapenter_icon.png`
 - **Directional battle art:** `apps/web/public/battles/cosmoids/carapenter_left.webp`, `carapenter_up.png`, and `carapenter_down.png`
-- **Creature manifest:** `apps/web/src/content/creatures/carapenter.json`
+- **Creation provenance:** [historical integration record](../art/CREATURE_PROVENANCE.md)
 - **Implementation status:** Production icon, corrected two-claw directional battle art, Grass gameplay data, Palmit's level-16 evolution node, TD visuals, and one capturable Level 5 encounter implemented
 
 ## Open Decisions

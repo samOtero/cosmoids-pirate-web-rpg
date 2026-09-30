@@ -1,6 +1,6 @@
 # Bramfrit
 
-> Concept record created August 30, 2026. Bramfrit's game assets, creature registry entry, and manifest are implemented; its Level 5 captive-ally behavior remains planned.
+> Concept record created August 30, 2026. Bramfrit's game assets, creature registry entry, and creation record are implemented; its Level 5 captive-ally behavior remains planned.
 
 ![Bramfrit concept art](./images/bramfrit-concept.png)
 
@@ -84,7 +84,7 @@ Because the ritual includes a deliberate pause, the player can anticipate each m
 - **Concept-art file:** `docs/cosmoids/images/bramfrit-concept.png`
 - **Game icon:** `apps/web/public/UI/Icons/bramfrit_icon.png`
 - **Directional battle art:** `apps/web/public/battles/cosmoids/bramfrit_left.webp`, `bramfrit_up.png`, and `bramfrit_down.png`
-- **Creature manifest:** `apps/web/src/content/creatures/bramfrit.json`
+- **Creation provenance:** [historical integration record](../art/CREATURE_PROVENANCE.md)
 - **Image status:** Approved concept direction and production game assets implemented
 - **Initial gameplay profile:** Fire type; bulky physical attacker; starts with Tackle and learns Ember at level 4
 

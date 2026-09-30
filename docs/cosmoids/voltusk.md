@@ -1,6 +1,6 @@
 # Voltusk
 
-> Updated September 6, 2026. Name, visual design, core lore, and all four normal-form assets are approved. Transparent assets, species registration, directional visuals, and the creature manifest are complete. The Level 6 encounter remains planned.
+> Updated September 6, 2026. Name, visual design, core lore, and all four normal-form assets are approved. Transparent assets, species registration, directional visuals, and the creation record are complete. The Level 6 encounter remains planned.
 
 ![Voltusk concept art](./images/voltusk-concept.png)
 
@@ -82,9 +82,9 @@ Bell or gong calls may contribute to this encounter, but their timing, effects, 
 - **Approved source image:** `exec-c19f0ea7-3cbf-44fc-b35c-8b7ca3428412.png`
 - **Visual selection:** Regal walrus direction, golden-yellow recolor, then marking variation 3 with black chest chevrons and flipper bands.
 - **Image status:** Approved standalone concept, copied unchanged from the generated source.
-- **Production status:** All four previews approved before background removal, per the user's instruction. Transparent head icon and left/down/up sprites are exported and registered; see [the asset review and final exports](reviews/voltusk/README.md) and [dated creature manifest](../../apps/web/src/content/creatures/voltusk.json). Right-facing visuals mirror the left sprite.
+- **Production status:** All four previews approved before background removal, per the user's instruction. Transparent head icon and left/down/up sprites are exported and registered; see [the asset review and final exports](reviews/voltusk/README.md) and [creation provenance](../art/CREATURE_PROVENANCE.md). Right-facing visuals mirror the left sprite.
 - **Initial gameplay defaults:** Slow, bulky special attacker: HP 90, Attack 74, Defense 88, Special Attack 92, Special Defense 78, Speed 24; base experience 96. Reuses the existing `lizard` movement profile, Body Rush (`TACKLE`), and Spark (`SPARK`), both available at level 1. These are integration defaults, not final Level 6 encounter balance.
-- **Placement status:** Reserved as the Level 6 boss in the manifest. The runtime still has a locked Level 6 placeholder, so no waves or capture policy have been added. The creature is registered independently of the future encounter.
+- **Placement status:** Reserved as the Level 6 boss in the creature design document. The runtime still has a locked Level 6 placeholder, so no waves or capture policy have been added. The creature is registered independently of the future encounter.
 
 ## Open Decisions
 
