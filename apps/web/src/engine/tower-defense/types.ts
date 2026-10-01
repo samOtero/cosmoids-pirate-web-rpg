@@ -41,9 +41,20 @@ export interface TDOpeningPan {
   durationMs: number;
 }
 
-export interface TDWaveGroup {
+export interface TDWeightedEncounter {
   /** References a level-scoped TDWaveEnemyDefinition. */
   enemyDefinitionId: string;
+  /** Positive relative weight. Chance per spawn is weight / total pool weight. */
+  weight: number;
+  /** Overrides the group's route for this encounter only. */
+  pathIndex?: number;
+}
+
+export interface TDWaveGroup {
+  /** Fixed encounter, or fallback when an encounter pool is unusable. */
+  enemyDefinitionId: string;
+  /** Roll independently for each spawn, including repeated waves. */
+  encounterPool?: TDWeightedEncounter[];
   count: number; // How many to spawn
   spawnIntervalMs: number; // Time between each spawn in this group
   delayBeforeGroupMs: number; // Delay before this group starts (after wave start or previous group ends)
@@ -209,6 +220,10 @@ export interface TDObjectiveAllyDefinition {
 export interface TDWave {
   id: string; // e.g. "wave_1"
   groups: TDWaveGroup[];
+  /** Total finite runs of this wave, including its first run. Defaults to 1. */
+  repeatCount?: number;
+  /** Delay to the first spawn of a repeated run, after the previous run finishes spawning. */
+  delayBetweenRepeatsMs?: number;
 }
 
 /**

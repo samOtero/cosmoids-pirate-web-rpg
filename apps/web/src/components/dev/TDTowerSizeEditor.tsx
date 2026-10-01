@@ -580,8 +580,8 @@ export default function TDTowerSizeEditor({
               </div>
               <input
                 type="range"
-                min={-100}
-                max={100}
+                min={-500}
+                max={500}
                 step={1}
                 value={healthBarOffsetY}
                 onChange={(e) =>

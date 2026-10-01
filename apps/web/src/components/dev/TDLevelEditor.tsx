@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { TDEncounterPoolEditor } from './TDEncounterPoolEditor';
 import { useEditorSource } from './useEditorSource';
 import EditorSourceStatus from './EditorSourceStatus';
 import PixiTDLevelEditor, {
@@ -437,6 +438,10 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
           if (group.enemyDefinitionId === previousId) {
             group.enemyDefinitionId = value;
           }
+          group.encounterPool?.forEach((entry) => {
+            if (entry.enemyDefinitionId === previousId)
+              entry.enemyDefinitionId = value;
+          });
         });
       });
       return {
@@ -1417,6 +1422,46 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
                       </div>
 
                       <div className="space-y-2">
+                        <div className="grid grid-cols-2 gap-2 text-xs text-slate-400">
+                          {(
+                            [
+                              ['repeatCount', 'Total waves', 1],
+                              [
+                                'delayBetweenRepeatsMs',
+                                'Pause between waves (ms)',
+                                0,
+                              ],
+                            ] as const
+                          ).map(([field, label, minimum]) => (
+                            <label key={field}>
+                              {label}
+                              <input
+                                type="number"
+                                min={minimum}
+                                step="1"
+                                value={
+                                  wave[field] ??
+                                  (field === 'repeatCount' ? 1 : 0)
+                                }
+                                onChange={(event) =>
+                                  setDraft((previousDraft) => {
+                                    const nextWaves = structuredClone(
+                                      previousDraft.waves
+                                    );
+                                    nextWaves[wIdx][field] = Number(
+                                      event.target.value
+                                    );
+                                    return {
+                                      ...previousDraft,
+                                      waves: nextWaves,
+                                    };
+                                  })
+                                }
+                                className="mt-1 w-full rounded border border-slate-700 bg-slate-950 p-1 text-white"
+                              />
+                            </label>
+                          ))}
+                        </div>
                         {wave.groups.map((group, gIdx) => (
                           <div
                             key={gIdx}
@@ -1430,9 +1475,20 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
                             </button>
 
                             <div className="mt-2 grid grid-cols-2 gap-2">
+                              <TDEncounterPoolEditor
+                                pool={group.encounterPool}
+                                defaultEnemyId={group.enemyDefinitionId}
+                                definitions={waveEnemyDefinitions}
+                                pathCount={paths.length}
+                                onChange={(pool) =>
+                                  updateGroup(wIdx, gIdx, 'encounterPool', pool)
+                                }
+                              />
                               <div>
                                 <label className="mb-1 block text-slate-400">
-                                  Enemy Definition
+                                  {group.encounterPool
+                                    ? 'Fallback Enemy Definition'
+                                    : 'Enemy Definition'}
                                 </label>
                                 <select
                                   value={group.enemyDefinitionId}

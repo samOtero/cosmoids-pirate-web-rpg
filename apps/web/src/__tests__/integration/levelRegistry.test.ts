@@ -5,6 +5,9 @@ import { COSMOID_TEMPLATES } from '@/constants/creatures';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { LEVEL_ORDER, TD_LEVELS } from '@/constants/tdLevels';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import { getWaveGroupEncounters } from '@/engine/tower-defense/waveEncounters';
+import { expandWaveRepetitions } from '@/engine/tower-defense/waveSchedule';
+import { validateTDLevelDraft } from '@/utils/tdLevelDraft';
 import type { Point } from '@/engine/tower-defense/types';
 import { battle } from '../engine/behaviorFixtures';
 
@@ -27,6 +30,9 @@ describe.each(Object.entries(TD_LEVELS))(
   '%s level integration',
   (id, { levelData: level, winEvents, journalCompletion }) => {
     it('has usable routes and valid wave, creature, attack, and objective references', () => {
+      expect(
+        validateTDLevelDraft(level, new Set(Object.keys(COSMOID_TEMPLATES)))
+      ).toEqual([]);
       expect(level.paths.length).toBeGreaterThan(0);
       for (const path of level.paths) {
         expect(path.length).toBeGreaterThanOrEqual(2);
@@ -70,6 +76,12 @@ describe.each(Object.entries(TD_LEVELS))(
             `${id}: unknown enemy ${group.enemyDefinitionId}`
           ).toBeDefined();
           pathIndex(group.pathIndex);
+          for (const encounter of getWaveGroupEncounters(group)) {
+            expect(definitions.get(encounter.enemyDefinitionId)).toBeDefined();
+            expect(Number.isFinite(encounter.weight)).toBe(true);
+            expect(encounter.weight).toBeGreaterThan(0);
+            pathIndex(encounter.pathIndex ?? group.pathIndex);
+          }
           if (group.laneHop) pathIndex(group.laneHop.targetPathIndex);
           expect(Number.isInteger(group.count)).toBe(true);
           expect(group.count).toBeGreaterThanOrEqual(0);
@@ -215,7 +227,9 @@ describe.each(Object.entries(TD_LEVELS))(
         for (const relocation of config.waveRelocations ?? []) {
           expect(Number.isInteger(relocation.afterWaveIndex)).toBe(true);
           expect(relocation.afterWaveIndex).toBeGreaterThan(previousWave);
-          expect(level.waves[relocation.afterWaveIndex]).toBeDefined();
+          expect(
+            expandWaveRepetitions(level.waves)[relocation.afterWaveIndex]
+          ).toBeDefined();
           expect(relocation.path.length).toBeGreaterThanOrEqual(2);
           expect(relocation.path[0]).toEqual(previous);
           relocation.path.forEach(point);

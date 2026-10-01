@@ -217,6 +217,21 @@ describe('tower-defense outro priority', () => {
     expect(onWin).toHaveBeenCalledOnce();
   });
 
+  it('shows the finite wave total including repeated runs', () => {
+    render(
+      <TowerDefenseScreen
+        levelData={{
+          paths: [],
+          placementSpots: [],
+          waveEnemyDefinitions: [],
+          waves: [{ id: 'wildlife', repeatCount: 3, groups: [] }],
+        }}
+        onClose={vi.fn()}
+      />
+    );
+    expect(screen.getByText('Wave 1 / 3')).toBeInTheDocument();
+  });
+
   it('renders Tower Defense in header (hidden on mobile) when no introMessage is provided', () => {
     render(
       <TowerDefenseScreen

@@ -1,4 +1,5 @@
 import { Point, TDLevelData } from '@/engine/tower-defense/types';
+import { expandWaveRepetitions } from '@/engine/tower-defense/waveSchedule';
 
 export function createEmptyTDLevelDraft(): TDLevelData {
   return {
@@ -238,7 +239,8 @@ export function validateTDLevelDraft(
       if (
         !Number.isInteger(relocation.afterWaveIndex) ||
         relocation.afterWaveIndex < 0 ||
-        relocation.afterWaveIndex >= levelData.waves.length - 1
+        relocation.afterWaveIndex >=
+          expandWaveRepetitions(levelData.waves).length - 1
       ) {
         errors.push(`${relocationLabel} must follow a non-final wave.`);
       }
@@ -429,6 +431,20 @@ export function validateTDLevelDraft(
     }
     waveIds.add(wave.id);
 
+    if (
+      wave.repeatCount !== undefined &&
+      (!Number.isInteger(wave.repeatCount) || wave.repeatCount < 1)
+    ) {
+      errors.push(`${waveLabel} repeat count must be a positive integer.`);
+    }
+    if (
+      wave.delayBetweenRepeatsMs !== undefined &&
+      (!Number.isFinite(wave.delayBetweenRepeatsMs) ||
+        wave.delayBetweenRepeatsMs < 0)
+    ) {
+      errors.push(`${waveLabel} repeat delay cannot be negative.`);
+    }
+
     wave.groups.forEach((group, groupIndex) => {
       const groupLabel = `${waveLabel}, group ${groupIndex + 1}`;
       if (!group.enemyDefinitionId.trim()) {
@@ -437,6 +453,47 @@ export function validateTDLevelDraft(
         errors.push(
           `${groupLabel} references unknown enemy definition "${group.enemyDefinitionId}".`
         );
+      }
+
+      if (group.encounterPool) {
+        if (group.encounterPool.length === 0) {
+          errors.push(`${groupLabel} encounter pool needs at least one entry.`);
+        }
+        const total = group.encounterPool.reduce(
+          (sum, entry) => sum + entry.weight,
+          0
+        );
+        if (!Number.isFinite(total) || total <= 0) {
+          errors.push(
+            `${groupLabel} encounter pool needs a finite positive total weight.`
+          );
+        }
+        group.encounterPool.forEach((entry, entryIndex) => {
+          const label = `${groupLabel}, encounter ${entryIndex + 1}`;
+          if (!enemyDefinitionIds.has(entry.enemyDefinitionId)) {
+            errors.push(
+              `${label} references unknown enemy definition "${entry.enemyDefinitionId}".`
+            );
+          }
+          if (!Number.isFinite(entry.weight) || entry.weight <= 0) {
+            errors.push(`${label} weight must be greater than 0.`);
+          }
+          if (
+            entry.pathIndex !== undefined &&
+            (!Number.isInteger(entry.pathIndex) ||
+              entry.pathIndex < 0 ||
+              entry.pathIndex >= levelData.paths.length)
+          ) {
+            errors.push(`${label} references an invalid path.`);
+          }
+          if (
+            group.laneHop &&
+            (entry.pathIndex ?? group.pathIndex) ===
+              group.laneHop.targetPathIndex
+          ) {
+            errors.push(`${label} lane hop must target a different path.`);
+          }
+        });
       }
 
       if (!Number.isInteger(group.count) || group.count < 1) {
@@ -469,7 +526,9 @@ export function validateTDLevelDraft(
           hop.targetPathIndex >= levelData.paths.length ||
           hop.targetPathIndex === group.pathIndex
         ) {
-          errors.push(`${groupLabel} lane hop references an invalid target path.`);
+          errors.push(
+            `${groupLabel} lane hop references an invalid target path.`
+          );
         }
         if (
           !Number.isFinite(hop.triggerProgress) ||
@@ -484,7 +543,9 @@ export function validateTDLevelDraft(
           errors.push(`${groupLabel} lane hop windup cannot be negative.`);
         }
         if (!Number.isFinite(hop.durationMs) || hop.durationMs <= 0) {
-          errors.push(`${groupLabel} lane hop duration must be greater than 0.`);
+          errors.push(
+            `${groupLabel} lane hop duration must be greater than 0.`
+          );
         }
         if (!Number.isFinite(hop.arcHeight) || hop.arcHeight < 0) {
           errors.push(`${groupLabel} lane hop arc height cannot be negative.`);

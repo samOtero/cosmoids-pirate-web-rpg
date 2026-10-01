@@ -10,6 +10,7 @@ import {
 } from '@/types/baseGame';
 import { LEVEL_ORDER, TD_LEVELS } from '@/constants/tdLevels';
 import { COSMOID_TEMPLATES } from '@/constants/creatures';
+import { getWaveGroupEncounters } from '@/engine/tower-defense/waveEncounters';
 import { Button } from '@/app/components/ui/Button';
 import { resolveDialog } from '@/utils/dialogResolver';
 import DialogContent from '@/app/components/ui/DialogContent';
@@ -29,8 +30,10 @@ function getLevelCreatureIcons(context: TDLevelContext): string[] {
   const uniqueIds = new Set<string>();
   levelConfig.levelData.waves.forEach((wave) => {
     wave.groups.forEach((group) => {
-      const definition = definitionsById.get(group.enemyDefinitionId);
-      if (definition?.creatureId) uniqueIds.add(definition.creatureId);
+      for (const encounter of getWaveGroupEncounters(group)) {
+        const definition = definitionsById.get(encounter.enemyDefinitionId);
+        if (definition?.creatureId) uniqueIds.add(definition.creatureId);
+      }
     });
   });
 

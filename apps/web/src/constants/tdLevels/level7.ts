@@ -1,9 +1,9 @@
 import { TDLevelData } from '@/engine/tower-defense/types';
 
 /**
- * A close, single-screen shoreline slice. Yokodillo patrols the folded land
- * route while Dormatee crosses the broad shallow-water foreground. Wildlife
- * leaves at the far end, and the level completes once every unit is gone.
+ * A close, single-screen shoreline slice with independently rolled wildlife.
+ * Land visitors follow the folded route; Dormatee and Aguana cross the shallows.
+ * A finite wildlife visit ends after the last arrivals clear, or on leaving early.
  */
 export const LEVEL_7: TDLevelData = {
   paths: [
@@ -68,25 +68,51 @@ export const LEVEL_7: TDLevelData = {
       level: 9,
       speedMultiplier: 0.65,
     },
+    {
+      id: 'level_7_aguana',
+      creatureId: 'aguana',
+      level: 9,
+      speedMultiplier: 0.8,
+    },
+    {
+      id: 'level_7_harlequill',
+      creatureId: 'harlequill',
+      level: 9,
+      speedMultiplier: 0.8,
+    },
+    {
+      id: 'level_7_knotia',
+      creatureId: 'mouse_1',
+      level: 9,
+      speedMultiplier: 0.8,
+    },
+    {
+      id: 'level_7_sailkworm',
+      creatureId: 'bug_stage_1',
+      level: 9,
+      speedMultiplier: 0.8,
+    },
   ],
   waves: [
     {
       id: 'island_wildlife',
+      repeatCount: 20,
+      delayBetweenRepeatsMs: 5000,
       groups: [
         {
           enemyDefinitionId: 'level_7_yokodillo',
-          count: 3,
-          spawnIntervalMs: 6000,
+          encounterPool: [
+            { enemyDefinitionId: 'level_7_yokodillo', weight: 15 },
+            { enemyDefinitionId: 'level_7_dormatee', weight: 5, pathIndex: 1 },
+            { enemyDefinitionId: 'level_7_aguana', weight: 10, pathIndex: 1 },
+            { enemyDefinitionId: 'level_7_harlequill', weight: 25 },
+            { enemyDefinitionId: 'level_7_knotia', weight: 25 },
+            { enemyDefinitionId: 'level_7_sailkworm', weight: 20 },
+          ],
+          count: 10,
+          spawnIntervalMs: 1500,
           delayBeforeGroupMs: 800,
           pathIndex: 0,
-        },
-        {
-          enemyDefinitionId: 'level_7_dormatee',
-          count: 2,
-          spawnIntervalMs: 9000,
-          delayBeforeGroupMs: 2500,
-          pathIndex: 1,
-          concurrentWithPrevious: true,
         },
       ],
     },
@@ -94,7 +120,8 @@ export const LEVEL_7: TDLevelData = {
   lives: 1,
   cannotLose: true,
   closeCompletesLevel: true,
-  introMessage: 'Explore at your own pace!',
+  introMessage:
+    'Explore and capture the island wildlife! Close whenever you are ready to leave.',
   backgroundUrl: '/battles/bg/bg_level_7_red_sandstone_shore.webp',
   backgroundScale: 2,
   initialView: { offsetX: 50, offsetY: 22, zoom: 1 },

@@ -77,6 +77,8 @@ import {
 } from './attackSpeedModifiers';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { TDWave, TDWaveGroup, Point } from './types';
+import { getWaveGroupEncounters, rollWaveEncounter } from './waveEncounters';
+import { expandWaveRepetitions } from './waveSchedule';
 import { TDEventBus } from './events/TDEventBus';
 import { TDProgressionManager } from './progression/TDProgressionManager';
 import { ENEMY_ABILITY_DEFS } from './enemyAbilities';
@@ -446,15 +448,20 @@ export class TowerDefenseEngine {
         definition,
       ])
     );
-    this.waves = levelData.waves || [];
+    this.waves = expandWaveRepetitions(levelData.waves || []);
     this.endlessWaves = levelData.endlessWaves;
     if (this.endlessWaves) {
       const finalWave = this.waves[this.waves.length - 1];
       const groups = finalWave?.groups.filter(
         (group) =>
           group.count > 0 &&
-          this.waveEnemyDefinitions[group.enemyDefinitionId]?.creatureId &&
-          !this.waveEnemyDefinitions[group.enemyDefinitionId]?.structure
+          getWaveGroupEncounters(group).length > 0 &&
+          getWaveGroupEncounters(group).every(
+            (encounter) =>
+              this.waveEnemyDefinitions[encounter.enemyDefinitionId]
+                ?.creatureId &&
+              !this.waveEnemyDefinitions[encounter.enemyDefinitionId]?.structure
+          )
       );
       if (groups?.length) {
         this.endlessWaveTemplate = { id: 'endless_reinforcements', groups };
@@ -727,8 +734,7 @@ export class TowerDefenseEngine {
         : 1;
       const regroupTarget = enemy.captureHaulRegroupTargetId
         ? this.captureUnits.find(
-            (captureUnit) =>
-              captureUnit.id === enemy.captureHaulRegroupTargetId
+            (captureUnit) => captureUnit.id === enemy.captureHaulRegroupTargetId
           )
         : undefined;
       if (enemy.captureHaulRegroupTargetId && !regroupTarget) {
@@ -761,9 +767,7 @@ export class TowerDefenseEngine {
             ? Math.max(0, nextWaypoint - 1)
             : nextWaypoint;
         }
-        if (
-          this.getPositionDistanceSq(enemy.position, pickupPosition) <= 125
-        ) {
+        if (this.getPositionDistanceSq(enemy.position, pickupPosition) <= 125) {
           moveSpeed = 0;
         }
       }
@@ -906,16 +910,16 @@ export class TowerDefenseEngine {
             ) {
               if (laneHop.balanceDecisionIndex === 0) {
                 laneHop.balanceDecisionIndex = 1;
-                laneHop.triggerProgress =
-                  balanceConfig.triggerProgresses[1];
+                laneHop.triggerProgress = balanceConfig.triggerProgresses[1];
               } else {
                 laneHop.phase = 'landed';
               }
               shouldJump = false;
             } else {
-              laneHop.targetPathIndex = balanceConfig.pathIndices.find(
-                (pathIndex) => pathIndex !== enemy.pathIndex
-              ) ?? enemy.pathIndex;
+              laneHop.targetPathIndex =
+                balanceConfig.pathIndices.find(
+                  (pathIndex) => pathIndex !== enemy.pathIndex
+                ) ?? enemy.pathIndex;
             }
           }
           if (shouldJump) {
@@ -2130,11 +2134,12 @@ export class TowerDefenseEngine {
       // Checking if it's time to spawn
       const timeSinceLastSpawn = time - spawner.lastSpawnTime;
       if (timeSinceLastSpawn >= spawner.group.spawnIntervalMs) {
+        const encounter = rollWaveEncounter(spawner.group);
         this.spawnEnemyFromDef(
-          spawner.group.enemyDefinitionId,
+          encounter.enemyDefinitionId,
           time,
           newEnemies,
-          spawner.group.pathIndex,
+          encounter.pathIndex,
           spawner.group.turnAroundAtEnd,
           spawner.group.uncapturable,
           spawner.group.isCursed,
@@ -2213,8 +2218,7 @@ export class TowerDefenseEngine {
         !candidate.heldCaptureUnitId &&
         (!candidateProjection ||
           candidatePathLength <= 0 ||
-          candidateProjection.progress / candidatePathLength <
-            decisionProgress)
+          candidateProjection.progress / candidatePathLength < decisionProgress)
       ) {
         continue;
       }
@@ -2292,7 +2296,9 @@ export class TowerDefenseEngine {
     const balanceConfig = !laneHop
       ? waveEnemyDefinition.balancedLaneHop
       : undefined;
-    const balanceTargetPathIndex = balanceConfig?.pathIndices.includes(pathIndex)
+    const balanceTargetPathIndex = balanceConfig?.pathIndices.includes(
+      pathIndex
+    )
       ? balanceConfig.pathIndices.find((index) => index !== pathIndex)
       : undefined;
     const automaticLaneHop =

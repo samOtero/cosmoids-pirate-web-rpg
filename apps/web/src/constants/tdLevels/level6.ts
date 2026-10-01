@@ -19,8 +19,8 @@ export const LEVEL_6: TDLevelData = {
   paths: [
     [
       {
-        x: -1,
-        y: 52,
+        x: -10.03,
+        y: 51.85,
       },
       {
         x: 9,
@@ -87,8 +87,8 @@ export const LEVEL_6: TDLevelData = {
     ],
     [
       {
-        x: -1,
-        y: 58,
+        x: -10.03,
+        y: 57.87,
       },
       {
         x: 9,
@@ -126,16 +126,16 @@ export const LEVEL_6: TDLevelData = {
   ],
   placementSpots: [
     {
-      x: 70.99,
-      y: 18.16,
+      x: 41.05,
+      y: 25.46,
     },
     {
-      x: 79.83,
-      y: 23.27,
+      x: 48.45,
+      y: 32,
     },
     {
-      x: 88.11,
-      y: 19.13,
+      x: 56,
+      y: 25.72,
     },
     {
       x: 25,
@@ -211,24 +211,24 @@ export const LEVEL_6: TDLevelData = {
   environmentUnits: [
     {
       position: {
-        x: 45.27,
-        y: 31.48,
+        x: 32.25,
+        y: 26.41,
       },
       tdConfigId: 'caleb_battle',
       facingDirection: 'up',
     },
     {
       position: {
-        x: 36.32,
-        y: 29.22,
+        x: 29.2,
+        y: 23.75,
       },
       tdConfigId: 'kip_battle',
       facingDirection: 'up',
     },
     {
       position: {
-        x: 18.07,
-        y: 20.1,
+        x: 26.01,
+        y: 28.13,
       },
       tdConfigId: 'maribel_capture',
       facingDirection: 'down',
@@ -236,34 +236,14 @@ export const LEVEL_6: TDLevelData = {
     },
     {
       position: {
-        x: 61.46,
-        y: 28.7,
+        x: 65.24,
+        y: 23.06,
       },
       tdConfigId: 'commander_strake_battle',
       facingDirection: 'left',
     },
   ],
-  startingTowers: [
-    {
-      creature: {
-        id: 'level_6_mopup',
-        speciesId: 'mopup',
-        level: 8,
-        xp: 0,
-        equippedAttacks: ['TACKLE'],
-        activeAttackIndex: 0,
-        targetingMode: 'first',
-        isShiny: false,
-      },
-      position: {
-        x: 82,
-        y: 55,
-      },
-      facingDirection: 'left',
-      isFixed: true,
-      receivesExperience: false,
-    },
-  ],
+  startingTowers: [],
   captureUnits: [
     {
       position: {
@@ -278,7 +258,7 @@ export const LEVEL_6: TDLevelData = {
       },
       groupHauling: {
         eligibleCreatureId: 'poguin',
-        joinRadius: 12,
+        joinRadius: 6,
         baseSpeedMultiplier: 0.12,
         speedMultiplierPerAdditionalHauler: 0.16,
         maxSpeedMultiplier: 0.92,
@@ -390,7 +370,7 @@ export const LEVEL_6: TDLevelData = {
   disableCapture: false,
   enemyHpMultiplier: 1,
   backgroundUrl: '/battles/bg/bg_level_6_three_lane_compact_v1.webp',
-  backgroundScale: 2,
+  backgroundScale: 2.5,
   initialView: {
     offsetX: 50,
     offsetY: 0,

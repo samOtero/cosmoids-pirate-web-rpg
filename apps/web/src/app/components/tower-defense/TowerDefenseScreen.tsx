@@ -145,6 +145,11 @@ export default function TowerDefenseScreen({
 
   const [uiLives, setUiLives] = useState(engineRef.current.lives);
   const [uiElapsedSeconds, setUiElapsedSeconds] = useState(0);
+  const [uiWaveIndex, setUiWaveIndex] = useState(0);
+  const totalWaveCount = (levelData.waves ?? []).reduce(
+    (total, wave) => total + (wave.repeatCount ?? 1),
+    0
+  );
   const lastSecondRef = useRef(0);
   const [activeTowerIds, setActiveTowerIds] = useState<string[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -447,6 +452,7 @@ export default function TowerDefenseScreen({
       if (currentSec !== lastSecondRef.current) {
         lastSecondRef.current = currentSec;
         setUiElapsedSeconds(currentSec);
+        setUiWaveIndex(engineRef.current.currentWaveIndex);
       }
 
       // 3. Check win condition
@@ -795,6 +801,12 @@ export default function TowerDefenseScreen({
               : 'w-full justify-between'
           }`}
         >
+          {levelData.waves?.some((wave) => (wave.repeatCount ?? 1) > 1) && (
+            <span className="shrink-0 rounded border border-cyan-700/50 bg-slate-900 px-2 py-1 font-mono text-sm text-cyan-300 lg:text-base">
+              Wave {Math.min(uiWaveIndex + 1, totalWaveCount)} /{' '}
+              {totalWaveCount}
+            </span>
+          )}
           {engineRef.current.surviveUntil &&
             engineRef.current.surviveUntil > 0 &&
             hasStarted && (
