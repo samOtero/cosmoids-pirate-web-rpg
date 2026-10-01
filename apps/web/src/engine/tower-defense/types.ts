@@ -344,7 +344,8 @@ export interface CaptureUnitDefinition {
   carrierSpeedMultiplier?: number;
   /**
    * Optional path used by the objective while a carrier moves along a separate
-   * flanking lane. Both paths are synchronized by normalized path progress.
+   * flanking lane. Pickup projects the objective onto the carrier's lane, and
+   * hauling projects the carrier onto this path, independent of path lengths.
    */
   haulPathIndex?: number;
   /** Optional cooperative rope-chain hauling behavior. */

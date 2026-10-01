@@ -76,6 +76,113 @@ function createEnemy(
 }
 
 describe('cooperative capture-unit hauling', () => {
+  const unequalRowsLevel: TDLevelData = {
+    ...level,
+    paths: [
+      [
+        { x: -100, y: 20 },
+        { x: 100, y: 20 },
+      ],
+      level.paths[1],
+      [
+        { x: 0, y: 80 },
+        { x: 200, y: 80 },
+      ],
+    ],
+    captureUnits: level.captureUnits?.map((unit) => ({
+      ...unit,
+      position: { x: 60, y: 50 },
+    })),
+  };
+
+  it.each([
+    { pathIndex: 0, distantX: 20 },
+    { pathIndex: 2, distantX: 120 },
+  ])(
+    'uses nearby map positions for pickup on unequal row $pathIndex',
+    ({ pathIndex, distantX }) => {
+      const engine = new TowerDefenseEngine(unequalRowsLevel);
+      engines.push(engine);
+      const objective = engine.captureUnits[0];
+      const penguin = createEnemy('penguin', distantX, pathIndex);
+      engine.enemies = [penguin];
+
+      engine.tick(0, 0);
+      expect(penguin.heldCaptureUnitId).toBeUndefined();
+
+      penguin.position.x = objective.position.x;
+      engine.tick(0, 0);
+      expect(objective.heldByEnemyId).toBe(penguin.id);
+      expect(penguin.heldCaptureUnitId).toBe(objective.id);
+      expect(penguin.pathIndex).toBe(pathIndex);
+    }
+  );
+
+  it.each([0, 2])(
+    'keeps the objective alongside its leader on unequal row %i',
+    (pathIndex) => {
+      const engine = new TowerDefenseEngine(unequalRowsLevel);
+      engines.push(engine);
+      const objective = engine.captureUnits[0];
+      const leader = createEnemy('leader', objective.position.x, pathIndex);
+      engine.enemies = [leader];
+      engine.tick(0, 0);
+
+      engine.tick(0, 100);
+      expect(leader.position.x).toBeLessThan(60);
+      expect(objective.position.x).toBeCloseTo(leader.position.x, 8);
+      expect(objective.position.y).toBe(50);
+      expect(objective.heldByEnemyId).toBe(leader.id);
+
+      const otherPathIndex = pathIndex === 0 ? 2 : 0;
+      const anchor = createEnemy(
+        'anchor',
+        objective.position.x,
+        otherPathIndex
+      );
+      engine.enemies.push(anchor);
+      engine.tick(0, 0);
+      expect(anchor.heldCaptureUnitId).toBe(objective.id);
+      expect(anchor.captureHaulLinkTargetEnemyId).toBeUndefined();
+
+      leader.hp = 0;
+      engine.tick(0, 0);
+      expect(objective.heldByEnemyId).toBe(anchor.id);
+      engine.tick(0, 100);
+      expect(objective.position.x).toBeCloseTo(anchor.position.x, 8);
+      expect(objective.position.y).toBe(50);
+    }
+  );
+
+  it.each([
+    { pathIndex: 0, startX: 40, movingBackward: false },
+    { pathIndex: 2, startX: 80, movingBackward: true },
+  ])(
+    'regroups toward the objective on unequal row $pathIndex and rejoins after the lock',
+    ({ pathIndex, startX, movingBackward }) => {
+      const engine = new TowerDefenseEngine(unequalRowsLevel);
+      engines.push(engine);
+      const objective = engine.captureUnits[0];
+      const penguin = createEnemy('loose', startX, pathIndex);
+      penguin.captureHaulRegroupTargetId = objective.id;
+      penguin.itemPickupBlockedUntilMs = 2000;
+      engine.enemies = [penguin];
+
+      engine.tick(0, 100);
+      expect(penguin.isMovingBackward).toBe(movingBackward);
+      expect(Math.abs(penguin.position.x - objective.position.x)).toBeLessThan(
+        Math.abs(startX - objective.position.x)
+      );
+      expect(penguin.heldCaptureUnitId).toBeUndefined();
+
+      penguin.position.x = objective.position.x;
+      engine.tick(0, 1900);
+      expect(penguin.heldCaptureUnitId).toBe(objective.id);
+      expect(penguin.captureHaulRegroupTargetId).toBeUndefined();
+      expect(penguin.pathIndex).toBe(pathIndex);
+    }
+  );
+
   it('lets Tigrevel walk slowly home while no Poguin is pulling', () => {
     expect(LEVEL_6.captureUnits?.[0].returnHome).toEqual({
       pathIndex: 1,
@@ -160,7 +267,11 @@ describe('cooperative capture-unit hauling', () => {
       6
     );
 
-    const lowerLaneAnchor = createEnemy('lower-anchor', objective.position.x, 2);
+    const lowerLaneAnchor = createEnemy(
+      'lower-anchor',
+      objective.position.x,
+      2
+    );
     engine.enemies.push(lowerLaneAnchor);
     engine.tick(0, 0);
     expect(lowerLaneAnchor.heldCaptureUnitId).toBe(objective.id);

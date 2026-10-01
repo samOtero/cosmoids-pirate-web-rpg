@@ -1212,7 +1212,7 @@ export class TowerDefenseEngine {
           // might push the enemy's line of movement slightly further from the
           // original visually-intended path line.
           if (distSq < 125) {
-            // within ~20 units
+            // Within sqrt(125), approximately 11.18 map units.
             cu.heldByEnemyId = enemy.id;
             enemy.heldCaptureUnitId = cu.id;
             enemy.captureHaulRegroupTargetId = undefined;
@@ -3201,26 +3201,18 @@ export class TowerDefenseEngine {
       return captureUnit.position;
     }
 
-    const haulPath = this.paths[captureUnit.haulPathIndex];
     const enemyPath = this.paths[enemy.pathIndex];
-    const haulProjection = haulPath
-      ? projectPointOntoPath(captureUnit.position, haulPath, this.aspectRatio)
+    const pickupProjection = enemyPath
+      ? projectPointOntoPath(captureUnit.position, enemyPath, this.aspectRatio)
       : undefined;
-    const haulLength = haulPath ? getPathLength(haulPath, this.aspectRatio) : 0;
-    const enemyPathLength = enemyPath
-      ? getPathLength(enemyPath, this.aspectRatio)
-      : 0;
-    if (!haulProjection || haulLength <= 0 || enemyPathLength <= 0) {
+    if (!pickupProjection) {
       return captureUnit.position;
     }
 
-    const normalizedProgress = Math.max(
-      0,
-      Math.min(1, haulProjection.progress / haulLength)
-    );
+    // Extra entry/exit sections must not shift the pickup point along the row.
     return getPointAtPathProgress(
       enemyPath,
-      normalizedProgress * enemyPathLength,
+      pickupProjection.progress,
       this.aspectRatio
     );
   }
@@ -3234,30 +3226,19 @@ export class TowerDefenseEngine {
       return;
     }
 
-    const carrierPath = this.paths[carrier.pathIndex];
     const haulPath = this.paths[captureUnit.haulPathIndex];
-    const carrierProjection = carrierPath
-      ? projectPointOntoPath(carrier.position, carrierPath, this.aspectRatio)
+    const haulProjection = haulPath
+      ? projectPointOntoPath(carrier.position, haulPath, this.aspectRatio)
       : undefined;
-    const carrierPathLength = carrierPath
-      ? getPathLength(carrierPath, this.aspectRatio)
-      : 0;
-    const haulPathLength = haulPath
-      ? getPathLength(haulPath, this.aspectRatio)
-      : 0;
-    if (!carrierProjection || carrierPathLength <= 0 || haulPathLength <= 0) {
+    if (!haulProjection) {
       captureUnit.position = { ...carrier.position };
       return;
     }
 
-    const normalizedProgress = Math.max(
-      0,
-      Math.min(1, carrierProjection.progress / carrierPathLength)
-    );
     const previousPosition = { ...captureUnit.position };
     captureUnit.position = getPointAtPathProgress(
       haulPath,
-      normalizedProgress * haulPathLength,
+      haulProjection.progress,
       this.aspectRatio
     );
 
