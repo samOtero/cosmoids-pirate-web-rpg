@@ -10,6 +10,7 @@
 - **ID:** `voltusk`
 - **Name concept:** Volt + tusk, directly connecting electricity with its defining anatomy.
 - **Typing:** Steel/Electric
+- **Evolutionary stage:** Final form; earlier family stages remain unspecified.
 - **Creature basis:** Walrus, with Pacific walrus biology informing its sensitive whiskers and tusk displays.
 - **External inspiration:** Lightning collection, electrical energy storage, and the relationship between visible strength and social status.
 - **Story placement:** The Ironbell Navy officer's boss partner in [Level 6](../levels/level-6.md).
@@ -74,6 +75,24 @@ Defeating the boss frees Tigrevel. Strake is stunned by the loss, Kip urges ever
 
 Bell or gong calls may contribute to this encounter, but their timing, effects, and relationship to minions are open. Follow the [Level 6 record](../levels/level-6.md) for the broader objective, recruitment ending, and unsettled battle details.
 
+## Approved Stat Direction
+
+Approved October 1, 2026: Voltusk is a final form with substantial HP, strong
+physical defense, and powerful special attacks. Its weight and steel tusks also
+support credible physical attacks. Special defense is solid but lower than
+physical defense; very low speed is its defining limitation. These tendencies
+preserve its heavy, armored identity when using shared or off-type moves.
+
+[Walrein](https://pokemondb.net/pokedex/walrein) supplied the body and bulk
+comparison, while [Magnezone](https://pokemondb.net/pokedex/magnezone) supplied the
+Steel/Electric special-attacker comparison. The approved spread favors living
+body mass over Magnezone's greater special power and speed.
+
+The authored stats live only in
+[`creatures.ts`](../../apps/web/src/constants/creatures.ts). This approval
+replaces the initial integration defaults; Level 6 encounter multipliers still
+require separate balance evaluation.
+
 ## Creation Record
 
 - **Final name selected:** Voltusk
@@ -83,12 +102,12 @@ Bell or gong calls may contribute to this encounter, but their timing, effects, 
 - **Visual selection:** Regal walrus direction, golden-yellow recolor, then marking variation 3 with black chest chevrons and flipper bands.
 - **Image status:** Approved standalone concept, copied unchanged from the generated source.
 - **Production status:** All four previews approved before background removal, per the user's instruction. Transparent head icon and left/down/up sprites are exported and registered; see [the asset review and final exports](reviews/voltusk/README.md) and [creation provenance](../art/CREATURE_PROVENANCE.md). Right-facing visuals mirror the left sprite.
-- **Initial gameplay defaults:** Slow, bulky special attacker: HP 90, Attack 74, Defense 88, Special Attack 92, Special Defense 78, Speed 24; base experience 96. Reuses the existing `lizard` movement profile, Body Rush (`TACKLE`), and Spark (`SPARK`), both available at level 1. These are integration defaults, not final Level 6 encounter balance.
+- **Initial gameplay defaults:** Integrated as a slow, bulky special attacker with reused movement and attacks. Its placeholder stats were replaced by the approved October 1, 2026 stat direction above. Current gameplay values are owned by the species registry.
 - **Placement status:** Reserved as the Level 6 boss in the creature design document. The runtime still has a locked Level 6 placeholder, so no waves or capture policy have been added. The creature is registered independently of the future encounter.
 
 ## Open Decisions
 
-- Decide whether Voltusk is a single-stage species or belongs to an evolutionary family; no evolution is approved.
+- Decide whether Voltusk has earlier family stages; its final-form status is approved, but no earlier forms are designed.
 - Define broader habitat, distribution, physical size, diet, and ecology beyond its approved storm-seeking behavior.
 - Tune the initial display scale and gameplay defaults during Level 6 encounter balancing.
 - Decide boss and minion mechanics, including whether bell/gong calls or lightning collection have gameplay effects.

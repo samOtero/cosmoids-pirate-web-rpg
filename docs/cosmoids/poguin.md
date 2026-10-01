@@ -10,6 +10,7 @@
 - **ID:** `poguin`
 - **Name concept:** Pogo + penguin, pronounced "POH-gwin"; the name connects its springy jumping with its animal basis.
 - **Typing:** Electric/Water
+- **Evolutionary stage:** Stage 1, with room for a future evolution; no evolved form or evolution requirement is approved.
 - **Creature basis:** Rockhopper and other crested penguins, with emperor penguin group movement as a separate behavioral inspiration.
 - **External inspiration:** Dance, shared rhythm, pogo-like bouncing, and useful cooperation turned into a performance.
 - **Story placement:** Selected supporting enemy direction for the Ironbell Navy officer's recapture effort in [Level 6](../levels/level-6.md).
@@ -72,6 +73,26 @@ The user endorsed rockhopper jumping as an additional source for the level. The 
 
 Do not infer approved attack IDs, damage, movement speed, invulnerability during jumps, terrain bypass, stun rules, pulse timing, or hauling progress from these notes. Final mechanics need implementation and balance decisions. The officer forces Voltusk into a Cursed Aura state by unidentified means; Poguin has no approved independent cursed form or evolution.
 
+## Approved Stat Direction
+
+Approved October 1, 2026: Poguin is a lightly built stage-one creature whose
+speed and charged splashes are its main strengths. Speed is its highest stat,
+followed by special attack. Its oversized feet still support useful physical
+attacks, while modest HP and defenses provide a meaningful limitation and leave
+room for evolution. These tendencies preserve its agile identity when using
+shared or off-type moves.
+
+[Piplup](https://pokemondb.net/pokedex/piplup) supplied the unevolved penguin
+comparison, [Chinchou](https://pokemondb.net/pokedex/chinchou) the Electric/Water
+comparison, and [Buizel](https://pokemondb.net/pokedex/buizel) the energetic aquatic
+movement comparison. The approved spread emphasizes agility over Piplup's bulk
+and special attacks over Buizel's physical emphasis.
+
+The authored stats live only in
+[`creatures.ts`](../../apps/web/src/constants/creatures.ts). This approval
+replaces the initial integration defaults; Level 6 encounter multipliers still
+require separate balance evaluation.
+
 ## Creation Record
 
 - **Selection and final naming date:** September 7, 2026.
@@ -87,7 +108,7 @@ Do not infer approved attack IDs, damage, movement speed, invulnerability during
 ## Open Decisions
 
 - Finalize the species description, habitat, physical size, and ecology beyond the selected character and movement ideas.
-- Decide whether Poguin is a single-stage species or has an evolutionary family; none is approved.
+- Design Poguin's future evolution and decide its evolution requirement; its stage-one status is approved.
 - Decide whether hopping is a movement presentation, an attack, a terrain interaction, or a combination, and define its readable counters.
 - Resolve group synchronization, hauling effects, interactions with Voltusk, wave composition, and balance in Level 6.
 - Decide capture availability and progression.

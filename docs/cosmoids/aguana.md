@@ -98,6 +98,8 @@ The family now uses **Warmth**, a persistent 0-100% battle resource based on the
 - **Story placement:** Capturable level-8 Aguana appear in both Level 6 waves on the center lane.
 - **Journal observation:** After a short dive, Aguana may stretch belly-up across a sun-warmed tidal rock with its head reclined and all four feet loose. The unusually vulnerable pose shows how completely it relaxes when it feels safe enough to recover its warmth.
 - **Journal artwork:** [`art-source/creatures/journal/aguana_journal.png`](../../art-source/creatures/journal/aguana_journal.png) -> `/UI/Journal/aguana_journal.webp`
+- **Journal revision approved October 1, 2026:** Used built-in ImageGen for localized edits to give Aguana a gently closed resting eye and neutral mouth, then smooth the pelvic underside into an uninterrupted belly surface without suggestive anatomical contours. The approved 1254x1254 PNG preserves the belly-up pose, species identity, four limbs, paddle tail, shoreline scene, and parchment treatment; the journal optimizer publishes the 1024x1024 WebP at the established quality settings.
+- **Revision inspection:** Reviewed the approved source, runtime derivative, and a 256px journal-size preview. The relaxed face and smooth underside remain readable, the anatomy and safe crop are intact, and no text or watermark was introduced. The parchment page remains opaque, matching its source treatment.
 - **Creation provenance:** [historical integration record](../art/CREATURE_PROVENANCE.md)
 - **Production status:** Integrated into the creature registry, journal, tower-defense visuals, Level 6 encounter data, and creation record.
 
