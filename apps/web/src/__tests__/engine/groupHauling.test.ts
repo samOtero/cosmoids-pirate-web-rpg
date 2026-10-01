@@ -37,6 +37,7 @@ const level: TDLevelData = {
       returnHome: { pathIndex: 1, speed: 1 },
       groupHauling: {
         eligibleCreatureId: 'poguin',
+        pickupRadius: 2,
         joinRadius: 12,
         baseSpeedMultiplier: 0.1,
         speedMultiplierPerAdditionalHauler: 0.2,
@@ -285,17 +286,18 @@ describe('cooperative capture-unit hauling', () => {
     );
   });
 
-  it('promotes a connected helper when the lead hauler is defeated', () => {
+  it('promotes a close helper without snapping the objective to it', () => {
     const engine = new TowerDefenseEngine(level);
     engines.push(engine);
     const objective = engine.captureUnits[0];
     const leader = createEnemy('leader', 100, 0);
-    const helper = createEnemy('helper', 96, 0);
+    const helper = createEnemy('helper', 99, 0);
     engine.enemies = [leader];
     engine.tick(0, 0);
     engine.enemies.push(helper);
     engine.tick(0, 0);
 
+    const handoffPosition = { ...objective.position };
     leader.hp = 0;
     engine.tick(0, 0);
 
@@ -303,6 +305,99 @@ describe('cooperative capture-unit hauling', () => {
     expect(objective.heldByEnemyId).toBe(helper.id);
     expect(helper.heldCaptureUnitId).toBe(objective.id);
     expect(helper.captureHaulLinkTargetEnemyId).toBeUndefined();
+    expect(objective.position).toEqual(handoffPosition);
+    engine.tick(0, 0);
+    expect(objective.position).toEqual(handoffPosition);
+
+    const helperBeforeMovement = helper.position.x;
+    engine.tick(0, 100);
+    expect(objective.position.x - handoffPosition.x).toBeCloseTo(
+      helper.position.x - helperBeforeMovement,
+      8
+    );
+  });
+
+  it.each([0, 2])(
+    'requires a distant replacement on unequal row %i to approach before pulling',
+    (pathIndex) => {
+      const engine = new TowerDefenseEngine(unequalRowsLevel);
+      engines.push(engine);
+      const objective = engine.captureUnits[0];
+      const leader = createEnemy('leader', objective.position.x, pathIndex);
+      const helper = createEnemy(
+        'helper',
+        objective.position.x - 10,
+        pathIndex
+      );
+      engine.enemies = [leader, helper];
+      engine.tick(0, 0);
+      expect(helper.captureHaulLinkTargetEnemyId).toBe(leader.id);
+      engine.tick(0, 100);
+
+      const beforeDrop = { ...objective.position };
+      leader.hp = 0;
+      engine.tick(0, 0);
+      expect(objective.position).toEqual(beforeDrop);
+      expect(objective.heldByEnemyId).toBeUndefined();
+      expect(helper.heldCaptureUnitId).toBeUndefined();
+      expect(helper.captureHaulRegroupTargetId).toBe(objective.id);
+
+      const helperBeforeRegroup = helper.position.x;
+      engine.tick(0, 50);
+      expect(helper.position.x).toBeGreaterThan(helperBeforeRegroup);
+      expect(helper.heldCaptureUnitId).toBeUndefined();
+
+      for (let step = 0; step < 24 && !objective.heldByEnemyId; step++) {
+        const beforeStep = objective.position.x;
+        engine.tick(0, 50);
+        // Until pickup, the objective can only walk home at its authored speed.
+        expect(Math.abs(objective.position.x - beforeStep)).toBeLessThanOrEqual(
+          objective.returnHome!.speed * 0.05 + 1e-8
+        );
+      }
+      expect(objective.heldByEnemyId).toBe(helper.id);
+      expect(helper.pathIndex).toBe(pathIndex);
+      expect(helper.captureHaulRegroupTargetId).toBeUndefined();
+      expect(
+        Math.abs(helper.position.x - objective.position.x)
+      ).toBeLessThanOrEqual(objective.groupHauling!.pickupRadius!);
+
+      const pickupPosition = { ...objective.position };
+      engine.tick(0, 0);
+      expect(objective.position).toEqual(pickupPosition);
+      const helperBeforePull = helper.position.x;
+      engine.tick(0, 100);
+      expect(objective.position.x - pickupPosition.x).toBeCloseTo(
+        helper.position.x - helperBeforePull,
+        8
+      );
+    }
+  );
+
+  it('preserves the pickup gap and only moves the objective when its leader moves', () => {
+    const engine = new TowerDefenseEngine(unequalRowsLevel);
+    engines.push(engine);
+    const objective = engine.captureUnits[0];
+    const leader = createEnemy('leader', objective.position.x + 1, 0);
+    engine.enemies = [leader];
+    const pickupPosition = { ...objective.position };
+    engine.tick(0, 0);
+    expect(objective.heldByEnemyId).toBe(leader.id);
+    engine.tick(0, 0);
+    expect(objective.position).toEqual(pickupPosition);
+
+    const leaderBeforePull = leader.position.x;
+    engine.tick(0, 100);
+    expect(objective.position.x - pickupPosition.x).toBeCloseTo(
+      leader.position.x - leaderBeforePull,
+      8
+    );
+    expect(leader.position.x - objective.position.x).toBeCloseTo(1, 8);
+
+    leader.statusConditions.push({ type: 'STUN', durationMs: 1000 });
+    const beforeStun = { ...objective.position };
+    engine.tick(0, 100);
+    expect(objective.position).toEqual(beforeStun);
   });
 
   it('breaks a distant branch when its middle hauler is defeated', () => {
@@ -337,8 +432,9 @@ describe('cooperative capture-unit hauling', () => {
 
     engine.tick(0, 100);
     expect(tail.position.x).toBeCloseTo(92, 2);
+    const beforeRegroup = tail.position.x;
     engine.tick(0, 600);
-    expect(tail.position.x).toBeCloseTo(92, 2);
+    expect(tail.position.x).toBeGreaterThan(beforeRegroup);
     expect(tail.heldCaptureUnitId).toBeUndefined();
     engine.tick(0, 200);
     expect(tail.heldCaptureUnitId).toBe(objective.id);

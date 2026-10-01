@@ -186,10 +186,17 @@ describe.each(Object.entries(TD_LEVELS))(
           expect(level.paths[config.returnHome.pathIndex]).toBeDefined();
         if (config.haulPathIndex !== undefined)
           expect(level.paths[config.haulPathIndex]).toBeDefined();
-        if (config.groupHauling)
+        if (config.groupHauling) {
           expect(
             COSMOID_TEMPLATES[config.groupHauling.eligibleCreatureId]
           ).toBeDefined();
+          if (config.groupHauling.pickupRadius !== undefined) {
+            expect(Number.isFinite(config.groupHauling.pickupRadius)).toBe(
+              true
+            );
+            expect(config.groupHauling.pickupRadius).toBeGreaterThan(0);
+          }
+        }
       }
       expect(engine.towers).toHaveLength(level.startingTowers?.length ?? 0);
       for (const config of level.startingTowers ?? []) {

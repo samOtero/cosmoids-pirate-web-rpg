@@ -258,6 +258,7 @@ export const LEVEL_6: TDLevelData = {
       },
       groupHauling: {
         eligibleCreatureId: 'poguin',
+        pickupRadius: 6,
         joinRadius: 6,
         baseSpeedMultiplier: 0.12,
         speedMultiplierPerAdditionalHauler: 0.16,

@@ -324,6 +324,8 @@ export interface CaptureUnitWaveRelocation {
 export interface CaptureUnitGroupHaulingConfig {
   /** Only this creature species can join the hauling chain. */
   eligibleCreatureId: string;
+  /** Row-local distance required to grab the objective or take over as leader. */
+  pickupRadius?: number;
   /** Distance at which a new hauler can connect to an existing hauler. */
   joinRadius: number;
   /** Movement multiplier with exactly one connected hauler. */
@@ -346,6 +348,7 @@ export interface CaptureUnitDefinition {
    * Optional path used by the objective while a carrier moves along a separate
    * flanking lane. Pickup projects the objective onto the carrier's lane, and
    * hauling projects the carrier onto this path, independent of path lengths.
+   * Group hauling transfers carrier movement without snapping on pickup/handoff.
    */
   haulPathIndex?: number;
   /** Optional cooperative rope-chain hauling behavior. */

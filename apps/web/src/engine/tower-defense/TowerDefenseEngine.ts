@@ -699,6 +699,13 @@ export class TowerDefenseEngine {
         this.reconcileCaptureHaulChain(captureUnit, newEnemies);
       }
     }
+    // A handoff changes the leader, not the objective's position. Only movement
+    // after this snapshot can pull a cooperatively hauled objective this frame.
+    const captureCarrierPositions = new Map(
+      newEnemies
+        .filter((enemy) => enemy.heldCaptureUnitId)
+        .map((enemy) => [enemy.id, { ...enemy.position }] as const)
+    );
 
     // Update enemies
     newEnemies.forEach((enemy) => {
@@ -766,8 +773,17 @@ export class TowerDefenseEngine {
           enemy.currentWaypointIndex = enemy.isMovingBackward
             ? Math.max(0, nextWaypoint - 1)
             : nextWaypoint;
+          if (timeScale > 0) {
+            moveSpeed = Math.min(
+              moveSpeed,
+              Math.abs(pickupProgress - enemyProgress) / timeScale
+            );
+          }
         }
-        if (this.getPositionDistanceSq(enemy.position, pickupPosition) <= 125) {
+        if (
+          this.getPositionDistanceSq(enemy.position, pickupPosition) <
+          this.getCapturePickupRadiusSq(regroupTarget)
+        ) {
           moveSpeed = 0;
         }
       }
@@ -1208,11 +1224,7 @@ export class TowerDefenseEngine {
           const dy = (enemy.position.y - pickupPosition.y) * this.aspectRatio;
           const distSq = dx * dx + dy * dy;
 
-          // Expand pickup radius generously because the new snapped orthogonal paths
-          // might push the enemy's line of movement slightly further from the
-          // original visually-intended path line.
-          if (distSq < 125) {
-            // Within sqrt(125), approximately 11.18 map units.
+          if (distSq < this.getCapturePickupRadiusSq(cu)) {
             cu.heldByEnemyId = enemy.id;
             enemy.heldCaptureUnitId = cu.id;
             enemy.captureHaulRegroupTargetId = undefined;
@@ -1234,7 +1246,11 @@ export class TowerDefenseEngine {
         // 2. Update position of held items to match their carrier
         const carrier = newEnemies.find((e) => e.id === cu.heldByEnemyId);
         if (carrier) {
-          this.syncCaptureUnitToCarrier(cu, carrier);
+          this.syncCaptureUnitToCarrier(
+            cu,
+            carrier,
+            captureCarrierPositions.get(carrier.id)
+          );
           cu.returnHomeAvailableAtMs = undefined;
         }
       }
@@ -3046,7 +3062,13 @@ export class TowerDefenseEngine {
     );
     if (!lead) {
       lead = haulers
-        .filter(isNearCapture)
+        .filter(
+          (enemy) =>
+            this.getPositionDistanceSq(
+              enemy.position,
+              this.getCapturePickupPosition(captureUnit, enemy)
+            ) <= this.getCapturePickupRadiusSq(captureUnit)
+        )
         .sort(
           (a, b) =>
             this.getCaptureDistanceSq(a, captureUnit) -
@@ -3136,7 +3158,8 @@ export class TowerDefenseEngine {
         .sort((a, b) => a.distanceSq - b.distanceSq)[0]?.hauler;
       const pickupPosition = this.getCapturePickupPosition(captureUnit, enemy);
       const canAnchorToCapture =
-        this.getPositionDistanceSq(enemy.position, pickupPosition) < 125;
+        this.getPositionDistanceSq(enemy.position, pickupPosition) <
+        this.getCapturePickupRadiusSq(captureUnit);
       if (!nearestHauler && !canAnchorToCapture) continue;
 
       enemy.heldCaptureUnitId = captureUnit.id;
@@ -3193,6 +3216,11 @@ export class TowerDefenseEngine {
     return droppedUnit;
   }
 
+  private getCapturePickupRadiusSq(captureUnit: CaptureUnit): number {
+    const radius = captureUnit.groupHauling?.pickupRadius;
+    return radius === undefined ? 125 : radius * radius;
+  }
+
   private getCapturePickupPosition(
     captureUnit: CaptureUnit,
     enemy: Enemy
@@ -3219,19 +3247,31 @@ export class TowerDefenseEngine {
 
   private syncCaptureUnitToCarrier(
     captureUnit: CaptureUnit,
-    carrier: Enemy
+    carrier: Enemy,
+    previousCarrierPosition?: Point
   ): void {
+    let targetPosition = carrier.position;
+    if (captureUnit.groupHauling) {
+      if (!previousCarrierPosition) return;
+      const dx = carrier.position.x - previousCarrierPosition.x;
+      const dy = carrier.position.y - previousCarrierPosition.y;
+      if (dx === 0 && dy === 0) return;
+      targetPosition = {
+        x: captureUnit.position.x + dx,
+        y: captureUnit.position.y + dy,
+      };
+    }
     if (captureUnit.haulPathIndex === undefined) {
-      captureUnit.position = { ...carrier.position };
+      captureUnit.position = { ...targetPosition };
       return;
     }
 
     const haulPath = this.paths[captureUnit.haulPathIndex];
     const haulProjection = haulPath
-      ? projectPointOntoPath(carrier.position, haulPath, this.aspectRatio)
+      ? projectPointOntoPath(targetPosition, haulPath, this.aspectRatio)
       : undefined;
     if (!haulProjection) {
-      captureUnit.position = { ...carrier.position };
+      captureUnit.position = { ...targetPosition };
       return;
     }
 
