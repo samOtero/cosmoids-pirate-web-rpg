@@ -94,6 +94,8 @@ export interface TDBalancedLaneHopConfig {
 /** A uniquely configurable enemy variant that wave groups can reuse. */
 export interface TDWaveEnemyDefinition {
   id: string;
+  /** Multiplies tower targeting reach against this encounter only. Defaults to 1. */
+  targetingRangeMultiplier?: number;
   /** Creature-backed enemies use a registered Cosmoid definition. */
   creatureId?: string;
   level: number;

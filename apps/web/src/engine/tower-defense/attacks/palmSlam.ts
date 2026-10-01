@@ -75,9 +75,9 @@ export function updatePalmSlams(
       const originalInRange =
         original &&
         engine.isEnemyTargetable(original) &&
-        engine.isPositionInTowerRange(
+        engine.isEnemyInTowerRange(
           source.position,
-          original.position,
+          original,
           attackDef.rangeIndex
         );
       const target = originalInRange

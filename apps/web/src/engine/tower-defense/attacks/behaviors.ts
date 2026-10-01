@@ -50,9 +50,9 @@ export const ProjectileBehavior: AttackBehavior = {
       ) {
         return false;
       }
-      return engine.isPositionInTowerRange(
+      return engine.isEnemyInTowerRange(
         source.position,
-        enemy.position,
+        enemy,
         attackDef.rangeIndex
       );
     });
@@ -170,11 +170,7 @@ export const InstantMeleeBehavior: AttackBehavior = {
     return engine.enemies.some(
       (enemy) =>
         engine.isEnemyTargetable(enemy) &&
-        engine.isPositionInTowerRange(
-          source.position,
-          enemy.position,
-          attackDef.rangeIndex
-        )
+        engine.isEnemyInTowerRange(source.position, enemy, attackDef.rangeIndex)
     );
   },
 
@@ -228,11 +224,7 @@ export const AdaptiveTargetedAoeBehavior: AttackBehavior = {
     return engine.enemies.some(
       (enemy) =>
         engine.isEnemyTargetable(enemy) &&
-        engine.isPositionInTowerRange(
-          source.position,
-          enemy.position,
-          attackDef.rangeIndex
-        )
+        engine.isEnemyInTowerRange(source.position, enemy, attackDef.rangeIndex)
     );
   },
 
@@ -340,9 +332,9 @@ export const FunnyDanceBehavior: AttackBehavior = {
       (enemy) =>
         engine.isEnemyTargetable(enemy) &&
         enemy.kind !== 'structure' &&
-        engine.isPositionInTowerRange(
+        engine.isEnemyInTowerRange(
           source.position,
-          enemy.position,
+          enemy,
           attackDef.rangeIndex
         ) &&
         Boolean(enemy.heldCaptureUnitId) &&
@@ -369,9 +361,9 @@ export const FunnyDanceBehavior: AttackBehavior = {
       if (
         !engine.isEnemyTargetable(enemy) ||
         enemy.kind === 'structure' ||
-        !engine.isPositionInTowerRange(
+        !engine.isEnemyInTowerRange(
           source.position,
-          enemy.position,
+          enemy,
           attackDef.rangeIndex
         ) ||
         !enemy.heldCaptureUnitId ||
@@ -440,9 +432,9 @@ export const InstantAoeBehavior: AttackBehavior = {
     return engine.enemies.some(
       (enemy) =>
         engine.isEnemyTargetable(enemy) &&
-        engine.isPositionInTowerRange(
+        engine.isEnemyInTowerRange(
           source.position,
-          enemy.position,
+          enemy,
           attackDef.rangeIndex
         ) &&
         Boolean(enemy.heldCaptureUnitId) &&
@@ -460,9 +452,9 @@ export const InstantAoeBehavior: AttackBehavior = {
     engine.enemies.forEach((enemy) => {
       if (
         !engine.isEnemyTargetable(enemy) ||
-        !engine.isPositionInTowerRange(
+        !engine.isEnemyInTowerRange(
           source.position,
-          enemy.position,
+          enemy,
           attackDef.rangeIndex
         ) ||
         !enemy.heldCaptureUnitId ||
@@ -523,11 +515,7 @@ function isEligiblePoisonAoeTarget(
     engine.isEnemyTargetable(enemy) &&
     !enemy.immuneToStatusEffects &&
     !findPoison(enemy, TOXIC_POLLEN_POISON_ID) &&
-    engine.isPositionInTowerRange(
-      source.position,
-      enemy.position,
-      attackDef.rangeIndex
-    )
+    engine.isEnemyInTowerRange(source.position, enemy, attackDef.rangeIndex)
   );
 }
 

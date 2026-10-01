@@ -25,11 +25,7 @@ function isEligible(
     !enemy.immuneToStatusEffects &&
     !isSleeping(enemy) &&
     (enemy.sleepResistantUntilMs ?? 0) <= engine.elapsedTimeMs &&
-    engine.isPositionInTowerRange(
-      source.position,
-      enemy.position,
-      attackDef.rangeIndex
-    )
+    engine.isEnemyInTowerRange(source.position, enemy, attackDef.rangeIndex)
   );
 }
 

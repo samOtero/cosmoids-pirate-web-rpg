@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
-import { Enemy, Tower } from '@/engine/tower-defense/types';
+import { Enemy, Tower, TowerTargetingMode } from '@/engine/tower-defense/types';
 
 describe('Tower Targeting Modes', () => {
   const levelData = {
@@ -44,7 +44,11 @@ describe('Tower Targeting Modes', () => {
     damagedByTowerIds: new Set(),
   });
 
-  const createMockTower = (x: number, y: number, mode: any = 'first'): Tower => ({
+  const createMockTower = (
+    x: number,
+    y: number,
+    mode: TowerTargetingMode = 'first'
+  ): Tower => ({
     id: 'tower_1',
     creature: {
       id: 'c1',
@@ -87,19 +91,11 @@ describe('Tower Targeting Modes', () => {
     const engine = new TowerDefenseEngine(levelData, []);
     engine.setAspectRatio(2);
     const tower = createMockTower(50, 50, 'closest');
-    const horizontallyOutside = createMockEnemy(
-      'horizontal',
-      56,
-      50,
-      50,
-      100
-    );
+    const horizontallyOutside = createMockEnemy('horizontal', 56, 50, 50, 100);
     const verticallyInside = createMockEnemy('vertical', 50, 60, 50, 100);
     engine.enemies = [horizontallyOutside, verticallyInside];
 
-    expect(engine.getTargetForTower(tower, 10, 'closest')?.id).toBe(
-      'vertical'
-    );
+    expect(engine.getTargetForTower(tower, 10, 'closest')?.id).toBe('vertical');
   });
 
   it('keeps the same physical range on scaled level backgrounds', () => {
@@ -131,6 +127,75 @@ describe('Tower Targeting Modes', () => {
       engine.isPositionInTowerRange(tower.position, { x: 6, y: 0 }, 10)
     ).toBe(false);
   });
+
+  it('applies extra reach to an encounter variant without changing target priority', () => {
+    const engine = new TowerDefenseEngine({
+      ...levelData,
+      towerRangeMultiplier: 0.4,
+      waveEnemyDefinitions: [
+        {
+          id: 'extended',
+          creatureId: 'senticle',
+          level: 5,
+          targetingRangeMultiplier: 3,
+        },
+      ],
+    });
+    try {
+      const tower = createMockTower(0, 0);
+      const boss = createMockEnemy('boss', 20, 0, 1000, 1000);
+      boss.waveEnemyDefinitionId = 'extended';
+      const ordinary = createMockEnemy('ordinary', 20, 0, 100, 100);
+      engine.enemies = [ordinary, boss];
+
+      expect(engine.getTowerAttackRange(20)).toBe(8);
+      expect(engine.getTowerAttackRange(20, boss)).toBe(24);
+      expect(engine.getTowerAttackRange(20, ordinary)).toBe(8);
+      expect(engine.isEnemyInTowerRange(tower.position, ordinary, 20)).toBe(
+        false
+      );
+      expect(engine.isEnemyInTowerRange(tower.position, boss, 20)).toBe(true);
+      expect(engine.getTargetForTower(tower, 20, 'closest')).toBe(boss);
+
+      ordinary.position.x = 4;
+      expect(engine.getTargetForTower(tower, 20, 'closest')).toBe(ordinary);
+      expect(engine.getTargetForTower(tower, 20, 'strongest')).toBe(boss);
+      boss.position.x = 24;
+      expect(engine.isEnemyInTowerRange(tower.position, boss, 20)).toBe(true);
+      boss.position.x += 0.01;
+      expect(engine.isEnemyInTowerRange(tower.position, boss, 20)).toBe(false);
+    } finally {
+      engine.destroy();
+    }
+  });
+
+  it.each([undefined, NaN, Infinity, 0, -3])(
+    'uses standard reach for an unusable target multiplier %s',
+    (targetingRangeMultiplier) => {
+      const engine = new TowerDefenseEngine({
+        ...levelData,
+        towerRangeMultiplier: 0.4,
+        waveEnemyDefinitions: [
+          {
+            id: 'variant',
+            creatureId: 'senticle',
+            level: 5,
+            targetingRangeMultiplier,
+          },
+        ],
+      });
+      try {
+        expect(
+          engine.getTowerAttackRange(20, { waveEnemyDefinitionId: 'variant' })
+        ).toBe(8);
+        expect(
+          engine.getTowerAttackRange(20, { waveEnemyDefinitionId: 'missing' })
+        ).toBe(8);
+      } finally {
+        engine.destroy();
+      }
+    }
+  );
 
   it('should target the furthest enemy along path in first mode', () => {
     const engine = new TowerDefenseEngine(levelData, []);

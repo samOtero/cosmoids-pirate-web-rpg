@@ -18,11 +18,7 @@ function hasTargetInRange(
   return engine.enemies.some(
     (enemy) =>
       engine.isEnemyTargetable(enemy) &&
-      engine.isPositionInTowerRange(
-        source.position,
-        enemy.position,
-        attackDef.rangeIndex
-      )
+      engine.isEnemyInTowerRange(source.position, enemy, attackDef.rangeIndex)
   );
 }
 

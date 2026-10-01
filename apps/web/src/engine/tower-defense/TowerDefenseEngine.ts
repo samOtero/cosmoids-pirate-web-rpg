@@ -3660,7 +3660,6 @@ export class TowerDefenseEngine {
     mode: TowerTargetingMode = 'first',
     enemyFilter?: (enemy: Enemy) => boolean
   ): Enemy | null {
-    const effectiveRange = this.getTowerAttackRange(range);
     const enemiesInRange: { enemy: Enemy; dist: number }[] = [];
     for (const enemy of this.enemies) {
       if (
@@ -3669,7 +3668,7 @@ export class TowerDefenseEngine {
       )
         continue;
       const dist = this.getAttackDistance(tower.position, enemy.position);
-      if (dist <= effectiveRange) {
+      if (dist <= this.getTowerAttackRange(range, enemy)) {
         enemiesInRange.push({ enemy, dist });
       }
     }
@@ -4487,9 +4486,32 @@ export class TowerDefenseEngine {
     return this.getAttackDistance(source, target) <= range;
   }
 
-  /** Resolve an attack's authored range through the current level's tower scaling. */
-  public getTowerAttackRange(range: number): number {
-    return Math.max(0, range) * this.towerRangeMultiplier;
+  /** Target allowances affect acquisition, never splash, chaining or ally support. */
+  public getTowerAttackRange(
+    range: number,
+    target?: Pick<Enemy, 'waveEnemyDefinitionId'>
+  ): number {
+    const multiplier = target?.waveEnemyDefinitionId
+      ? this.waveEnemyDefinitions[target.waveEnemyDefinitionId]
+          ?.targetingRangeMultiplier
+      : undefined;
+    const targetMultiplier =
+      multiplier !== undefined && Number.isFinite(multiplier) && multiplier > 0
+        ? multiplier
+        : 1;
+    return Math.max(0, range) * this.towerRangeMultiplier * targetMultiplier;
+  }
+
+  public isEnemyInTowerRange(
+    source: Point,
+    target: Enemy,
+    range: number
+  ): boolean {
+    return this.isPositionInAttackRange(
+      source,
+      target.position,
+      this.getTowerAttackRange(range, target)
+    );
   }
 
   public isPositionInTowerRange(

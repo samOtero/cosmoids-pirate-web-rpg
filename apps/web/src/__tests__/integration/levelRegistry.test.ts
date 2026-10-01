@@ -66,6 +66,12 @@ describe.each(Object.entries(TD_LEVELS))(
             CREATURE_TD_CONFIGS[definition.structure.tdConfigId]
           ).toBeDefined();
         if (definition.stationaryPosition) point(definition.stationaryPosition);
+        if (definition.targetingRangeMultiplier !== undefined) {
+          expect(Number.isFinite(definition.targetingRangeMultiplier)).toBe(
+            true
+          );
+          expect(definition.targetingRangeMultiplier).toBeGreaterThan(0);
+        }
         for (const index of definition.balancedLaneHop?.pathIndices ?? [])
           pathIndex(index);
       }

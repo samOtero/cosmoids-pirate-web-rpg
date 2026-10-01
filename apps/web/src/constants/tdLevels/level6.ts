@@ -126,16 +126,16 @@ export const LEVEL_6: TDLevelData = {
   ],
   placementSpots: [
     {
-      x: 41.05,
-      y: 25.46,
+      x: 44.27,
+      y: 25.16,
     },
     {
-      x: 48.45,
-      y: 32,
+      x: 49.46,
+      y: 32.3,
     },
     {
-      x: 56,
-      y: 25.72,
+      x: 55.01,
+      y: 25.64,
     },
     {
       x: 25,
@@ -211,24 +211,24 @@ export const LEVEL_6: TDLevelData = {
   environmentUnits: [
     {
       position: {
-        x: 32.25,
-        y: 26.41,
+        x: 34.21,
+        y: 29.65,
       },
       tdConfigId: 'caleb_battle',
       facingDirection: 'up',
     },
     {
       position: {
-        x: 29.2,
-        y: 23.75,
+        x: 31.19,
+        y: 27.52,
       },
       tdConfigId: 'kip_battle',
       facingDirection: 'up',
     },
     {
       position: {
-        x: 26.01,
-        y: 28.13,
+        x: 27.82,
+        y: 30.89,
       },
       tdConfigId: 'maribel_capture',
       facingDirection: 'down',
@@ -236,8 +236,8 @@ export const LEVEL_6: TDLevelData = {
     },
     {
       position: {
-        x: 65.24,
-        y: 23.06,
+        x: 65.52,
+        y: 29.38,
       },
       tdConfigId: 'commander_strake_battle',
       facingDirection: 'left',
@@ -284,13 +284,14 @@ export const LEVEL_6: TDLevelData = {
     {
       id: 'level_6_voltusk',
       creatureId: 'voltusk',
-      level: 10,
+      targetingRangeMultiplier: 2,
+      level: 20,
       stationaryPosition: {
-        x: 85,
-        y: 14,
+        x: 50,
+        y: 25,
       },
       abilityId: 'VOLTUSK_ELECTRIC_ORB',
-      hpMultiplier: 4,
+      hpMultiplier: 40,
       weakenedThreshold: 0.3,
     },
     {
@@ -374,8 +375,8 @@ export const LEVEL_6: TDLevelData = {
   backgroundScale: 2.5,
   initialView: {
     offsetX: 50,
-    offsetY: 0,
-    zoom: 0.7,
+    offsetY: 9,
+    zoom: 0.6,
   },
   introMessage: 'Protect Tigrevel!',
 };

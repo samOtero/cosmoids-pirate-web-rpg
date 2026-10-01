@@ -19,11 +19,7 @@ function hasTargetInRange(
   return engine.enemies.some(
     (enemy) =>
       engine.isEnemyTargetable(enemy) &&
-      engine.isPositionInTowerRange(
-        source.position,
-        enemy.position,
-        attackDef.rangeIndex
-      )
+      engine.isEnemyInTowerRange(source.position, enemy, attackDef.rangeIndex)
   );
 }
 
@@ -270,9 +266,7 @@ export function updateRiggingNests(
         target,
         attackDef,
         1,
-        isWindMarked
-          ? (sailcutterConfig?.threadlingDamageMultiplier ?? 1)
-          : 1
+        isWindMarked ? (sailcutterConfig?.threadlingDamageMultiplier ?? 1) : 1
       );
       threadling.attacksRemaining -= 1;
       threadling.nextAttackAtMs =

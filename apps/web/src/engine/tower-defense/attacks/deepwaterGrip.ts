@@ -97,11 +97,7 @@ export function updateDeepwaterGrips(
       target.constrictedByTowerId !== source.id ||
       source.position.x !== grip.origin.x ||
       source.position.y !== grip.origin.y ||
-      !engine.isPositionInTowerRange(
-        source.position,
-        target.position,
-        def.rangeIndex
-      )
+      !engine.isEnemyInTowerRange(source.position, target, def.rangeIndex)
     ) {
       releaseDeepwaterGrip(engine, source, enemies);
       continue;
