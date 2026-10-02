@@ -8,7 +8,7 @@ export const LEVEL_7_INTRO: DialogConfig = {
   sequence: [
     {
       portraits: [{ key: SpeakerImageKey.EMPTY, displayName: '' }],
-      text: 'The morning after escaping Ironbell, Caleb’s little boat creeps along with its new crew packed shoulder to shoulder.',
+      text: 'After escaping Ironbell, Caleb’s little boat creeps along with its new crew packed shoulder to shoulder.',
     },
     {
       portraits: [
@@ -42,7 +42,7 @@ export const LEVEL_7_INTRO: DialogConfig = {
           displayName: 'Caleb',
         },
       ],
-      text: 'A wild island? There could be Cosmoids here we’ve never seen before! Come on—let’s explore!',
+      text: 'A wild island? There could be Cosmoids here we’ve never seen before! Let’s explore!',
       backgroundImageKey: BackgroundImageKey.LEVEL_7_LANDFALL,
     },
   ],

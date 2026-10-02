@@ -128,18 +128,8 @@ export const LEVEL_6: TDLevelData = {
     ],
   ],
   placementSpots: [
-    {
-      x: 44.27,
-      y: 25.16,
-    },
-    {
-      x: 49.46,
-      y: 32.3,
-    },
-    {
-      x: 55.01,
-      y: 25.64,
-    },
+    { x: 45.61, y: 28.53 },
+    { x: 54.09, y: 28.76 },
     {
       x: 25,
       y: 64,
@@ -188,22 +178,10 @@ export const LEVEL_6: TDLevelData = {
       x: 64,
       y: 64,
     },
-    {
-      x: 75,
-      y: 45,
-    },
-    {
-      x: 86,
-      y: 45,
-    },
-    {
-      x: 75,
-      y: 64,
-    },
-    {
-      x: 86,
-      y: 64,
-    },
+    { x: 73.32, y: 45.2 },
+    { x: 82.02, y: 45.27 },
+    { x: 73.41, y: 64.52 },
+    { x: 82.19, y: 63.98 },
   ],
   cursedPhase: {
     enemyDefinitionId: 'level_6_voltusk',

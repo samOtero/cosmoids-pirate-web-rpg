@@ -129,7 +129,7 @@ export const LEVEL_7: TDLevelData = {
   lives: 1,
   cannotLose: true,
   closeCompletesLevel: true,
-  introMessage: 'Relax and discover!',
+  introMessage: 'Relax!',
   backgroundUrl: '/battles/bg/bg_level_7_red_sandstone_shore.webp',
   backgroundScale: 2,
   initialView: { offsetX: 50, offsetY: 22, zoom: 0.8 },

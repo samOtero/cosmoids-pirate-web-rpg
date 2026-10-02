@@ -140,7 +140,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     name: 'Hot Streak',
     type: ElementType.FIRE,
     category: 'physical',
-    power: 45,
+    power: 40,
     cooldownMs: ATTACK_COOLDOWNS.NORMAL,
     rangeIndex: ATTACK_RANGES.NORMAL,
     behaviorType: 'PROJECTILE',
