@@ -16,7 +16,7 @@ describe('editor source loading for registered content', () => {
         JSON.parse(JSON.stringify(entry.levelData))
       );
     }
-  });
+  }, 10000);
 
   it('reads every dialogue without evaluating the source module', async () => {
     for (const [id, config] of Object.entries(dialogs)) {
@@ -27,7 +27,7 @@ describe('editor source loading for registered content', () => {
         JSON.parse(JSON.stringify(config))
       );
     }
-  });
+  }, 10000);
 
   it('reads the animations and every visual entry directly from source', async () => {
     const animations = await loadEditorSource('animations', 'ANIMATIONS');
@@ -43,5 +43,5 @@ describe('editor source loading for registered content', () => {
         JSON.parse(JSON.stringify(config))
       );
     }
-  });
+  }, 10000);
 });

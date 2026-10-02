@@ -414,5 +414,5 @@ export const LEVEL_6: TDLevelData = {
     offsetY: 9,
     zoom: 0.6,
   },
-  introMessage: 'Defeat Voltusk and clear the Poguin!',
+  introMessage: 'Defeat Voltusk!',
 };
