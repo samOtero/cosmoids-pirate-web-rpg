@@ -84,6 +84,25 @@ The family now uses **Warmth**, a persistent 0-100% battle resource based on the
 - Salt expulsion, which becomes much more prominent after evolution
 - Short dives and quick shoreline movement as Aguana's stage-specific emphasis
 
+## Approved Stat Direction
+
+Approved October 1, 2026: Aguana is an agile stage-one physical Water attacker.
+Speed is its highest stat, followed by attack, supporting quick shoreline
+movement, hooked claws, and the approved physical Wake Whip. Modest HP and
+defenses fit its slim juvenile body and short dives; lower special attack keeps
+its paddle-tail offense distinct. Warmth supplies conditional offensive strength,
+while its agile physical profile remains recognizable with shared or off-type
+moves. Nautiguan develops the family toward a heavier adult body.
+
+[Totodile](https://pokemondb.net/pokedex/totodile) supplied the physical
+Water-reptile comparison; [Squirtle](https://pokemondb.net/pokedex/squirtle)
+supplied the defensive aquatic-reptile comparison. The approved spread favors
+agility over those creatures' physical durability.
+
+The authored stats live only in
+[`creatures.ts`](../../apps/web/src/constants/creatures.ts). This approval replaces
+the initial integration defaults; encounter tuning remains a separate decision.
+
 ## Creation Record
 
 - **Creation date:** September 21, 2026
@@ -94,20 +113,20 @@ The family now uses **Warmth**, a persistent 0-100% battle resource based on the
 - **Family:** Aguana -> Nautiguan
 - **Production date:** September 22, 2026
 - **Production assets:** Tight portrait icon plus left, up, and down directional battle sprites, with PNG masters under `art-source/creatures` and transparency-preserving WebP derivatives in `apps/web/public`.
-- **Gameplay implementation:** Pure Water type with a fast juvenile stat profile and the Warmth family resource. Its current learnset is `SCRATCH`, `SUNBATHE`, `WAKE_WHIP`, and provisional `DEEPWATER_GRIP`; evolves into Nautiguan at level 16. Wake Whip establishes the family's physical paddle-tail offense, while the later Water move and base stats still await redesign.
-- **Story placement:** Capturable level-8 Aguana appear in both Level 6 waves on the center lane.
+- **Gameplay implementation:** Pure Water type with the Warmth family resource and the approved October 1, 2026 agile physical stat direction. Wake Whip establishes the family's paddle-tail offense; later Water techniques remain open. Current learnset and evolution requirements are owned by the species registry.
+- **Story placement:** Optional capturable wildlife on Level 7's aquatic route; encounter tuning is owned by the level registry.
 - **Journal observation:** After a short dive, Aguana may stretch belly-up across a sun-warmed tidal rock with its head reclined and all four feet loose. The unusually vulnerable pose shows how completely it relaxes when it feels safe enough to recover its warmth.
 - **Journal artwork:** [`art-source/creatures/journal/aguana_journal.png`](../../art-source/creatures/journal/aguana_journal.png) -> `/UI/Journal/aguana_journal.webp`
 - **Journal revision approved October 1, 2026:** Used built-in ImageGen for localized edits to give Aguana a gently closed resting eye and neutral mouth, then smooth the pelvic underside into an uninterrupted belly surface without suggestive anatomical contours. The approved 1254x1254 PNG preserves the belly-up pose, species identity, four limbs, paddle tail, shoreline scene, and parchment treatment; the journal optimizer publishes the 1024x1024 WebP at the established quality settings.
 - **Revision inspection:** Reviewed the approved source, runtime derivative, and a 256px journal-size preview. The relaxed face and smooth underside remain readable, the anatomy and safe crop are intact, and no text or watermark was introduced. The parchment page remains opaque, matching its source treatment.
 - **Creation provenance:** [historical integration record](../art/CREATURE_PROVENANCE.md)
-- **Production status:** Integrated into the creature registry, journal, tower-defense visuals, Level 6 encounter data, and creation record.
+- **Production status:** Integrated into the creature registry, journal, tower-defense visuals, Level 7 encounter data, and creation record.
 
 ## Open Decisions
 
 - Replacement for provisional `DEEPWATER_GRIP` and any additional Warmth interaction it receives
-- Final stat spread after the attack kit is approved
+- Further encounter balance and later Water techniques following the approved stage-one stat direction
 - Whether reversible shrinking should remain lore-only or appear in a later mechanic
-- Broader habitat distribution and rarity beyond the Level 6 encounter
+- Broader habitat distribution and rarity beyond the Level 7 encounter
 
 Individual natures or personality variants are intentionally outside this species-concept record.

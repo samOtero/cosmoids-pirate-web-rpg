@@ -10,6 +10,7 @@
 - **ID:** `dormatee`
 - **Name concept:** _Dormire_ ("to sleep") or _dormant_ + _manatee_, giving the name a simple, warmly sleepy sound.
 - **Typing:** Psychic
+- **Evolutionary stage:** Stage 1; no evolved form or evolution requirement is approved.
 - **Creature basis:** Florida or West Indian manatee, especially its suspended resting posture and unusually extensive tactile whiskers.
 - **External inspiration:** Shared dreams, communal rest, and sleep as a safe refuge.
 - **Story placement:** Proposed rare wildlife encounter for Level 7, a peaceful island stop with no required objective and no loss condition.
@@ -84,13 +85,32 @@ The visual treatment centers on Dormatee's pearly dream orb rather than a projec
 
 The move has a ten-second simulation-clock cooldown beginning on activation. Attack-speed modifiers do not shorten it. This distinguishes Shared Slumber from Deepwater Grip: the latter guarantees four seconds of damaging single-target control, whereas Shared Slumber trades damage and reliability for broad control and a longer self-commitment.
 
+## Approved Stat Direction
+
+Approved October 1, 2026: Dormatee is a slow, durable stage-one Psychic controller.
+Its substantial HP and special defense support surviving the commitment of its
+sleep technique, while special attack supports deliberate dream-orb damage.
+Low physical attack, very low speed, and moderate physical defense are its
+limitations. Its bulk and special emphasis remain recognizable when using shared
+or off-type moves, with room for a future evolution to deepen its role.
+
+[Munna](https://pokemondb.net/pokedex/munna) supplied the sleepy, rounded Psychic
+comparison; [Drowzee](https://pokemondb.net/pokedex/drowzee) supplied the special
+durability comparison. The approved spread combines the former's HP and special
+offense with a stronger special-defense emphasis.
+
+The authored stats live only in
+[`creatures.ts`](../../apps/web/src/constants/creatures.ts). This approval replaces
+the initial integration defaults; encounter tuning remains a separate decision.
+
 ## Production Integration
 
 Dormatee is registered as the game's first Psychic-type species. Psychic has its own UI and battle-effect colors, and its initial type interactions follow the familiar creature-battling relationships currently supported by the game's type roster: Psychic is strong against Poison, resisted by Psychic and Steel, and ineffective against Dark; Bug and Dark are strong against Psychic.
 
-The current gameplay values remain provisional while Dormatee's bulky special-attacker role is developed:
+The species registry owns current gameplay values. Dormatee's stage-one stat
+direction was approved October 1, 2026; additional techniques remain open:
 
-- **Base stats:** HP 86, Attack 42, Defense 70, Special Attack 76, Special Defense 90, Speed 18.
+- **Base stats:** See the species registry and approved stat direction above.
 - **Base experience:** 82.
 - **Movement profile:** Existing `lizard` profile as an integration default pending bespoke floating movement.
 - **Learnset:** Grumble (`GRUMBLE`) at level 1, Reverie Orb (`REVERIE_ORB`) at level 4, and Shared Slumber (`SHARED_SLUMBER`) at level 8.
@@ -126,7 +146,7 @@ Production assets:
 
 - Decide Dormatee's exact rarity, spawn conditions, and capture tuning in Level 7.
 - Select, revise, combine, or reject the remaining provisional gameplay ideas before implementing additional attacks or abilities.
-- Tune the initial stats, scale, offsets, movement, animation needs, and broader battle role during Level 7 development.
-- Decide whether Dormatee is a single-stage species or belongs to an evolutionary family.
+- Tune encounter balance, scale, offsets, movement, animation needs, and later techniques during Level 7 development.
+- Design Dormatee's future evolution and decide its evolution requirement; its stage-one status is approved.
 - Lock its physical size, broader habitat, diet, distribution, and ecology beyond the quiet lagoon premise.
 - Define Level 7's map, optional interactions, creature roster, and exit flow without compromising its no-objective, cannot-lose structure.

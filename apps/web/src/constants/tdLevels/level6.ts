@@ -270,9 +270,9 @@ export const LEVEL_6: TDLevelData = {
     {
       id: 'level_6_poguin',
       creatureId: 'poguin',
-      level: 16,
-      speedMultiplier: 1.25,
-      hpMultiplier: 5,
+      level: 14,
+      speedMultiplier: 1.2,
+      hpMultiplier: 3,
       balancedLaneHop: {
         pathIndices: [0, 2],
         triggerProgresses: [0.35, 0.65],
@@ -355,5 +355,5 @@ export const LEVEL_6: TDLevelData = {
     offsetY: 9,
     zoom: 0.6,
   },
-  introMessage: 'Protect Tigrevel!',
+  introMessage: 'Defeat Voltusk!',
 };

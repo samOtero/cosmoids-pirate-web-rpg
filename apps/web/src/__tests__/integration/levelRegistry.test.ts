@@ -17,12 +17,18 @@ function point(position: Point) {
 }
 
 describe('level selection registry', () => {
-  it('offers registered levels without duplicating their authored layout', () => {
+  it('offers registered levels or locked placeholders without duplicating their authored layout', () => {
     expect(new Set(LEVEL_ORDER.map((entry) => entry.context)).size).toBe(
       LEVEL_ORDER.length
     );
-    for (const entry of LEVEL_ORDER)
-      expect(TD_LEVELS[entry.context]).toBeDefined();
+    for (const entry of LEVEL_ORDER) {
+      if (entry.context.startsWith('LOCKED_')) {
+        expect(TD_LEVELS[entry.context]).toBeUndefined();
+        expect(entry.requiredProgression).toBeDefined();
+      } else {
+        expect(TD_LEVELS[entry.context]).toBeDefined();
+      }
+    }
   });
 });
 

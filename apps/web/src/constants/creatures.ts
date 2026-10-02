@@ -44,7 +44,7 @@ export const MOUSE_1: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'NIBBLE' },
     { level: 4, attackId: 'QUICK_ATTACK' },
-    { level: 14, attackId: 'LOOSE_END' },
+    { level: 12, attackId: 'LOOSE_END' },
   ],
 };
 
@@ -71,7 +71,7 @@ export const BIRD_1: CosmoidTemplate = {
   learnableAttacks: [
     { level: 1, attackId: 'PECK' },
     { level: 5, attackId: 'FUNNY_DANCE' },
-    { level: 9, attackId: 'FLYING_COLORS' },
+    { level: 10, attackId: 'FLYING_COLORS' },
   ],
 };
 
@@ -115,11 +115,7 @@ export const CAFFIQUI: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/caffiqui_down.webp',
   battleSpriteUrl: '/battles/cosmoids/caffiqui_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [
-    { level: 1, attackId: 'TACKLE' },
-    { level: 3, attackId: 'VINE_WHIP' },
-    { level: 6, attackId: 'STRING_SHOT' },
-  ],
+  learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
 };
 
 export const SNOUTASCO: CosmoidTemplate = {
@@ -139,11 +135,7 @@ export const SNOUTASCO: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/snoutasco_down.webp',
   battleSpriteUrl: '/battles/cosmoids/snoutasco_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [
-    { level: 1, attackId: 'NIBBLE' },
-    { level: 3, attackId: 'VINE_WHIP' },
-    { level: 6, attackId: 'STRING_SHOT' },
-  ],
+  learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
 };
 
 export const ZAPYBARA: CosmoidTemplate = {
@@ -164,11 +156,7 @@ export const ZAPYBARA: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/zapybara_down.webp',
   battleSpriteUrl: '/battles/cosmoids/zapybara_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [
-    { level: 1, attackId: 'NIBBLE' },
-    { level: 3, attackId: 'TACKLE' },
-    { level: 6, attackId: 'STRING_SHOT' },
-  ],
+  learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
 };
 
 export const SONARION: CosmoidTemplate = {
@@ -198,7 +186,7 @@ export const SONARION: CosmoidTemplate = {
     { level: 10, attackId: 'STATIC_YIP' },
     { level: 14, attackId: 'RALLY_HOWL' },
   ],
-  evolutionNodes: [{ level: 26, evolutionDefId: 'resonarion' }],
+  evolutionNodes: [{ level: 20, evolutionDefId: 'resonarion' }],
 };
 
 export const RESONARION: CosmoidTemplate = {
@@ -251,11 +239,7 @@ export const TIGREVEL: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/tigrevel_down.webp',
   battleSpriteUrl: '/battles/cosmoids/tigrevel_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [
-    { level: 1, attackId: 'SCRATCH' },
-    { level: 4, attackId: 'NIBBLE' },
-    { level: 7, attackId: 'QUICK_ATTACK' },
-  ],
+  learnableAttacks: [{ level: 1, attackId: 'SCRATCH' }],
 };
 
 export const VOLTUSK: CosmoidTemplate = {
@@ -279,10 +263,7 @@ export const VOLTUSK: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/voltusk_down.webp',
   battleSpriteUrl: '/battles/cosmoids/voltusk_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [
-    { level: 1, attackId: 'TACKLE' },
-    { level: 1, attackId: 'SPARK' },
-  ],
+  learnableAttacks: [{ level: 1, attackId: 'SPARK' }],
 };
 
 export const POGUIN: CosmoidTemplate = {
@@ -306,11 +287,7 @@ export const POGUIN: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/poguin_down.webp',
   battleSpriteUrl: '/battles/cosmoids/poguin_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [
-    { level: 1, attackId: 'TACKLE' },
-    { level: 4, attackId: 'WATER_GUN' },
-    { level: 7, attackId: 'SPARK' },
-  ],
+  learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
 };
 
 export const DORMATEE: CosmoidTemplate = {
@@ -318,12 +295,12 @@ export const DORMATEE: CosmoidTemplate = {
   name: 'Dormatee',
   type: ElementType.PSYCHIC,
   baseStats: {
-    hp: 86,
-    attack: 42,
-    defense: 70,
-    specialAttack: 76,
-    specialDefense: 90,
-    speed: 18,
+    hp: 75,
+    attack: 30,
+    defense: 50,
+    specialAttack: 65,
+    specialDefense: 75,
+    speed: 20,
   },
   baseExperience: 82,
   iconImg: '/UI/Icons/dormatee_icon.png',
@@ -345,18 +322,18 @@ export const YOKODILLO: CosmoidTemplate = {
   name: 'Yokodillo',
   type: ElementType.FIGHTING,
   baseStats: {
-    hp: 92,
-    attack: 78,
-    defense: 90,
-    specialAttack: 30,
-    specialDefense: 68,
-    speed: 22,
+    hp: 75,
+    attack: 70,
+    defense: 80,
+    specialAttack: 25,
+    specialDefense: 45,
+    speed: 25,
   },
   baseExperience: 80,
   iconImg: '/UI/Icons/yokodillo_icon.png',
   journalImg: '/UI/Journal/yokodillo_journal.webp',
   journalEntry:
-    'It braces with an eager grin and refuses to budge. Once a rival finally moves it, Yokodillo curls into a ball and rolls back much farther than intended.',
+    'Although its shell can close into a protective ball, it prefers to meet challenges with its belly exposed. It takes great pride in holding its ground.',
   spriteUrl: '/battles/cosmoids/yokodillo_down.webp',
   battleSpriteUrl: '/battles/cosmoids/yokodillo_left.webp',
   movementId: 'lizard',
@@ -372,12 +349,12 @@ export const AGUANA: CosmoidTemplate = {
   name: 'Aguana',
   type: ElementType.WATER,
   baseStats: {
-    hp: 48,
-    attack: 58,
-    defense: 52,
-    specialAttack: 55,
-    specialDefense: 58,
-    speed: 72,
+    hp: 45,
+    attack: 60,
+    defense: 45,
+    specialAttack: 40,
+    specialDefense: 50,
+    speed: 70,
   },
   baseExperience: 65,
   iconImg: '/UI/Icons/aguana_icon.webp',
@@ -401,12 +378,12 @@ export const NAUTIGUAN: CosmoidTemplate = {
   name: 'Nautiguan',
   type: ElementType.WATER,
   baseStats: {
-    hp: 88,
-    attack: 82,
-    defense: 92,
-    specialAttack: 72,
-    specialDefense: 84,
-    speed: 30,
+    hp: 95,
+    attack: 110,
+    defense: 95,
+    specialAttack: 50,
+    specialDefense: 80,
+    speed: 40,
   },
   baseExperience: 96,
   iconImg: '/UI/Icons/nautiguan_icon.webp',
@@ -445,10 +422,7 @@ export const BRAMFRIT: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/bramfrit_down.webp',
   battleSpriteUrl: '/battles/cosmoids/bramfrit_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [
-    { level: 1, attackId: 'TACKLE' },
-    { level: 4, attackId: 'EMBER' },
-  ],
+  learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
 };
 
 export const SEPIPPET: CosmoidTemplate = {
@@ -471,10 +445,7 @@ export const SEPIPPET: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/sepippet_down.webp',
   battleSpriteUrl: '/battles/cosmoids/sepippet_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [
-    { level: 1, attackId: 'TACKLE' },
-    { level: 4, attackId: 'QUICK_ATTACK' },
-  ],
+  learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
 };
 
 export const PARLET: CosmoidTemplate = {
@@ -497,10 +468,7 @@ export const PARLET: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/parlet_down.webp',
   battleSpriteUrl: '/battles/cosmoids/parlet_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [
-    { level: 1, attackId: 'TACKLE' },
-    { level: 4, attackId: 'WATER_GUN' },
-  ],
+  learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
 };
 
 export const CORROGOON: CosmoidTemplate = {
@@ -524,11 +492,7 @@ export const CORROGOON: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/corrogoon_down.webp',
   battleSpriteUrl: '/battles/cosmoids/corrogoon_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [
-    { level: 1, attackId: 'PINCH' },
-    { level: 4, attackId: 'TACKLE' },
-    { level: 7, attackId: 'NIBBLE' },
-  ],
+  learnableAttacks: [{ level: 1, attackId: 'PINCH' }],
 };
 
 export const BUFFLORA: CosmoidTemplate = {
@@ -610,11 +574,7 @@ export const BETTLE: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/bettle_down.webp',
   battleSpriteUrl: '/battles/cosmoids/bettle_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [
-    { level: 1, attackId: 'PINCH' },
-    { level: 3, attackId: 'TACKLE' },
-    { level: 6, attackId: 'STRING_SHOT' },
-  ],
+  learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
 };
 
 export const BUG_STAGE_1: CosmoidTemplate = {
@@ -666,7 +626,7 @@ export const BUG_STAGE_2: CosmoidTemplate = {
   battleScale: 1.25,
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'TACKLE' }, // Replace Bug Bite with TACKLE since BUG_BITE is not in ATTACK_DEFS
+    { level: 1, attackId: 'TACKLE' },
     { level: 1, attackId: 'STRING_SHOT' },
     { level: 7, attackId: 'RIGGING_NEST' },
   ],

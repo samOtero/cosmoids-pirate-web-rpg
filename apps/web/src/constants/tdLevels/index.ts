@@ -214,6 +214,10 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
   },
   [TDLevelContext.LEVEL_6]: {
     levelData: LEVEL_6,
+    journalCompletion: {
+      progression: StoryProgression.DEFEAT_LEVEL_6,
+      seenSpeciesIds: ['poguin', 'voltusk'],
+    },
     introEvents: [
       {
         type: 'SHOW_DIALOG',
@@ -250,7 +254,7 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
     levelData: LEVEL_7,
     journalCompletion: {
       progression: StoryProgression.COMPLETE_LEVEL_7,
-      seenSpeciesIds: ['dormatee', 'yokodillo'],
+      seenSpeciesIds: ['dormatee', 'yokodillo', 'aguana'],
     },
     introEvents: [
       {
@@ -350,16 +354,21 @@ export const LEVEL_ORDER: LevelInfo[] = [
   },
   {
     context: TDLevelContext.LEVEL_6,
-    name: 'Officer Confrontation (WIP)',
-    description: 'Stop the Navy from dragging Tigrevel back into captivity.',
+    name: 'Ironbell Showdown',
+    description: 'Stop the Navy from taking Tigrevel back to captivity.',
     requiredProgression: StoryProgression.DEFEAT_LEVEL_5,
   },
   {
     context: TDLevelContext.LEVEL_7,
     name: 'Shore Leave',
-    description:
-      'Explore a peaceful red-sandstone shore and meet its wildlife.',
+    description: 'Explore a peaceful shore and meet its wildlife.',
     requiredProgression: StoryProgression.DEFEAT_LEVEL_6,
+  },
+  {
+    context: 'LOCKED_8' as TDLevelContext,
+    name: 'Coming soon',
+    description: 'More story adventures are on the way.',
+    requiredProgression: StoryProgression.COMPLETE_LEVEL_7,
   },
 ];
 

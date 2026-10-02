@@ -82,6 +82,26 @@ Approved biological sources for that next move-design pass include:
 - Directed salt expulsion or salt-spitting
 - Greater strength and heat retention supporting longer dives
 
+## Approved Stat Direction
+
+Approved October 1, 2026: Nautiguan is a bulky physical Water attacker and the
+family's currently final evolution. Evolution shifts Aguana's shoreline agility
+into strength and staying power. Attack is its highest stat, supporting its
+massive paddle tail, anchoring claws, and physical Salt Spit. Strong HP and
+defense reflect its broad adult body, with solid special defense and a slight
+physical defensive emphasis. Low speed and special attack preserve clear
+limitations. Warmth supplies conditional offensive strength, while its physical
+power and durability remain recognizable with shared or off-type moves.
+
+[Drednaw](https://pokemondb.net/pokedex/drednaw) supplied the physical aquatic
+reptile comparison; [Carracosta](https://pokemondb.net/pokedex/carracosta) supplied
+the slow, heavy adult comparison. The approved direction favors a slower physical
+attacker with more balanced defenses than a heavily shelled specialist.
+
+The authored stats live only in
+[`creatures.ts`](../../apps/web/src/constants/creatures.ts). This approval replaces
+the initial integration defaults; encounter tuning remains a separate decision.
+
 ## Seafaring World Role
 
 Some crews keep a Nautiguan aboard on long voyages and gather the crystals it expels after feeding. This gives the species a valued, repeatable relationship with sailors without adding tools, clothing, or a nautical costume to its anatomy.
@@ -98,7 +118,7 @@ The exact economics, prevalence, handling method, and story use of this salt-col
 - **Family:** Aguana -> Nautiguan
 - **Production date:** September 22, 2026
 - **Production assets:** Tight portrait icon plus left, up, and down directional battle sprites, with PNG masters under `art-source/creatures` and transparency-preserving WebP derivatives in `apps/web/public`.
-- **Gameplay implementation:** Pure Water type with the Warmth family resource and a provisional slow, durable adult stat profile. Its current learnset is `SCRATCH`, `SUNBATHE`, `WAKE_WHIP`, provisional `DEEPWATER_GRIP`, and `SALT_SPIT`. Wake Whip and Salt Spit are the approved physical Water attacks; Deepwater Grip and the final stat spread still await redesign. It is the level-16 evolution of Aguana.
+- **Gameplay implementation:** Pure Water type with the Warmth family resource and the approved October 1, 2026 bulky physical stat direction. Wake Whip and Salt Spit are the approved physical Water attacks; Deepwater Grip still awaits redesign. Current learnset and evolution requirements are owned by the species registry.
 - **Story placement:** Evolution-only within the current Level 6 family integration; wild Nautiguan placement remains open.
 - **Creation provenance:** [historical integration record](../art/CREATURE_PROVENANCE.md)
 - **Journal observation:** In strong underwater currents, a mature Nautiguan braces itself against the flow like a living breakwater while a young Aguana clings to the shelter of its flank. The adult looks back to check on the juvenile as loose seaweed and bubbles stream past them.
@@ -109,7 +129,6 @@ The exact economics, prevalence, handling method, and story use of this salt-col
 
 - Exact physical scale and diving limits in Cosmoids lore
 - Replacement for provisional `DEEPWATER_GRIP` and final adult Warmth balance
-- Final stat spread after the attack kit is approved
 - Mechanical treatment of anchoring and reversible size change
 - Wild habitat distribution, rarity, capture rules, and direct story placement
 - How common the shipboard salt-harvesting relationship is

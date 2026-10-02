@@ -10,6 +10,7 @@
 - **Repository ID:** `yokodillo`
 - **Name concept:** _Yokozuna_ + _armadillo_, joining sumo's highest rank to the creature's animal basis.
 - **Typing:** Fighting
+- **Evolutionary stage:** Stage 1; no evolved form or evolution requirement is approved.
 - **Creature basis:** Southern three-banded armadillo
 - **External inspiration:** Sumo wrestling, friendly island sparring, and a restrained wooden-cask influence in the round armored silhouette and warm brown palette.
 - **Character core:** A jovial, grounded brawler that genuinely enjoys being pushed and treats a contest of strength as an invitation to play.
@@ -19,6 +20,8 @@
 ## Character and Story Hook
 
 Yokodillo is competitive without being hostile. It squares up with an eager grin, raises both palms, and waits for another creature to test its footing. Being moved is not an insult—it is the most exciting part of the game.
+
+Its journal description emphasizes the choice to stand its ground: although it can close its shell into a protective ball, it prefers to face a challenge with its belly exposed. Its pride comes from holding its footing rather than retreating into its armor.
 
 Its comedy comes from the contrast between control and momentum. Yokodillo looks immovable while braced, but once it curls up and starts rolling, it may travel much farther than it meant to. That makes it a natural fit for a relaxed island visit where the crew and local Cosmoids are stretching, playing, and sparring rather than fighting for survival.
 
@@ -67,7 +70,28 @@ The island's final name, Yokodillo's exact location, spawn rate, capture flow, a
 
 ## Evolution and Scale Intent
 
-Yokodillo was conceived to read clearly as a self-contained single-stage creature, but its evolutionary status has not been locked. An approximate height near 0.8 metres was discussed as an early scale cue and remains provisional.
+Yokodillo's stage-one status was approved October 1, 2026, replacing the earlier
+single-stage concept direction. Its future evolution and evolution requirement
+remain open. An approximate height near 0.8 metres was discussed as an early scale
+cue and remains provisional.
+
+## Approved Stat Direction
+
+Approved October 1, 2026: Yokodillo is an armored stage-one physical brawler.
+Physical defense is its highest stat, backed by substantial HP and strong attack
+for bracing against shoves and answering with committed palm strikes. Very low
+speed, low special attack, and weaker special durability provide clear
+limitations. Its physical bulk and offense preserve its identity when using
+shared or off-type moves, while leaving room for evolution.
+
+[Makuhita](https://pokemondb.net/pokedex/makuhita) supplied the sumo comparison;
+ordinary [Sandshrew](https://pokemondb.net/pokedex/sandshrew) supplied the armored,
+curling-body comparison. Relative to Sandshrew, the approved spread exchanges
+some attack, defense, and speed for greater HP and special defense.
+
+The authored stats live only in
+[`creatures.ts`](../../apps/web/src/constants/creatures.ts). This approval replaces
+the initial integration defaults; encounter tuning remains a separate decision.
 
 ## Approved Technique: Palm Slam
 
@@ -97,6 +121,7 @@ The ground effect avoids thin concentric rings and branching line cracks, which 
 - **Journal observation:** Yokodillo settles its great belly close to the ground and uses its broad hands with unexpected delicacy, lifting loose bark to inspect the insects sheltering beneath it.
 - **Journal artwork:** [`art-source/creatures/journal/yokodillo_journal.png`](../../art-source/creatures/journal/yokodillo_journal.png), published at `/UI/Journal/yokodillo_journal.webp`.
 - **Journal artwork approval:** September 22, 2026
+- **Journal description revision:** October 1, 2026; approved the strength-over-shelter direction, emphasizing its exposed-belly stance and pride in holding its ground. The authored entry lives in `apps/web/src/constants/creatures.ts`.
 
 ## Open Decisions
 
@@ -104,4 +129,4 @@ The ground effect avoids thin concentric rings and branching line cracks, which 
 - Additional later-level attacks, special abilities, and final balance tuning
 - Final island name and any local environmental storytelling
 - Broader habitat, diet, ecology, and any future revision of the journal entry
-- Final scale and whether it remains single-stage or joins an evolution family
+- Final scale, future evolved form, and evolution requirement; its stage-one status is approved
