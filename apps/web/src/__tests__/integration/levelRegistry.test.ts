@@ -135,6 +135,10 @@ describe.each(Object.entries(TD_LEVELS))(
         expect(
           definitions.get(level.cursedPhase.enemyDefinitionId)
         ).toBeDefined();
+      if (level.reinforcementBossDefinitionId)
+        expect(
+          definitions.get(level.reinforcementBossDefinitionId)?.creatureId
+        ).toBeDefined();
       for (const index of level.safePlacementSpotIndices ?? [])
         expect(level.placementSpots[index]).toBeDefined();
       for (const index of level.towerRecovery?.placementSpotIndices ?? [])

@@ -174,6 +174,9 @@ export class EffectProcessor {
   ) {
     // Multiple projectiles can arrive in one tick; dead targets cannot build combos.
     if (target.hp <= 0) return;
+    const wasBurning = target.statusConditions.some(
+      (status) => status.type === 'BURN' && status.durationMs > 0
+    );
     const level = source.creature.level;
     const power =
       attackDef.power *
@@ -199,18 +202,6 @@ export class EffectProcessor {
         : 1;
     const defense = Math.max(1, baseDefense * scouredMultiplier);
 
-    // Get Defender Type
-    const defenderMeta = TD_CREATURE_DEFS[target.definitionId];
-    const defenderTypes =
-      target.elementTypes && target.elementTypes.length > 0
-        ? target.elementTypes
-        : defenderMeta
-          ? [
-              defenderMeta.baseCreature.type,
-              defenderMeta.baseCreature.secondaryType,
-            ].filter((type): type is ElementType => type !== undefined)
-          : [ElementType.NORMAL];
-
     // Get Attacker Type
     const attackerMeta = TD_CREATURE_DEFS[source.creature.speciesId];
     const attackerTypes = attackerMeta
@@ -231,11 +222,9 @@ export class EffectProcessor {
     const isStab = attackerTypes.includes(attackDef.type);
     const stabMultiplier = isStab ? 1.5 : 1.0;
 
-    const effectivenessMultiplier = defenderTypes.reduce(
-      (multiplier, defenderType) =>
-        multiplier *
-        (TYPE_EFFECTIVENESS[attackDef.type]?.[defenderType] ?? 1.0),
-      1.0
+    const effectivenessMultiplier = this.getTypeEffectiveness(
+      target,
+      attackDef.type
     );
     const isDrenched = target.statusConditions.some(
       (status) => status.type === 'DRENCHED'
@@ -319,48 +308,15 @@ export class EffectProcessor {
     // even when the attack is a non-damaging status move.
     target.damagedByTowerIds.add(source.id);
 
-    let textColor = 0xffffff;
-    let textScale = 1.0;
-
-    if (combinedEffectiveness > 1) {
-      textColor = 0xfacc15; // Yellow-ish for super effective
-      textScale = 1.4;
-    } else if (combinedEffectiveness < 1) {
-      textColor = 0x9ca3af; // Gray for not very effective
-      textScale = 0.75;
-    }
-
-    let damageDealt = 0;
-    if (finalDamage > 0) {
-      if (!target.isInvulnerable) {
-        damageDealt = Math.min(target.hp, finalDamage);
-        target.hp -= finalDamage;
-      }
-      if (target.hp <= 0) target.fuseRushMarks = undefined;
-      if (fuseFinisher) {
-        textColor = 0xffa63d;
-        textScale = Math.max(textScale, 1.5);
-      }
-      startDamageFlash(target, attackDef.type);
-
-      engine.events?.emit({
-        type: 'ATTACK_DAMAGE_DEALT',
-        towerId: source.id,
-        targetEnemyId: target.id,
-        attackDefId: attackDef.id,
-        damage: finalDamage,
-      });
-
-      engine.floatingTexts.push({
-        id: `ft_dmg_${Date.now()}_${Math.random().toString(36).substring(7)}`,
-        text: Math.ceil(finalDamage).toString(),
-        position: { ...target.position },
-        color: textColor,
-        scale: textScale,
-        durationMs: 1000,
-        elapsedMs: 0,
-      });
-    }
+    const damageDealt = this.applyResolvedHit(
+      engine,
+      source,
+      target,
+      attackDef,
+      finalDamage,
+      combinedEffectiveness,
+      fuseFinisher
+    );
 
     if (attackDef.sailcutter) {
       applySailcutterMark(engine, source, target, attackDef);
@@ -370,6 +326,17 @@ export class EffectProcessor {
     // hit gets a wake roll so one attack cannot roll several times.
     if (damageDealt > 0 && hitCount === 1) {
       tryWakeFromDirectDamage(engine, target);
+    }
+
+    // Preview targets preserve HP but still resolve hits and show their payoff.
+    if (wasBurning && finalDamage > 0 && hitCount === 1) {
+      this.applyBurningTargetSplash(
+        engine,
+        source,
+        target,
+        attackDef,
+        finalDamage
+      );
     }
 
     if (
@@ -635,5 +602,133 @@ export class EffectProcessor {
         }
       });
     }
+  }
+
+  /** Reuses hit feedback and attribution without rerolling damage or on-hit effects. */
+  private static applyResolvedHit(
+    engine: TowerDefenseEngine,
+    source: Tower,
+    target: Enemy,
+    attackDef: AttackDefinition,
+    damage: number,
+    effectiveness: number = 1,
+    fuseFinisher: boolean = false
+  ): number {
+    if (damage <= 0) return 0;
+    let damageDealt = 0;
+    if (!target.isInvulnerable) {
+      damageDealt = Math.min(target.hp, damage);
+      target.hp -= damage;
+    }
+    if (target.hp <= 0) target.fuseRushMarks = undefined;
+    const textColor = fuseFinisher
+      ? 0xffa63d
+      : effectiveness > 1
+        ? 0xfacc15
+        : effectiveness < 1
+          ? 0x9ca3af
+          : 0xffffff;
+    const textScale = fuseFinisher
+      ? 1.5
+      : effectiveness > 1
+        ? 1.4
+        : effectiveness < 1
+          ? 0.75
+          : 1;
+    startDamageFlash(target, attackDef.type);
+    engine.events?.emit({
+      type: 'ATTACK_DAMAGE_DEALT',
+      towerId: source.id,
+      targetEnemyId: target.id,
+      attackDefId: attackDef.id,
+      damage,
+    });
+    engine.floatingTexts.push({
+      id: `ft_dmg_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+      text: Math.ceil(damage).toString(),
+      position: { ...target.position },
+      color: textColor,
+      scale: textScale,
+      durationMs: 1000,
+      elapsedMs: 0,
+    });
+    return damageDealt;
+  }
+
+  private static applyBurningTargetSplash(
+    engine: TowerDefenseEngine,
+    source: Tower,
+    primaryTarget: Enemy,
+    attackDef: AttackDefinition,
+    primaryDamage: number
+  ): void {
+    const splash = attackDef.burningTargetSplash;
+    if (!splash) return;
+    // The resolved primary hit supplies the spark budget, including overkill.
+    // Secondary targets apply their own matchup, but no defense or affinity reroll.
+    const sparkDamage = primaryDamage * splash.damageRatio;
+    const targets = engine.enemies.filter(
+      (enemy) =>
+        enemy.id !== primaryTarget.id &&
+        engine.isEnemyTargetable(enemy) &&
+        engine.isPositionInAttackRange(
+          primaryTarget.position,
+          enemy.position,
+          splash.radiusIndex
+        )
+    );
+    const hitTargets: Enemy[] = [];
+    for (const enemy of targets) {
+      const effectiveness = this.getTypeEffectiveness(enemy, attackDef.type);
+      if (effectiveness === 0) continue;
+      const damage = Math.max(1, Math.floor(sparkDamage * effectiveness));
+      hitTargets.push(enemy);
+      enemy.damagedByTowerIds.add(source.id);
+      const damageDealt = this.applyResolvedHit(
+        engine,
+        source,
+        enemy,
+        attackDef,
+        damage,
+        effectiveness
+      );
+      if (damageDealt > 0) tryWakeFromDirectDamage(engine, enemy);
+      if (enemy.hp <= 0) engine.emitEnemyDefeated(enemy, source);
+    }
+    if (splash.visualEffectConfigId && hitTargets.length > 0) {
+      const configId = splash.visualEffectConfigId;
+      const durationMs =
+        CREATURE_TD_CONFIGS[configId]?.default.vfxAnimation?.durationMs ?? 240;
+      for (const enemy of [primaryTarget, ...hitTargets]) {
+        engine.visualEffects.push({
+          id: `vfx_burning_splash_${enemy.id}_${engine.elapsedTimeMs}_${Math.random()}`,
+          configId,
+          position: { ...enemy.position },
+          targetId: enemy.id,
+          durationMs,
+          elapsedMs: 0,
+        });
+      }
+    }
+  }
+
+  private static getTypeEffectiveness(
+    target: Enemy,
+    attackType: ElementType
+  ): number {
+    const defenderMeta = TD_CREATURE_DEFS[target.definitionId];
+    const defenderTypes = target.elementTypes?.length
+      ? target.elementTypes
+      : defenderMeta
+        ? [
+            defenderMeta.baseCreature.type,
+            defenderMeta.baseCreature.secondaryType,
+          ].filter((type): type is ElementType => type !== undefined)
+        : [ElementType.NORMAL];
+    return defenderTypes.reduce(
+      (multiplier, defenderType) =>
+        multiplier * (TYPE_EFFECTIVENESS[attackType]?.[defenderType] ?? 1),
+      1
+    );
   }
 }

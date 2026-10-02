@@ -36,9 +36,34 @@ Bell- or gong-like calls remain an optional source of Level 6 mechanics, rather 
 
 The officer throws a steel net over Tigrevel as Navy equipment; the net is not produced by the boss or part of its anatomy. The officer sends his boss and supporting Cosmoids to drag Tigrevel back toward the prison. Tigrevel struggles against the restraint and remains visibly present as the creature the player is protecting. The playable placeholder uses a dedicated transparent netted-Tigrevel capture-unit graphic in every objective state, including while an enemy carries it.
 
-Tigrevel is a moving objective: reaching the recapture endpoint causes defeat. Defeating the boss breaks its control of the net, frees Tigrevel, and wins the encounter. The first playable battlefield keeps Tigrevel on an unobstructed central extraction track while Poguin haul from parallel upper and lower lanes. The first Poguin to reach Tigrevel anchors a steel rope and begins pulling at 12% of normal movement speed. Nearby Poguin can connect to Tigrevel or another attached Poguin; each helper adds 16 percentage points to the shared pull speed, capped at 92%. Progress along either Poguin lane is synchronized to Tigrevel's position on the center track, preserving one leftward recapture direction. Only Poguin with a continuous chain of nearby links to Tigrevel contribute to the pull. If a middle hauler falls or the gap between linked Poguin grows beyond the 12-unit joining distance, the downstream branch drops its ropes and stops contributing. Loose Poguin turn back toward Tigrevel and may reconnect to a nearby live link after a one-second delay. If the lead falls, only a helper close enough to anchor directly to Tigrevel takes over; otherwise Tigrevel slowly walks back toward its starting position on the center track at 1 unit per second until a Poguin reconnects. The netted Tigrevel sprite faces right throughout, including while Poguin pull it left. These values are initial tuning targets rather than final balance.
+Tigrevel is a moving objective: reaching the recapture endpoint causes defeat. Defeating the boss stops reinforcements. The remaining Poguin keep hauling, and Tigrevel is freed only after they are cleared. The first playable battlefield keeps Tigrevel on an unobstructed central extraction track while Poguin haul from parallel upper and lower lanes. The first Poguin to reach Tigrevel anchors a steel rope and begins pulling at 12% of normal movement speed. Nearby Poguin can connect to Tigrevel or another attached Poguin; each helper adds 16 percentage points to the shared pull speed, capped at 92%. Progress along either Poguin lane is synchronized to Tigrevel's position on the center track, preserving one leftward recapture direction. Only Poguin with a continuous chain of nearby links to Tigrevel contribute to the pull. If a middle hauler falls or the gap between linked Poguin grows beyond the 12-unit joining distance, the downstream branch drops its ropes and stops contributing. Loose Poguin turn back toward Tigrevel and may reconnect to a nearby live link after a one-second delay. If the lead falls, only a helper close enough to anchor directly to Tigrevel takes over; otherwise Tigrevel slowly walks back toward its starting position on the center track at 1 unit per second until a Poguin reconnects. The netted Tigrevel sprite faces right throughout, including while Poguin pull it left. These values are initial tuning targets rather than final balance.
 
 This progresses from Level 5's stationary gate objective. The player must balance damaging the boss against stopping the recapture effort, rather than simply repeat the previous level's gate destruction. The relationship between enemy pressure and Tigrevel's movement should be readable at a glance.
+
+## Reinforcement Cycle Prototype
+
+Voltusk is immune to forced displacement in this encounter, keeping it on its
+platform in both normal and cursed phases. Push and pull effects still deal their
+normal damage and apply their other effects; the Poguin remain displaceable.
+
+The October 1, 2026 prototype spawns Voltusk once alongside a small staggered
+opening on both Poguin lanes. Reinforcements then repeat an upper-lane surge
+with sparse lower-lane arrivals, a mirrored lower-lane surge, and a coordinated
+push on both lanes. Existing lane hops and hauling chains provide the tactical
+variation; no additional enemy role or ability is introduced.
+
+After the last spawn of each cycle, there is a twelve-second recovery window
+with no new enemies spawning on either lane. Surviving Poguin, objective movement,
+and Voltusk's attacks continue, allowing the player to clear a backlog, recover
+ground, and focus on the boss. The next cycle starts on a timer regardless of
+survivors. Counts and enemy health stay constant across repeats for this first
+balance pass, including after the cursed intermission.
+
+Defeating the configured boss stops all future spawns, including pending groups,
+but the player must clear the surviving Poguin to win. Those survivors keep moving
+and hauling Tigrevel, so recapture can still cause defeat during cleanup. Clearing
+penguins while Voltusk is alive does not win. Wave composition and the recovery
+duration are prototype tuning, owned by the level registry.
 
 ## Electric Minions — Mechanics Undecided
 

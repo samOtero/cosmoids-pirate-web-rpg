@@ -924,6 +924,14 @@ export const CREATURE_TD_CONFIGS: Record<string, UnitVisuals> = {
       },
     },
   },
+  attack_cinder_spit_sparks: {
+    default: {
+      vfxAnimation: {
+        type: 'FUSE_RUSH_HIT',
+        durationMs: 240,
+      },
+    },
+  },
   attack_fuse_rush_detonation: {
     default: {
       vfxAnimation: {

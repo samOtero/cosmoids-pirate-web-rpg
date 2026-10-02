@@ -164,6 +164,12 @@ export interface AttackDefinition {
     damageMultiplier: number;
     prioritizePoisonedTargets?: boolean;
   };
+  /** Sparks copy a fraction of a hit on a burning target, then apply each recipient's matchup. */
+  burningTargetSplash?: {
+    radiusIndex: number;
+    damageRatio: number;
+    visualEffectConfigId?: string;
+  };
   /** Pushes nearby secondary enemies against their movement when the primary hit lands. */
   secondaryImpactPush?: {
     radiusIndex: number;

@@ -380,6 +380,7 @@ export class TowerDefenseEngine {
   private completedRelocationWaveIndexes = new Set<number>();
   public hasFinishedAllWaves: boolean = false;
   public hasDestroyedVictoryStructure: boolean = false;
+  private reinforcementBossDefinitionId?: string;
   private lastSpawnTime: number = 0;
   private balancedHopTieCount: number = 0;
 
@@ -449,6 +450,8 @@ export class TowerDefenseEngine {
       ])
     );
     this.waves = expandWaveRepetitions(levelData.waves || []);
+    this.reinforcementBossDefinitionId =
+      levelData.reinforcementBossDefinitionId;
     this.endlessWaves = levelData.endlessWaves;
     if (this.endlessWaves) {
       const finalWave = this.waves[this.waves.length - 1];
@@ -1660,6 +1663,7 @@ export class TowerDefenseEngine {
 
       // Drop capture units when an enemy dies
       deadEnemies.forEach((e) => {
+        this.checkReinforcementBossDefeated(e);
         this.dropCaptureUnit(e);
       });
     }
@@ -1753,6 +1757,7 @@ export class TowerDefenseEngine {
 
     enemy.definitionId = definition.creatureId;
     enemy.waveEnemyDefinitionId = definition.id;
+    enemy.immuneToDisplacement = definition.immuneToDisplacement;
     enemy.weakenedThreshold = definition.weakenedThreshold;
     enemy.level = level;
     enemy.hp = maxHp;
@@ -2347,6 +2352,7 @@ export class TowerDefenseEngine {
         ? structuredClone(structure.visualLayout)
         : undefined,
       waveEnemyDefinitionId,
+      immuneToDisplacement: waveEnemyDefinition.immuneToDisplacement,
       level: enemyLevel,
       position: structure?.position
         ? { ...structure.position }
@@ -3796,6 +3802,8 @@ export class TowerDefenseEngine {
       return;
     }
 
+    this.checkReinforcementBossDefeated(target);
+
     this.events.emit({
       type: 'ENEMY_DIED',
       enemyId: target.id,
@@ -3813,6 +3821,18 @@ export class TowerDefenseEngine {
     if (!target) return;
     this.focusedStructureId =
       this.focusedStructureId === structureId ? null : structureId;
+  }
+
+  private checkReinforcementBossDefeated(target: Enemy): void {
+    if (
+      target.kind !== 'structure' &&
+      target.hp <= 0 &&
+      this.reinforcementBossDefinitionId !== undefined &&
+      target.waveEnemyDefinitionId === this.reinforcementBossDefinitionId
+    ) {
+      this.hasFinishedAllWaves = true;
+      this.activeSpawners = [];
+    }
   }
 
   private handleStructureDestroyed(
@@ -4226,6 +4246,7 @@ export class TowerDefenseEngine {
     const path = this.paths[enemy.pathIndex];
     if (
       enemy.kind === 'structure' ||
+      enemy.immuneToDisplacement ||
       enemy.laneHopState?.phase === 'airborne' ||
       !path ||
       path.length < 2

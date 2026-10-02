@@ -27,6 +27,38 @@ function wave(group: Partial<TDWaveGroup> = {}) {
 }
 
 describe('level combat rules', () => {
+  it.each([undefined, false, true])(
+    'loads encounter displacement immunity=%s independently of zero movement speed',
+    (immuneToDisplacement) => {
+      const fixture = battleSpecies('test_anchored_species');
+      const anchor = { x: 50, y: 20 };
+      const engine = battle({
+        waveEnemyDefinitions: [
+          {
+            id: 'test_enemy',
+            creatureId: fixture.id,
+            level: 5,
+            stationaryPosition: anchor,
+            immuneToDisplacement,
+          },
+        ],
+        waves: wave(),
+      });
+      engine.tick(0, 16);
+      const enemy = engine.enemies[0];
+      expect(enemy.speed).toBe(0);
+      const waypoint = enemy.currentWaypointIndex;
+      engine.pushEnemyAgainstMovement(enemy, 10);
+      engine.pushEnemyAgainstMovement(enemy, -10);
+      if (immuneToDisplacement) {
+        expect(enemy.position).toEqual(anchor);
+        expect(enemy.currentWaypointIndex).toBe(waypoint);
+      } else {
+        expect(enemy.position.y).toBe(engine.paths[0][0].y);
+      }
+    }
+  );
+
   it('keeps a fixed guest defender in place without adding it to the player roster', () => {
     const fixture = battleSpecies('test_guest');
     const creature = {

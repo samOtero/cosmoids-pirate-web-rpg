@@ -38,6 +38,14 @@ describe.each(Object.entries(ATTACK_DEFS))(
         expect(effect.chance).toBeGreaterThanOrEqual(0);
         expect(effect.chance).toBeLessThanOrEqual(1);
       }
+      if (attack.burningTargetSplash) {
+        const { radiusIndex, damageRatio } = attack.burningTargetSplash;
+        expect(Number.isFinite(radiusIndex)).toBe(true);
+        expect(radiusIndex).toBeGreaterThan(0);
+        expect(Number.isFinite(damageRatio)).toBe(true);
+        expect(damageRatio).toBeGreaterThan(0);
+        expect(damageRatio).toBeLessThanOrEqual(1);
+      }
     });
 
     it('references existing visual configurations and shipped artwork', () => {
@@ -45,6 +53,7 @@ describe.each(Object.entries(ATTACK_DEFS))(
         attack.visualEffectConfigId,
         attack.launchVisualEffectConfigId,
         attack.coirSnapCombo?.bindVisualEffectConfigId,
+        attack.burningTargetSplash?.visualEffectConfigId,
       ];
       for (const configId of effectIds) {
         if (!configId) continue;

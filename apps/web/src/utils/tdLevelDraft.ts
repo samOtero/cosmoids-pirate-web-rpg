@@ -87,6 +87,18 @@ export function validateTDLevelDraft(
 ): string[] {
   const errors: string[] = [];
 
+  if (
+    levelData.reinforcementBossDefinitionId !== undefined &&
+    !levelData.waveEnemyDefinitions.some(
+      (definition) =>
+        definition.id === levelData.reinforcementBossDefinitionId &&
+        definition.creatureId &&
+        !definition.structure
+    )
+  ) {
+    errors.push('The reinforcement boss must reference a creature encounter.');
+  }
+
   if (levelData.paths.length === 0) {
     errors.push('At least one enemy path is required.');
   }

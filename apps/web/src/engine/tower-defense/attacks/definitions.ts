@@ -253,6 +253,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
   EMBER: {
     id: 'EMBER',
     name: 'Cinder Spit',
+    description:
+      'Spits a cinder with a chance to burn. Hitting an already-burning enemy scatters sparks to other nearby enemies.',
     type: ElementType.FIRE,
     category: 'special',
     power: 35,
@@ -272,6 +274,11 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
       innerColor: 0xfb4b2b,
     },
     effects: [{ type: 'BURN', chance: 0.2 }],
+    burningTargetSplash: {
+      radiusIndex: 20,
+      damageRatio: 0.3,
+      visualEffectConfigId: 'attack_cinder_spit_sparks',
+    },
   },
   WATER_GUN: {
     id: 'WATER_GUN',
@@ -388,7 +395,7 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     behaviorType: 'PROJECTILE',
     projectileSpeed: 1.15,
     secondaryImpactPush: {
-      radiusIndex: 12,
+      radiusIndex: 20,
       distance: 8,
     },
     visualEffectConfigId: 'attack_barrel_bash_1',

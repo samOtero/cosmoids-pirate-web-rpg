@@ -101,6 +101,8 @@ export interface TDWaveEnemyDefinition {
   level: number;
   /** Optional fixed spawn point for a stationary creature encounter. */
   stationaryPosition?: Point;
+  /** Encounter-specific immunity to forced movement, without preventing damage or status. */
+  immuneToDisplacement?: boolean;
   speedMultiplier?: number;
   /** Whether this enemy can pick up a capture objective. Defaults to true. */
   canCarryCaptureUnits?: boolean;
@@ -394,6 +396,8 @@ export interface TDLevelData {
   cursedPhase?: TDCursedPhaseConfig;
   waveEnemyDefinitions: TDWaveEnemyDefinition[];
   waves: TDWave[];
+  /** Defeating this encounter stops all spawning; survivors must still be cleared. */
+  reinforcementBossDefinitionId?: string;
   /** Repeat the final wave's creature groups indefinitely after authored waves. */
   endlessWaves?: {
     /** Pause after the previous wave finishes spawning, without waiting for kills. */
@@ -595,6 +599,8 @@ export interface StatusCondition {
 }
 
 export interface Enemy extends BaseTDUnit {
+  /** Prevents shared push/pull mechanics from changing position or path progress. */
+  immuneToDisplacement?: boolean;
   constrictedByTowerId?: string;
   constrictionResistantUntilMs?: number;
   /** Shared immunity window applied whenever this enemy wakes from sleep. */

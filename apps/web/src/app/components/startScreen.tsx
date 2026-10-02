@@ -31,7 +31,7 @@ export default function StartScreen({ onStart }: { onStart: () => void }) {
             }}
           />
         </div>
-        <p className={styles.credit}>v1.0.1 • By Samuel Otero</p>
+        <p className={styles.credit}>v1.0.2 • By Samuel Otero</p>
       </div>
     </main>
   );

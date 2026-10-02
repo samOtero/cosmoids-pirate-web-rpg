@@ -73,8 +73,10 @@ describe('Secondary impact push', () => {
     const primary = createEnemy('primary', 10);
     const nearby = createEnemy('nearby', 18);
     const distant = createEnemy('distant', 30);
+    const anchored = createEnemy('anchored', 18);
+    anchored.immuneToDisplacement = true;
     engine.towers = [monkeg];
-    engine.enemies = [primary, nearby, distant];
+    engine.enemies = [primary, nearby, distant, anchored];
 
     ProjectileBehavior.execute(engine, monkeg, ATTACK_FIXTURES.BARREL_BASH);
     expect(engine.projectiles).toHaveLength(1);
@@ -88,6 +90,9 @@ describe('Secondary impact push', () => {
     expect(nearby.position.x).toBeCloseTo(10);
     expect(distant.hp).toBe(distant.maxHp);
     expect(distant.position).toEqual({ x: 30, y: 0 });
+    expect(anchored.position).toEqual({ x: 18, y: 0 });
+    expect(anchored.currentWaypointIndex).toBe(1);
+    expect(anchored.hp).toBe(anchored.maxHp);
     expect(engine.visualEffects).toContainEqual(
       expect.objectContaining({
         configId: 'attack_barrel_bash_1',

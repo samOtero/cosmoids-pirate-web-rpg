@@ -12,6 +12,9 @@ import { LEVEL_6_CURSED_INTERMISSION } from '@/constants/dialogs/level6CursedInt
  * at either shared crossing point and cannot be newly targeted while airborne.
  * At 30% health, Voltusk pauses the fight for a short story intermission, gains
  * the cursed aura, and marks up to three distinct orb targets per attack.
+ * Alternating lane surges and a joint push repeat until Voltusk falls, with
+ * twelve seconds of no spawning after each cycle to recover and attack the boss.
+ * After Voltusk falls, spawning stops but surviving haulers must be cleared.
  * Final encounter balance remains in progress.
  */
 export const LEVEL_6: TDLevelData = {
@@ -204,7 +207,7 @@ export const LEVEL_6: TDLevelData = {
   ],
   cursedPhase: {
     enemyDefinitionId: 'level_6_voltusk',
-    triggerHealthFraction: 0.3,
+    triggerHealthFraction: 0.25,
     intermission: LEVEL_6_CURSED_INTERMISSION,
     transformationLineIndex: 2,
   },
@@ -260,9 +263,9 @@ export const LEVEL_6: TDLevelData = {
         eligibleCreatureId: 'poguin',
         pickupRadius: 6,
         joinRadius: 6,
-        baseSpeedMultiplier: 0.12,
-        speedMultiplierPerAdditionalHauler: 0.16,
-        maxSpeedMultiplier: 0.92,
+        baseSpeedMultiplier: 0.1,
+        speedMultiplierPerAdditionalHauler: 0.1,
+        maxSpeedMultiplier: 0.6,
       },
     },
   ],
@@ -272,7 +275,7 @@ export const LEVEL_6: TDLevelData = {
       creatureId: 'poguin',
       level: 14,
       speedMultiplier: 1.2,
-      hpMultiplier: 3,
+      hpMultiplier: 4,
       balancedLaneHop: {
         pathIndices: [0, 2],
         triggerProgresses: [0.35, 0.65],
@@ -284,6 +287,7 @@ export const LEVEL_6: TDLevelData = {
     {
       id: 'level_6_voltusk',
       creatureId: 'voltusk',
+      immuneToDisplacement: true,
       targetingRangeMultiplier: 2,
       level: 22,
       stationaryPosition: {
@@ -291,21 +295,20 @@ export const LEVEL_6: TDLevelData = {
         y: 25,
       },
       abilityId: 'VOLTUSK_ELECTRIC_ORB',
-      hpMultiplier: 50,
-      weakenedThreshold: 0.3,
+      hpMultiplier: 60,
+      weakenedThreshold: 0.25,
     },
   ],
   waves: [
     {
-      id: 'poguin_haulers',
+      id: 'voltusk_and_first_haulers',
       groups: [
         {
-          enemyDefinitionId: 'level_6_poguin',
-          count: 3,
-          spawnIntervalMs: 1300,
-          delayBeforeGroupMs: 500,
+          enemyDefinitionId: 'level_6_voltusk',
+          count: 1,
+          spawnIntervalMs: 0,
+          delayBeforeGroupMs: 2000,
           pathIndex: 0,
-          turnAroundAtEnd: true,
           uncapturable: true,
         },
         {
@@ -313,6 +316,16 @@ export const LEVEL_6: TDLevelData = {
           count: 3,
           spawnIntervalMs: 1300,
           delayBeforeGroupMs: 500,
+          pathIndex: 0,
+          turnAroundAtEnd: true,
+          concurrentWithPrevious: true,
+          uncapturable: true,
+        },
+        {
+          enemyDefinitionId: 'level_6_poguin',
+          count: 3,
+          spawnIntervalMs: 1800,
+          delayBeforeGroupMs: 1300,
           pathIndex: 2,
           turnAroundAtEnd: true,
           concurrentWithPrevious: true,
@@ -321,13 +334,54 @@ export const LEVEL_6: TDLevelData = {
       ],
     },
     {
-      id: 'voltusk_advance',
+      id: 'poguin_pressure_cycle',
       groups: [
+        // Upper surge with a sparse lower-lane escort.
         {
-          enemyDefinitionId: 'level_6_voltusk',
-          count: 1,
-          spawnIntervalMs: 1000,
-          delayBeforeGroupMs: 1000,
+          enemyDefinitionId: 'level_6_poguin',
+          count: 5,
+          spawnIntervalMs: 1100,
+          delayBeforeGroupMs: 0,
+          pathIndex: 0,
+          turnAroundAtEnd: true,
+          uncapturable: true,
+        },
+        {
+          enemyDefinitionId: 'level_6_poguin',
+          count: 2,
+          spawnIntervalMs: 3200,
+          delayBeforeGroupMs: 0,
+          pathIndex: 2,
+          turnAroundAtEnd: true,
+          concurrentWithPrevious: true,
+          uncapturable: true,
+        },
+        // Mirror the pressure after a short break.
+        {
+          enemyDefinitionId: 'level_6_poguin',
+          count: 5,
+          spawnIntervalMs: 1100,
+          delayBeforeGroupMs: 6000,
+          pathIndex: 2,
+          turnAroundAtEnd: true,
+          uncapturable: true,
+        },
+        {
+          enemyDefinitionId: 'level_6_poguin',
+          count: 2,
+          spawnIntervalMs: 3200,
+          delayBeforeGroupMs: 6000,
+          pathIndex: 0,
+          turnAroundAtEnd: true,
+          concurrentWithPrevious: true,
+          uncapturable: true,
+        },
+        // A coordinated push precedes the completely quiet recovery window.
+        {
+          enemyDefinitionId: 'level_6_poguin',
+          count: 4,
+          spawnIntervalMs: 1100,
+          delayBeforeGroupMs: 6000,
           pathIndex: 0,
           turnAroundAtEnd: true,
           uncapturable: true,
@@ -336,7 +390,7 @@ export const LEVEL_6: TDLevelData = {
           enemyDefinitionId: 'level_6_poguin',
           count: 4,
           spawnIntervalMs: 1100,
-          delayBeforeGroupMs: 1500,
+          delayBeforeGroupMs: 6000,
           pathIndex: 2,
           turnAroundAtEnd: true,
           concurrentWithPrevious: true,
@@ -345,6 +399,11 @@ export const LEVEL_6: TDLevelData = {
       ],
     },
   ],
+  reinforcementBossDefinitionId: 'level_6_voltusk',
+  endlessWaves: {
+    delayBetweenWavesMs: 10000,
+    hpIncreasePerWave: 0.05,
+  },
   lives: 1,
   disableCapture: false,
   enemyHpMultiplier: 1,
@@ -355,5 +414,5 @@ export const LEVEL_6: TDLevelData = {
     offsetY: 9,
     zoom: 0.6,
   },
-  introMessage: 'Defeat Voltusk!',
+  introMessage: 'Defeat Voltusk and clear the Poguin!',
 };

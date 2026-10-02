@@ -49,45 +49,53 @@ function createBattle() {
 }
 
 describe('Committed projectile push', () => {
-  it('faces its target, commits through the waggle, and launches one empowered wake', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
-    const { engine, tower, target } = createBattle();
-    tower.warmth!.value = 10;
-    tower.equippedAttacksRuntime[0].lastFiredTime = -1000;
+  it.each([false, true])(
+    'damages its committed target while respecting displacement immunity=%s',
+    (immuneToDisplacement) => {
+      vi.spyOn(Math, 'random').mockReturnValue(0);
+      const { engine, tower, target } = createBattle();
+      target.immuneToDisplacement = immuneToDisplacement;
+      tower.warmth!.value = 10;
+      tower.equippedAttacksRuntime[0].lastFiredTime = -1000;
 
-    engine.tick(1, 1);
+      engine.tick(1, 1);
 
-    expect(tower.facingDirection).toBe('right');
-    expect(tower.wakeWhip).toMatchObject({
-      targetId: target.id,
-      attackFacingDirection: 'right',
-      warmthDamageMultiplier: 1.4,
-      launched: false,
-    });
-    expect(tower.warmth?.value).toBe(0);
-    expect(engine.projectiles).toHaveLength(0);
+      expect(tower.facingDirection).toBe('right');
+      expect(tower.wakeWhip).toMatchObject({
+        targetId: target.id,
+        attackFacingDirection: 'right',
+        warmthDamageMultiplier: 1.4,
+        launched: false,
+      });
+      expect(tower.warmth?.value).toBe(0);
+      expect(engine.projectiles).toHaveLength(0);
 
-    engine.elapsedTimeMs = tower.wakeWhip!.launchAtMs;
-    updateWakeWhips(engine);
+      engine.elapsedTimeMs = tower.wakeWhip!.launchAtMs;
+      updateWakeWhips(engine);
 
-    expect(tower.facingDirection).toBe('right');
-    expect(tower.wakeWhip?.launched).toBe(true);
-    expect(engine.projectiles).toHaveLength(1);
-    expect(engine.projectiles[0]).toMatchObject({
-      attackDefinitionId: 'WAKE_WHIP',
-      targetId: target.id,
-      warmthDamageMultiplier: 1.4,
-      facingDirection: 'right',
-    });
+      expect(tower.facingDirection).toBe('right');
+      expect(tower.wakeWhip?.launched).toBe(true);
+      expect(engine.projectiles).toHaveLength(1);
+      expect(engine.projectiles[0]).toMatchObject({
+        attackDefinitionId: 'WAKE_WHIP',
+        targetId: target.id,
+        warmthDamageMultiplier: 1.4,
+        facingDirection: 'right',
+      });
 
-    const positionBeforeImpact = target.position.x;
-    engine.tick(200, 500);
+      const positionBeforeImpact = target.position.x;
+      engine.tick(200, 500);
 
-    expect(target.hp).toBeLessThan(target.maxHp);
-    expect(target.position.x).toBeLessThan(positionBeforeImpact);
-    expect(tower.wakeWhip).toBeUndefined();
-    expect(tower.facingDirection).toBe('right');
-  });
+      expect(target.hp).toBeLessThan(target.maxHp);
+      if (immuneToDisplacement) {
+        expect(target.position.x).toBe(positionBeforeImpact);
+      } else {
+        expect(target.position.x).toBeLessThan(positionBeforeImpact);
+      }
+      expect(tower.wakeWhip).toBeUndefined();
+      expect(tower.facingDirection).toBe('right');
+    }
+  );
 
   it('cancels the committed windup when the tower is moved', () => {
     const { engine, tower } = createBattle();

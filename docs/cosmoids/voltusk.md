@@ -71,7 +71,7 @@ The officer throws a steel net over Tigrevel as Navy equipment, then sends Voltu
 
 At 30% Voltusk health, the battle pauses for a short five-panel intermission. The officer forces Voltusk into a Cursed Aura state, but the means by which he does so is neither named nor shown. A painful dark-purple Cursed Aura appears, and Voltusk's electric-orb attack begins marking up to three distinct valid targets at once instead of one. This is not a permanent Cursed evolution. Voltusk retains its remaining health after the intermission.
 
-Defeating the boss frees Tigrevel. Strake is stunned by the loss, Kip urges everyone to run before he recovers, and the children immediately escape to Ironbell harbor.
+Defeating the boss stops reinforcements; the surviving Poguin must be cleared before Tigrevel is freed and the encounter is won. Strake is stunned by the loss, Kip urges everyone to run before he recovers, and the children immediately escape to Ironbell harbor.
 
 Bell or gong calls may contribute to this encounter, but their timing, effects, and relationship to minions are open. Follow the [Level 6 record](../levels/level-6.md) for the broader objective, recruitment ending, and unsettled battle details.
 

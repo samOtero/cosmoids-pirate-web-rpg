@@ -4,8 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import TowerDefenseScreen from '@/app/components/tower-defense/TowerDefenseScreen';
 
 const engineHarness = vi.hoisted(() => ({
-  instance: null as null | { events: { emit: (event: unknown) => void } },
-  outcome: 'win' as 'win' | 'lose' | 'destruction-objective',
+  instance: null as null | {
+    events: { emit: (event: unknown) => void };
+    enemies: unknown[];
+  },
+  outcome: 'win' as 'win' | 'lose' | 'destruction-objective' | 'boss-objective',
 }));
 
 vi.mock('@/app/components/tower-defense/PixiBattlefield', () => ({
@@ -66,6 +69,8 @@ vi.mock('@/engine/tower-defense/TowerDefenseEngine', () => {
         this.lives = 0;
       } else if (engineHarness.outcome === 'destruction-objective') {
         this.hasDestroyedVictoryStructure = true;
+      } else if (engineHarness.outcome === 'boss-objective') {
+        this.hasFinishedAllWaves = true;
       } else {
         this.enemies = [];
         this.hasFinishedAllWaves = true;
@@ -158,6 +163,35 @@ describe('tower-defense outro priority', () => {
     expect(screen.getByText('You Win!')).toBeInTheDocument();
   });
 
+  it('waits for surviving enemies to be cleared after the boss stops spawning', () => {
+    engineHarness.outcome = 'boss-objective';
+    const onWin = vi.fn();
+    render(
+      <TowerDefenseScreen
+        levelData={{ paths: [], placementSpots: [] } as any}
+        onClose={vi.fn()}
+        onWin={onWin}
+      />
+    );
+    act(() => vi.advanceTimersByTime(1000));
+    act(() => vi.advanceTimersByTime(1000));
+    act(() => scheduledFrame?.(16));
+    act(() => scheduledFrame?.(32));
+    expect(engineHarness.instance).toMatchObject({
+      hasFinishedAllWaves: true,
+      enemies: [{}],
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Later' }));
+    expect(screen.queryByText('You Win!')).not.toBeInTheDocument();
+    expect(onWin).not.toHaveBeenCalled();
+    engineHarness.instance!.enemies = [];
+    act(() => scheduledFrame?.(48));
+    act(() => scheduledFrame?.(64));
+    expect(screen.getByText('You Win!')).toBeInTheDocument();
+    act(() => vi.advanceTimersByTime(3000));
+    expect(onWin).toHaveBeenCalledOnce();
+  });
+
   it('shows an optional level message before the static Ready/Go countdown', () => {
     render(
       <TowerDefenseScreen
@@ -172,8 +206,12 @@ describe('tower-defense outro priority', () => {
       />
     );
 
-    expect(screen.getByRole('heading', { level: 2, name: 'Protect the girl!' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 2, name: 'Protect the girl!' })).not.toHaveClass('hidden');
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Protect the girl!' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Protect the girl!' })
+    ).not.toHaveClass('hidden');
 
     const messageOverlay = screen.getAllByText('Protect the girl!')[0];
     expect(messageOverlay).not.toHaveClass('animate-bounce');
@@ -245,7 +283,10 @@ describe('tower-defense outro priority', () => {
       />
     );
 
-    const heading = screen.getByRole('heading', { level: 2, name: 'Tower Defense' });
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: 'Tower Defense',
+    });
     expect(heading).toBeInTheDocument();
     expect(heading).toHaveClass('hidden');
     expect(heading).toHaveClass('lg:block');
@@ -265,10 +306,15 @@ describe('tower-defense outro priority', () => {
       />
     );
 
-    const heading = screen.getByRole('heading', { level: 2, name: 'Protect the girl!' });
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: 'Protect the girl!',
+    });
     expect(heading).toBeInTheDocument();
     expect(heading).not.toHaveClass('hidden');
-    expect(screen.queryByRole('heading', { level: 2, name: 'Tower Defense' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { level: 2, name: 'Tower Defense' })
+    ).not.toBeInTheDocument();
   });
 
   it('waits for a progression modal before showing and completing the lose outro', () => {
