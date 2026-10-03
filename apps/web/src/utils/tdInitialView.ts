@@ -7,6 +7,19 @@ function clamp(value: number, minimum: number, maximum: number): number {
   return Math.min(maximum, Math.max(minimum, value));
 }
 
+/** Fits compact arenas without changing the height-based sizing of existing maps. */
+export function resolveTDBattlefieldHeight(
+  viewportWidth: number,
+  viewportHeight: number,
+  textureAspectRatio: number,
+  backgroundScale: number,
+  fitToScreen: boolean
+): number {
+  return fitToScreen
+    ? Math.min(viewportHeight, viewportWidth / textureAspectRatio)
+    : viewportHeight * Math.max(1, backgroundScale);
+}
+
 /** Resolves optional level camera settings while preserving legacy defaults. */
 export function resolveTDInitialView(
   backgroundScale: number | undefined,

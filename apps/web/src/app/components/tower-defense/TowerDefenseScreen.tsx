@@ -144,6 +144,9 @@ export default function TowerDefenseScreen({
   };
 
   const [uiLives, setUiLives] = useState(engineRef.current.lives);
+  const [uiRivalFlagLives, setUiRivalFlagLives] = useState(
+    engineRef.current.rivalFlagLives
+  );
   const [uiElapsedSeconds, setUiElapsedSeconds] = useState(0);
   const [uiWaveIndex, setUiWaveIndex] = useState(0);
   const totalWaveCount = (levelData.waves ?? []).reduce(
@@ -433,6 +436,7 @@ export default function TowerDefenseScreen({
       engineRef.current.tick(time, deltaTime);
 
       // 2. Sync essential UI state (could throttle this for more perf)
+      setUiRivalFlagLives(engineRef.current.rivalFlagLives);
       if (engineRef.current.lives !== uiLives) {
         setUiLives(engineRef.current.lives);
         if (
@@ -465,6 +469,7 @@ export default function TowerDefenseScreen({
         engineRef.current.lives > 0;
 
       const normalWin =
+        !engineRef.current.flagDuel &&
         engineRef.current.hasFinishedAllWaves &&
         engineRef.current.enemies.length === 0 &&
         engineRef.current.lives > 0;
@@ -474,7 +479,11 @@ export default function TowerDefenseScreen({
         engineRef.current.lives > 0;
 
       if (
-        (surviveWin || normalWin || destructionObjectiveWin) &&
+        (surviveWin ||
+          normalWin ||
+          destructionObjectiveWin ||
+          (engineRef.current.hasCapturedRivalFlag &&
+            engineRef.current.lives > 0)) &&
         !hasEndedRef.current
       ) {
         hasEndedRef.current = true;
@@ -801,12 +810,13 @@ export default function TowerDefenseScreen({
               : 'w-full justify-between'
           }`}
         >
-          {levelData.waves?.some((wave) => (wave.repeatCount ?? 1) > 1) && (
-            <span className="shrink-0 rounded border border-cyan-700/50 bg-slate-900 px-2 py-1 font-mono text-sm text-cyan-300 lg:text-base">
-              Wave {Math.min(uiWaveIndex + 1, totalWaveCount)} /{' '}
-              {totalWaveCount}
-            </span>
-          )}
+          {!levelData.flagDuel &&
+            levelData.waves?.some((wave) => (wave.repeatCount ?? 1) > 1) && (
+              <span className="shrink-0 rounded border border-cyan-700/50 bg-slate-900 px-2 py-1 font-mono text-sm text-cyan-300 lg:text-base">
+                Wave {Math.min(uiWaveIndex + 1, totalWaveCount)} /{' '}
+                {totalWaveCount}
+              </span>
+            )}
           {engineRef.current.surviveUntil &&
             engineRef.current.surviveUntil > 0 &&
             hasStarted && (
@@ -826,7 +836,12 @@ export default function TowerDefenseScreen({
                 levelData.introMessage ? 'flex-none' : 'flex-1'
               }`}
             >
-              Lives: {uiLives}
+              {levelData.flagDuel ? 'Your flag' : 'Lives'}: {uiLives}
+            </span>
+          )}
+          {levelData.flagDuel && (
+            <span className="shrink-0 rounded border border-cyan-700/50 bg-slate-900 px-2 py-1 font-mono text-sm text-cyan-300 lg:text-base">
+              Rival flag: {uiRivalFlagLives}
             </span>
           )}
           <button
@@ -859,6 +874,7 @@ export default function TowerDefenseScreen({
         engine={engineRef.current}
         backgroundUrl={levelData.backgroundUrl}
         backgroundScale={levelData.backgroundScale}
+        fitToScreen={levelData.fitToScreen}
         initialView={levelData.initialView}
         openingPan={levelData.openingPan}
         hideUi={introState === 'cameraPan'}

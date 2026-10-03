@@ -601,5 +601,58 @@ export function validateTDLevelDraft(
     }
   }
 
+  if (levelData.flagDuel) {
+    const duel = levelData.flagDuel;
+    const runner = duel.alliedRunner;
+    if (!Number.isInteger(duel.rivalFlagLives) || duel.rivalFlagLives <= 0) {
+      errors.push('Rival flag lives must be a positive integer.');
+    }
+    if (
+      validCreatureDefinitionIds &&
+      !validCreatureDefinitionIds.has(runner.creatureId)
+    ) {
+      errors.push(
+        'The allied flag runner must reference a registered creature.'
+      );
+    }
+    if (
+      !Number.isInteger(runner.pathIndex) ||
+      !levelData.paths[runner.pathIndex]
+    ) {
+      errors.push('The allied flag runner must reference a valid path.');
+    }
+    for (const [name, value] of Object.entries({
+      level: runner.level,
+      speed: runner.speed,
+      spawnIntervalMs: runner.spawnIntervalMs,
+    })) {
+      if (!Number.isFinite(value) || value <= 0)
+        errors.push(`Flag runner ${name} must be positive.`);
+    }
+    for (const value of [runner.firstSpawnDelayMs, runner.strikeDurationMs]) {
+      if (!Number.isFinite(value) || value < 0)
+        errors.push('Flag runner timings must be nonnegative.');
+    }
+    for (const defender of duel.defenders) {
+      if (
+        !levelData.waveEnemyDefinitions.some(
+          (entry) => entry.id === defender.enemyDefinitionId && entry.creatureId
+        )
+      ) {
+        errors.push('Flag defenders must reference creature encounters.');
+      }
+      for (const value of [
+        defender.range,
+        defender.damage,
+        defender.cooldownMs,
+      ]) {
+        if (!Number.isFinite(value) || value <= 0)
+          errors.push(
+            'Flag defender range, damage, and cooldown must be positive.'
+          );
+      }
+    }
+  }
+
   return errors;
 }

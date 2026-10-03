@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="625" viewBox="0 0 1600 625">
+  <rect width="1600" height="625" fill="#173f4d"/>
+  <rect x="35" y="35" width="1530" height="555" rx="40" fill="#725b45" stroke="#e2ba70" stroke-width="8"/>
+  <rect x="60" y="60" width="1480" height="505" rx="30" fill="#d9be88"/>
+  <path d="M800 75V550" stroke="#ac8b59" stroke-width="3" stroke-dasharray="12 12"/>
+  <path d="M192 312.5L320 237.5H1120L1408 312.5" fill="none" stroke="#8faeb8" stroke-width="35" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M1408 387.5H480L192 312.5" fill="none" stroke="#bb8069" stroke-width="35" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M212 300L325 237.5H1120L1388 305" fill="none" stroke="#e4eff0" stroke-width="3" stroke-dasharray="10 14"/>
+  <path d="M1388 387.5H480L212 318" fill="none" stroke="#f7d6b5" stroke-width="3" stroke-dasharray="10 14"/>
+  <g fill="#557e91"><path d="m780 226 18 12-18 12z"/><path d="m480 226 18 12-18 12z"/></g>
+  <g fill="#934e40"><path d="m820 376-18 12 18 12z"/><path d="m1120 376-18 12 18 12z"/></g>
+  <g fill="#c3a26f" stroke="#876846" stroke-width="3" stroke-dasharray="6 5">
+    <circle cx="1200" cy="175" r="20"/>
+    <circle cx="1040" cy="175" r="20"/>
+    <circle cx="1040" cy="468.75" r="20"/>
+    <circle cx="1200" cy="468.75" r="20"/>
+  </g>
+  <g stroke="#553f2b" stroke-width="6" stroke-linecap="round">
+    <path d="M192 313V255"/><path d="M1408 313V255"/>
+  </g>
+  <path d="M195 255H242L227 271L242 287H195Z" fill="#278bc4" stroke="#eaf7ff" stroke-width="2"/>
+  <path d="M1405 255H1358L1373 271L1358 287H1405Z" fill="#bd4444" stroke="#fff0df" stroke-width="2"/>
+  <g font-family="Arial, sans-serif" font-weight="bold" text-anchor="middle" fill="#513d29">
+    <text x="800" y="112" font-size="28">HARBOR TOURNAMENT</text>
+    <text x="192" y="350" font-size="16">YOUR FLAG</text>
+    <text x="1408" y="350" font-size="16">RIVAL FLAG</text>
+    <text x="800" y="534" font-size="17">ARENA PRACTICE</text>
+  </g>
+</svg>

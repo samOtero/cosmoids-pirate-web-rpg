@@ -41,6 +41,42 @@ export interface TDOpeningPan {
   durationMs: number;
 }
 
+/** Prototype rules for autonomous runners contesting a rival flag. */
+export interface TDFlagDuelConfig {
+  rivalFlagLives: number;
+  alliedRunner: {
+    creatureId: string;
+    level: number;
+    pathIndex: number;
+    /** Horizontal map percentage points traveled per second. */
+    speed: number;
+    spawnIntervalMs: number;
+    firstSpawnDelayMs: number;
+    strikeDurationMs: number;
+  };
+  /** Encounter-specific practice shots; these are not creature learnset moves. */
+  defenders: {
+    enemyDefinitionId: string;
+    range: number;
+    damage: number;
+    cooldownMs: number;
+  }[];
+}
+
+export interface FlagRunner extends BaseTDUnit {
+  definitionId: string;
+  currentWaypointIndex: number;
+  spawnedAtMs: number;
+  strikeEndsAtMs?: number;
+}
+
+export interface FlagDuelShot {
+  id: string;
+  source: Point;
+  target: Point;
+  expiresAtMs: number;
+}
+
 export interface TDWeightedEncounter {
   /** References a level-scoped TDWaveEnemyDefinition. */
   enemyDefinitionId: string;
@@ -421,6 +457,9 @@ export interface TDLevelData {
   disableCapture?: boolean;
   backgroundUrl?: string;
   backgroundScale?: number; // If > 1, background is taller than viewport and can be scrolled
+  /** Contain the whole battlefield in the available viewport, including on narrow screens. */
+  fitToScreen?: boolean;
+  flagDuel?: TDFlagDuelConfig;
   initialView?: TDInitialView;
   openingPan?: TDOpeningPan;
   /** Optional message shown once before the Ready/Go countdown. */

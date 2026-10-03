@@ -7,6 +7,8 @@ const engineHarness = vi.hoisted(() => ({
   instance: null as null | {
     events: { emit: (event: unknown) => void };
     enemies: unknown[];
+    hasCapturedRivalFlag: boolean;
+    rivalFlagLives: number;
   },
   outcome: 'win' as 'win' | 'lose' | 'destruction-objective' | 'boss-objective',
 }));
@@ -51,9 +53,13 @@ vi.mock('@/engine/tower-defense/TowerDefenseEngine', () => {
     playerSelectedTargetingModes = {};
     disableCapture = true;
     cannotLose = false;
+    flagDuel?: object;
+    rivalFlagLives = 3;
+    hasCapturedRivalFlag = false;
     private didFinish = false;
 
-    constructor() {
+    constructor(levelData: { flagDuel?: object } = {}) {
+      this.flagDuel = levelData.flagDuel;
       engineHarness.instance = this;
     }
 
@@ -161,6 +167,53 @@ describe('tower-defense outro priority', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: 'Later' }));
     expect(screen.getByText('You Win!')).toBeInTheDocument();
+  });
+
+  it('waits for the rival flag instead of ending a duel when incoming waves clear', () => {
+    const onWin = vi.fn();
+    render(
+      <TowerDefenseScreen
+        levelData={{
+          paths: [],
+          placementSpots: [],
+          waveEnemyDefinitions: [],
+          waves: [],
+          flagDuel: {
+            rivalFlagLives: 3,
+            defenders: [],
+            alliedRunner: {
+              creatureId: 'controlled_runner',
+              level: 1,
+              pathIndex: 0,
+              speed: 1,
+              spawnIntervalMs: 1000,
+              firstSpawnDelayMs: 0,
+              strikeDurationMs: 100,
+            },
+          },
+        }}
+        onClose={vi.fn()}
+        onWin={onWin}
+      />
+    );
+    act(() => vi.advanceTimersByTime(1000));
+    act(() => vi.advanceTimersByTime(1000));
+    act(() => scheduledFrame?.(16));
+    act(() => scheduledFrame?.(32));
+    fireEvent.click(screen.getByRole('button', { name: 'Later' }));
+    expect(screen.queryByText('You Win!')).not.toBeInTheDocument();
+    expect(screen.getByText('Rival flag: 3')).toBeInTheDocument();
+    expect(onWin).not.toHaveBeenCalled();
+
+    engineHarness.instance!.enemies = [{}];
+    engineHarness.instance!.rivalFlagLives = 0;
+    engineHarness.instance!.hasCapturedRivalFlag = true;
+    act(() => scheduledFrame?.(48));
+    act(() => scheduledFrame?.(64));
+    expect(screen.getByText('Rival flag: 0')).toBeInTheDocument();
+    expect(screen.getByText('You Win!')).toBeInTheDocument();
+    act(() => vi.advanceTimersByTime(3000));
+    expect(onWin).toHaveBeenCalledOnce();
   });
 
   it('waits for surviving enemies to be cleared after the boss stops spawning', () => {

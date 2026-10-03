@@ -10,6 +10,7 @@ import { LEVEL_4 } from './level4';
 import { LEVEL_5 } from './level5';
 import { LEVEL_6 } from './level6';
 import { LEVEL_7 } from './level7';
+import { LEVEL_8 } from './level8';
 import { VANE_LEVEL } from './vaneLevel';
 import {
   CHALLENGE_FIRST_LEVEL,
@@ -284,6 +285,11 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
       },
     ],
   },
+  [TDLevelContext.LEVEL_8]: {
+    levelData: LEVEL_8,
+    winEvents: [{ type: 'GO_TO_LEVEL_SELECT' }],
+    loseEvents: [{ type: 'GO_TO_LEVEL_SELECT' }],
+  },
   [TDLevelContext.CHALLENGE_FIRST_LEVEL]: {
     levelData: CHALLENGE_FIRST_LEVEL,
     winEvents: [
@@ -365,9 +371,9 @@ export const LEVEL_ORDER: LevelInfo[] = [
     requiredProgression: StoryProgression.DEFEAT_LEVEL_6,
   },
   {
-    context: 'LOCKED_8' as TDLevelContext,
-    name: 'Coming soon',
-    description: 'More story adventures are on the way.',
+    context: TDLevelContext.LEVEL_8,
+    name: 'Harbor Tournament — Prototype',
+    description: 'Send runners at the rival flag while defending your own.',
     requiredProgression: StoryProgression.COMPLETE_LEVEL_7,
   },
 ];

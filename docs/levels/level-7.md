@@ -188,4 +188,5 @@ Interface prompts should use invitational language such as **Explore**, **Observ
 ## Related Records
 
 - [Level 6 — Ironbell Officer Confrontation](level-6.md)
+- [Levels 8–10 — Harbor Tournament Arc](harbor-tournament-arc.md)
 - [Story, themes, and dialogue guide](../../STORY_AND_THEMES.md)

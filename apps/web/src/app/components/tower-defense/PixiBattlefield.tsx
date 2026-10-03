@@ -28,6 +28,7 @@ import {
 import { interpolateKeyframes } from '@/utils/animationUtils';
 import {
   resolveTDInitialView,
+  resolveTDBattlefieldHeight,
   resolveTDOpeningPanView,
 } from '@/utils/tdInitialView';
 import {
@@ -3102,6 +3103,7 @@ interface PixiBattlefieldProps {
   getDragState?: () => 'tower' | 'capture' | false;
   backgroundUrl?: string;
   backgroundScale?: number;
+  fitToScreen?: boolean;
   initialView?: TDInitialView;
   openingPan?: TDOpeningPan;
   onOpeningPanComplete?: () => void;
@@ -3138,6 +3140,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
       getDragState,
       backgroundUrl,
       backgroundScale = 1,
+      fitToScreen = false,
       initialView,
       openingPan,
       onOpeningPanComplete,
@@ -3414,7 +3417,13 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           ) {
             const ratio = bgSprite.texture.width / bgSprite.texture.height;
             const zoom = zoomRef.current;
-            fullBgHeight = app.screen.height * scale;
+            fullBgHeight = resolveTDBattlefieldHeight(
+              app.screen.width,
+              app.screen.height,
+              ratio,
+              scale,
+              fitToScreen
+            );
             fullBgWidth = fullBgHeight * ratio;
 
             // Display dimensions = world dims * zoom
@@ -3531,6 +3540,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         // Sprite caching structure
         const towerSprites = new Map<string, PIXI.Container>();
         const enemySprites = new Map<string, PIXI.Container>();
+        const flagRunnerSprites = new Map<string, PIXI.Container>();
+        const flagShotGraphics = new PIXI.Graphics();
+        flagShotGraphics.eventMode = 'none';
+        airFxLayer.addChild(flagShotGraphics);
         const environmentUnitSprites = new Map<string, PIXI.Container>();
         const objectiveAllySprites = new Map<string, PIXI.Container>();
         const objectiveAllyShadowSprites = new Map<string, PIXI.Container>();
@@ -4073,6 +4086,88 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 environmentVisualState
               )
             );
+          }
+
+          // --- Render autonomous allied flag runners ---
+          const flagRunnerIds = new Set(
+            engine.alliedFlagRunners.map((runner) => runner.id)
+          );
+          for (const [id, container] of flagRunnerSprites) {
+            if (!flagRunnerIds.has(id)) {
+              container.destroy({ children: true });
+              flagRunnerSprites.delete(id);
+            }
+          }
+          for (const runner of engine.alliedFlagRunners) {
+            let container = flagRunnerSprites.get(runner.id);
+            if (!container) {
+              container = new PIXI.Container();
+              container.eventMode = 'none';
+              const marker = new PIXI.Graphics();
+              marker.label = 'flagRunnerMarker';
+              container.addChild(marker);
+              const shadow = new PIXI.Graphics();
+              shadow.label = 'shadow';
+              container.addChild(shadow);
+              const sprite = new PIXI.Sprite();
+              sprite.label = 'flagRunnerSprite';
+              sprite.anchor.set(0.5);
+              container.addChild(sprite);
+              worldLayer.addChild(container);
+              flagRunnerSprites.set(runner.id, container);
+            }
+            container.position.set(
+              offsetX + (runner.position.x / 100) * screenW,
+              offsetY + (runner.position.y / 100) * screenH
+            );
+            container.scale.set((zoom * app.screen.height) / TD_BASE_HEIGHT);
+            const marker = container.getChildByLabel(
+              'flagRunnerMarker'
+            ) as PIXI.Graphics;
+            const ground = getTDUnitGroundContactOffset(
+              runner,
+              runner.definitionId
+            );
+            marker
+              .clear()
+              .ellipse(ground.x, ground.y, 28, 10)
+              .fill({ color: 0x38bdf8, alpha: 0.65 })
+              .stroke({ color: 0xa5f3fc, width: 2 });
+            if (runner.strikeEndsAtMs !== undefined) {
+              marker.circle(0, 0, 30).stroke({ color: 0x67e8f9, width: 3 });
+            }
+            const sprite = container.getChildByLabel(
+              'flagRunnerSprite'
+            ) as PIXI.Sprite;
+            const shadow = container.getChildByLabel('shadow') as PIXI.Graphics;
+            applyTDUnitTransforms(
+              runner,
+              sprite,
+              shadow,
+              runner.definitionId,
+              TD_CREATURE_DEFS[runner.definitionId]?.baseCreature
+                .battleSpriteUrl,
+              (texture) => {
+                if (!isDestroyed) sprite.texture = texture;
+              }
+            );
+            renderHealthBar(runner, container, runner.definitionId);
+            updateContainerWorldDepth(
+              container,
+              getTDUnitGroundContactOffset(runner, runner.definitionId)
+            );
+          }
+          flagShotGraphics.clear();
+          for (const shot of engine.flagDuelShots) {
+            flagShotGraphics.moveTo(
+              offsetX + (shot.source.x / 100) * screenW,
+              offsetY + (shot.source.y / 100) * screenH
+            );
+            flagShotGraphics.lineTo(
+              offsetX + (shot.target.x / 100) * screenW,
+              offsetY + (shot.target.y / 100) * screenH
+            );
+            flagShotGraphics.stroke({ color: 0xfca5a5, width: 3, alpha: 0.8 });
           }
 
           // --- Render objective allies (captives and released helpers) ---
@@ -6484,7 +6579,14 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           app.destroy(true, { children: true });
         }
       };
-    }, [engine, backgroundScale, backgroundUrl, initialView, openingPan]);
+    }, [
+      engine,
+      backgroundScale,
+      backgroundUrl,
+      fitToScreen,
+      initialView,
+      openingPan,
+    ]);
 
     return (
       <div className="relative flex-1 overflow-hidden">

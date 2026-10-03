@@ -115,6 +115,17 @@ describe.each(Object.entries(TD_LEVELS))(
         point(ally.lockedPosition);
         ally.releasePath.forEach(point);
       }
+      if (level.flagDuel) {
+        expect(
+          COSMOID_TEMPLATES[level.flagDuel.alliedRunner.creatureId]
+        ).toBeDefined();
+        pathIndex(level.flagDuel.alliedRunner.pathIndex);
+        for (const defender of level.flagDuel.defenders) {
+          expect(
+            definitions.get(defender.enemyDefinitionId)?.creatureId
+          ).toBeDefined();
+        }
+      }
       for (const creature of [
         ...(level.premadeRoster ?? []),
         ...(level.startingTowers ?? []).map((tower) => tower.creature),

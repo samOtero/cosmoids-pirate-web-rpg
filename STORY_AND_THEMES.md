@@ -75,6 +75,18 @@ Vane mocks Kip's art and impossible-sounding dream because belittling her subord
 
 In Level 3, Vane battles Caleb personally rather than sending her full crew against him. She considers him beneath the need for reinforcements and wants to reassert her control in front of Kip. The emotional structure should center on Kip overcoming his fear, declaring his dream, and choosing to leave with Caleb. The scene may echo the emotional clarity of an early pirate-adventure recruitment encounter, but its dialogue, creature battle, character roles, and resolution should remain specific to Cosmoids.
 
+## Harbor Tournament Arc — Planned Levels 8–10
+
+After Shore Leave, the crew visits the nearby harbor island remembered by Kip from Vane's travels and reached with Mari's navigation. They cannot afford a larger boat, but a tournament offers one as its grand prize. An eight-entrant bracket gives Caleb three rounds: a quarterfinal against an inventive, boastful storyteller, a semifinal against a hospitable cook who dreams of a traveling kitchen, and a final against a calculating captain whose gentlemanly reputation hides exploitation of his crew and Cosmoids.
+
+Turnout is unusually low because fear of the final captain's reputation and quiet threats both discourage potential competitors. The storyteller hopes to bluff his way to victory. The cook comes from another island and does not initially know the captain's identity or reputation, although he is suspicious of his conduct. The specific threats, bluffs, and first grounds for suspicion remain open.
+
+Each new tournament character should introduce new Cosmoid species that the player has not encountered earlier in the story. Their partner rosters should express their distinct personalities and relationships; species concepts and typings remain open.
+
+The tournament battle format is still being explored. The current proposal has both captains defending flags against level-spawned runners while their Cosmoids can attack opposing defenders. Knocked-out defenders recover before returning, and the storyteller's side may use telegraphed long-range attacks that deal damage. The arena should fit on a single screen with both flags, teams, and runner routes visible, without requiring camera dragging between sides. The combat rules require a prototype and are not implemented or finalized.
+
+Caleb wins the boat while learning to rely on his companions. The storyteller and cook become friends through the competition and initially sail with the crew as temporary guests. Their later decisions to become full crew members should be earned in subsequent adventures. Usopp, Sanji, and Captain Kuro are broad creative touchstones; the new characters must have original identities and conflicts. See [the approved harbor tournament beat outline](docs/levels/harbor-tournament-arc.md) for the three-level progression and open decisions.
+
 ## The World
 
 The game takes place during the pirate-and-Cosmoid era, across an enormous ocean filled with varied islands, cultures, habitats, ruins, and trade routes.

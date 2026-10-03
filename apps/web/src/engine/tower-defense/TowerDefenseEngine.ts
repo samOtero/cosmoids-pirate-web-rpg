@@ -35,6 +35,9 @@ import {
   DestroyedStructureVisual,
   RiggingNest,
   RiggingThreadling,
+  TDFlagDuelConfig,
+  FlagRunner,
+  FlagDuelShot,
 } from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
 import { startDamageFlash } from './damageFlash';
@@ -321,6 +324,13 @@ export class TowerDefenseEngine {
   public static forceShinySpawns: boolean = false;
   public towers: Tower[] = [];
   public enemies: Enemy[] = [];
+  public flagDuel?: TDFlagDuelConfig;
+  public alliedFlagRunners: FlagRunner[] = [];
+  public flagDuelShots: FlagDuelShot[] = [];
+  public rivalFlagLives = 0;
+  private nextFlagRunnerSpawnAtMs = 0;
+  private flagRunnerSerial = 0;
+  private flagDefenderReadyAtMs = new Map<string, number>();
   public projectiles: Projectile[] = [];
   public visualEffects: VisualEffect[] = [];
   public floatingTexts: FloatingText[] = [];
@@ -476,6 +486,12 @@ export class TowerDefenseEngine {
       ? Math.max(0, levelData.towerRangeMultiplier!)
       : 1;
     this.disableCapture = levelData.disableCapture ?? false;
+    this.flagDuel = levelData.flagDuel
+      ? structuredClone(levelData.flagDuel)
+      : undefined;
+    this.rivalFlagLives = this.flagDuel?.rivalFlagLives ?? 0;
+    this.nextFlagRunnerSpawnAtMs =
+      this.flagDuel?.alliedRunner.firstSpawnDelayMs ?? 0;
     this.cannotLose = levelData.cannotLose ?? false;
     this.resonantEvolution = levelData.resonantEvolution;
     this.towerRecovery = levelData.towerRecovery
@@ -1714,7 +1730,156 @@ export class TowerDefenseEngine {
     this.enemies = newEnemies;
     this.projectiles = activeProjectiles;
     this.towers = newTowers;
+    this.processFlagDuel(deltaMs);
     updateDeepwaterGrips(this, newEnemies, 0);
+  }
+
+  public get hasCapturedRivalFlag(): boolean {
+    return !!this.flagDuel && this.rivalFlagLives <= 0;
+  }
+
+  private processFlagDuel(deltaMs: number): void {
+    const duel = this.flagDuel;
+    if (!duel || this.lives <= 0 || this.hasCapturedRivalFlag) return;
+    const config = duel.alliedRunner;
+    const path = this.paths[config.pathIndex];
+    const species = COSMOID_TEMPLATES[config.creatureId];
+    if (!species || !path?.length || config.spawnIntervalMs <= 0) return;
+
+    while (this.nextFlagRunnerSpawnAtMs <= this.elapsedTimeMs) {
+      const hp = calculateMaxHp(species.baseStats.hp, config.level);
+      this.alliedFlagRunners.push({
+        id: `flag_runner_${this.flagRunnerSerial++}`,
+        definitionId: config.creatureId,
+        position: { ...path[0] },
+        facingDirection: 'right',
+        hp,
+        maxHp: hp,
+        currentWaypointIndex: 1,
+        spawnedAtMs: this.nextFlagRunnerSpawnAtMs,
+      });
+      this.nextFlagRunnerSpawnAtMs += config.spawnIntervalMs;
+    }
+
+    for (const runner of this.alliedFlagRunners) {
+      runner.damageFlashTimerMs = Math.max(
+        0,
+        (runner.damageFlashTimerMs ?? 0) - deltaMs
+      );
+      const activeMs = Math.min(
+        deltaMs,
+        this.elapsedTimeMs - runner.spawnedAtMs
+      );
+      let remainingDistance = config.speed * (activeMs / 1000);
+      while (
+        runner.currentWaypointIndex < path.length &&
+        remainingDistance > 0
+      ) {
+        const waypoint = path[runner.currentWaypointIndex];
+        const distance = getPathSegmentLength(
+          runner.position,
+          waypoint,
+          this.aspectRatio
+        );
+        const step = stepUnitTowardsWaypoint(
+          runner.position,
+          waypoint,
+          remainingDistance,
+          this.aspectRatio,
+          path[runner.currentWaypointIndex - 1],
+          runner.facingDirection
+        );
+        runner.facingDirection = step.facingDirection;
+        if (!step.reachedWaypoint) break;
+        remainingDistance = Math.max(0, remainingDistance - distance);
+        runner.currentWaypointIndex++;
+      }
+      if (
+        runner.currentWaypointIndex >= path.length &&
+        runner.strikeEndsAtMs === undefined
+      ) {
+        runner.strikeEndsAtMs = this.elapsedTimeMs + config.strikeDurationMs;
+      }
+    }
+
+    // Only surviving defenders intercept runners. Player towers can clear these targets.
+    const defenderIds = new Set(this.enemies.map((enemy) => enemy.id));
+    for (const id of this.flagDefenderReadyAtMs.keys()) {
+      if (!defenderIds.has(id)) this.flagDefenderReadyAtMs.delete(id);
+    }
+    this.flagDuelShots = this.flagDuelShots.filter(
+      (shot) => shot.expiresAtMs > this.elapsedTimeMs
+    );
+    for (const defender of this.enemies) {
+      const shot = duel.defenders.find(
+        (entry) => entry.enemyDefinitionId === defender.waveEnemyDefinitionId
+      );
+      if (
+        !shot ||
+        defender.hp <= 0 ||
+        isSleeping(defender) ||
+        defender.statusConditions.some((status) => status.type === 'STUN') ||
+        (this.flagDefenderReadyAtMs.get(defender.id) ?? 0) > this.elapsedTimeMs
+      )
+        continue;
+      const target = this.alliedFlagRunners.find(
+        (runner) =>
+          runner.hp > 0 &&
+          getPathSegmentLength(
+            defender.position,
+            runner.position,
+            this.aspectRatio
+          ) <= shot.range
+      );
+      if (!target) continue;
+      defender.facingDirection = stepUnitTowardsWaypoint(
+        { ...defender.position },
+        target.position,
+        0,
+        this.aspectRatio
+      ).facingDirection;
+      target.hp -= shot.damage;
+      startDamageFlash(target, ElementType.NORMAL);
+      this.flagDefenderReadyAtMs.set(
+        defender.id,
+        this.elapsedTimeMs + shot.cooldownMs
+      );
+      this.flagDuelShots.push({
+        id: `flag_shot_${defender.id}_${this.elapsedTimeMs}`,
+        source: { ...defender.position },
+        target: { ...target.position },
+        expiresAtMs: this.elapsedTimeMs + 180,
+      });
+      this.floatingTexts.push({
+        id: `flag_hit_${target.id}_${this.elapsedTimeMs}`,
+        text: target.hp <= 0 ? 'Blocked!' : `${Math.ceil(shot.damage)}`,
+        position: { ...target.position },
+        color: 0xffaaaa,
+        durationMs: 700,
+        elapsedMs: 0,
+      });
+    }
+
+    this.alliedFlagRunners = this.alliedFlagRunners.filter((runner) => {
+      if (runner.hp <= 0) return false;
+      if (
+        runner.strikeEndsAtMs === undefined ||
+        runner.strikeEndsAtMs > this.elapsedTimeMs
+      )
+        return true;
+      if (this.rivalFlagLives > 0) {
+        this.rivalFlagLives--;
+        this.floatingTexts.push({
+          id: `flag_score_${runner.id}`,
+          text: 'Flag hit!',
+          position: { ...runner.position },
+          color: 0x67e8f9,
+          durationMs: 1000,
+          elapsedMs: 0,
+        });
+      }
+      return false;
+    });
   }
 
   private getCaptureDistanceSq(enemy: Enemy, captureUnit: CaptureUnit) {
