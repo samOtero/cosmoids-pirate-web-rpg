@@ -2,8 +2,8 @@ import { TDLevelData } from '@/engine/tower-defense/types';
 
 /**
  * Tournament layout prototype. Existing species are temporary visual stand-ins,
- * not the storyteller's approved roster. Automatic allied runners contest the
- * rival flag while player towers protect their flag and clear the rival defender.
+ * not the storyteller's approved roster. Automatic waves and committed roster
+ * runners contest the rival flag while towers defend and clear the rival defender.
  */
 export const LEVEL_8: TDLevelData = {
   paths: [
@@ -86,8 +86,17 @@ export const LEVEL_8: TDLevelData = {
     },
   ],
   lives: 3,
+  endlessWaves: {
+    delayBetweenWavesMs: 5000,
+    hpIncreasePerWave: 0,
+  },
   flagDuel: {
     rivalFlagLives: 3,
+    playerLaunch: {
+      position: { x: 20, y: 38 },
+      speed: 10,
+      recoveryDurationMs: 8000,
+    },
     alliedRunner: {
       creatureId: 'mouse_1',
       level: 8,

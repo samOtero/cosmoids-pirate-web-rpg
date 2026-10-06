@@ -987,6 +987,11 @@ export default function TowerDefenseScreen({
           const activeTower = engineRef.current.towers.find(
             (tower) => tower.creature.id === creature.id
           );
+          const deployment = levelData.flagDuel?.playerLaunch
+            ? engineRef.current.getFlagRunnerDeployment(creature.id)
+            : undefined;
+          const runningUnit =
+            deployment?.state === 'running' ? deployment.runner : undefined;
 
           let displayLevel = creature.level;
           let displayXp = creature.xp;
@@ -1004,12 +1009,20 @@ export default function TowerDefenseScreen({
               creature={creature}
               name={name}
               spriteUrl={spriteUrl}
-              isActive={isActive}
+              isActive={isActive || !!deployment}
               displayLevel={displayLevel}
               displayXp={displayXp}
-              displayHp={activeTower?.hp}
-              displayMaxHp={activeTower?.maxHp}
+              displayHp={runningUnit?.hp ?? activeTower?.hp}
+              displayMaxHp={runningUnit?.maxHp ?? activeTower?.maxHp}
+              deploymentStatus={
+                deployment?.state === 'running'
+                  ? 'Running'
+                  : deployment?.state === 'recovering'
+                    ? `Recovering ${Math.ceil(deployment.remainingMs / 1000)}s`
+                    : undefined
+              }
               onClick={() => {
+                if (deployment) return;
                 if (justDraggedRef.current) {
                   justDraggedRef.current = false;
                   return;
@@ -1021,6 +1034,11 @@ export default function TowerDefenseScreen({
                 }
               }}
               onPointerDown={(e) => {
+                if (
+                  engineRef.current.flagDuel?.playerLaunch &&
+                  engineRef.current.getFlagRunnerDeployment(creature.id)
+                )
+                  return;
                 e.currentTarget.setPointerCapture(e.pointerId);
                 const rect = e.currentTarget.getBoundingClientRect();
                 pendingDragRef.current = {

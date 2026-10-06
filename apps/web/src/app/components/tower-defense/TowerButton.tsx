@@ -10,6 +10,7 @@ export function TowerButton({
   displayXp,
   displayHp,
   displayMaxHp,
+  deploymentStatus,
   onClick,
   onPointerDown,
 }: {
@@ -21,6 +22,7 @@ export function TowerButton({
   displayXp: number;
   displayHp?: number;
   displayMaxHp?: number;
+  deploymentStatus?: string;
   onClick?: () => void;
   draggable?: boolean;
   onPointerDown?: (e: React.PointerEvent<HTMLButtonElement>) => void;
@@ -36,37 +38,38 @@ export function TowerButton({
 
   return (
     <button
+      disabled={!!deploymentStatus}
       onClick={onClick}
       onPointerDown={onPointerDown}
-      className={`relative w-16 h-16 lg:w-24 lg:h-24 p-0.5 lg:p-1 rounded flex flex-col items-center justify-center transition-all shrink-0 touch-none ${
+      className={`relative flex h-16 w-16 shrink-0 touch-none flex-col items-center justify-center rounded p-0.5 transition-all disabled:cursor-default disabled:opacity-60 lg:h-24 lg:w-24 lg:p-1 ${
         onPointerDown
-          ? 'cursor-grab active:cursor-grabbing hover:scale-105'
+          ? 'cursor-grab hover:scale-105 active:cursor-grabbing'
           : 'cursor-default'
       } ${
         isActive
-          ? 'bg-cyan-800 border-2 border-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.6)] hover:bg-cyan-700'
-          : 'bg-slate-700 border-2 border-transparent hover:bg-slate-500'
+          ? 'border-2 border-cyan-300 bg-cyan-800 shadow-[0_0_15px_rgba(34,211,238,0.6)] hover:bg-cyan-700'
+          : 'border-2 border-transparent bg-slate-700 hover:bg-slate-500'
       }`}
     >
       <img
         src={spriteUrl}
         alt={name}
-        className="w-7 h-7 lg:w-10 lg:h-10 object-contain pointer-events-none"
+        className="pointer-events-none h-7 w-7 object-contain lg:h-10 lg:w-10"
       />
-      <div className="flex flex-col items-center w-full mt-0.5 lg:mt-1 pointer-events-none">
+      <div className="pointer-events-none mt-0.5 flex w-full flex-col items-center lg:mt-1">
         <span
-          className={`text-[7px] lg:text-[9px] uppercase font-bold truncate w-full text-center leading-tight ${isActive ? 'text-cyan-100' : 'text-white'}`}
+          className={`w-full truncate text-center text-[7px] leading-tight font-bold uppercase lg:text-[9px] ${isActive ? 'text-cyan-100' : 'text-white'}`}
         >
           {name}
         </span>
 
-        <div className="w-full flex items-center justify-between px-0.5 lg:px-1 mt-0.5">
-          <span className="text-[6px] lg:text-[8px] text-gray-300 leading-none">
+        <div className="mt-0.5 flex w-full items-center justify-between px-0.5 lg:px-1">
+          <span className="text-[6px] leading-none text-gray-300 lg:text-[8px]">
             Lv.{displayLevel}
           </span>
           {hasLife && (
             <span
-              className={`text-[6px] font-bold leading-none lg:text-[8px] ${lifeColor}`}
+              className={`text-[6px] leading-none font-bold lg:text-[8px] ${lifeColor}`}
               title={`HP ${displayHp} / ${displayMaxHp}`}
             >
               HP {displayHp}/{displayMaxHp}
@@ -74,8 +77,8 @@ export function TowerButton({
           )}
         </div>
 
-        <div className="w-full px-0.5 lg:px-1 mt-0.5">
-          <div className="w-full h-1 lg:h-1.5 bg-gray-900 rounded-full overflow-hidden border border-gray-600">
+        <div className="mt-0.5 w-full px-0.5 lg:px-1">
+          <div className="h-1 w-full overflow-hidden rounded-full border border-gray-600 bg-gray-900 lg:h-1.5">
             <div
               className="h-full bg-cyan-400 transition-all duration-300"
               style={{
@@ -84,6 +87,11 @@ export function TowerButton({
             />
           </div>
         </div>
+        {deploymentStatus && (
+          <span className="text-[7px] leading-tight font-bold text-cyan-200 lg:text-[9px]">
+            {deploymentStatus}
+          </span>
+        )}
       </div>
     </button>
   );

@@ -331,6 +331,7 @@ export class TowerDefenseEngine {
   private nextFlagRunnerSpawnAtMs = 0;
   private flagRunnerSerial = 0;
   private flagDefenderReadyAtMs = new Map<string, number>();
+  private flagRunnerRecoveryUntilMs = new Map<string, number>();
   public projectiles: Projectile[] = [];
   public visualEffects: VisualEffect[] = [];
   public floatingTexts: FloatingText[] = [];
@@ -1738,7 +1739,107 @@ export class TowerDefenseEngine {
     return !!this.flagDuel && this.rivalFlagLives <= 0;
   }
 
+  public getFlagRunnerDeployment(
+    creatureId: string
+  ):
+    | { state: 'running'; runner: FlagRunner }
+    | { state: 'recovering'; remainingMs: number }
+    | undefined {
+    const runner = this.alliedFlagRunners.find(
+      (unit) => unit.playerCreatureId === creatureId
+    );
+    if (runner) return { state: 'running', runner };
+    const until = this.flagRunnerRecoveryUntilMs.get(creatureId);
+    if (until !== undefined && until > this.elapsedTimeMs)
+      return { state: 'recovering', remainingMs: until - this.elapsedTimeMs };
+    return undefined;
+  }
+
+  /** Shared snapping destinations for both roster-button and battlefield drags. */
+  public getTowerPlacementSpots(): Point[] {
+    const launch = this.flagDuel?.playerLaunch;
+    return launch
+      ? [...this.placementSpots, launch.position]
+      : this.placementSpots;
+  }
+
+  public getTowerDropSpot(position: Point): Point | undefined {
+    let closest: Point | undefined;
+    let distanceSq = 100;
+    for (const spot of this.getTowerPlacementSpots()) {
+      const candidateDistanceSq =
+        (position.x - spot.x) ** 2 + (position.y - spot.y) ** 2;
+      if (candidateDistanceSq <= distanceSq) {
+        closest = spot;
+        distanceSq = candidateDistanceSq;
+      }
+    }
+    return closest;
+  }
+
+  public launchFlagRunner(creatureId: string): boolean {
+    const duel = this.flagDuel;
+    const launch = duel?.playerLaunch;
+    const path = duel ? this.paths[duel.alliedRunner.pathIndex] : undefined;
+    const creature = this.roster.find((unit) => unit.id === creatureId);
+    if (
+      !launch ||
+      !path?.length ||
+      !creature ||
+      this.lives <= 0 ||
+      this.hasCapturedRivalFlag ||
+      this.getFlagRunnerDeployment(creatureId)
+    )
+      return false;
+    const deployed = this.towers.find(
+      (unit) => unit.creature.id === creatureId
+    );
+    if (deployed?.isFixed) return false;
+    const tower =
+      deployed ??
+      this.reserveTowers.get(creatureId) ??
+      this.createTower(creature, path[0].x, path[0].y);
+    if (!tower || tower.hp <= 0) return false;
+    if (deployed) this.moveTowerToReserve(deployed);
+    else this.reserveTowers.set(creatureId, tower);
+    const launchWaypoint = path.findIndex(
+      (point) => point.x === launch.position.x && point.y === launch.position.y
+    );
+    this.alliedFlagRunners.push({
+      id: `flag_runner_${this.flagRunnerSerial++}`,
+      definitionId: tower.creature.speciesId,
+      isShiny: tower.creature.isShiny,
+      playerCreatureId: creatureId,
+      position: { ...launch.position },
+      facingDirection: 'right',
+      hp: tower.hp,
+      maxHp: tower.maxHp,
+      currentWaypointIndex: launchWaypoint >= 0 ? launchWaypoint + 1 : 0,
+      spawnedAtMs: this.elapsedTimeMs,
+    });
+    return true;
+  }
+
+  private finishPlayerFlagRun(runner: FlagRunner, defeated: boolean): void {
+    const id = runner.playerCreatureId;
+    if (!id) return;
+    const tower = this.reserveTowers.get(id);
+    if (tower) tower.hp = Math.max(0, runner.hp);
+    if (defeated)
+      this.flagRunnerRecoveryUntilMs.set(
+        id,
+        this.elapsedTimeMs +
+          (this.flagDuel?.playerLaunch?.recoveryDurationMs ?? 0)
+      );
+  }
+
   private processFlagDuel(deltaMs: number): void {
+    for (const [id, until] of this.flagRunnerRecoveryUntilMs) {
+      if (until > this.elapsedTimeMs) continue;
+      const tower = this.reserveTowers.get(id);
+      if (tower) tower.hp = tower.maxHp;
+      this.flagRunnerRecoveryUntilMs.delete(id);
+    }
     const duel = this.flagDuel;
     if (!duel || this.lives <= 0 || this.hasCapturedRivalFlag) return;
     const config = duel.alliedRunner;
@@ -1770,7 +1871,10 @@ export class TowerDefenseEngine {
         deltaMs,
         this.elapsedTimeMs - runner.spawnedAtMs
       );
-      let remainingDistance = config.speed * (activeMs / 1000);
+      const speed = runner.playerCreatureId
+        ? (duel.playerLaunch?.speed ?? config.speed)
+        : config.speed;
+      let remainingDistance = speed * (activeMs / 1000);
       while (
         runner.currentWaypointIndex < path.length &&
         remainingDistance > 0
@@ -1861,7 +1965,10 @@ export class TowerDefenseEngine {
     }
 
     this.alliedFlagRunners = this.alliedFlagRunners.filter((runner) => {
-      if (runner.hp <= 0) return false;
+      if (runner.hp <= 0) {
+        this.finishPlayerFlagRun(runner, true);
+        return false;
+      }
       if (
         runner.strikeEndsAtMs === undefined ||
         runner.strikeEndsAtMs > this.elapsedTimeMs
@@ -1878,6 +1985,7 @@ export class TowerDefenseEngine {
           elapsedMs: 0,
         });
       }
+      this.finishPlayerFlagRun(runner, false);
       return false;
     });
   }
@@ -3640,6 +3748,7 @@ export class TowerDefenseEngine {
   }
 
   public removeTower(creatureId: string) {
+    if (this.getFlagRunnerDeployment(creatureId)) return false;
     const tower = this.towers.find((t) => t.creature.id === creatureId);
     if (tower?.isFixed) return false;
     if (tower) this.moveTowerToReserve(tower);
@@ -3647,6 +3756,10 @@ export class TowerDefenseEngine {
   }
 
   public placeTower(creatureId: string, x: number, y: number) {
+    if (this.getFlagRunnerDeployment(creatureId)) return false;
+    const launch = this.flagDuel?.playerLaunch?.position;
+    if (launch && launch.x === x && launch.y === y)
+      return this.launchFlagRunner(creatureId);
     const creature = this.roster.find((c) => c.id === creatureId);
     if (!creature) return false;
 

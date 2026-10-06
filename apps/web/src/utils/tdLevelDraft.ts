@@ -604,6 +604,39 @@ export function validateTDLevelDraft(
   if (levelData.flagDuel) {
     const duel = levelData.flagDuel;
     const runner = duel.alliedRunner;
+    if (duel.playerLaunch) {
+      const launch = duel.playerLaunch;
+      const route = levelData.paths[runner.pathIndex];
+      if (
+        route &&
+        !route.some(
+          (point) =>
+            point.x === launch.position.x && point.y === launch.position.y
+        )
+      )
+        errors.push(
+          'Flag launch position must be a waypoint on the runner path.'
+        );
+      for (const value of [launch.position.x, launch.position.y]) {
+        if (!Number.isFinite(value) || value < 0 || value > 100)
+          errors.push('Flag launch position must be within the map.');
+      }
+      if (!Number.isFinite(launch.speed) || launch.speed <= 0)
+        errors.push('Player flag runner speed must be positive.');
+      if (
+        !Number.isFinite(launch.recoveryDurationMs) ||
+        launch.recoveryDurationMs <= 0
+      )
+        errors.push('Flag runner recoveryDurationMs must be positive.');
+      if (
+        levelData.placementSpots.some(
+          (spot) => spot.x === launch.position.x && spot.y === launch.position.y
+        )
+      )
+        errors.push(
+          'Flag launch position must be separate from defensive spots.'
+        );
+    }
     if (!Number.isInteger(duel.rivalFlagLives) || duel.rivalFlagLives <= 0) {
       errors.push('Rival flag lives must be a positive integer.');
     }

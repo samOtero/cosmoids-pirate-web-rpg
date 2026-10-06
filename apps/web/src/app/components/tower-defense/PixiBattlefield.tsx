@@ -3248,20 +3248,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
         if (towerIdStr) {
           if (engine) {
-            let closestSpot: { x: number; y: number } | null = null;
-            let minSqDist = Infinity;
-            const SNAP_DIST_SQ = 100; // 10 units squared
-
-            for (const spot of engine.placementSpots) {
-              const dx = x - spot.x;
-              const dy = y - spot.y;
-              const distSq = dx * dx + dy * dy;
-
-              if (distSq <= SNAP_DIST_SQ && distSq < minSqDist) {
-                minSqDist = distSq;
-                closestSpot = spot;
-              }
-            }
+            const closestSpot = engine.getTowerDropSpot({ x, y });
 
             if (closestSpot) {
               onMapDropRef.current(towerIdStr, closestSpot.x, closestSpot.y);
@@ -3568,6 +3555,22 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           PIXI.Container
         >();
         const spotGraphics = new PIXI.Graphics();
+        const launchGraphics = new PIXI.Graphics();
+        launchGraphics.eventMode = 'none';
+        groundFxLayer.addChild(launchGraphics);
+        const launchLabel = new PIXI.Text({
+          text: 'Run to flag',
+          style: {
+            fontFamily: 'Arial',
+            fontSize: 18,
+            fontWeight: 'bold',
+            fill: 0xe0f2fe,
+            stroke: { color: 0x082f49, width: 4 },
+          },
+        });
+        launchLabel.anchor.set(0.5, 0);
+        launchLabel.eventMode = 'none';
+        hudLayer.addChild(launchLabel);
         const invalidSpotGraphics = new PIXI.Graphics();
         const recoveryTutorialGraphics = new PIXI.Graphics();
         const resonantEvolutionGraphics = new PIXI.Graphics();
@@ -3583,20 +3586,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             const x = ((e.global.x - bgBounds.x) / bgBounds.width) * 100;
             const y = ((e.global.y - bgBounds.y) / bgBounds.height) * 100;
 
-            let closestSpot: { x: number; y: number } | null = null;
-            let minSqDist = Infinity;
-            const SNAP_DIST_SQ = 100; // 10 units squared (percentage)
-
-            for (const spot of engine.placementSpots) {
-              const dx = x - spot.x;
-              const dy = y - spot.y;
-              const distSq = dx * dx + dy * dy;
-
-              if (distSq <= SNAP_DIST_SQ && distSq < minSqDist) {
-                minSqDist = distSq;
-                closestSpot = spot;
-              }
-            }
+            const closestSpot = engine.getTowerDropSpot({ x, y });
 
             if (closestSpot) {
               onMapDropRef.current(
@@ -3998,6 +3988,47 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             (!isDraggingCapture && dragPosRef.current !== null) ||
             draggingTowerCreatureId !== null;
 
+          // The launch destination stays visible even before a roster drag starts.
+          const launch = engine.flagDuel?.playerLaunch?.position;
+          const hoveredSpot = dragPosRef.current
+            ? engine.getTowerDropSpot(dragPosRef.current)
+            : undefined;
+          const hoveringLaunch =
+            !!launch && isDraggingTower && hoveredSpot === launch;
+          launchGraphics.clear();
+          launchLabel.visible = !!launch && !hideUiRef.current;
+          if (launch && !hideUiRef.current) {
+            const x = offsetX + (launch.x / 100) * screenW;
+            const y = offsetY + (launch.y / 100) * screenH;
+            const radius = viewportH * 0.05 * zoom;
+            launchGraphics
+              .circle(x, y, radius)
+              .fill({ color: 0x0ea5e9, alpha: hoveringLaunch ? 0.5 : 0.25 })
+              .stroke({ color: 0x67e8f9, width: hoveringLaunch ? 4 : 2 });
+            launchGraphics
+              .moveTo(x - radius * 0.45, y)
+              .lineTo(x + radius * 0.45, y)
+              .lineTo(x + radius * 0.1, y - radius * 0.3)
+              .moveTo(x + radius * 0.45, y)
+              .lineTo(x + radius * 0.1, y + radius * 0.3)
+              .stroke({ color: 0xe0f2fe, width: 3 });
+            launchLabel.position.set(x, y + radius + 3);
+            launchLabel.scale.set(
+              Math.max(0.6, (zoom * app.screen.height) / TD_BASE_HEIGHT)
+            );
+            if (hoveringLaunch) {
+              const path =
+                engine.paths[engine.flagDuel!.alliedRunner.pathIndex];
+              path?.forEach((point, index) => {
+                const px = offsetX + (point.x / 100) * screenW;
+                const py = offsetY + (point.y / 100) * screenH;
+                if (index === 0) launchGraphics.moveTo(px, py);
+                else launchGraphics.lineTo(px, py);
+              });
+              launchGraphics.stroke({ color: 0x67e8f9, width: 3, alpha: 0.7 });
+            }
+          }
+
           // --- Render Environment Units ---
           const currentEnvUnitIds = new Set(
             engine.environmentUnits.map((e) => e.id)
@@ -4088,7 +4119,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             );
           }
 
-          // --- Render autonomous allied flag runners ---
+          // --- Render allied flag runners (automatic waves and roster deployments) ---
           const flagRunnerIds = new Set(
             engine.alliedFlagRunners.map((runner) => runner.id)
           );
@@ -5104,6 +5135,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               }
             }
           } else if (isDraggingTower) {
+            if (hoveringLaunch) isHoveringValidSpot = true;
             // Normal Tower Placement Logic
             if (draggingTowerCreatureId === null && dragPosRef.current) {
               const pxX = offsetX + (dragPosRef.current.x / 100) * screenW;
@@ -5125,7 +5157,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 ? ATTACK_DEFS[attackId]?.rangeIndex
                 : undefined;
 
-              if (rangeIndex !== undefined) {
+              if (rangeIndex !== undefined && !hoveringLaunch) {
                 const radius = getTDRangePreviewRadius(
                   engine.getTowerAttackRange(rangeIndex),
                   viewportH,
@@ -5145,18 +5177,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               const pxX = offsetX + (spot.x / 100) * screenW;
               const pxY = offsetY + (spot.y / 100) * screenH;
 
-              let isHovered = false;
-
-              if (dragPosRef.current) {
-                const dx = dragPosRef.current.x - spot.x;
-                const dy = dragPosRef.current.y - spot.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist <= 10) {
-                  // Hover/Snap threshold is 10vw/vh approx
-                  isHovered = true;
-                  isHoveringValidSpot = true;
-                }
-              }
+              const isHovered = hoveredSpot === spot;
+              if (isHovered) isHoveringValidSpot = true;
 
               const strokeWidth = isHovered ? 4 : 2;
               const alpha = isHovered ? 1 : 0.8;

@@ -1,6 +1,6 @@
 # Levels 8–10 — Harbor Tournament Arc
 
-> Story beat direction approved October 2, 2026. This is a planned arc outline, not implemented levels or finished dialogue. Character names, island name, tournament name, and ship design remain open. `STORY_AND_THEMES.md` remains the narrative source of truth.
+> Story beat direction approved October 2, 2026. This is a planned arc outline, not implemented levels or finished dialogue. The opponents are Rollo, Corin, and Marwick. Marwick's pirate captain identity is hidden from the public. Island name, tournament name, and ship design remain open. `STORY_AND_THEMES.md` remains the narrative source of truth.
 
 A [Level 8 playable placeholder](level-8.md) now provides a wide single-screen arena with automatic runners attacking both flags and a rival defender firing practice shots at allied runners, using temporary existing-species stand-ins. Capturing the rival flag wins the prototype. The story, new species, attacks against player towers, and recovery system remain unimplemented.
 
@@ -14,13 +14,13 @@ An eight-entrant bracket gives Caleb three playable rounds across three levels:
 
 | Planned level | Round | Opponent | Relationship change |
 | --- | --- | --- | --- |
-| 8 | Quarterfinal | The storyteller | An irritating rival becomes a friend. |
-| 9 | Semifinal | The cook | A sincere competitor earns mutual respect. |
-| 10 | Final | A calculating, villainous captain | Former opponents choose to support Caleb. |
+| 8 | Quarterfinal | Rollo, the storyteller | An irritating rival becomes a friend. |
+| 9 | Semifinal | Corin, the cook | A sincere competitor earns mutual respect. |
+| 10 | Final | Marwick, a gentleman with a hidden pirate captain identity | Former opponents choose to support Caleb. |
 
 The tournament begins as a lively, legitimate competition. The final captain's cruelty supplies the escalating conflict; the whole event does not need to be secretly corrupt.
 
-Turnout is unusually low for such a valuable prize. Fear of the captain's reputation and quiet threats to potential competitors both discourage entry, giving the small eight-entrant field a story reason. The exact threats and how they become apparent remain open. This can establish unease during registration while preserving his courteous public presentation and leaving the full extent of his cruelty for later levels. Low turnout does not require empty bracket slots or byes; Caleb still plays all three rounds.
+Turnout is unusually low for such a valuable prize. Marwick's formidable competitive reputation and quiet threats to potential competitors both discourage entry, giving the small eight-entrant field a story reason. Locals do not publicly know that he is a pirate captain; fear of facing him or suffering retaliation must not imply that they know this secret. The exact threats and how they become apparent remain open. This can establish unease during registration while preserving his courteous public presentation and leaving the full extent of his cruelty for later levels. Low turnout does not require empty bracket slots or byes; Caleb still plays all three rounds.
 
 ## Proposed Tournament Battle Format
 
@@ -58,50 +58,54 @@ Offensive orders from defensive positions and a contested central placement area
 
 The storyteller, cook, and final captain should each introduce new Cosmoid species that the player has not encountered earlier in the story. Develop their partner rosters around their distinct personalities and relationships; do not fill these new characters' teams with already-seen species. Animal anchors, species concepts, typings, and team sizes remain open.
 
-### The Storyteller
+### Rollo — The Storyteller
 
-A flamboyant storyteller and inventive battler claims an impressive history of adventures despite having little actual sailing experience. Winning the boat would let him finally live the stories he has been inventing. His initial strategy is to bluff his way to victory, persuading opponents that he is far more formidable than he really is. The exact bluffs remain open; his real ingenuity emerges when Caleb makes him back up his claims in the match.
+Rollo, a flamboyant storyteller and inventive battler, claims an impressive history of adventures despite having little actual sailing experience. Winning the boat would let him finally live the stories he has been inventing. His initial strategy is to bluff his way to victory, persuading opponents that he is far more formidable than he really is. The exact bluffs remain open; his real ingenuity emerges when Caleb makes him back up his claims in the match.
 
 His broad touchstone is Usopp, developed into an original Cosmoids character. Emphasize exaggeration, pride, showmanship, and real ingenuity. His role should remain distinct from Kip's quiet observation, art, and courage. The storyteller's bravado hides a sincere desire to matter.
 
-### The Cook
+His name and visual concept are approved. Rollo is a short, stocky teenage sharpshooter with warm brown skin, slick dark side-parted hair, a gently elongated rounded nose, a green waistcoat, and mustard cropped trousers. He carries an oversized handmade wooden slingshot with cord bindings and brass repairs. See [Rollo's character direction](../../STORY_AND_THEMES.md#rollo) for the visual source of truth. His slingshot's role in the tournament rules remains undecided; the existing Cosmoid-driven ranged-attack proposal is still a separate open gameplay decision.
 
-A talented cook wants a traveling kitchen: a way to discover ingredients and feed people across the seas. The prize ship represents independence and a real personal dream.
+### Corin — The Cook
 
-He comes from a different island and does not initially know who the final captain is or why locals fear him. He enters without that local knowledge, although the captain's conduct makes him suspicious. Distinguish that early unease from the later evidence of mistreated Cosmoids; he does not arrive already knowing the captain is a villain.
+Corin, a talented cook, wants a traveling kitchen: a way to discover ingredients and feed people across the seas. The prize ship represents independence and a real personal dream.
 
-His broad touchstone is Sanji, developed into an original Cosmoids character. Introduce him through food and hospitality before his tournament role. He cares for his Cosmoid partners, takes competition seriously, and struggles to accept help himself. Losing should matter without making him resent Caleb.
+He comes from a different island and does not initially know who Marwick is or why locals fear facing him. He enters without that local knowledge, although Marwick's conduct makes him suspicious. Distinguish that early unease from the later evidence of mistreated Cosmoids; Corin does not arrive already knowing Marwick is a villain or pirate captain.
 
-### The Final Captain
+His broad touchstones are Tracey Sketchit's gentleness and attentiveness and Sanji's hospitality and culinary pride, developed into an original Cosmoids character. Introduce him through food and hospitality before his tournament role. He cares for his Cosmoid partners, takes competition seriously, and struggles to accept help himself. Losing should matter without making him resent Caleb.
 
-A celebrated competitor presents himself as a courteous, professional gentleman. Beneath that reputation, he treats his crew and Cosmoids as disposable investments. He studies opponents and expects careful planning to guarantee victory; Caleb disrupting that certainty reveals his cruelty.
+His name is approved and his selected visual direction is the Gentleman Galley Cook: swept copper-red hair, natural auburn eyebrows, plum cook jacket, cream shirt, charcoal apron, navy cropped trousers, oxblood boots, and striped kitchen towel. See [Corin's character direction](../../STORY_AND_THEMES.md#corin) for the source-only concept reference.
 
-Captain Kuro from One Piece's Syrup Village arc is the broad touchstone for calculation, deception, and willingness to sacrifice subordinates. Develop an original identity, motive, appearance, and scheme. Do not reproduce Kuro's disguise, inheritance plot, signature weapons, or scenes.
+### Marwick — The Hidden Pirate Captain
+
+Marwick presents himself as a courteous, professional gentleman and celebrated competitor. His pirate captain identity is hidden from the public. Beneath that reputation, he treats his crew and Cosmoids as disposable investments. He studies opponents and expects careful planning to guarantee victory; Caleb disrupting that certainty reveals his cruelty. Public introductions and dialogue should use Marwick or Mr. Marwick without exposing his pirate rank. His public occupation or cover story, and who discovers his secret when, remain open.
+
+His broad touchstones are Maxie, Team Magma's leader, and Captain Kuro from One Piece's Syrup Village arc: intellectual severity, calculation, deception, and willingness to sacrifice subordinates. His selected visual concept uses a tall lean silhouette, angular features, bronze spectacles, burgundy hair with gray temples, and restrained wine-red accents in a charcoal long coat. Keep his nautical elegance compatible with the respectable public image, without an overt pirate insignia. His name and concept are approved. See [Marwick's character direction](../../STORY_AND_THEMES.md#marwick) and [the selected concept](../../art-source/characters/concepts/tournament-captain/marwick.png). Develop an original identity, motive, and scheme. Do not reproduce Team Magma's goals or uniform, Kuro's disguise, inheritance plot, signature weapons, or scenes.
 
 The intended climax exposes exploitation without repeating Strake's forced Cursed Aura transformation. The captain's precise methods and the consequences for him remain to be designed.
 
-## Level 8 — Quarterfinal Against the Storyteller
+## Level 8 — Quarterfinal Against Rollo
 
 1. The crew reaches the harbor expecting to find a larger boat and discovers that buying one is unaffordable.
 2. They learn about the tournament and its prize ship. Surprisingly few people have signed up because of the feared captain. Caleb enters eagerly, before fully appreciating the competition.
 3. The storyteller makes a theatrical entrance and tries to bluff Caleb into believing he faces an overwhelming opponent. His boasting irritates Caleb, who makes him back up his claims; his ingenuity proves genuine during the match.
 4. Caleb wins. The storyteller's bravado briefly slips: the boat was meant to make his imagined adventures possible.
 5. Caleb recognizes the real dream beneath the exaggeration. The defeated opponent stays to watch his next match, outwardly claiming he only wants to judge whether Caleb is any good.
-6. Introduce the eventual final captain winning another quarterfinal with unnerving ease. His public bearing is courteous and professional.
+6. Introduce Marwick winning another quarterfinal with unnerving ease. His public bearing is courteous and professional; the introduction does not reveal that he is a pirate captain.
 
 The match begins a friendship; it does not recruit the storyteller into the crew.
 
-## Level 9 — Semifinal Against the Cook
+## Level 9 — Semifinal Against Corin
 
 1. Between rounds, the crew meets the cook through his food and hospitality, then discovers he is Caleb's next opponent.
-2. Establish the traveling-kitchen dream and why the boat matters to the cook. He is visiting from another island and entered without knowing the feared captain's reputation, although he is suspicious of the man's conduct. Both sides have a legitimate reason to want the prize.
+2. Establish the traveling-kitchen dream and why the boat matters to the cook. He is visiting from another island and entered without knowing Marwick's local competitive reputation or hidden pirate identity, although he is suspicious of the man's conduct. Both sides have a legitimate reason to want the prize.
 3. The semifinal is competitive and sincere. The cook exposes Caleb's impulsiveness, requiring him to rely on Kip and Mari.
 4. Caleb wins narrowly. The cook accepts the result, but the crew understands what losing costs them.
 5. The cook remains involved because he likes the crew and notices that the other finalist's Cosmoids are poorly cared for beneath his polished presentation, giving substance to his earlier suspicions.
 
 The cook earns respect through the competition and his care for others. He remains an independent person with his own destination and dream.
 
-## Level 10 — Final Against the Captain
+## Level 10 — Final Against Marwick
 
 1. Caleb faces an opponent who expects his preparation and reputation to make victory inevitable.
 2. As Caleb disrupts the plan, the captain's respectable presentation breaks down. His treatment of exhausted Cosmoids and frightened subordinates becomes the emotional stake of the final.
@@ -110,7 +114,7 @@ The cook earns respect through the competition and his care for others. He remai
 5. Caleb defeats the captain and wins the tournament. The crew receives the boat in a public celebration.
 6. A quieter departure establishes the storyteller and cook as temporary traveling guests.
 
-Keep the earned tournament victory and boat prize central to the resolution. The final encounter's mechanics, escalation, and handling of the captain's crew remain open.
+Keep the earned tournament victory and boat prize central to the resolution. The final encounter's mechanics, escalation, and handling of Marwick's crew remain open. Exposing his cruelty does not by itself settle when his pirate identity becomes public; design the reveal's evidence, timing, and witnesses separately.
 
 ## Departure and Later Recruitment
 
@@ -128,6 +132,7 @@ The new boat provides a shared home and space for the existing crew's identities
 - Show Caleb learning to trust the crew through decisions and consequences.
 - Use the One Piece touchstones as broad inspiration while developing original characters and conflicts.
 - Keep adventure, humor, and hospitality present as the captain's cruelty emerges.
+- Preserve Marwick's hidden pirate identity in public-facing introductions, titles, rumors, and dialogue until an authored reveal establishes who knows. Local intimidation does not make his piracy common knowledge.
 - This outline describes beats across an arc, not dialogue panels. When drafting each ordinary introduction, intermission, or ending, keep it within five to ten player-advanced panels, including narration and action text. Identify any genuinely necessary major-turning-point exception explicitly.
 
 ## Open Decisions
@@ -135,7 +140,8 @@ The new boat provides a shared home and space for the existing crew's identities
 - Island and tournament names, harbor culture, organizers, schedule, and entry conditions.
 - The captain's specific threats and how the combination of intimidation and his reputation becomes apparent during registration.
 - The storyteller's specific bluffs and the cook's home island and first grounds for suspicion.
-- Original names, appearances, and backstories for the three opponents, plus new Cosmoid species for each opponent's partner roster.
+- Backstories for all three opponents and new Cosmoid species for each opponent's partner roster. Rollo and Marwick's names and visual concepts are approved; Corin's name and selected cook concept are recorded.
+- Marwick's public occupation or cover story, how his pirate captain identity is concealed, and the evidence, timing, and witnesses of its eventual reveal.
 - Tournament rules, arena presentation, and how the existing crew and spectators participate.
 - Prototype the proposed two-flag battle format, runner schedules, defender combat, knockout recovery, and redeployment.
 - Develop a single-screen arena layout and test opposing-defender attacks without requiring camera panning.

@@ -9,6 +9,13 @@ by the game, this directory retains the source copy while `apps/web/public`
 retains the current runtime copy. Art that has no runtime reference is kept
 only here.
 
+## Human character selections
+
+Keep human character concept exploration outside the repository until a design
+is selected. Add only the selected final concept and finished portrait expressions.
+Retain concise approval, export, and inspection records; do not add unused
+alternatives, generation prompts, or refinement history to the repository.
+
 ## Organization
 
 - `app-icons/`: installable app and browser icons

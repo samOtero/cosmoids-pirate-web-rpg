@@ -41,9 +41,16 @@ export interface TDOpeningPan {
   durationMs: number;
 }
 
-/** Prototype rules for autonomous runners contesting a rival flag. */
+/** Prototype rules for automatic waves and committed roster runners contesting a rival flag. */
 export interface TDFlagDuelConfig {
   rivalFlagLives: number;
+  /** Optional direct deployment spot for committed, non-attacking roster runners. */
+  playerLaunch?: {
+    position: Point;
+    /** Horizontal map percentage points traveled per second. */
+    speed: number;
+    recoveryDurationMs: number;
+  };
   alliedRunner: {
     creatureId: string;
     level: number;
@@ -65,6 +72,8 @@ export interface TDFlagDuelConfig {
 
 export interface FlagRunner extends BaseTDUnit {
   definitionId: string;
+  /** Absent for the automatic small waves. Roster runners cannot be recalled. */
+  playerCreatureId?: string;
   currentWaypointIndex: number;
   spawnedAtMs: number;
   strikeEndsAtMs?: number;
