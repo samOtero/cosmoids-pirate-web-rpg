@@ -69,7 +69,6 @@
   margin-bottom: clamp(0rem, 4vh, 3rem);
 }
 
-.launcher > div > button:first-child,
 .launcher > button {
   margin-top: 0;
   padding: clamp(0.65rem, 1.4vh, 1rem) clamp(1rem, 3.3vw, 3rem);

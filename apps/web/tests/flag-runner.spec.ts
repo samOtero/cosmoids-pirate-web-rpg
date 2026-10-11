@@ -75,7 +75,7 @@ for (const viewport of [
     await page.addStyleTag({
       content: 'nextjs-portal { pointer-events: none; }',
     });
-    await page.getByRole('button', { name: 'Play in Browser' }).click();
+    await page.getByRole('button', { name: 'Play as guest' }).click();
     await page.getByText('Flag runner test', { exact: true }).click();
     await page.locator('#mode-story').click();
     await page.locator(`#level-${LEVEL_ORDER.indexOf(entry) + 1}`).click();
@@ -83,6 +83,12 @@ for (const viewport of [
     const pause = page.getByRole('button', { name: 'Pause', exact: true });
     await expect(pause).toBeEnabled();
     await pause.click();
+    await expect(
+      page.getByRole('button', { name: 'Enter fullscreen' })
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole('button', { name: 'Exit fullscreen' })
+    ).toHaveCount(0);
     const canvas = page.locator('canvas').first();
     await expect(canvas).toBeVisible();
     const bounds = (await canvas.boundingBox())!;

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 
-import FullscreenLauncher from './FullscreenLauncher';
+import { Button } from './ui/Button';
 import { trackGameEvent } from '@/utils/analytics';
 import styles from './startScreen.module.css';
 
@@ -24,12 +24,15 @@ export default function StartScreen({ onStart }: { onStart: () => void }) {
           <h2 className={styles.subtitle}>The Grand Voyage</h2>
         </div>
         <div className={styles.launcher}>
-          <FullscreenLauncher
-            onStart={() => {
+          <Button
+            variant="wood"
+            onClick={() => {
               void trackGameEvent('game_started');
               onStart();
             }}
-          />
+          >
+            Play as guest
+          </Button>
         </div>
         <p className={styles.credit}>v1.0.2 • By Samuel Otero</p>
       </div>

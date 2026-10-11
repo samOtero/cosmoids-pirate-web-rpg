@@ -63,7 +63,7 @@ export default function DevTools() {
   return (
     <>
       {showMenu && !activeTool && (
-        <div className="fixed right-4 bottom-4 z-9999 flex flex-col gap-2">
+        <div className="fixed right-4 bottom-20 z-9999 flex flex-col gap-2">
           <div className="rounded border border-slate-700 bg-black/90 p-3 text-white shadow-xl">
             <h3 className="mb-2 text-xs font-bold text-slate-400 uppercase">
               Dev Tools (Ctrl+D)

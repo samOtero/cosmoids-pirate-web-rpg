@@ -5,10 +5,10 @@ test('all source-writing editors load a versioned draft', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'No thanks', exact: true }).click();
   await page
-    .getByRole('button', { name: 'Play in Browser', exact: true })
+    .getByRole('button', { name: 'Play as guest', exact: true })
     .click();
   await expect(
-    page.getByRole('button', { name: 'Play in Browser', exact: true })
+    page.getByRole('button', { name: 'Play as guest', exact: true })
   ).toHaveCount(0);
   const tools = [
     { name: 'TD Level Editor', kind: 'level' },

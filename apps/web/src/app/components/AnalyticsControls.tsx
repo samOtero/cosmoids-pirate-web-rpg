@@ -78,7 +78,7 @@ export default function AnalyticsControls() {
 
   return (
     <aside
-      className="fixed right-[max(0.75rem,env(safe-area-inset-right))] bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-[10001] max-w-[calc(100vw-1.5rem)] text-slate-100"
+      className="fixed right-[calc(max(0.75rem,env(safe-area-inset-right))+3.5rem)] bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-[10001] max-w-[calc(100vw-5rem)] text-slate-100"
       aria-label="Gameplay analytics and feedback"
     >
       {(open || preference === null) && (
