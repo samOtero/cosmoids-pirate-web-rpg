@@ -3,6 +3,10 @@
 Fastify runs on `127.0.0.1:3001`, behind Nginx in production. Postgres stores
 accounts and sessions; Better Auth handles email/password authentication.
 
+For the current VPS file locations, environment settings, Nginx/systemd
+configuration, deployment steps, and troubleshooting commands, see the
+[API operations reference](OPERATIONS.md).
+
 This is the first account-development step. Email addresses are **unverified**.
 Email verification, password recovery, and the game login UI still need to be
 connected before opening accounts to players. Creature ownership, cloud saves,
@@ -35,7 +39,8 @@ Alongside the existing `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, and `PGPASSWO
 
 ```dotenv
 BETTER_AUTH_SECRET=replace-with-a-random-secret-generated-on-the-server
-BETTER_AUTH_URL=https://159.223.127.157
+BETTER_AUTH_URL=https://api.cosmoids-td.com
+AUTH_TRUSTED_ORIGINS=https://staging.cosmoids-td.com,https://cosmoids-pirate-web-rpg-git-experimental-sams-projects-022093db.vercel.app
 ```
 
 Generate the secret on the VPS with `openssl rand -base64 32`. Keep it in
@@ -68,10 +73,14 @@ Signup signs the player in automatically. The browser stores a signed session
 cookie and sends it with subsequent requests. Production cookies are Secure,
 HttpOnly, and use Better Auth's default SameSite protection. Use
 `credentials: "include"` for browser fetches between allowed origins. Browser
-origins and cookie _sites_ are different: allowing a Vercel origin does not make
-an IP-address API a same-site service. Before connecting the public game UI, use
-a shared parent domain or a same-origin API proxy so login does not rely on
-third-party cookies being accepted.
+origins and cookie _sites_ are different. The custom staging and API domains now
+share the parent domain `cosmoids-td.com`. Use the custom staging domain for
+browser login tests; the original `vercel.app` addresses are on a different site,
+and allowing their origins alone does not solve third-party-cookie restrictions.
+The original staging URL is included in the example allowlist to preserve API
+access from that address. Cookie login there still needs a same-origin API proxy.
+Local game saves are also specific to each origin; see the operations reference
+for the old-URL transition plan and future production origins.
 
 Keep Better Auth's origin and CSRF checks enabled. Nginx should continue
 overwriting `X-Real-IP` and setting `X-Forwarded-For` with
@@ -119,8 +128,8 @@ it, then explicitly apply it:
 NODE_ENV=production node --env-file="$HOME/.config/cosmoids/api.env" apps/api/dist/auth-migrate.js --apply
 sudo systemctl restart cosmoids-api
 sudo systemctl status cosmoids-api --no-pager
-curl https://159.223.127.157/health/db
-curl -i https://159.223.127.157/api/me
+curl https://api.cosmoids-td.com/health/db
+curl -i https://api.cosmoids-td.com/api/me
 ```
 
 The database check should return `{"ok":true}`. `/api/me` should return 401 until
