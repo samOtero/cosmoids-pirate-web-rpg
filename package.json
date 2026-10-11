@@ -10,6 +10,7 @@
     "build:check": "pnpm --filter @cosmoids/web build:check",
     "typecheck": "pnpm --filter @cosmoids/web typecheck",
     "typecheck:api": "pnpm --filter @cosmoids/api typecheck",
+    "test:api": "pnpm --filter @cosmoids/api test",
     "verify:quick": "pnpm --filter @cosmoids/web verify:quick",
     "start": "pnpm --filter @cosmoids/web start",
     "start:api": "pnpm --filter @cosmoids/api start",

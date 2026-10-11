@@ -6,9 +6,14 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.mjs",
+    "auth:plan": "node dist/auth-migrate.js",
+    "auth:migrate": "node dist/auth-migrate.js --apply"
   },
   "dependencies": {
+    "@fastify/cors": "^11.3.1",
+    "better-auth": "^1.7.7",
     "fastify": "^5.12.5",
     "pg": "^8.23.1"
   },

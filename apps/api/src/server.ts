@@ -1,7 +1,24 @@
 import Fastify from "fastify";
+import { readAuthConfig } from "./auth-config.js";
+import { createAuth } from "./auth.js";
+import { registerAuthRoutes } from "./auth-routes.js";
 import { pool } from "./database.js";
 
-const server = Fastify({ logger: true });
+const server = Fastify({
+  logger: {
+    redact: [
+      "req.headers.cookie",
+      "req.headers.authorization",
+      "res.headers['set-cookie']",
+    ],
+  },
+  // Nginx connects over loopback; other forwarded-header senders are untrusted.
+  trustProxy: "loopback",
+});
+
+const authConfig = readAuthConfig();
+const auth = createAuth(pool, authConfig);
+await registerAuthRoutes(server, auth, authConfig);
 
 pool.on("error", (error) => {
   server.log.error({ err: error }, "Idle database connection failed");
