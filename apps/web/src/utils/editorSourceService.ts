@@ -18,6 +18,7 @@ import type { TDLevelData } from '@/engine/tower-defense/types';
 import {
   EditorSourceError,
   findEditorExport,
+  parseEditorFile,
   parseEditorSource,
   patchEditorExport,
   removeEditorExport,
@@ -90,10 +91,20 @@ async function resolveTarget(
   // Resolve existing exports by syntax, never by a prefix or a string in a comment.
   let resolvedFile = registered?.fileName;
   if (!resolvedFile) {
-    for (const name of await fs.readdir(dirPath)) {
-      if (!name.endsWith('.ts')) continue;
-      const source = await fs.readFile(path.join(dirPath, name), 'utf8');
-      if (findEditorExport(parseEditorSource(source), exportName)) {
+    const modules = await Promise.all(
+      (await fs.readdir(dirPath))
+        .filter((name) => name.endsWith('.ts'))
+        .map(async (name) => {
+          const filePath = path.join(dirPath, name);
+          return {
+            name,
+            filePath,
+            source: await fs.readFile(filePath, 'utf8'),
+          };
+        })
+    );
+    for (const { name, filePath, source } of modules) {
+      if (findEditorExport(parseEditorFile(filePath, source), exportName)) {
         if (resolvedFile)
           throw new EditorSourceError(
             `Multiple files export ${exportName}. Fix the duplicate before saving.`

@@ -20,6 +20,26 @@ export function parseEditorSource(source: string): ts.SourceFile {
   return file;
 }
 
+// Editor reads parse the same modules repeatedly (every directory module during
+// export resolution, shared enums for every snapshot). A parse is reused only
+// while the file text is identical, so manual edits and editor writes are
+// always observed. Callers must treat the returned tree as read-only.
+const parsedEditorFiles = new Map<
+  string,
+  { source: string; file: ts.SourceFile }
+>();
+
+export function parseEditorFile(
+  filePath: string,
+  source: string
+): ts.SourceFile {
+  const cached = parsedEditorFiles.get(filePath);
+  if (cached?.source === source) return cached.file;
+  const file = parseEditorSource(source);
+  parsedEditorFiles.set(filePath, { source, file });
+  return file;
+}
+
 export function findEditorExport(file: ts.SourceFile, name: string) {
   for (const statement of file.statements) {
     if (

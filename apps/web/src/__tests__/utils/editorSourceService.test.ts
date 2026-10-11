@@ -199,6 +199,25 @@ describe('shared editor save service', () => {
     ).rejects.toMatchObject({ status: 409 });
   });
 
+  it('resolves exports from current source after files change between lookups', async () => {
+    await loadEditorSource('dialog', 'SAMPLE');
+    await write(
+      'dialogs/sample.ts',
+      `export const SAMPLE_EXTRA = { sequence: [] };`
+    );
+    await write(
+      'dialogs/moved.ts',
+      `export const SAMPLE = { sequence: [{ text: 'moved' }] };`
+    );
+    expect((await loadEditorSource('dialog', 'SAMPLE')).config).toEqual({
+      sequence: [{ text: 'moved' }],
+    });
+    await write('dialogs/copy.ts', `export const SAMPLE = { sequence: [] };`);
+    await expect(loadEditorSource('dialog', 'SAMPLE')).rejects.toThrow(
+      'Multiple files export SAMPLE'
+    );
+  });
+
   it('serializes concurrent saves and rejects the second stale draft', async () => {
     const snapshot = await loadEditorSource('visuals', 'demo');
     const baseline = { revision: snapshot.revision, base: snapshot.config };

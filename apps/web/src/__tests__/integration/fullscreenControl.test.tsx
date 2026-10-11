@@ -60,6 +60,7 @@ describe('separate play and fullscreen controls', () => {
           Screens.PROFILES,
           Screens.MODE_SELECT,
           Screens.LEVEL_SELECT,
+          Screens.CHALLENGE_SELECT,
           Screens.PARTY,
         ].includes(currentScreen)
       ) {

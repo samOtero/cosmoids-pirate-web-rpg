@@ -73,6 +73,7 @@ export default function FullscreenControl() {
     screen !== Screens.PROFILES &&
     screen !== Screens.MODE_SELECT &&
     screen !== Screens.LEVEL_SELECT &&
+    screen !== Screens.CHALLENGE_SELECT &&
     screen !== Screens.PARTY
   ) {
     return null;

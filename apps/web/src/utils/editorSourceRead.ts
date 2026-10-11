@@ -3,7 +3,7 @@ import ts from 'typescript';
 import {
   EditorSourceError,
   findEditorExport,
-  parseEditorSource,
+  parseEditorFile,
 } from './editorSourcePatch';
 import {
   editorAppPath,
@@ -34,7 +34,7 @@ export async function readEditorSnapshot(
         `Cannot read imported source ${path.basename(target)}.`
       );
     sources.set(target, source);
-    const file = parseEditorSource(source);
+    const file = parseEditorFile(target, source);
     files.set(target, file);
     return file;
   };
