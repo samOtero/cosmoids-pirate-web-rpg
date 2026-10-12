@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
+    "better-auth": "1.7.7",
     "next": "16.2.4",
     "pixi.js": "^8.16.0",
     "posthog-js": "^1.427.2",

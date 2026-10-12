@@ -8,8 +8,9 @@ configuration, deployment steps, and troubleshooting commands, see the
 [API operations reference](OPERATIONS.md).
 
 This is the first account-development step. Email addresses are **unverified**.
-Email verification, password recovery, and the game login UI still need to be
-connected before opening accounts to players. Creature ownership, cloud saves,
+Email verification and password recovery still need to be
+connected before opening accounts to players. The browser account UI is described
+in [the game account guide](../../docs/development/GAME_ACCOUNTS.md). Creature ownership, cloud saves,
 trading, and shiny validation are separate game features.
 
 ## How the code fits together
@@ -56,6 +57,9 @@ For development, use `BETTER_AUTH_URL=http://localhost:3001` and a separate rand
 secret. `http://localhost:3000` is trusted by default outside production. Local
 variables can live in an ignored `apps/api/.env`; run from the repo root with
 `pnpm --filter @cosmoids/api exec node --env-file=.env --import tsx src/server.ts`.
+The root `pnpm dev:api` command also loads that file and watches source changes.
+For Docker-based local Postgres, use the local setup in the game account guide;
+the root `pnpm db:up` / `pnpm db:stop` scripts manage that database.
 
 ## Endpoints
 

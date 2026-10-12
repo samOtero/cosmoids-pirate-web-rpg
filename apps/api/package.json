@@ -3,13 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "node --watch --env-file=.env --import tsx src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test tests/*.test.mjs",
     "auth:plan": "node dist/auth-migrate.js",
-    "auth:migrate": "node dist/auth-migrate.js --apply"
+    "auth:migrate": "node dist/auth-migrate.js --apply",
+    "auth:migrate:local": "node --env-file=.env --import tsx src/auth-migrate.ts --apply"
   },
   "dependencies": {
     "@fastify/cors": "^11.3.1",

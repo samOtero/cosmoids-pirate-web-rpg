@@ -53,6 +53,9 @@ root lockfile after running `pnpm install`.
 
 ## Vercel deployment
 
+For the browser signup/login UI, public API URL configuration, session behavior,
+and local-save limitations, see [Game accounts](docs/development/GAME_ACCOUNTS.md).
+
 Configure the web project with Root Directory `apps/web`, Framework Preset
 Next.js, automatic pnpm installation, and Build Command `pnpm build`. Keep the
 framework's default Output Directory; the static export is `apps/web/out` on

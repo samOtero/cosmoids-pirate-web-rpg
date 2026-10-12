@@ -617,9 +617,11 @@ From the repository root:
 pnpm --filter @cosmoids/api exec node --env-file=.env --import tsx src/server.ts
 ```
 
-The API's `dev` script runs `tsx watch`, but it does not automatically load a
-file merely because it is named `.env`. Supply the environment to its process.
-Do not point casual local development at the live player database.
+The API's `dev` script now uses Node's watch mode with `--env-file=.env` and
+the `tsx` import hook. Run `pnpm dev:api` from the root to load the local API
+environment automatically. Use `pnpm db:up` for the separate Docker Postgres
+database on port 5433; see [the local setup guide](../../docs/development/GAME_ACCOUNTS.md#local-docker-setup).
+Local development uses its own database and auth secret.
 
 TypeScript uses `NodeNext` module and resolution settings with ESM
 (`"type": "module"` in `package.json`), targets ES2022, and emits from `src`
@@ -638,7 +640,9 @@ string.
 
 ## Work still to do
 
-- Implement the browser account UI and consume `NEXT_PUBLIC_API_URL`.
+- Deploy and verify the browser account UI on the custom staging domain; see
+  [the game account guide](../../docs/development/GAME_ACCOUNTS.md) for its client
+  configuration and the limits of the current local-save flow.
 - Apply/check the original staging URL's trusted-origin entry and add a
   same-origin proxy before relying on cookie login from that URL.
 - Add save export/import or an account-based transition for local saves on old

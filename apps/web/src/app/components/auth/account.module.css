@@ -1,0 +1,173 @@
+.launcher {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  max-width: 23rem;
+}
+.launcher button {
+  cursor: pointer;
+}
+.launcher button:disabled {
+  cursor: wait;
+}
+.launcher > button,
+.accountActions > button:first-child {
+  padding: clamp(0.5rem, 1.3vh, 0.85rem) clamp(1rem, 3vw, 2.5rem);
+  font-size: clamp(0.8rem, 1.4vw, 1.15rem);
+}
+.accountActions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+.textButton {
+  min-height: 2.75rem;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.65rem;
+  color: #cffafe;
+  font-size: 0.875rem;
+  text-decoration: underline;
+}
+.textButton:focus-visible,
+.closeButton:focus-visible,
+.primaryButton:focus-visible {
+  outline: 2px solid #67e8f9;
+  outline-offset: 3px;
+}
+.textButton:disabled {
+  opacity: 0.5;
+}
+.note {
+  color: #d5edf3;
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+.identity {
+  max-width: 100%;
+  color: #ecfeff;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+.error {
+  max-width: 26rem;
+  color: #fde68a;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+.dialog {
+  text-align: left;
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(28rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  border: 1px solid #67e8f955;
+  border-radius: 1rem;
+  background: #0a1628;
+  color: #f4e4bc;
+  padding: 1.25rem;
+  box-shadow: 0 20px 60px #0009;
+}
+
+@media (max-height: 450px) and (min-width: 600px) {
+  .fields.signupFields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .signupFields > label:last-of-type,
+  .signupFields > p,
+  .signupFields > button {
+    grid-column: 1 / -1;
+  }
+}
+.dialog::backdrop {
+  background: #000c;
+}
+.dialogHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.4rem;
+}
+.dialogHeader h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+.closeButton {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.4rem;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+.closeButton:hover {
+  background: #cffafe15;
+}
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  min-width: 0;
+  margin-top: 1rem;
+}
+.fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+}
+.fields input {
+  width: 100%;
+  min-height: 2.75rem;
+  border: 1px solid #64748b;
+  border-radius: 0.4rem;
+  padding: 0.55rem 0.7rem;
+  color: #f8fafc;
+  background: #0f2438;
+  font-size: 1rem;
+}
+.fields input:focus {
+  outline: 2px solid #67e8f9;
+  outline-offset: 1px;
+}
+.primaryButton {
+  min-height: 2.75rem;
+  border-radius: 0.4rem;
+  border: 1px solid #9a5b2b;
+  background: #8b5a2b;
+  color: #f4e4bc;
+  padding: 0.6rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.primaryButton:hover {
+  background: #a67c52;
+}
+.fields:disabled {
+  opacity: 0.6;
+}
+@media (max-height: 450px) {
+  .launcher {
+    gap: 0.1rem;
+  }
+  .textButton {
+    min-height: 2.25rem;
+    font-size: 0.75rem;
+  }
+  .note {
+    font-size: 0.65rem;
+  }
+  .dialog {
+    padding: 0.8rem 1rem;
+  }
+  .fields {
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+}

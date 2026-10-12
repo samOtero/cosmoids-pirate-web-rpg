@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "pnpm --filter @cosmoids/web dev",
     "dev:api": "pnpm --filter @cosmoids/api dev",
+    "db:up": "docker compose --env-file apps/api/.env -f compose.local.yaml up -d --wait",
+    "db:stop": "docker compose --env-file apps/api/.env -f compose.local.yaml stop",
+    "auth:migrate:local": "pnpm --filter @cosmoids/api auth:migrate:local",
     "build": "pnpm --filter @cosmoids/web build",
     "build:api": "pnpm --filter @cosmoids/api build",
     "build:check": "pnpm --filter @cosmoids/web build:check",

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 
-import { Button } from './ui/Button';
+import AccountLauncher from './auth/AccountLauncher';
 import { trackGameEvent } from '@/utils/analytics';
 import styles from './startScreen.module.css';
 
@@ -24,15 +24,12 @@ export default function StartScreen({ onStart }: { onStart: () => void }) {
           <h2 className={styles.subtitle}>The Grand Voyage</h2>
         </div>
         <div className={styles.launcher}>
-          <Button
-            variant="wood"
-            onClick={() => {
+          <AccountLauncher
+            onStart={() => {
               void trackGameEvent('game_started');
               onStart();
             }}
-          >
-            Play as guest
-          </Button>
+          />
         </div>
         <p className={styles.credit}>v1.0.2 • By Samuel Otero</p>
       </div>
