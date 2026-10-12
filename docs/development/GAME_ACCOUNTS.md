@@ -10,6 +10,7 @@ from game saves: this first version does not upload, migrate, or synchronize sav
 | ------------------------------------------------------ | ------------------------------------------------------------------------------- |
 | `apps/web/src/lib/auth-client.ts`                      | Client URL, cookie requests, session refresh options, public error messages     |
 | `apps/web/vercel.json`                                 | Redirects the original staging host to its custom domain                        |
+| `apps/web/src/lib/legacy-game-redirect.ts`             | Builds an early HTML redirect fallback from the same Vercel rules               |
 | `apps/web/src/app/components/auth/AuthProvider.tsx`    | Mounts one session hook for the game and shares its state through React context |
 | `apps/web/src/app/components/auth/AccountLauncher.tsx` | Login/signup actions, signed-in identity, Continue, logout, and guest play      |
 | `apps/web/src/app/components/auth/AccountDialog.tsx`   | Accessible native dialog, forms, submissions, and session confirmation          |
@@ -110,6 +111,14 @@ so a browser does not permanently remember this transition. The rule runs on
 Vercel before loading the game. It does not match the custom domains, localhost,
 the production URL, or other preview deployment URLs.
 
+The exported HTML also includes an inline redirect in its head, generated from
+the same rules. This is a fallback for the observed deployment behavior where
+the old hostname returned game HTML with status 200 instead of redirecting.
+It runs before the game hydrates and preserves the path, query and fragment.
+It requires no game JavaScript bundle to load. The browser uses
+`location.replace`, avoiding an extra old-game entry in its history. It runs
+only after Vercel permits access to the HTML; preview authentication still applies.
+
 The development-stage decision is to start fresh on the custom domain without a
 save migration. LocalStorage belongs to each origin, so players coming from the
 old URL see the custom domain's own save profiles. Existing saves on the custom
@@ -178,7 +187,14 @@ on the custom staging domain with no redirect loop. Test a URL with a path and
 query string as well. On the custom domain, check login, refresh and logout on
 the phone that previously failed. Vercel preview protection may require an
 authorized Vercel login before the game or redirect can be reached. Local
-`pnpm dev` does not apply `vercel.json` routing; verify the deployed rule.
+`pnpm dev` does not apply Vercel's edge routing. The HTML fallback reads the same
+rules and is inactive on localhost. Verify the destination address in the live
+browser; an old-document 200 followed by navigation can be the fallback working.
+
+The fallback was checked in WebKit and Chromium using the production HTML with
+all game JavaScript/CSS requests blocked. It still navigated to the custom
+staging URL and preserved paths, queries and fragments. Custom domains,
+localhost, unrelated previews and the production URL stayed in place.
 
 Before inviting players publicly, configure email verification and password
 recovery, test database backups/restores, and decide how staging will be isolated

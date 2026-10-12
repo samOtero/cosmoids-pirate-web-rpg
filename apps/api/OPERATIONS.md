@@ -180,6 +180,7 @@ database credentials and `BETTER_AUTH_SECRET` in the API's private configuration
 The account UI calls the API directly from the custom game domain. No extra
 proxy credential is required. Vercel's project Root Directory is `apps/web`,
 where `vercel.json` contains the host-specific staging redirect.
+The web layout also embeds an early HTML fallback from those same rules.
 
 ## Nginx and HTTPS
 
@@ -499,6 +500,12 @@ URL and a temporary 307 redirect to `https://staging.cosmoids-td.com/:path*`.
 Paths and query strings are preserved. Custom domains and localhost do not
 match, preventing a redirect loop. Other generated preview URLs are left alone.
 Vercel applies this configuration at its edge; `pnpm dev` does not apply it.
+Because the deployed old hostname was observed returning HTML with status 200,
+the web layout also includes an inline redirect fallback in the HTML head.
+It reads the same destinations from `vercel.json`, uses `location.replace`,
+and preserves paths, queries and fragments before the game starts. This works
+even if game JS/CSS assets fail to load. It does not bypass Vercel authentication
+or redirect localhost, custom domains, unrelated previews or production.
 
 1. Commit and push the staging redirect changes to `experimental`, then deploy
    the Vercel Preview build. Keep `NEXT_PUBLIC_API_URL=https://api.cosmoids-td.com`
@@ -526,7 +533,9 @@ Vercel applies this configuration at its edge; `pnpm dev` does not apply it.
    URL with a path/query, then the custom domain itself for no loop. Vercel
    Deployment Protection may return a sign-in response before deployment routing;
    use an authorized browser session or the project's intended protection setting
-   to check the redirect. A redirect test does not replace a real browser login.
+   to check the redirect. If the edge response remains 200, a browser should still
+   navigate using the HTML fallback; curl does not execute it. The edge-routing
+   cause remains unverified. A redirect test does not replace a real browser login.
 
 ### Production redirect prepared for later
 

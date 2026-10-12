@@ -8,6 +8,7 @@ import { Analytics } from '@vercel/analytics/next';
 import AnalyticsControls from './components/AnalyticsControls';
 import FullscreenControl from './components/FullscreenControl';
 import AuthProvider from './components/auth/AuthProvider';
+import { legacyGameRedirectScript } from '@/lib/legacy-game-redirect';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -47,6 +48,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: legacyGameRedirectScript }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} h-dvh w-screen overflow-hidden bg-[#0d2b45] text-[#f4e4b] antialiased`}
       >
