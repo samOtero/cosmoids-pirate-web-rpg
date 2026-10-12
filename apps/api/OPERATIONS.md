@@ -1,6 +1,6 @@
 # Cosmoids API operations reference
 
-Last updated: 2026-10-11. This records the setup confirmed during deployment.
+Last updated: 2026-10-12. This records the setup confirmed during deployment.
 Check the live VPS and provider dashboards when troubleshooting; this file is a
 reference, not an automatically synchronized inventory. All secret values below
 are placeholders.
@@ -14,6 +14,7 @@ are placeholders.
 - [systemd service](#systemd-service)
 - [Deploying API changes](#deploying-api-changes)
 - [Authentication and database](#authentication-and-database)
+- [Game URL redirect rollout](#game-url-redirect-rollout)
 - [Checks and troubleshooting](#checks-and-troubleshooting)
 - [Local development](#local-development)
 - [Work still to do](#work-still-to-do)
@@ -53,8 +54,10 @@ environment. The VPS uses `NODE_ENV=production` even while running code from the
 
 Account signup, login, session recognition, logout, domain HTTPS, certificate
 renewal simulation, and staging CORS preflight have been checked on the VPS. The
-frontend API variable is saved in Vercel, but the account UI has not been
-implemented yet.
+account UI works on the custom staging domain, including on a phone. The
+staging redirect is implemented in the repository and awaits Vercel deployment.
+The production custom domain currently redirects to a parking address, so its
+old URL redirect is prepared below for a later rollout.
 
 ## Where files and settings live
 
@@ -72,6 +75,7 @@ paths on the server, not files in your Windows checkout.
 | `apps/api/tests/auth.test.mjs`                       | Authentication tests; SQLite by default, optional isolated Postgres tests      |
 | `apps/api/tsconfig.json`                             | TypeScript compiler settings; `src` becomes `dist`                             |
 | `apps/api/package.json`                              | API dependencies and scripts                                                   |
+| `apps/web/vercel.json`                               | Original staging host redirect to the custom staging domain                    |
 | `pnpm-lock.yaml`                                     | Exact workspace dependency resolution                                          |
 | `/home/deploy/.config/cosmoids/api.env`              | Private VPS database and auth configuration                                    |
 | `/etc/systemd/system/cosmoids-api.service`           | How the API starts and restarts                                                |
@@ -113,7 +117,7 @@ PGUSER=cosmoids_app
 PGPASSWORD=<your-private-database-password>
 BETTER_AUTH_SECRET=<your-existing-private-auth-secret>
 BETTER_AUTH_URL=https://api.cosmoids-td.com
-AUTH_TRUSTED_ORIGINS=https://staging.cosmoids-td.com,https://cosmoids-pirate-web-rpg-git-experimental-sams-projects-022093db.vercel.app
+AUTH_TRUSTED_ORIGINS=https://staging.cosmoids-td.com
 ```
 
 | Variable                             | Meaning                                                                                          |
@@ -127,21 +131,15 @@ AUTH_TRUSTED_ORIGINS=https://staging.cosmoids-td.com,https://cosmoids-pirate-web
 
 The API's own origin is trusted automatically. Additional origins must include
 the scheme and hostname, with no paths, credentials, or wildcards. The example
-above includes both staging addresses so the original Vercel URL can continue
-making API requests. The custom staging origin was verified on the VPS; adding
-the original staging origin is a follow-up env change and must be applied and
-checked there separately.
+above is the preferred custom-domain setup. Both staging origins were previously
+checked against live CORS responses; an existing Vercel staging entry can be
+removed after its redirect is verified.
 
-When production accounts are ready, preserve both staging entries and append the
-exact production origins that serve the game:
-
-- `https://cosmoids-pirate-web-rpg.vercel.app` (existing production URL)
-- `https://cosmoids-td.com` (after configuring the production custom domain)
-- The `www` origin separately, if it actually serves the game.
-
-Keep each origin explicit; do not allow all `vercel.app` deployments with a
-wildcard. Adding an origin does not bypass the cookie restrictions described
-below.
+When production accounts are ready, preserve the custom staging entry and add
+`https://cosmoids-td.com` after configuring the production custom domain. Add
+the `www` origin separately only if it actually serves the game. The old
+production Vercel hostname will redirect, so it does not need account access.
+Keep origins explicit; do not allow all Vercel deployments with a wildcard.
 
 For a **new** installation, `openssl rand -base64 32` generates a secret. Keep
 the existing secret stable during routine deployments. Never commit real env
@@ -178,9 +176,10 @@ NEXT_PUBLIC_API_URL=https://api.cosmoids-td.com
 
 `NEXT_PUBLIC_` values are visible in browser JavaScript. They are embedded at
 build time, so changes require a new deployment. The URL is public; keep
-database credentials and the auth secret in the API's private configuration.
-This setting is prepared for the upcoming UI; current game code does not yet
-consume it.
+database credentials and `BETTER_AUTH_SECRET` in the API's private configuration.
+The account UI calls the API directly from the custom game domain. No extra
+proxy credential is required. Vercel's project Root Directory is `apps/web`,
+where `vercel.json` contains the host-specific staging redirect.
 
 ## Nginx and HTTPS
 
@@ -480,25 +479,84 @@ URLs are on a different site; allowing those origins alone does not solve
 third-party-cookie restrictions. API cookies can remain scoped to the API host;
 the UI does not need to read the cookie or share it with every subdomain.
 
-### Keeping saves on the original game URLs
+### Starting fresh on custom game domains
 
-The game persists its state under the localStorage key `cosmoids-game-state`.
-localStorage belongs to an exact origin. The original Vercel staging URL and
+The game persists local profiles under `cosmoids-game-state`. LocalStorage
+belongs to an exact origin. The original Vercel staging URL and
 `staging.cosmoids-td.com` therefore have separate local saves even though they
-serve the same code. Adding a trusted origin does not move or share those saves.
-Keep the original URLs usable and avoid redirecting players away from them until
-a save export/import or account-based migration is implemented. Apply the same
-transition approach to the original production URL when its custom domain is
-introduced.
+serve the same code.
 
-Allowing the original Vercel URL enables CORS and Better Auth's origin checks,
-but direct cookie authentication to `api.cosmoids-td.com` is cross-site. Our
-current SameSite cookie settings and browser third-party-cookie protections
-prevent treating this as a fully supported login setup. To support login while
-players remain on the original URL, add a same-origin API proxy for that site
-and have its UI call the proxied path. That proxy has not been implemented yet;
-cookie forwarding, origin checks, real client IPs/rate limits, and browser
-session persistence must be checked when it is added.
+During development, the chosen transition is to redirect visitors to the custom
+domain and start with that domain's local profiles, without migrating old saves.
+Existing custom-domain saves remain intact. The redirect does not erase old
+localStorage or reset account records in Postgres. Authentication and game
+progress remain separate until cloud saves are implemented.
+
+### Game URL redirect rollout
+
+`apps/web/vercel.json` uses an exact host condition for the original staging
+URL and a temporary 307 redirect to `https://staging.cosmoids-td.com/:path*`.
+Paths and query strings are preserved. Custom domains and localhost do not
+match, preventing a redirect loop. Other generated preview URLs are left alone.
+Vercel applies this configuration at its edge; `pnpm dev` does not apply it.
+
+1. Commit and push the staging redirect changes to `experimental`, then deploy
+   the Vercel Preview build. Keep `NEXT_PUBLIC_API_URL=https://api.cosmoids-td.com`
+   in Preview settings scoped to `experimental`. There are no API source changes
+   in this replacement, so a VPS code deployment is not required for the redirect.
+
+2. If `AUTH_PROXY_SECRET` was added for the abandoned proxy, remove that unused
+   setting from Vercel and `~/.config/cosmoids/api.env`. Keep the existing
+   `BETTER_AUTH_SECRET`. If proxy code was actually deployed on the VPS, update
+   it to the replacement code, build and restart using the normal API deployment
+   instructions. No migration or Nginx change is needed.
+
+3. On the same phone, open the old staging URL and confirm the address changes
+   to `staging.cosmoids-td.com`. Log in, refresh and log out there. Players who
+   have not used that domain begin with empty local profiles. Communicate that
+   development saves are starting fresh. Existing profiles on that domain remain.
+
+4. Check the redirect response without following it:
+
+   ```bash
+   curl -I 'https://cosmoids-pirate-web-rpg-git-experimental-sams-projects-022093db.vercel.app/'
+   ```
+
+   Expected: 307 with `Location: https://staging.cosmoids-td.com/`. Also check a
+   URL with a path/query, then the custom domain itself for no loop. Vercel
+   Deployment Protection may return a sign-in response before deployment routing;
+   use an authorized browser session or the project's intended protection setting
+   to check the redirect. A redirect test does not replace a real browser login.
+
+### Production redirect prepared for later
+
+On 2026-10-12, `https://cosmoids-td.com` returned a redirect to
+`cosmoids-td-com.l.ink`, a parking address. The production Vercel URL remains
+available until the custom domain is connected. Do these steps before enabling
+its redirect:
+
+1. Add `cosmoids-td.com` to the production Vercel deployment, apply the DNS
+   records Vercel supplies in Porkbun, and verify the game loads with valid HTTPS.
+2. If enabling production accounts, set its frontend API URL and add the exact
+   custom production origin to `AUTH_TRUSTED_ORIGINS`, then restart the API.
+3. Append this second object to the `redirects` array in `apps/web/vercel.json`,
+   preserving the staging rule, and deploy the change to production:
+
+   ```json
+   {
+     "source": "/:path*",
+     "has": [{ "type": "host", "value": "cosmoids-pirate-web-rpg.vercel.app" }],
+     "destination": "https://cosmoids-td.com/:path*",
+     "permanent": false
+   }
+   ```
+
+4. Verify the old production URL lands on the production custom domain, its
+   paths/queries are preserved, and the custom domain does not redirect back.
+
+Temporary redirects keep this reversible during development. After both domain
+transitions are settled, `permanent: true` changes a rule to a cacheable 308
+redirect. No save export/import or database wipe is part of this rollout.
 
 ### Database tables
 
@@ -556,7 +614,7 @@ Expected: 204, `access-control-allow-origin: https://staging.cosmoids-td.com`,
 and `access-control-allow-credentials: true`. This verifies a browser preflight;
 it does not itself sign a player in or prove that a browser saved a session
 cookie. The curl account-flow test on the VPS also does not replace testing the
-future UI in a real browser.
+UI in a real browser.
 
 ### Which layer is failing?
 
@@ -640,14 +698,13 @@ string.
 
 ## Work still to do
 
-- Deploy and verify the browser account UI on the custom staging domain; see
-  [the game account guide](../../docs/development/GAME_ACCOUNTS.md) for its client
-  configuration and the limits of the current local-save flow.
-- Apply/check the original staging URL's trusted-origin entry and add a
-  same-origin proxy before relying on cookie login from that URL.
-- Add save export/import or an account-based transition for local saves on old
-  URLs; preserve the old production URL during its eventual domain transition.
-- Configure and confirm the production game domain and its trusted origin.
+- Deploy and verify the original staging URL's redirect using the
+  [rollout steps](#game-url-redirect-rollout). The account UI already works on
+  the custom staging domain; see [the game account guide](../../docs/development/GAME_ACCOUNTS.md).
+- Connect and verify the production custom domain, then enable its prepared
+  redirect and trusted origin. Development saves start fresh at the custom
+  domain; no old-save migration is planned.
+
 - Choose/configure an email sender and its DNS verification records.
 - Add email verification and password recovery; currently `emailVerified` is
   false for newly created accounts.
@@ -670,4 +727,5 @@ string.
 - [Porkbun DNS records](https://kb.porkbun.com/article/231-how-to-add-dns-records-on-porkbun)
 - [Vercel custom domains](https://vercel.com/docs/domains/working-with-domains/add-a-domain)
 - [Vercel domain-to-branch assignment](https://vercel.com/docs/domains/working-with-domains/assign-domain-to-a-git-branch)
+- [Vercel redirects and host conditions](https://vercel.com/docs/project-configuration/vercel-json#redirects)
 - [Next.js environment variables](https://nextjs.org/docs/app/guides/environment-variables)

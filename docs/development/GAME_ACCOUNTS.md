@@ -6,16 +6,17 @@ from game saves: this first version does not upload, migrate, or synchronize sav
 
 ## Where the code lives
 
-| File | Purpose |
-| --- | --- |
-| `apps/web/src/lib/auth-client.ts` | Client URL, cookie requests, session refresh options, public error messages |
-| `apps/web/src/app/components/auth/AuthProvider.tsx` | Mounts one session hook for the game and shares its state through React context |
-| `apps/web/src/app/components/auth/AccountLauncher.tsx` | Login/signup actions, signed-in identity, Continue, logout, and guest play |
-| `apps/web/src/app/components/auth/AccountDialog.tsx` | Accessible native dialog, forms, submissions, and session confirmation |
-| `apps/web/src/app/components/auth/account.module.css` | Account UI and responsive dialog styles |
-| `apps/web/src/__tests__/integration/accounts.test.tsx` | Uses the real client against controlled HTTP responses |
-| `apps/api/src/auth.ts` | Server password rules, cookie security, rate limits, and database configuration |
-| `apps/api/src/auth-routes.ts` | Fastify adapter, cookie forwarding, CORS, session and identity endpoints |
+| File                                                   | Purpose                                                                         |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| `apps/web/src/lib/auth-client.ts`                      | Client URL, cookie requests, session refresh options, public error messages     |
+| `apps/web/vercel.json`                                 | Redirects the original staging host to its custom domain                        |
+| `apps/web/src/app/components/auth/AuthProvider.tsx`    | Mounts one session hook for the game and shares its state through React context |
+| `apps/web/src/app/components/auth/AccountLauncher.tsx` | Login/signup actions, signed-in identity, Continue, logout, and guest play      |
+| `apps/web/src/app/components/auth/AccountDialog.tsx`   | Accessible native dialog, forms, submissions, and session confirmation          |
+| `apps/web/src/app/components/auth/account.module.css`  | Account UI and responsive dialog styles                                         |
+| `apps/web/src/__tests__/integration/accounts.test.tsx` | Uses the real client against controlled HTTP responses                          |
+| `apps/api/src/auth.ts`                                 | Server password rules, cookie security, rate limits, and database configuration |
+| `apps/api/src/auth-routes.ts`                          | Fastify adapter, cookie forwarding, CORS, session and identity endpoints        |
 
 ## Configuration
 
@@ -90,14 +91,40 @@ NEXT_PUBLIC_API_URL=https://api.cosmoids-td.com
 
 Next.js embeds this public URL at build time; restart development or redeploy
 after changing it. Never add database credentials or `BETTER_AUTH_SECRET` to
-frontend environment variables. If the API URL is absent, the game renders its
+browser-exposed environment variables. If the API URL is absent, the game renders its
 guest launcher without mounting the session hook or calling the account API.
 
-Use `https://staging.cosmoids-td.com` for the first real browser login test.
-Its origin must be in the API's `AUTH_TRUSTED_ORIGINS`. The original Vercel
-addresses remain usable for local guest saves, but reliable login there still
-requires the same-origin proxy described in `apps/api/OPERATIONS.md`. This change
-does not implement that proxy or redirect players away from their old saves.
+The client calls the configured API directly. The custom staging domain and API
+share the site `cosmoids-td.com`, allowing our existing session cookies to work.
+The custom game origin must remain in the API's `AUTH_TRUSTED_ORIGINS`.
+
+### Old URL redirects and local saves
+
+`apps/web/vercel.json` redirects only the original experimental hostname:
+
+`https://cosmoids-pirate-web-rpg-git-experimental-sams-projects-022093db.vercel.app`
+
+It sends visitors to `https://staging.cosmoids-td.com`, preserving the path and
+query string. It uses a temporary 307 redirect while the game is in development,
+so a browser does not permanently remember this transition. The rule runs on
+Vercel before loading the game. It does not match the custom domains, localhost,
+the production URL, or other preview deployment URLs.
+
+The development-stage decision is to start fresh on the custom domain without a
+save migration. LocalStorage belongs to each origin, so players coming from the
+old URL see the custom domain's own save profiles. Existing saves on the custom
+domain stay available; the redirect does not clear them. Old-origin saves are
+not imported or deleted. Account records in Postgres are unaffected.
+
+There is no auth proxy or additional proxy secret to configure. If the earlier
+proxy setting `AUTH_PROXY_SECRET` was already added to Vercel or the VPS env
+file, it can be removed; keep `BETTER_AUTH_SECRET` unchanged. See
+[the redirect rollout steps](../../apps/api/OPERATIONS.md#game-url-redirect-rollout).
+
+Production is prepared in that reference, with a rule mapping
+`cosmoids-pirate-web-rpg.vercel.app` to `https://cosmoids-td.com`. That rule is
+not active yet: first connect and verify the production custom domain, then add
+the documented rule and deploy it to production.
 
 ## Account flow
 
@@ -145,6 +172,13 @@ Before deploying, verify the web build and then test the real staging domain:
 create a test account, log out, log in, refresh the page, return after switching
 tabs, and confirm existing local profiles remain available. Controlled HTTP tests
 do not replace checking real browser cookies, Nginx, CORS, and Postgres together.
+
+After deploying the redirect, open the original staging URL and verify it lands
+on the custom staging domain with no redirect loop. Test a URL with a path and
+query string as well. On the custom domain, check login, refresh and logout on
+the phone that previously failed. Vercel preview protection may require an
+authorized Vercel login before the game or redirect can be reached. Local
+`pnpm dev` does not apply `vercel.json` routing; verify the deployed rule.
 
 Before inviting players publicly, configure email verification and password
 recovery, test database backups/restores, and decide how staging will be isolated

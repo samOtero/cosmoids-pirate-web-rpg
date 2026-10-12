@@ -41,7 +41,7 @@ Alongside the existing `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, and `PGPASSWO
 ```dotenv
 BETTER_AUTH_SECRET=replace-with-a-random-secret-generated-on-the-server
 BETTER_AUTH_URL=https://api.cosmoids-td.com
-AUTH_TRUSTED_ORIGINS=https://staging.cosmoids-td.com,https://cosmoids-pirate-web-rpg-git-experimental-sams-projects-022093db.vercel.app
+AUTH_TRUSTED_ORIGINS=https://staging.cosmoids-td.com
 ```
 
 Generate the secret on the VPS with `openssl rand -base64 32`. Keep it in
@@ -81,10 +81,17 @@ origins and cookie _sites_ are different. The custom staging and API domains now
 share the parent domain `cosmoids-td.com`. Use the custom staging domain for
 browser login tests; the original `vercel.app` addresses are on a different site,
 and allowing their origins alone does not solve third-party-cookie restrictions.
-The original staging URL is included in the example allowlist to preserve API
-access from that address. Cookie login there still needs a same-origin API proxy.
-Local game saves are also specific to each origin; see the operations reference
-for the old-URL transition plan and future production origins.
+`apps/web/vercel.json` redirects the original experimental staging URL to
+`staging.cosmoids-td.com`. The game calls the API directly from the custom
+domain, using our existing session cookie settings. Players start with that
+origin's local save storage; old saves are not migrated. Production's redirect
+will be enabled after its custom domain is connected. See
+[the redirect rollout steps](OPERATIONS.md#game-url-redirect-rollout).
+
+The preferred trusted-origin configuration lists custom game domains. An
+existing legacy staging entry can be removed after its redirect is verified.
+The API remains behind Nginx, with IP-based rate limits using Fastify's resolved
+client address.
 
 Keep Better Auth's origin and CSRF checks enabled. Nginx should continue
 overwriting `X-Real-IP` and setting `X-Forwarded-For` with

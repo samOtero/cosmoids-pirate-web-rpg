@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "cosmoids-pirate-web-rpg-git-experimental-sams-projects-022093db.vercel.app"
+        }
+      ],
+      "destination": "https://staging.cosmoids-td.com/:path*",
+      "permanent": false
+    }
+  ]
+}
