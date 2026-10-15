@@ -29,6 +29,7 @@ const createHarlequillTower = (): Tower => ({
     level: 5,
     xp: 0,
     equippedAttacks: ['FUNNY_DANCE'],
+    gender: 'female' as const,
     isShiny: false,
   },
   position: { x: 0, y: 0 },

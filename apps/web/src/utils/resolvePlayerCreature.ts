@@ -1,5 +1,6 @@
 import { Creature, PlayerCreature, CosmoidTemplate } from '@/types/baseGame';
 import { COSMOID_TEMPLATES } from '@/constants/creatures';
+import { rollCreatureGender } from '@/utils/creatureGender';
 
 /**
  * Calculates max HP using the standard formula without IVs/EVs.
@@ -41,6 +42,7 @@ export function createWildCreature(speciesId: string, level: number, isShiny: bo
   return {
     id: `wild_${speciesId}_${Date.now()}_${Math.random().toString(36).substring(7)}`,
     speciesId,
+    gender: rollCreatureGender(template.genderRatio),
     name: template.name,
     type: template.type,
     secondaryType: template.secondaryType,
@@ -76,6 +78,7 @@ export function resolvePlayerCreature(pc: PlayerCreature): Creature {
   return {
     id: pc.id,
     speciesId: pc.speciesId,
+    gender: pc.gender,
     name: template.name,
     type: template.type,
     secondaryType: template.secondaryType,

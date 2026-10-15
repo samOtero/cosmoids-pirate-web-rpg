@@ -24,6 +24,7 @@ function learner(equippedAttacks: string[]) {
       level: 4,
       xp: 0,
       equippedAttacks,
+      gender: 'female' as const,
       isShiny: false,
     },
     equippedAttacksRuntime: equippedAttacks.map((definitionId) => ({

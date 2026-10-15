@@ -33,6 +33,7 @@ function createBattle(targetCount = 3) {
         level: 16,
         xp: 0,
         equippedAttacks: ['SALT_SPIT'],
+        gender: 'female' as const,
         isShiny: false,
       },
     ]

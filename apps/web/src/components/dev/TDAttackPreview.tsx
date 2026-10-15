@@ -1,4 +1,5 @@
 'use client';
+import { generateCreatureGender } from '@/utils/creatureGender';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
@@ -107,6 +108,7 @@ function createEngine(
       (attack) => attack.id === 'EMBER'
     ),
     targetingMode: 'closest',
+    gender: generateCreatureGender(towerCreatureId),
     isShiny: false,
   };
   const engine = new TowerDefenseEngine(
@@ -135,6 +137,7 @@ function createEngine(
               xp: 0,
               equippedAttacks: ['VINE_WHIP'],
               activeAttackIndex: 0,
+              gender: 'female' as const,
               isShiny: false,
             },
           ]

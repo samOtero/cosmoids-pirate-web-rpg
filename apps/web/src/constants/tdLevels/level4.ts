@@ -346,6 +346,7 @@ export const LEVEL_4: TDLevelData = {
         equippedAttacks: ['TACKLE'],
         activeAttackIndex: 0,
         targetingMode: 'first',
+        gender: 'male' as const,
         isShiny: false,
       },
       position: {

@@ -20,6 +20,7 @@ export const CHALLENGE_FIRST_LEVEL: TDLevelData = {
       level: 5,
       xp: 0,
       equippedAttacks: TowerDefenseEngine.getDefaultAttacks('starter_iguana'),
+      gender: 'male' as const,
       isShiny: false,
     },
   ],

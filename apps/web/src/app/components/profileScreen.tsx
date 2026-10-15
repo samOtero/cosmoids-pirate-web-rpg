@@ -7,6 +7,8 @@ import { TestProfileTemplateOption } from '@/constants/testProfileTemplates';
 import { resolvePlayerCreature } from '@/utils/resolvePlayerCreature';
 import Panel from '@/app/components/ui/Panel';
 import { Button } from '@/app/components/ui/Button';
+import { useAccount } from './auth/AuthProvider';
+import AccountIdentity from './auth/AccountIdentity';
 
 interface ProfileScreenProps {
   profiles: (Profile | null)[];
@@ -27,6 +29,7 @@ export default function ProfileScreen({
   testProfileTemplates,
   onApplyTestTemplate,
 }: ProfileScreenProps) {
+  const { session } = useAccount();
   const [showTestTemplates, setShowTestTemplates] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState(
     testProfileTemplates?.[0]?.id ?? ''
@@ -42,7 +45,7 @@ export default function ProfileScreen({
 
   return (
     <div className="flex h-full flex-col items-center justify-center overflow-y-auto p-2 lg:p-4">
-      <div className="mb-4 flex w-full max-w-4xl items-center justify-between gap-3 lg:mb-8">
+      <div className="mb-4 flex w-full max-w-4xl flex-wrap items-center justify-between gap-3 lg:mb-8">
         <h2 className="border-b-2 border-wood pb-2 text-xl font-bold tracking-widest text-sand uppercase lg:text-3xl">
           Select Save File
         </h2>
@@ -56,9 +59,13 @@ export default function ProfileScreen({
               🧪 Profile 3 Templates
             </Button>
           )}
-          <Button variant="wood" onClick={onBack}>
-            Back
-          </Button>
+          {session ? (
+            <AccountIdentity onSignedOut={onBack} />
+          ) : (
+            <Button variant="wood" onClick={onBack}>
+              Back
+            </Button>
+          )}
         </div>
       </div>
 

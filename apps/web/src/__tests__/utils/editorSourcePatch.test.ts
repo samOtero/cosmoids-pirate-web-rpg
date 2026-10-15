@@ -9,6 +9,33 @@ import {
 } from '@/utils/editorSourcePatch';
 
 describe('editor source patches', () => {
+  it('adds and removes an encounter gender without replacing other authored fields', () => {
+    const source = `export const LEVEL = {
+      waveEnemyDefinitions: [{ id: 'boss', creatureId: 'example', level: LEVEL_CAP, /* keep */ }],
+      paths: SHARED_PATHS,
+    };
+    export const OTHER = { enabled: true };`;
+    const before = {
+      waveEnemyDefinitions: [{ id: 'boss', creatureId: 'example', level: 10 }],
+      paths: [],
+    };
+    const after = {
+      ...before,
+      waveEnemyDefinitions: [
+        { ...before.waveEnemyDefinitions[0], gender: 'male' },
+      ],
+    };
+    const added = patchEditorExport(source, 'LEVEL', before, after);
+    expect(added).toContain('"gender": "male"');
+    expect(added).toContain('level: LEVEL_CAP');
+    expect(added).toContain('/* keep */');
+    expect(added).toContain('paths: SHARED_PATHS');
+    expect(added).toContain('export const OTHER = { enabled: true };');
+    const removed = patchEditorExport(added, 'LEVEL', after, before);
+    expect(removed).not.toContain('gender');
+    expect(removed).toContain('level: LEVEL_CAP');
+    parseEditorSource(removed);
+  });
   it('changes one nested value while preserving references, comments, helpers and neighboring exports', () => {
     const source = `import { SHARED } from './shared';
 const HP = 100;

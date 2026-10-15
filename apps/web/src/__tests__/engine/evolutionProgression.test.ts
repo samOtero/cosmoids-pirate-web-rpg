@@ -43,6 +43,7 @@ function createLearner(
     level,
     xp: 0,
     equippedAttacks,
+    gender: 'female' as const,
     isShiny: false,
   };
   const engine = battle({}, [creature]);
@@ -96,6 +97,8 @@ describe('Shared evolution progression', () => {
     expect(engine.evolveTower(tower.id, evolvedId)).toBe(true);
     expect(engine.evolveTower(tower.id, evolvedId)).toBe(false);
     expect(engine.roster[0].speciesId).toBe(evolvedId);
+    expect(engine.roster[0].gender).toBe(tower.creature.gender);
+    expect(tower.creature.gender).toBe('female');
   });
   it('reconsiders a canceled evolution only after another level-up', () => {
     const { engine, tower, events, reward, levelUp } = createLearner();

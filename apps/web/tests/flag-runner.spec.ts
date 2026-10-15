@@ -7,6 +7,7 @@ import { COSMOID_TEMPLATES } from '../src/constants/creatures';
 import { LEVEL_ORDER, TD_LEVELS } from '../src/constants/tdLevels';
 import { resolveTDBattlefieldHeight } from '../src/utils/tdInitialView';
 import { getDefaultAttacksForLevel } from '../src/utils/resolvePlayerCreature';
+import { generateCreatureGender } from '../src/utils/creatureGender';
 
 const entry = LEVEL_ORDER.find(
   (item) => TD_LEVELS[item.context]?.levelData.flagDuel?.playerLaunch
@@ -67,6 +68,7 @@ for (const viewport of [
             MAX_COSMOID_LEVEL
           ),
           isShiny: false,
+          gender: generateCreatureGender(species.id),
         },
       }
     );

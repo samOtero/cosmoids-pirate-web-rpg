@@ -33,6 +33,7 @@ function battle() {
       level: 12,
       xp: 0,
       equippedAttacks: ['SHIPSHAPE', 'PINCH'],
+      gender: 'female' as const,
       isShiny: false,
     }))
   );

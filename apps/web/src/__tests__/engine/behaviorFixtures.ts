@@ -50,6 +50,7 @@ export function species(
   const fixture: CosmoidTemplate = {
     id,
     name: 'Behavior test creature',
+    genderRatio: { female: 0.5 },
     type: ElementType.NORMAL,
     baseStats: {
       hp: 60,

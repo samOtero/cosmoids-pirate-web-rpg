@@ -6,6 +6,10 @@ import {
 } from '@/constants/creatures';
 import { ElementType, PlayerCreature } from '@/types/baseGame';
 import {
+  generateCreatureGender,
+  resolveEncounterGender,
+} from '@/utils/creatureGender';
+import {
   calculateMaxHp,
   calculateStat,
   createWildCreature,
@@ -643,6 +647,7 @@ export class TowerDefenseEngine {
         const newEnemy: Enemy = {
           id: `enemy_${time}`,
           definitionId: randomEnemyDef.id,
+          gender: generateCreatureGender(randomEnemyDef.id),
           level: enemyLevel,
           position: { x: startPath[0].x, y: startPath[0].y },
           hp: newEnemyHp,
@@ -2612,6 +2617,9 @@ export class TowerDefenseEngine {
       id: `enemy_${time}_${Math.random().toString(36).substring(7)}`,
       definitionId: definitionId,
       kind: structure ? 'structure' : 'creature',
+      gender: structure
+        ? undefined
+        : resolveEncounterGender(creatureId!, waveEnemyDefinition.gender),
       tdConfigId: structure?.tdConfigId,
       displayName: structure?.displayName,
       elementTypes: structure?.elementTypes,
@@ -3186,6 +3194,7 @@ export class TowerDefenseEngine {
         config.id ??
         `preview_enemy_${Date.now()}_${Math.random().toString(36).substring(7)}`,
       definitionId: config.creatureId,
+      gender: generateCreatureGender(config.creatureId),
       level: config.level,
       position: { ...config.position },
       hp: maxHp,
@@ -3232,6 +3241,7 @@ export class TowerDefenseEngine {
     if (enemyIndex === -1 || this.enemies[enemyIndex].uncapturable) return null;
 
     const enemy = this.enemies[enemyIndex];
+    if (enemy.kind === 'structure' || enemy.gender === undefined) return null;
 
     // Remove the enemy from the battlefield
     this.enemies.splice(enemyIndex, 1);
@@ -3245,6 +3255,7 @@ export class TowerDefenseEngine {
     const captured: PlayerCreature = {
       id: crypto.randomUUID(),
       speciesId: enemy.definitionId,
+      gender: enemy.gender,
       level: capturedLevel,
       xp: 0,
       equippedAttacks: template

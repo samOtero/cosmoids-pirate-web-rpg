@@ -30,6 +30,7 @@ function battle() {
       level: 12,
       xp: 0,
       equippedAttacks: ['DEEPWATER_GRIP', 'WATER_GUN'],
+      gender: 'female' as const,
       isShiny: false,
     }))
   );

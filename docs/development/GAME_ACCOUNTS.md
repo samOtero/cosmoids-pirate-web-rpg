@@ -12,7 +12,8 @@ from game saves: this first version does not upload, migrate, or synchronize sav
 | `apps/web/vercel.json`                                 | Redirects the original staging host to its custom domain                        |
 | `apps/web/src/lib/legacy-game-redirect.ts`             | Builds an early HTML redirect fallback from the same Vercel rules               |
 | `apps/web/src/app/components/auth/AuthProvider.tsx`    | Mounts one session hook for the game and shares its state through React context |
-| `apps/web/src/app/components/auth/AccountLauncher.tsx` | Login/signup actions, signed-in identity, Continue, logout, and guest play      |
+| `apps/web/src/app/components/auth/AccountLauncher.tsx` | Login/signup actions, automatic profile navigation, and guest play              |
+| `apps/web/src/app/components/auth/AccountIdentity.tsx` | Display name, logout, and session retry on the profile selection screen         |
 | `apps/web/src/app/components/auth/AccountDialog.tsx`   | Accessible native dialog, forms, submissions, and session confirmation          |
 | `apps/web/src/app/components/auth/account.module.css`  | Account UI and responsive dialog styles                                         |
 | `apps/web/src/__tests__/integration/accounts.test.tsx` | Uses the real client against controlled HTTP responses                          |
@@ -144,8 +145,11 @@ the documented rule and deploy it to production.
 - After successful signup or login, the UI checks `/api/auth/get-session` before
   closing the form. A successful POST alone does not prove the browser retained
   its session cookie. Failed confirmation leaves the form open with guidance.
-- Signed-in players see their name, Continue, and Log out on the start screen.
-  Continue opens the same device-local profile selection as guest play.
+- Confirmed login or signup opens the device-local profile selection immediately.
+  An existing session restored on the start screen also opens profile selection
+  automatically. There is no separate Continue step.
+- The profile selection screen shows the account display name and Log out.
+  Logout returns to the start screen; guests retain their Back button.
 - Login and logout do not modify `cosmoids-game-state`. Profiles are not yet
   associated with account ownership; local saves remain specific to each origin.
 

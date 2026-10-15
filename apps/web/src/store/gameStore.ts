@@ -40,6 +40,7 @@ import {
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { createTestProfileFromTemplate } from '@/constants/testProfileTemplates';
 import { isTestProfileOverrideEnabled } from '@/utils/testProfileAccess';
+import { generateCreatureGender } from '@/utils/creatureGender';
 
 function mergeCapturedSpeciesIds(
   profile: Profile,
@@ -272,6 +273,7 @@ export const useGameStore = create<GameState>()(
                         const starterPlayerCreature: PlayerCreature = {
                           id: creature.id, // will be replaced with UUID in addCreatureToProfile
                           speciesId: creature.id,
+                          gender: generateCreatureGender(creature.id),
                           level: 5, // Starter starts at level 5
                           xp: 0,
                           equippedAttacks: TowerDefenseEngine.getDefaultAttacks(
@@ -298,6 +300,7 @@ export const useGameStore = create<GameState>()(
                     const playerCreature: PlayerCreature = {
                       id: c.id,
                       speciesId: c.speciesId || c.id,
+                      gender: c.gender,
                       level: c.level,
                       xp: c.xp,
                       equippedAttacks: TowerDefenseEngine.getDefaultAttacks(

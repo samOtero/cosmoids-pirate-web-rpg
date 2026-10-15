@@ -1,7 +1,7 @@
 import { SpeakerImageKey, BackgroundImageKey } from '@/types/baseGame';
 
 export const MAX_PROFILES = 3;
-export const CURRENT_PROFILE_VERSION = 9;
+export const CURRENT_PROFILE_VERSION = 10;
 export const MAX_COSMOID_LEVEL = 16;
 export const MAX_PARTY_SIZE = 6;
 

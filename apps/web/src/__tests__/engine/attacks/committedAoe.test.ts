@@ -53,6 +53,7 @@ function battle() {
         level: 10,
         xp: 0,
         equippedAttacks: ['SHIKO_QUAKE'],
+        gender: 'female' as const,
         isShiny: false,
       },
     ]

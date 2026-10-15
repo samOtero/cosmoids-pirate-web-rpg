@@ -32,6 +32,7 @@ const createBuffloraTower = (): Tower => ({
     level: 8,
     xp: 0,
     equippedAttacks: ['TOXIC_POLLEN'],
+    gender: 'female' as const,
     isShiny: false,
   },
   position: { x: 0, y: 0 },

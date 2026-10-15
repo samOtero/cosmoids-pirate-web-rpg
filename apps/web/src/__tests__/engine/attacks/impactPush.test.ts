@@ -26,6 +26,7 @@ const createMonkegTower = (): Tower => ({
     level: 6,
     xp: 0,
     equippedAttacks: ['BARREL_BASH'],
+    gender: 'female' as const,
     isShiny: false,
   },
   position: { x: 0, y: 0 },

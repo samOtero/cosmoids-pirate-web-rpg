@@ -1,4 +1,9 @@
-import { Creature, ElementType, PlayerCreature } from '@/types/baseGame';
+import {
+  Creature,
+  CreatureGender,
+  ElementType,
+  PlayerCreature,
+} from '@/types/baseGame';
 import type { DialogConfig } from '@/types/baseGame';
 import type { AttackInstance } from './attacks/types';
 
@@ -143,6 +148,8 @@ export interface TDWaveEnemyDefinition {
   targetingRangeMultiplier?: number;
   /** Creature-backed enemies use a registered Cosmoid definition. */
   creatureId?: string;
+  /** Fixed gender for this encounter; omitted encounters roll the species ratio per spawn. */
+  gender?: CreatureGender;
   level: number;
   /** Optional fixed spawn point for a stationary creature encounter. */
   stationaryPosition?: Point;
@@ -647,6 +654,8 @@ export interface StatusCondition {
 }
 
 export interface Enemy extends BaseTDUnit {
+  /** Creature identity assigned at spawn; structures have no gender. */
+  gender?: CreatureGender;
   /** Prevents shared push/pull mechanics from changing position or path progress. */
   immuneToDisplacement?: boolean;
   constrictedByTowerId?: string;

@@ -300,9 +300,15 @@ export interface EvolutionNode {
   evolutionDefId: string;
 }
 
+export type CreatureGender = 'male' | 'female' | 'genderless';
+
+/** Female probability from 0 to 1, or a species without male/female classification. */
+export type CreatureGenderRatio = { female: number } | 'genderless';
+
 export interface CosmoidTemplate {
   id: string; // Species ID (e.g. 'starter_crab')
   name: string;
+  genderRatio: CreatureGenderRatio;
   type: ElementType;
   secondaryType?: ElementType;
   baseStats: BaseStats;
@@ -323,6 +329,7 @@ export interface CosmoidTemplate {
 export interface Creature {
   id: string; // Unique instance ID
   speciesId: string; // References CosmoidTemplate.id
+  gender: CreatureGender;
   name: string;
   type: ElementType;
   secondaryType?: ElementType;
@@ -350,6 +357,7 @@ export interface Creature {
 export interface PlayerCreature {
   id: string; // Unique instance ID
   speciesId: string; // References species def (e.g., 'starter_crab')
+  gender: CreatureGender;
   level: number;
   xp: number;
   equippedAttacks: string[]; // Attack definition IDs

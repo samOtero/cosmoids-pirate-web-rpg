@@ -56,6 +56,7 @@ function battle() {
         level: 10,
         xp: 0,
         equippedAttacks: ['SAILCUTTER', 'RIGGING_NEST'],
+        gender: 'female' as const,
         isShiny: false,
       },
     ]

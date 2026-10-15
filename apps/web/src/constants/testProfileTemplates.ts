@@ -16,6 +16,7 @@ import {
   STARTER_MONKEY,
 } from '@/constants/creatures';
 import { getDefaultAttacksForLevel } from '@/utils/resolvePlayerCreature';
+import { generateCreatureGender } from '@/utils/creatureGender';
 
 const TEST_LEVELS = [
   {
@@ -100,6 +101,7 @@ function createTemplateCreature(
   return {
     id: `test-profile-3-${idPrefix}-${speciesId}`,
     speciesId,
+    gender: generateCreatureGender(speciesId),
     level,
     xp: 0,
     equippedAttacks: getDefaultAttacksForLevel(speciesTemplate, level),

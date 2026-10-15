@@ -7,6 +7,7 @@ import {
   waitFor,
   within,
 } from '@testing-library/react';
+import { useState } from 'react';
 
 const api = vi.hoisted(() => {
   vi.stubEnv('NEXT_PUBLIC_API_URL', 'http://localhost:3001');
@@ -18,6 +19,7 @@ const api = vi.hoisted(() => {
 import { authClient } from '@/lib/auth-client';
 import AuthProvider from '@/app/components/auth/AuthProvider';
 import StartScreen from '@/app/components/startScreen';
+import ProfileScreen from '@/app/components/profileScreen';
 
 vi.mock('@/utils/analytics', () => ({ trackGameEvent: vi.fn() }));
 
@@ -54,9 +56,28 @@ function json(value: unknown, status = 200) {
 
 function showStart() {
   const onStart = vi.fn();
+  function GameScreens() {
+    const [showProfiles, setShowProfiles] = useState(false);
+    return showProfiles ? (
+      <ProfileScreen
+        profiles={[null, null, null]}
+        onSelect={vi.fn()}
+        onCreate={vi.fn()}
+        onDelete={vi.fn()}
+        onBack={() => setShowProfiles(false)}
+      />
+    ) : (
+      <StartScreen
+        onStart={() => {
+          onStart();
+          setShowProfiles(true);
+        }}
+      />
+    );
+  }
   render(
     <AuthProvider>
-      <StartScreen onStart={onStart} />
+      <GameScreens />
     </AuthProvider>
   );
   return onStart;
@@ -144,6 +165,7 @@ describe('account UI with the real Better Auth client', () => {
     // Reset the client's session through its public API between cases.
     await act(async () => {
       await authClient.signOut();
+      await authClient.$store.atoms.session.get().refetch();
     });
     api.fetch.mockClear();
   });
@@ -186,24 +208,33 @@ describe('account UI with the real Better Auth client', () => {
     expect(localStorage.getItem('cosmoids-game-state')).toBe(
       'existing-local-save'
     );
-    expect(onStart).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(
+      screen.getByRole('heading', { name: 'Select Save File' })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Continue' })
+    ).not.toBeInTheDocument();
     expect(onStart).toHaveBeenCalledOnce();
   });
 
   it('logs in and out without deleting local progress', async () => {
     localStorage.setItem('cosmoids-game-state', 'existing-local-save');
-    showStart();
+    const onStart = showStart();
     const dialog = await openForm('Log in');
     fillForm(dialog);
     fireEvent.click(within(dialog).getByRole('button', { name: 'Log in' }));
     await waitFor(() =>
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     );
+    expect(
+      screen.getByRole('heading', { name: 'Select Save File' })
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Signed in as/)).toHaveTextContent(user.name);
+    expect(onStart).toHaveBeenCalledOnce();
     fireEvent.click(await screen.findByRole('button', { name: 'Log out' }));
     await waitFor(() =>
       expect(
-        screen.queryByRole('button', { name: 'Continue' })
+        screen.queryByRole('heading', { name: 'Select Save File' })
       ).not.toBeInTheDocument()
     );
     expect(
@@ -218,7 +249,7 @@ describe('account UI with the real Better Auth client', () => {
     'shows a useful error when login returns %s',
     async (status) => {
       rejectedLogin = status;
-      showStart();
+      const onStart = showStart();
       const dialog = await openForm('Log in');
       fillForm(dialog);
       fireEvent.click(within(dialog).getByRole('button', { name: 'Log in' }));
@@ -228,12 +259,13 @@ describe('account UI with the real Better Auth client', () => {
       expect(
         within(dialog).getByRole('button', { name: 'Log in' })
       ).toBeEnabled();
+      expect(onStart).not.toHaveBeenCalled();
     }
   );
 
   it('does not report a successful login when the browser session cannot be confirmed', async () => {
     acceptCookie = false;
-    showStart();
+    const onStart = showStart();
     const dialog = await openForm('Log in');
     fillForm(dialog);
     fireEvent.click(within(dialog).getByRole('button', { name: 'Log in' }));
@@ -242,6 +274,10 @@ describe('account UI with the real Better Auth client', () => {
     );
     expect(
       screen.queryByRole('button', { name: 'Continue' })
+    ).not.toBeInTheDocument();
+    expect(onStart).not.toHaveBeenCalled();
+    expect(
+      screen.queryByRole('heading', { name: 'Select Save File' })
     ).not.toBeInTheDocument();
   });
 
@@ -253,14 +289,26 @@ describe('account UI with the real Better Auth client', () => {
     ).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Play as guest' }));
     expect(onStart).toHaveBeenCalledOnce();
+    expect(
+      screen.getByRole('heading', { name: 'Select Save File' })
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/Signed in as/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+    expect(
+      await screen.findByRole('button', { name: 'Play as guest' })
+    ).toBeEnabled();
   });
 
   it('restores the session on mount and retains it after a failed tab-return check', async () => {
     serverSession = validSession;
-    showStart();
+    const onStart = showStart();
     expect(await screen.findByText(/Signed in as/)).toHaveTextContent(
       user.name
     );
+    expect(
+      screen.getByRole('heading', { name: 'Select Save File' })
+    ).toBeInTheDocument();
+    expect(onStart).toHaveBeenCalledOnce();
     sessionFailure = true;
     const later = Date.now() + 20000;
     vi.spyOn(Date, 'now').mockReturnValue(later);

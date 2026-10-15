@@ -10,9 +10,11 @@ export type AccountAction = 'login' | 'signup';
 export default function AccountDialog({
   action,
   onClose,
+  onAuthenticated,
 }: {
   action: AccountAction;
   onClose: () => void;
+  onAuthenticated: () => void;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [busy, setBusy] = useState(false);
@@ -64,7 +66,7 @@ export default function AccountDialog({
       }
       await refetch();
       form.reset();
-      onClose();
+      onAuthenticated();
     } catch {
       setError(
         'We couldn’t reach the account service. Check your connection and try again.'

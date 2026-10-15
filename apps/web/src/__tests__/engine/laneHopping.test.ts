@@ -69,6 +69,7 @@ function createTower(): Tower {
       level: 8,
       xp: 0,
       equippedAttacks: ['PINCH'],
+      gender: 'female' as const,
       isShiny: false,
     },
     position: { x: 30, y: 20 },

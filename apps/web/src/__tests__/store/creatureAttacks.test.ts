@@ -20,6 +20,7 @@ describe('Creature Attacks Store Actions', () => {
       xp: 0,
       equippedAttacks: ['PINCH'],
       activeAttackIndex: 0,
+      gender: 'female' as const,
       isShiny: false,
     });
 
@@ -51,6 +52,7 @@ describe('Creature Attacks Store Actions', () => {
         xp: 0,
         equippedAttacks: ['SCRATCH'],
         activeAttackIndex: 0,
+        gender: 'female' as const,
         isShiny: false,
       },
       true // forceStorage
@@ -84,6 +86,7 @@ describe('Creature Attacks Store Actions', () => {
       xp: 0,
       equippedAttacks: ['PINCH'],
       activeAttackIndex: 0,
+      gender: 'female' as const,
       isShiny: false,
     });
 

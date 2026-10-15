@@ -64,6 +64,7 @@ function battle() {
         level: 8,
         xp: 0,
         equippedAttacks: ['SHARED_SLUMBER', 'TACKLE'],
+        gender: 'female' as const,
         isShiny: false,
       },
     ]

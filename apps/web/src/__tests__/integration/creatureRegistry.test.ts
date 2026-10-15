@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { COSMOID_TEMPLATES } from '@/constants/creatures';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import { isCreatureGenderAllowed } from '@/utils/creatureGender';
 
 const publicDirectory = join(process.cwd(), 'public');
 
@@ -28,6 +29,24 @@ describe('creature content ownership', () => {
 describe.each(Object.entries(COSMOID_TEMPLATES))(
   '%s creature integration',
   (id, template) => {
+    it('has a valid gender distribution and preserves supported identities through evolution', () => {
+      const ratio = template.genderRatio;
+      if (ratio !== 'genderless') {
+        expect(Number.isFinite(ratio.female)).toBe(true);
+        expect(ratio.female).toBeGreaterThanOrEqual(0);
+        expect(ratio.female).toBeLessThanOrEqual(1);
+      }
+      for (const { evolutionDefId } of template.evolutionNodes ?? []) {
+        const evolved = COSMOID_TEMPLATES[evolutionDefId];
+        expect(evolved).toBeDefined();
+        for (const gender of ['male', 'female', 'genderless'] as const) {
+          if (isCreatureGenderAllowed(ratio, gender))
+            expect(isCreatureGenderAllowed(evolved.genderRatio, gender)).toBe(
+              true
+            );
+        }
+      }
+    });
     it('references registered attacks and evolution targets', () => {
       expect(template.id).toBe(id);
       for (const { attackId } of template.learnableAttacks) {

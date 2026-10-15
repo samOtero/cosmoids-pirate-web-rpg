@@ -33,6 +33,7 @@ function createBattle() {
         level: 16,
         xp: 0,
         equippedAttacks: ['MALLET_SMASH'],
+        gender: 'female' as const,
         isShiny: false,
       },
     ]

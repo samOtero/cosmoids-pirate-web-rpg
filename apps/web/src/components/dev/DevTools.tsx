@@ -1,4 +1,5 @@
 'use client';
+import { generateCreatureGender } from '@/utils/creatureGender';
 
 import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { useGameStore } from '@/store/gameStore';
@@ -143,6 +144,7 @@ export default function DevTools() {
                   ].map((c) => ({
                     id: c.id,
                     speciesId: c.id,
+                    gender: generateCreatureGender(c.id),
                     level: 1,
                     xp: 0,
                     equippedAttacks: TowerDefenseEngine.getDefaultAttacks(c.id),
@@ -165,6 +167,7 @@ export default function DevTools() {
                   ].map((c) => ({
                     id: c.id,
                     speciesId: c.id,
+                    gender: generateCreatureGender(c.id),
                     level: 1,
                     xp: 0,
                     equippedAttacks: TowerDefenseEngine.getDefaultAttacks(c.id),
@@ -183,6 +186,7 @@ export default function DevTools() {
                     () => ({
                       id: STARTER_CRAB.id,
                       speciesId: STARTER_CRAB.id,
+                      gender: generateCreatureGender(STARTER_CRAB.id),
                       level: 10,
                       xp: 0,
                       equippedAttacks: TowerDefenseEngine.getDefaultAttacks(

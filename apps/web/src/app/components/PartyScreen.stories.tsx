@@ -3,6 +3,7 @@ import { useState } from 'react';
 import PartyScreen from './PartyScreen';
 import { MAX_PARTY_SIZE } from '@/constants/game';
 import { Creature, CosmoidTemplate } from '@/types/baseGame';
+import { rollCreatureGender } from '@/utils/creatureGender';
 import {
   STARTER_IGUANA,
   STARTER_CRAB,
@@ -25,6 +26,7 @@ const createMockInstance = (
   return {
     id: `${base.id}_instance_${instanceNum}`,
     speciesId: base.id,
+    gender: rollCreatureGender(base.genderRatio, () => instanceNum % 2 === 0 ? 0 : 0.99),
     name: base.name,
     type: base.type,
     maxHp: hp,

@@ -8,6 +8,7 @@ import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { getWaveGroupEncounters } from '@/engine/tower-defense/waveEncounters';
 import { expandWaveRepetitions } from '@/engine/tower-defense/waveSchedule';
 import { validateTDLevelDraft } from '@/utils/tdLevelDraft';
+import { isCreatureGenderAllowed } from '@/utils/creatureGender';
 import type { Point } from '@/engine/tower-defense/types';
 import { battle } from '../engine/behaviorFixtures';
 
@@ -64,6 +65,14 @@ describe.each(Object.entries(TD_LEVELS))(
           definition.creatureId !== undefined ||
             definition.structure !== undefined
         ).toBe(true);
+        if (definition.gender !== undefined) {
+          expect(definition.structure).toBeUndefined();
+          const template = COSMOID_TEMPLATES[definition.creatureId!];
+          expect(template).toBeDefined();
+          expect(
+            isCreatureGenderAllowed(template.genderRatio, definition.gender)
+          ).toBe(true);
+        }
         if (definition.creatureId)
           expect(COSMOID_TEMPLATES[definition.creatureId]).toBeDefined();
         // Procedural prison gates are drawn from their layout, without a texture config.

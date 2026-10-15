@@ -18,7 +18,12 @@ import {
 } from '@/engine/tower-defense/types';
 import { TD_CREATURE_DEFS } from '@/engine/tower-defense/TowerDefenseEngine';
 import { ENEMY_ABILITY_DEFS } from '@/engine/tower-defense/enemyAbilities';
-import { TDLevelContext } from '@/types/baseGame';
+import { CreatureGender, TDLevelContext } from '@/types/baseGame';
+import { COSMOID_TEMPLATES } from '@/constants/creatures';
+import {
+  CREATURE_GENDER_LABELS,
+  isCreatureGenderAllowed,
+} from '@/utils/creatureGender';
 import {
   cloneTDLevelDraft,
   createEmptyTDLevelDraft,
@@ -428,6 +433,20 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
       );
       const previousId = nextDefinitions[definitionIndex].id;
       nextDefinitions[definitionIndex][field] = value;
+      if (field === 'creatureId' || field === 'structure') {
+        const definition = nextDefinitions[definitionIndex];
+        const template = definition.creatureId
+          ? COSMOID_TEMPLATES[definition.creatureId]
+          : undefined;
+        if (
+          definition.gender !== undefined &&
+          (definition.structure ||
+            !template ||
+            !isCreatureGenderAllowed(template.genderRatio, definition.gender))
+        ) {
+          delete definition.gender;
+        }
+      }
       if (field !== 'id' || typeof value !== 'string') {
         return { ...previousDraft, waveEnemyDefinitions: nextDefinitions };
       }
@@ -1280,6 +1299,43 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
                                   </option>
                                 )
                               )}
+                            </select>
+                          </label>
+                          <label className="block text-slate-400">
+                            Gender
+                            <select
+                              disabled={Boolean(definition.structure)}
+                              value={definition.gender ?? ''}
+                              onChange={(event) =>
+                                updateWaveEnemyDefinition(
+                                  definitionIndex,
+                                  'gender',
+                                  (event.target.value || undefined) as
+                                    | CreatureGender
+                                    | undefined
+                                )
+                              }
+                              className="mt-1 w-full rounded border border-slate-700 bg-slate-950 p-1 text-white"
+                            >
+                              <option value="">
+                                Species ratio (random per spawn)
+                              </option>
+                              {Object.entries(CREATURE_GENDER_LABELS).map(([gender, label]) => (
+                                <option
+                                  key={gender}
+                                  value={gender}
+                                  disabled={
+                                    !definition.creatureId ||
+                                    !isCreatureGenderAllowed(
+                                      COSMOID_TEMPLATES[definition.creatureId]
+                                        ?.genderRatio ?? 'genderless',
+                                      gender
+                                    )
+                                  }
+                                >
+                                  {label}
+                                </option>
+                              ))}
                             </select>
                           </label>
                           <label className="block text-slate-400">

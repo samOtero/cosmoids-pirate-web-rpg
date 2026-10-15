@@ -1,5 +1,7 @@
 import { Point, TDLevelData } from '@/engine/tower-defense/types';
 import { expandWaveRepetitions } from '@/engine/tower-defense/waveSchedule';
+import { COSMOID_TEMPLATES } from '@/constants/creatures';
+import { isCreatureGenderAllowed } from '@/utils/creatureGender';
 
 export function createEmptyTDLevelDraft(): TDLevelData {
   return {
@@ -281,6 +283,20 @@ export function validateTDLevelDraft(
   const enemyDefinitionIds = new Set<string>();
   levelData.waveEnemyDefinitions.forEach((definition, definitionIndex) => {
     const definitionLabel = `Enemy definition ${definitionIndex + 1}`;
+    if (definition.gender !== undefined) {
+      const template = definition.creatureId
+        ? COSMOID_TEMPLATES[definition.creatureId]
+        : undefined;
+      if (
+        definition.structure ||
+        !template ||
+        !isCreatureGenderAllowed(template.genderRatio, definition.gender)
+      ) {
+        errors.push(
+          `${definitionLabel} has an invalid gender override for its species.`
+        );
+      }
+    }
     if (definition.stationaryPosition) {
       validatePoint(
         definition.stationaryPosition,

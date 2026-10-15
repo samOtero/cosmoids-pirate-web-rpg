@@ -19,6 +19,7 @@ function createCreature(): PlayerCreature {
     equippedAttacks: ['TACKLE'],
     activeAttackIndex: 0,
     targetingMode: 'first',
+    gender: 'female' as const,
     isShiny: false,
   };
 }

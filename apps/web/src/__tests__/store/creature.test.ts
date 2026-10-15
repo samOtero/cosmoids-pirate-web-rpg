@@ -21,6 +21,7 @@ describe('Creature Store Logic', () => {
       level: 1,
       xp: 0,
       equippedAttacks: STARTER_CRAB.learnableAttacks.map((a) => a.attackId),
+      gender: 'female' as const,
       isShiny: false,
     });
 
@@ -51,6 +52,7 @@ describe('Creature Store Logic', () => {
       level: 1,
       xp: 0,
       equippedAttacks: STARTER_CRAB.learnableAttacks.map((a) => a.attackId),
+      gender: 'female' as const,
       isShiny: false,
     });
     store.addCreatureToProfile(profileId, {
@@ -59,6 +61,7 @@ describe('Creature Store Logic', () => {
       level: 1,
       xp: 0,
       equippedAttacks: STARTER_IGUANA.learnableAttacks.map((a) => a.attackId),
+      gender: 'female' as const,
       isShiny: false,
     });
 
@@ -94,6 +97,7 @@ describe('Creature Store Logic', () => {
       level: 6,
       xp: 0,
       equippedAttacks: ['TACKLE'],
+      gender: 'female' as const,
       isShiny: false,
     });
 
@@ -130,6 +134,7 @@ describe('Creature Store Logic', () => {
       level: 1,
       xp: 0,
       equippedAttacks: STARTER_CRAB.learnableAttacks.map((a) => a.attackId),
+      gender: 'female' as const,
       isShiny: false,
     });
     store.addCreatureToProfile(profileId, {
@@ -138,6 +143,7 @@ describe('Creature Store Logic', () => {
       level: 1,
       xp: 0,
       equippedAttacks: STARTER_IGUANA.learnableAttacks.map((a) => a.attackId),
+      gender: 'female' as const,
       isShiny: false,
     });
     store.addCreatureToProfile(profileId, {
@@ -146,6 +152,7 @@ describe('Creature Store Logic', () => {
       level: 1,
       xp: 0,
       equippedAttacks: [],
+      gender: 'female' as const,
       isShiny: false,
     });
 
@@ -190,6 +197,7 @@ describe('Creature Store Logic', () => {
         level: 1,
         xp: 0,
         equippedAttacks: [],
+        gender: 'female' as const,
         isShiny: false,
       });
     });
@@ -202,6 +210,7 @@ describe('Creature Store Logic', () => {
           level: 1,
           xp: 0,
           equippedAttacks: [],
+          gender: 'female' as const,
           isShiny: false,
         },
         true
@@ -235,6 +244,7 @@ describe('Creature Store Logic', () => {
       level: 1,
       xp: 0,
       equippedAttacks: [],
+      gender: 'female' as const,
       isShiny: false,
     }));
     const existingStorage = {
@@ -243,6 +253,7 @@ describe('Creature Store Logic', () => {
       level: 1,
       xp: 0,
       equippedAttacks: [],
+      gender: 'female' as const,
       isShiny: false,
     };
 
@@ -291,6 +302,7 @@ describe('Creature Store Logic', () => {
       level: 1,
       xp: 0,
       equippedAttacks: [],
+      gender: 'female' as const,
       isShiny: false,
     }));
 
@@ -300,6 +312,7 @@ describe('Creature Store Logic', () => {
     engine.enemies.push({
       id: 'enemy_test',
       definitionId: 'starter_iguana',
+      gender: 'female',
       level: 5,
       position: { x: 0, y: 0 },
       hp: 10,
@@ -345,6 +358,7 @@ describe('Creature Store Logic', () => {
       level: 1,
       xp: 0,
       equippedAttacks: [],
+      gender: 'female' as const,
       isShiny: false,
     }));
 
@@ -354,6 +368,7 @@ describe('Creature Store Logic', () => {
     engine.enemies.push({
       id: 'enemy_test',
       definitionId: 'starter_iguana',
+      gender: 'female',
       level: 5,
       position: { x: 0, y: 0 },
       hp: 10,
@@ -396,6 +411,7 @@ describe('Creature Store Logic', () => {
         level: 1,
         xp: 0,
         equippedAttacks: STARTER_CRAB.learnableAttacks.map((a) => a.attackId),
+        gender: 'female' as const,
         isShiny: false,
       },
       true
@@ -424,6 +440,7 @@ describe('Creature Store Logic', () => {
       level: 1,
       xp: 0,
       equippedAttacks: [],
+      gender: 'female' as const,
       isShiny: false,
     }));
 
@@ -433,6 +450,7 @@ describe('Creature Store Logic', () => {
     engine.enemies.push({
       id: 'enemy_shiny',
       definitionId: 'starter_iguana',
+      gender: 'female',
       level: 5,
       position: { x: 0, y: 0 },
       hp: 10,
@@ -471,6 +489,7 @@ describe('Creature Store Logic', () => {
       level: 5,
       xp: 0,
       equippedAttacks: [],
+      gender: 'female' as const,
       isShiny: false,
     };
     store.addCreatureToProfile(profileId, starterCreatureInput);
@@ -511,6 +530,7 @@ describe('Creature Store Logic', () => {
       pathIndex: 0,
       facingDirection: 'down',
       damagedByTowerIds: new Set(),
+      gender: 'female' as const,
       isShiny: false,
     });
 

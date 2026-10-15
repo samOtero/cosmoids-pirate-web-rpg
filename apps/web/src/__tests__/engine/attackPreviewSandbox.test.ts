@@ -25,6 +25,7 @@ function createTowerEngine() {
       level: 10,
       xp: 0,
       equippedAttacks: ['EMBER'],
+      gender: 'female' as const,
       isShiny: false,
     },
   ]);

@@ -24,6 +24,7 @@ function battle() {
     level: 16,
     xp: 0,
     equippedAttacks: ['FIRE_CLAW'],
+    gender: 'female' as const,
     isShiny: false,
   };
   const engine = new TowerDefenseEngine(

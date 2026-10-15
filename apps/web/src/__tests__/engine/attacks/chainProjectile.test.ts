@@ -22,6 +22,7 @@ function createBattle() {
     level: 9,
     xp: 0,
     equippedAttacks: ['FLYING_COLORS'],
+    gender: 'female' as const,
     isShiny: false,
   };
   const engine = new TowerDefenseEngine(

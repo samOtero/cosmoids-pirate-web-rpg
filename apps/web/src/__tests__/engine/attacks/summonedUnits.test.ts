@@ -55,6 +55,7 @@ function battle() {
         level: 7,
         xp: 0,
         equippedAttacks: ['RIGGING_NEST'],
+        gender: 'female' as const,
         isShiny: false,
       },
     ]

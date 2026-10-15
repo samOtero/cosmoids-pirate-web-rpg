@@ -33,6 +33,7 @@ function battle() {
       level: 16,
       xp: 0,
       equippedAttacks: ['FUSE_RUSH', 'SCRATCH'],
+      gender: 'female' as const,
       isShiny: false,
     }))
   );

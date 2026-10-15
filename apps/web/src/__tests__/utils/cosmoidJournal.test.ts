@@ -47,6 +47,7 @@ function owned(speciesId: string) {
     level: 5,
     xp: 0,
     equippedAttacks: [],
+    gender: 'female' as const,
     isShiny: false,
   };
 }

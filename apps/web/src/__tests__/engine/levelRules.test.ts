@@ -67,6 +67,7 @@ describe('level combat rules', () => {
       level: 5,
       xp: 0,
       equippedAttacks: [],
+      gender: 'female' as const,
       isShiny: false,
     };
     const position = { x: 20, y: 30 };

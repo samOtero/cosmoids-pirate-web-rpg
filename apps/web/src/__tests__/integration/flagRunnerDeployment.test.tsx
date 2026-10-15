@@ -50,6 +50,7 @@ describe('flag runner roster availability', () => {
           xp: 0,
           equippedAttacks: ['TACKLE'],
           activeAttackIndex: 0,
+          gender: 'female' as const,
           isShiny: false,
         },
       ],

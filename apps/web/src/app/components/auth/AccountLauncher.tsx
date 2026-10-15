@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { authClient, getAuthErrorMessage } from '@/lib/auth-client';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '../ui/Button';
 import { useAccount } from './AuthProvider';
 import AccountDialog, { type AccountAction } from './AccountDialog';
@@ -10,43 +9,19 @@ import styles from './account.module.css';
 export default function AccountLauncher({ onStart }: { onStart: () => void }) {
   const { enabled, session, isPending, hasError, refetch } = useAccount();
   const [action, setAction] = useState<AccountAction | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const started = useRef(false);
 
-  const logout = async () => {
-    setBusy(true);
-    setError(null);
-    try {
-      const result = await authClient.signOut();
-      if (result.error) setError(getAuthErrorMessage(result.error));
-      else await refetch();
-    } catch {
-      setError('We couldn’t log you out. Check your connection and try again.');
-    } finally {
-      setBusy(false);
+  useEffect(() => {
+    // Restore an existing session, but let an open form confirm its cookie first.
+    if (enabled && session && !isPending && !action && !started.current) {
+      started.current = true;
+      onStart();
     }
-  };
+  }, [enabled, session, isPending, action, onStart]);
 
   return (
     <div className={styles.launcher}>
-      {enabled && session ? (
-        <>
-          <p className={styles.identity}>
-            Signed in as <strong>{session.user.name}</strong>
-          </p>
-          <Button variant="wood" onClick={onStart}>
-            Continue
-          </Button>
-          <button
-            type="button"
-            className={styles.textButton}
-            onClick={logout}
-            disabled={busy}
-          >
-            {busy ? 'Logging out…' : 'Log out'}
-          </button>
-        </>
-      ) : (
+      {!(enabled && session) && (
         <>
           {enabled && (
             <div className={styles.accountActions}>
@@ -94,13 +69,16 @@ export default function AccountLauncher({ onStart }: { onStart: () => void }) {
           </button>
         </p>
       )}
-      {error && (
-        <p role="alert" className={styles.error}>
-          {error}
-        </p>
-      )}
       {action && (
-        <AccountDialog action={action} onClose={() => setAction(null)} />
+        <AccountDialog
+          action={action}
+          onClose={() => setAction(null)}
+          onAuthenticated={() => {
+            started.current = true;
+            setAction(null);
+            onStart();
+          }}
+        />
       )}
     </div>
   );

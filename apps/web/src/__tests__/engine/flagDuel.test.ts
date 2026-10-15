@@ -184,6 +184,7 @@ describe('committed roster flag runners', () => {
       equippedAttacks: ['TACKLE'],
       activeAttackIndex: 0,
       targetingMode: 'first',
+      gender: 'female' as const,
       isShiny: false,
     };
     return { level, creature, engine: battle(level, [creature]) };

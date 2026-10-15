@@ -39,6 +39,7 @@ function createEngine(withTarget = true, level = 14) {
       level,
       xp: 0,
       equippedAttacks: ['RALLY_HOWL', 'STATIC_YIP'],
+      gender: 'female' as const,
       isShiny: false,
     }))
   );

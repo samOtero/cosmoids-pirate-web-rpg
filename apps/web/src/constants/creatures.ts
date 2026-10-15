@@ -3,6 +3,7 @@ import { CosmoidTemplate, ElementType } from '@/types/baseGame';
 export const SENTICLE: CosmoidTemplate = {
   id: 'senticle',
   name: 'Senticle',
+  genderRatio: 'genderless',
   type: ElementType.WATER,
   baseStats: {
     hp: 20,
@@ -24,6 +25,7 @@ export const SENTICLE: CosmoidTemplate = {
 export const MOUSE_1: CosmoidTemplate = {
   id: 'mouse_1',
   name: 'Knotia',
+  genderRatio: { female: 0.5 },
   type: ElementType.NORMAL,
   baseStats: {
     hp: 30,
@@ -51,6 +53,7 @@ export const MOUSE_1: CosmoidTemplate = {
 export const BIRD_1: CosmoidTemplate = {
   id: 'harlequill',
   name: 'Harlequill',
+  genderRatio: { female: 0.5 },
   type: ElementType.FLYING,
   baseStats: {
     hp: 38,
@@ -78,6 +81,7 @@ export const BIRD_1: CosmoidTemplate = {
 export const MOPUP: CosmoidTemplate = {
   id: 'mopup',
   name: 'Mopup',
+  genderRatio: { female: 0.5 },
   type: ElementType.WATER,
   baseStats: {
     hp: 60,
@@ -101,6 +105,7 @@ export const MOPUP: CosmoidTemplate = {
 export const CAFFIQUI: CosmoidTemplate = {
   id: 'caffiqui',
   name: 'Caffiqui',
+  genderRatio: 'genderless',
   type: ElementType.GRASS,
   baseStats: {
     hp: 44,
@@ -121,6 +126,7 @@ export const CAFFIQUI: CosmoidTemplate = {
 export const SNOUTASCO: CosmoidTemplate = {
   id: 'snoutasco',
   name: 'Snoutasco',
+  genderRatio: { female: 0.5 },
   type: ElementType.POISON,
   baseStats: {
     hp: 48,
@@ -141,6 +147,7 @@ export const SNOUTASCO: CosmoidTemplate = {
 export const ZAPYBARA: CosmoidTemplate = {
   id: 'zapybara',
   name: 'Zapybara',
+  genderRatio: { female: 0.5 },
   type: ElementType.ELECTRIC,
   baseStats: {
     hp: 65,
@@ -162,6 +169,7 @@ export const ZAPYBARA: CosmoidTemplate = {
 export const SONARION: CosmoidTemplate = {
   id: 'sonarion',
   name: 'Razcall',
+  genderRatio: { female: 0.5 },
   type: ElementType.NORMAL,
   secondaryType: ElementType.ELECTRIC,
   baseStats: {
@@ -192,6 +200,7 @@ export const SONARION: CosmoidTemplate = {
 export const RESONARION: CosmoidTemplate = {
   id: 'resonarion',
   name: 'Razound',
+  genderRatio: { female: 0.5 },
   type: ElementType.NORMAL,
   secondaryType: ElementType.ELECTRIC,
   baseStats: {
@@ -222,6 +231,7 @@ export const RESONARION: CosmoidTemplate = {
 export const TIGREVEL: CosmoidTemplate = {
   id: 'tigrevel',
   name: 'Tigrevel',
+  genderRatio: { female: 0.5 },
   type: ElementType.ROCK,
   baseStats: {
     hp: 72,
@@ -245,6 +255,7 @@ export const TIGREVEL: CosmoidTemplate = {
 export const VOLTUSK: CosmoidTemplate = {
   id: 'voltusk',
   name: 'Voltusk',
+  genderRatio: { female: 0.5 },
   type: ElementType.STEEL,
   secondaryType: ElementType.ELECTRIC,
   baseStats: {
@@ -269,6 +280,7 @@ export const VOLTUSK: CosmoidTemplate = {
 export const POGUIN: CosmoidTemplate = {
   id: 'poguin',
   name: 'Poguin',
+  genderRatio: { female: 0.5 },
   type: ElementType.ELECTRIC,
   secondaryType: ElementType.WATER,
   baseStats: {
@@ -293,6 +305,7 @@ export const POGUIN: CosmoidTemplate = {
 export const DORMATEE: CosmoidTemplate = {
   id: 'dormatee',
   name: 'Dormatee',
+  genderRatio: { female: 0.5 },
   type: ElementType.PSYCHIC,
   baseStats: {
     hp: 75,
@@ -320,6 +333,7 @@ export const DORMATEE: CosmoidTemplate = {
 export const YOKODILLO: CosmoidTemplate = {
   id: 'yokodillo',
   name: 'Yokodillo',
+  genderRatio: { female: 0.25 },
   type: ElementType.FIGHTING,
   baseStats: {
     hp: 75,
@@ -347,6 +361,7 @@ export const YOKODILLO: CosmoidTemplate = {
 export const AGUANA: CosmoidTemplate = {
   id: 'aguana',
   name: 'Aguana',
+  genderRatio: { female: 0.5 },
   type: ElementType.WATER,
   baseStats: {
     hp: 45,
@@ -376,6 +391,7 @@ export const AGUANA: CosmoidTemplate = {
 export const NAUTIGUAN: CosmoidTemplate = {
   id: 'nautiguan',
   name: 'Nautiguan',
+  genderRatio: { female: 0.5 },
   type: ElementType.WATER,
   baseStats: {
     hp: 95,
@@ -405,6 +421,7 @@ export const NAUTIGUAN: CosmoidTemplate = {
 export const BRAMFRIT: CosmoidTemplate = {
   id: 'bramfrit',
   name: 'Bramfrit',
+  genderRatio: { female: 0.25 },
   type: ElementType.FIRE,
   baseStats: {
     hp: 76,
@@ -428,6 +445,7 @@ export const BRAMFRIT: CosmoidTemplate = {
 export const SEPIPPET: CosmoidTemplate = {
   id: 'sepippet',
   name: 'Sepippet',
+  genderRatio: { female: 0.5 },
   type: ElementType.DARK,
   baseStats: {
     hp: 52,
@@ -451,6 +469,7 @@ export const SEPIPPET: CosmoidTemplate = {
 export const PARLET: CosmoidTemplate = {
   id: 'parlet',
   name: 'Parlet',
+  genderRatio: { female: 0.75 },
   type: ElementType.WATER,
   baseStats: {
     hp: 62,
@@ -474,6 +493,7 @@ export const PARLET: CosmoidTemplate = {
 export const CORROGOON: CosmoidTemplate = {
   id: 'corrogoon',
   name: 'Corrogoon',
+  genderRatio: { female: 0.5 },
   type: ElementType.POISON,
   secondaryType: ElementType.GROUND,
   baseStats: {
@@ -498,6 +518,7 @@ export const CORROGOON: CosmoidTemplate = {
 export const BUFFLORA: CosmoidTemplate = {
   id: 'bufflora',
   name: 'Bufflora',
+  genderRatio: { female: 0.5 },
   type: ElementType.POISON,
   secondaryType: ElementType.GRASS,
   baseStats: {
@@ -527,6 +548,7 @@ export const BUFFLORA: CosmoidTemplate = {
 export const MAROPHIS: CosmoidTemplate = {
   id: 'marophis',
   name: 'Marophis',
+  genderRatio: { female: 0.5 },
   type: ElementType.POISON,
   secondaryType: ElementType.WATER,
   baseStats: {
@@ -556,6 +578,7 @@ export const MAROPHIS: CosmoidTemplate = {
 export const BETTLE: CosmoidTemplate = {
   id: 'bettle',
   name: 'Beetadel',
+  genderRatio: { female: 0.5 },
   type: ElementType.BUG,
   secondaryType: ElementType.STEEL,
   baseStats: {
@@ -580,6 +603,7 @@ export const BETTLE: CosmoidTemplate = {
 export const BUG_STAGE_1: CosmoidTemplate = {
   id: 'bug_stage_1',
   name: 'Sailkworm',
+  genderRatio: { female: 0.5 },
   type: ElementType.BUG,
   iconImg: '/UI/Icons/buglet_icon.png',
   journalImg: '/UI/Journal/buglet_journal.webp',
@@ -607,6 +631,7 @@ export const BUG_STAGE_1: CosmoidTemplate = {
 export const BUG_STAGE_2: CosmoidTemplate = {
   id: 'bug_stage_2',
   name: 'Cocoonot',
+  genderRatio: { female: 0.5 },
   type: ElementType.BUG,
   iconImg: '/UI/Icons/bugitor_icon.png',
   journalImg: '/UI/Journal/bugitor_journal.webp',
@@ -636,6 +661,7 @@ export const BUG_STAGE_2: CosmoidTemplate = {
 export const BUG_STAGE_3: CosmoidTemplate = {
   id: 'bug_stage_3',
   name: 'Mainscale',
+  genderRatio: { female: 0.5 },
   type: ElementType.BUG,
   secondaryType: ElementType.FLYING,
   iconImg: '/UI/Icons/moth_icon.png',
@@ -667,6 +693,7 @@ export const BUG_STAGE_3: CosmoidTemplate = {
 export const STARTER_CRAB: CosmoidTemplate = {
   id: 'starter_crab',
   name: 'Palmit',
+  genderRatio: { female: 0.5 },
   type: ElementType.GRASS,
   baseStats: {
     hp: 55,
@@ -695,6 +722,7 @@ export const STARTER_CRAB: CosmoidTemplate = {
 export const CARAPENTER: CosmoidTemplate = {
   id: 'carapenter',
   name: 'Carapenter',
+  genderRatio: { female: 0.5 },
   type: ElementType.GRASS,
   baseStats: {
     hp: 65,
@@ -723,6 +751,7 @@ export const CARAPENTER: CosmoidTemplate = {
 export const STARTER_IGUANA: CosmoidTemplate = {
   id: 'starter_iguana',
   name: 'Fueguana',
+  genderRatio: { female: 0.5 },
   type: ElementType.FIRE,
   baseStats: {
     hp: 38,
@@ -752,6 +781,7 @@ export const STARTER_IGUANA: CosmoidTemplate = {
 export const VELOCINDER: CosmoidTemplate = {
   id: 'velocinder',
   name: 'Velocinder',
+  genderRatio: { female: 0.5 },
   type: ElementType.FIRE,
   baseStats: {
     hp: 58,
@@ -780,6 +810,7 @@ export const VELOCINDER: CosmoidTemplate = {
 export const STARTER_MONKEY: CosmoidTemplate = {
   id: 'starter_monkey',
   name: 'Monkeg',
+  genderRatio: { female: 0.5 },
   type: ElementType.WATER,
   baseStats: {
     hp: 62,
@@ -807,6 +838,7 @@ export const STARTER_MONKEY: CosmoidTemplate = {
 export const MACASK: CosmoidTemplate = {
   id: 'macask',
   name: 'Macask',
+  genderRatio: { female: 0.5 },
   type: ElementType.WATER,
   baseStats: {
     hp: 82,

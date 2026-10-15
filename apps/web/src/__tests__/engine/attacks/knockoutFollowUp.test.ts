@@ -22,6 +22,7 @@ function createBattle() {
     level: 14,
     xp: 0,
     equippedAttacks: ['LOOSE_END'],
+    gender: 'female' as const,
     isShiny: false,
   };
   const engine = new TowerDefenseEngine(

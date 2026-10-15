@@ -14,6 +14,7 @@ const profile: Profile = {
       level: 5,
       xp: 0,
       equippedAttacks: ['PINCH'],
+      gender: 'female' as const,
       isShiny: false,
     },
     {
@@ -22,6 +23,7 @@ const profile: Profile = {
       level: 5,
       xp: 0,
       equippedAttacks: ['SCRATCH'],
+      gender: 'female' as const,
       isShiny: false,
     },
     {
@@ -30,6 +32,7 @@ const profile: Profile = {
       level: 5,
       xp: 0,
       equippedAttacks: ['TACKLE'],
+      gender: 'female' as const,
       isShiny: false,
     },
     {
@@ -38,6 +41,7 @@ const profile: Profile = {
       level: 7,
       xp: 0,
       equippedAttacks: ['NIBBLE'],
+      gender: 'female' as const,
       isShiny: false,
     },
     {
@@ -46,6 +50,7 @@ const profile: Profile = {
       level: 6,
       xp: 0,
       equippedAttacks: ['TACKLE'],
+      gender: 'female' as const,
       isShiny: false,
     },
     {
@@ -54,6 +59,7 @@ const profile: Profile = {
       level: 4,
       xp: 0,
       equippedAttacks: ['TACKLE'],
+      gender: 'female' as const,
       isShiny: false,
     },
     {
@@ -62,6 +68,7 @@ const profile: Profile = {
       level: 8,
       xp: 0,
       equippedAttacks: ['TACKLE'],
+      gender: 'female' as const,
       isShiny: false,
     },
     {
@@ -70,6 +77,7 @@ const profile: Profile = {
       level: 12,
       xp: 0,
       equippedAttacks: ['TACKLE'],
+      gender: 'female' as const,
       isShiny: false,
     },
     {
@@ -78,6 +86,7 @@ const profile: Profile = {
       level: 10,
       xp: 0,
       equippedAttacks: ['PINCH'],
+      gender: 'female' as const,
       isShiny: false,
     },
   ],
@@ -202,6 +211,7 @@ describe('CosmoidCodexScreen', () => {
           level: 10,
           xp: 0,
           equippedAttacks: ['TACKLE'],
+          gender: 'female' as const,
           isShiny: false,
         }),
       capturedSpeciesIds: ['bug_stage_1', 'bug_stage_2', 'bug_stage_3'],

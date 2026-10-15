@@ -36,6 +36,7 @@ const createMarophisTower = (): Tower => ({
     level: 8,
     xp: 0,
     equippedAttacks: ['VENOM_SPRAY'],
+    gender: 'female' as const,
     isShiny: false,
   },
   position: { x: 0, y: 0 },

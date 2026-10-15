@@ -4,6 +4,7 @@ import Panel from '@/app/components/ui/Panel';
 import { Button } from '@/app/components/ui/Button';
 import { MAX_PARTY_SIZE } from '@/constants/game';
 import CreatureDetailsScreen from '@/app/components/CreatureDetailsScreen';
+import { GenderBadge } from '@/app/components/ui/GenderBadge';
 
 interface PartyScreenProps {
   creatures: Creature[];
@@ -227,6 +228,11 @@ export default function PartyScreen({
               <div className="absolute top-0 right-0 rounded-bl bg-black/60 px-1 text-[8px] font-bold text-sand lg:text-[10px]">
                 Lv{creature.level}
               </div>
+              <GenderBadge
+                gender={creature.gender}
+                compact
+                className="absolute bottom-0 right-0 text-[10px] lg:text-xs"
+              />
               {creature.isShiny && (
                 <div className="absolute top-0.5 left-0.5 text-[8px] lg:text-[10px]">
                   ✨
@@ -314,6 +320,11 @@ export default function PartyScreen({
                       <div className="absolute top-0.5 right-0.5 rounded bg-black/80 px-1 text-[9px] font-bold text-sand lg:text-xs">
                         Lv{creature.level}
                       </div>
+                      <GenderBadge
+                        gender={creature.gender}
+                        compact
+                        className="absolute bottom-0 right-0 text-[10px] lg:text-xs"
+                      />
                       {creature.isShiny && (
                         <div className="absolute top-0.5 left-0.5 text-[9px] lg:text-sm">
                           ✨

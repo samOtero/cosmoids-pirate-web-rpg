@@ -119,6 +119,7 @@ export const VANE_LEVEL: TDLevelData = {
         equippedAttacks: ['TACKLE'],
         activeAttackIndex: 0,
         targetingMode: 'first',
+        gender: 'male' as const,
         isShiny: false,
       },
       position: {
@@ -146,6 +147,7 @@ export const VANE_LEVEL: TDLevelData = {
       speedMultiplier: 0.5,
       goalDamage: 10,
       hpMultiplier: 11,
+      gender: 'female' as const,
       abilityId: 'BETTLE_HARDEN',
     },
   ],

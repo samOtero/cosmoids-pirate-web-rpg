@@ -82,6 +82,7 @@ export const FOREST_LEVEL: TDLevelData = {
         equippedAttacks: ['TACKLE'],
         activeAttackIndex: 0,
         targetingMode: 'first',
+        gender: 'male' as const,
         isShiny: false,
       },
       position: {

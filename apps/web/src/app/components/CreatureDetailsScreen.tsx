@@ -8,6 +8,7 @@ import { ATTACK_DEFS } from "@/engine/tower-defense/attacks/definitions";
 import { Button } from "@/app/components/ui/Button";
 import Panel from "@/app/components/ui/Panel";
 import { TypeBadge } from "@/app/components/ui/TypeBadge";
+import { GenderBadge } from "@/app/components/ui/GenderBadge";
 
 interface CreatureDetailsScreenProps {
   creature: Creature;
@@ -94,13 +95,14 @@ export default function CreatureDetailsScreen({
     <div className="fixed inset-0 z-50 flex flex-col bg-[#0b1520] text-sand p-3 lg:p-6 overflow-hidden animate-[fadeIn_0.2s_ease-out]">
       {/* Top Header Bar */}
       <div className="flex items-center justify-between mb-2 lg:mb-4 shrink-0 border-b border-wood/30 pb-2">
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 flex-wrap items-center gap-2 lg:gap-3">
           <h2 className="text-xl lg:text-3xl font-black text-sand tracking-wide uppercase drop-shadow">
             {creature.name}
           </h2>
           <span className="text-xs lg:text-sm font-extrabold bg-cyan-900/60 px-2 py-0.5 rounded-full border border-cyan-500/30 text-cyan-400">
             Lv {creature.level}
           </span>
+          <GenderBadge gender={creature.gender} className="text-xs lg:text-sm" />
           <TypeBadge type={creature.type} />
           {creature.secondaryType && (
             <TypeBadge type={creature.secondaryType} />

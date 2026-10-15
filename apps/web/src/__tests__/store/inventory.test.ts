@@ -19,6 +19,7 @@ describe('Inventory & Profile Logic', () => {
       level: 5,
       xp: 200,
       equippedAttacks: ['TACKLE', 'EMBER'],
+      gender: 'female' as const,
       isShiny: false,
     });
 

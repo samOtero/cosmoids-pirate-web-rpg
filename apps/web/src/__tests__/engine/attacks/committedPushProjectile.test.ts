@@ -32,6 +32,7 @@ function createBattle() {
         level: 8,
         xp: 0,
         equippedAttacks: ['WAKE_WHIP'],
+        gender: 'female' as const,
         isShiny: false,
       },
     ]

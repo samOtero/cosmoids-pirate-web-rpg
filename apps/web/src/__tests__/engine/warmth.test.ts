@@ -40,6 +40,7 @@ function createEngine() {
         level: 8,
         xp: 0,
         equippedAttacks: ['SUNBATHE', 'SCRATCH', 'WAKE_WHIP', 'DEEPWATER_GRIP'],
+        gender: 'female' as const,
         isShiny: false,
       },
     ]

@@ -32,6 +32,7 @@ function battle(
         speciesId: 'macask',
         level: 16,
         xp: 0,
+        gender: 'female' as const,
         isShiny: false,
         equippedAttacks: ['BARREL_BOWLING', 'BARREL_BASH'],
       },

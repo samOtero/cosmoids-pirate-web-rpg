@@ -38,6 +38,7 @@ const createPalmitTower = (id = 'palmit_tower'): Tower => ({
     level: 5,
     xp: 0,
     equippedAttacks: ['COIR_SNAP'],
+    gender: 'female' as const,
     isShiny: false,
   },
   position: { x: 0, y: 0 },
