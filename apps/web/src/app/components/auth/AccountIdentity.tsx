@@ -8,8 +8,10 @@ import styles from './account.module.css';
 
 export default function AccountIdentity({
   onSignedOut,
+  onStart,
 }: {
   onSignedOut: () => void;
+  onStart?: () => void;
 }) {
   const { session, hasError, refetch } = useAccount();
   const [busy, setBusy] = useState(false);
@@ -35,14 +37,42 @@ export default function AccountIdentity({
   };
 
   return (
-    <div className="flex min-w-0 flex-col items-end gap-1">
-      <div className="flex min-w-0 items-center gap-3">
+    <div
+      className={
+        onStart ? styles.titleIdentity : 'flex min-w-0 flex-col items-end gap-1'
+      }
+    >
+      <div
+        className={
+          onStart ? styles.titleActions : 'flex min-w-0 items-center gap-3'
+        }
+      >
         <p className={styles.identity}>
           Signed in as <strong>{session?.user.name}</strong>
         </p>
-        <Button variant="wood" onClick={logout} disabled={busy}>
-          {busy ? 'Logging out…' : 'Log out'}
-        </Button>
+        {onStart ? (
+          <>
+            <Button
+              variant="wood"
+              className={styles.startButton}
+              onClick={onStart}
+            >
+              Start
+            </Button>
+            <button
+              type="button"
+              className={styles.textButton}
+              onClick={logout}
+              disabled={busy}
+            >
+              {busy ? 'Logging out…' : 'Log out'}
+            </button>
+          </>
+        ) : (
+          <Button variant="wood" onClick={logout} disabled={busy}>
+            {busy ? 'Logging out…' : 'Log out'}
+          </Button>
+        )}
       </div>
       {hasError && (
         <p role="status" className={styles.error}>

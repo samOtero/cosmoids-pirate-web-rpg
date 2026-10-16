@@ -14,12 +14,10 @@ export default function AccountLauncher({ onStart }: { onStart: () => void }) {
   return (
     <div className={styles.launcher}>
       {enabled && session ? (
-        <>
-          <AccountIdentity onSignedOut={() => setAction(null)} />
-          <Button variant="wood" onClick={onStart}>
-            Start
-          </Button>
-        </>
+        <AccountIdentity
+          onSignedOut={() => setAction(null)}
+          onStart={onStart}
+        />
       ) : (
         <>
           {enabled && (
