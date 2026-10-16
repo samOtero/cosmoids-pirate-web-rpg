@@ -217,7 +217,7 @@ describe('account UI with the real Better Auth client', () => {
     expect(onStart).toHaveBeenCalledOnce();
   });
 
-  it('logs in and out without deleting local progress', async () => {
+  it('logs in, returns to the title without logging out, and logs out without deleting local progress', async () => {
     localStorage.setItem('cosmoids-game-state', 'existing-local-save');
     const onStart = showStart();
     const dialog = await openForm('Log in');
@@ -231,6 +231,17 @@ describe('account UI with the real Better Auth client', () => {
     ).toBeInTheDocument();
     expect(screen.getByText(/Signed in as/)).toHaveTextContent(user.name);
     expect(onStart).toHaveBeenCalledOnce();
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+    expect(
+      screen.getByRole('heading', { name: 'COSMOIDS TD' })
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Signed in as/)).toHaveTextContent(user.name);
+    expect(screen.getByRole('button', { name: 'Start' })).toBeEnabled();
+    expect(
+      screen.queryByRole('button', { name: 'Play offline' })
+    ).not.toBeInTheDocument();
+    expect(serverSession).toEqual(validSession);
+    expect(onStart).toHaveBeenCalledOnce();
     fireEvent.click(await screen.findByRole('button', { name: 'Log out' }));
     await waitFor(() =>
       expect(
@@ -238,11 +249,16 @@ describe('account UI with the real Better Auth client', () => {
       ).not.toBeInTheDocument()
     );
     expect(
-      await screen.findByRole('button', { name: 'Play as guest' })
+      await screen.findByRole('button', { name: 'Play offline' })
     ).toBeEnabled();
     expect(localStorage.getItem('cosmoids-game-state')).toBe(
       'existing-local-save'
     );
+    expect(screen.getByRole('button', { name: 'Log in' })).toBeEnabled();
+    expect(
+      screen.getByRole('button', { name: 'Create account' })
+    ).toBeEnabled();
+    expect(screen.queryByText(/Signed in as/)).not.toBeInTheDocument();
   });
 
   it.each([401, 429])(
@@ -287,7 +303,7 @@ describe('account UI with the real Better Auth client', () => {
     expect(
       await screen.findByText(/couldn’t check your account/)
     ).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Play as guest' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Play offline' }));
     expect(onStart).toHaveBeenCalledOnce();
     expect(
       screen.getByRole('heading', { name: 'Select Save File' })
@@ -295,7 +311,7 @@ describe('account UI with the real Better Auth client', () => {
     expect(screen.queryByText(/Signed in as/)).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Back' }));
     expect(
-      await screen.findByRole('button', { name: 'Play as guest' })
+      await screen.findByRole('button', { name: 'Play offline' })
     ).toBeEnabled();
   });
 
@@ -306,9 +322,16 @@ describe('account UI with the real Better Auth client', () => {
       user.name
     );
     expect(
-      screen.getByRole('heading', { name: 'Select Save File' })
-    ).toBeInTheDocument();
-    expect(onStart).toHaveBeenCalledOnce();
+      screen.queryByRole('heading', { name: 'Select Save File' })
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Start' })).toBeEnabled();
+    expect(
+      screen.queryByRole('button', { name: 'Play offline' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Log in' })
+    ).not.toBeInTheDocument();
+    expect(onStart).not.toHaveBeenCalled();
     sessionFailure = true;
     const later = Date.now() + 20000;
     vi.spyOn(Date, 'now').mockReturnValue(later);
@@ -322,5 +345,15 @@ describe('account UI with the real Better Auth client', () => {
     ).toBeInTheDocument();
     expect(screen.getByText(/Signed in as/)).toHaveTextContent(user.name);
     Reflect.deleteProperty(document, 'visibilityState');
+    expect(onStart).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }));
+    expect(
+      screen.getByRole('heading', { name: 'Select Save File' })
+    ).toBeInTheDocument();
+    expect(onStart).toHaveBeenCalledOnce();
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+    expect(screen.getByRole('button', { name: 'Start' })).toBeEnabled();
+    expect(screen.getByText(/Signed in as/)).toHaveTextContent(user.name);
+    expect(onStart).toHaveBeenCalledOnce();
   });
 });

@@ -15,6 +15,6 @@ test('blocks the game in portrait and clears after rotating to landscape', async
   await page.setViewportSize({ width: 844, height: 390 });
   await expect(rotatePrompt).toBeHidden();
   await expect(
-    page.getByRole('button', { name: 'Play as guest' })
+    page.getByRole('button', { name: 'Play offline' })
   ).toBeVisible();
 });

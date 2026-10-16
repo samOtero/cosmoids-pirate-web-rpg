@@ -78,7 +78,7 @@ for (const viewport of [
     });
     if (await decline.isVisible()) await decline.click();
     await page
-      .getByRole('button', { name: 'Play as guest', exact: true })
+      .getByRole('button', { name: 'Play offline', exact: true })
       .click();
     await page.getByText('Gender browser test', { exact: true }).click();
     await page.locator('#mode-story').click();

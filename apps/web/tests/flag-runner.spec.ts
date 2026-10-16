@@ -77,7 +77,7 @@ for (const viewport of [
     await page.addStyleTag({
       content: 'nextjs-portal { pointer-events: none; }',
     });
-    await page.getByRole('button', { name: 'Play as guest' }).click();
+    await page.getByRole('button', { name: 'Play offline' }).click();
     await page.getByText('Flag runner test', { exact: true }).click();
     await page.locator('#mode-story').click();
     await page.locator(`#level-${LEVEL_ORDER.indexOf(entry) + 1}`).click();

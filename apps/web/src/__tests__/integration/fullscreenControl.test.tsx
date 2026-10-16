@@ -102,7 +102,7 @@ describe('separate play and fullscreen controls', () => {
         <FullscreenControl />
       </>
     );
-    fireEvent.click(screen.getByRole('button', { name: 'Play as guest' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Play offline' }));
     expect(onStart).toHaveBeenCalledOnce();
     expect(request).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: 'Enter fullscreen' }));

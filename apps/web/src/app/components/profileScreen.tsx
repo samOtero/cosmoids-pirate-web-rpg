@@ -59,13 +59,10 @@ export default function ProfileScreen({
               🧪 Profile 3 Templates
             </Button>
           )}
-          {session ? (
-            <AccountIdentity onSignedOut={onBack} />
-          ) : (
-            <Button variant="wood" onClick={onBack}>
-              Back
-            </Button>
-          )}
+          {session && <AccountIdentity onSignedOut={onBack} />}
+          <Button variant="wood" onClick={onBack}>
+            Back
+          </Button>
         </div>
       </div>
 

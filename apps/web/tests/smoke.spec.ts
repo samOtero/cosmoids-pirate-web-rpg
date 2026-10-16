@@ -9,7 +9,7 @@ test('loads the game shell without uncaught browser errors', async ({
   const response = await page.goto('/');
 
   expect(response?.ok()).toBe(true);
-  await page.getByRole('button', { name: 'Play as guest' }).click();
+  await page.getByRole('button', { name: 'Play offline' }).click();
   await expect(
     page.getByRole('heading', { name: 'Select Save File' })
   ).toBeVisible();
@@ -18,7 +18,7 @@ test('loads the game shell without uncaught browser errors', async ({
 
 test('toggles fullscreen independently of guest play', async ({ page }) => {
   await page.goto('/');
-  const play = page.getByRole('button', { name: 'Play as guest' });
+  const play = page.getByRole('button', { name: 'Play offline' });
   await page.getByRole('button', { name: 'Enter fullscreen' }).click();
   await expect(
     page.getByRole('button', { name: 'Exit fullscreen' })
