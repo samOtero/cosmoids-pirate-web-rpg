@@ -38,7 +38,12 @@ describe.each(Object.entries(TD_LEVELS))(
   (id, { levelData: level, winEvents, journalCompletion }) => {
     it('has usable routes and valid wave, creature, attack, and objective references', () => {
       expect(
-        validateTDLevelDraft(level, new Set(Object.keys(COSMOID_TEMPLATES)))
+        validateTDLevelDraft(
+          level,
+          new Set(
+            Object.values(COSMOID_TEMPLATES).map((template) => template.id)
+          )
+        )
       ).toEqual([]);
       expect(level.paths.length).toBeGreaterThan(0);
       for (const path of level.paths) {

@@ -1,10 +1,11 @@
+import { AttackId } from '@/types/definitionIds';
 import { beforeEach, afterEach } from 'vitest';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import type { AttackDefinition } from '@/engine/tower-defense/attacks/types';
 import { ElementType } from '@/types/baseGame';
 
 function mechanic(
-  id: string,
+  id: AttackId,
   overrides: Partial<AttackDefinition>
 ): AttackDefinition {
   return {
@@ -24,8 +25,8 @@ function mechanic(
 // Stable simulation inputs, independent of shipped move tuning. Never synchronize
 // these values with the production registry. Only mechanics under test own them.
 // Existing IDs route legacy engine hooks that still dispatch by move ID.
-export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
-  BARREL_BASH: mechanic('BARREL_BASH', {
+export const ATTACK_FIXTURES: Record<AttackId, AttackDefinition> = {
+  [AttackId.BARREL_BASH]: mechanic(AttackId.BARREL_BASH, {
     type: ElementType.WATER,
     cooldownMs: 1200,
     projectileSpeed: 1.15,
@@ -37,7 +38,7 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
     isDashAttack: true,
     dashTrailType: 'WATER',
   }),
-  BARREL_BOWLING: mechanic('BARREL_BOWLING', {
+  [AttackId.BARREL_BOWLING]: mechanic(AttackId.BARREL_BOWLING, {
     type: ElementType.WATER,
     power: 50,
     cooldownMs: 1600,
@@ -49,7 +50,7 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
       hitRadius: 4,
     },
   }),
-  COIR_SNAP: mechanic('COIR_SNAP', {
+  [AttackId.COIR_SNAP]: mechanic(AttackId.COIR_SNAP, {
     type: ElementType.GRASS,
     power: 25,
     cooldownMs: 900,
@@ -61,7 +62,7 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
       projectileScales: [0.72, 0.86, 1],
     },
   }),
-  DEEPWATER_GRIP: mechanic('DEEPWATER_GRIP', {
+  [AttackId.DEEPWATER_GRIP]: mechanic(AttackId.DEEPWATER_GRIP, {
     type: ElementType.WATER,
     category: 'special',
     power: 20,
@@ -73,7 +74,7 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
       resistanceMs: 6000,
     },
   }),
-  FIRE_CLAW: mechanic('FIRE_CLAW', {
+  [AttackId.FIRE_CLAW]: mechanic(AttackId.FIRE_CLAW, {
     type: ElementType.FIRE,
     power: 20,
     cooldownMs: 800,
@@ -87,7 +88,7 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
       decayIntervalMs: 2000,
     },
   }),
-  FLYING_COLORS: mechanic('FLYING_COLORS', {
+  [AttackId.FLYING_COLORS]: mechanic(AttackId.FLYING_COLORS, {
     type: ElementType.FLYING,
     category: 'special',
     power: 30,
@@ -100,7 +101,7 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
     },
     visualEffectConfigId: 'attack_flying_colors_1',
   }),
-  FUNNY_DANCE: mechanic('FUNNY_DANCE', {
+  [AttackId.FUNNY_DANCE]: mechanic(AttackId.FUNNY_DANCE, {
     category: 'special',
     power: 0,
     cooldownMs: 1600,
@@ -109,7 +110,7 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
     itemPickupLockMs: 2500,
     visualEffectConfigId: 'attack_funny_dance_1',
   }),
-  FUSE_RUSH: mechanic('FUSE_RUSH', {
+  [AttackId.FUSE_RUSH]: mechanic(AttackId.FUSE_RUSH, {
     type: ElementType.FIRE,
     power: 45,
     cooldownMs: 800,
@@ -121,14 +122,14 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
       damageMultiplier: 2,
     },
   }),
-  LOOSE_END: mechanic('LOOSE_END', {
+  [AttackId.LOOSE_END]: mechanic(AttackId.LOOSE_END, {
     power: 50,
     projectileSpeed: 1.4,
     looseEnd: {
       followUpRadius: 40,
     },
   }),
-  MALLET_SMASH: mechanic('MALLET_SMASH', {
+  [AttackId.MALLET_SMASH]: mechanic(AttackId.MALLET_SMASH, {
     type: ElementType.GRASS,
     power: 50,
     cooldownMs: 1200,
@@ -156,7 +157,7 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
     dashImpactHoldMs: 520,
     dashStopRange: 16,
   }),
-  NECTAR_SIPHON: mechanic('NECTAR_SIPHON', {
+  [AttackId.NECTAR_SIPHON]: mechanic(AttackId.NECTAR_SIPHON, {
     type: ElementType.GRASS,
     category: 'special',
     cooldownMs: 800,
@@ -173,12 +174,12 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
       },
     ],
   }),
-  NIBBLE: mechanic('NIBBLE', {
+  [AttackId.NIBBLE]: mechanic(AttackId.NIBBLE, {
     cooldownMs: 800,
     visualEffectConfigId: 'attack_nibble_1',
     isDashAttack: true,
   }),
-  PALM_SLAM: mechanic('PALM_SLAM', {
+  [AttackId.PALM_SLAM]: mechanic(AttackId.PALM_SLAM, {
     type: ElementType.FIGHTING,
     power: 95,
     cooldownMs: 3000,
@@ -192,16 +193,16 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
     ],
     visualEffectConfigId: 'attack_palm_slam_1',
   }),
-  PINCH: mechanic('PINCH', {
+  [AttackId.PINCH]: mechanic(AttackId.PINCH, {
     cooldownMs: 800,
     isDashAttack: true,
   }),
-  QUICK_ATTACK: mechanic('QUICK_ATTACK', {
+  [AttackId.QUICK_ATTACK]: mechanic(AttackId.QUICK_ATTACK, {
     power: 15,
     cooldownMs: 400,
     isDashAttack: true,
   }),
-  RALLY_HOWL: mechanic('RALLY_HOWL', {
+  [AttackId.RALLY_HOWL]: mechanic(AttackId.RALLY_HOWL, {
     category: 'special',
     power: 0,
     cooldownMs: 20000,
@@ -213,7 +214,7 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
     },
     visualEffectConfigId: 'attack_rally_howl_1',
   }),
-  RIGGING_NEST: mechanic('RIGGING_NEST', {
+  [AttackId.RIGGING_NEST]: mechanic(AttackId.RIGGING_NEST, {
     type: ElementType.BUG,
     category: 'special',
     power: 15,
@@ -243,7 +244,7 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
       },
     },
   }),
-  SAILCUTTER: mechanic('SAILCUTTER', {
+  [AttackId.SAILCUTTER]: mechanic(AttackId.SAILCUTTER, {
     type: ElementType.FLYING,
     category: 'special',
     power: 35,
@@ -258,7 +259,7 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
       threadlingDamageMultiplier: 1.35,
     },
   }),
-  SALT_SPIT: mechanic('SALT_SPIT', {
+  [AttackId.SALT_SPIT]: mechanic(AttackId.SALT_SPIT, {
     type: ElementType.WATER,
     power: 30,
     cooldownMs: 2400,
@@ -276,12 +277,12 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
       },
     ],
   }),
-  SCRATCH: mechanic('SCRATCH', {
+  [AttackId.SCRATCH]: mechanic(AttackId.SCRATCH, {
     cooldownMs: 800,
     visualEffectConfigId: 'attack_scratch_1',
     isDashAttack: true,
   }),
-  SHARED_SLUMBER: mechanic('SHARED_SLUMBER', {
+  [AttackId.SHARED_SLUMBER]: mechanic(AttackId.SHARED_SLUMBER, {
     type: ElementType.PSYCHIC,
     category: 'special',
     power: 0,
@@ -289,7 +290,7 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
     behaviorType: 'SHARED_SLUMBER',
     visualEffectConfigId: 'attack_shared_slumber_1',
   }),
-  SHIKO_QUAKE: mechanic('SHIKO_QUAKE', {
+  [AttackId.SHIKO_QUAKE]: mechanic(AttackId.SHIKO_QUAKE, {
     type: ElementType.FIGHTING,
     power: 35,
     cooldownMs: 2400,
@@ -303,7 +304,7 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
     ],
     visualEffectConfigId: 'attack_shiko_quake_1',
   }),
-  SHIPSHAPE: mechanic('SHIPSHAPE', {
+  [AttackId.SHIPSHAPE]: mechanic(AttackId.SHIPSHAPE, {
     type: ElementType.GRASS,
     power: 0,
     cooldownMs: 5000,
@@ -314,7 +315,7 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
     },
     visualEffectConfigId: 'attack_shipshape_taps',
   }),
-  STATIC_YIP: mechanic('STATIC_YIP', {
+  [AttackId.STATIC_YIP]: mechanic(AttackId.STATIC_YIP, {
     type: ElementType.ELECTRIC,
     category: 'special',
     cooldownMs: 800,
@@ -322,11 +323,11 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
     launchVisualEffectConfigId: 'attack_static_yip_launch_1',
     visualEffectConfigId: 'attack_static_yip_1',
   }),
-  TACKLE: mechanic('TACKLE', {
+  [AttackId.TACKLE]: mechanic(AttackId.TACKLE, {
     cooldownMs: 800,
     isDashAttack: true,
   }),
-  TOXIC_POLLEN: mechanic('TOXIC_POLLEN', {
+  [AttackId.TOXIC_POLLEN]: mechanic(AttackId.TOXIC_POLLEN, {
     type: ElementType.POISON,
     category: 'special',
     power: 0,
@@ -344,7 +345,7 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
     ],
     visualEffectConfigId: 'attack_toxic_pollen_1',
   }),
-  VENOM_SPRAY: mechanic('VENOM_SPRAY', {
+  [AttackId.VENOM_SPRAY]: mechanic(AttackId.VENOM_SPRAY, {
     type: ElementType.POISON,
     category: 'special',
     power: 35,
@@ -368,7 +369,7 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
       },
     ],
   }),
-  WAKE_WHIP: mechanic('WAKE_WHIP', {
+  [AttackId.WAKE_WHIP]: mechanic(AttackId.WAKE_WHIP, {
     type: ElementType.WATER,
     behaviorType: 'WAKE_WHIP',
     projectileSpeed: 1.35,
@@ -379,7 +380,7 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
       warmPushDistance: 7,
     },
   }),
-  WATER_GUN: mechanic('WATER_GUN', {
+  [AttackId.WATER_GUN]: mechanic(AttackId.WATER_GUN, {
     type: ElementType.WATER,
     category: 'special',
     cooldownMs: 800,
@@ -391,7 +392,7 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
       damageMode: 'FIRST_ONLY',
     },
   }),
-  WIND_GUST: mechanic('WIND_GUST', {
+  [AttackId.WIND_GUST]: mechanic(AttackId.WIND_GUST, {
     type: ElementType.FLYING,
     category: 'special',
     power: 0,
@@ -403,9 +404,10 @@ export const ATTACK_FIXTURES: Record<string, AttackDefinition> = {
 };
 
 export function installAttackFixtures() {
-  const originals = new Map<string, AttackDefinition | undefined>();
+  const originals = new Map<AttackId, AttackDefinition | undefined>();
   beforeEach(() => {
-    for (const [id, fixture] of Object.entries(ATTACK_FIXTURES)) {
+    for (const fixture of Object.values(ATTACK_FIXTURES)) {
+      const id = fixture.id;
       originals.set(id, ATTACK_DEFS[id]);
       ATTACK_DEFS[id] = structuredClone(fixture);
     }

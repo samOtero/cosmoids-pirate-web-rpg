@@ -1,3 +1,4 @@
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { describe, expect, it, vi } from 'vitest';
 import {
   rollCreatureGender,
@@ -48,15 +49,14 @@ describe('creature gender rules', () => {
     const template = Object.values(COSMOID_TEMPLATES).find(
       (t) => t.genderRatio !== 'genderless'
     )!;
-    const pc: PlayerCreature = {
+    const pc: PlayerCreature = makePlayerCreature({
       id: 'saved-individual',
       speciesId: template.id,
       gender: 'female',
       level: 3,
       xp: 1,
       equippedAttacks: [],
-      isShiny: false,
-    };
+    });
     const random = vi.spyOn(Math, 'random').mockImplementation(() => {
       throw new Error('Resolution must not reroll identity');
     });

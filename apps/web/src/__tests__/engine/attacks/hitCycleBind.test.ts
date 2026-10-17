@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ProjectileBehavior } from '@/engine/tower-defense/attacks/behaviors';
@@ -32,15 +34,12 @@ const createEngine = (): TowerDefenseEngine => {
 
 const createPalmitTower = (id = 'palmit_tower'): Tower => ({
   id,
-  creature: {
+  creature: makePlayerCreature({
     id: `palmit_${id}`,
-    speciesId: 'starter_crab',
+    speciesId: SpeciesId.PALMIT,
     level: 5,
-    xp: 0,
-    equippedAttacks: ['COIR_SNAP'],
-    gender: 'female' as const,
-    isShiny: false,
-  },
+    equippedAttacks: [AttackId.COIR_SNAP],
+  }),
   position: { x: 0, y: 0 },
   lastAttackTime: 0,
   currentAttack: 55,
@@ -49,7 +48,9 @@ const createPalmitTower = (id = 'palmit_tower'): Tower => ({
   currentSpecialDefense: 58,
   hp: 100,
   maxHp: 100,
-  equippedAttacksRuntime: [{ definitionId: 'COIR_SNAP', lastFiredTime: 0 }],
+  equippedAttacksRuntime: [
+    { definitionId: AttackId.COIR_SNAP, lastFiredTime: 0 },
+  ],
   selectedAttackIndex: 0,
   facingDirection: 'right',
   targetingMode: 'closest',
@@ -57,7 +58,7 @@ const createPalmitTower = (id = 'palmit_tower'): Tower => ({
 
 const createEnemy = (): Enemy => ({
   id: 'enemy',
-  definitionId: 'senticle',
+  definitionId: SpeciesId.SENTICLE,
   level: 5,
   position: { x: 10, y: 0 },
   hp: 1000,
@@ -86,7 +87,7 @@ describe('Per-caster hit cycle and bind', () => {
         engine,
         palmit,
         enemy,
-        ATTACK_FIXTURES.COIR_SNAP
+        ATTACK_FIXTURES[AttackId.COIR_SNAP]
       );
       expect(palmit.coirSnapHits).toBe(progress);
     }
@@ -123,12 +124,16 @@ describe('Per-caster hit cycle and bind', () => {
       ProjectileBehavior.execute(
         engine,
         firstPalmit,
-        ATTACK_FIXTURES.COIR_SNAP
+        ATTACK_FIXTURES[AttackId.COIR_SNAP]
       );
       expect(engine.projectiles.at(-1)?.visualScale).toBe(expectedScale);
     }
 
-    ProjectileBehavior.execute(engine, secondPalmit, ATTACK_FIXTURES.COIR_SNAP);
+    ProjectileBehavior.execute(
+      engine,
+      secondPalmit,
+      ATTACK_FIXTURES[AttackId.COIR_SNAP]
+    );
     expect(engine.projectiles.at(-1)?.visualScale).toBe(0.72);
   });
 });

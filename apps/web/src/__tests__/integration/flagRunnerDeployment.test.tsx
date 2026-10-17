@@ -1,4 +1,9 @@
-import React from 'react';
+import { AttackId } from '@/types/definitionIds';
+import {
+  makePlayerCreature,
+  testDefinitionId,
+} from '@/__tests__/utils/dataBuilders';
+
 import { act, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import TowerDefenseScreen from '@/app/components/tower-defense/TowerDefenseScreen';
@@ -30,7 +35,7 @@ afterEach(() => {
 
 describe('flag runner roster availability', () => {
   it('locks the tower button during a committed run and recovery, then enables it again', () => {
-    battleSpecies('test_ui_runner');
+    battleSpecies(testDefinitionId('test_ui_runner'));
     const levelData: TDLevelData = {
       paths: [
         [
@@ -43,16 +48,13 @@ describe('flag runner roster availability', () => {
       waves: [],
       disableCapture: true,
       premadeRoster: [
-        {
+        makePlayerCreature({
           id: 'runner',
-          speciesId: 'test_ui_runner',
+          speciesId: testDefinitionId('test_ui_runner'),
           level: 5,
-          xp: 0,
-          equippedAttacks: ['TACKLE'],
+          equippedAttacks: [AttackId.TACKLE],
           activeAttackIndex: 0,
-          gender: 'female' as const,
-          isShiny: false,
-        },
+        }),
       ],
       flagDuel: {
         rivalFlagLives: 3,
@@ -62,7 +64,7 @@ describe('flag runner roster availability', () => {
           recoveryDurationMs: 500,
         },
         alliedRunner: {
-          creatureId: 'test_ui_runner',
+          creatureId: testDefinitionId('test_ui_runner'),
           level: 1,
           pathIndex: 0,
           speed: 10,

@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -30,15 +32,12 @@ const levelData = {
 
 const createMarophisTower = (): Tower => ({
   id: 'marophis_tower',
-  creature: {
+  creature: makePlayerCreature({
     id: 'marophis_one',
-    speciesId: 'marophis',
+    speciesId: SpeciesId.MAROPHIS,
     level: 8,
-    xp: 0,
-    equippedAttacks: ['VENOM_SPRAY'],
-    gender: 'female' as const,
-    isShiny: false,
-  },
+    equippedAttacks: [AttackId.VENOM_SPRAY],
+  }),
   position: { x: 0, y: 0 },
   lastAttackTime: 0,
   currentAttack: 12,
@@ -47,7 +46,9 @@ const createMarophisTower = (): Tower => ({
   currentSpecialDefense: 18,
   hp: 28,
   maxHp: 28,
-  equippedAttacksRuntime: [{ definitionId: 'VENOM_SPRAY', lastFiredTime: 0 }],
+  equippedAttacksRuntime: [
+    { definitionId: AttackId.VENOM_SPRAY, lastFiredTime: 0 },
+  ],
   selectedAttackIndex: 0,
   facingDirection: 'right',
   targetingMode: 'closest',
@@ -55,7 +56,7 @@ const createMarophisTower = (): Tower => ({
 
 const createEnemy = (): Enemy => ({
   id: 'target',
-  definitionId: 'mouse_1',
+  definitionId: SpeciesId.KNOTIA,
   level: 8,
   position: { x: 10, y: 0 },
   hp: 200,
@@ -85,7 +86,7 @@ describe('Stacking poison', () => {
       engine,
       source,
       target,
-      ATTACK_FIXTURES.VENOM_SPRAY
+      ATTACK_FIXTURES[AttackId.VENOM_SPRAY]
     );
 
     expect(target.hp).toBeLessThan(target.maxHp);
@@ -116,7 +117,7 @@ describe('Stacking poison', () => {
       engine,
       source,
       target,
-      ATTACK_FIXTURES.VENOM_SPRAY
+      ATTACK_FIXTURES[AttackId.VENOM_SPRAY]
     );
 
     expect(target.hp).toBe(target.maxHp);
@@ -143,7 +144,7 @@ describe('Stacking poison', () => {
         engine,
         source,
         target,
-        ATTACK_FIXTURES.VENOM_SPRAY
+        ATTACK_FIXTURES[AttackId.VENOM_SPRAY]
       );
 
       expect(target.statusConditions).toHaveLength(1);
@@ -162,7 +163,7 @@ describe('Stacking poison', () => {
       engine,
       source,
       target,
-      ATTACK_FIXTURES.VENOM_SPRAY
+      ATTACK_FIXTURES[AttackId.VENOM_SPRAY]
     );
 
     expect(target.statusConditions).toHaveLength(1);
@@ -196,7 +197,7 @@ describe('Stacking poison', () => {
       engine,
       source,
       target,
-      ATTACK_FIXTURES.VENOM_SPRAY
+      ATTACK_FIXTURES[AttackId.VENOM_SPRAY]
     );
 
     expect(target.hp).toBeLessThan(target.maxHp);
@@ -232,7 +233,7 @@ describe('Stacking poison', () => {
       engine,
       source,
       target,
-      ATTACK_FIXTURES.VENOM_SPRAY
+      ATTACK_FIXTURES[AttackId.VENOM_SPRAY]
     );
 
     expect(target.statusConditions).toHaveLength(2);
@@ -263,14 +264,14 @@ describe('Stacking poison', () => {
       engine,
       source,
       target,
-      ATTACK_FIXTURES.VENOM_SPRAY
+      ATTACK_FIXTURES[AttackId.VENOM_SPRAY]
     );
     source.currentSpecialAttack = 200;
     EffectProcessor.applyDamageAndEffects(
       engine,
       source,
       target,
-      ATTACK_FIXTURES.VENOM_SPRAY
+      ATTACK_FIXTURES[AttackId.VENOM_SPRAY]
     );
 
     expect(findPoison(target, VENOM_SPRAY_POISON_ID)).toMatchObject({

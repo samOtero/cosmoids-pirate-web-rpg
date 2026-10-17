@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useEditorSource } from './useEditorSource';
 import EditorSourceStatus from './EditorSourceStatus';
 import * as PIXI from 'pixi.js';
-import * as CREATURES from '@/constants/creatures';
+
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { interpolateKeyframes } from '@/utils/animationUtils';
 import {

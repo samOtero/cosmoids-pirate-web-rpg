@@ -1,3 +1,5 @@
+import { AttackId, SpeciesId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it } from 'vitest';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
@@ -14,7 +16,7 @@ const engines: TowerDefenseEngine[] = [];
 afterEach(() => {
   engines.splice(0).forEach((engine) => engine.destroy());
 });
-const move = ATTACK_FIXTURES.SHIPSHAPE;
+const move = ATTACK_FIXTURES[AttackId.SHIPSHAPE];
 function battle() {
   const engine = new TowerDefenseEngine(
     {
@@ -27,15 +29,14 @@ function battle() {
       placementSpots: [],
       waves: [{ id: 'empty', groups: [] }],
     },
-    ['caster', 'ally', 'far', 'dead'].map((id) => ({
-      id,
-      speciesId: 'starter_crab',
-      level: 12,
-      xp: 0,
-      equippedAttacks: ['SHIPSHAPE', 'PINCH'],
-      gender: 'female' as const,
-      isShiny: false,
-    }))
+    ['caster', 'ally', 'far', 'dead'].map((id) =>
+      makePlayerCreature({
+        id,
+        speciesId: SpeciesId.PALMIT,
+        level: 12,
+        equippedAttacks: [AttackId.SHIPSHAPE, AttackId.PINCH],
+      })
+    )
   );
   engines.push(engine);
   for (const [id, x, y] of [

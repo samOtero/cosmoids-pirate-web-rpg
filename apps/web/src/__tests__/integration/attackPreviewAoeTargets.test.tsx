@@ -1,4 +1,5 @@
-import React from 'react';
+import { AttackId } from '@/types/definitionIds';
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 
@@ -49,7 +50,7 @@ describe('Attack & Ability Lab AOE targets', () => {
         engine.isPositionInAttackRange(
           tower.position,
           enemy.position,
-          ATTACK_DEFS.TOXIC_POLLEN.rangeIndex
+          ATTACK_DEFS[AttackId.TOXIC_POLLEN].rangeIndex
         )
       )
     ).toBe(true);

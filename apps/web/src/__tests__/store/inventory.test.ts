@@ -1,3 +1,5 @@
+import { AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useGameStore } from '@/store/gameStore';
 import { STARTER_CRAB } from '@/constants/creatures';
@@ -13,22 +15,26 @@ describe('Inventory & Profile Logic', () => {
     const store = useGameStore.getState();
     const profileId = 0;
 
-    store.addCreatureToProfile(profileId, {
-      id: STARTER_CRAB.id,
-      speciesId: STARTER_CRAB.id,
-      level: 5,
-      xp: 200,
-      equippedAttacks: ['TACKLE', 'EMBER'],
-      gender: 'female' as const,
-      isShiny: false,
-    });
+    store.addCreatureToProfile(
+      profileId,
+      makePlayerCreature({
+        id: '',
+        speciesId: STARTER_CRAB.id,
+        level: 5,
+        xp: 200,
+        equippedAttacks: [AttackId.TACKLE, AttackId.EMBER],
+      })
+    );
 
     const profile = useGameStore.getState().profiles[0]!;
     expect(profile.creatures).toHaveLength(1);
     expect(profile.creatures[0].speciesId).toBe(STARTER_CRAB.id);
     expect(profile.creatures[0].level).toBe(5);
     expect(profile.creatures[0].xp).toBe(200);
-    expect(profile.creatures[0].equippedAttacks).toEqual(['TACKLE', 'EMBER']);
+    expect(profile.creatures[0].equippedAttacks).toEqual([
+      AttackId.TACKLE,
+      AttackId.EMBER,
+    ]);
   });
 
   it('should handle GAIN_ITEM event correctly', () => {

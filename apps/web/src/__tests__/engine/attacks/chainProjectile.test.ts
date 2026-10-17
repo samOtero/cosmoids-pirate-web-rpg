@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ProjectileBehavior } from '@/engine/tower-defense/attacks/behaviors';
@@ -16,15 +18,12 @@ afterEach(() => {
 
 function createBattle() {
   vi.spyOn(Math, 'random').mockReturnValue(0.99);
-  const creature = {
+  const creature = makePlayerCreature({
     id: 'harlequill',
-    speciesId: 'harlequill',
+    speciesId: SpeciesId.HARLEQUILL,
     level: 9,
-    xp: 0,
-    equippedAttacks: ['FLYING_COLORS'],
-    gender: 'female' as const,
-    isShiny: false,
-  };
+    equippedAttacks: [AttackId.FLYING_COLORS],
+  });
   const engine = new TowerDefenseEngine(
     {
       paths: [
@@ -50,7 +49,7 @@ function createBattle() {
 function addEnemy(engine: TowerDefenseEngine, id: string, y: number): Enemy {
   const enemy = engine.spawnPreviewEnemy({
     id,
-    creatureId: 'senticle',
+    creatureId: SpeciesId.SENTICLE,
     level: 9,
     position: { x: 10, y },
   })!;
@@ -72,7 +71,11 @@ describe('Distinct-target projectile chains', () => {
     expect(
       engine.isPositionInTowerRange(tower.position, routeThird.position, 50)
     ).toBe(false);
-    ProjectileBehavior.execute(engine, tower, ATTACK_FIXTURES.FLYING_COLORS);
+    ProjectileBehavior.execute(
+      engine,
+      tower,
+      ATTACK_FIXTURES[AttackId.FLYING_COLORS]
+    );
     expect(engine.projectiles[0].targetId).toBe(first.id);
 
     engine.tick(0, 200);
@@ -106,7 +109,11 @@ describe('Distinct-target projectile chains', () => {
     const first = addEnemy(engine, 'first', 0);
     const far = addEnemy(engine, 'far', 60);
 
-    ProjectileBehavior.execute(engine, tower, ATTACK_FIXTURES.FLYING_COLORS);
+    ProjectileBehavior.execute(
+      engine,
+      tower,
+      ATTACK_FIXTURES[AttackId.FLYING_COLORS]
+    );
     engine.tick(0, 200);
 
     expect(first.hp).toBeLessThan(first.maxHp);
@@ -121,7 +128,11 @@ describe('Distinct-target projectile chains', () => {
     const second = addEnemy(engine, 'second', 25);
     const third = addEnemy(engine, 'third', 60);
 
-    ProjectileBehavior.execute(engine, tower, ATTACK_FIXTURES.FLYING_COLORS);
+    ProjectileBehavior.execute(
+      engine,
+      tower,
+      ATTACK_FIXTURES[AttackId.FLYING_COLORS]
+    );
     engine.tick(0, 200);
     expect(first.hp).toBeLessThanOrEqual(0);
     expect(engine.projectiles[0].targetId).toBe(second.id);

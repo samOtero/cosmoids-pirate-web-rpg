@@ -1,4 +1,5 @@
-import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
+import { getDefinitionVisuals } from '@/utils/definitionVisuals';
+
 import type { TowerDefenseEngine } from '../TowerDefenseEngine';
 import type { Enemy, Tower } from '../types';
 import { EffectProcessor } from './EffectProcessor';
@@ -110,7 +111,7 @@ export function updatePalmSlams(
         if (attackDef.visualEffectConfigId) {
           const configId = attackDef.visualEffectConfigId;
           const vfxConfig =
-            CREATURE_TD_CONFIGS[configId]?.default?.vfxAnimation;
+            getDefinitionVisuals(configId)?.default?.vfxAnimation;
           engine.visualEffects.push({
             id: `vfx_palm_slam_${source.id}_${engine.elapsedTimeMs}_${Math.random()}`,
             configId,

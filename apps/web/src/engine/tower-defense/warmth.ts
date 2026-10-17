@@ -1,3 +1,4 @@
+import { SpeciesId } from '@/types/definitionIds';
 import { ElementType } from '@/types/baseGame';
 import type { AttackDefinition } from './attacks/types';
 import type { Tower, TowerWarmthState } from './types';
@@ -8,7 +9,10 @@ export const WARMTH_PASSIVE_GAIN = 10;
 export const WARMTH_WATER_DAMAGE_MULTIPLIER = 1.4;
 export const WARMTH_DRAIN_PER_WATER_ACTIVATION = 10;
 
-const WARMTH_FAMILY_IDS = new Set(['aguana', 'nautiguan']);
+const WARMTH_FAMILY_IDS = new Set<SpeciesId>([
+  SpeciesId.AGUANA,
+  SpeciesId.NAUTIGUAN,
+]);
 
 export function isWarmthFamilyTower(tower: Tower): boolean {
   return WARMTH_FAMILY_IDS.has(tower.creature.speciesId);

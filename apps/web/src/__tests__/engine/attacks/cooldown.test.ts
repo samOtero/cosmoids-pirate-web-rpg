@@ -1,3 +1,4 @@
+import { testDefinitionId } from '@/__tests__/utils/dataBuilders';
 import { describe, expect, it, vi } from 'vitest';
 import { ProjectileBehavior } from '@/engine/tower-defense/attacks/behaviors';
 import { applyAttackSpeedBuff } from '@/engine/tower-defense/attackSpeedModifiers';
@@ -6,7 +7,9 @@ import { makeAttack, makeBattle, registerAttack } from './helpers';
 describe('Shared attack activation and cooldowns', () => {
   it('uses the configured cooldown and preserves it when switching away and back', () => {
     const { engine, source, attack } = makeBattle();
-    const other = registerAttack(makeAttack({ id: 'TEST_OTHER_PROJECTILE' }));
+    const other = registerAttack(
+      makeAttack({ id: testDefinitionId('TEST_OTHER_PROJECTILE') })
+    );
     source.equippedAttacksRuntime = [
       { definitionId: attack.id, lastFiredTime: 0 },
       { definitionId: other.id, lastFiredTime: 0 },

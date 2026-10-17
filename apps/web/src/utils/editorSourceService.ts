@@ -307,7 +307,11 @@ export async function saveEditorSource(
       try {
         errors = validateTDLevelDraft(
           config as TDLevelData,
-          new Set(Object.keys(TD_CREATURE_DEFS)),
+          new Set(
+            Object.values(TD_CREATURE_DEFS).map(
+              (definition) => definition.baseCreature.speciesId
+            )
+          ),
           new Set(Object.keys(ENEMY_ABILITY_DEFS))
         );
       } catch {

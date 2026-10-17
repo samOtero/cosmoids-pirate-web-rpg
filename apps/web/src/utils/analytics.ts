@@ -3,7 +3,10 @@ import { useGameStore } from '@/store/gameStore';
 
 export const ANALYTICS_PREFERENCE_KEY = 'cosmoids.analytics-consent.v1';
 export type AnalyticsPreference = 'allowed' | 'declined' | null;
-type Properties = Record<string, string | number | boolean | string[]>;
+type Properties = Record<
+  string,
+  string | number | boolean | string[] | number[]
+>;
 type GameEvent =
   | 'game_started'
   | 'level_started'
@@ -54,7 +57,6 @@ export function analyticsEnabled(): boolean {
 
   return enabled;
 }
-
 
 export function setAnalyticsPreference(
   value: Exclude<AnalyticsPreference, null>

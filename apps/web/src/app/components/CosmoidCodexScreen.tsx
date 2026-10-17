@@ -1,5 +1,7 @@
 'use client';
 
+import type { SpeciesId } from '@/types/definitionIds';
+
 import Image from 'next/image';
 import { useMemo, useState } from 'react';
 
@@ -51,7 +53,7 @@ export default function CosmoidCodexScreen({
     [seenSpeciesIds, species]
   );
   const firstDiscoveredId = discoveredSpecies[0]?.id ?? null;
-  const [selectedSpeciesId, setSelectedSpeciesId] = useState<string | null>(
+  const [selectedSpeciesId, setSelectedSpeciesId] = useState<SpeciesId | null>(
     firstDiscoveredId
   );
 

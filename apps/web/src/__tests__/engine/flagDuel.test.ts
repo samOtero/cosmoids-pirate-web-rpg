@@ -1,3 +1,8 @@
+import { AttackId } from '@/types/definitionIds';
+import {
+  makePlayerCreature,
+  testDefinitionId,
+} from '@/__tests__/utils/dataBuilders';
 import { describe, expect, it } from 'vitest';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import type { TDFlagDuelConfig } from '@/engine/tower-defense/types';
@@ -6,12 +11,12 @@ import { actor, battle, battleSpecies } from './behaviorFixtures';
 import type { PlayerCreature } from '@/types/baseGame';
 
 function setup(overrides: Partial<TDFlagDuelConfig> = {}) {
-  battleSpecies('test_flag_runner');
-  battleSpecies('test_flag_guard');
+  battleSpecies(testDefinitionId('test_flag_runner'));
+  battleSpecies(testDefinitionId('test_flag_guard'));
   const flagDuel: TDFlagDuelConfig = {
     rivalFlagLives: 2,
     alliedRunner: {
-      creatureId: 'test_flag_runner',
+      creatureId: testDefinitionId('test_flag_runner'),
       level: 1,
       pathIndex: 0,
       speed: 10,
@@ -32,7 +37,11 @@ function setup(overrides: Partial<TDFlagDuelConfig> = {}) {
     ],
     placementSpots: [],
     waveEnemyDefinitions: [
-      { id: 'test_guard', creatureId: 'test_flag_guard', level: 1 },
+      {
+        id: 'test_guard',
+        creatureId: testDefinitionId('test_flag_guard'),
+        level: 1,
+      },
     ],
     waves: [{ id: 'empty', groups: [] }],
     lives: 3,
@@ -107,7 +116,12 @@ describe('autonomous flag runners', () => {
         },
       ],
     });
-    const guard = actor(engine, 'guard', 'test_flag_guard', 5);
+    const guard = actor(
+      engine,
+      'guard',
+      testDefinitionId('test_flag_guard'),
+      5
+    );
     guard.waveEnemyDefinitionId = 'test_guard';
     advance(engine, 50);
     const runner = engine.alliedFlagRunners[0];
@@ -132,7 +146,12 @@ describe('autonomous flag runners', () => {
         },
       ],
     });
-    const guard = actor(engine, 'guard', 'test_flag_guard', 5);
+    const guard = actor(
+      engine,
+      'guard',
+      testDefinitionId('test_flag_guard'),
+      5
+    );
     guard.waveEnemyDefinitionId = 'test_guard';
     guard.hp = 0;
     advance(engine, 1300);
@@ -145,11 +164,14 @@ describe('autonomous flag runners', () => {
 
   it('validates references and rejects unsafe spawn timings without mirroring level tuning', () => {
     const { level } = setup();
-    const species = new Set(['test_flag_runner', 'test_flag_guard']);
+    const species = new Set([
+      testDefinitionId('test_flag_runner'),
+      testDefinitionId('test_flag_guard'),
+    ]);
     expect(validateTDLevelDraft(level, species)).toEqual([]);
     level.flagDuel.alliedRunner.spawnIntervalMs = 0;
     level.flagDuel.alliedRunner.pathIndex = 99;
-    level.flagDuel.alliedRunner.creatureId = 'missing';
+    level.flagDuel.alliedRunner.creatureId = testDefinitionId('missing');
     level.flagDuel.defenders = [
       { enemyDefinitionId: 'missing', range: 1, damage: 1, cooldownMs: 1 },
     ];
@@ -176,17 +198,14 @@ describe('committed roster flag runners', () => {
     const level = { ...baseLevel, placementSpots: [{ x: 5, y: 40 }] };
     // Keep automatic waves out of these lifecycle assertions.
     level.flagDuel.alliedRunner.firstSpawnDelayMs = 10000;
-    const creature: PlayerCreature = {
+    const creature: PlayerCreature = makePlayerCreature({
       id: 'player-runner',
-      speciesId: 'test_flag_runner',
+      speciesId: testDefinitionId('test_flag_runner'),
       level: 5,
-      xp: 0,
-      equippedAttacks: ['TACKLE'],
+      equippedAttacks: [AttackId.TACKLE],
       activeAttackIndex: 0,
       targetingMode: 'first',
-      gender: 'female' as const,
-      isShiny: false,
-    };
+    });
     return { level, creature, engine: battle(level, [creature]) };
   }
 
@@ -201,7 +220,12 @@ describe('committed roster flag runners', () => {
       level.placementSpots[0]
     );
     expect(engine.getTowerDropSpot({ x: 100, y: 0 })).toBeUndefined();
-    const target = actor(engine, 'nearby-target', 'test_flag_guard', 5);
+    const target = actor(
+      engine,
+      'nearby-target',
+      testDefinitionId('test_flag_guard'),
+      5
+    );
     const hp = target.hp;
     expect(engine.placeTower(creature.id, launch.x, launch.y)).toBe(true);
     expect(engine.towers).toHaveLength(0);
@@ -244,7 +268,12 @@ describe('committed roster flag runners', () => {
         cooldownMs: 1,
       },
     ];
-    const guard = actor(engine, 'guard', 'test_flag_guard', 5);
+    const guard = actor(
+      engine,
+      'guard',
+      testDefinitionId('test_flag_guard'),
+      5
+    );
     guard.waveEnemyDefinitionId = 'test_guard';
     engine.launchFlagRunner(creature.id);
     advance(engine, 50);

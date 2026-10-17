@@ -1,3 +1,4 @@
+import { testDefinitionId } from '@/__tests__/utils/dataBuilders';
 import { describe, expect, it } from 'vitest';
 import type { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import type { TDLevelData, Tower } from '@/engine/tower-defense/types';
@@ -5,7 +6,7 @@ import { validateTDLevelDraft } from '@/utils/tdLevelDraft';
 import { battle, battleSpecies } from './behaviorFixtures';
 
 function reinforcementBattle(overrides: Partial<TDLevelData> = {}) {
-  battleSpecies('test_reinforcement_species');
+  battleSpecies(testDefinitionId('test_reinforcement_species'));
   const level: TDLevelData = {
     paths: [
       [
@@ -19,8 +20,16 @@ function reinforcementBattle(overrides: Partial<TDLevelData> = {}) {
     ],
     placementSpots: [],
     waveEnemyDefinitions: [
-      { id: 'test_boss', creatureId: 'test_reinforcement_species', level: 5 },
-      { id: 'test_helper', creatureId: 'test_reinforcement_species', level: 5 },
+      {
+        id: 'test_boss',
+        creatureId: testDefinitionId('test_reinforcement_species'),
+        level: 5,
+      },
+      {
+        id: 'test_helper',
+        creatureId: testDefinitionId('test_reinforcement_species'),
+        level: 5,
+      },
     ],
     reinforcementBossDefinitionId: 'test_boss',
     waves: [

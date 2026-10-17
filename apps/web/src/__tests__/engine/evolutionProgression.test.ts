@@ -1,3 +1,8 @@
+import { AttackId } from '@/types/definitionIds';
+import {
+  makePlayerCreature,
+  testDefinitionId,
+} from '@/__tests__/utils/dataBuilders';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { COSMOID_TEMPLATES } from '@/constants/creatures';
 import type { TDEvent } from '@/engine/tower-defense/events/TDEventBus';
@@ -5,12 +10,12 @@ import { calculateMaxHp, calculateStat } from '@/utils/resolvePlayerCreature';
 import { ElementType } from '@/types/baseGame';
 import { battle, species } from './behaviorFixtures';
 
-const baseId = 'test_evolution_base';
-const evolvedId = 'test_evolution_middle';
-const finalId = 'test_evolution_final';
-const rewardId = 'test_evolution_reward';
+const baseId = testDefinitionId('test_evolution_base');
+const evolvedId = testDefinitionId('test_evolution_middle');
+const finalId = testDefinitionId('test_evolution_final');
+const rewardId = testDefinitionId('test_evolution_reward');
 const threshold = 5;
-const evolutionMove = 'TEST_EVOLUTION_MOVE';
+const evolutionMove = testDefinitionId('TEST_EVOLUTION_MOVE');
 beforeEach(() => {
   species(baseId, {
     evolutionNodes: [{ level: threshold, evolutionDefId: evolvedId }],
@@ -35,17 +40,15 @@ beforeEach(() => {
 
 function createLearner(
   level = threshold - 1,
-  equippedAttacks = ['TEST_STARTER']
+  equippedAttacks: AttackId[] = [testDefinitionId('TEST_STARTER')]
 ) {
-  const creature = {
+  const creature = makePlayerCreature({
+    originalOwnerId: 'test-original-account',
     id: 'learner',
     speciesId: baseId,
     level,
-    xp: 0,
     equippedAttacks,
-    gender: 'female' as const,
-    isShiny: false,
-  };
+  });
   const engine = battle({}, [creature]);
   expect(engine.placeTower(creature.id, 25, 25)).toBe(true);
   const tower = engine.towers[0];
@@ -123,7 +126,7 @@ describe('Shared evolution progression', () => {
     expect(events.some((event) => event.type === 'TOWER_LEARNED_ATTACK')).toBe(
       false
     );
-    let speciesAtLearning: string | undefined;
+    let speciesAtLearning: number | undefined;
     engine.events.subscribe((event) => {
       if (event.type === 'TOWER_LEARNED_ATTACK')
         speciesAtLearning = tower.creature.speciesId;
@@ -141,7 +144,12 @@ describe('Shared evolution progression', () => {
     );
   });
   it('requests a move replacement after evolution when the loadout is full', () => {
-    const loadout = ['TEST_A', 'TEST_B', 'TEST_C', 'TEST_D'];
+    const loadout = [
+      testDefinitionId('TEST_A'),
+      testDefinitionId('TEST_B'),
+      testDefinitionId('TEST_C'),
+      testDefinitionId('TEST_D'),
+    ];
     const { engine, tower, events, levelUp } = createLearner(threshold - 1, [
       ...loadout,
     ]);
@@ -183,10 +191,12 @@ describe('Shared evolution progression', () => {
   });
   it('offers the next evolution when accepting a delayed evolution after both thresholds', () => {
     const { engine, tower, events, levelUp } = createLearner();
+    const originalOwnerId = tower.creature.originalOwnerId;
     levelUp();
     levelUp();
     levelUp();
     expect(engine.evolveTower(tower.id, evolvedId)).toBe(true);
+    expect(tower.creature.originalOwnerId).toBe(originalOwnerId);
     expect(events.at(-1)).toEqual({
       type: 'TOWER_ASK_EVOLUTION',
       towerId: tower.id,
@@ -194,5 +204,6 @@ describe('Shared evolution progression', () => {
       newDefinitionId: finalId,
     });
     expect(engine.evolveTower(tower.id, finalId)).toBe(true);
+    expect(tower.creature.originalOwnerId).toBe(originalOwnerId);
   });
 });

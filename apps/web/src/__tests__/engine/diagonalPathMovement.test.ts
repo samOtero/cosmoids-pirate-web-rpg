@@ -1,3 +1,4 @@
+import { SpeciesId } from '@/types/definitionIds';
 import { describe, it, expect } from 'vitest';
 import {
   stepUnitTowardsWaypoint,
@@ -25,7 +26,14 @@ describe('stepUnitTowardsWaypoint', () => {
     const previous: Point = { x: 20, y: 0 };
     const aspectRatio = 2; // wide screen
 
-    const result = stepUnitTowardsWaypoint(pos, target, 5, aspectRatio, previous, 'left');
+    const result = stepUnitTowardsWaypoint(
+      pos,
+      target,
+      5,
+      aspectRatio,
+      previous,
+      'left'
+    );
 
     expect(result.reachedWaypoint).toBe(false);
     expect(result.facingDirection).toBe('down');
@@ -72,7 +80,14 @@ describe('stepUnitTowardsWaypoint', () => {
     const pos: Point = { x: 19.5, y: 29.5 };
     const target: Point = { x: 20, y: 30 };
 
-    const result = stepUnitTowardsWaypoint(pos, target, 5, 1, undefined, 'right');
+    const result = stepUnitTowardsWaypoint(
+      pos,
+      target,
+      5,
+      1,
+      undefined,
+      'right'
+    );
 
     expect(result.reachedWaypoint).toBe(true);
     expect(pos.x).toBe(20);
@@ -93,7 +108,7 @@ describe('TowerDefenseEngine diagonal path traversal', () => {
     waveEnemyDefinitions: [
       {
         id: 'bug_scout',
-        creatureId: 'bug_stage_1',
+        creatureId: SpeciesId.SAILKWORM,
         level: 3,
         speedMultiplier: 1,
       },
@@ -135,7 +150,9 @@ describe('TowerDefenseEngine diagonal path traversal', () => {
       if (enemy.currentWaypointIndex === 1) {
         facings.push(enemy.facingDirection);
         // Position should remain on line y = x (with tolerance for floating point)
-        expect(Math.abs(enemy.position.x - enemy.position.y)).toBeLessThan(0.01);
+        expect(Math.abs(enemy.position.x - enemy.position.y)).toBeLessThan(
+          0.01
+        );
       }
     }
 
@@ -188,7 +205,7 @@ describe('TowerDefenseEngine diagonal path traversal', () => {
       waveEnemyDefinitions: [
         {
           id: 'bug_patrol',
-          creatureId: 'bug_stage_1',
+          creatureId: SpeciesId.SAILKWORM,
           level: 3,
           speedMultiplier: 2,
         },

@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { PoisonAoeBehavior } from '@/engine/tower-defense/attacks/behaviors';
@@ -26,15 +28,12 @@ const levelData = {
 
 const createBuffloraTower = (): Tower => ({
   id: 'bufflora_tower',
-  creature: {
+  creature: makePlayerCreature({
     id: 'bufflora_one',
-    speciesId: 'bufflora',
+    speciesId: SpeciesId.BUFFLORA,
     level: 8,
-    xp: 0,
-    equippedAttacks: ['TOXIC_POLLEN'],
-    gender: 'female' as const,
-    isShiny: false,
-  },
+    equippedAttacks: [AttackId.TOXIC_POLLEN],
+  }),
   position: { x: 0, y: 0 },
   lastAttackTime: 0,
   currentAttack: 13,
@@ -43,7 +42,9 @@ const createBuffloraTower = (): Tower => ({
   currentSpecialDefense: 13,
   hp: 25,
   maxHp: 25,
-  equippedAttacksRuntime: [{ definitionId: 'TOXIC_POLLEN', lastFiredTime: 0 }],
+  equippedAttacksRuntime: [
+    { definitionId: AttackId.TOXIC_POLLEN, lastFiredTime: 0 },
+  ],
   selectedAttackIndex: 0,
   facingDirection: 'right',
   targetingMode: 'closest',
@@ -58,7 +59,7 @@ const createEnemy = (
   } = {}
 ): Enemy => ({
   id,
-  definitionId: 'mouse_1',
+  definitionId: SpeciesId.KNOTIA,
   level: 3,
   position: { x, y: 0 },
   hp: 100,
@@ -102,7 +103,11 @@ describe('Area poison budgets', () => {
     ];
 
     expect(
-      PoisonAoeBehavior.canExecute(engine, source, ATTACK_FIXTURES.TOXIC_POLLEN)
+      PoisonAoeBehavior.canExecute(
+        engine,
+        source,
+        ATTACK_FIXTURES[AttackId.TOXIC_POLLEN]
+      )
     ).toBe(false);
 
     engine.enemies.push(
@@ -112,7 +117,11 @@ describe('Area poison budgets', () => {
     );
 
     expect(
-      PoisonAoeBehavior.canExecute(engine, source, ATTACK_FIXTURES.TOXIC_POLLEN)
+      PoisonAoeBehavior.canExecute(
+        engine,
+        source,
+        ATTACK_FIXTURES[AttackId.TOXIC_POLLEN]
+      )
     ).toBe(true);
     engine.destroy();
   });
@@ -140,7 +149,11 @@ describe('Area poison budgets', () => {
       outOfRange,
     ];
 
-    PoisonAoeBehavior.execute(engine, source, ATTACK_FIXTURES.TOXIC_POLLEN);
+    PoisonAoeBehavior.execute(
+      engine,
+      source,
+      ATTACK_FIXTURES[AttackId.TOXIC_POLLEN]
+    );
 
     for (const target of [first, second, alreadyVenomed]) {
       expect(target.hp).toBe(100);
@@ -170,12 +183,16 @@ describe('Area poison budgets', () => {
         configId: 'attack_toxic_pollen_1',
         position: source.position,
         durationMs: 900,
-        rangeIndex: ATTACK_FIXTURES.TOXIC_POLLEN.rangeIndex,
+        rangeIndex: ATTACK_FIXTURES[AttackId.TOXIC_POLLEN].rangeIndex,
       })
     );
 
     const visualEffectCount = engine.visualEffects.length;
-    PoisonAoeBehavior.execute(engine, source, ATTACK_FIXTURES.TOXIC_POLLEN);
+    PoisonAoeBehavior.execute(
+      engine,
+      source,
+      ATTACK_FIXTURES[AttackId.TOXIC_POLLEN]
+    );
 
     expect(first.statusConditions).toHaveLength(1);
     expect(second.statusConditions).toHaveLength(1);
@@ -183,7 +200,11 @@ describe('Area poison budgets', () => {
     expect(alreadyVenomed.statusConditions).toHaveLength(2);
     expect(engine.visualEffects).toHaveLength(visualEffectCount);
     expect(
-      PoisonAoeBehavior.canExecute(engine, source, ATTACK_FIXTURES.TOXIC_POLLEN)
+      PoisonAoeBehavior.canExecute(
+        engine,
+        source,
+        ATTACK_FIXTURES[AttackId.TOXIC_POLLEN]
+      )
     ).toBe(false);
 
     engine.enemies = [first];

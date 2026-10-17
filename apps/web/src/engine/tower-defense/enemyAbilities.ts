@@ -1,3 +1,4 @@
+import { SpeciesId } from '@/types/definitionIds';
 interface EnemyAbilityDefinitionBase {
   id: string;
   initialCooldownMs: number;
@@ -22,7 +23,7 @@ export type EnemyAbilityDefinition =
       cooldownMs: number;
       triggerCaptureUnitTdConfigId: string;
       triggerRadius: number;
-      targetCreatureId: string;
+      targetCreatureId: SpeciesId;
       maxActivations: number;
       speedIncreasePerActivation: number;
       maxSpeedMultiplier: number;
@@ -71,7 +72,7 @@ export const ENEMY_ABILITY_DEFS: Record<string, EnemyAbilityDefinition> = {
     cooldownMs: 1400,
     triggerCaptureUnitTdConfigId: 'maribel_capture',
     triggerRadius: 10,
-    targetCreatureId: 'resonarion',
+    targetCreatureId: SpeciesId.RAZOUND,
     maxActivations: 2,
     speedIncreasePerActivation: 0.2,
     maxSpeedMultiplier: 20,

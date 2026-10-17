@@ -1,3 +1,8 @@
+import { SpeciesId } from '@/types/definitionIds';
+import {
+  makePlayerCreature,
+  testDefinitionId,
+} from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -23,15 +28,12 @@ const levelData = {
 
 const source: Tower = {
   id: 'source',
-  creature: {
+  creature: makePlayerCreature({
     id: 'monkeg',
-    speciesId: 'starter_monkey',
+    speciesId: SpeciesId.MONKEG,
     level: 6,
-    xp: 0,
     equippedAttacks: [],
-    gender: 'female' as const,
-    isShiny: false,
-  },
+  }),
   position: { x: 0, y: 0 },
   lastAttackTime: 0,
   currentAttack: 65,
@@ -47,7 +49,7 @@ const source: Tower = {
 
 const createEnemy = (drenched: boolean): Enemy => ({
   id: 'target',
-  definitionId: 'mouse_1',
+  definitionId: SpeciesId.KNOTIA,
   level: 5,
   position: { x: 10, y: 0 },
   hp: 100,
@@ -75,7 +77,7 @@ describe('Drenched', () => {
     const engine = new TowerDefenseEngine(levelData);
     const target = createEnemy(drenched);
     const attack: AttackDefinition = {
-      id: `TEST_${type}`,
+      id: testDefinitionId(`TEST_${type}`),
       name: 'Test',
       type,
       category: 'special',
@@ -111,7 +113,7 @@ describe('Drenched', () => {
     const target = createEnemy(true);
     target.statusConditions[0].durationMs = 200;
     const drenchAttack: AttackDefinition = {
-      id: 'TEST_DRENCH',
+      id: testDefinitionId('TEST_DRENCH'),
       name: 'Test Drench',
       type: ElementType.WATER,
       category: 'special',

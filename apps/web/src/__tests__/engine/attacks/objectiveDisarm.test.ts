@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -23,15 +25,12 @@ const levelData = {
 
 const createHarlequillTower = (): Tower => ({
   id: 'harlequill_tower',
-  creature: {
+  creature: makePlayerCreature({
     id: 'harlequill',
-    speciesId: 'harlequill',
+    speciesId: SpeciesId.HARLEQUILL,
     level: 5,
-    xp: 0,
-    equippedAttacks: ['FUNNY_DANCE'],
-    gender: 'female' as const,
-    isShiny: false,
-  },
+    equippedAttacks: [AttackId.FUNNY_DANCE],
+  }),
   position: { x: 0, y: 0 },
   lastAttackTime: 0,
   currentAttack: 15,
@@ -40,7 +39,9 @@ const createHarlequillTower = (): Tower => ({
   currentSpecialDefense: 10,
   hp: 100,
   maxHp: 100,
-  equippedAttacksRuntime: [{ definitionId: 'FUNNY_DANCE', lastFiredTime: 0 }],
+  equippedAttacksRuntime: [
+    { definitionId: AttackId.FUNNY_DANCE, lastFiredTime: 0 },
+  ],
   selectedAttackIndex: 0,
   facingDirection: 'right',
   targetingMode: 'closest',
@@ -52,7 +53,7 @@ const createEnemy = (
   heldCaptureUnitId?: string
 ): Enemy => ({
   id,
-  definitionId: 'mouse_1',
+  definitionId: SpeciesId.KNOTIA,
   level: 3,
   position: { x, y: 0 },
   hp: 100,
@@ -99,7 +100,11 @@ describe('Objective disarm with a committed reaction', () => {
     engine.captureUnits = [coin, sack, farCoin];
     const harlequill = createHarlequillTower();
 
-    FunnyDanceBehavior.execute(engine, harlequill, ATTACK_FIXTURES.FUNNY_DANCE);
+    FunnyDanceBehavior.execute(
+      engine,
+      harlequill,
+      ATTACK_FIXTURES[AttackId.FUNNY_DANCE]
+    );
 
     expect(carrierOne.heldCaptureUnitId).toBeUndefined();
     expect(carrierTwo.heldCaptureUnitId).toBeUndefined();
@@ -155,7 +160,11 @@ describe('Objective disarm with a committed reaction', () => {
     engine.enemies = [carrier];
     engine.captureUnits = [coin];
 
-    FunnyDanceBehavior.execute(engine, harlequill, ATTACK_FIXTURES.FUNNY_DANCE);
+    FunnyDanceBehavior.execute(
+      engine,
+      harlequill,
+      ATTACK_FIXTURES[AttackId.FUNNY_DANCE]
+    );
     expect(carrier.heldCaptureUnitId).toBeUndefined();
     expect(coin.heldByEnemyId).toBeUndefined();
     expect(carrier.hasBeenWindDisarmed).toBe(true);
@@ -172,12 +181,16 @@ describe('Objective disarm with a committed reaction', () => {
       FunnyDanceBehavior.canExecute(
         engine,
         harlequill,
-        ATTACK_FIXTURES.FUNNY_DANCE
+        ATTACK_FIXTURES[AttackId.FUNNY_DANCE]
       )
     ).toBe(false);
 
     // Second execution must not disarm or re-lock carrier
-    FunnyDanceBehavior.execute(engine, harlequill, ATTACK_FIXTURES.FUNNY_DANCE);
+    FunnyDanceBehavior.execute(
+      engine,
+      harlequill,
+      ATTACK_FIXTURES[AttackId.FUNNY_DANCE]
+    );
     expect(carrier.heldCaptureUnitId).toBe(coin.id);
     expect(coin.heldByEnemyId).toBe(carrier.id);
     expect(carrier.itemPickupBlockedUntilMs).toBe(2500);
@@ -195,7 +208,11 @@ describe('Area objective disarm', () => {
     engine.enemies = [carrier, bystander];
     engine.captureUnits = [coin];
 
-    InstantAoeBehavior.execute(engine, tower, ATTACK_FIXTURES.WIND_GUST);
+    InstantAoeBehavior.execute(
+      engine,
+      tower,
+      ATTACK_FIXTURES[AttackId.WIND_GUST]
+    );
 
     expect(carrier).toMatchObject({
       hasBeenWindDisarmed: true,

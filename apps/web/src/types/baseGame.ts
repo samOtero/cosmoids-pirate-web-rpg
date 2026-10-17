@@ -1,3 +1,4 @@
+import type { SpeciesId, AttackId } from '@/types/definitionIds';
 export enum Screens {
   START = 'START',
   PROFILES = 'PROFILES',
@@ -31,7 +32,7 @@ export interface TDLevelConfig {
   /** Kip's Journal entries revealed once this level's completion milestone is reached. */
   journalCompletion?: {
     progression: StoryProgressionValue;
-    seenSpeciesIds: string[];
+    seenSpeciesIds: SpeciesId[];
   };
 }
 
@@ -292,12 +293,12 @@ export interface BaseStats {
 
 export interface LearnableAttack {
   level: number;
-  attackId: string;
+  attackId: AttackId;
 }
 
 export interface EvolutionNode {
   level: number;
-  evolutionDefId: string;
+  evolutionDefId: SpeciesId;
 }
 
 export type CreatureGender = 'male' | 'female' | 'genderless';
@@ -306,7 +307,9 @@ export type CreatureGender = 'male' | 'female' | 'genderless';
 export type CreatureGenderRatio = { female: number } | 'genderless';
 
 export interface CosmoidTemplate {
-  id: string; // Species ID (e.g. 'starter_crab')
+  /** Stable artwork/editor key, independent of the numeric species identity. */
+  visualConfigId: string;
+  id: SpeciesId; // Species ID (e.g. 'starter_crab')
   name: string;
   genderRatio: CreatureGenderRatio;
   type: ElementType;
@@ -328,7 +331,9 @@ export interface CosmoidTemplate {
 
 export interface Creature {
   id: string; // Unique instance ID
-  speciesId: string; // References CosmoidTemplate.id
+  /** Absent for wild creatures; retained when resolving an owned creature. */
+  readonly originalOwnerId?: string;
+  speciesId: SpeciesId; // References CosmoidTemplate.id
   gender: CreatureGender;
   name: string;
   type: ElementType;
@@ -343,7 +348,7 @@ export interface Creature {
   speed: number;
   level: number;
   xp: number;
-  moves: string[];
+  moves: AttackId[];
   spriteUrl: string;
   iconImg?: string;
   battleSpriteUrl?: string;
@@ -356,11 +361,13 @@ export interface Creature {
 /** Slim save format for a creature the player owns. Base stats are derived at runtime from species definitions. */
 export interface PlayerCreature {
   id: string; // Unique instance ID
-  speciesId: string; // References species def (e.g., 'starter_crab')
+  /** First account owner, or "guest" until the save is explicitly claimed. */
+  readonly originalOwnerId: string;
+  speciesId: SpeciesId; // References the permanent numeric species definition ID
   gender: CreatureGender;
   level: number;
   xp: number;
-  equippedAttacks: string[]; // Attack definition IDs
+  equippedAttacks: AttackId[]; // Attack definition IDs
   activeAttackIndex?: number; // The currently selected attack index
   targetingMode?: string; // Persistent selected targeting mode
   isShiny: boolean;
@@ -368,12 +375,14 @@ export interface PlayerCreature {
 
 export interface Profile {
   id: number;
+  /** Account identity shared across its save slots, or "guest". */
+  ownerId: string;
   name: string;
   lastPlayed: number; // Timestamp
   creatures: PlayerCreature[]; // Active party (max 6)
   storageCreatures: PlayerCreature[]; // Storage box creatures (independent from party)
   /** Species this profile has captured or obtained, including evolved-away forms. */
-  capturedSpeciesIds?: string[];
+  capturedSpeciesIds?: SpeciesId[];
   inventory: Item[];
   gameFlags: GameFlagValue[]; // Persistent flags set by events (e.g. GameFlag.STARTER_PALMIT)
   storyProgression: number;

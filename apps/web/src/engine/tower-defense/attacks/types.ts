@@ -1,3 +1,4 @@
+import type { AttackId } from '@/types/definitionIds';
 import { ElementType } from '@/types/baseGame';
 import { TowerDefenseEngine } from '../TowerDefenseEngine';
 import { PoisonId, Tower } from '../types';
@@ -115,7 +116,7 @@ export interface AdaptiveTargetedAoeConfig {
 }
 
 export interface AttackDefinition {
-  id: string; // e.g., 'BUBBLE_BEAM'
+  id: AttackId; // e.g., 'BUBBLE_BEAM'
   name: string;
   description?: string;
   type: ElementType; // Water
@@ -258,7 +259,7 @@ export interface AttackDefinition {
 }
 
 export interface AttackInstance {
-  definitionId: string;
+  definitionId: AttackId;
   lastFiredTime: number;
   /** Simulation-clock cooldown for support moves; undefined means ready. */
   readyAtMs?: number;

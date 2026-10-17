@@ -1,3 +1,4 @@
+import type { SpeciesId } from '@/types/definitionIds';
 import { analyticsEnabled, trackGameEvent } from './analytics';
 
 export function createBattleAnalytics(
@@ -7,7 +8,7 @@ export function createBattleAnalytics(
 ) {
   let attemptId: string | undefined;
   let finished = false;
-  const deployed = new Set<string>();
+  const deployed = new Set<SpeciesId>();
   return {
     start() {
       if (attemptId || !analyticsEnabled() || levelId === 'unknown') return;
@@ -19,7 +20,7 @@ export function createBattleAnalytics(
         team,
       });
     },
-    deploy(speciesId: string) {
+    deploy(speciesId: SpeciesId) {
       deployed.add(speciesId);
     },
     finish(
@@ -41,7 +42,7 @@ export function createBattleAnalytics(
         deployed_species: [...deployed],
       });
     },
-    capture(speciesId: string, level: number, success: boolean) {
+    capture(speciesId: SpeciesId, level: number, success: boolean) {
       if (!attemptId || finished) return;
       void trackGameEvent('capture_result', {
         level_id: levelId,

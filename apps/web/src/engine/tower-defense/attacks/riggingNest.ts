@@ -1,3 +1,4 @@
+import { AttackId } from '@/types/definitionIds';
 import type { TowerDefenseEngine } from '../TowerDefenseEngine';
 import type {
   Enemy,
@@ -52,7 +53,7 @@ function getThreadlingTarget(
   assignedMarkedTargetIds: Set<string> = new Set()
 ): Enemy | null {
   const virtualSource = { ...source, position: origin };
-  const sailcutterRange = ATTACK_DEFS.SAILCUTTER.rangeIndex;
+  const sailcutterRange = ATTACK_DEFS[AttackId.SAILCUTTER].rangeIndex;
   const markedTarget = engine.getTargetForTower(
     virtualSource,
     sailcutterRange,
@@ -183,7 +184,7 @@ export function updateRiggingNests(
   for (const nest of engine.riggingNests) {
     const source = ownersById.get(nest.ownerTowerId);
     if (!source) continue;
-    const attackDef = ATTACK_DEFS.RIGGING_NEST;
+    const attackDef = ATTACK_DEFS[AttackId.RIGGING_NEST];
     const config = attackDef?.riggingNest;
     if (!attackDef || !config) continue;
 
@@ -220,7 +221,7 @@ export function updateRiggingNests(
     threadling.targetId = target?.id;
     if (!target) continue;
 
-    const sailcutterConfig = ATTACK_DEFS.SAILCUTTER.sailcutter;
+    const sailcutterConfig = ATTACK_DEFS[AttackId.SAILCUTTER].sailcutter;
     const isWindMarked = isSailcutterMarkedBy(
       target,
       source.id,

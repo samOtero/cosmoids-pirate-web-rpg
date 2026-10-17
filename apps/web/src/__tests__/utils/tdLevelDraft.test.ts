@@ -1,3 +1,5 @@
+import { testDefinitionId } from '@/__tests__/utils/dataBuilders';
+import { SpeciesId } from '@/types/definitionIds';
 import { ElementType } from '@/types/baseGame';
 import { TDLevelData } from '@/engine/tower-defense/types';
 import { TD_LEVELS } from '@/constants/tdLevels';
@@ -51,7 +53,7 @@ describe('TD level drafts', () => {
       waveEnemyDefinitions: [
         {
           id: 'starter_crab_variant',
-          creatureId: 'starter_crab',
+          creatureId: SpeciesId.PALMIT,
           level: 1,
           futureDefinitionField: 'definition metadata',
         },
@@ -220,7 +222,7 @@ describe('TD level drafts', () => {
       waveEnemyDefinitions: [
         {
           id: 'broken_enemy',
-          creatureId: 'missing_enemy',
+          creatureId: testDefinitionId('missing_enemy'),
           level: 0,
           speedMultiplier: 0,
           hpMultiplier: 0,
@@ -248,13 +250,13 @@ describe('TD level drafts', () => {
     expect(
       validateTDLevelDraft(
         invalidLevel,
-        new Set(['known_enemy']),
+        new Set([testDefinitionId('known_enemy')]),
         new Set(['known_ability'])
       )
     ).toEqual(
       expect.arrayContaining([
         'Path 1 needs at least two points.',
-        'Enemy definition 1 references unknown creature "missing_enemy".',
+        `Enemy definition 1 references unknown creature "${testDefinitionId('missing_enemy')}".`,
         'Enemy definition 1 level must be a positive integer.',
         'Enemy definition 1 speed multiplier must be greater than 0.',
         'Enemy definition 1 HP multiplier must be greater than 0.',
@@ -270,7 +272,11 @@ describe('TD level drafts', () => {
   });
 
   it('accepts every currently registered level', () => {
-    const creatureIds = new Set(Object.keys(TD_CREATURE_DEFS));
+    const creatureIds = new Set(
+      Object.values(TD_CREATURE_DEFS).map(
+        (definition) => definition.baseCreature.speciesId
+      )
+    );
     const abilityIds = new Set(Object.keys(ENEMY_ABILITY_DEFS));
 
     Object.entries(TD_LEVELS).forEach(([context, config]) => {
@@ -344,7 +350,7 @@ describe('TD level drafts', () => {
       waveEnemyDefinitions: [
         {
           id: 'invalid_mouse',
-          creatureId: 'mouse_1',
+          creatureId: SpeciesId.KNOTIA,
           level: 3,
           hpMultiplier: 0,
         },
@@ -382,13 +388,13 @@ describe('TD level drafts', () => {
       waveEnemyDefinitions: [
         {
           id: 'mouse_scout',
-          creatureId: 'mouse_1',
+          creatureId: SpeciesId.KNOTIA,
           level: 3,
           speedMultiplier: 2,
         },
         {
           id: 'mouse_tank',
-          creatureId: 'mouse_1',
+          creatureId: SpeciesId.KNOTIA,
           level: 7,
           hpMultiplier: 4,
           defenseMultiplier: 2,
@@ -418,7 +424,9 @@ describe('TD level drafts', () => {
       ],
     };
 
-    expect(validateTDLevelDraft(level, new Set(['mouse_1']))).toEqual([]);
+    expect(
+      validateTDLevelDraft(level, new Set<number>([SpeciesId.KNOTIA]))
+    ).toEqual([]);
   });
 
   it('rejects invalid enemy goal damage', () => {
@@ -432,7 +440,7 @@ describe('TD level drafts', () => {
     level.waveEnemyDefinitions = [
       {
         id: 'invalid_goal_damage',
-        creatureId: 'mouse_1',
+        creatureId: SpeciesId.KNOTIA,
         level: 3,
         goalDamage: 0,
       },
@@ -503,13 +511,13 @@ describe('TD level drafts', () => {
     level.waveEnemyDefinitions = [
       {
         id: 'invalid_weakened_threshold',
-        creatureId: 'mouse_1',
+        creatureId: SpeciesId.KNOTIA,
         level: 3,
         weakenedThreshold: 1.5,
       },
       {
         id: 'zero_weakened_threshold',
-        creatureId: 'mouse_1',
+        creatureId: SpeciesId.KNOTIA,
         level: 3,
         weakenedThreshold: 0,
       },
@@ -526,7 +534,7 @@ describe('TD level drafts', () => {
     level.waveEnemyDefinitions = [
       {
         id: 'valid_weakened_threshold',
-        creatureId: 'mouse_1',
+        creatureId: SpeciesId.KNOTIA,
         level: 3,
         weakenedThreshold: 0.5,
       },
@@ -549,7 +557,7 @@ describe('TD level drafts', () => {
       ],
     ];
     level.waveEnemyDefinitions = [
-      { id: 'hopper', creatureId: 'poguin', level: 8 },
+      { id: 'hopper', creatureId: SpeciesId.POGUIN, level: 8 },
     ];
     level.waves = [
       {

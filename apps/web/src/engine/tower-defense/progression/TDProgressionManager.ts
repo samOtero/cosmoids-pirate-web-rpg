@@ -1,3 +1,4 @@
+import type { SpeciesId } from '@/types/definitionIds';
 import { TowerDefenseEngine } from '../TowerDefenseEngine';
 import { TDEventBus, TDEvent } from '../events/TDEventBus';
 import { calculateMaxHp, calculateStat } from '@/utils/resolvePlayerCreature';
@@ -8,7 +9,7 @@ import type { Tower } from '../types';
 export class TDProgressionManager {
   private engine: TowerDefenseEngine;
   private unsubscribe: () => void;
-  private pendingEvolutions = new Map<string, string>();
+  private pendingEvolutions = new Map<string, SpeciesId>();
 
   constructor(engine: TowerDefenseEngine, eventBus: TDEventBus) {
     this.engine = engine;
@@ -60,7 +61,6 @@ export class TDProgressionManager {
         }
       });
     }
-
   }
 
   private requestEligibleEvolution(tower: Tower) {
@@ -85,10 +85,12 @@ export class TDProgressionManager {
     return this.pendingEvolutions.delete(towerId);
   }
 
-  public evolveTower(towerId: string, evolutionDefId: string): boolean {
+  public evolveTower(towerId: string, evolutionDefId: SpeciesId): boolean {
     if (this.pendingEvolutions.get(towerId) !== evolutionDefId) return false;
 
-    const tower = this.engine.towers.find((candidate) => candidate.id === towerId);
+    const tower = this.engine.towers.find(
+      (candidate) => candidate.id === towerId
+    );
     const newTemplate = COSMOID_TEMPLATES[evolutionDefId];
     if (!tower || !newTemplate) {
       this.pendingEvolutions.delete(towerId);
@@ -145,11 +147,14 @@ export class TDProgressionManager {
   }
 
   private distributeExperience(
-    enemyDefinitionId: string,
+    enemyDefinitionId: SpeciesId | string,
     enemyLevel: number,
     participantTowerIds: string[]
   ) {
-    const template = COSMOID_TEMPLATES[enemyDefinitionId];
+    const template =
+      typeof enemyDefinitionId === 'number'
+        ? COSMOID_TEMPLATES[enemyDefinitionId]
+        : undefined;
     const baseExperience = template ? template.baseExperience : 50;
 
     const experienceRecipients = participantTowerIds.filter((towerId) => {
@@ -225,8 +230,10 @@ export class TDProgressionManager {
             tower.creature.level
           );
           tower.currentDefense =
-            calculateStat(towerTemplate.baseStats.defense, tower.creature.level) *
-            (tower.defenseBoostMultiplier ?? 1);
+            calculateStat(
+              towerTemplate.baseStats.defense,
+              tower.creature.level
+            ) * (tower.defenseBoostMultiplier ?? 1);
           tower.currentSpecialDefense = calculateStat(
             towerTemplate.baseStats.specialDefense,
             tower.creature.level

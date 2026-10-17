@@ -1,5 +1,7 @@
+import type { SpeciesId } from '@/types/definitionIds';
+import { getDefinitionVisuals } from '@/utils/definitionVisuals';
 import * as PIXI from 'pixi.js';
-import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
+
 import { UnitSpriteConfig, UnitVisuals } from '@/types/baseGame';
 import { BaseTDUnit } from '@/engine/tower-defense/types';
 
@@ -17,10 +19,10 @@ const spriteVisualStates = new WeakMap<
 
 function resolveTDUnitSpriteConfig(
   unit: BaseTDUnit,
-  configId: string,
+  configId: SpeciesId | string,
   visualState?: keyof UnitVisuals
 ): UnitSpriteConfig {
-  const tdConfigMap: UnitVisuals = CREATURE_TD_CONFIGS[configId] || {
+  const tdConfigMap: UnitVisuals = getDefinitionVisuals(configId) || {
     default: { scale: 1 },
   };
   return (
@@ -31,7 +33,7 @@ function resolveTDUnitSpriteConfig(
 /** Local-space point where this unit visually meets the battlefield. */
 export function getTDUnitGroundContactOffset(
   unit: BaseTDUnit,
-  configId: string,
+  configId: SpeciesId | string,
   visualState?: keyof UnitVisuals
 ) {
   const tdConfig = resolveTDUnitSpriteConfig(unit, configId, visualState);
@@ -47,7 +49,7 @@ export function applyTDUnitTransforms(
   unit: BaseTDUnit,
   sprite: PIXI.Sprite,
   shadow: PIXI.Graphics,
-  configId: string,
+  configId: SpeciesId | string,
   fallbackUrl?: string,
   onImageLoaded?: (texture: PIXI.Texture) => void,
   visualState?: keyof UnitVisuals

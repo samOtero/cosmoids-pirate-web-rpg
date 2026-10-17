@@ -7,6 +7,12 @@
 - Game filesystem paths are under `apps/web/src` and `apps/web/public`. Browser asset URLs remain rooted at `/` (for example, `/UI/Icons/...`). Treat older external skill references to root `src/` or `public/` as paths under `apps/web`.
 - Keep the workspace lockfile, Git hooks, narrative documents, `docs/`, and repository skills at the root. Local web environment variables belong in `apps/web/.env.local`.
 
+## Test data construction
+
+- Use the typed `makePlayerCreature` and `makeProfile` builders in `apps/web/src/__tests__/utils/dataBuilders.ts` for ordinary test setup. Supply explicit creature instance/species IDs and override fields relevant to the behavior under test instead of copying complete saved-data objects.
+- Keep the builders independent of production acquisition, save, and profile-creation logic. Defaults are neutral controlled inputs, not copies of creature stats, learnsets, or other authored balance data. Preserve fresh mutable collections for each call, including caller-supplied collections.
+- Keep raw legacy saves, malformed data, and deliberately incomplete boundary inputs explicit. Assert the behavior being tested; do not construct expected production output with the same builder used for the input. See `docs/development/TEST_DATA_BUILDERS.md`.
+
 ## Development editor persistence
 
 - Editors that write authored TypeScript must use the shared `useEditorSource` / `editorSourceService` protocol described in `docs/development/EDITOR_SAVES.md`.
@@ -86,3 +92,7 @@
 - Count the panels before presenting or implementing the draft. Do not evade the range by splitting one beat into several short panels; move secondary explanation, jokes, and worldbuilding into gameplay or a later scene.
 - Exceed ten panels only for a major turning point that genuinely requires it, and explicitly identify the exception when proposing it.
 - Preserve character motivation, flaws, and conflict while keeping individual dialogue beats concise and appropriate for an all-ages adventure.
+
+## Definition identities
+
+- Use permanent numeric `SpeciesId` and `AttackId` constants throughout gameplay and saved references. Follow `docs/development/DEFINITION_IDS.md`; append assignments without renumbering or reusing IDs. Keep instance, owner, encounter, behavior and artwork identities in their respective domains.

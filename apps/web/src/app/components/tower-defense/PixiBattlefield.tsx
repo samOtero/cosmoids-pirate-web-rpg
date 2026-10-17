@@ -1,9 +1,6 @@
-import React, {
-  useEffect,
-  useRef,
-  forwardRef,
-  useImperativeHandle,
-} from 'react';
+import { getDefinitionVisuals } from '@/utils/definitionVisuals';
+import { AttackId, SpeciesId } from '@/types/definitionIds';
+import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import * as PIXI from 'pixi.js';
 import {
   TowerDefenseEngine,
@@ -12,7 +9,7 @@ import {
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { ElementType } from '@/types/baseGame';
 import { TD_BASE_HEIGHT } from '@/constants/game';
-import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
+
 import {
   BaseTDUnit,
   DestroyedStructureVisual,
@@ -188,11 +185,11 @@ export function isUnitWeakened(
 export function renderHealthBar(
   unit: BaseTDUnit,
   container: PIXI.Container,
-  configId: string,
+  configId: SpeciesId | string,
   hideWhenFull: boolean = false,
   offsetYOverride?: number
 ) {
-  const tdConfigMap = CREATURE_TD_CONFIGS[configId] || {
+  const tdConfigMap = getDefinitionVisuals(configId) || {
     default: { scale: 1 },
   };
   const tdConfig = tdConfigMap[unit.facingDirection] || tdConfigMap.default;
@@ -355,7 +352,7 @@ function drawSpeedChevron(
 function updateSpeedBoostIndicator(
   container: PIXI.Container,
   unit: BaseTDUnit,
-  configId: string,
+  configId: SpeciesId | string,
   currentTimeMs: number,
   delta: number
 ) {
@@ -425,7 +422,7 @@ function updateSpeedBoostIndicator(
     indicator.displayedStackCount = stackCount;
     indicator.stackPulseElapsed = 0;
   }
-  const tdConfigMap = CREATURE_TD_CONFIGS[configId] || {
+  const tdConfigMap = getDefinitionVisuals(configId) || {
     default: { scale: 1 },
   };
   const tdConfig = tdConfigMap[unit.facingDirection] || tdConfigMap.default;
@@ -615,7 +612,7 @@ function hasDefenseBoost(unit: BaseTDUnit) {
 function updateDefenseBoostIndicator(
   container: PIXI.Container,
   unit: BaseTDUnit,
-  configId: string,
+  configId: SpeciesId | string,
   currentTimeMs: number,
   delta: number
 ) {
@@ -666,7 +663,7 @@ function updateDefenseBoostIndicator(
   }
 
   indicator.elapsed += delta;
-  const tdConfigMap = CREATURE_TD_CONFIGS[configId] || {
+  const tdConfigMap = getDefinitionVisuals(configId) || {
     default: { scale: 1 },
   };
   const tdConfig = tdConfigMap[unit.facingDirection] || tdConfigMap.default;
@@ -2333,7 +2330,7 @@ function updatePoisonIndicator(
   container: PIXI.Container,
   enemy: Enemy,
   sprite: PIXI.Sprite,
-  configId: string,
+  configId: SpeciesId | string,
   delta: number
 ) {
   const poisons = getActivePoisons(enemy).sort(
@@ -2378,7 +2375,7 @@ function updatePoisonIndicator(
   }
 
   indicator.elapsed += delta;
-  const tdConfigMap = CREATURE_TD_CONFIGS[configId] || {
+  const tdConfigMap = getDefinitionVisuals(configId) || {
     default: { scale: 1 },
   };
   const tdConfig = tdConfigMap[enemy.facingDirection] || tdConfigMap.default;
@@ -2442,8 +2439,8 @@ function createDreamBubbleIndicator(label: string) {
   return indicator;
 }
 
-function getStatusIndicatorOffsetY(configId: string, enemy: Enemy) {
-  const tdConfigMap = CREATURE_TD_CONFIGS[configId] || {
+function getStatusIndicatorOffsetY(configId: SpeciesId | string, enemy: Enemy) {
+  const tdConfigMap = getDefinitionVisuals(configId) || {
     default: { scale: 1 },
   };
   const tdConfig = tdConfigMap[enemy.facingDirection] || tdConfigMap.default;
@@ -2456,7 +2453,7 @@ function updateSleepIndicator(
   container: PIXI.Container,
   enemy: Enemy,
   sprite: PIXI.Sprite,
-  configId: string,
+  configId: SpeciesId | string,
   elapsedTimeMs: number
 ) {
   const isAsleep = enemy.statusConditions.some(
@@ -2513,7 +2510,7 @@ function createSleepResistanceIndicator() {
 function updateSleepResistanceIndicator(
   container: PIXI.Container,
   enemy: Enemy,
-  configId: string,
+  configId: SpeciesId | string,
   elapsedTimeMs: number
 ) {
   const remainingMs = (enemy.sleepResistantUntilMs ?? 0) - elapsedTimeMs;
@@ -2577,7 +2574,7 @@ function updateSharedSlumberTowerVisual(
     container.addChild(indicator);
   }
 
-  const tdConfigMap = CREATURE_TD_CONFIGS[tower.creature.speciesId] || {
+  const tdConfigMap = getDefinitionVisuals(tower.creature.speciesId) || {
     default: { scale: 1 },
   };
   const tdConfig = tdConfigMap[tower.facingDirection] || tdConfigMap.default;
@@ -3357,11 +3354,13 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         await PIXI.Assets.load(bgUrl);
         if (isDestroyed) return;
 
-        const flyingColorsVisual = ATTACK_DEFS.FLYING_COLORS.projectileVisual;
+        const flyingColorsVisual =
+          ATTACK_DEFS[AttackId.FLYING_COLORS].projectileVisual;
         if (flyingColorsVisual?.type === 'FLYING_COLORS') {
           void PIXI.Assets.load(flyingColorsVisual.spriteUrl);
         }
-        const riggingNestVisual = ATTACK_DEFS.RIGGING_NEST.riggingNest;
+        const riggingNestVisual =
+          ATTACK_DEFS[AttackId.RIGGING_NEST].riggingNest;
         if (riggingNestVisual) {
           for (const url of new Set([
             riggingNestVisual.nestSpriteUrl,
@@ -4322,7 +4321,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               sprite,
               creatureShadow,
               projection.tdConfigId,
-              TD_CREATURE_DEFS.sepippet?.baseCreature.battleSpriteUrl,
+              TD_CREATURE_DEFS[SpeciesId.SEPIPPET]?.baseCreature
+                .battleSpriteUrl,
               (texture) => {
                 if (!isDestroyed) sprite.texture = texture;
               }
@@ -4372,7 +4372,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             );
           }
 
-          const riggingVisual = ATTACK_DEFS.RIGGING_NEST.riggingNest;
+          const riggingVisual = ATTACK_DEFS[AttackId.RIGGING_NEST].riggingNest;
           if (riggingVisual) {
             const currentNestIds = new Set(
               engine.riggingNests.map((nest) => nest.id)
@@ -4823,7 +4823,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 tsprite,
                 shadow,
                 tower.creature.speciesId,
-                baseCreature.battleSpriteUrl || baseCreature.spriteUrl,
+                baseCreature?.battleSpriteUrl || baseCreature?.spriteUrl,
                 (t) => {
                   if (!isDestroyed) tsprite.texture = t;
                 }
@@ -4866,7 +4866,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               // Fade tower if it's currently performing a Tackle attack
               const isTackling = engine.projectiles.some(
                 (p) =>
-                  p.sourceId === tower.id && p.attackDefinitionId === 'TACKLE'
+                  p.sourceId === tower.id &&
+                  p.attackDefinitionId === AttackId.TACKLE
               );
               tsprite.alpha = isTackling ? 0 : 1;
               shadow.alpha = isTackling ? 0 : 1;
@@ -5357,13 +5358,15 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               esprite.visible = true;
               shadow.visible = true;
               const baseCreature =
-                TD_CREATURE_DEFS[enemy.definitionId].baseCreature;
+                typeof enemy.definitionId === 'number'
+                  ? TD_CREATURE_DEFS[enemy.definitionId]?.baseCreature
+                  : undefined;
               applyTDUnitTransforms(
                 enemy,
                 esprite,
                 shadow,
                 enemy.definitionId,
-                baseCreature.battleSpriteUrl || baseCreature.spriteUrl,
+                baseCreature?.battleSpriteUrl || baseCreature?.spriteUrl,
                 (t) => {
                   if (!isDestroyed) esprite.texture = t;
                 }
@@ -5981,7 +5984,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                     psprite,
                     shadow,
                     sourceTower.creature.speciesId,
-                    baseCreature.battleSpriteUrl || baseCreature.spriteUrl,
+                    baseCreature?.battleSpriteUrl || baseCreature?.spriteUrl,
                     (t) => {
                       if (!isDestroyed) psprite.texture = t;
                     }
@@ -6036,7 +6039,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             const container = existingContainer || new PIXI.Container();
 
             // Fetch the visual effect configuration
-            const tdConfigMap = CREATURE_TD_CONFIGS[vfx.configId] || {
+            const tdConfigMap = getDefinitionVisuals(vfx.configId) || {
               default: { scale: 1 },
             };
             const tdConfig =
@@ -6075,7 +6078,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 sparks.label = 'sound_or_electric_attack_vfx';
                 container.addChild(sparks);
               } else if (animConfig?.type === 'COIR_SNARE') {
-                const coirVisual = ATTACK_DEFS.COIR_SNARE.projectileVisual;
+                const coirVisual =
+                  ATTACK_DEFS[AttackId.COIR_SNARE].projectileVisual;
                 if (coirVisual?.type === 'COIR_BOLA') {
                   drawCoirSnareImpact(
                     container,
@@ -6086,7 +6090,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                   );
                 }
               } else if (animConfig?.type === 'STRING_SHOT') {
-                const stringVisual = ATTACK_DEFS.STRING_SHOT.projectileVisual;
+                const stringVisual =
+                  ATTACK_DEFS[AttackId.STRING_SHOT].projectileVisual;
                 if (stringVisual?.type === 'STRING_COIL') {
                   drawCoirSnareImpact(
                     container,
@@ -6211,7 +6216,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               const pearl = container.getChildByLabel(
                 'reverie_orb_vfx'
               ) as PIXI.Graphics;
-              const palette = ATTACK_DEFS.REVERIE_ORB.projectileVisual;
+              const palette =
+                ATTACK_DEFS[AttackId.REVERIE_ORB].projectileVisual;
               if (palette?.type === 'REVERIE_ORB') {
                 if (animConfig.type === 'REVERIE_ORB_LAUNCH') {
                   const sourceTower = engine.towers.find(
@@ -6258,7 +6264,11 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 animConfig.type === 'GRUMBLE_LAUNCH';
               const palette =
                 ATTACK_DEFS[
-                  isSpark ? 'SPARK' : isGrumble ? 'GRUMBLE' : 'STATIC_YIP'
+                  isSpark
+                    ? AttackId.SPARK
+                    : isGrumble
+                      ? AttackId.GRUMBLE
+                      : AttackId.STATIC_YIP
                 ].projectileVisual;
               if (
                 palette?.type === 'STATIC_YIP' ||

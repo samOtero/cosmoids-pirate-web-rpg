@@ -1,3 +1,4 @@
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createJSONStorage } from 'zustand/middleware';
 import { useGameStore } from '@/store/gameStore';
@@ -10,15 +11,13 @@ const storage = useGameStore.persist.getOptions().storage;
 const speciesId = Object.values(COSMOID_TEMPLATES).find(
   (t) => t.genderRatio !== 'genderless'
 )!.id;
-const creature: PlayerCreature = {
+const creature: PlayerCreature = makePlayerCreature({
   id: 'gender-test-owned',
   speciesId,
   gender: 'female',
   level: 3,
-  xp: 0,
   equippedAttacks: [],
-  isShiny: false,
-};
+});
 
 beforeEach(() => {
   useGameStore.persist.setOptions({

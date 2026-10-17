@@ -1,7 +1,7 @@
 'use client';
 import { generateCreatureGender } from '@/utils/creatureGender';
 
-import React, { useEffect, useState, lazy, Suspense } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { useGameStore } from '@/store/gameStore';
 import {
   STARTER_CRAB,
@@ -142,7 +142,7 @@ export default function DevTools() {
                     STARTER_MONKEY,
                     BUG_STAGE_1,
                   ].map((c) => ({
-                    id: c.id,
+                    id: crypto.randomUUID(),
                     speciesId: c.id,
                     gender: generateCreatureGender(c.id),
                     level: 1,
@@ -165,7 +165,7 @@ export default function DevTools() {
                     STARTER_MONKEY,
                     BUG_STAGE_1,
                   ].map((c) => ({
-                    id: c.id,
+                    id: crypto.randomUUID(),
                     speciesId: c.id,
                     gender: generateCreatureGender(c.id),
                     level: 1,
@@ -184,7 +184,7 @@ export default function DevTools() {
                 onClick={() => {
                   const thirtyCreatures = Array.from({ length: 30 }).map(
                     () => ({
-                      id: STARTER_CRAB.id,
+                      id: crypto.randomUUID(),
                       speciesId: STARTER_CRAB.id,
                       gender: generateCreatureGender(STARTER_CRAB.id),
                       level: 10,

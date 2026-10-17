@@ -1,3 +1,4 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
 import { describe, expect, it, vi } from 'vitest';
 import { ElementType } from '@/types/baseGame';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
@@ -81,7 +82,7 @@ function createBramfritRescueLevel(): TDLevelData {
     objectiveAllies: [
       {
         id: 'bramfrit',
-        creatureId: 'bramfrit',
+        creatureId: SpeciesId.BRAMFRIT,
         displayName: 'Bramfrit',
         gateDefinitionId: 'bramfrit_gate',
         lockedPosition: { x: 0, y: 0 },
@@ -151,7 +152,7 @@ function createSepippetRescueLevel(): TDLevelData {
       },
       {
         id: 'shadow_target',
-        creatureId: 'sonarion',
+        creatureId: SpeciesId.RAZCALL,
         level: 8,
       },
     ],
@@ -188,7 +189,7 @@ function createSepippetRescueLevel(): TDLevelData {
     objectiveAllies: [
       {
         id: 'sepippet',
-        creatureId: 'sepippet',
+        creatureId: SpeciesId.SEPIPPET,
         displayName: 'Sepippet',
         gateDefinitionId: 'sepippet_gate',
         lockedPosition: { x: 0, y: 0 },
@@ -270,7 +271,7 @@ function createParletRescueLevel(): TDLevelData {
       },
       {
         id: 'current_target',
-        creatureId: 'sonarion',
+        creatureId: SpeciesId.RAZCALL,
         level: 8,
       },
     ],
@@ -307,7 +308,7 @@ function createParletRescueLevel(): TDLevelData {
     objectiveAllies: [
       {
         id: 'parlet',
-        creatureId: 'parlet',
+        creatureId: SpeciesId.PARLET,
         displayName: 'Parlet',
         gateDefinitionId: 'parlet_gate',
         lockedPosition: { x: 0, y: 0 },
@@ -391,7 +392,7 @@ function createCorrogoonRescueLevel(): TDLevelData {
       },
       {
         id: 'acid_target',
-        creatureId: 'sonarion',
+        creatureId: SpeciesId.RAZCALL,
         level: 8,
       },
     ],
@@ -436,7 +437,7 @@ function createCorrogoonRescueLevel(): TDLevelData {
     objectiveAllies: [
       {
         id: 'corrogoon',
-        creatureId: 'corrogoon',
+        creatureId: SpeciesId.CORROGOON,
         displayName: 'Corrogoon',
         gateDefinitionId: 'corrogoon_gate',
         lockedPosition: { x: 0, y: 0 },
@@ -457,7 +458,7 @@ function createCorrogoonRescueLevel(): TDLevelData {
       },
       {
         id: 'secondary_prisoner',
-        creatureId: 'bramfrit',
+        creatureId: SpeciesId.BRAMFRIT,
         displayName: 'Secondary Prisoner',
         gateDefinitionId: 'secondary_gate',
         lockedPosition: { x: 0, y: 0 },
@@ -752,7 +753,7 @@ describe('objective allies', () => {
     )!;
     const tower = {
       id: 'tower',
-      creature: { speciesId: 'bramfrit', level: 10 },
+      creature: { speciesId: SpeciesId.BRAMFRIT, level: 10 },
       currentAttack: 100,
       currentSpecialAttack: 100,
     } as Tower;
@@ -762,7 +763,7 @@ describe('objective allies', () => {
       engine,
       tower,
       target,
-      ATTACK_DEFS.TACKLE
+      ATTACK_DEFS[AttackId.TACKLE]
     );
     const normalDamage = initialHp - target.hp;
     target.hp = initialHp;
@@ -779,7 +780,7 @@ describe('objective allies', () => {
       engine,
       tower,
       target,
-      ATTACK_DEFS.TACKLE
+      ATTACK_DEFS[AttackId.TACKLE]
     );
 
     const scouredPhysicalDamage = initialHp - target.hp;
@@ -791,7 +792,7 @@ describe('objective allies', () => {
       engine,
       tower,
       target,
-      ATTACK_DEFS.EMBER
+      ATTACK_DEFS[AttackId.EMBER]
     );
     const normalSpecialDamage = initialHp - target.hp;
     target.hp = initialHp;
@@ -808,7 +809,7 @@ describe('objective allies', () => {
       engine,
       tower,
       target,
-      ATTACK_DEFS.EMBER
+      ATTACK_DEFS[AttackId.EMBER]
     );
     expect(initialHp - target.hp).toBeGreaterThan(normalSpecialDamage);
     engine.destroy();

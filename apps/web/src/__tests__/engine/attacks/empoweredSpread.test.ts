@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
@@ -27,15 +29,12 @@ function createBattle(targetCount = 3) {
       waves: [],
     },
     [
-      {
+      makePlayerCreature({
         id: 'nautiguan',
-        speciesId: 'nautiguan',
+        speciesId: SpeciesId.NAUTIGUAN,
         level: 16,
-        xp: 0,
-        equippedAttacks: ['SALT_SPIT'],
-        gender: 'female' as const,
-        isShiny: false,
-      },
+        equippedAttacks: [AttackId.SALT_SPIT],
+      }),
     ]
   );
   engines.push(engine);
@@ -43,7 +42,7 @@ function createBattle(targetCount = 3) {
   const targets = Array.from({ length: targetCount }, (_, index) => {
     const enemy = engine.spawnPreviewEnemy({
       id: `salt-target-${index}`,
-      creatureId: 'mouse_1',
+      creatureId: SpeciesId.KNOTIA,
       level: 16,
       position: { x: 58 + index * 5, y: 50 },
     })!;
@@ -130,7 +129,11 @@ describe('Empowered projectile spreads', () => {
 
     targets[0].heldCaptureUnitId = objectives[0].id;
     objectives[0].heldByEnemyId = targets[0].id;
-    disarmSaltSpitTarget(engine, targets[0], ATTACK_FIXTURES.SALT_SPIT);
+    disarmSaltSpitTarget(
+      engine,
+      targets[0],
+      ATTACK_FIXTURES[AttackId.SALT_SPIT]
+    );
     expect(targets[0].heldCaptureUnitId).toBe(objectives[0].id);
     expect(objectives[0].heldByEnemyId).toBe(targets[0].id);
 

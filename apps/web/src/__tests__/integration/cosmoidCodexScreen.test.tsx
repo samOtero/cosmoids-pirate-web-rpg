@@ -1,100 +1,75 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import {
+  makeProfile,
+  makePlayerCreature,
+} from '@/__tests__/utils/dataBuilders';
 import { fireEvent, render, screen } from '@testing-library/react';
 
 import CosmoidCodexScreen from '@/app/components/CosmoidCodexScreen';
 import { Profile, StoryProgression } from '@/types/baseGame';
 
-const profile: Profile = {
+const profile: Profile = makeProfile({
   id: 0,
   name: 'Caleb',
   lastPlayed: 0,
   creatures: [
-    {
+    makePlayerCreature({
       id: 'captured-palmit',
-      speciesId: 'starter_crab',
+      speciesId: SpeciesId.PALMIT,
       level: 5,
-      xp: 0,
-      equippedAttacks: ['PINCH'],
-      gender: 'female' as const,
-      isShiny: false,
-    },
-    {
+      equippedAttacks: [AttackId.PINCH],
+    }),
+    makePlayerCreature({
       id: 'captured-fueguana',
-      speciesId: 'starter_iguana',
+      speciesId: SpeciesId.FUEGUANA,
       level: 5,
-      xp: 0,
-      equippedAttacks: ['SCRATCH'],
-      gender: 'female' as const,
-      isShiny: false,
-    },
-    {
+      equippedAttacks: [AttackId.SCRATCH],
+    }),
+    makePlayerCreature({
       id: 'captured-monkeg',
-      speciesId: 'starter_monkey',
+      speciesId: SpeciesId.MONKEG,
       level: 5,
-      xp: 0,
-      equippedAttacks: ['TACKLE'],
-      gender: 'female' as const,
-      isShiny: false,
-    },
-    {
+      equippedAttacks: [AttackId.TACKLE],
+    }),
+    makePlayerCreature({
       id: 'captured-knotia',
-      speciesId: 'mouse_1',
+      speciesId: SpeciesId.KNOTIA,
       level: 7,
-      xp: 0,
-      equippedAttacks: ['NIBBLE'],
-      gender: 'female' as const,
-      isShiny: false,
-    },
-    {
+      equippedAttacks: [AttackId.NIBBLE],
+    }),
+    makePlayerCreature({
       id: 'captured-mopup',
-      speciesId: 'mopup',
+      speciesId: SpeciesId.MOPUP,
       level: 6,
-      xp: 0,
-      equippedAttacks: ['TACKLE'],
-      gender: 'female' as const,
-      isShiny: false,
-    },
-    {
+      equippedAttacks: [AttackId.TACKLE],
+    }),
+    makePlayerCreature({
       id: 'captured-buglet',
-      speciesId: 'bug_stage_1',
+      speciesId: SpeciesId.SAILKWORM,
       level: 4,
-      xp: 0,
-      equippedAttacks: ['TACKLE'],
-      gender: 'female' as const,
-      isShiny: false,
-    },
-    {
+      equippedAttacks: [AttackId.TACKLE],
+    }),
+    makePlayerCreature({
       id: 'captured-bugitor',
-      speciesId: 'bug_stage_2',
+      speciesId: SpeciesId.COCOONOT,
       level: 8,
-      xp: 0,
-      equippedAttacks: ['TACKLE'],
-      gender: 'female' as const,
-      isShiny: false,
-    },
-    {
+      equippedAttacks: [AttackId.TACKLE],
+    }),
+    makePlayerCreature({
       id: 'captured-moth',
-      speciesId: 'bug_stage_3',
+      speciesId: SpeciesId.MAINSCALE,
       level: 12,
-      xp: 0,
-      equippedAttacks: ['TACKLE'],
-      gender: 'female' as const,
-      isShiny: false,
-    },
-    {
+      equippedAttacks: [AttackId.TACKLE],
+    }),
+    makePlayerCreature({
       id: 'captured-bettle',
-      speciesId: 'bettle',
+      speciesId: SpeciesId.BEETADEL,
       level: 10,
-      xp: 0,
-      equippedAttacks: ['PINCH'],
-      gender: 'female' as const,
-      isShiny: false,
-    },
+      equippedAttacks: [AttackId.PINCH],
+    }),
   ],
-  storageCreatures: [],
-  inventory: [],
-  gameFlags: [],
   storyProgression: StoryProgression.DEFEAT_BUG_STAGE_2,
-};
+});
 
 describe('CosmoidCodexScreen', () => {
   it('shows discovered species and distinguishes seen from captured', () => {
@@ -204,17 +179,27 @@ describe('CosmoidCodexScreen', () => {
     const evolvedProfile: Profile = {
       ...profile,
       creatures: profile.creatures
-        .filter((creature) => !creature.speciesId.startsWith('bug_stage_'))
-        .concat({
-          id: 'evolved-bug',
-          speciesId: 'bug_stage_3',
-          level: 10,
-          xp: 0,
-          equippedAttacks: ['TACKLE'],
-          gender: 'female' as const,
-          isShiny: false,
-        }),
-      capturedSpeciesIds: ['bug_stage_1', 'bug_stage_2', 'bug_stage_3'],
+        .filter(
+          (creature) =>
+            !new Set<SpeciesId>([
+              SpeciesId.SAILKWORM,
+              SpeciesId.COCOONOT,
+              SpeciesId.MAINSCALE,
+            ]).has(creature.speciesId)
+        )
+        .concat(
+          makePlayerCreature({
+            id: 'evolved-bug',
+            speciesId: SpeciesId.MAINSCALE,
+            level: 10,
+            equippedAttacks: [AttackId.TACKLE],
+          })
+        ),
+      capturedSpeciesIds: [
+        SpeciesId.SAILKWORM,
+        SpeciesId.COCOONOT,
+        SpeciesId.MAINSCALE,
+      ],
     };
 
     render(<CosmoidCodexScreen profile={evolvedProfile} onBack={() => {}} />);
@@ -234,7 +219,7 @@ describe('CosmoidCodexScreen', () => {
     const level4Profile: Profile = {
       ...profile,
       storyProgression: StoryProgression.DEFEAT_LEVEL_4,
-      capturedSpeciesIds: ['sonarion', 'resonarion'],
+      capturedSpeciesIds: [SpeciesId.RAZCALL, SpeciesId.RAZOUND],
     };
 
     render(<CosmoidCodexScreen profile={level4Profile} onBack={() => {}} />);
@@ -245,16 +230,18 @@ describe('CosmoidCodexScreen', () => {
         .getByRole('img', { name: 'Razcall field sketch' })
         .getAttribute('src')
     ).toContain(encodeURIComponent('/UI/Journal/sonarion_journal.webp'));
-    expect(screen.getByText(/howl for Razound when cornered/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/howl for Razound when cornered/i)
+    ).toBeInTheDocument();
 
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Razound, captured' })
-    );
+    fireEvent.click(screen.getByRole('button', { name: 'Razound, captured' }));
     expect(
       screen
         .getByRole('img', { name: 'Razound field sketch' })
         .getAttribute('src')
     ).toContain(encodeURIComponent('/UI/Journal/resonarion_journal.webp'));
-    expect(screen.getByText(/At a Razcall's two-toned call/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/At a Razcall's two-toned call/i)
+    ).toBeInTheDocument();
   });
 });

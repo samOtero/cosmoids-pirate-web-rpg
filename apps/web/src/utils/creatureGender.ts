@@ -1,3 +1,4 @@
+import type { SpeciesId } from '@/types/definitionIds';
 import { COSMOID_TEMPLATES } from '@/constants/creatures';
 import type { CreatureGender, CreatureGenderRatio } from '@/types/baseGame';
 
@@ -16,7 +17,7 @@ export function rollCreatureGender(
 }
 
 export function generateCreatureGender(
-  speciesId: string,
+  speciesId: SpeciesId,
   random: () => number = Math.random
 ): CreatureGender {
   const template = COSMOID_TEMPLATES[speciesId];
@@ -36,7 +37,7 @@ export function isCreatureGenderAllowed(
 }
 
 export function resolveEncounterGender(
-  speciesId: string,
+  speciesId: SpeciesId,
   override?: CreatureGender
 ): CreatureGender {
   if (override === undefined) return generateCreatureGender(speciesId);

@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ProjectileBehavior } from '@/engine/tower-defense/attacks/behaviors';
@@ -20,15 +22,12 @@ const levelData = {
 
 const createMonkegTower = (): Tower => ({
   id: 'monkeg_tower',
-  creature: {
+  creature: makePlayerCreature({
     id: 'monkeg',
-    speciesId: 'starter_monkey',
+    speciesId: SpeciesId.MONKEG,
     level: 6,
-    xp: 0,
-    equippedAttacks: ['BARREL_BASH'],
-    gender: 'female' as const,
-    isShiny: false,
-  },
+    equippedAttacks: [AttackId.BARREL_BASH],
+  }),
   position: { x: 0, y: 0 },
   lastAttackTime: 0,
   currentAttack: 65,
@@ -37,7 +36,9 @@ const createMonkegTower = (): Tower => ({
   currentSpecialDefense: 55,
   hp: 100,
   maxHp: 100,
-  equippedAttacksRuntime: [{ definitionId: 'BARREL_BASH', lastFiredTime: 0 }],
+  equippedAttacksRuntime: [
+    { definitionId: AttackId.BARREL_BASH, lastFiredTime: 0 },
+  ],
   selectedAttackIndex: 0,
   facingDirection: 'right',
   targetingMode: 'closest',
@@ -45,7 +46,7 @@ const createMonkegTower = (): Tower => ({
 
 const createEnemy = (id: string, x: number): Enemy => ({
   id,
-  definitionId: 'mouse_1',
+  definitionId: SpeciesId.KNOTIA,
   level: 5,
   position: { x, y: 0 },
   hp: 100,
@@ -79,7 +80,11 @@ describe('Secondary impact push', () => {
     engine.towers = [monkeg];
     engine.enemies = [primary, nearby, distant, anchored];
 
-    ProjectileBehavior.execute(engine, monkeg, ATTACK_FIXTURES.BARREL_BASH);
+    ProjectileBehavior.execute(
+      engine,
+      monkeg,
+      ATTACK_FIXTURES[AttackId.BARREL_BASH]
+    );
     expect(engine.projectiles).toHaveLength(1);
     expect(engine.projectiles[0].targetId).toBe(primary.id);
     engine.tick(0, 200);

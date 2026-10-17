@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { AGUANA, NAUTIGUAN } from '@/constants/creatures';
@@ -34,15 +36,17 @@ function createEngine() {
       waves: [],
     },
     [
-      {
+      makePlayerCreature({
         id: 'aguana',
-        speciesId: 'aguana',
+        speciesId: SpeciesId.AGUANA,
         level: 8,
-        xp: 0,
-        equippedAttacks: ['SUNBATHE', 'SCRATCH', 'WAKE_WHIP', 'DEEPWATER_GRIP'],
-        gender: 'female' as const,
-        isShiny: false,
-      },
+        equippedAttacks: [
+          AttackId.SUNBATHE,
+          AttackId.SCRATCH,
+          AttackId.WAKE_WHIP,
+          AttackId.DEEPWATER_GRIP,
+        ],
+      }),
     ]
   );
   engines.push(engine);
@@ -55,10 +59,10 @@ describe('Aguana family Warmth', () => {
     for (const species of [AGUANA, NAUTIGUAN]) {
       expect(species.learnableAttacks).toContainEqual({
         level: 4,
-        attackId: 'SUNBATHE',
+        attackId: AttackId.SUNBATHE,
       });
     }
-    expect(ATTACK_DEFS.SUNBATHE).toMatchObject({
+    expect(ATTACK_DEFS[AttackId.SUNBATHE]).toMatchObject({
       name: 'Sunbathe',
       type: ElementType.NORMAL,
       power: 0,
@@ -76,47 +80,49 @@ describe('Aguana family Warmth', () => {
       nonWaterActiveMs: 0,
     });
 
-    updatePassiveWarmth(tower, ATTACK_DEFS.SCRATCH, 999);
+    updatePassiveWarmth(tower, ATTACK_DEFS[AttackId.SCRATCH], 999);
     expect(tower.warmth?.value).toBe(0);
-    updatePassiveWarmth(tower, ATTACK_DEFS.SUNBATHE, 1);
+    updatePassiveWarmth(tower, ATTACK_DEFS[AttackId.SUNBATHE], 1);
     expect(tower.warmth?.value).toBe(10);
-    updatePassiveWarmth(tower, ATTACK_DEFS.SCRATCH, 2000);
+    updatePassiveWarmth(tower, ATTACK_DEFS[AttackId.SCRATCH], 2000);
     expect(tower.warmth?.value).toBe(30);
 
-    updatePassiveWarmth(tower, ATTACK_DEFS.SCRATCH, 500);
-    updatePassiveWarmth(tower, ATTACK_DEFS.WAKE_WHIP, 5000);
-    updatePassiveWarmth(tower, ATTACK_DEFS.SCRATCH, 500);
+    updatePassiveWarmth(tower, ATTACK_DEFS[AttackId.SCRATCH], 500);
+    updatePassiveWarmth(tower, ATTACK_DEFS[AttackId.WAKE_WHIP], 5000);
+    updatePassiveWarmth(tower, ATTACK_DEFS[AttackId.SCRATCH], 500);
     expect(tower.warmth?.value).toBe(30);
-    updatePassiveWarmth(tower, ATTACK_DEFS.SCRATCH, 500);
+    updatePassiveWarmth(tower, ATTACK_DEFS[AttackId.SCRATCH], 500);
     expect(tower.warmth?.value).toBe(40);
   });
 
   it('gives the full 40% Water bonus whenever any Warmth is available', () => {
     const engine = createEngine();
     const tower = engine.towers[0];
-    expect(getWarmthWaterDamageMultiplier(tower, ATTACK_DEFS.WAKE_WHIP)).toBe(
-      1
-    );
+    expect(
+      getWarmthWaterDamageMultiplier(tower, ATTACK_DEFS[AttackId.WAKE_WHIP])
+    ).toBe(1);
     tower.warmth!.value = 10;
-    expect(getWarmthWaterDamageMultiplier(tower, ATTACK_DEFS.WAKE_WHIP)).toBe(
-      1.4
-    );
+    expect(
+      getWarmthWaterDamageMultiplier(tower, ATTACK_DEFS[AttackId.WAKE_WHIP])
+    ).toBe(1.4);
     tower.warmth!.value = 100;
-    expect(getWarmthWaterDamageMultiplier(tower, ATTACK_DEFS.WAKE_WHIP)).toBe(
-      1.4
-    );
-    expect(getWarmthWaterDamageMultiplier(tower, ATTACK_DEFS.SCRATCH)).toBe(1);
+    expect(
+      getWarmthWaterDamageMultiplier(tower, ATTACK_DEFS[AttackId.WAKE_WHIP])
+    ).toBe(1.4);
+    expect(
+      getWarmthWaterDamageMultiplier(tower, ATTACK_DEFS[AttackId.SCRATCH])
+    ).toBe(1);
 
     vi.spyOn(Math, 'random').mockReturnValue(0);
     const coldTarget = engine.spawnPreviewEnemy({
       id: 'cold-target',
-      creatureId: 'mouse_1',
+      creatureId: SpeciesId.KNOTIA,
       level: 8,
       position: { x: 50, y: 50 },
     })!;
     const warmTarget = engine.spawnPreviewEnemy({
       id: 'warm-target',
-      creatureId: 'mouse_1',
+      creatureId: SpeciesId.KNOTIA,
       level: 8,
       position: { x: 50, y: 50 },
     })!;
@@ -125,7 +131,7 @@ describe('Aguana family Warmth', () => {
       engine,
       tower,
       coldTarget,
-      ATTACK_DEFS.WAKE_WHIP
+      ATTACK_DEFS[AttackId.WAKE_WHIP]
     );
     const coldDamage = coldTarget.maxHp - coldTarget.hp;
     tower.warmth!.value = 100;
@@ -133,7 +139,7 @@ describe('Aguana family Warmth', () => {
       engine,
       tower,
       warmTarget,
-      ATTACK_DEFS.WAKE_WHIP
+      ATTACK_DEFS[AttackId.WAKE_WHIP]
     );
     const warmDamage = warmTarget.maxHp - warmTarget.hp;
     expect(warmDamage).toBe(Math.floor(coldDamage * 1.4));
@@ -143,7 +149,11 @@ describe('Aguana family Warmth', () => {
     const engine = createEngine();
     const tower = engine.towers[0];
 
-    WarmthSupportBehavior.execute(engine, tower, ATTACK_DEFS.SUNBATHE);
+    WarmthSupportBehavior.execute(
+      engine,
+      tower,
+      ATTACK_DEFS[AttackId.SUNBATHE]
+    );
     expect(tower.warmth).toEqual({
       value: 100,
       sunSoaked: true,
@@ -151,7 +161,11 @@ describe('Aguana family Warmth', () => {
     });
     expect(engine.floatingTexts.at(-1)?.text).toBe('Warmth 100% + Sun-Soaked!');
     expect(
-      WarmthSupportBehavior.canExecute(engine, tower, ATTACK_DEFS.SUNBATHE)
+      WarmthSupportBehavior.canExecute(
+        engine,
+        tower,
+        ATTACK_DEFS[AttackId.SUNBATHE]
+      )
     ).toBe(false);
 
     expect(consumeWaterActivationWarmth(tower)).toEqual({
@@ -173,13 +187,13 @@ describe('Aguana family Warmth', () => {
     const tower = engine.towers[0];
     const coldTarget = engine.spawnPreviewEnemy({
       id: 'cold-target',
-      creatureId: 'mouse_1',
+      creatureId: SpeciesId.KNOTIA,
       level: 8,
       position: { x: 95, y: 50 },
     })!;
     const warmTarget = engine.spawnPreviewEnemy({
       id: 'warm-target',
-      creatureId: 'mouse_1',
+      creatureId: SpeciesId.KNOTIA,
       level: 8,
       position: { x: 50, y: 50 },
     })!;
@@ -187,7 +201,7 @@ describe('Aguana family Warmth', () => {
       engine,
       tower,
       coldTarget,
-      ATTACK_DEFS.WAKE_WHIP
+      ATTACK_DEFS[AttackId.WAKE_WHIP]
     );
     const coldDamage = coldTarget.maxHp - coldTarget.hp;
 
@@ -201,7 +215,7 @@ describe('Aguana family Warmth', () => {
     engine.elapsedTimeMs = tower.wakeWhip!.launchAtMs;
     updateWakeWhips(engine);
     const launchedProjectiles = engine.projectiles.filter(
-      (projectile) => projectile.attackDefinitionId === 'WAKE_WHIP'
+      (projectile) => projectile.attackDefinitionId === AttackId.WAKE_WHIP
     );
     expect(launchedProjectiles).toHaveLength(1);
     expect(
@@ -220,13 +234,13 @@ describe('Aguana family Warmth', () => {
     const tower = engine.towers[0];
     const coldTarget = engine.spawnPreviewEnemy({
       id: 'cold-grip-target',
-      creatureId: 'mouse_1',
+      creatureId: SpeciesId.KNOTIA,
       level: 8,
       position: { x: 95, y: 50 },
     })!;
     const warmTarget = engine.spawnPreviewEnemy({
       id: 'warm-grip-target',
-      creatureId: 'mouse_1',
+      creatureId: SpeciesId.KNOTIA,
       level: 8,
       position: { x: 50, y: 50 },
     })!;
@@ -236,7 +250,7 @@ describe('Aguana family Warmth', () => {
       engine,
       tower,
       coldTarget,
-      ATTACK_DEFS.DEEPWATER_GRIP
+      ATTACK_DEFS[AttackId.DEEPWATER_GRIP]
     );
     const coldPulseDamage = coldTarget.maxHp - coldTarget.hp;
 

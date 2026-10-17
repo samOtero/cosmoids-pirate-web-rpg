@@ -1,8 +1,9 @@
+import type { SpeciesId } from '@/types/definitionIds';
 import { TD_LEVELS } from '@/constants/tdLevels';
 import { Profile } from '@/types/baseGame';
 
 /** Species the player has captured, plus current ownership for legacy saves. */
-export function getCapturedSpeciesIds(profile: Profile): Set<string> {
+export function getCapturedSpeciesIds(profile: Profile): Set<SpeciesId> {
   return new Set([
     ...(profile.capturedSpeciesIds ?? []),
     ...profile.creatures.map((creature) => creature.speciesId),
@@ -11,7 +12,7 @@ export function getCapturedSpeciesIds(profile: Profile): Set<string> {
 }
 
 /** Species Kip has documented through completed levels, plus exact captures. */
-export function getJournalSeenSpeciesIds(profile: Profile): Set<string> {
+export function getJournalSeenSpeciesIds(profile: Profile): Set<SpeciesId> {
   const seenSpeciesIds = getCapturedSpeciesIds(profile);
 
   Object.values(TD_LEVELS).forEach((level) => {

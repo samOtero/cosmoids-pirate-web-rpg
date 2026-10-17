@@ -1,3 +1,4 @@
+import { testDefinitionId } from '@/__tests__/utils/dataBuilders';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 const capture = vi.hoisted(() => vi.fn());
 vi.mock('@/utils/analytics', () => ({
@@ -14,8 +15,8 @@ describe('battle analytics lifecycle', () => {
     ]);
     battle.start();
     battle.start();
-    battle.deploy('fueguana');
-    battle.deploy('fueguana');
+    battle.deploy(testDefinitionId('fueguana'));
+    battle.deploy(testDefinitionId('fueguana'));
     battle.finish('win', 12345, 3, 2);
     battle.finish('quit', 14000, 3, 2);
     expect(capture).toHaveBeenCalledTimes(2);
@@ -23,7 +24,7 @@ describe('battle analytics lifecycle', () => {
       attempt_id: capture.mock.calls[0][1].attempt_id,
       outcome: 'win',
       simulation_duration_seconds: 12,
-      deployed_species: ['fueguana'],
+      deployed_species: [testDefinitionId('fueguana')],
     });
   });
   it('does not invent starts or outcomes for previews and unstarted battles', () => {

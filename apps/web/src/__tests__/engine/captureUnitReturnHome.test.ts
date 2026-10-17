@@ -1,3 +1,4 @@
+import { SpeciesId } from '@/types/definitionIds';
 import { describe, expect, it } from 'vitest';
 
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
@@ -26,7 +27,7 @@ const createLevel = (delayMs = 0): TDLevelData => ({
 
 const createCarrier = (captureUnitId: string): Enemy => ({
   id: 'carrier',
-  definitionId: 'mouse_1',
+  definitionId: SpeciesId.KNOTIA,
   level: 3,
   position: { x: 0, y: 0 },
   hp: 100,
@@ -139,13 +140,13 @@ describe('returning capture objectives', () => {
     level.waveEnemyDefinitions = [
       {
         id: 'juvenile_tracker',
-        creatureId: 'mouse_1',
+        creatureId: SpeciesId.KNOTIA,
         level: 3,
         canCarryCaptureUnits: false,
       },
       {
         id: 'adult_carrier',
-        creatureId: 'mouse_1',
+        creatureId: SpeciesId.KNOTIA,
         level: 3,
       },
     ];

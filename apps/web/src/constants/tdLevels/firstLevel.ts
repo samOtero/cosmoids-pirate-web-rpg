@@ -1,3 +1,4 @@
+import { SpeciesId } from '@/types/definitionIds';
 import { TDLevelData } from '@/engine/tower-defense/types';
 
 export const FIRST_LEVEL: TDLevelData = {
@@ -151,7 +152,7 @@ export const FIRST_LEVEL: TDLevelData = {
   waveEnemyDefinitions: [
     {
       id: 'dock_mouse',
-      creatureId: 'mouse_1',
+      creatureId: SpeciesId.KNOTIA,
       level: 3,
       speedMultiplier: 2,
     },

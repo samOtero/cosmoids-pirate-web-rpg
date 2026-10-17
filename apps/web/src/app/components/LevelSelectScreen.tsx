@@ -27,7 +27,7 @@ function getLevelCreatureIcons(context: TDLevelContext): string[] {
       definition,
     ])
   );
-  const uniqueIds = new Set<string>();
+  const uniqueIds = new Set<number>();
   levelConfig.levelData.waves.forEach((wave) => {
     wave.groups.forEach((group) => {
       for (const encounter of getWaveGroupEncounters(group)) {

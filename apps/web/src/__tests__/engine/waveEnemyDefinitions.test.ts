@@ -1,3 +1,5 @@
+import { testDefinitionId } from '@/__tests__/utils/dataBuilders';
+import { SpeciesId } from '@/types/definitionIds';
 import { describe, expect, it, vi } from 'vitest';
 
 import { isUnitWeakened } from '@/app/components/tower-defense/PixiBattlefield';
@@ -24,13 +26,13 @@ describe('wave enemy definitions', () => {
       waveEnemyDefinitions: [
         {
           id: 'mouse_scout',
-          creatureId: 'mouse_1',
+          creatureId: SpeciesId.KNOTIA,
           level: 3,
           speedMultiplier: 2,
         },
         {
           id: 'mouse_tank',
-          creatureId: 'mouse_1',
+          creatureId: SpeciesId.KNOTIA,
           level: 7,
           speedMultiplier: 0.5,
           hpMultiplier: 3,
@@ -71,17 +73,17 @@ describe('wave enemy definitions', () => {
     const tank = engine.enemies.find(
       (enemy) => enemy.waveEnemyDefinitionId === 'mouse_tank'
     );
-    const mouse = TD_CREATURE_DEFS.mouse_1.baseCreature;
+    const mouse = TD_CREATURE_DEFS[SpeciesId.KNOTIA].baseCreature;
 
     expect(scout).toMatchObject({
-      definitionId: 'mouse_1',
+      definitionId: SpeciesId.KNOTIA,
       level: 3,
       speed: (mouse.speed / 100) * 2,
     });
     expect(scout?.abilityRuntime).toBeUndefined();
 
     expect(tank).toMatchObject({
-      definitionId: 'mouse_1',
+      definitionId: SpeciesId.KNOTIA,
       level: 7,
       speed: (mouse.speed / 100) * 0.5,
       maxHp: calculateMaxHp(mouse.maxHp, 7) * 3,
@@ -109,7 +111,7 @@ describe('wave enemy definitions', () => {
       waveEnemyDefinitions: [
         {
           id: 'boat_breaker',
-          creatureId: 'mouse_1',
+          creatureId: SpeciesId.KNOTIA,
           level: 3,
           goalDamage: 10,
         },
@@ -148,12 +150,12 @@ describe('wave enemy definitions', () => {
       waveEnemyDefinitions: [
         {
           id: 'standard_mouse',
-          creatureId: 'mouse_1',
+          creatureId: SpeciesId.KNOTIA,
           level: 5,
         },
         {
           id: 'boss_mouse',
-          creatureId: 'mouse_1',
+          creatureId: SpeciesId.KNOTIA,
           level: 5,
           weakenedThreshold: 0.3,
         },
@@ -246,7 +248,7 @@ describe('wave enemy definitions', () => {
         },
         {
           id: 'mouse_guard',
-          creatureId: 'mouse_1',
+          creatureId: SpeciesId.KNOTIA,
           level: 3,
         },
       ],
@@ -360,12 +362,12 @@ describe('wave enemy definitions', () => {
     const target = engine.enemies[0];
     const tower = {
       id: 'fire_tower',
-      creature: { speciesId: 'starter_iguana', level: 8 },
+      creature: { speciesId: SpeciesId.FUEGUANA, level: 8 },
       currentAttack: 60,
       currentSpecialAttack: 60,
     } as Tower;
     const attack = (type: ElementType): AttackDefinition => ({
-      id: `TEST_${type}`,
+      id: testDefinitionId(`TEST_${type}`),
       name: 'Test',
       type,
       category: 'special',

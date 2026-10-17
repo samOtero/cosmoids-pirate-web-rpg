@@ -1,3 +1,4 @@
+import type { SpeciesId } from '@/types/definitionIds';
 import {
   GameFlag,
   GameFlagValue,
@@ -16,6 +17,7 @@ import {
   STARTER_MONKEY,
 } from '@/constants/creatures';
 import { getDefaultAttacksForLevel } from '@/utils/resolvePlayerCreature';
+import { GUEST_OWNER_ID } from '@/utils/creatureOwnership';
 import { generateCreatureGender } from '@/utils/creatureGender';
 
 const TEST_LEVELS = [
@@ -61,7 +63,7 @@ const TEST_STARTERS = [
 
 const PRIOR_LEVEL_CATCHES: Record<
   number,
-  { speciesId: string; level: number }[]
+  { speciesId: SpeciesId; level: number }[]
 > = {
   1: [],
   2: [{ speciesId: MOUSE_1.id, level: 3 }],
@@ -82,7 +84,7 @@ export interface TestProfileTemplateOption {
   level: number;
   creatureLevel: number;
   starterName: string;
-  starterSpeciesId: string;
+  starterSpeciesId: SpeciesId;
   starterIcon: string;
 }
 
@@ -92,7 +94,7 @@ interface TestProfileTemplateDefinition extends TestProfileTemplateOption {
 }
 
 function createTemplateCreature(
-  speciesId: string,
+  speciesId: SpeciesId,
   level: number,
   idPrefix: 'starter' | 'caught'
 ): PlayerCreature {
@@ -100,6 +102,7 @@ function createTemplateCreature(
 
   return {
     id: `test-profile-3-${idPrefix}-${speciesId}`,
+    originalOwnerId: GUEST_OWNER_ID,
     speciesId,
     gender: generateCreatureGender(speciesId),
     level,
@@ -160,6 +163,7 @@ export function createTestProfileFromTemplate(
 
   return {
     id: 2,
+    ownerId: GUEST_OWNER_ID,
     name: `Test L${template.level} · ${template.starterName}`,
     lastPlayed: now,
     creatures: [

@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { describe, it, expect } from 'vitest';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { Enemy, Tower, TowerTargetingMode } from '@/engine/tower-defense/types';
@@ -25,7 +27,7 @@ describe('Tower Targeting Modes', () => {
     isBackward: boolean = false
   ): Enemy => ({
     id,
-    definitionId: 'senticle',
+    definitionId: SpeciesId.SENTICLE,
     level: 5,
     position: { x, y },
     hp,
@@ -50,15 +52,12 @@ describe('Tower Targeting Modes', () => {
     mode: TowerTargetingMode = 'first'
   ): Tower => ({
     id: 'tower_1',
-    creature: {
+    creature: makePlayerCreature({
       id: 'c1',
-      speciesId: 'starter_crab',
+      speciesId: SpeciesId.PALMIT,
       level: 1,
-      xp: 0,
-      equippedAttacks: ['PINCH'],
-      gender: 'female' as const,
-      isShiny: false,
-    },
+      equippedAttacks: [AttackId.PINCH],
+    }),
     position: { x, y },
     lastAttackTime: 0,
     currentAttack: 10,
@@ -67,7 +66,9 @@ describe('Tower Targeting Modes', () => {
     currentSpecialDefense: 10,
     hp: 100,
     maxHp: 100,
-    equippedAttacksRuntime: [{ definitionId: 'PINCH', lastFiredTime: 0 }],
+    equippedAttacksRuntime: [
+      { definitionId: AttackId.PINCH, lastFiredTime: 0 },
+    ],
     selectedAttackIndex: 0,
     facingDirection: 'down',
     targetingMode: mode,
@@ -136,7 +137,7 @@ describe('Tower Targeting Modes', () => {
       waveEnemyDefinitions: [
         {
           id: 'extended',
-          creatureId: 'senticle',
+          creatureId: SpeciesId.SENTICLE,
           level: 5,
           targetingRangeMultiplier: 3,
         },
@@ -179,7 +180,7 @@ describe('Tower Targeting Modes', () => {
         waveEnemyDefinitions: [
           {
             id: 'variant',
-            creatureId: 'senticle',
+            creatureId: SpeciesId.SENTICLE,
             level: 5,
             targetingRangeMultiplier,
           },
@@ -286,16 +287,13 @@ describe('Tower Targeting Modes', () => {
 
   it('should persist targetingMode to the roster creature and initialize correctly in the engine', () => {
     const initialRoster = [
-      {
+      makePlayerCreature({
         id: 'c1',
-        speciesId: 'starter_crab',
+        speciesId: SpeciesId.PALMIT,
         level: 1,
-        xp: 0,
-        equippedAttacks: ['PINCH'],
-        gender: 'female' as const,
-        isShiny: false,
+        equippedAttacks: [AttackId.PINCH],
         targetingMode: 'strongest',
-      },
+      }),
     ];
 
     // 1. Initialized engine should load targetingMode from roster

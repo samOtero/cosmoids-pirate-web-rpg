@@ -5,7 +5,7 @@ import {
   ENEMY_ABILITY_DEFS,
   type EnemyAbilityDefinition,
 } from '@/engine/tower-defense/enemyAbilities';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+
 import { COSMOID_TEMPLATES } from '@/constants/creatures';
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 import { TD_LEVELS } from '@/constants/tdLevels';
@@ -85,12 +85,14 @@ describe.each(Object.entries(ENEMY_ABILITY_DEFS))(
       }
     });
     it('keeps enemy abilities separate from player attacks and learnsets', () => {
-      expect(ATTACK_DEFS[id]).toBeUndefined();
+      expect(typeof id).toBe('string');
       for (const template of Object.values(COSMOID_TEMPLATES)) {
         expect(
-          template.learnableAttacks.some((move) => move.attackId === id),
-          `${template.id}: enemy ability in learnset`
-        ).toBe(false);
+          template.learnableAttacks.every((move) =>
+            Number.isSafeInteger(move.attackId)
+          ),
+          `${template.id}: player moves use numeric attack identities`
+        ).toBe(true);
       }
     });
     it('references registered visual effects and shipped assets', () => {

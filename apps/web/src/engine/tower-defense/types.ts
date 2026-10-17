@@ -1,3 +1,4 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
 import {
   Creature,
   CreatureGender,
@@ -9,12 +10,12 @@ import type { AttackInstance } from './attacks/types';
 
 export interface TDEvolutionNode {
   level: number;
-  evolutionDefId: string;
+  evolutionDefId: SpeciesId;
 }
 
 export interface TDAttackUnlockNode {
   level: number;
-  attackDefId: string;
+  attackDefId: AttackId;
 }
 
 export interface TDCreatureMetadata {
@@ -57,7 +58,7 @@ export interface TDFlagDuelConfig {
     recoveryDurationMs: number;
   };
   alliedRunner: {
-    creatureId: string;
+    creatureId: SpeciesId;
     level: number;
     pathIndex: number;
     /** Horizontal map percentage points traveled per second. */
@@ -76,7 +77,7 @@ export interface TDFlagDuelConfig {
 }
 
 export interface FlagRunner extends BaseTDUnit {
-  definitionId: string;
+  definitionId: SpeciesId;
   /** Absent for the automatic small waves. Roster runners cannot be recalled. */
   playerCreatureId?: string;
   currentWaypointIndex: number;
@@ -147,7 +148,7 @@ export interface TDWaveEnemyDefinition {
   /** Multiplies tower targeting reach against this encounter only. Defaults to 1. */
   targetingRangeMultiplier?: number;
   /** Creature-backed enemies use a registered Cosmoid definition. */
-  creatureId?: string;
+  creatureId?: SpeciesId;
   /** Fixed gender for this encounter; omitted encounters roll the species ratio per spawn. */
   gender?: CreatureGender;
   level: number;
@@ -262,7 +263,7 @@ export type TDObjectiveAllyBehavior =
 
 export interface TDObjectiveAllyDefinition {
   id: string;
-  creatureId: string;
+  creatureId: SpeciesId;
   displayName: string;
   /** Destroying this structure releases the ally. */
   gateDefinitionId: string;
@@ -287,7 +288,7 @@ export interface TDWave {
  * member into a configured evolved enemy variant.
  */
 export interface TDResonantEvolutionConfig {
-  sourceCreatureId: string;
+  sourceCreatureId: SpeciesId;
   evolvedEnemyDefinitionId: string;
   requiredCount: number;
   /** Distance from the capture unit at which the first chain member can anchor. */
@@ -379,7 +380,7 @@ export interface CaptureUnitWaveRelocation {
 
 export interface CaptureUnitGroupHaulingConfig {
   /** Only this creature species can join the hauling chain. */
-  eligibleCreatureId: string;
+  eligibleCreatureId: SpeciesId;
   /** Row-local distance required to grab the objective or take over as leader. */
   pickupRadius?: number;
   /** Distance at which a new hauler can connect to an existing hauler. */
@@ -545,7 +546,7 @@ export interface TowerWarmthState {
 export interface Tower extends BaseTDUnit {
   deepwaterGrip?: {
     targetId: string;
-    attackDefinitionId: string;
+    attackDefinitionId: AttackId;
     origin: Point;
     startedAtMs: number;
     expiresAtMs: number;
@@ -557,7 +558,7 @@ export interface Tower extends BaseTDUnit {
   sharedSlumberUntilMs?: number;
   /** Wind-up, impact, and recovery state for Yokodillo's stationary stomp. */
   shikoQuake?: {
-    attackDefinitionId: string;
+    attackDefinitionId: AttackId;
     startedAtMs: number;
     impactAtMs: number;
     endsAtMs: number;
@@ -566,7 +567,7 @@ export interface Tower extends BaseTDUnit {
   };
   /** Stationary, single-target wind-up and recovery for Yokodillo's palm blow. */
   palmSlam?: {
-    attackDefinitionId: string;
+    attackDefinitionId: AttackId;
     targetId: string;
     startedAtMs: number;
     impactAtMs: number;
@@ -576,7 +577,7 @@ export interface Tower extends BaseTDUnit {
   };
   /** Committed facing-forward waggle windup for Aguana's paddle-tail attack. */
   wakeWhip?: {
-    attackDefinitionId: string;
+    attackDefinitionId: AttackId;
     targetId: string;
     targetPosition: Point;
     attackFacingDirection: 'up' | 'down' | 'left' | 'right';
@@ -666,7 +667,7 @@ export interface Enemy extends BaseTDUnit {
   fuseRushMarks?: number;
   /** Per-Mainscale Wind Mark expirations, keyed by the marking tower. */
   sailcutterMarks?: Record<string, number>;
-  definitionId: string;
+  definitionId: SpeciesId | string;
   kind?: 'creature' | 'structure';
   /** Visual configuration used by structure enemies. */
   tdConfigId?: string;
@@ -767,7 +768,7 @@ export interface Enemy extends BaseTDUnit {
 }
 
 export interface ObjectiveAlly extends BaseTDUnit {
-  definitionId: string;
+  definitionId: SpeciesId;
   tdConfigId: string;
   displayName: string;
   gateDefinitionId: string;
@@ -822,7 +823,7 @@ export interface RiggingNest {
 export interface RiggingThreadling {
   id: string;
   ownerTowerId: string;
-  attackDefinitionId: string;
+  attackDefinitionId: AttackId;
   ownerOrigin: Point;
   nestPosition: Point;
   position: Point;
@@ -910,7 +911,7 @@ export interface Projectile {
     sourceSnapshot: Tower;
   };
   id: string;
-  attackDefinitionId?: string; // Used to know what sprite to render and what effects to apply
+  attackDefinitionId?: AttackId; // Used to know what sprite to render and what effects to apply
   sourceId: string;
   targetId: string;
   position: Point;

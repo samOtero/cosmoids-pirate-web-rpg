@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { installAttackFixtures } from './fixtures';
@@ -26,22 +28,19 @@ function createBattle() {
       waves: [],
     },
     [
-      {
+      makePlayerCreature({
         id: 'aguana',
-        speciesId: 'aguana',
+        speciesId: SpeciesId.AGUANA,
         level: 8,
-        xp: 0,
-        equippedAttacks: ['WAKE_WHIP'],
-        gender: 'female' as const,
-        isShiny: false,
-      },
+        equippedAttacks: [AttackId.WAKE_WHIP],
+      }),
     ]
   );
   engines.push(engine);
   engine.placeTower('aguana', 40, 50);
   const target = engine.spawnPreviewEnemy({
     id: 'wake-target',
-    creatureId: 'mouse_1',
+    creatureId: SpeciesId.KNOTIA,
     level: 8,
     position: { x: 70, y: 50 },
   })!;
@@ -78,7 +77,7 @@ describe('Committed projectile push', () => {
       expect(tower.wakeWhip?.launched).toBe(true);
       expect(engine.projectiles).toHaveLength(1);
       expect(engine.projectiles[0]).toMatchObject({
-        attackDefinitionId: 'WAKE_WHIP',
+        attackDefinitionId: AttackId.WAKE_WHIP,
         targetId: target.id,
         warmthDamageMultiplier: 1.4,
         facingDirection: 'right',

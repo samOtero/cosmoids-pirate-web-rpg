@@ -1,7 +1,10 @@
 import { expect, test } from '@playwright/test';
 import { COSMOID_TEMPLATES } from '../src/constants/creatures';
-import { CURRENT_PROFILE_VERSION } from '../src/constants/game';
 import { StoryProgression } from '../src/types/baseGame';
+import {
+  makePlayerCreature,
+  makeProfile,
+} from '../src/__tests__/utils/dataBuilders';
 
 const ordinary = Object.values(COSMOID_TEMPLATES).find(
   (template) => template.genderRatio !== 'genderless'
@@ -21,53 +24,46 @@ for (const viewport of [
     await page.setViewportSize(viewport);
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
-    await page.addInitScript(
-      ({ speciesId, genderlessId, version, progression }) => {
-        const creature = (id: string, speciesId: string, gender: string) => ({
-          id,
-          speciesId,
-          gender,
+    const profile = makeProfile({
+      name: 'Gender browser test',
+      lastPlayed: Date.now(),
+      storyProgression: StoryProgression.DEFEAT_FIRST_BATTLE,
+      journalOpened: true,
+      journalUnlockShown: true,
+      creatures: [
+        makePlayerCreature({
+          id: 'party-female',
+          speciesId: ordinary.id,
+          gender: 'female',
           level: 3,
-          xp: 0,
-          equippedAttacks: [],
-          isShiny: false,
-        });
-        localStorage.setItem(
-          'cosmoids-game-state',
-          JSON.stringify({
-            version: 0,
-            state: {
-              profiles: [
-                {
-                  id: 0,
-                  name: 'Gender browser test',
-                  lastPlayed: Date.now(),
-                  version,
-                  storyProgression: progression,
-                  journalOpened: true,
-                  journalUnlockShown: true,
-                  creatures: [creature('party-female', speciesId, 'female')],
-                  storageCreatures: [
-                    creature('stored-male', speciesId, 'male'),
-                    creature('stored-genderless', genderlessId, 'genderless'),
-                  ],
-                  inventory: [],
-                  gameFlags: [],
-                },
-                null,
-                null,
-              ],
-            },
-          })
-        );
-      },
-      {
-        speciesId: ordinary.id,
-        genderlessId: genderless.id,
-        version: CURRENT_PROFILE_VERSION,
-        progression: StoryProgression.DEFEAT_FIRST_BATTLE,
-      }
-    );
+        }),
+      ],
+      storageCreatures: [
+        makePlayerCreature({
+          id: 'stored-male',
+          speciesId: ordinary.id,
+          gender: 'male',
+          level: 3,
+        }),
+        makePlayerCreature({
+          id: 'stored-genderless',
+          speciesId: genderless.id,
+          gender: 'genderless',
+          level: 3,
+        }),
+      ],
+    });
+    await page.addInitScript((savedProfile) => {
+      localStorage.setItem(
+        'cosmoids-game-state',
+        JSON.stringify({
+          version: 0,
+          state: {
+            profiles: [savedProfile, null, null],
+          },
+        })
+      );
+    }, profile);
     await page.goto('/');
     await page.addStyleTag({
       content: 'nextjs-portal { pointer-events: none; }',

@@ -1,3 +1,5 @@
+import { AttackId, SpeciesId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
@@ -11,7 +13,7 @@ afterEach(() => {
   engines.splice(0).forEach((e) => e.destroy());
   vi.restoreAllMocks();
 });
-const move = ATTACK_FIXTURES.DEEPWATER_GRIP;
+const move = ATTACK_FIXTURES[AttackId.DEEPWATER_GRIP];
 function battle() {
   const engine = new TowerDefenseEngine(
     {
@@ -24,15 +26,14 @@ function battle() {
       placementSpots: [],
       waves: [{ id: 'empty', groups: [] }],
     },
-    ['one', 'two'].map((id) => ({
-      id,
-      speciesId: 'marophis',
-      level: 12,
-      xp: 0,
-      equippedAttacks: ['DEEPWATER_GRIP', 'WATER_GUN'],
-      gender: 'female' as const,
-      isShiny: false,
-    }))
+    ['one', 'two'].map((id) =>
+      makePlayerCreature({
+        id,
+        speciesId: SpeciesId.MAROPHIS,
+        level: 12,
+        equippedAttacks: [AttackId.DEEPWATER_GRIP, AttackId.WATER_GUN],
+      })
+    )
   );
   engines.push(engine);
   engine.placeTower('one', 40, 50);
@@ -41,7 +42,7 @@ function battle() {
   other.equippedAttacksRuntime = [];
   const target: Enemy = {
     id: 'target',
-    definitionId: 'mouse_1',
+    definitionId: SpeciesId.KNOTIA,
     level: 12,
     position: { x: 50, y: 50 },
     hp: 500,

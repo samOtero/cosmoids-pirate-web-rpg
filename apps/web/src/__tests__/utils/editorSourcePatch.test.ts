@@ -1,3 +1,4 @@
+import { testDefinitionId } from '@/__tests__/utils/dataBuilders';
 import { describe, expect, it } from 'vitest';
 import {
   findEditorExport,
@@ -16,7 +17,9 @@ describe('editor source patches', () => {
     };
     export const OTHER = { enabled: true };`;
     const before = {
-      waveEnemyDefinitions: [{ id: 'boss', creatureId: 'example', level: 10 }],
+      waveEnemyDefinitions: [
+        { id: 'boss', creatureId: testDefinitionId('example'), level: 10 },
+      ],
       paths: [],
     };
     const after = {

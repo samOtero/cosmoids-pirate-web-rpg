@@ -1,3 +1,4 @@
+import { testDefinitionId } from '@/__tests__/utils/dataBuilders';
 import { describe, expect, it } from 'vitest';
 import {
   getActiveSpeedMultiplier,
@@ -9,8 +10,8 @@ describe('Timed ally speed boosts', () => {
   it.each([1.4, 2.3])(
     'snapshots living allies, expires, and recasts using a configured %s multiplier',
     (speedMultiplier) => {
-      const casterSpecies = species('test_speed_caster');
-      const allySpecies = species('test_speed_ally');
+      const casterSpecies = species(testDefinitionId('test_speed_caster'));
+      const allySpecies = species(testDefinitionId('test_speed_ally'));
       const move = ability({
         id: 'TEST_ALLY_SPEED',
         type: 'ALLY_SPEED_BOOST',
@@ -73,7 +74,7 @@ describe('One-use defense boosts', () => {
   ])(
     'boosts defenses independently (%s, %s) once for the fight',
     (defenseMultiplier, specialDefenseMultiplier) => {
-      const template = species('test_defense_caster');
+      const template = species(testDefinitionId('test_defense_caster'));
       const move = ability({
         id: 'TEST_DEFENSE',
         type: 'SELF_DEFENSE_BOOST',
@@ -116,9 +117,9 @@ describe('Proximity-triggered stacking support', () => {
   it.each([2, 4])(
     'requires the designated objective, affects eligible allies, caps speed, and stops after %s casts',
     (maxActivations) => {
-      const casterSpecies = species('test_proximity_caster');
-      const targetSpecies = species('test_proximity_ally');
-      const otherSpecies = species('test_other_ally');
+      const casterSpecies = species(testDefinitionId('test_proximity_caster'));
+      const targetSpecies = species(testDefinitionId('test_proximity_ally'));
+      const otherSpecies = species(testDefinitionId('test_other_ally'));
       const move = ability({
         id: 'TEST_STACKING_SUPPORT',
         type: 'PROXIMITY_HOWL_SPEED_STACK',
@@ -194,7 +195,7 @@ describe('Proximity-triggered stacking support', () => {
   );
 
   it('combines persistent support buffs with the configured carrier slowdown', () => {
-    const template = species('test_carrier');
+    const template = species(testDefinitionId('test_carrier'));
     const carrierMultiplier = 0.7;
     const engine = battle({
       captureUnits: [

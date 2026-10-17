@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useEditorSource } from './useEditorSource';
 import EditorSourceStatus from './EditorSourceStatus';
 import * as PIXI from 'pixi.js';
 import * as CREATURES from '@/constants/creatures';
-import { Creature } from '@/types/baseGame';
+
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
 
 const BATTLE_SPRITES = [
@@ -69,7 +69,9 @@ export default function TDTowerSizeEditor({
 }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const selectedConfigKey = ALL_CONFIG_KEYS[selectedIndex];
-  const creature = ALL_CREATURES_LIST.find((c) => c.id === selectedConfigKey);
+  const creature = ALL_CREATURES_LIST.find(
+    (c) => c.visualConfigId === selectedConfigKey
+  );
 
   const [selectedDirection, setSelectedDirection] = useState<
     'default' | 'up' | 'down' | 'left' | 'right'

@@ -1,18 +1,15 @@
+import { makeProfile } from '@/__tests__/utils/dataBuilders';
 import { render, screen } from '@testing-library/react';
 
 import LevelSelectScreen from '@/app/components/LevelSelectScreen';
 import { Profile, StoryProgression } from '@/types/baseGame';
 
-const profile: Profile = {
+const profile: Profile = makeProfile({
   id: 0,
   name: 'Caleb',
   lastPlayed: 0,
-  creatures: [],
-  storageCreatures: [],
-  inventory: [],
-  gameFlags: [],
   storyProgression: StoryProgression.DEFEAT_BUG_STAGE_1,
-};
+});
 
 describe('LevelSelectScreen', () => {
   it('uses a horizontal swipe row on mobile and a grid on desktop', () => {

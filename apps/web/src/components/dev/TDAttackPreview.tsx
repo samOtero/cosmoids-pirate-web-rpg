@@ -1,4 +1,7 @@
 'use client';
+
+import { AttackId, SpeciesId } from '@/types/definitionIds';
+
 import { generateCreatureGender } from '@/utils/creatureGender';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -18,7 +21,7 @@ const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5));
 
 interface EnemyPreviewConfig {
   id: string;
-  creatureId: string;
+  creatureId: SpeciesId;
   level: number;
   abilityId: string;
 }
@@ -89,15 +92,16 @@ function getAdditionalEnemyPosition(index: number) {
 }
 
 function createEngine(
-  towerCreatureId: string,
+  towerCreatureId: SpeciesId,
   towerLevel: number,
-  targetCreatureId: string,
+  targetCreatureId: SpeciesId,
   targetLevel: number,
   targetAbilityId: string,
   additionalEnemies: EnemyPreviewConfig[],
   showNearbyAlly: boolean
 ) {
   const towerCreature = {
+    originalOwnerId: 'guest',
     id: 'attack-preview-tower',
     speciesId: towerCreatureId,
     level: towerLevel,
@@ -105,7 +109,7 @@ function createEngine(
     // Sandbox loadout: selecting a move uses production swapping, not a new battle.
     equippedAttacks: attackOptions.map((attack) => attack.id),
     activeAttackIndex: attackOptions.findIndex(
-      (attack) => attack.id === 'EMBER'
+      (attack) => attack.id === AttackId.EMBER
     ),
     targetingMode: 'closest',
     gender: generateCreatureGender(towerCreatureId),
@@ -131,11 +135,12 @@ function createEngine(
       ...(showNearbyAlly
         ? [
             {
+              originalOwnerId: 'guest',
               id: 'attack-preview-ally',
-              speciesId: 'starter_crab',
+              speciesId: SpeciesId.PALMIT,
               level: towerLevel,
               xp: 0,
-              equippedAttacks: ['VINE_WHIP'],
+              equippedAttacks: [AttackId.VINE_WHIP],
               activeAttackIndex: 0,
               gender: 'female' as const,
               isShiny: false,
@@ -199,11 +204,15 @@ function AbilitySelect({
 }
 
 export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
-  const [towerCreatureId, setTowerCreatureId] = useState('starter_iguana');
+  const [towerCreatureId, setTowerCreatureId] = useState<SpeciesId>(
+    SpeciesId.FUEGUANA
+  );
   const [towerLevel, setTowerLevel] = useState(10);
-  const [towerAttackId, setTowerAttackId] = useState('EMBER');
+  const [towerAttackId, setTowerAttackId] = useState<AttackId>(AttackId.EMBER);
   const [showNearbyAlly, setShowNearbyAlly] = useState(false);
-  const [targetCreatureId, setTargetCreatureId] = useState('mouse_1');
+  const [targetCreatureId, setTargetCreatureId] = useState<SpeciesId>(
+    SpeciesId.KNOTIA
+  );
   const [targetLevel, setTargetLevel] = useState(10);
   const [targetAbilityId, setTargetAbilityId] = useState('');
   const [additionalEnemies, setAdditionalEnemies] = useState<
@@ -249,7 +258,10 @@ export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
       'attack-preview-tower',
       attackOptions.findIndex((attack) => attack.id === towerAttackId)
     );
-    if (towerAttackId === 'WIND_GUST' || towerAttackId === 'FUNNY_DANCE') {
+    if (
+      towerAttackId === AttackId.WIND_GUST ||
+      towerAttackId === AttackId.FUNNY_DANCE
+    ) {
       armWindGustTarget(engine);
     }
   }, [engine, towerAttackId]);
@@ -284,7 +296,10 @@ export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
     const animate = (time: number) => {
       if (previousTime !== null) {
         engine.tick(time, Math.min(time - previousTime, 50));
-        if (towerAttackId === 'WIND_GUST' || towerAttackId === 'FUNNY_DANCE') {
+        if (
+          towerAttackId === AttackId.WIND_GUST ||
+          towerAttackId === AttackId.FUNNY_DANCE
+        ) {
           armWindGustTarget(engine);
         }
       }
@@ -361,7 +376,9 @@ export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
                 aria-label="Tower creature"
                 className={fieldClass}
                 value={towerCreatureId}
-                onChange={(event) => setTowerCreatureId(event.target.value)}
+                onChange={(event) =>
+                  setTowerCreatureId(Number(event.target.value))
+                }
               >
                 {creatureOptions.map((creature) => (
                   <option key={creature.id} value={creature.id}>
@@ -386,7 +403,9 @@ export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
               <select
                 className={`${fieldClass} mt-1`}
                 value={towerAttackId}
-                onChange={(event) => setTowerAttackId(event.target.value)}
+                onChange={(event) =>
+                  setTowerAttackId(Number(event.target.value))
+                }
               >
                 {attackOptions.map((attack) => (
                   <option key={attack.id} value={attack.id}>
@@ -396,12 +415,19 @@ export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
               </select>
             </label>
             <div className="mt-2 grid grid-cols-4 gap-1 text-center text-[11px]">
-              <Stat label={activeAttack.constriction ? 'Power/pulse' : 'Power'} value={activeAttack.power} />
+              <Stat
+                label={activeAttack.constriction ? 'Power/pulse' : 'Power'}
+                value={activeAttack.power}
+              />
               <Stat label="Type" value={activeAttack.type} />
               <Stat label="Class" value={activeAttack.category} />
               <Stat label="CD" value={`${activeAttack.cooldownMs}ms`} />
             </div>
-            {activeAttack.description && <p className="mt-2 text-xs text-cyan-200">{activeAttack.description}</p>}
+            {activeAttack.description && (
+              <p className="mt-2 text-xs text-cyan-200">
+                {activeAttack.description}
+              </p>
+            )}
             {activeAttack.supportBuff && (
               <p className="mt-2 text-xs text-amber-200">
                 +
@@ -424,7 +450,8 @@ export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
               <div className="mt-2 space-y-2 text-xs text-emerald-200">
                 <p>
                   Heals 20% max HP and grants +25% physical defense. Repairs the
-                  lowest HP percentage first, then reinforces allies before self.
+                  lowest HP percentage first, then reinforces allies before
+                  self.
                 </p>
                 <div className="flex gap-2">
                   <button
@@ -467,15 +494,19 @@ export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
                   entrance. Hits each enemy once; the final splash is cosmetic.
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {(['horizontal', 'vertical', 'bend'] as const).map((direction) => (
-                    <button
-                      key={direction}
-                      className={buttonClass}
-                      onClick={() => configureBowlingPreview(engine, direction)}
-                    >
-                      Test {direction}
-                    </button>
-                  ))}
+                  {(['horizontal', 'vertical', 'bend'] as const).map(
+                    (direction) => (
+                      <button
+                        key={direction}
+                        className={buttonClass}
+                        onClick={() =>
+                          configureBowlingPreview(engine, direction)
+                        }
+                      >
+                        Test {direction}
+                      </button>
+                    )
+                  )}
                 </div>
                 <p>Lane tests add immortal targets and use First targeting.</p>
               </div>
@@ -500,7 +531,9 @@ export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
                 aria-label="Target creature"
                 className={fieldClass}
                 value={targetCreatureId}
-                onChange={(event) => setTargetCreatureId(event.target.value)}
+                onChange={(event) =>
+                  setTargetCreatureId(Number(event.target.value))
+                }
               >
                 {creatureOptions.map((creature) => (
                   <option key={creature.id} value={creature.id}>
@@ -565,7 +598,7 @@ export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
                     ...current,
                     {
                       id,
-                      creatureId: 'bettle',
+                      creatureId: SpeciesId.BEETADEL,
                       level: 10,
                       abilityId: '',
                     },
@@ -613,7 +646,10 @@ export default function TDAttackPreview({ onClose }: { onClose: () => void }) {
                           setAdditionalEnemies((current) =>
                             current.map((item) =>
                               item.id === enemy.id
-                                ? { ...item, creatureId: event.target.value }
+                                ? {
+                                    ...item,
+                                    creatureId: Number(event.target.value),
+                                  }
                                 : item
                             )
                           )

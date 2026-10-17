@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
@@ -24,7 +26,7 @@ afterEach(() => {
 function createEnemy(id: string, x: number): Enemy {
   return {
     id,
-    definitionId: 'mouse_1',
+    definitionId: SpeciesId.KNOTIA,
     level: 8,
     position: { x, y: 50 },
     hp: 300,
@@ -58,15 +60,12 @@ function battle() {
       waves: [{ id: 'empty', groups: [] }],
     },
     [
-      {
+      makePlayerCreature({
         id: 'dormatee-one',
-        speciesId: 'dormatee',
+        speciesId: SpeciesId.DORMATEE,
         level: 8,
-        xp: 0,
-        equippedAttacks: ['SHARED_SLUMBER', 'TACKLE'],
-        gender: 'female' as const,
-        isShiny: false,
-      },
+        equippedAttacks: [AttackId.SHARED_SLUMBER, AttackId.TACKLE],
+      }),
     ]
   );
   engines.push(engine);
@@ -91,7 +90,7 @@ describe('Shared sleep and wake resistance', () => {
     SharedSlumberBehavior.execute(
       engine,
       source,
-      ATTACK_FIXTURES.SHARED_SLUMBER
+      ATTACK_FIXTURES[AttackId.SHARED_SLUMBER]
     );
 
     expect(source.sharedSlumberUntilMs).toBe(SHARED_SLUMBER_DURATION_MS);
@@ -139,14 +138,14 @@ describe('Shared sleep and wake resistance', () => {
     SharedSlumberBehavior.execute(
       engine,
       source,
-      ATTACK_FIXTURES.SHARED_SLUMBER
+      ATTACK_FIXTURES[AttackId.SHARED_SLUMBER]
     );
 
     EffectProcessor.applyDamageAndEffects(
       engine,
       source,
       target,
-      ATTACK_FIXTURES.TACKLE
+      ATTACK_FIXTURES[AttackId.TACKLE]
     );
     expect(isSleeping(target)).toBe(true);
 
@@ -155,7 +154,7 @@ describe('Shared sleep and wake resistance', () => {
       engine,
       source,
       target,
-      ATTACK_FIXTURES.TACKLE
+      ATTACK_FIXTURES[AttackId.TACKLE]
     );
     expect(isSleeping(target)).toBe(false);
     expect(target.sleepResistantUntilMs).toBe(
@@ -172,7 +171,7 @@ describe('Shared sleep and wake resistance', () => {
       SharedSlumberBehavior.canExecute(
         engine,
         source,
-        ATTACK_FIXTURES.SHARED_SLUMBER
+        ATTACK_FIXTURES[AttackId.SHARED_SLUMBER]
       )
     ).toBe(false);
   });

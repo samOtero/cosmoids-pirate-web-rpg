@@ -1,3 +1,4 @@
+import { testDefinitionId } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as encounters from '@/engine/tower-defense/waveEncounters';
 import { expandWaveRepetitions } from '@/engine/tower-defense/waveSchedule';
@@ -40,8 +41,13 @@ function level(waveGroup = group()) {
     ],
     placementSpots: [],
     waveEnemyDefinitions: [
-      { id: 'common', creatureId: 'test_common', level: 4 },
-      { id: 'rare', creatureId: 'test_rare', level: 7, hpMultiplier: 2 },
+      { id: 'common', creatureId: testDefinitionId('test_common'), level: 4 },
+      {
+        id: 'rare',
+        creatureId: testDefinitionId('test_rare'),
+        level: 7,
+        hpMultiplier: 2,
+      },
     ],
     waves: [{ id: 'wildlife', groups: [waveGroup] }],
   };
@@ -49,8 +55,8 @@ function level(waveGroup = group()) {
 
 describe('weighted wildlife encounters', () => {
   it('stops after finite repeats, preserving intervals, inter-wave pauses, and independent rolls', () => {
-    battleSpecies('test_common');
-    battleSpecies('test_rare');
+    battleSpecies(testDefinitionId('test_common'));
+    battleSpecies(testDefinitionId('test_rare'));
     const random = vi
       .fn()
       .mockReturnValueOnce(0)
@@ -164,8 +170,8 @@ describe('weighted wildlife encounters', () => {
   });
 
   it('rolls at each timed spawn and preserves selected definitions, routes, and captures', () => {
-    battleSpecies('test_common');
-    battleSpecies('test_rare');
+    battleSpecies(testDefinitionId('test_common'));
+    battleSpecies(testDefinitionId('test_rare'));
     const random = vi
       .fn()
       .mockReturnValueOnce(0)
@@ -198,7 +204,7 @@ describe('weighted wildlife encounters', () => {
       ['common', 0, 4],
     ]);
     expect(engine.captureEnemy(engine.enemies[1].id)).toMatchObject({
-      speciesId: 'test_rare',
+      speciesId: testDefinitionId('test_rare'),
       level: 7,
     });
     engine.tick(300, 50);
@@ -209,8 +215,8 @@ describe('weighted wildlife encounters', () => {
   it.each([{ uncapturable: true }, { isCursed: true }])(
     'preserves pool capture restrictions %j',
     (restriction) => {
-      battleSpecies('test_common');
-      battleSpecies('test_rare');
+      battleSpecies(testDefinitionId('test_common'));
+      battleSpecies(testDefinitionId('test_rare'));
       vi.spyOn(encounters, 'rollWaveEncounter').mockImplementation((entry) =>
         rollEncounter(entry, () => 0.9)
       );
@@ -220,15 +226,17 @@ describe('weighted wildlife encounters', () => {
         )
       );
       engine.tick(0, 16);
-      expect(engine.enemies[0].definitionId).toBe('test_rare');
+      expect(engine.enemies[0].definitionId).toBe(
+        testDefinitionId('test_rare')
+      );
       expect(engine.enemies[0].uncapturable).toBe(true);
       expect(engine.captureEnemy(engine.enemies[0].id)).toBeNull();
     }
   );
 
   it('rerolls endless wildlife after the delay without escalating stats or counts', () => {
-    battleSpecies('test_common');
-    battleSpecies('test_rare');
+    battleSpecies(testDefinitionId('test_common'));
+    battleSpecies(testDefinitionId('test_rare'));
     const random = vi
       .fn()
       .mockReturnValueOnce(0.9)

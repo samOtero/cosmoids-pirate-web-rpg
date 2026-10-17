@@ -1,7 +1,7 @@
 import { SpeakerImageKey, BackgroundImageKey } from '@/types/baseGame';
 
 export const MAX_PROFILES = 3;
-export const CURRENT_PROFILE_VERSION = 10;
+export const CURRENT_PROFILE_VERSION = 12;
 export const MAX_COSMOID_LEVEL = 16;
 export const MAX_PARTY_SIZE = 6;
 
@@ -43,7 +43,8 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
   [SpeakerImageKey.STARTER_CHEST_CLOSED]: '/starter_box.webp',
   [SpeakerImageKey.STARTER_CHEST_OPEN]: '/starter_box_opened.webp',
   [SpeakerImageKey.STARTER_1_CRAB]: '/crab-starter-grass-neutral-skin-1.webp',
-  [SpeakerImageKey.STARTER_2_IGUANA]: '/iguana_starter_fire_neutral_skin_1.webp',
+  [SpeakerImageKey.STARTER_2_IGUANA]:
+    '/iguana_starter_fire_neutral_skin_1.webp',
   [SpeakerImageKey.STARTER_3_MONKEY]:
     '/monkey_starter_water_neutral_skin_1.webp',
   [SpeakerImageKey.MOPUP]: '/UI/Icons/mopup_icon.png',
@@ -55,7 +56,8 @@ export const SPEAKER_IMAGES: Record<SpeakerImageKey, string> = {
     '/dialog_pirate_grunt_aggressive.webp',
   [SpeakerImageKey.PIRATE_GRUNT_JOE_ANGRY_POINTING]:
     '/dialog_pirate_grunt_aggressive_point.webp',
-  [SpeakerImageKey.LANCE_NEUTRAL_OUTFIT_1]: '/dialog/lance_portrait_actual.webp',
+  [SpeakerImageKey.LANCE_NEUTRAL_OUTFIT_1]:
+    '/dialog/lance_portrait_actual.webp',
   [SpeakerImageKey.LANCE_AMUSED]: '/dialog/lance_amused_small.webp',
   [SpeakerImageKey.LANCE_ANGRY]: '/dialog/lance_angry_small.webp',
   [SpeakerImageKey.LANCE_CALM]: '/dialog/lance_calm_small.webp',
@@ -144,7 +146,8 @@ export const BACKGROUND_IMAGES: Record<BackgroundImageKey, string> = {
   [BackgroundImageKey.LEVEL_5_MEMORY_NAVY_CAPTURE]:
     '/bg_level_5_memory_navy_capture.webp',
   [BackgroundImageKey.LEVEL_5_TIGREVEL_CELL]: '/bg_level_5_tigrevel_cell.webp',
-  [BackgroundImageKey.LEVEL_5_TIGREVEL_FREED]: '/bg_level_5_tigrevel_freed.webp',
+  [BackgroundImageKey.LEVEL_5_TIGREVEL_FREED]:
+    '/bg_level_5_tigrevel_freed.webp',
   [BackgroundImageKey.LEVEL_5_TIGREVEL_PROTECTS_KIDS]:
     '/bg_level_5_tigrevel_protects_kids.webp',
   [BackgroundImageKey.LEVEL_6_NET_THROW]: '/bg_level_6_net_throw.webp',

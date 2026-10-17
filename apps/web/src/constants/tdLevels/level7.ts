@@ -1,3 +1,4 @@
+import { SpeciesId } from '@/types/definitionIds';
 import { TDLevelData } from '@/engine/tower-defense/types';
 
 /**
@@ -58,7 +59,7 @@ export const LEVEL_7: TDLevelData = {
   waveEnemyDefinitions: [
     {
       id: 'level_7_yokodillo',
-      creatureId: 'yokodillo',
+      creatureId: SpeciesId.YOKODILLO,
       level: 12,
       speedMultiplier: 1,
       hpMultiplier: 6,
@@ -66,7 +67,7 @@ export const LEVEL_7: TDLevelData = {
     },
     {
       id: 'level_7_dormatee',
-      creatureId: 'dormatee',
+      creatureId: SpeciesId.DORMATEE,
       level: 12,
       speedMultiplier: 0.65,
       hpMultiplier: 6,
@@ -74,7 +75,7 @@ export const LEVEL_7: TDLevelData = {
     },
     {
       id: 'level_7_aguana',
-      creatureId: 'aguana',
+      creatureId: SpeciesId.AGUANA,
       level: 12,
       speedMultiplier: 1.1,
       hpMultiplier: 5,
@@ -82,21 +83,21 @@ export const LEVEL_7: TDLevelData = {
     },
     {
       id: 'level_7_harlequill',
-      creatureId: 'harlequill',
+      creatureId: SpeciesId.HARLEQUILL,
       level: 12,
       speedMultiplier: 1.1,
       hpMultiplier: 4,
     },
     {
       id: 'level_7_knotia',
-      creatureId: 'mouse_1',
+      creatureId: SpeciesId.KNOTIA,
       level: 12,
       speedMultiplier: 1.4,
       hpMultiplier: 4,
     },
     {
       id: 'level_7_sailkworm',
-      creatureId: 'bug_stage_1',
+      creatureId: SpeciesId.SAILKWORM,
       level: 6,
       speedMultiplier: 1.1,
       hpMultiplier: 4,

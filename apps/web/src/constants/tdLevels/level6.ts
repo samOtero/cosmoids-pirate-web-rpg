@@ -1,3 +1,4 @@
+import { SpeciesId } from '@/types/definitionIds';
 import { TDLevelData } from '@/engine/tower-defense/types';
 import { LEVEL_6_CURSED_INTERMISSION } from '@/constants/dialogs/level6CursedIntermission';
 
@@ -238,7 +239,7 @@ export const LEVEL_6: TDLevelData = {
         speed: 1,
       },
       groupHauling: {
-        eligibleCreatureId: 'poguin',
+        eligibleCreatureId: SpeciesId.POGUIN,
         pickupRadius: 6,
         joinRadius: 6,
         baseSpeedMultiplier: 0.1,
@@ -250,7 +251,7 @@ export const LEVEL_6: TDLevelData = {
   waveEnemyDefinitions: [
     {
       id: 'level_6_poguin',
-      creatureId: 'poguin',
+      creatureId: SpeciesId.POGUIN,
       level: 14,
       speedMultiplier: 1.2,
       hpMultiplier: 4,
@@ -264,7 +265,7 @@ export const LEVEL_6: TDLevelData = {
     },
     {
       id: 'level_6_voltusk',
-      creatureId: 'voltusk',
+      creatureId: SpeciesId.VOLTUSK,
       immuneToDisplacement: true,
       targetingRangeMultiplier: 2,
       level: 22,

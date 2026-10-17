@@ -17,7 +17,7 @@ describe.each(Object.entries(ATTACK_DEFS))(
   '%s attack registration',
   (id, attack) => {
     it('connects to an implemented behavior and valid activation settings', () => {
-      expect(attack.id).toBe(id);
+      expect(attack.id).toBe(Number(id));
       const behavior = AttackBehaviorRegistry[attack.behaviorType];
       expect(
         behavior,

@@ -48,7 +48,7 @@ describe.each(Object.entries(COSMOID_TEMPLATES))(
       }
     });
     it('references registered attacks and evolution targets', () => {
-      expect(template.id).toBe(id);
+      expect(template.id).toBe(Number(id));
       for (const { attackId } of template.learnableAttacks) {
         expect(
           ATTACK_DEFS[attackId],
@@ -75,7 +75,7 @@ describe.each(Object.entries(COSMOID_TEMPLATES))(
     });
 
     it('has usable battle visuals for every direction', () => {
-      const visuals = CREATURE_TD_CONFIGS[id];
+      const visuals = CREATURE_TD_CONFIGS[template.visualConfigId];
       expect(
         visuals,
         `${id}: missing battle visual configuration`

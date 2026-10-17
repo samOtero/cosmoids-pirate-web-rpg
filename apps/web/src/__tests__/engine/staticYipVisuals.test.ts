@@ -1,3 +1,4 @@
+import { AttackId } from '@/types/definitionIds';
 import { describe, expect, it, vi } from 'vitest';
 import type { Graphics, Sprite } from 'pixi.js';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
@@ -87,7 +88,7 @@ function graphicsRecorder() {
 }
 
 describe('Distinct Electric attack visuals', () => {
-  const palette = ATTACK_DEFS.STATIC_YIP.projectileVisual!;
+  const palette = ATTACK_DEFS[AttackId.STATIC_YIP].projectileVisual!;
   if (palette.type !== 'STATIC_YIP')
     throw new Error('Missing Static Yip palette');
 

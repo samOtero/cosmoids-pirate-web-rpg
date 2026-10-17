@@ -1,5 +1,6 @@
+import { getDefinitionVisuals } from '@/utils/definitionVisuals';
 import { Container, Graphics } from 'pixi.js';
-import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
+
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import type { Tower } from '@/engine/tower-defense/types';
 import { isWarmthFamilyTower, WARMTH_MAX } from '@/engine/tower-defense/warmth';
@@ -48,7 +49,7 @@ export function updateWarmthIndicator(
   const warmth = Math.max(0, Math.min(WARMTH_MAX, tower.warmth?.value ?? 0));
   const progress = warmth / WARMTH_MAX;
   const waterSelected = isWaterMoveSelected(tower);
-  const configMap = CREATURE_TD_CONFIGS[tower.creature.speciesId];
+  const configMap = getDefinitionVisuals(tower.creature.speciesId);
   const config = configMap?.[tower.facingDirection] ?? configMap?.default;
   badge.position.set(33, (config?.healthBarOffsetY ?? -40) - 15);
   badge.clear();

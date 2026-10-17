@@ -1,3 +1,4 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
 import { TDLevelData } from '@/engine/tower-defense/types';
 
 export const FOREST_LEVEL: TDLevelData = {
@@ -76,10 +77,11 @@ export const FOREST_LEVEL: TDLevelData = {
     {
       creature: {
         id: 'kip_mopup',
-        speciesId: 'mopup',
+        originalOwnerId: 'guest',
+        speciesId: SpeciesId.MOPUP,
         level: 3,
         xp: 0,
-        equippedAttacks: ['TACKLE'],
+        equippedAttacks: [AttackId.TACKLE],
         activeAttackIndex: 0,
         targetingMode: 'first',
         gender: 'male' as const,
@@ -169,13 +171,13 @@ export const FOREST_LEVEL: TDLevelData = {
   waveEnemyDefinitions: [
     {
       id: 'forest_mouse',
-      creatureId: 'mouse_1',
+      creatureId: SpeciesId.KNOTIA,
       level: 3,
       speedMultiplier: 2,
     },
     {
       id: 'forest_harlequill',
-      creatureId: 'harlequill',
+      creatureId: SpeciesId.HARLEQUILL,
       level: 5,
       speedMultiplier: 2,
       hpMultiplier: 2,

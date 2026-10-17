@@ -1,3 +1,8 @@
+import type { AttackId } from '@/types/definitionIds';
+import {
+  makePlayerCreature,
+  testDefinitionId,
+} from '@/__tests__/utils/dataBuilders';
 import { afterEach, beforeEach, vi } from 'vitest';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
@@ -6,7 +11,7 @@ import type { Enemy, Tower } from '@/engine/tower-defense/types';
 import { ElementType } from '@/types/baseGame';
 
 const engines: TowerDefenseEngine[] = [];
-const originals = new Map<string, AttackDefinition | undefined>();
+const originals = new Map<AttackId, AttackDefinition | undefined>();
 
 beforeEach(() => vi.spyOn(Math, 'random').mockReturnValue(0.5));
 afterEach(() => {
@@ -23,7 +28,7 @@ export function makeAttack(
   overrides: Partial<AttackDefinition> = {}
 ): AttackDefinition {
   return {
-    id: 'TEST_PROJECTILE',
+    id: testDefinitionId('TEST_PROJECTILE'),
     name: 'Controlled behavior input',
     type: ElementType.NORMAL,
     category: 'special',
@@ -86,15 +91,12 @@ export function makeBattle(
   engines.push(engine);
   const source: Tower = {
     id: 'caster',
-    creature: {
+    creature: makePlayerCreature({
       id: 'caster',
-      speciesId: 'test_attacker',
+      speciesId: testDefinitionId('test_attacker'),
       level: 10,
-      xp: 0,
       equippedAttacks: [attack.id],
-      gender: 'female' as const,
-      isShiny: false,
-    },
+    }),
     position: { x: 0, y: 0 },
     hp: 200,
     maxHp: 200,

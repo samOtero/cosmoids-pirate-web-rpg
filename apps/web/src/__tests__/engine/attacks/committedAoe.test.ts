@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
@@ -16,7 +18,7 @@ afterEach(() => {
 function createEnemy(id: string, x: number): Enemy {
   return {
     id,
-    definitionId: 'mouse_1',
+    definitionId: SpeciesId.KNOTIA,
     level: 10,
     position: { x, y: 50 },
     hp: 300,
@@ -47,15 +49,12 @@ function battle() {
       waves: [{ id: 'empty', groups: [] }],
     },
     [
-      {
+      makePlayerCreature({
         id: 'yokodillo-one',
-        speciesId: 'yokodillo',
+        speciesId: SpeciesId.YOKODILLO,
         level: 10,
-        xp: 0,
-        equippedAttacks: ['SHIKO_QUAKE'],
-        gender: 'female' as const,
-        isShiny: false,
-      },
+        equippedAttacks: [AttackId.SHIKO_QUAKE],
+      }),
     ]
   );
   engines.push(engine);
@@ -72,7 +71,11 @@ describe('Committed area impact', () => {
     const distant = createEnemy('distant', 90);
     engine.enemies = [first, second, third, distant];
 
-    ShikoQuakeBehavior.execute(engine, source, ATTACK_FIXTURES.SHIKO_QUAKE);
+    ShikoQuakeBehavior.execute(
+      engine,
+      source,
+      ATTACK_FIXTURES[AttackId.SHIKO_QUAKE]
+    );
 
     expect(source.shikoQuake).toMatchObject({
       startedAtMs: 0,
@@ -111,7 +114,11 @@ describe('Committed area impact', () => {
     );
     engine.enemies = targets;
 
-    ShikoQuakeBehavior.execute(engine, source, ATTACK_FIXTURES.SHIKO_QUAKE);
+    ShikoQuakeBehavior.execute(
+      engine,
+      source,
+      ATTACK_FIXTURES[AttackId.SHIKO_QUAKE]
+    );
     engine.tick(359, 359);
     engine.tick(360, 1);
 
@@ -155,7 +162,11 @@ describe('Committed area impact', () => {
     structure.immuneToStatusEffects = true;
     engine.enemies = [structure];
 
-    ShikoQuakeBehavior.execute(engine, source, ATTACK_FIXTURES.SHIKO_QUAKE);
+    ShikoQuakeBehavior.execute(
+      engine,
+      source,
+      ATTACK_FIXTURES[AttackId.SHIKO_QUAKE]
+    );
     engine.tick(360, 360);
 
     expect(structure.hp).toBeLessThan(structure.maxHp);
@@ -174,7 +185,11 @@ describe('Committed area impact', () => {
     const { engine, source } = battle();
     const target = createEnemy('target', 45);
     engine.enemies = [target];
-    ShikoQuakeBehavior.execute(engine, source, ATTACK_FIXTURES.SHIKO_QUAKE);
+    ShikoQuakeBehavior.execute(
+      engine,
+      source,
+      ATTACK_FIXTURES[AttackId.SHIKO_QUAKE]
+    );
 
     engine.placeTower(source.creature.id, 42, 50);
     expect(source.shikoQuake).toBeUndefined();

@@ -1,7 +1,10 @@
+import { validateDefinitionRegistry } from '@/utils/definitionRegistry';
+import { SpeciesId, AttackId } from '@/types/definitionIds';
 import { CosmoidTemplate, ElementType } from '@/types/baseGame';
 
 export const SENTICLE: CosmoidTemplate = {
-  id: 'senticle',
+  id: SpeciesId.SENTICLE,
+  visualConfigId: 'senticle',
   name: 'Senticle',
   genderRatio: 'genderless',
   type: ElementType.WATER,
@@ -19,11 +22,12 @@ export const SENTICLE: CosmoidTemplate = {
   battleSpriteUrl:
     '/battles/cosmoids/eel-basic-normal-neutral-skin-battle-ground-2.webp',
   movementId: 'lizard',
-  learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
+  learnableAttacks: [{ level: 1, attackId: AttackId.TACKLE }],
 };
 
 export const MOUSE_1: CosmoidTemplate = {
-  id: 'mouse_1',
+  id: SpeciesId.KNOTIA,
+  visualConfigId: 'mouse_1',
   name: 'Knotia',
   genderRatio: { female: 0.5 },
   type: ElementType.NORMAL,
@@ -44,14 +48,15 @@ export const MOUSE_1: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/mouse_1_down_1_25.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'NIBBLE' },
-    { level: 4, attackId: 'QUICK_ATTACK' },
-    { level: 12, attackId: 'LOOSE_END' },
+    { level: 1, attackId: AttackId.NIBBLE },
+    { level: 4, attackId: AttackId.QUICK_ATTACK },
+    { level: 12, attackId: AttackId.LOOSE_END },
   ],
 };
 
 export const BIRD_1: CosmoidTemplate = {
-  id: 'harlequill',
+  id: SpeciesId.HARLEQUILL,
+  visualConfigId: 'harlequill',
   name: 'Harlequill',
   genderRatio: { female: 0.5 },
   type: ElementType.FLYING,
@@ -72,14 +77,15 @@ export const BIRD_1: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/bird_1_down_1_25.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'PECK' },
-    { level: 5, attackId: 'FUNNY_DANCE' },
-    { level: 10, attackId: 'FLYING_COLORS' },
+    { level: 1, attackId: AttackId.PECK },
+    { level: 5, attackId: AttackId.FUNNY_DANCE },
+    { level: 10, attackId: AttackId.FLYING_COLORS },
   ],
 };
 
 export const MOPUP: CosmoidTemplate = {
-  id: 'mopup',
+  id: SpeciesId.MOPUP,
+  visualConfigId: 'mopup',
   name: 'Mopup',
   genderRatio: { female: 0.5 },
   type: ElementType.WATER,
@@ -99,11 +105,12 @@ export const MOPUP: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/mopup_down.webp',
   battleSpriteUrl: '/battles/cosmoids/mopup_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
+  learnableAttacks: [{ level: 1, attackId: AttackId.TACKLE }],
 };
 
 export const CAFFIQUI: CosmoidTemplate = {
-  id: 'caffiqui',
+  id: SpeciesId.CAFFIQUI,
+  visualConfigId: 'caffiqui',
   name: 'Caffiqui',
   genderRatio: 'genderless',
   type: ElementType.GRASS,
@@ -120,11 +127,12 @@ export const CAFFIQUI: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/caffiqui_down.webp',
   battleSpriteUrl: '/battles/cosmoids/caffiqui_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
+  learnableAttacks: [{ level: 1, attackId: AttackId.TACKLE }],
 };
 
 export const SNOUTASCO: CosmoidTemplate = {
-  id: 'snoutasco',
+  id: SpeciesId.SNOUTASCO,
+  visualConfigId: 'snoutasco',
   name: 'Snoutasco',
   genderRatio: { female: 0.5 },
   type: ElementType.POISON,
@@ -141,11 +149,12 @@ export const SNOUTASCO: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/snoutasco_down.webp',
   battleSpriteUrl: '/battles/cosmoids/snoutasco_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
+  learnableAttacks: [{ level: 1, attackId: AttackId.TACKLE }],
 };
 
 export const ZAPYBARA: CosmoidTemplate = {
-  id: 'zapybara',
+  id: SpeciesId.ZAPYBARA,
+  visualConfigId: 'zapybara',
   name: 'Zapybara',
   genderRatio: { female: 0.5 },
   type: ElementType.ELECTRIC,
@@ -163,11 +172,12 @@ export const ZAPYBARA: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/zapybara_down.webp',
   battleSpriteUrl: '/battles/cosmoids/zapybara_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
+  learnableAttacks: [{ level: 1, attackId: AttackId.TACKLE }],
 };
 
 export const SONARION: CosmoidTemplate = {
-  id: 'sonarion',
+  id: SpeciesId.RAZCALL,
+  visualConfigId: 'sonarion',
   name: 'Razcall',
   genderRatio: { female: 0.5 },
   type: ElementType.NORMAL,
@@ -189,16 +199,17 @@ export const SONARION: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/sonarion_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'NIBBLE' },
-    { level: 4, attackId: 'QUICK_ATTACK' },
-    { level: 10, attackId: 'STATIC_YIP' },
-    { level: 14, attackId: 'RALLY_HOWL' },
+    { level: 1, attackId: AttackId.NIBBLE },
+    { level: 4, attackId: AttackId.QUICK_ATTACK },
+    { level: 10, attackId: AttackId.STATIC_YIP },
+    { level: 14, attackId: AttackId.RALLY_HOWL },
   ],
-  evolutionNodes: [{ level: 20, evolutionDefId: 'resonarion' }],
+  evolutionNodes: [{ level: 20, evolutionDefId: SpeciesId.RAZOUND }],
 };
 
 export const RESONARION: CosmoidTemplate = {
-  id: 'resonarion',
+  id: SpeciesId.RAZOUND,
+  visualConfigId: 'resonarion',
   name: 'Razound',
   genderRatio: { female: 0.5 },
   type: ElementType.NORMAL,
@@ -220,16 +231,17 @@ export const RESONARION: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/resonarion_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'NIBBLE' },
-    { level: 4, attackId: 'QUICK_ATTACK' },
-    { level: 8, attackId: 'TACKLE' },
-    { level: 10, attackId: 'STATIC_YIP' },
-    { level: 14, attackId: 'RALLY_HOWL' },
+    { level: 1, attackId: AttackId.NIBBLE },
+    { level: 4, attackId: AttackId.QUICK_ATTACK },
+    { level: 8, attackId: AttackId.TACKLE },
+    { level: 10, attackId: AttackId.STATIC_YIP },
+    { level: 14, attackId: AttackId.RALLY_HOWL },
   ],
 };
 
 export const TIGREVEL: CosmoidTemplate = {
-  id: 'tigrevel',
+  id: SpeciesId.TIGREVEL,
+  visualConfigId: 'tigrevel',
   name: 'Tigrevel',
   genderRatio: { female: 0.5 },
   type: ElementType.ROCK,
@@ -249,11 +261,12 @@ export const TIGREVEL: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/tigrevel_down.webp',
   battleSpriteUrl: '/battles/cosmoids/tigrevel_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [{ level: 1, attackId: 'SCRATCH' }],
+  learnableAttacks: [{ level: 1, attackId: AttackId.SCRATCH }],
 };
 
 export const VOLTUSK: CosmoidTemplate = {
-  id: 'voltusk',
+  id: SpeciesId.VOLTUSK,
+  visualConfigId: 'voltusk',
   name: 'Voltusk',
   genderRatio: { female: 0.5 },
   type: ElementType.STEEL,
@@ -274,11 +287,12 @@ export const VOLTUSK: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/voltusk_down.webp',
   battleSpriteUrl: '/battles/cosmoids/voltusk_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [{ level: 1, attackId: 'SPARK' }],
+  learnableAttacks: [{ level: 1, attackId: AttackId.SPARK }],
 };
 
 export const POGUIN: CosmoidTemplate = {
-  id: 'poguin',
+  id: SpeciesId.POGUIN,
+  visualConfigId: 'poguin',
   name: 'Poguin',
   genderRatio: { female: 0.5 },
   type: ElementType.ELECTRIC,
@@ -299,11 +313,12 @@ export const POGUIN: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/poguin_down.webp',
   battleSpriteUrl: '/battles/cosmoids/poguin_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
+  learnableAttacks: [{ level: 1, attackId: AttackId.TACKLE }],
 };
 
 export const DORMATEE: CosmoidTemplate = {
-  id: 'dormatee',
+  id: SpeciesId.DORMATEE,
+  visualConfigId: 'dormatee',
   name: 'Dormatee',
   genderRatio: { female: 0.5 },
   type: ElementType.PSYCHIC,
@@ -324,14 +339,15 @@ export const DORMATEE: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/dormatee_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'GRUMBLE' },
-    { level: 4, attackId: 'REVERIE_ORB' },
-    { level: 8, attackId: 'SHARED_SLUMBER' },
+    { level: 1, attackId: AttackId.GRUMBLE },
+    { level: 4, attackId: AttackId.REVERIE_ORB },
+    { level: 8, attackId: AttackId.SHARED_SLUMBER },
   ],
 };
 
 export const YOKODILLO: CosmoidTemplate = {
-  id: 'yokodillo',
+  id: SpeciesId.YOKODILLO,
+  visualConfigId: 'yokodillo',
   name: 'Yokodillo',
   genderRatio: { female: 0.25 },
   type: ElementType.FIGHTING,
@@ -352,14 +368,15 @@ export const YOKODILLO: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/yokodillo_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'TACKLE' },
-    { level: 6, attackId: 'PALM_SLAM' },
-    { level: 10, attackId: 'SHIKO_QUAKE' },
+    { level: 1, attackId: AttackId.TACKLE },
+    { level: 6, attackId: AttackId.PALM_SLAM },
+    { level: 10, attackId: AttackId.SHIKO_QUAKE },
   ],
 };
 
 export const AGUANA: CosmoidTemplate = {
-  id: 'aguana',
+  id: SpeciesId.AGUANA,
+  visualConfigId: 'aguana',
   name: 'Aguana',
   genderRatio: { female: 0.5 },
   type: ElementType.WATER,
@@ -380,16 +397,17 @@ export const AGUANA: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/aguana_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'SCRATCH' },
-    { level: 4, attackId: 'SUNBATHE' },
-    { level: 5, attackId: 'WAKE_WHIP' },
-    { level: 10, attackId: 'DEEPWATER_GRIP' },
+    { level: 1, attackId: AttackId.SCRATCH },
+    { level: 4, attackId: AttackId.SUNBATHE },
+    { level: 5, attackId: AttackId.WAKE_WHIP },
+    { level: 10, attackId: AttackId.DEEPWATER_GRIP },
   ],
-  evolutionNodes: [{ level: 16, evolutionDefId: 'nautiguan' }],
+  evolutionNodes: [{ level: 16, evolutionDefId: SpeciesId.NAUTIGUAN }],
 };
 
 export const NAUTIGUAN: CosmoidTemplate = {
-  id: 'nautiguan',
+  id: SpeciesId.NAUTIGUAN,
+  visualConfigId: 'nautiguan',
   name: 'Nautiguan',
   genderRatio: { female: 0.5 },
   type: ElementType.WATER,
@@ -410,16 +428,17 @@ export const NAUTIGUAN: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/nautiguan_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'SCRATCH' },
-    { level: 4, attackId: 'SUNBATHE' },
-    { level: 5, attackId: 'WAKE_WHIP' },
-    { level: 10, attackId: 'DEEPWATER_GRIP' },
-    { level: 16, attackId: 'SALT_SPIT' },
+    { level: 1, attackId: AttackId.SCRATCH },
+    { level: 4, attackId: AttackId.SUNBATHE },
+    { level: 5, attackId: AttackId.WAKE_WHIP },
+    { level: 10, attackId: AttackId.DEEPWATER_GRIP },
+    { level: 16, attackId: AttackId.SALT_SPIT },
   ],
 };
 
 export const BRAMFRIT: CosmoidTemplate = {
-  id: 'bramfrit',
+  id: SpeciesId.BRAMFRIT,
+  visualConfigId: 'bramfrit',
   name: 'Bramfrit',
   genderRatio: { female: 0.25 },
   type: ElementType.FIRE,
@@ -439,11 +458,12 @@ export const BRAMFRIT: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/bramfrit_down.webp',
   battleSpriteUrl: '/battles/cosmoids/bramfrit_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
+  learnableAttacks: [{ level: 1, attackId: AttackId.TACKLE }],
 };
 
 export const SEPIPPET: CosmoidTemplate = {
-  id: 'sepippet',
+  id: SpeciesId.SEPIPPET,
+  visualConfigId: 'sepippet',
   name: 'Sepippet',
   genderRatio: { female: 0.5 },
   type: ElementType.DARK,
@@ -463,11 +483,12 @@ export const SEPIPPET: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/sepippet_down.webp',
   battleSpriteUrl: '/battles/cosmoids/sepippet_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
+  learnableAttacks: [{ level: 1, attackId: AttackId.TACKLE }],
 };
 
 export const PARLET: CosmoidTemplate = {
-  id: 'parlet',
+  id: SpeciesId.PARLET,
+  visualConfigId: 'parlet',
   name: 'Parlet',
   genderRatio: { female: 0.75 },
   type: ElementType.WATER,
@@ -487,11 +508,12 @@ export const PARLET: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/parlet_down.webp',
   battleSpriteUrl: '/battles/cosmoids/parlet_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
+  learnableAttacks: [{ level: 1, attackId: AttackId.TACKLE }],
 };
 
 export const CORROGOON: CosmoidTemplate = {
-  id: 'corrogoon',
+  id: SpeciesId.CORROGOON,
+  visualConfigId: 'corrogoon',
   name: 'Corrogoon',
   genderRatio: { female: 0.5 },
   type: ElementType.POISON,
@@ -512,11 +534,12 @@ export const CORROGOON: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/corrogoon_down.webp',
   battleSpriteUrl: '/battles/cosmoids/corrogoon_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [{ level: 1, attackId: 'PINCH' }],
+  learnableAttacks: [{ level: 1, attackId: AttackId.PINCH }],
 };
 
 export const BUFFLORA: CosmoidTemplate = {
-  id: 'bufflora',
+  id: SpeciesId.BUFFLORA,
+  visualConfigId: 'bufflora',
   name: 'Bufflora',
   genderRatio: { female: 0.5 },
   type: ElementType.POISON,
@@ -538,15 +561,16 @@ export const BUFFLORA: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/bufflora_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'TACKLE' },
-    { level: 4, attackId: 'WIND_GUST' },
-    { level: 8, attackId: 'TOXIC_POLLEN' },
-    { level: 12, attackId: 'NECTAR_SIPHON' },
+    { level: 1, attackId: AttackId.TACKLE },
+    { level: 4, attackId: AttackId.WIND_GUST },
+    { level: 8, attackId: AttackId.TOXIC_POLLEN },
+    { level: 12, attackId: AttackId.NECTAR_SIPHON },
   ],
 };
 
 export const MAROPHIS: CosmoidTemplate = {
-  id: 'marophis',
+  id: SpeciesId.MAROPHIS,
+  visualConfigId: 'marophis',
   name: 'Marophis',
   genderRatio: { female: 0.5 },
   type: ElementType.POISON,
@@ -568,15 +592,16 @@ export const MAROPHIS: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/marophis_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'NIBBLE' },
-    { level: 4, attackId: 'WATER_GUN' },
-    { level: 8, attackId: 'VENOM_SPRAY' },
-    { level: 12, attackId: 'DEEPWATER_GRIP' },
+    { level: 1, attackId: AttackId.NIBBLE },
+    { level: 4, attackId: AttackId.WATER_GUN },
+    { level: 8, attackId: AttackId.VENOM_SPRAY },
+    { level: 12, attackId: AttackId.DEEPWATER_GRIP },
   ],
 };
 
 export const BETTLE: CosmoidTemplate = {
-  id: 'bettle',
+  id: SpeciesId.BEETADEL,
+  visualConfigId: 'bettle',
   name: 'Beetadel',
   genderRatio: { female: 0.5 },
   type: ElementType.BUG,
@@ -597,11 +622,12 @@ export const BETTLE: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/bettle_down.webp',
   battleSpriteUrl: '/battles/cosmoids/bettle_left.webp',
   movementId: 'lizard',
-  learnableAttacks: [{ level: 1, attackId: 'TACKLE' }],
+  learnableAttacks: [{ level: 1, attackId: AttackId.TACKLE }],
 };
 
 export const BUG_STAGE_1: CosmoidTemplate = {
-  id: 'bug_stage_1',
+  id: SpeciesId.SAILKWORM,
+  visualConfigId: 'bug_stage_1',
   name: 'Sailkworm',
   genderRatio: { female: 0.5 },
   type: ElementType.BUG,
@@ -622,14 +648,15 @@ export const BUG_STAGE_1: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/bug_1_left_1.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'TACKLE' },
-    { level: 1, attackId: 'STRING_SHOT' },
+    { level: 1, attackId: AttackId.TACKLE },
+    { level: 1, attackId: AttackId.STRING_SHOT },
   ],
-  evolutionNodes: [{ level: 7, evolutionDefId: 'bug_stage_2' }],
+  evolutionNodes: [{ level: 7, evolutionDefId: SpeciesId.COCOONOT }],
 };
 
 export const BUG_STAGE_2: CosmoidTemplate = {
-  id: 'bug_stage_2',
+  id: SpeciesId.COCOONOT,
+  visualConfigId: 'bug_stage_2',
   name: 'Cocoonot',
   genderRatio: { female: 0.5 },
   type: ElementType.BUG,
@@ -651,15 +678,16 @@ export const BUG_STAGE_2: CosmoidTemplate = {
   battleScale: 1.25,
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'TACKLE' },
-    { level: 1, attackId: 'STRING_SHOT' },
-    { level: 7, attackId: 'RIGGING_NEST' },
+    { level: 1, attackId: AttackId.TACKLE },
+    { level: 1, attackId: AttackId.STRING_SHOT },
+    { level: 7, attackId: AttackId.RIGGING_NEST },
   ],
-  evolutionNodes: [{ level: 10, evolutionDefId: 'bug_stage_3' }],
+  evolutionNodes: [{ level: 10, evolutionDefId: SpeciesId.MAINSCALE }],
 };
 
 export const BUG_STAGE_3: CosmoidTemplate = {
-  id: 'bug_stage_3',
+  id: SpeciesId.MAINSCALE,
+  visualConfigId: 'bug_stage_3',
   name: 'Mainscale',
   genderRatio: { female: 0.5 },
   type: ElementType.BUG,
@@ -682,16 +710,17 @@ export const BUG_STAGE_3: CosmoidTemplate = {
   battleScale: 0.85,
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'TACKLE' },
-    { level: 1, attackId: 'STRING_SHOT' },
-    { level: 7, attackId: 'RIGGING_NEST' },
-    { level: 10, attackId: 'SAILCUTTER' },
+    { level: 1, attackId: AttackId.TACKLE },
+    { level: 1, attackId: AttackId.STRING_SHOT },
+    { level: 7, attackId: AttackId.RIGGING_NEST },
+    { level: 10, attackId: AttackId.SAILCUTTER },
   ],
 };
 
 // Starter Cosmoid Definitions
 export const STARTER_CRAB: CosmoidTemplate = {
-  id: 'starter_crab',
+  id: SpeciesId.PALMIT,
+  visualConfigId: 'starter_crab',
   name: 'Palmit',
   genderRatio: { female: 0.5 },
   type: ElementType.GRASS,
@@ -711,16 +740,17 @@ export const STARTER_CRAB: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/palmit_down_1.webp',
   battleSpriteUrl: '/battles/cosmoids/palmit_down_1.webp',
   learnableAttacks: [
-    { level: 1, attackId: 'PINCH' },
-    { level: 6, attackId: 'COIR_SNAP' },
-    { level: 16, attackId: 'SHIPSHAPE' },
-    { level: 16, attackId: 'MALLET_SMASH' },
+    { level: 1, attackId: AttackId.PINCH },
+    { level: 6, attackId: AttackId.COIR_SNAP },
+    { level: 16, attackId: AttackId.SHIPSHAPE },
+    { level: 16, attackId: AttackId.MALLET_SMASH },
   ],
-  evolutionNodes: [{ level: 16, evolutionDefId: 'carapenter' }],
+  evolutionNodes: [{ level: 16, evolutionDefId: SpeciesId.CARAPENTER }],
 };
 
 export const CARAPENTER: CosmoidTemplate = {
-  id: 'carapenter',
+  id: SpeciesId.CARAPENTER,
+  visualConfigId: 'carapenter',
   name: 'Carapenter',
   genderRatio: { female: 0.5 },
   type: ElementType.GRASS,
@@ -741,15 +771,16 @@ export const CARAPENTER: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/carapenter_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'PINCH' },
-    { level: 6, attackId: 'COIR_SNAP' },
-    { level: 16, attackId: 'SHIPSHAPE' },
-    { level: 16, attackId: 'MALLET_SMASH' },
+    { level: 1, attackId: AttackId.PINCH },
+    { level: 6, attackId: AttackId.COIR_SNAP },
+    { level: 16, attackId: AttackId.SHIPSHAPE },
+    { level: 16, attackId: AttackId.MALLET_SMASH },
   ],
 };
 
 export const STARTER_IGUANA: CosmoidTemplate = {
-  id: 'starter_iguana',
+  id: SpeciesId.FUEGUANA,
+  visualConfigId: 'starter_iguana',
   name: 'Fueguana',
   genderRatio: { female: 0.5 },
   type: ElementType.FIRE,
@@ -770,16 +801,17 @@ export const STARTER_IGUANA: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/fueguana_left_1_v3.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'SCRATCH' },
-    { level: 6, attackId: 'FIRE_CLAW' },
-    { level: 9, attackId: 'EMBER' },
-    { level: 16, attackId: 'FUSE_RUSH' },
+    { level: 1, attackId: AttackId.SCRATCH },
+    { level: 6, attackId: AttackId.FIRE_CLAW },
+    { level: 9, attackId: AttackId.EMBER },
+    { level: 16, attackId: AttackId.FUSE_RUSH },
   ],
-  evolutionNodes: [{ level: 16, evolutionDefId: 'velocinder' }],
+  evolutionNodes: [{ level: 16, evolutionDefId: SpeciesId.VELOCINDER }],
 };
 
 export const VELOCINDER: CosmoidTemplate = {
-  id: 'velocinder',
+  id: SpeciesId.VELOCINDER,
+  visualConfigId: 'velocinder',
   name: 'Velocinder',
   genderRatio: { female: 0.5 },
   type: ElementType.FIRE,
@@ -800,15 +832,16 @@ export const VELOCINDER: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/velocinder_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'SCRATCH' },
-    { level: 6, attackId: 'FIRE_CLAW' },
-    { level: 9, attackId: 'EMBER' },
-    { level: 16, attackId: 'FUSE_RUSH' },
+    { level: 1, attackId: AttackId.SCRATCH },
+    { level: 6, attackId: AttackId.FIRE_CLAW },
+    { level: 9, attackId: AttackId.EMBER },
+    { level: 16, attackId: AttackId.FUSE_RUSH },
   ],
 };
 
 export const STARTER_MONKEY: CosmoidTemplate = {
-  id: 'starter_monkey',
+  id: SpeciesId.MONKEG,
+  visualConfigId: 'starter_monkey',
   name: 'Monkeg',
   genderRatio: { female: 0.5 },
   type: ElementType.WATER,
@@ -828,15 +861,16 @@ export const STARTER_MONKEY: CosmoidTemplate = {
   spriteUrl: '/battles/cosmoids/monkeg_down_1_v2.webp',
   battleSpriteUrl: '/battles/cosmoids/monkeg_down_1_v2.webp',
   learnableAttacks: [
-    { level: 1, attackId: 'TACKLE' },
-    { level: 6, attackId: 'BARREL_BASH' },
-    { level: 16, attackId: 'BARREL_BOWLING' },
+    { level: 1, attackId: AttackId.TACKLE },
+    { level: 6, attackId: AttackId.BARREL_BASH },
+    { level: 16, attackId: AttackId.BARREL_BOWLING },
   ],
-  evolutionNodes: [{ level: 16, evolutionDefId: 'macask' }],
+  evolutionNodes: [{ level: 16, evolutionDefId: SpeciesId.MACASK }],
 };
 
 export const MACASK: CosmoidTemplate = {
-  id: 'macask',
+  id: SpeciesId.MACASK,
+  visualConfigId: 'macask',
   name: 'Macask',
   genderRatio: { female: 0.5 },
   type: ElementType.WATER,
@@ -857,14 +891,14 @@ export const MACASK: CosmoidTemplate = {
   battleSpriteUrl: '/battles/cosmoids/macask_left.webp',
   movementId: 'lizard',
   learnableAttacks: [
-    { level: 1, attackId: 'TACKLE' },
-    { level: 6, attackId: 'BARREL_BASH' },
-    { level: 16, attackId: 'BARREL_BOWLING' },
+    { level: 1, attackId: AttackId.TACKLE },
+    { level: 6, attackId: AttackId.BARREL_BASH },
+    { level: 16, attackId: AttackId.BARREL_BOWLING },
   ],
 };
 
 /** All known species definitions, keyed by species ID. */
-export const COSMOID_TEMPLATES: Record<string, CosmoidTemplate> = {
+export const COSMOID_TEMPLATES: Record<SpeciesId, CosmoidTemplate> = {
   [STARTER_CRAB.id]: STARTER_CRAB,
   [CARAPENTER.id]: CARAPENTER,
   [STARTER_IGUANA.id]: STARTER_IGUANA,
@@ -898,3 +932,5 @@ export const COSMOID_TEMPLATES: Record<string, CosmoidTemplate> = {
   [MAROPHIS.id]: MAROPHIS,
   [BETTLE.id]: BETTLE,
 };
+
+validateDefinitionRegistry('Species', SpeciesId, COSMOID_TEMPLATES);

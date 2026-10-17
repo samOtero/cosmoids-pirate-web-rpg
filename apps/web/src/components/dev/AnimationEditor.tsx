@@ -1,6 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import { SpeciesId } from '@/types/definitionIds';
+
+import { useState, useEffect, useMemo } from 'react';
 import { useEditorSource } from './useEditorSource';
 import EditorSourceStatus from './EditorSourceStatus';
 import { ANIMATIONS } from '@/constants/animations';
@@ -11,7 +13,7 @@ import {
   AnimationMap,
 } from '@/types/animation';
 import { generateKeyframesCss } from '@/utils/animationUtils';
-import { Creature } from '@/types/baseGame';
+
 import * as allCreatures from '@/constants/creatures';
 
 // --- Helpers ---
@@ -98,7 +100,7 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
     }
   );
   const [selectedAnimId, setSelectedAnimId] = useState<string | null>(null);
-  const [selectedCreatureId, setSelectedCreatureId] = useState<string>(
+  const [selectedCreatureId, setSelectedCreatureId] = useState<SpeciesId>(
     SENTICLE.id
   );
   const [selectedPercent, setSelectedPercent] = useState<number | null>(0);
@@ -490,7 +492,9 @@ export default function AnimationEditor({ onClose }: { onClose: () => void }) {
                 <h3 className="text-xs font-bold text-slate-400">Preview</h3>
                 <select
                   value={selectedCreatureId}
-                  onChange={(e) => setSelectedCreatureId(e.target.value)}
+                  onChange={(e) =>
+                    setSelectedCreatureId(Number(e.target.value))
+                  }
                   className="w-48 rounded border border-slate-700 bg-slate-900 px-2 py-1 text-xs"
                 >
                   {creatureList.map((c) => (

@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
@@ -33,7 +35,7 @@ function createEngine() {
 function createHopper(): Enemy {
   return {
     id: 'hopper',
-    definitionId: 'poguin',
+    definitionId: SpeciesId.POGUIN,
     level: 8,
     position: { x: 30, y: 20 },
     hp: 20,
@@ -63,15 +65,12 @@ function createHopper(): Enemy {
 function createTower(): Tower {
   return {
     id: 'tower',
-    creature: {
+    creature: makePlayerCreature({
       id: 'tower-creature',
-      speciesId: 'starter_crab',
+      speciesId: SpeciesId.PALMIT,
       level: 8,
-      xp: 0,
-      equippedAttacks: ['PINCH'],
-      gender: 'female' as const,
-      isShiny: false,
-    },
+      equippedAttacks: [AttackId.PINCH],
+    }),
     position: { x: 30, y: 20 },
     lastAttackTime: 0,
     currentAttack: 10,
@@ -80,7 +79,9 @@ function createTower(): Tower {
     currentSpecialDefense: 10,
     hp: 100,
     maxHp: 100,
-    equippedAttacksRuntime: [{ definitionId: 'PINCH', lastFiredTime: 0 }],
+    equippedAttacksRuntime: [
+      { definitionId: AttackId.PINCH, lastFiredTime: 0 },
+    ],
     selectedAttackIndex: 0,
     facingDirection: 'right',
     targetingMode: 'closest',
@@ -107,7 +108,7 @@ function createBalancedEngine(startPathIndex: 0 | 2 = 0) {
     waveEnemyDefinitions: [
       {
         id: 'poguin_balancer',
-        creatureId: 'poguin',
+        creatureId: SpeciesId.POGUIN,
         level: 8,
         balancedLaneHop: {
           pathIndices: [0, 2],
@@ -158,7 +159,8 @@ describe('enemy lane hopping', () => {
       )?.balancedLaneHop?.triggerProgresses
     ).toEqual([0.35, 0.65]);
     expect(
-      LEVEL_6.waves?.flatMap((wave) => wave.groups)
+      LEVEL_6.waves
+        ?.flatMap((wave) => wave.groups)
         .filter((group) => group.enemyDefinitionId === 'level_6_poguin')
         .every((group) => group.laneHop === undefined)
     ).toBe(true);
@@ -170,7 +172,9 @@ describe('enemy lane hopping', () => {
       triggerProgress: 0.35,
       balanceDecisionIndex: 0,
     });
-    expect(createBalancedEngine(2).jumper.laneHopState?.targetPathIndex).toBe(0);
+    expect(createBalancedEngine(2).jumper.laneHopState?.targetPathIndex).toBe(
+      0
+    );
   });
 
   it('jumps at the first point when the opposite lane has fewer Poguin ahead', () => {

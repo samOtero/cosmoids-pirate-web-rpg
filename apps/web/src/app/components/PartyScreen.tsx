@@ -1,3 +1,4 @@
+import type { AttackId } from '@/types/definitionIds';
 import { Creature } from '@/types/baseGame';
 import { useState, useEffect, useRef } from 'react';
 import Panel from '@/app/components/ui/Panel';
@@ -12,7 +13,11 @@ interface PartyScreenProps {
   onBack: () => void;
   onReorder: (startIndex: number, endIndex: number) => void;
   onContinue?: () => void;
-  onUpdateAttacks?: (creatureId: string, equippedAttacks: string[], activeAttackIndex: number) => void;
+  onUpdateAttacks?: (
+    creatureId: string,
+    equippedAttacks: AttackId[],
+    activeAttackIndex: number
+  ) => void;
   getCreatureActiveAttackIndex?: (creatureId: string) => number;
   showTutorial?: boolean;
 }
@@ -30,7 +35,9 @@ export default function PartyScreen({
   const [currentPage, setCurrentPage] = useState(0);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [isDesktop, setIsDesktop] = useState(false);
-  const [selectedCreatureIndex, setSelectedCreatureIndex] = useState<number | null>(null);
+  const [selectedCreatureIndex, setSelectedCreatureIndex] = useState<
+    number | null
+  >(null);
   const [tutorialDismissed, setTutorialDismissed] = useState(false);
 
   useEffect(() => {
@@ -130,11 +137,12 @@ export default function PartyScreen({
       ) {
         e.target.releasePointerCapture(e.pointerId);
       }
-      
-      const resolvedCreature = clickedIdx < MAX_PARTY_SIZE
-        ? activeTeam[clickedIdx] 
-        : storageCreatures[clickedIdx - MAX_PARTY_SIZE];
-      
+
+      const resolvedCreature =
+        clickedIdx < MAX_PARTY_SIZE
+          ? activeTeam[clickedIdx]
+          : storageCreatures[clickedIdx - MAX_PARTY_SIZE];
+
       if (resolvedCreature) {
         setSelectedCreatureIndex(clickedIdx);
       }
@@ -231,7 +239,7 @@ export default function PartyScreen({
               <GenderBadge
                 gender={creature.gender}
                 compact
-                className="absolute bottom-0 right-0 text-[10px] lg:text-xs"
+                className="absolute right-0 bottom-0 text-[10px] lg:text-xs"
               />
               {creature.isShiny && (
                 <div className="absolute top-0.5 left-0.5 text-[8px] lg:text-[10px]">
@@ -323,7 +331,7 @@ export default function PartyScreen({
                       <GenderBadge
                         gender={creature.gender}
                         compact
-                        className="absolute bottom-0 right-0 text-[10px] lg:text-xs"
+                        className="absolute right-0 bottom-0 text-[10px] lg:text-xs"
                       />
                       {creature.isShiny && (
                         <div className="absolute top-0.5 left-0.5 text-[9px] lg:text-sm">
@@ -410,9 +418,7 @@ export default function PartyScreen({
           selectedCreatureIndex !== null
             ? selectedCreatureIndex < MAX_PARTY_SIZE
               ? activeTeam[selectedCreatureIndex]
-              : storageCreatures[
-                  selectedCreatureIndex - MAX_PARTY_SIZE
-                ]
+              : storageCreatures[selectedCreatureIndex - MAX_PARTY_SIZE]
             : null;
 
         if (!selectedCreature) return null;
@@ -448,8 +454,8 @@ export default function PartyScreen({
               <div className="space-y-1 font-mono text-[10px] leading-relaxed text-sand md:text-xs lg:space-y-2 lg:text-lg">
                 <div>
                   <span className="font-bold text-cyan-400">1.</span> Drag a
-                  Cosmoid from your &quot;Storage&quot; and drop &apos;em onto your
-                  &quot;Current Team&quot;.
+                  Cosmoid from your &quot;Storage&quot; and drop &apos;em onto
+                  your &quot;Current Team&quot;.
                 </div>
                 <div>
                   <span className="font-bold text-cyan-400">2.</span> Tap on any

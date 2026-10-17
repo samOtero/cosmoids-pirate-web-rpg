@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { installAttackFixtures } from './fixtures';
@@ -15,7 +17,7 @@ afterEach(() => {
 function createEnemy(x = 47, y = 52.5): Enemy {
   return {
     id: 'rigging_target',
-    definitionId: 'mouse_1',
+    definitionId: SpeciesId.KNOTIA,
     level: 7,
     position: { x, y },
     hp: 10000,
@@ -49,15 +51,12 @@ function battle() {
       waves: [{ id: 'empty', groups: [] }],
     },
     [
-      {
+      makePlayerCreature({
         id: 'cocoonot-one',
-        speciesId: 'bug_stage_2',
+        speciesId: SpeciesId.COCOONOT,
         level: 7,
-        xp: 0,
-        equippedAttacks: ['RIGGING_NEST'],
-        gender: 'female' as const,
-        isShiny: false,
-      },
+        equippedAttacks: [AttackId.RIGGING_NEST],
+      }),
     ]
   );
   engines.push(engine);

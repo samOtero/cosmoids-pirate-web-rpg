@@ -1,4 +1,6 @@
-import React from 'react';
+import { testDefinitionId } from '@/__tests__/utils/dataBuilders';
+import { AttackId } from '@/types/definitionIds';
+
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import TowerDefenseScreen from '@/app/components/tower-defense/TowerDefenseScreen';
@@ -33,7 +35,7 @@ vi.mock('@/engine/tower-defense/TowerDefenseEngine', () => {
 
   class MockTowerDefenseEngine {
     static getDefaultAttacks() {
-      return ['TACKLE'];
+      return [AttackId.TACKLE];
     }
 
     static getEquippedAttacks() {
@@ -69,7 +71,7 @@ vi.mock('@/engine/tower-defense/TowerDefenseEngine', () => {
       this.events.emit({
         type: 'TOWER_LEARNED_ATTACK',
         towerId: 'tower-1',
-        attackDefId: 'TACKLE',
+        attackDefId: AttackId.TACKLE,
       });
       if (engineHarness.outcome === 'lose') {
         this.lives = 0;
@@ -182,7 +184,7 @@ describe('tower-defense outro priority', () => {
             rivalFlagLives: 3,
             defenders: [],
             alliedRunner: {
-              creatureId: 'controlled_runner',
+              creatureId: testDefinitionId('controlled_runner'),
               level: 1,
               pathIndex: 0,
               speed: 1,

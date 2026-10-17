@@ -1,3 +1,4 @@
+import { SpeciesId } from '@/types/definitionIds';
 import { afterEach } from 'vitest';
 import { COSMOID_TEMPLATES } from '@/constants/creatures';
 import {
@@ -20,9 +21,9 @@ import type {
 } from '@/engine/tower-defense/types';
 
 const engines: TowerDefenseEngine[] = [];
-const speciesOriginals = new Map<string, CosmoidTemplate | undefined>();
+const speciesOriginals = new Map<SpeciesId, CosmoidTemplate | undefined>();
 const abilityOriginals = new Map<string, EnemyAbilityDefinition | undefined>();
-const metadataOriginals = new Map<string, TDCreatureMetadata | undefined>();
+const metadataOriginals = new Map<SpeciesId, TDCreatureMetadata | undefined>();
 afterEach(() => {
   engines.splice(0).forEach((engine) => engine.destroy());
   for (const [id, original] of speciesOriginals) {
@@ -44,12 +45,13 @@ afterEach(() => {
 
 // Controlled inputs for engine mechanics. These are not copies of authored data.
 export function species(
-  id: string,
+  id: SpeciesId,
   overrides: Partial<CosmoidTemplate> = {}
 ): CosmoidTemplate {
   const fixture: CosmoidTemplate = {
     id,
     name: 'Behavior test creature',
+    visualConfigId: 'test-creature',
     genderRatio: { female: 0.5 },
     type: ElementType.NORMAL,
     baseStats: {
@@ -80,7 +82,7 @@ export function ability<T extends EnemyAbilityDefinition>(fixture: T): T {
 }
 
 export function battleSpecies(
-  id: string,
+  id: SpeciesId,
   overrides: Partial<CosmoidTemplate> = {}
 ) {
   const fixture = species(id, overrides);
@@ -99,7 +101,8 @@ export function battleSpecies(
 
 export function battle(
   overrides: Partial<TDLevelData> = {},
-  roster: PlayerCreature[] = []
+  roster: PlayerCreature[] = [],
+  ownerId?: string
 ) {
   const engine = new TowerDefenseEngine(
     {
@@ -113,7 +116,8 @@ export function battle(
       waves: [{ id: 'test_empty_wave', groups: [] }],
       ...overrides,
     },
-    roster
+    roster,
+    ownerId
   );
   engines.push(engine);
   return engine;
@@ -122,7 +126,7 @@ export function battle(
 export function actor(
   engine: TowerDefenseEngine,
   id: string,
-  speciesId: string,
+  speciesId: SpeciesId,
   x: number,
   abilityId?: string
 ) {

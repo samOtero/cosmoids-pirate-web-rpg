@@ -1,3 +1,4 @@
+import { SpeciesId } from '@/types/definitionIds';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
@@ -36,7 +37,7 @@ const level: TDLevelData = {
       haulPathIndex: 1,
       returnHome: { pathIndex: 1, speed: 1 },
       groupHauling: {
-        eligibleCreatureId: 'poguin',
+        eligibleCreatureId: SpeciesId.POGUIN,
         pickupRadius: 2,
         joinRadius: 12,
         baseSpeedMultiplier: 0.1,
@@ -53,7 +54,7 @@ function createEnemy(
   id: string,
   x: number,
   pathIndex: number,
-  definitionId = 'poguin'
+  definitionId: SpeciesId = SpeciesId.POGUIN
 ): Enemy {
   return {
     id,
@@ -252,7 +253,7 @@ describe('cooperative capture-unit hauling', () => {
     expect(objective.position.y).toBe(50);
 
     const helper = createEnemy('helper', 96, 0);
-    const ineligible = createEnemy('outsider', 96, 0, 'mouse_1');
+    const ineligible = createEnemy('outsider', 96, 0, SpeciesId.KNOTIA);
     engine.enemies.push(helper, ineligible);
     engine.tick(0, 0);
 

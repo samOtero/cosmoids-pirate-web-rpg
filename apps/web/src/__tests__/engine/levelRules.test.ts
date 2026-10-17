@@ -1,3 +1,7 @@
+import {
+  makePlayerCreature,
+  testDefinitionId,
+} from '@/__tests__/utils/dataBuilders';
 import { describe, expect, it } from 'vitest';
 import { TD_CREATURE_DEFS } from '@/engine/tower-defense/TowerDefenseEngine';
 import {
@@ -30,7 +34,7 @@ describe('level combat rules', () => {
   it.each([undefined, false, true])(
     'loads encounter displacement immunity=%s independently of zero movement speed',
     (immuneToDisplacement) => {
-      const fixture = battleSpecies('test_anchored_species');
+      const fixture = battleSpecies(testDefinitionId('test_anchored_species'));
       const anchor = { x: 50, y: 20 };
       const engine = battle({
         waveEnemyDefinitions: [
@@ -60,16 +64,13 @@ describe('level combat rules', () => {
   );
 
   it('keeps a fixed guest defender in place without adding it to the player roster', () => {
-    const fixture = battleSpecies('test_guest');
-    const creature = {
+    const fixture = battleSpecies(testDefinitionId('test_guest'));
+    const creature = makePlayerCreature({
       id: 'test_guest_instance',
       speciesId: fixture.id,
       level: 5,
-      xp: 0,
       equippedAttacks: [],
-      gender: 'female' as const,
-      isShiny: false,
-    };
+    });
     const position = { x: 20, y: 30 };
     const engine = battle({
       startingTowers: [{ creature, position, isFixed: true }],
@@ -91,10 +92,14 @@ describe('level combat rules', () => {
   ])(
     'applies capture restrictions: $uncapturable, cursed: $isCursed',
     ({ uncapturable, isCursed, canCapture }) => {
-      battleSpecies('test_species');
+      battleSpecies(testDefinitionId('test_species'));
       const engine = battle({
         waveEnemyDefinitions: [
-          { id: 'test_enemy', creatureId: 'test_species', level: 5 },
+          {
+            id: 'test_enemy',
+            creatureId: testDefinitionId('test_species'),
+            level: 5,
+          },
         ],
         waves: wave({ uncapturable, isCursed }),
       });
@@ -103,7 +108,10 @@ describe('level combat rules', () => {
       expect(enemy.uncapturable).toBe(!canCapture);
       const captured = engine.captureEnemy(enemy.id);
       if (canCapture) {
-        expect(captured).toMatchObject({ speciesId: 'test_species', level: 5 });
+        expect(captured).toMatchObject({
+          speciesId: testDefinitionId('test_species'),
+          level: 5,
+        });
         expect(engine.enemies).not.toContain(enemy);
       } else {
         expect(captured).toBeNull();
@@ -113,7 +121,7 @@ describe('level combat rules', () => {
   );
 
   it('applies enemy multipliers to battlefield stats without carrying them into a capture', () => {
-    const fixture = battleSpecies('test_species');
+    const fixture = battleSpecies(testDefinitionId('test_species'));
     const level = 4;
     const engine = battle({
       enemyHpMultiplier: 2,
@@ -151,9 +159,14 @@ describe('level combat rules', () => {
   it.each([false, true])(
     'handles an enemy reaching the goal with cannotLose=%s',
     (cannotLose) => {
-      battleSpecies('test_species');
+      battleSpecies(testDefinitionId('test_species'));
       const engine = battle({ lives: 2, cannotLose });
-      const enemy = actor(engine, 'goal_enemy', 'test_species', 1000);
+      const enemy = actor(
+        engine,
+        'goal_enemy',
+        testDefinitionId('test_species'),
+        1000
+      );
       enemy.currentWaypointIndex = engine.paths[0].length;
       engine.tick(0, 16);
       expect(engine.enemies).not.toContain(enemy);

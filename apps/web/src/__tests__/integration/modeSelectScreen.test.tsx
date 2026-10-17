@@ -1,18 +1,15 @@
+import { makeProfile } from '@/__tests__/utils/dataBuilders';
 import { render, screen } from '@testing-library/react';
 
 import ModeSelectScreen from '@/app/components/ModeSelectScreen';
 import { Profile, StoryProgression } from '@/types/baseGame';
 
-const profile: Profile = {
+const profile: Profile = makeProfile({
   id: 0,
   name: 'Caleb',
   lastPlayed: 0,
-  creatures: [],
-  storageCreatures: [],
-  inventory: [],
-  gameFlags: [],
   storyProgression: StoryProgression.DEFEAT_BUG_STAGE_1,
-};
+});
 
 const callbacks = {
   onSelectStory: () => {},

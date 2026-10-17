@@ -1,6 +1,7 @@
+import { getDefinitionVisuals } from '@/utils/definitionVisuals';
 import { Container, Graphics } from 'pixi.js';
 import type { Tower } from '@/engine/tower-defense/types';
-import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
+
 import { getAttackSpeedMultiplier } from '@/engine/tower-defense/attackSpeedModifiers';
 
 /** Exactly two warm, staggered sound pulses; no electrical spokes or sparks. */
@@ -53,7 +54,7 @@ export function updateRallyIndicator(
   }
   const buff = tower.attackSpeedBuff;
   const arrival = Math.max(0, 1 - (currentTimeMs - buff.appliedAtMs) / 450);
-  const configMap = CREATURE_TD_CONFIGS[tower.creature.speciesId];
+  const configMap = getDefinitionVisuals(tower.creature.speciesId);
   const config = configMap?.[tower.facingDirection] ?? configMap?.default;
   badge.position.set(-33, (config?.healthBarOffsetY ?? -40) - 15 - arrival * 8);
   badge.scale.set(1 + arrival * 0.25);

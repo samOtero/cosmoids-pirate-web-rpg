@@ -1,3 +1,4 @@
+import { makeProfile } from '@/__tests__/utils/dataBuilders';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -33,26 +34,45 @@ describe('Profile Management Integration', () => {
 
       // Click on empty slot to start creation
       const emptySlots = screen.getAllByText('Empty Slot');
-      await user.click(emptySlots[0].closest('div')!);
+      await user.click(emptySlots[0].closest('button')!);
 
       // Verify onCreate was called with correct parameters
       expect(mockOnCreate).toHaveBeenCalledWith(0);
+    });
+
+    it('waits for account identity before allowing a new save', async () => {
+      const user = userEvent.setup();
+      render(
+        <ProfileScreen
+          profiles={[null, null, null]}
+          onSelect={mockOnSelect}
+          onCreate={mockOnCreate}
+          onDelete={mockOnDelete}
+          onBack={mockOnBack}
+          creationPending
+        />
+      );
+      const button = screen.getByRole('button', {
+        name: 'Create save in slot 1',
+      });
+      expect(button).toBeDisabled();
+      expect(screen.getByRole('status')).toHaveTextContent(
+        'Checking your account'
+      );
+      await user.click(button);
+      expect(mockOnCreate).not.toHaveBeenCalled();
     });
   });
 
   describe('Profile Selection', () => {
     it('should select an existing profile and call onSelect', async () => {
       const user = userEvent.setup();
-      const existingProfile = {
+      const existingProfile = makeProfile({
         id: 0,
         name: 'Pirate Pete',
         lastPlayed: Date.now(),
-        creatures: [],
-        storageCreatures: [],
-        inventory: [],
         storyProgression: 0,
-        gameFlags: [],
-      };
+      });
 
       render(
         <ProfileScreen
@@ -73,16 +93,13 @@ describe('Profile Management Integration', () => {
 
     it('should display profile information correctly', () => {
       const testDate = new Date('2025-11-15').getTime();
-      const existingProfile = {
+      const existingProfile = makeProfile({
         id: 1,
         name: 'Sea Captain',
         lastPlayed: testDate,
-        creatures: [],
-        storageCreatures: [],
-        inventory: [],
         storyProgression: 2, // DEFEAT_FIRST_BATTLE unlocks Level 2
         gameFlags: [],
-      };
+      });
 
       render(
         <ProfileScreen
@@ -107,16 +124,12 @@ describe('Profile Management Integration', () => {
       const user = userEvent.setup();
       const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
 
-      const existingProfile = {
+      const existingProfile = makeProfile({
         id: 0,
         name: 'To Delete',
         lastPlayed: Date.now(),
-        creatures: [],
-        storageCreatures: [],
-        inventory: [],
         storyProgression: 0,
-        gameFlags: [],
-      };
+      });
 
       render(
         <ProfileScreen
@@ -141,16 +154,12 @@ describe('Profile Management Integration', () => {
       const user = userEvent.setup();
       const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
 
-      const existingProfile = {
+      const existingProfile = makeProfile({
         id: 1,
         name: 'Keep Me',
         lastPlayed: Date.now(),
-        creatures: [],
-        storageCreatures: [],
-        inventory: [],
         storyProgression: 0,
-        gameFlags: [],
-      };
+      });
 
       render(
         <ProfileScreen

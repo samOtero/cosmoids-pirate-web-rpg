@@ -1,13 +1,15 @@
 import { expect, test } from '@playwright/test';
-import {
-  CURRENT_PROFILE_VERSION,
-  MAX_COSMOID_LEVEL,
-} from '../src/constants/game';
+import { MAX_COSMOID_LEVEL } from '../src/constants/game';
 import { COSMOID_TEMPLATES } from '../src/constants/creatures';
 import { LEVEL_ORDER, TD_LEVELS } from '../src/constants/tdLevels';
 import { resolveTDBattlefieldHeight } from '../src/utils/tdInitialView';
 import { getDefaultAttacksForLevel } from '../src/utils/resolvePlayerCreature';
 import { generateCreatureGender } from '../src/utils/creatureGender';
+import { StoryProgression } from '../src/types/baseGame';
+import {
+  makePlayerCreature,
+  makeProfile,
+} from '../src/__tests__/utils/dataBuilders';
 
 const entry = LEVEL_ORDER.find(
   (item) => TD_LEVELS[item.context]?.levelData.flagDuel?.playerLaunch
@@ -26,52 +28,33 @@ for (const viewport of [
     await page.setViewportSize(viewport);
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
-    await page.addInitScript(
-      ({ version, progression, creature }) => {
-        localStorage.setItem(
-          'cosmoids-game-state',
-          JSON.stringify({
-            state: {
-              profiles: [
-                {
-                  id: 0,
-                  name: 'Flag runner test',
-                  lastPlayed: Date.now(),
-                  version,
-                  storyProgression: progression,
-                  journalOpened: true,
-                  journalUnlockShown: true,
-                  creatures: [creature],
-                  storageCreatures: [],
-                  capturedSpeciesIds: [creature.speciesId],
-                  inventory: [],
-                  gameFlags: [],
-                },
-                null,
-                null,
-              ],
-            },
-            version: 0,
-          })
-        );
-      },
-      {
-        version: CURRENT_PROFILE_VERSION,
-        progression: entry.requiredProgression,
-        creature: {
-          id: 'runner-test',
-          speciesId: species.id,
-          level: MAX_COSMOID_LEVEL,
-          xp: 0,
-          equippedAttacks: getDefaultAttacksForLevel(
-            species,
-            MAX_COSMOID_LEVEL
-          ),
-          isShiny: false,
-          gender: generateCreatureGender(species.id),
-        },
-      }
-    );
+    const creature = makePlayerCreature({
+      id: 'runner-test',
+      speciesId: species.id,
+      level: MAX_COSMOID_LEVEL,
+      equippedAttacks: getDefaultAttacksForLevel(species, MAX_COSMOID_LEVEL),
+      gender: generateCreatureGender(species.id),
+    });
+    const profile = makeProfile({
+      name: 'Flag runner test',
+      lastPlayed: Date.now(),
+      storyProgression: entry.requiredProgression ?? StoryProgression.NEW_GAME,
+      journalOpened: true,
+      journalUnlockShown: true,
+      creatures: [creature],
+      capturedSpeciesIds: [creature.speciesId],
+    });
+    await page.addInitScript((savedProfile) => {
+      localStorage.setItem(
+        'cosmoids-game-state',
+        JSON.stringify({
+          state: {
+            profiles: [savedProfile, null, null],
+          },
+          version: 0,
+        })
+      );
+    }, profile);
     await page.goto('/');
     // Development chrome must not intercept game input on small viewports.
     await page.addStyleTag({
@@ -83,7 +66,8 @@ for (const viewport of [
     await page.locator(`#level-${LEVEL_ORDER.indexOf(entry) + 1}`).click();
     await page.getByRole('button', { name: 'Start', exact: true }).click();
     const pause = page.getByRole('button', { name: 'Pause', exact: true });
-    await expect(pause).toBeEnabled();
+    // Wait for battle loading and its intro sequence, including cold dev builds.
+    await expect(pause).toBeEnabled({ timeout: 15000 });
     await pause.click();
     await expect(
       page.getByRole('button', { name: 'Enter fullscreen' })

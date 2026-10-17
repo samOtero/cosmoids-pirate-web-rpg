@@ -1,3 +1,5 @@
+import { AttackId, SpeciesId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
@@ -8,7 +10,7 @@ import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 installAttackFixtures();
 
 const engines: TowerDefenseEngine[] = [];
-const move = ATTACK_FIXTURES.FUSE_RUSH;
+const move = ATTACK_FIXTURES[AttackId.FUSE_RUSH];
 afterEach(() => {
   engines.splice(0).forEach((engine) => engine.destroy());
   vi.restoreAllMocks();
@@ -27,15 +29,14 @@ function battle() {
       placementSpots: [],
       waves: [],
     },
-    ['first', 'second'].map((id) => ({
-      id,
-      speciesId: 'velocinder',
-      level: 16,
-      xp: 0,
-      equippedAttacks: ['FUSE_RUSH', 'SCRATCH'],
-      gender: 'female' as const,
-      isShiny: false,
-    }))
+    ['first', 'second'].map((id) =>
+      makePlayerCreature({
+        id,
+        speciesId: SpeciesId.VELOCINDER,
+        level: 16,
+        equippedAttacks: [AttackId.FUSE_RUSH, AttackId.SCRATCH],
+      })
+    )
   );
   engines.push(engine);
   engine.placeTower('first', 40, 50);
@@ -51,7 +52,7 @@ function battle() {
   }
   const target = engine.spawnPreviewEnemy({
     id: 'target',
-    creatureId: 'mouse_1',
+    creatureId: SpeciesId.KNOTIA,
     level: 16,
     position: { x: 45, y: 50 },
   })!;
@@ -66,7 +67,7 @@ describe('Shared target hit combos', () => {
   it('cycles one, two, detonation, one and doubles resolved damage without AOE or statuses', () => {
     const { engine, first, target } = battle();
     const nearby = engine.spawnPreviewEnemy({
-      creatureId: 'mouse_1',
+      creatureId: SpeciesId.KNOTIA,
       level: 16,
       position: { x: 46, y: 50 },
     })!;
@@ -122,7 +123,7 @@ describe('Shared target hit combos', () => {
       engine,
       first,
       target,
-      ATTACK_FIXTURES.SCRATCH
+      ATTACK_FIXTURES[AttackId.SCRATCH]
     );
     engine.placeTower('first', 5, 5);
     engine.tick(0, 600000);
@@ -160,7 +161,7 @@ describe('Shared target hit combos', () => {
     const { engine, first, target } = battle();
     const marked = engine.spawnPreviewEnemy({
       id: 'marked',
-      creatureId: 'mouse_1',
+      creatureId: SpeciesId.KNOTIA,
       level: 16,
       position: { x: 60, y: 50 },
     })!;

@@ -1,3 +1,8 @@
+import { AttackId } from '@/types/definitionIds';
+import {
+  makePlayerCreature,
+  testDefinitionId,
+} from '@/__tests__/utils/dataBuilders';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { getAttackSpeedMultiplier } from '@/engine/tower-defense/attackSpeedModifiers';
@@ -7,8 +12,8 @@ import { BackgroundImageKey, type PlayerCreature } from '@/types/baseGame';
 
 // Fixed inputs for the ground-target/paralysis mechanic, independent of production tuning.
 beforeEach(() => {
-  species('test_orb_tower');
-  species('test_orb_caster');
+  species(testDefinitionId('test_orb_tower'));
+  species(testDefinitionId('test_orb_caster'));
   ability({
     id: 'TEST_GROUND_ORB',
     type: 'TOWER_GROUND_ORB',
@@ -26,17 +31,14 @@ beforeEach(() => {
 });
 
 function createCreature(id: string): PlayerCreature {
-  return {
+  return makePlayerCreature({
     id,
-    speciesId: 'test_orb_tower',
+    speciesId: testDefinitionId('test_orb_tower'),
     level: 8,
-    xp: 0,
-    equippedAttacks: ['TACKLE'],
+    equippedAttacks: [AttackId.TACKLE],
     activeAttackIndex: 0,
     targetingMode: 'first',
-    gender: 'female' as const,
-    isShiny: false,
-  };
+  });
 }
 
 function createEngine(creatureIds: string[]) {
@@ -61,7 +63,7 @@ function createEngine(creatureIds: string[]) {
   );
   engine.spawnPreviewEnemy({
     id: 'test_orb_caster',
-    creatureId: 'test_orb_caster',
+    creatureId: testDefinitionId('test_orb_caster'),
     level: 10,
     position: { x: 50, y: 10 },
     abilityId: 'TEST_GROUND_ORB',
@@ -180,7 +182,7 @@ describe('Ground-targeted projectiles and paralysis', () => {
     engine.tick(0, 1400);
 
     const attack = tower.equippedAttacksRuntime[0];
-    attack.definitionId = 'RALLY_HOWL';
+    attack.definitionId = AttackId.RALLY_HOWL;
     attack.readyAtMs = 20000;
     engine.tick(0, 1000);
 
@@ -229,7 +231,7 @@ describe('Ground-targeted projectiles and paralysis', () => {
     });
     const voltusk = engine.spawnPreviewEnemy({
       id: 'phase-voltusk',
-      creatureId: 'test_orb_caster',
+      creatureId: testDefinitionId('test_orb_caster'),
       level: 10,
       position: { x: 50, y: 10 },
       abilityId: 'TEST_GROUND_ORB',
@@ -250,7 +252,7 @@ describe('Ground-targeted projectiles and paralysis', () => {
     expect(phaseEvents).toEqual([
       expect.objectContaining({
         enemyId: 'phase-voltusk',
-        enemyDefinitionId: 'test_orb_caster',
+        enemyDefinitionId: testDefinitionId('test_orb_caster'),
       }),
     ]);
     expect(voltusk.isCursed).not.toBe(true);

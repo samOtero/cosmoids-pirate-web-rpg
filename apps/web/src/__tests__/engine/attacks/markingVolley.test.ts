@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { SailcutterBehavior } from '@/engine/tower-defense/attacks/behaviors';
@@ -19,7 +21,7 @@ afterEach(() => {
 function createEnemy(id: string, x: number, y = 50): Enemy {
   return {
     id,
-    definitionId: 'mouse_1',
+    definitionId: SpeciesId.KNOTIA,
     level: 10,
     position: { x, y },
     hp: 10000,
@@ -50,15 +52,12 @@ function battle() {
       waves: [{ id: 'empty', groups: [] }],
     },
     [
-      {
+      makePlayerCreature({
         id: 'mainscale-one',
-        speciesId: 'bug_stage_3',
+        speciesId: SpeciesId.MAINSCALE,
         level: 10,
-        xp: 0,
-        equippedAttacks: ['SAILCUTTER', 'RIGGING_NEST'],
-        gender: 'female' as const,
-        isShiny: false,
-      },
+        equippedAttacks: [AttackId.SAILCUTTER, AttackId.RIGGING_NEST],
+      }),
     ]
   );
   engines.push(engine);
@@ -75,7 +74,7 @@ function createThreadling(
   return {
     id,
     ownerTowerId,
-    attackDefinitionId: 'RIGGING_NEST',
+    attackDefinitionId: AttackId.RIGGING_NEST,
     ownerOrigin: { x: 40, y: 50 },
     nestPosition: { x: 43.5, y: 52.5 },
     position: { x, y: 52.5 },
@@ -98,7 +97,11 @@ describe('Marking volleys', () => {
       createEnemy('four', 56),
     ];
 
-    SailcutterBehavior.execute(engine, source, ATTACK_FIXTURES.SAILCUTTER);
+    SailcutterBehavior.execute(
+      engine,
+      source,
+      ATTACK_FIXTURES[AttackId.SAILCUTTER]
+    );
 
     expect(engine.projectiles).toHaveLength(3);
     expect(new Set(engine.projectiles.map((shot) => shot.targetId)).size).toBe(
@@ -112,10 +115,14 @@ describe('Marking volleys', () => {
     const target = createEnemy('solo', 44);
     engine.enemies = [target];
 
-    SailcutterBehavior.execute(engine, source, ATTACK_FIXTURES.SAILCUTTER);
+    SailcutterBehavior.execute(
+      engine,
+      source,
+      ATTACK_FIXTURES[AttackId.SAILCUTTER]
+    );
     expect(engine.projectiles).toHaveLength(1);
     expect(engine.projectiles[0]).toMatchObject({
-      attackDefinitionId: 'SAILCUTTER',
+      attackDefinitionId: AttackId.SAILCUTTER,
       targetId: 'solo',
       damage: 35,
     });
@@ -138,7 +145,7 @@ describe('Marking volleys', () => {
       engine,
       source,
       target,
-      ATTACK_FIXTURES.SAILCUTTER
+      ATTACK_FIXTURES[AttackId.SAILCUTTER]
     );
     expect(target.sailcutterMarks?.[source.id]).toBe(4000);
 
@@ -147,7 +154,7 @@ describe('Marking volleys', () => {
       engine,
       source,
       target,
-      ATTACK_FIXTURES.SAILCUTTER
+      ATTACK_FIXTURES[AttackId.SAILCUTTER]
     );
     expect(target.sailcutterMarks?.[source.id]).toBe(5200);
   });
@@ -185,7 +192,7 @@ describe('Marking volleys', () => {
       engine,
       source,
       baseline,
-      ATTACK_FIXTURES.RIGGING_NEST
+      ATTACK_FIXTURES[AttackId.RIGGING_NEST]
     );
     const baselineDamage = baseline.maxHp - baseline.hp;
 

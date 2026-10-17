@@ -19,6 +19,7 @@ import {
 import { resolveDialog } from '@/utils/dialogResolver';
 import { TEST_PROFILE_TEMPLATE_OPTIONS } from '@/constants/testProfileTemplates';
 import { isTestProfileOverrideEnabled } from '@/utils/testProfileAccess';
+import { useAccount } from '@/app/components/auth/AuthProvider';
 
 const StartScreen = lazy(() => import('@/app/components/startScreen'));
 const ProfileScreen = lazy(() => import('@/app/components/profileScreen'));
@@ -47,6 +48,7 @@ const getServerTestProfileOverrideEnabled = () =>
   isTestProfileOverrideEnabled();
 
 export default function Home() {
+  const { session, isPending: isAccountPending } = useAccount();
   const {
     currentScreen,
     setScreen,
@@ -106,7 +108,12 @@ export default function Home() {
         <ProfileScreen
           profiles={profiles}
           onSelect={selectProfile}
-          onCreate={createProfile}
+          onCreate={(slotId) => {
+            // Do not label a new save as guest while identity is unresolved.
+            if (isAccountPending) return;
+            createProfile(slotId, session?.user.id);
+          }}
+          creationPending={isAccountPending}
           onDelete={deleteProfile}
           onBack={() => setScreen(Screens.START)}
           testProfileTemplates={

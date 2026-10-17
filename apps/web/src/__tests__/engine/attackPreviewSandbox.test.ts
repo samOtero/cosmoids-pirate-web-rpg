@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { EffectProcessor } from '@/engine/tower-defense/attacks/EffectProcessor';
@@ -19,15 +21,12 @@ const previewLevel = {
 
 function createTowerEngine() {
   const engine = new TowerDefenseEngine(previewLevel, [
-    {
+    makePlayerCreature({
       id: 'preview-tower',
-      speciesId: 'starter_iguana',
+      speciesId: SpeciesId.FUEGUANA,
       level: 10,
-      xp: 0,
-      equippedAttacks: ['EMBER'],
-      gender: 'female' as const,
-      isShiny: false,
-    },
+      equippedAttacks: [AttackId.EMBER],
+    }),
   ]);
   engine.placeTower('preview-tower', 42, 50);
   return engine;
@@ -43,7 +42,7 @@ describe('attack preview sandbox hooks', () => {
     const engine = createTowerEngine();
     const target = engine.spawnPreviewEnemy({
       id: 'primary-target',
-      creatureId: 'mouse_1',
+      creatureId: SpeciesId.KNOTIA,
       level: 10,
       position: { x: 60, y: 50 },
       isInvulnerable: true,
@@ -61,7 +60,7 @@ describe('attack preview sandbox hooks', () => {
       engine,
       tower,
       target!,
-      ATTACK_DEFS.EMBER
+      ATTACK_DEFS[AttackId.EMBER]
     );
 
     expect(damageEvents).toHaveLength(1);
@@ -77,14 +76,14 @@ describe('attack preview sandbox hooks', () => {
     const engine = new TowerDefenseEngine(previewLevel);
     const caster = engine.spawnPreviewEnemy({
       id: 'tailwind-caster',
-      creatureId: 'bug_stage_3',
+      creatureId: SpeciesId.MAINSCALE,
       level: 8,
       position: { x: 60, y: 35 },
       abilityId: 'MOTH_TAILWIND',
     });
     const ally = engine.spawnPreviewEnemy({
       id: 'tailwind-ally',
-      creatureId: 'bettle',
+      creatureId: SpeciesId.BEETADEL,
       level: 8,
       position: { x: 70, y: 50 },
     });
@@ -109,7 +108,7 @@ describe('attack preview sandbox hooks', () => {
     const engine = new TowerDefenseEngine(previewLevel);
     const target = engine.spawnPreviewEnemy({
       id: 'harden-target',
-      creatureId: 'bettle',
+      creatureId: SpeciesId.BEETADEL,
       level: 10,
       position: { x: 60, y: 50 },
       abilityId: 'BETTLE_HARDEN',

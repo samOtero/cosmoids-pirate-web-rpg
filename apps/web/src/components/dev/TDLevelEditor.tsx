@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { TDEncounterPoolEditor } from './TDEncounterPoolEditor';
 import { useEditorSource } from './useEditorSource';
 import EditorSourceStatus from './EditorSourceStatus';
@@ -339,7 +339,11 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
 
     const validationErrors = validateTDLevelDraft(
       draft,
-      new Set(Object.keys(TD_CREATURE_DEFS)),
+      new Set(
+        Object.values(TD_CREATURE_DEFS).map(
+          (definition) => definition.baseCreature.speciesId
+        )
+      ),
       new Set(Object.keys(ENEMY_ABILITY_DEFS))
     );
     if (validationErrors.length > 0) {
@@ -411,7 +415,8 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
         ...previousDraft.waveEnemyDefinitions,
         {
           id: `enemy_${Date.now()}`,
-          creatureId: Object.keys(TD_CREATURE_DEFS)[0] ?? '',
+          creatureId:
+            Object.values(TD_CREATURE_DEFS)[0]?.baseCreature.speciesId,
           level: 1,
           speedMultiplier: 1,
           hpMultiplier: 1,
@@ -1287,7 +1292,7 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
                                 updateWaveEnemyDefinition(
                                   definitionIndex,
                                   'creatureId',
-                                  event.target.value
+                                  Number(event.target.value)
                                 )
                               }
                               className="mt-1 w-full rounded border border-slate-700 bg-slate-950 p-1 text-white"
@@ -1320,22 +1325,24 @@ export default function TDLevelEditor({ onClose }: { onClose: () => void }) {
                               <option value="">
                                 Species ratio (random per spawn)
                               </option>
-                              {Object.entries(CREATURE_GENDER_LABELS).map(([gender, label]) => (
-                                <option
-                                  key={gender}
-                                  value={gender}
-                                  disabled={
-                                    !definition.creatureId ||
-                                    !isCreatureGenderAllowed(
-                                      COSMOID_TEMPLATES[definition.creatureId]
-                                        ?.genderRatio ?? 'genderless',
-                                      gender
-                                    )
-                                  }
-                                >
-                                  {label}
-                                </option>
-                              ))}
+                              {Object.entries(CREATURE_GENDER_LABELS).map(
+                                ([gender, label]) => (
+                                  <option
+                                    key={gender}
+                                    value={gender}
+                                    disabled={
+                                      !definition.creatureId ||
+                                      !isCreatureGenderAllowed(
+                                        COSMOID_TEMPLATES[definition.creatureId]
+                                          ?.genderRatio ?? 'genderless',
+                                        gender
+                                      )
+                                    }
+                                  >
+                                    {label}
+                                  </option>
+                                )
+                              )}
                             </select>
                           </label>
                           <label className="block text-slate-400">

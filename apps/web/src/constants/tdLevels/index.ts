@@ -1,3 +1,4 @@
+import { SpeciesId } from '@/types/definitionIds';
 import {
   TDLevelContext,
   TDLevelConfig,
@@ -57,7 +58,7 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
     levelData: FOREST_LEVEL,
     journalCompletion: {
       progression: StoryProgression.DEFEAT_BUG_STAGE_1,
-      seenSpeciesIds: ['mouse_1', 'harlequill', 'mopup'],
+      seenSpeciesIds: [SpeciesId.KNOTIA, SpeciesId.HARLEQUILL, SpeciesId.MOPUP],
     },
     introEvents: [
       {
@@ -95,7 +96,7 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
     levelData: VANE_LEVEL,
     journalCompletion: {
       progression: StoryProgression.DEFEAT_BUG_STAGE_2,
-      seenSpeciesIds: ['bug_stage_1', 'bettle'],
+      seenSpeciesIds: [SpeciesId.SAILKWORM, SpeciesId.BEETADEL],
     },
     introEvents: [
       {
@@ -133,7 +134,7 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
     levelData: LEVEL_4,
     journalCompletion: {
       progression: StoryProgression.DEFEAT_LEVEL_4,
-      seenSpeciesIds: ['sonarion', 'resonarion'],
+      seenSpeciesIds: [SpeciesId.RAZCALL, SpeciesId.RAZOUND],
     },
     introEvents: [
       {
@@ -172,13 +173,13 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
     journalCompletion: {
       progression: StoryProgression.DEFEAT_LEVEL_5,
       seenSpeciesIds: [
-        'marophis',
-        'tigrevel',
-        'bufflora',
-        'corrogoon',
-        'parlet',
-        'sepippet',
-        'bramfrit',
+        SpeciesId.MAROPHIS,
+        SpeciesId.TIGREVEL,
+        SpeciesId.BUFFLORA,
+        SpeciesId.CORROGOON,
+        SpeciesId.PARLET,
+        SpeciesId.SEPIPPET,
+        SpeciesId.BRAMFRIT,
       ],
     },
     introEvents: [
@@ -217,7 +218,7 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
     levelData: LEVEL_6,
     journalCompletion: {
       progression: StoryProgression.DEFEAT_LEVEL_6,
-      seenSpeciesIds: ['poguin', 'voltusk'],
+      seenSpeciesIds: [SpeciesId.POGUIN, SpeciesId.VOLTUSK],
     },
     introEvents: [
       {
@@ -255,7 +256,11 @@ export const TD_LEVELS: Record<TDLevelContext, TDLevelConfig> = {
     levelData: LEVEL_7,
     journalCompletion: {
       progression: StoryProgression.COMPLETE_LEVEL_7,
-      seenSpeciesIds: ['dormatee', 'yokodillo', 'aguana'],
+      seenSpeciesIds: [
+        SpeciesId.DORMATEE,
+        SpeciesId.YOKODILLO,
+        SpeciesId.AGUANA,
+      ],
     },
     introEvents: [
       {

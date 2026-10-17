@@ -1,4 +1,5 @@
 import { Point, TDLevelData } from '@/engine/tower-defense/types';
+import type { SpeciesId } from '@/types/definitionIds';
 import { expandWaveRepetitions } from '@/engine/tower-defense/waveSchedule';
 import { COSMOID_TEMPLATES } from '@/constants/creatures';
 import { isCreatureGenderAllowed } from '@/utils/creatureGender';
@@ -84,7 +85,7 @@ function validatePoint(point: Point, label: string, errors: string[]): void {
 
 export function validateTDLevelDraft(
   levelData: TDLevelData,
-  validCreatureDefinitionIds?: ReadonlySet<string>,
+  validCreatureDefinitionIds?: ReadonlySet<SpeciesId>,
   validEnemyAbilityIds?: ReadonlySet<string>
 ): string[] {
   const errors: string[] = [];
@@ -185,7 +186,10 @@ export function validateTDLevelDraft(
     }
     if (unit.groupHauling) {
       const hauling = unit.groupHauling;
-      if (!hauling.eligibleCreatureId.trim()) {
+      if (
+        !Number.isSafeInteger(hauling.eligibleCreatureId) ||
+        hauling.eligibleCreatureId <= 0
+      ) {
         errors.push(
           `Capture unit ${index + 1} group hauling needs an eligible creature ID.`
         );
@@ -390,7 +394,11 @@ export function validateTDLevelDraft(
           );
         }
       }
-    } else if (!definition.creatureId?.trim()) {
+    } else if (
+      typeof definition.creatureId !== 'number' ||
+      !Number.isSafeInteger(definition.creatureId) ||
+      definition.creatureId <= 0
+    ) {
       errors.push(`${definitionLabel} needs a creature ID.`);
     } else if (
       validCreatureDefinitionIds &&

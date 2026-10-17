@@ -1,3 +1,4 @@
+import { testDefinitionId } from '@/__tests__/utils/dataBuilders';
 import { describe, expect, it, vi } from 'vitest';
 import { battle, battleSpecies } from './behaviorFixtures';
 import type { CreatureGender } from '@/types/baseGame';
@@ -17,7 +18,12 @@ function encounter(gender?: CreatureGender): TDLevelData {
     ],
     placementSpots: [],
     waveEnemyDefinitions: [
-      { id: 'encounter', creatureId: 'gender-test', level: 3, gender },
+      {
+        id: 'encounter',
+        creatureId: testDefinitionId('gender-test'),
+        level: 3,
+        gender,
+      },
     ],
     waves: [
       {
@@ -38,7 +44,9 @@ function encounter(gender?: CreatureGender): TDLevelData {
 
 describe('encounter gender identity', () => {
   it('rolls independently for each spawn and preserves gender through capture', () => {
-    battleSpecies('gender-test', { genderRatio: { female: 0.5 } });
+    battleSpecies(testDefinitionId('gender-test'), {
+      genderRatio: { female: 0.5 },
+    });
     const engine = battle(encounter());
     const random = vi.spyOn(Math, 'random').mockReturnValue(0);
     try {
@@ -62,7 +70,7 @@ describe('encounter gender identity', () => {
   it.each(['male', 'female', 'genderless'] as const)(
     'honors a fixed %s encounter and captures that identity',
     (gender) => {
-      battleSpecies('gender-test', {
+      battleSpecies(testDefinitionId('gender-test'), {
         genderRatio: gender === 'genderless' ? 'genderless' : { female: 0.5 },
       });
       const engine = battle(encounter(gender));
@@ -73,7 +81,9 @@ describe('encounter gender identity', () => {
   );
 
   it('validates and retains overrides in level drafts', () => {
-    battleSpecies('gender-test', { genderRatio: { female: 0.5 } });
+    battleSpecies(testDefinitionId('gender-test'), {
+      genderRatio: { female: 0.5 },
+    });
     const draft = encounter('male');
     expect(validateTDLevelDraft(draft)).toEqual([]);
     expect(

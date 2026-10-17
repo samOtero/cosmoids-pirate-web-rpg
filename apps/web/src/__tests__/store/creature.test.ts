@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useGameStore } from '@/store/gameStore';
 import { STARTER_CRAB, STARTER_IGUANA } from '@/constants/creatures';
@@ -15,15 +17,15 @@ describe('Creature Store Logic', () => {
     const profileId = 0;
 
     // Setup: Add PlayerCreature
-    store.addCreatureToProfile(profileId, {
-      id: STARTER_CRAB.id,
-      speciesId: STARTER_CRAB.id,
-      level: 1,
-      xp: 0,
-      equippedAttacks: STARTER_CRAB.learnableAttacks.map((a) => a.attackId),
-      gender: 'female' as const,
-      isShiny: false,
-    });
+    store.addCreatureToProfile(
+      profileId,
+      makePlayerCreature({
+        id: '',
+        speciesId: STARTER_CRAB.id,
+        level: 1,
+        equippedAttacks: STARTER_CRAB.learnableAttacks.map((a) => a.attackId),
+      })
+    );
 
     // Verify initial state
     let profile = useGameStore.getState().profiles[0]!;
@@ -46,24 +48,24 @@ describe('Creature Store Logic', () => {
     const profileId = 0;
 
     // Setup: Add two PlayerCreatures
-    store.addCreatureToProfile(profileId, {
-      id: STARTER_CRAB.id,
-      speciesId: STARTER_CRAB.id,
-      level: 1,
-      xp: 0,
-      equippedAttacks: STARTER_CRAB.learnableAttacks.map((a) => a.attackId),
-      gender: 'female' as const,
-      isShiny: false,
-    });
-    store.addCreatureToProfile(profileId, {
-      id: STARTER_IGUANA.id,
-      speciesId: STARTER_IGUANA.id,
-      level: 1,
-      xp: 0,
-      equippedAttacks: STARTER_IGUANA.learnableAttacks.map((a) => a.attackId),
-      gender: 'female' as const,
-      isShiny: false,
-    });
+    store.addCreatureToProfile(
+      profileId,
+      makePlayerCreature({
+        id: '',
+        speciesId: STARTER_CRAB.id,
+        level: 1,
+        equippedAttacks: STARTER_CRAB.learnableAttacks.map((a) => a.attackId),
+      })
+    );
+    store.addCreatureToProfile(
+      profileId,
+      makePlayerCreature({
+        id: '',
+        speciesId: STARTER_IGUANA.id,
+        level: 1,
+        equippedAttacks: STARTER_IGUANA.learnableAttacks.map((a) => a.attackId),
+      })
+    );
 
     const profileBefore = useGameStore.getState().profiles[0]!;
     const added1 = profileBefore.creatures.find(
@@ -91,35 +93,38 @@ describe('Creature Store Logic', () => {
     const store = useGameStore.getState();
     const profileId = 0;
 
-    store.addCreatureToProfile(profileId, {
-      id: 'evolving-bug',
-      speciesId: 'bug_stage_1',
-      level: 6,
-      xp: 0,
-      equippedAttacks: ['TACKLE'],
-      gender: 'female' as const,
-      isShiny: false,
-    });
+    store.addCreatureToProfile(
+      profileId,
+      makePlayerCreature({
+        id: 'evolving-bug',
+        speciesId: SpeciesId.SAILKWORM,
+        level: 6,
+        equippedAttacks: [AttackId.TACKLE],
+      })
+    );
 
     let profile = useGameStore.getState().profiles[profileId]!;
     const evolvingBug = profile.creatures[0];
-    expect(profile.capturedSpeciesIds).toEqual(['bug_stage_1']);
+    expect(profile.capturedSpeciesIds).toEqual([SpeciesId.SAILKWORM]);
 
     store.updateCreatures([
-      { ...evolvingBug, speciesId: 'bug_stage_2', level: 7 },
+      { ...evolvingBug, speciesId: SpeciesId.COCOONOT, level: 7 },
     ]);
     profile = useGameStore.getState().profiles[profileId]!;
-    expect(profile.capturedSpeciesIds).toEqual(['bug_stage_1', 'bug_stage_2']);
-
-    store.updateCreatures([
-      { ...profile.creatures[0], speciesId: 'bug_stage_3', level: 10 },
-    ]);
-    profile = useGameStore.getState().profiles[profileId]!;
-    expect(profile.creatures[0].speciesId).toBe('bug_stage_3');
     expect(profile.capturedSpeciesIds).toEqual([
-      'bug_stage_1',
-      'bug_stage_2',
-      'bug_stage_3',
+      SpeciesId.SAILKWORM,
+      SpeciesId.COCOONOT,
+    ]);
+
+    store.updateCreatures([
+      { ...profile.creatures[0], speciesId: SpeciesId.MAINSCALE, level: 10 },
+    ]);
+    profile = useGameStore.getState().profiles[profileId]!;
+    expect(profile.creatures[0].speciesId).toBe(SpeciesId.MAINSCALE);
+    expect(profile.capturedSpeciesIds).toEqual([
+      SpeciesId.SAILKWORM,
+      SpeciesId.COCOONOT,
+      SpeciesId.MAINSCALE,
     ]);
   });
 
@@ -128,33 +133,33 @@ describe('Creature Store Logic', () => {
     const profileId = 0;
 
     // Add three creatures
-    store.addCreatureToProfile(profileId, {
-      id: 'c1',
-      speciesId: STARTER_CRAB.id,
-      level: 1,
-      xp: 0,
-      equippedAttacks: STARTER_CRAB.learnableAttacks.map((a) => a.attackId),
-      gender: 'female' as const,
-      isShiny: false,
-    });
-    store.addCreatureToProfile(profileId, {
-      id: 'c2',
-      speciesId: STARTER_IGUANA.id,
-      level: 1,
-      xp: 0,
-      equippedAttacks: STARTER_IGUANA.learnableAttacks.map((a) => a.attackId),
-      gender: 'female' as const,
-      isShiny: false,
-    });
-    store.addCreatureToProfile(profileId, {
-      id: 'c3',
-      speciesId: 'starter_monkey',
-      level: 1,
-      xp: 0,
-      equippedAttacks: [],
-      gender: 'female' as const,
-      isShiny: false,
-    });
+    store.addCreatureToProfile(
+      profileId,
+      makePlayerCreature({
+        id: 'c1',
+        speciesId: STARTER_CRAB.id,
+        level: 1,
+        equippedAttacks: STARTER_CRAB.learnableAttacks.map((a) => a.attackId),
+      })
+    );
+    store.addCreatureToProfile(
+      profileId,
+      makePlayerCreature({
+        id: 'c2',
+        speciesId: STARTER_IGUANA.id,
+        level: 1,
+        equippedAttacks: STARTER_IGUANA.learnableAttacks.map((a) => a.attackId),
+      })
+    );
+    store.addCreatureToProfile(
+      profileId,
+      makePlayerCreature({
+        id: 'c3',
+        speciesId: SpeciesId.MONKEG,
+        level: 1,
+        equippedAttacks: [],
+      })
+    );
 
     let profile = useGameStore.getState().profiles[0]!;
     expect(profile.creatures.length).toBe(3);
@@ -191,28 +196,25 @@ describe('Creature Store Logic', () => {
     const storageIds = ['storage-0', 'storage-1'];
 
     partyIds.forEach((id) => {
-      store.addCreatureToProfile(profileId, {
-        id,
-        speciesId: STARTER_CRAB.id,
-        level: 1,
-        xp: 0,
-        equippedAttacks: [],
-        gender: 'female' as const,
-        isShiny: false,
-      });
+      store.addCreatureToProfile(
+        profileId,
+        makePlayerCreature({
+          id,
+          speciesId: STARTER_CRAB.id,
+          level: 1,
+          equippedAttacks: [],
+        })
+      );
     });
     storageIds.forEach((id) => {
       store.addCreatureToProfile(
         profileId,
-        {
+        makePlayerCreature({
           id,
           speciesId: STARTER_IGUANA.id,
           level: 1,
-          xp: 0,
           equippedAttacks: [],
-          gender: 'female' as const,
-          isShiny: false,
-        },
+        }),
         true
       );
     });
@@ -238,24 +240,20 @@ describe('Creature Store Logic', () => {
   });
 
   it('should move legacy party overflow to storage without losing creatures', () => {
-    const overflowParty = Array.from({ length: 8 }, (_, index) => ({
-      id: `legacy-party-${index}`,
-      speciesId: STARTER_CRAB.id,
-      level: 1,
-      xp: 0,
-      equippedAttacks: [],
-      gender: 'female' as const,
-      isShiny: false,
-    }));
-    const existingStorage = {
+    const overflowParty = Array.from({ length: 8 }, (_, index) =>
+      makePlayerCreature({
+        id: `legacy-party-${index}`,
+        speciesId: STARTER_CRAB.id,
+        level: 1,
+        equippedAttacks: [],
+      })
+    );
+    const existingStorage = makePlayerCreature({
       id: 'existing-storage',
       speciesId: STARTER_IGUANA.id,
       level: 1,
-      xp: 0,
       equippedAttacks: [],
-      gender: 'female' as const,
-      isShiny: false,
-    };
+    });
 
     useGameStore.setState((state) => {
       const profiles = [...state.profiles];
@@ -280,10 +278,7 @@ describe('Creature Store Logic', () => {
       'legacy-party-6',
       'legacy-party-7',
     ]);
-    expect([
-      ...profile.creatures,
-      ...profile.storageCreatures,
-    ]).toHaveLength(9);
+    expect([...profile.creatures, ...profile.storageCreatures]).toHaveLength(9);
   });
 
   it('should not add captured creature to active roster if roster has 6 or more creatures', () => {
@@ -296,22 +291,21 @@ describe('Creature Store Logic', () => {
       ],
       placementSpots: [],
     };
-    const playerCreatures = Array.from({ length: 6 }, (_, i) => ({
-      id: `c_${i}`,
-      speciesId: 'starter_crab',
-      level: 1,
-      xp: 0,
-      equippedAttacks: [],
-      gender: 'female' as const,
-      isShiny: false,
-    }));
+    const playerCreatures = Array.from({ length: 6 }, (_, i) =>
+      makePlayerCreature({
+        id: `c_${i}`,
+        speciesId: SpeciesId.PALMIT,
+        level: 1,
+        equippedAttacks: [],
+      })
+    );
 
     const engine = new TowerDefenseEngine(levelData, playerCreatures);
 
     // Spawn an enemy to capture
     engine.enemies.push({
       id: 'enemy_test',
-      definitionId: 'starter_iguana',
+      definitionId: SpeciesId.FUEGUANA,
       gender: 'female',
       level: 5,
       position: { x: 0, y: 0 },
@@ -334,10 +328,10 @@ describe('Creature Store Logic', () => {
     const captured = engine.captureEnemy('enemy_test');
 
     expect(captured).not.toBeNull();
-    expect(captured?.speciesId).toBe('starter_iguana');
+    expect(captured?.speciesId).toBe(SpeciesId.FUEGUANA);
     // Roster should still be 6, and not have the newly captured creature!
     expect(engine.roster.length).toBe(6);
-    expect(engine.roster.some((c) => c.speciesId === 'starter_iguana')).toBe(
+    expect(engine.roster.some((c) => c.speciesId === SpeciesId.FUEGUANA)).toBe(
       false
     );
   });
@@ -352,22 +346,21 @@ describe('Creature Store Logic', () => {
       ],
       placementSpots: [],
     };
-    const playerCreatures = Array.from({ length: 5 }, (_, i) => ({
-      id: `c_${i}`,
-      speciesId: 'starter_crab',
-      level: 1,
-      xp: 0,
-      equippedAttacks: [],
-      gender: 'female' as const,
-      isShiny: false,
-    }));
+    const playerCreatures = Array.from({ length: 5 }, (_, i) =>
+      makePlayerCreature({
+        id: `c_${i}`,
+        speciesId: SpeciesId.PALMIT,
+        level: 1,
+        equippedAttacks: [],
+      })
+    );
 
     const engine = new TowerDefenseEngine(levelData, playerCreatures);
 
     // Spawn an enemy to capture
     engine.enemies.push({
       id: 'enemy_test',
-      definitionId: 'starter_iguana',
+      definitionId: SpeciesId.FUEGUANA,
       gender: 'female',
       level: 5,
       position: { x: 0, y: 0 },
@@ -390,10 +383,10 @@ describe('Creature Store Logic', () => {
     const captured = engine.captureEnemy('enemy_test');
 
     expect(captured).not.toBeNull();
-    expect(captured?.speciesId).toBe('starter_iguana');
+    expect(captured?.speciesId).toBe(SpeciesId.FUEGUANA);
     // Roster should now be 6, and contain the newly captured creature!
     expect(engine.roster.length).toBe(6);
-    expect(engine.roster.some((c) => c.speciesId === 'starter_iguana')).toBe(
+    expect(engine.roster.some((c) => c.speciesId === SpeciesId.FUEGUANA)).toBe(
       true
     );
   });
@@ -405,15 +398,12 @@ describe('Creature Store Logic', () => {
     // Act: Add PlayerCreature with forceStorage = true
     store.addCreatureToProfile(
       profileId,
-      {
-        id: STARTER_CRAB.id,
+      makePlayerCreature({
+        id: '',
         speciesId: STARTER_CRAB.id,
         level: 1,
-        xp: 0,
         equippedAttacks: STARTER_CRAB.learnableAttacks.map((a) => a.attackId),
-        gender: 'female' as const,
-        isShiny: false,
-      },
+      }),
       true
     );
 
@@ -434,22 +424,21 @@ describe('Creature Store Logic', () => {
       ],
       placementSpots: [],
     };
-    const playerCreatures = Array.from({ length: 2 }, (_, i) => ({
-      id: `c_${i}`,
-      speciesId: 'starter_crab',
-      level: 1,
-      xp: 0,
-      equippedAttacks: [],
-      gender: 'female' as const,
-      isShiny: false,
-    }));
+    const playerCreatures = Array.from({ length: 2 }, (_, i) =>
+      makePlayerCreature({
+        id: `c_${i}`,
+        speciesId: SpeciesId.PALMIT,
+        level: 1,
+        equippedAttacks: [],
+      })
+    );
 
     const engine = new TowerDefenseEngine(levelData, playerCreatures);
 
     // Spawn a shiny enemy
     engine.enemies.push({
       id: 'enemy_shiny',
-      definitionId: 'starter_iguana',
+      definitionId: SpeciesId.FUEGUANA,
       gender: 'female',
       level: 5,
       position: { x: 0, y: 0 },
@@ -483,15 +472,12 @@ describe('Creature Store Logic', () => {
     const profileId = 0;
 
     // 1. Setup the profile with a starter creature
-    const starterCreatureInput = {
+    const starterCreatureInput = makePlayerCreature({
       id: 'starter_crab', // will be replaced with a UUID by addCreatureToProfile
-      speciesId: 'starter_crab',
+      speciesId: SpeciesId.PALMIT,
       level: 5,
-      xp: 0,
       equippedAttacks: [],
-      gender: 'female' as const,
-      isShiny: false,
-    };
+    });
     store.addCreatureToProfile(profileId, starterCreatureInput);
 
     // Get the profile after adding the starter to get its correct UUID
@@ -515,7 +501,7 @@ describe('Creature Store Logic', () => {
     // Spawn an enemy
     engine.enemies.push({
       id: 'enemy_to_catch',
-      definitionId: 'mouse_1',
+      definitionId: SpeciesId.KNOTIA,
       level: 3,
       position: { x: 0, y: 0 },
       hp: 10,

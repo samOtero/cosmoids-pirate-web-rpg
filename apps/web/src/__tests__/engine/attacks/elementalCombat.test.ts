@@ -1,3 +1,4 @@
+import { testDefinitionId } from '@/__tests__/utils/dataBuilders';
 import { describe, expect, it } from 'vitest';
 import { EffectProcessor } from '@/engine/tower-defense/attacks/EffectProcessor';
 import { ElementType } from '@/types/baseGame';
@@ -9,7 +10,7 @@ function damage(
   defenders: ElementType[],
   attackerTypes: ElementType[] = [ElementType.NORMAL]
 ) {
-  const attacker = battleSpecies('test_affinity', {
+  const attacker = battleSpecies(testDefinitionId('test_affinity'), {
     type: attackerTypes[0],
     secondaryType: attackerTypes[1],
   });

@@ -1,4 +1,5 @@
-import React from 'react';
+import { AttackId } from '@/types/definitionIds';
+
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -33,7 +34,7 @@ vi.mock('@/engine/tower-defense/TowerDefenseEngine', () => {
 
   class MockTowerDefenseEngine {
     static getDefaultAttacks() {
-      return ['TACKLE'];
+      return [AttackId.TACKLE];
     }
 
     static getEquippedAttacks() {

@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ProjectileBehavior } from '@/engine/tower-defense/attacks/behaviors';
@@ -25,15 +27,12 @@ const levelData = {
 
 const createBuffloraTower = (): Tower => ({
   id: 'bufflora_tower',
-  creature: {
+  creature: makePlayerCreature({
     id: 'bufflora_one',
-    speciesId: 'bufflora',
+    speciesId: SpeciesId.BUFFLORA,
     level: 12,
-    xp: 0,
-    equippedAttacks: ['NECTAR_SIPHON'],
-    gender: 'female' as const,
-    isShiny: false,
-  },
+    equippedAttacks: [AttackId.NECTAR_SIPHON],
+  }),
   position: { x: 0, y: 0 },
   lastAttackTime: 0,
   currentAttack: 15,
@@ -42,7 +41,9 @@ const createBuffloraTower = (): Tower => ({
   currentSpecialDefense: 15,
   hp: 20,
   maxHp: 40,
-  equippedAttacksRuntime: [{ definitionId: 'NECTAR_SIPHON', lastFiredTime: 0 }],
+  equippedAttacksRuntime: [
+    { definitionId: AttackId.NECTAR_SIPHON, lastFiredTime: 0 },
+  ],
   selectedAttackIndex: 0,
   facingDirection: 'right',
   targetingMode: 'closest',
@@ -50,7 +51,7 @@ const createBuffloraTower = (): Tower => ({
 
 const createEnemy = (): Enemy => ({
   id: 'target',
-  definitionId: 'mouse_1',
+  definitionId: SpeciesId.KNOTIA,
   level: 12,
   position: { x: 10, y: 0 },
   hp: 200,
@@ -82,7 +83,7 @@ describe('Drain and poison payoff', () => {
       engine,
       source,
       target,
-      ATTACK_FIXTURES.NECTAR_SIPHON
+      ATTACK_FIXTURES[AttackId.NECTAR_SIPHON]
     );
 
     const damageDealt = startingTargetHp - target.hp;
@@ -136,7 +137,7 @@ describe('Drain and poison payoff', () => {
         engine,
         source,
         target,
-        ATTACK_FIXTURES.NECTAR_SIPHON
+        ATTACK_FIXTURES[AttackId.NECTAR_SIPHON]
       );
     }
 
@@ -179,7 +180,11 @@ describe('Drain and poison payoff', () => {
     };
     engine.enemies = [closerUnpoisoned, fartherPoisoned];
 
-    ProjectileBehavior.execute(engine, source, ATTACK_FIXTURES.NECTAR_SIPHON);
+    ProjectileBehavior.execute(
+      engine,
+      source,
+      ATTACK_FIXTURES[AttackId.NECTAR_SIPHON]
+    );
 
     expect(engine.projectiles).toHaveLength(1);
     expect(engine.projectiles[0].targetId).toBe(fartherPoisoned.id);
@@ -198,7 +203,7 @@ describe('Drain and poison payoff', () => {
       engine,
       source,
       target,
-      ATTACK_FIXTURES.NECTAR_SIPHON
+      ATTACK_FIXTURES[AttackId.NECTAR_SIPHON]
     );
 
     expect(target.hp).toBeLessThanOrEqual(0);
@@ -217,7 +222,7 @@ describe('Drain and poison payoff', () => {
       engine,
       source,
       target,
-      ATTACK_FIXTURES.NECTAR_SIPHON
+      ATTACK_FIXTURES[AttackId.NECTAR_SIPHON]
     );
 
     expect(target.hp).toBe(target.maxHp);

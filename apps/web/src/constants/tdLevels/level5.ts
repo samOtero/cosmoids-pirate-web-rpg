@@ -1,3 +1,4 @@
+import { SpeciesId } from '@/types/definitionIds';
 import { TDLevelData } from '@/engine/tower-defense/types';
 import { ElementType } from '@/types/baseGame';
 
@@ -482,7 +483,7 @@ export const LEVEL_5: TDLevelData = {
     },
     {
       id: 'level_5_bufflora_wild',
-      creatureId: 'bufflora',
+      creatureId: SpeciesId.BUFFLORA,
       level: 12,
       speedMultiplier: 1.1,
       canCarryCaptureUnits: true,
@@ -491,7 +492,7 @@ export const LEVEL_5: TDLevelData = {
     },
     {
       id: 'level_5_marophis_wild',
-      creatureId: 'marophis',
+      creatureId: SpeciesId.MAROPHIS,
       level: 12,
       speedMultiplier: 1.1,
       canCarryCaptureUnits: true,
@@ -500,28 +501,28 @@ export const LEVEL_5: TDLevelData = {
     },
     {
       id: 'level_5_bramfrit_prisoner',
-      creatureId: 'bramfrit',
+      creatureId: SpeciesId.BRAMFRIT,
       level: 8,
       speedMultiplier: 0.75,
       canCarryCaptureUnits: false,
     },
     {
       id: 'level_5_sepippet_prisoner',
-      creatureId: 'sepippet',
+      creatureId: SpeciesId.SEPIPPET,
       level: 8,
       speedMultiplier: 0.85,
       canCarryCaptureUnits: false,
     },
     {
       id: 'level_5_parlet_prisoner',
-      creatureId: 'parlet',
+      creatureId: SpeciesId.PARLET,
       level: 8,
       speedMultiplier: 0.8,
       canCarryCaptureUnits: false,
     },
     {
       id: 'level_5_corrogoon_prisoner',
-      creatureId: 'corrogoon',
+      creatureId: SpeciesId.CORROGOON,
       level: 8,
       speedMultiplier: 0.7,
       canCarryCaptureUnits: false,
@@ -683,7 +684,7 @@ export const LEVEL_5: TDLevelData = {
   objectiveAllies: [
     {
       id: 'bramfrit_rescue',
-      creatureId: 'bramfrit',
+      creatureId: SpeciesId.BRAMFRIT,
       displayName: 'Bramfrit',
       gateDefinitionId: 'bramfrit_cell_gate',
       lockedPosition: {
@@ -749,7 +750,7 @@ export const LEVEL_5: TDLevelData = {
     },
     {
       id: 'sepippet_rescue',
-      creatureId: 'sepippet',
+      creatureId: SpeciesId.SEPIPPET,
       displayName: 'Sepippet',
       gateDefinitionId: 'sepippet_cell_gate',
       lockedPosition: {
@@ -810,7 +811,7 @@ export const LEVEL_5: TDLevelData = {
     },
     {
       id: 'parlet_rescue',
-      creatureId: 'parlet',
+      creatureId: SpeciesId.PARLET,
       displayName: 'Parlet',
       gateDefinitionId: 'parlet_cell_gate',
       lockedPosition: {
@@ -854,7 +855,7 @@ export const LEVEL_5: TDLevelData = {
     },
     {
       id: 'corrogoon_rescue',
-      creatureId: 'corrogoon',
+      creatureId: SpeciesId.CORROGOON,
       displayName: 'Corrogoon',
       gateDefinitionId: 'corrogoon_cell_gate',
       lockedPosition: {

@@ -1,3 +1,4 @@
+import { SpeciesId } from '@/types/definitionIds';
 import { describe, expect, it } from 'vitest';
 
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
@@ -31,7 +32,7 @@ const createLevel = (): TDLevelData => ({
   waveEnemyDefinitions: [
     {
       id: 'non_carrier',
-      creatureId: 'mouse_1',
+      creatureId: SpeciesId.KNOTIA,
       level: 3,
       canCarryCaptureUnits: false,
     },

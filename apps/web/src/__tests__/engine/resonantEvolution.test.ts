@@ -1,3 +1,4 @@
+import { SpeciesId } from '@/types/definitionIds';
 import { describe, expect, it } from 'vitest';
 
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
@@ -18,7 +19,7 @@ const createLevel = (): TDLevelData => ({
     },
   ],
   resonantEvolution: {
-    sourceCreatureId: 'sonarion',
+    sourceCreatureId: SpeciesId.RAZCALL,
     evolvedEnemyDefinitionId: 'evolved',
     requiredCount: 3,
     radius: 10,
@@ -32,13 +33,13 @@ const createLevel = (): TDLevelData => ({
   waveEnemyDefinitions: [
     {
       id: 'small',
-      creatureId: 'sonarion',
+      creatureId: SpeciesId.RAZCALL,
       level: 5,
       canCarryCaptureUnits: false,
     },
     {
       id: 'evolved',
-      creatureId: 'resonarion',
+      creatureId: SpeciesId.RAZOUND,
       level: 8,
       hpMultiplier: 2,
     },
@@ -53,7 +54,7 @@ function addSonarion(
 ) {
   const enemy = engine.spawnPreviewEnemy({
     id,
-    creatureId: 'sonarion',
+    creatureId: SpeciesId.RAZCALL,
     level: 5,
     position,
   });
@@ -121,7 +122,7 @@ describe('resonant evolution', () => {
     engine.tick(1000, 1000);
 
     const evolved = engine.enemies.find(
-      (enemy) => enemy.definitionId === 'resonarion'
+      (enemy) => enemy.definitionId === SpeciesId.RAZOUND
     );
     expect(evolved).toMatchObject({
       waveEnemyDefinitionId: 'evolved',
@@ -165,7 +166,7 @@ describe('resonant evolution', () => {
 
     engine.tick(1500, 1400);
     expect(
-      engine.enemies.some((enemy) => enemy.definitionId === 'resonarion')
+      engine.enemies.some((enemy) => enemy.definitionId === SpeciesId.RAZOUND)
     ).toBe(false);
 
     engine.destroy();

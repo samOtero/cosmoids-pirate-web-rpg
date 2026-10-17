@@ -1,8 +1,9 @@
+import { getDefinitionVisuals } from '@/utils/definitionVisuals';
 import { TowerDefenseEngine } from '../TowerDefenseEngine';
 import { Enemy, Tower } from '../types';
 import { AttackDefinition, AttackBehavior } from './types';
 import { EffectProcessor } from './EffectProcessor';
-import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
+
 import { hasActiveSpeedBoost, hasActiveSpeedSlow } from '../speedModifiers';
 import { applyAttackSpeedBuff } from '../attackSpeedModifiers';
 import { applySunbathe, canSunbathe } from '../warmth';
@@ -107,7 +108,7 @@ export const ProjectileBehavior: AttackBehavior = {
           configId,
           position: { ...source.position },
           durationMs:
-            CREATURE_TD_CONFIGS[configId]?.default?.vfxAnimation?.durationMs ??
+            getDefinitionVisuals(configId)?.default?.vfxAnimation?.durationMs ??
             160,
           elapsedMs: 0,
           targetId: source.id,
@@ -203,7 +204,7 @@ export const InstantMeleeBehavior: AttackBehavior = {
 
       // Add visual effect if configured
       if (attackDef.visualEffectConfigId) {
-        const configMap = CREATURE_TD_CONFIGS[attackDef.visualEffectConfigId];
+        const configMap = getDefinitionVisuals(attackDef.visualEffectConfigId);
         const vfxConfig = configMap?.default?.vfxAnimation;
         const durationMs = vfxConfig?.durationMs ?? 500;
         engine.visualEffects.push({
@@ -308,7 +309,7 @@ export function resolveAdaptiveTargetedAoeImpact(
 
   if (showVisualEffect && attackDef.visualEffectConfigId) {
     const configId = attackDef.visualEffectConfigId;
-    const vfxConfig = CREATURE_TD_CONFIGS[configId]?.default?.vfxAnimation;
+    const vfxConfig = getDefinitionVisuals(configId)?.default?.vfxAnimation;
     engine.visualEffects.push({
       id: `vfx_adaptive_aoe_${source.id}_${engine.elapsedTimeMs}_${Math.random()}`,
       configId,
@@ -407,7 +408,7 @@ export const FunnyDanceBehavior: AttackBehavior = {
     });
 
     if (attackDef.visualEffectConfigId) {
-      const configMap = CREATURE_TD_CONFIGS[attackDef.visualEffectConfigId];
+      const configMap = getDefinitionVisuals(attackDef.visualEffectConfigId);
       const vfxConfig = configMap?.default?.vfxAnimation;
       engine.visualEffects.push({
         id: `vfx_${Date.now()}_${Math.random()}`,
@@ -490,7 +491,7 @@ export const InstantAoeBehavior: AttackBehavior = {
     });
 
     if (attackDef.visualEffectConfigId) {
-      const configMap = CREATURE_TD_CONFIGS[attackDef.visualEffectConfigId];
+      const configMap = getDefinitionVisuals(attackDef.visualEffectConfigId);
       const vfxConfig = configMap?.default?.vfxAnimation;
       engine.visualEffects.push({
         id: `vfx_${Date.now()}_${Math.random()}`,
@@ -538,7 +539,7 @@ export const PoisonAoeBehavior: AttackBehavior = {
 
     if (attackDef.visualEffectConfigId) {
       const configId = attackDef.visualEffectConfigId;
-      const vfxConfig = CREATURE_TD_CONFIGS[configId]?.default?.vfxAnimation;
+      const vfxConfig = getDefinitionVisuals(configId)?.default?.vfxAnimation;
       engine.visualEffects.push({
         id: `vfx_toxic_pollen_${source.id}_${engine.elapsedTimeMs}_${Math.random()}`,
         configId,
@@ -589,7 +590,7 @@ export const SupportAuraBehavior: AttackBehavior = {
         configId,
         position: { ...source.position },
         durationMs:
-          CREATURE_TD_CONFIGS[configId]?.default?.vfxAnimation?.durationMs ??
+          getDefinitionVisuals(configId)?.default?.vfxAnimation?.durationMs ??
           800,
         elapsedMs: 0,
         facingDirection: source.facingDirection,
@@ -683,7 +684,7 @@ export const RepairSupportBehavior: AttackBehavior = {
         position: { ...recipient.position },
         targetId: recipient.id,
         durationMs:
-          CREATURE_TD_CONFIGS[configId]?.default?.vfxAnimation?.durationMs ??
+          getDefinitionVisuals(configId)?.default?.vfxAnimation?.durationMs ??
           900,
         elapsedMs: 0,
       });

@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ProjectileBehavior } from '@/engine/tower-defense/attacks/behaviors';
@@ -16,15 +18,12 @@ afterEach(() => {
 
 function createBattle() {
   vi.spyOn(Math, 'random').mockReturnValue(0.99);
-  const creature = {
+  const creature = makePlayerCreature({
     id: 'knotia',
-    speciesId: 'mouse_1',
+    speciesId: SpeciesId.KNOTIA,
     level: 14,
-    xp: 0,
-    equippedAttacks: ['LOOSE_END'],
-    gender: 'female' as const,
-    isShiny: false,
-  };
+    equippedAttacks: [AttackId.LOOSE_END],
+  });
   const engine = new TowerDefenseEngine(
     {
       paths: [
@@ -55,7 +54,7 @@ function addEnemy(
 ): Enemy {
   const enemy = engine.spawnPreviewEnemy({
     id,
-    creatureId: 'senticle',
+    creatureId: SpeciesId.SENTICLE,
     level: 14,
     position: { x, y: 0 },
   })!;
@@ -72,13 +71,17 @@ describe('Knockout follow-up projectiles', () => {
     const nearest = addEnemy(engine, 'nearest', 33, 1);
     const outsideInitialRadius = addEnemy(engine, 'outside', 36, 100);
 
-    ProjectileBehavior.execute(engine, tower, ATTACK_FIXTURES.LOOSE_END);
+    ProjectileBehavior.execute(
+      engine,
+      tower,
+      ATTACK_FIXTURES[AttackId.LOOSE_END]
+    );
     engine.tick(0, 200);
 
     expect(primary.hp).toBeLessThanOrEqual(0);
     expect(engine.projectiles).toHaveLength(1);
     expect(engine.projectiles[0]).toMatchObject({
-      attackDefinitionId: 'LOOSE_END',
+      attackDefinitionId: AttackId.LOOSE_END,
       targetId: nearest.id,
       position: { x: 10, y: 0 },
       looseEndFollowUp: true,
@@ -96,7 +99,11 @@ describe('Knockout follow-up projectiles', () => {
     const primary = addEnemy(engine, 'primary', 10, 500);
     addEnemy(engine, 'nearby', 20, 500);
 
-    ProjectileBehavior.execute(engine, tower, ATTACK_FIXTURES.LOOSE_END);
+    ProjectileBehavior.execute(
+      engine,
+      tower,
+      ATTACK_FIXTURES[AttackId.LOOSE_END]
+    );
     engine.tick(0, 200);
 
     expect(primary.hp).toBeLessThan(primary.maxHp);

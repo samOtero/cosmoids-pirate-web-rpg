@@ -9,7 +9,8 @@ export function configureBowlingPreview(
   const target = engine.enemies.find(
     (enemy) => enemy.id === 'attack-preview-primary-target'
   );
-  if (!target) return;
+  if (!target || typeof target.definitionId !== 'number') return;
+  const speciesId = target.definitionId;
   engine.projectiles = [];
   engine.enemies = engine.enemies.filter(
     (enemy) => !enemy.id.startsWith('attack-preview-bowling-')
@@ -68,7 +69,7 @@ export function configureBowlingPreview(
   layout.positions.slice(1).forEach((position, i) => {
     const enemy = engine.spawnPreviewEnemy({
       id: `attack-preview-bowling-${i}`,
-      creatureId: target.definitionId,
+      creatureId: speciesId,
       level: target.level,
       position,
       isInvulnerable: true,

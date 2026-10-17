@@ -1,4 +1,5 @@
-import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
+import { getDefinitionVisuals } from '@/utils/definitionVisuals';
+
 import type { TowerDefenseEngine } from '../TowerDefenseEngine';
 import type { Enemy, Tower } from '../types';
 import { EffectProcessor } from './EffectProcessor';
@@ -88,8 +89,8 @@ export function updateShikoQuakes(
       for (const enemy of targets) {
         EffectProcessor.applyDamageAndEffects(engine, source, enemy, attackDef);
         if (enemy.hp <= 0) engine.emitEnemyDefeated(enemy, source);
-        const hitConfig =
-          CREATURE_TD_CONFIGS[SHIKO_STOMP_HIT_VFX_ID]?.default?.vfxAnimation;
+        const hitConfig = getDefinitionVisuals(SHIKO_STOMP_HIT_VFX_ID)?.default
+          ?.vfxAnimation;
         engine.visualEffects.push({
           id: `vfx_shiko_hit_${source.id}_${enemy.id}_${engine.elapsedTimeMs}_${Math.random()}`,
           configId: SHIKO_STOMP_HIT_VFX_ID,
@@ -102,7 +103,7 @@ export function updateShikoQuakes(
 
       if (attackDef.visualEffectConfigId) {
         const configId = attackDef.visualEffectConfigId;
-        const vfxConfig = CREATURE_TD_CONFIGS[configId]?.default?.vfxAnimation;
+        const vfxConfig = getDefinitionVisuals(configId)?.default?.vfxAnimation;
         engine.visualEffects.push({
           id: `vfx_shiko_quake_${source.id}_${engine.elapsedTimeMs}_${Math.random()}`,
           configId,

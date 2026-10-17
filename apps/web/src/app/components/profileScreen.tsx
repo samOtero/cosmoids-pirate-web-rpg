@@ -16,6 +16,7 @@ interface ProfileScreenProps {
   onCreate: (slotId: number) => void;
   onDelete: (slotId: number) => void;
   onBack: () => void;
+  creationPending?: boolean;
   testProfileTemplates?: TestProfileTemplateOption[];
   onApplyTestTemplate?: (templateId: string) => void;
 }
@@ -26,6 +27,7 @@ export default function ProfileScreen({
   onCreate,
   onDelete,
   onBack,
+  creationPending = false,
   testProfileTemplates,
   onApplyTestTemplate,
 }: ProfileScreenProps) {
@@ -66,6 +68,7 @@ export default function ProfileScreen({
         </div>
       </div>
 
+      {creationPending && <p role="status">Checking your account…</p>}
       <div className="grid w-full max-w-4xl grid-cols-3 gap-4 lg:gap-6">
         {[0, 1, 2].map((slotId) => {
           const profile = profiles[slotId];
@@ -134,17 +137,20 @@ export default function ProfileScreen({
               key={slotId}
               className="flex h-52 cursor-pointer flex-col items-center justify-center transition-colors hover:bg-white/5 lg:h-64"
             >
-              <div
+              <button
+                type="button"
+                disabled={creationPending}
+                aria-label={`Create save in slot ${slotId + 1}`}
                 onClick={() => onCreate(slotId)}
-                className="space-y-1 text-center lg:space-y-4"
+                className="space-y-1 text-center disabled:cursor-wait disabled:opacity-50 lg:space-y-4"
               >
-                <div className="text-2xl text-wood-light opacity-50 lg:text-4xl">
+                <span className="block text-2xl text-wood-light opacity-50 lg:text-4xl">
                   +
-                </div>
-                <p className="text-sm font-bold tracking-widest text-sand/50 uppercase lg:text-base">
+                </span>
+                <span className="block text-sm font-bold tracking-widest text-sand/50 uppercase lg:text-base">
                   Empty Slot
-                </p>
-              </div>
+                </span>
+              </button>
             </Panel>
           );
         })}

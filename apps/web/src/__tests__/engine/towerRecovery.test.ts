@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
@@ -11,17 +13,14 @@ afterEach(() => {
 });
 
 function createCreature(): PlayerCreature {
-  return {
+  return makePlayerCreature({
     id: 'patient',
-    speciesId: 'mopup',
+    speciesId: SpeciesId.MOPUP,
     level: 8,
-    xp: 0,
-    equippedAttacks: ['TACKLE'],
+    equippedAttacks: [AttackId.TACKLE],
     activeAttackIndex: 0,
     targetingMode: 'first',
-    gender: 'female' as const,
-    isShiny: false,
-  };
+  });
 }
 
 function createEngine() {

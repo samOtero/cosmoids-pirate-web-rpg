@@ -1,3 +1,4 @@
+import { AttackId, SpeciesId } from '@/types/definitionIds';
 import { create } from 'zustand';
 import { persist, devtools } from 'zustand/middleware';
 import {
@@ -41,11 +42,16 @@ import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { createTestProfileFromTemplate } from '@/constants/testProfileTemplates';
 import { isTestProfileOverrideEnabled } from '@/utils/testProfileAccess';
 import { generateCreatureGender } from '@/utils/creatureGender';
+import {
+  GUEST_OWNER_ID,
+  recordCreatureOwnership,
+  type AcquiredCreature,
+} from '@/utils/creatureOwnership';
 
 function mergeCapturedSpeciesIds(
   profile: Profile,
-  speciesIds: Iterable<string> = []
-): string[] {
+  speciesIds: Iterable<SpeciesId> = []
+): SpeciesId[] {
   return Array.from(
     new Set([
       ...(profile.capturedSpeciesIds ?? []),
@@ -85,21 +91,21 @@ interface GameState {
   ) => void;
   profiles: (Profile | null)[];
   currentProfileId: number | null;
-  createProfile: (slotId: number) => void;
+  createProfile: (slotId: number, ownerId?: string) => void;
   deleteProfile: (slotId: number) => void;
   selectProfile: (slotId: number) => void;
   applyTestProfileTemplate: (templateId: string) => void;
   addCreatureToProfile: (
     slotId: number,
-    creature: PlayerCreature,
+    creature: AcquiredCreature,
     forceStorage?: boolean
   ) => void;
   updateCreatures: (creatures: PlayerCreature[]) => void;
-  overwriteProfileCreatures: (creatures: PlayerCreature[]) => void;
+  overwriteProfileCreatures: (creatures: AcquiredCreature[]) => void;
   reorderCreatures: (startIndex: number, endIndex: number) => void;
   updateCreatureAttacks: (
     creatureId: string,
-    equippedAttacks: string[],
+    equippedAttacks: AttackId[],
     activeAttackIndex: number
   ) => void;
   // Progression
@@ -262,7 +268,10 @@ export const useGameStore = create<GameState>()(
                       updates.currentProfileId ?? state.currentProfileId; // Use ?? because id can be 0 or null
 
                     if (currentProfileId !== null && payload.flag) {
-                      const creatureMap: Record<string, CosmoidTemplate> = {
+                      const creatureMap: Record<
+                        GameFlagValue,
+                        CosmoidTemplate
+                      > = {
                         [GameFlag.STARTER_PALMIT]: STARTER_CRAB,
                         [GameFlag.STARTER_FUEGUANA]: STARTER_IGUANA,
                         [GameFlag.STARTER_MONKEG]: STARTER_MONKEY,
@@ -271,7 +280,8 @@ export const useGameStore = create<GameState>()(
                       if (creature) {
                         state.setGameFlag(payload.flag);
                         const starterPlayerCreature: PlayerCreature = {
-                          id: creature.id, // will be replaced with UUID in addCreatureToProfile
+                          id: crypto.randomUUID(),
+                          originalOwnerId: GUEST_OWNER_ID,
                           speciesId: creature.id,
                           gender: generateCreatureGender(creature.id),
                           level: 5, // Starter starts at level 5
@@ -299,12 +309,13 @@ export const useGameStore = create<GameState>()(
                     const c = payload.creature;
                     const playerCreature: PlayerCreature = {
                       id: c.id,
-                      speciesId: c.speciesId || c.id,
+                      originalOwnerId: c.originalOwnerId ?? GUEST_OWNER_ID,
+                      speciesId: c.speciesId,
                       gender: c.gender,
                       level: c.level,
                       xp: c.xp,
                       equippedAttacks: TowerDefenseEngine.getDefaultAttacks(
-                        c.speciesId || c.id
+                        c.speciesId
                       ),
                       isShiny: c.isShiny ?? false,
                     };
@@ -386,13 +397,14 @@ export const useGameStore = create<GameState>()(
         clearQueue: () => set({ eventQueue: [] }, false, 'clearQueue'),
         setTdLevel: (config: TDLevelConfig | null) =>
           set({ currentTdLevel: config }, false, 'setTdLevel'),
-        createProfile: (slotId: number) => {
+        createProfile: (slotId: number, ownerId = GUEST_OWNER_ID) => {
           set(
             (state) => {
               if (slotId < 0 || slotId >= MAX_PROFILES) return state;
               const newProfiles = [...state.profiles];
               newProfiles[slotId] = {
                 id: slotId,
+                ownerId,
                 name: `Caleb`,
                 lastPlayed: Date.now(),
                 creatures: [],
@@ -479,6 +491,7 @@ export const useGameStore = create<GameState>()(
                 );
                 newProfiles[slotId] = {
                   id: slotId,
+                  ownerId: profile.ownerId || GUEST_OWNER_ID,
                   name: profile.name,
                   lastPlayed: Date.now(),
                   creatures: [],
@@ -504,8 +517,7 @@ export const useGameStore = create<GameState>()(
               newProfiles[slotId] = {
                 ...normalizedProfile,
                 lastPlayed: Date.now(),
-                capturedSpeciesIds:
-                  mergeCapturedSpeciesIds(normalizedProfile),
+                capturedSpeciesIds: mergeCapturedSpeciesIds(normalizedProfile),
               };
 
               let initialEvents: GameEvent[] = [];
@@ -530,7 +542,7 @@ export const useGameStore = create<GameState>()(
 
         addCreatureToProfile: (
           slotId: number,
-          creature: PlayerCreature,
+          creature: AcquiredCreature,
           forceStorage?: boolean
         ) =>
           set(
@@ -545,11 +557,11 @@ export const useGameStore = create<GameState>()(
               if (newProfiles[slotId]) {
                 const profile = enforcePartySize(newProfiles[slotId]!);
                 const newCreatureInstance: PlayerCreature = {
-                  ...creature,
-                  id:
-                    creature.id && creature.id !== creature.speciesId
-                      ? creature.id
-                      : crypto.randomUUID(),
+                  ...recordCreatureOwnership(
+                    creature,
+                    profile.ownerId || GUEST_OWNER_ID
+                  ),
+                  id: creature.id || crypto.randomUUID(),
                 };
                 // Add to party if it has room and is not forced to storage.
                 if (
@@ -589,7 +601,7 @@ export const useGameStore = create<GameState>()(
                 return state;
               const profile = enforcePartySize(state.profiles[profileId]!);
               const newCreatures = [...profile.creatures];
-              const updatedSpeciesIds: string[] = [];
+              const updatedSpeciesIds: SpeciesId[] = [];
 
               let hasUpdates = false;
               creatures.forEach((updatedCreature) => {
@@ -597,7 +609,14 @@ export const useGameStore = create<GameState>()(
                   (c) => c.id === updatedCreature.id
                 );
                 if (partyIndex !== -1) {
-                  newCreatures[partyIndex] = updatedCreature;
+                  // Battle snapshots must never rewrite or erase provenance.
+                  newCreatures[partyIndex] = {
+                    ...updatedCreature,
+                    originalOwnerId:
+                      newCreatures[partyIndex].originalOwnerId ||
+                      profile.ownerId ||
+                      GUEST_OWNER_ID,
+                  };
                   updatedSpeciesIds.push(updatedCreature.speciesId);
                   hasUpdates = true;
                 }
@@ -619,7 +638,7 @@ export const useGameStore = create<GameState>()(
             false,
             'updateCreatures'
           ),
-        overwriteProfileCreatures: (creatures: PlayerCreature[]) =>
+        overwriteProfileCreatures: (creatures: AcquiredCreature[]) =>
           set(
             (state) => {
               const profileId = state.currentProfileId;
@@ -629,10 +648,13 @@ export const useGameStore = create<GameState>()(
               const newProfiles = [...state.profiles];
               const profile = enforcePartySize(newProfiles[profileId]!);
               const newCreatures = creatures.map((c) => ({
-                  ...c,
-                  id: crypto.randomUUID(),
-                  isShiny: c.isShiny ?? false,
-                }));
+                ...recordCreatureOwnership(
+                  c,
+                  profile.ownerId || GUEST_OWNER_ID
+                ),
+                id: crypto.randomUUID(),
+                isShiny: c.isShiny ?? false,
+              }));
               newProfiles[profileId] = {
                 ...profile,
                 creatures: newCreatures.slice(0, MAX_PARTY_SIZE),
@@ -718,7 +740,7 @@ export const useGameStore = create<GameState>()(
           ),
         updateCreatureAttacks: (
           creatureId: string,
-          equippedAttacks: string[],
+          equippedAttacks: AttackId[],
           activeAttackIndex: number
         ) =>
           set(
@@ -880,6 +902,7 @@ export const useGameStore = create<GameState>()(
               );
               return {
                 id: profile.id,
+                ownerId: profile.ownerId || GUEST_OWNER_ID,
                 name: profile.name,
                 lastPlayed: Date.now(),
                 creatures: [],

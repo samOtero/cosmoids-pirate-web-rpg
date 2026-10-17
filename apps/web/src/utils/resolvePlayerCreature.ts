@@ -1,3 +1,4 @@
+import { AttackId, SpeciesId } from '@/types/definitionIds';
 import { Creature, PlayerCreature, CosmoidTemplate } from '@/types/baseGame';
 import { COSMOID_TEMPLATES } from '@/constants/creatures';
 import { rollCreatureGender } from '@/utils/creatureGender';
@@ -21,22 +22,30 @@ export function calculateStat(baseStat: number, level: number): number {
 /**
  * Resolves default moves for a species at a given level.
  */
-export function getDefaultAttacksForLevel(template: CosmoidTemplate, level: number): string[] {
+export function getDefaultAttacksForLevel(
+  template: CosmoidTemplate,
+  level: number
+): AttackId[] {
   // Collect all learnable attacks up to the specified level
   const attacks = template.learnableAttacks
     .filter((a) => a.level <= level)
     .map((a) => a.attackId);
 
   // Return the last 4 unlocked, or tackle as standard fallback
-  if (attacks.length === 0) return ['TACKLE'];
+  if (attacks.length === 0) return [AttackId.TACKLE];
   return attacks.slice(-4);
 }
 
 /**
  * Generates a fully-resolved runtime Creature instance for wild/enemy creatures.
  */
-export function createWildCreature(speciesId: string, level: number, isShiny: boolean = false): Creature {
-  const template = COSMOID_TEMPLATES[speciesId] || COSMOID_TEMPLATES['starter_crab'];
+export function createWildCreature(
+  speciesId: SpeciesId,
+  level: number,
+  isShiny: boolean = false
+): Creature {
+  const template = COSMOID_TEMPLATES[speciesId];
+  if (!template) throw new Error(`Unknown creature definition: ${speciesId}`);
   const maxHp = calculateMaxHp(template.baseStats.hp, level);
 
   return {
@@ -72,11 +81,14 @@ export function createWildCreature(speciesId: string, level: number, isShiny: bo
  * stats with the instance's runtime fields (level, xp, moves from equippedAttacks).
  */
 export function resolvePlayerCreature(pc: PlayerCreature): Creature {
-  const template = COSMOID_TEMPLATES[pc.speciesId] || COSMOID_TEMPLATES['starter_crab'];
+  const template = COSMOID_TEMPLATES[pc.speciesId];
+  if (!template)
+    throw new Error(`Unknown creature definition: ${pc.speciesId}`);
   const maxHp = calculateMaxHp(template.baseStats.hp, pc.level);
 
   return {
     id: pc.id,
+    originalOwnerId: pc.originalOwnerId,
     speciesId: pc.speciesId,
     gender: pc.gender,
     name: template.name,
@@ -92,7 +104,10 @@ export function resolvePlayerCreature(pc: PlayerCreature): Creature {
     baseExperience: template.baseExperience,
     level: pc.level,
     xp: pc.xp,
-    moves: pc.equippedAttacks.length > 0 ? pc.equippedAttacks : getDefaultAttacksForLevel(template, pc.level),
+    moves:
+      pc.equippedAttacks.length > 0
+        ? pc.equippedAttacks
+        : getDefaultAttacksForLevel(template, pc.level),
     spriteUrl: template.spriteUrl,
     iconImg: template.iconImg,
     battleSpriteUrl: template.battleSpriteUrl,

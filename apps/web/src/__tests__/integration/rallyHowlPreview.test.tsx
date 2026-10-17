@@ -1,4 +1,5 @@
-import React from 'react';
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
@@ -28,31 +29,31 @@ describe('Rally Howl lab preview', () => {
   it('uses real attack swaps without recreating the engine or resetting the buff/cooldown', () => {
     render(<TDAttackPreview onClose={() => undefined} />);
     fireEvent.change(screen.getByLabelText('Tower creature'), {
-      target: { value: 'sonarion' },
+      target: { value: SpeciesId.RAZCALL },
     });
     const engine = preview.engine!;
     fireEvent.change(screen.getByLabelText('Active attack'), {
-      target: { value: 'RALLY_HOWL' },
+      target: { value: AttackId.RALLY_HOWL },
     });
     expect(preview.engine).toBe(engine);
     engine.tick(1, 1);
     const tower = engine.towers[0];
     const buff = tower.attackSpeedBuff;
     const howlRuntime = tower.equippedAttacksRuntime.find(
-      (move) => move.definitionId === 'RALLY_HOWL'
+      (move) => move.definitionId === AttackId.RALLY_HOWL
     )!;
     expect(buff?.multiplier).toBe(1.2);
     expect(howlRuntime.readyAtMs).toBe(20001);
     fireEvent.change(screen.getByLabelText('Active attack'), {
-      target: { value: 'STATIC_YIP' },
+      target: { value: AttackId.STATIC_YIP },
     });
     expect(preview.engine).toBe(engine);
     expect(tower.attackSpeedBuff).toBe(buff);
     expect(
       tower.equippedAttacksRuntime[tower.selectedAttackIndex].definitionId
-    ).toBe('STATIC_YIP');
+    ).toBe(AttackId.STATIC_YIP);
     fireEvent.change(screen.getByLabelText('Active attack'), {
-      target: { value: 'RALLY_HOWL' },
+      target: { value: AttackId.RALLY_HOWL },
     });
     engine.tick(17, 16);
     expect(howlRuntime.readyAtMs).toBe(20001);
@@ -63,7 +64,7 @@ describe('Rally Howl lab preview', () => {
     render(<TDAttackPreview onClose={() => undefined} />);
     fireEvent.click(screen.getByLabelText('Show nearby ally'));
     fireEvent.change(screen.getByLabelText('Active attack'), {
-      target: { value: 'RALLY_HOWL' },
+      target: { value: AttackId.RALLY_HOWL },
     });
     const engine = preview.engine!;
     expect(engine.towers).toHaveLength(2);

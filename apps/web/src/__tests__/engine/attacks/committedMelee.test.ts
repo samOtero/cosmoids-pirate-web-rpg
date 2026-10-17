@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
@@ -17,7 +19,7 @@ afterEach(() => {
 function createEnemy(id: string, x: number): Enemy {
   return {
     id,
-    definitionId: 'mouse_1',
+    definitionId: SpeciesId.KNOTIA,
     level: 10,
     position: { x, y: 50 },
     hp: 300,
@@ -48,15 +50,12 @@ function battle() {
       waves: [{ id: 'empty', groups: [] }],
     },
     [
-      {
+      makePlayerCreature({
         id: 'yokodillo-one',
-        speciesId: 'yokodillo',
+        speciesId: SpeciesId.YOKODILLO,
         level: 10,
-        xp: 0,
-        equippedAttacks: ['PALM_SLAM', 'SHIKO_QUAKE'],
-        gender: 'female' as const,
-        isShiny: false,
-      },
+        equippedAttacks: [AttackId.PALM_SLAM, AttackId.SHIKO_QUAKE],
+      }),
     ]
   );
   engines.push(engine);
@@ -71,7 +70,11 @@ describe('Committed melee impact', () => {
     const second = createEnemy('second', 55);
     engine.enemies = [first, second];
 
-    PalmSlamBehavior.execute(engine, source, ATTACK_FIXTURES.PALM_SLAM);
+    PalmSlamBehavior.execute(
+      engine,
+      source,
+      ATTACK_FIXTURES[AttackId.PALM_SLAM]
+    );
     expect(source.palmSlam).toMatchObject({
       impactAtMs: 600,
       endsAtMs: 900,
@@ -109,7 +112,11 @@ describe('Committed melee impact', () => {
     const first = createEnemy('first', 55);
     const second = createEnemy('second', 48);
     engine.enemies = [first, second];
-    PalmSlamBehavior.execute(engine, source, ATTACK_FIXTURES.PALM_SLAM);
+    PalmSlamBehavior.execute(
+      engine,
+      source,
+      ATTACK_FIXTURES[AttackId.PALM_SLAM]
+    );
     expect(source.palmSlam?.targetId).toBe('first');
 
     first.hp = 0;
@@ -151,7 +158,11 @@ describe('Committed melee impact', () => {
     structure.immuneToStatusEffects = true;
     engine.enemies = [structure];
 
-    PalmSlamBehavior.execute(engine, source, ATTACK_FIXTURES.PALM_SLAM);
+    PalmSlamBehavior.execute(
+      engine,
+      source,
+      ATTACK_FIXTURES[AttackId.PALM_SLAM]
+    );
     engine.tick(600, 600);
 
     expect(structure.hp).toBeLessThan(structure.maxHp);
@@ -162,7 +173,11 @@ describe('Committed melee impact', () => {
     const { engine, source } = battle();
     const target = createEnemy('target', 45);
     engine.enemies = [target];
-    PalmSlamBehavior.execute(engine, source, ATTACK_FIXTURES.PALM_SLAM);
+    PalmSlamBehavior.execute(
+      engine,
+      source,
+      ATTACK_FIXTURES[AttackId.PALM_SLAM]
+    );
 
     engine.placeTower(source.creature.id, 42, 50);
     expect(source.palmSlam).toBeUndefined();

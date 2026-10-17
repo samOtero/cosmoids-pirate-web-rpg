@@ -1,3 +1,4 @@
+import type { AttackId, SpeciesId } from '@/types/definitionIds';
 export interface TDStatSnapshot {
   hp: number;
   attack: number;
@@ -11,7 +12,7 @@ export type TDEvent =
       type: 'ATTACK_DAMAGE_DEALT';
       towerId: string;
       targetEnemyId: string;
-      attackDefId: string;
+      attackDefId: AttackId;
       damage: number;
     }
   | {
@@ -34,7 +35,7 @@ export type TDEvent =
   | {
       type: 'ENEMY_DIED';
       enemyId: string;
-      enemyDefinitionId: string;
+      enemyDefinitionId: SpeciesId | string;
       enemyLevel: number;
       participantTowerIds: string[];
     }
@@ -47,7 +48,7 @@ export type TDEvent =
   | {
       type: 'ENEMY_CAPTURED';
       enemyId: string;
-      enemyDefinitionId: string;
+      enemyDefinitionId: SpeciesId | string;
       enemyLevel: number;
       participantTowerIds: string[];
     }
@@ -60,7 +61,7 @@ export type TDEvent =
   | {
       type: 'TOWER_LEVELED_UP';
       towerId: string;
-      speciesId: string;
+      speciesId: SpeciesId;
       prevLevel: number;
       newLevel: number;
       prevStats: TDStatSnapshot;
@@ -69,31 +70,31 @@ export type TDEvent =
   | {
       type: 'TOWER_EVOLVED';
       towerId: string;
-      oldDefinitionId: string;
-      newDefinitionId: string;
+      oldDefinitionId: SpeciesId;
+      newDefinitionId: SpeciesId;
     }
   | {
       type: 'TOWER_ASK_EVOLUTION';
       towerId: string;
-      oldDefinitionId: string;
-      newDefinitionId: string;
+      oldDefinitionId: SpeciesId;
+      newDefinitionId: SpeciesId;
     }
-  | { type: 'TOWER_LEARNED_ATTACK'; towerId: string; attackDefId: string }
+  | { type: 'TOWER_LEARNED_ATTACK'; towerId: string; attackDefId: AttackId }
   | {
       type: 'TOWER_ASK_REPLACE_ATTACK';
       towerId: string;
-      newAttackDefId: string;
+      newAttackDefId: AttackId;
     }
   | {
       type: 'SHINY_ENEMY_SPAWNED';
       enemyId: string;
-      enemyDefinitionId: string;
+      enemyDefinitionId: SpeciesId;
       level: number;
     }
   | {
       type: 'CURSED_PHASE_TRIGGERED';
       enemyId: string;
-      enemyDefinitionId: string;
+      enemyDefinitionId: SpeciesId | string;
     };
 
 type TDEventHandler = (event: TDEvent) => void;

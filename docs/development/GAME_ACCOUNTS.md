@@ -150,12 +150,39 @@ the documented rule and deploy it to production.
   automatically. There is no separate Continue step.
 - The profile selection screen shows the account display name and Log out.
   Logout returns to the start screen; guests retain their Back button.
-- Login and logout do not modify `cosmoids-game-state`. Profiles are not yet
-  associated with account ownership; local saves remain specific to each origin.
+- Login and logout do not claim or relabel existing profiles. Local saves remain
+  specific to each origin under `cosmoids-game-state`.
 
 The browser manages the Secure/HttpOnly production cookie. The client sends
 `credentials: 'include'`; session tokens and passwords are not persisted in the
 game's localStorage or logged by the account UI.
+
+## Save and creature ownership
+
+New profiles record `ownerId` using the signed-in account's stable user ID, or
+`"guest"` for guest play. All three slots created for the same account share that
+identity; slot numbers and display names do not establish ownership. Profile
+creation waits while the initial account lookup is pending.
+
+Every saved `PlayerCreature` records `originalOwnerId`. New starters, captures,
+story grants, and development roster replacements receive the destination
+profile's owner ID when their origin is absent or `"guest"`. An established
+account origin is preserved. Party/storage moves, attack updates, evolution,
+battle writeback, and save reload retain the original owner. Captures receive
+the profile owner inside the battle engine as well as in the saved collection.
+Species definitions and unowned wild creatures do not carry player ownership.
+
+Profile version 11 introduces this required metadata. Older profiles reset
+through the existing version checks on selection and hydration; no save
+migration is performed.
+
+Ownership is currently local metadata, not server-enforced access control.
+Logging in does not claim existing guest profiles. When database saves are
+implemented, an explicit claim should save the selected guest profile under the
+authenticated account and replace `"guest"` origins throughout both party and
+storage, while preserving existing account origins. The server must derive the
+account ID from its session. Save claims, account-specific local storage keys,
+database synchronization, and online ownership validation are still future work.
 
 ## Refresh and failures
 
@@ -203,10 +230,12 @@ localhost, unrelated previews and the production URL stayed in place.
 Before inviting players publicly, configure email verification and password
 recovery, test database backups/restores, and decide how staging will be isolated
 from production accounts. Email/password accounts are currently unverified and
-there is no password recovery UI. Cloud saves, save imports, creature ownership,
-shiny validation, and trading remain separate future work.
+there is no password recovery UI. Cloud saves, save imports, server-validated
+creature ownership, shiny validation, and trading remain separate future work.
 
 References: [Better Auth client](https://better-auth.com/docs/concepts/client),
 [email/password](https://better-auth.com/docs/authentication/email-password),
 [session management](https://better-auth.com/docs/concepts/session-management),
 and the [API operations reference](../../apps/api/OPERATIONS.md).
+
+Creature and attack references now use permanent numeric definition IDs. Profile version 12 resets older string-ID saves without migration. Account owner IDs and individual creature IDs remain strings. See [definition ID conventions](DEFINITION_IDS.md).

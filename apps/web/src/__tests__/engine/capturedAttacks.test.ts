@@ -1,11 +1,15 @@
+import { AttackId, SpeciesId } from '@/types/definitionIds';
 import { describe, expect, it } from 'vitest';
 import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 
 describe('captured creature attacks', () => {
   it.each([
-    { level: 3, attacks: ['NIBBLE'] },
-    { level: 4, attacks: ['NIBBLE', 'QUICK_ATTACK'] },
-    { level: 14, attacks: ['NIBBLE', 'QUICK_ATTACK', 'LOOSE_END'] },
+    { level: 3, attacks: [AttackId.NIBBLE] },
+    { level: 4, attacks: [AttackId.NIBBLE, AttackId.QUICK_ATTACK] },
+    {
+      level: 14,
+      attacks: [AttackId.NIBBLE, AttackId.QUICK_ATTACK, AttackId.LOOSE_END],
+    },
   ])('equips attacks unlocked at level $level', ({ level, attacks }) => {
     const engine = new TowerDefenseEngine({
       paths: [
@@ -16,7 +20,7 @@ describe('captured creature attacks', () => {
       ],
       placementSpots: [],
       waveEnemyDefinitions: [
-        { id: 'mouse_to_catch', creatureId: 'mouse_1', level },
+        { id: 'mouse_to_catch', creatureId: SpeciesId.KNOTIA, level },
       ],
       waves: [
         {
@@ -38,7 +42,7 @@ describe('captured creature attacks', () => {
     const captured = engine.captureEnemy(engine.enemies[0].id);
 
     expect(captured).toMatchObject({
-      speciesId: 'mouse_1',
+      speciesId: SpeciesId.KNOTIA,
       level,
       equippedAttacks: attacks,
     });

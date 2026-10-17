@@ -1,5 +1,7 @@
 'use client';
 
+import { AttackId, SpeciesId } from '@/types/definitionIds';
+
 import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import { useGameStore } from '@/store/gameStore';
@@ -11,40 +13,37 @@ import PixiBattlefield, { PixiBattlefieldRef } from './PixiBattlefield';
 import DialogContent from '@/app/components/ui/DialogContent';
 import { ActiveAttackMenu } from './ActiveAttackMenu';
 import { TowerButton } from './TowerButton';
-import {
-  ExecuteTDActionEventPayload,
-  StoryProgression,
-} from '@/types/baseGame';
+import { ExecuteTDActionEventPayload } from '@/types/baseGame';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { TDLevelData } from '@/engine/tower-defense/types';
-import { TDStatSnapshot } from '@/engine/tower-defense/events/TDEventBus';
+
 import { createBattleAnalytics } from '@/utils/battleAnalytics';
 
 type QueuedModal =
   | {
       type: 'LEARNED_ATTACK';
       towerId: string;
-      attackDefId: string;
+      attackDefId: AttackId;
     }
   | {
       type: 'ASK_REPLACE_ATTACK';
       towerId: string;
-      newAttackDefId: string;
+      newAttackDefId: AttackId;
     }
   | {
       type: 'CAPTURED_CREATURE';
-      speciesId: string;
+      speciesId: SpeciesId;
       wasSentToStorage: boolean;
     }
   | {
       type: 'SHINY_APPEARED';
-      speciesId: string;
+      speciesId: SpeciesId;
     }
   | {
       type: 'ASK_EVOLUTION';
       towerId: string;
-      oldDefinitionId: string;
-      newDefinitionId: string;
+      oldDefinitionId: SpeciesId;
+      newDefinitionId: SpeciesId;
     };
 
 type HealingTutorialState = {
@@ -70,12 +69,14 @@ const sortModalQueue = (queue: QueuedModal[]): QueuedModal[] => {
       'towerId' in a ? a.towerId : 'speciesId' in a ? a.speciesId : '';
     const idB =
       'towerId' in b ? b.towerId : 'speciesId' in b ? b.speciesId : '';
-    return idA.localeCompare(idB);
+    return typeof idA === 'number' && typeof idB === 'number'
+      ? idA - idB
+      : String(idA).localeCompare(String(idB));
   });
 };
 
 /** Resolve display info (name, spriteUrl) for a creature from its species definition. */
-function resolveSpeciesVisuals(speciesId: string): {
+function resolveSpeciesVisuals(speciesId: SpeciesId): {
   name: string;
   spriteUrl: string;
 } {
@@ -118,7 +119,11 @@ export default function TowerDefenseScreen({
 
   const engineRef = useRef<TowerDefenseEngine>(null!);
   if (!engineRef.current) {
-    engineRef.current = new TowerDefenseEngine(levelData, playerCreatures);
+    engineRef.current = new TowerDefenseEngine(
+      levelData,
+      playerCreatures,
+      profile?.ownerId
+    );
   }
 
   const analyticsRef = useRef<ReturnType<typeof createBattleAnalytics> | null>(
@@ -546,6 +551,7 @@ export default function TowerDefenseScreen({
     if (!enemy) return;
 
     const speciesId = enemy.definitionId;
+    if (typeof speciesId !== 'number') return;
     const wasSentToStorage = profile ? profile.creatures.length >= 6 : false;
 
     const capturedCreature = engineRef.current.captureEnemy(enemyId);
@@ -1402,7 +1408,7 @@ export default function TowerDefenseScreen({
                   <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
                     {/* Current Attacks */}
                     {tower.creature.equippedAttacks.map(
-                      (atk: string, idx: number) => {
+                      (atk: AttackId, idx: number) => {
                         const def = ATTACK_DEFS[atk];
                         return (
                           <button

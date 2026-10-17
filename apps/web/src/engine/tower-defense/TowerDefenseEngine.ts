@@ -1,3 +1,5 @@
+import { getDefinitionVisuals } from '@/utils/definitionVisuals';
+import { SpeciesId, AttackId } from '@/types/definitionIds';
 import {
   BUG_STAGE_1,
   BUG_STAGE_2,
@@ -5,6 +7,7 @@ import {
   COSMOID_TEMPLATES,
 } from '@/constants/creatures';
 import { ElementType, PlayerCreature } from '@/types/baseGame';
+import { GUEST_OWNER_ID } from '@/utils/creatureOwnership';
 import {
   generateCreatureGender,
   resolveEncounterGender,
@@ -82,7 +85,7 @@ import {
   getAttackSpeedMultiplier,
   getParalyzedStepMs,
 } from './attackSpeedModifiers';
-import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
+
 import { TDWave, TDWaveGroup, Point } from './types';
 import { getWaveGroupEncounters, rollWaveEncounter } from './waveEncounters';
 import { expandWaveRepetitions } from './waveSchedule';
@@ -275,24 +278,24 @@ function getWaypointIndexAfterPathProgress(
   return path.length;
 }
 
-const defaultLevels: Record<string, number> = {
-  senticle: 15,
-  mouse_1: 3,
-  harlequill: 5,
-  mopup: 5,
-  bug_stage_1: 3,
-  bug_stage_2: 8,
-  bug_stage_3: 8,
-  starter_crab: 5,
-  starter_iguana: 5,
-  starter_monkey: 5,
+const defaultLevels: Record<SpeciesId, number> = {
+  [SpeciesId.SENTICLE]: 15,
+  [SpeciesId.KNOTIA]: 3,
+  [SpeciesId.HARLEQUILL]: 5,
+  [SpeciesId.MOPUP]: 5,
+  [SpeciesId.SAILKWORM]: 3,
+  [SpeciesId.COCOONOT]: 8,
+  [SpeciesId.MAINSCALE]: 8,
+  [SpeciesId.PALMIT]: 5,
+  [SpeciesId.FUEGUANA]: 5,
+  [SpeciesId.MONKEG]: 5,
 };
 
-export const TD_CREATURE_DEFS: Record<string, TDCreatureMetadata> = {};
+export const TD_CREATURE_DEFS: Record<SpeciesId, TDCreatureMetadata> = {};
 
 // Populate TD_CREATURE_DEFS dynamically from COSMOID_TEMPLATES for compatibility
-Object.keys(COSMOID_TEMPLATES).forEach((id) => {
-  const template = COSMOID_TEMPLATES[id];
+Object.values(COSMOID_TEMPLATES).forEach((template) => {
+  const id = template.id;
   const defaultLevel = defaultLevels[id] ?? 1;
   TD_CREATURE_DEFS[id] = {
     baseCreature: createWildCreature(id, defaultLevel),
@@ -316,7 +319,7 @@ interface ActiveSpawnerState {
 
 export interface PreviewEnemyConfig {
   id?: string;
-  creatureId: string;
+  creatureId: SpeciesId;
   level: number;
   position: Point;
   abilityId?: string;
@@ -354,23 +357,28 @@ export class TowerDefenseEngine {
   public money: number = 100;
   public lives: number = 3;
 
-  public static getDefaultAttacks(speciesId: string): string[] {
-    const defaultAttacks: string[] = [];
-    if (speciesId === 'starter_crab') defaultAttacks.push('PINCH');
-    else if (speciesId === 'starter_iguana') defaultAttacks.push('SCRATCH');
-    else if (speciesId === 'starter_monkey') defaultAttacks.push('TACKLE');
-    else if (speciesId === 'mouse_1') defaultAttacks.push('NIBBLE');
-    else if (speciesId === 'harlequill') defaultAttacks.push('PECK');
-    else if (speciesId === 'bettle') defaultAttacks.push('PINCH');
-    else if (speciesId === 'bug_stage_1')
-      defaultAttacks.push('TACKLE', 'STRING_SHOT');
-    else defaultAttacks.push('TACKLE'); // Fallback
+  public static getDefaultAttacks(speciesId: SpeciesId): AttackId[] {
+    const defaultAttacks: AttackId[] = [];
+    if (speciesId === SpeciesId.PALMIT) defaultAttacks.push(AttackId.PINCH);
+    else if (speciesId === SpeciesId.FUEGUANA)
+      defaultAttacks.push(AttackId.SCRATCH);
+    else if (speciesId === SpeciesId.MONKEG)
+      defaultAttacks.push(AttackId.TACKLE);
+    else if (speciesId === SpeciesId.KNOTIA)
+      defaultAttacks.push(AttackId.NIBBLE);
+    else if (speciesId === SpeciesId.HARLEQUILL)
+      defaultAttacks.push(AttackId.PECK);
+    else if (speciesId === SpeciesId.BEETADEL)
+      defaultAttacks.push(AttackId.PINCH);
+    else if (speciesId === SpeciesId.SAILKWORM)
+      defaultAttacks.push(AttackId.TACKLE, AttackId.STRING_SHOT);
+    else defaultAttacks.push(AttackId.TACKLE); // Fallback
     return defaultAttacks;
   }
 
   public static getEquippedAttacks(
     creature: Pick<PlayerCreature, 'speciesId' | 'equippedAttacks'>
-  ): string[] {
+  ): AttackId[] {
     return creature.equippedAttacks.length > 0
       ? creature.equippedAttacks
       : TowerDefenseEngine.getDefaultAttacks(creature.speciesId);
@@ -433,7 +441,8 @@ export class TowerDefenseEngine {
   constructor(
     levelData: Pick<TDLevelData, 'paths' | 'placementSpots'> &
       Partial<TDLevelData>,
-    initialRoster: PlayerCreature[] = []
+    initialRoster: PlayerCreature[] = [],
+    private readonly ownerId: string = GUEST_OWNER_ID
   ) {
     this.roster = JSON.parse(JSON.stringify(initialRoster));
 
@@ -509,7 +518,7 @@ export class TowerDefenseEngine {
       (ally: TDObjectiveAllyDefinition) => ({
         id: `objective_ally_${ally.id}`,
         definitionId: ally.creatureId,
-        tdConfigId: ally.creatureId,
+        tdConfigId: COSMOID_TEMPLATES[ally.creatureId].visualConfigId,
         displayName: ally.displayName,
         gateDefinitionId: ally.gateDefinitionId,
         targetStructureDefinitionId: ally.targetStructureDefinitionId,
@@ -666,7 +675,11 @@ export class TowerDefenseEngine {
         };
         newEnemies.push(newEnemy);
 
-        if (isShiny && !this.disableCapture) {
+        if (
+          isShiny &&
+          !this.disableCapture &&
+          typeof newEnemy.definitionId === 'number'
+        ) {
           this.events.emit({
             type: 'SHINY_ENEMY_SPAWNED',
             enemyId: newEnemy.id,
@@ -1293,7 +1306,11 @@ export class TowerDefenseEngine {
     updatePalmSlams(this, newTowers, newEnemies);
     updateWakeWhips(this, newTowers);
     newTowers.forEach((tower) => {
-      updateFireClawHeat(tower, ATTACK_DEFS.FIRE_CLAW, this.elapsedTimeMs);
+      updateFireClawHeat(
+        tower,
+        ATTACK_DEFS[AttackId.FIRE_CLAW],
+        this.elapsedTimeMs
+      );
       if (tower.damageFlashTimerMs) {
         tower.damageFlashTimerMs -= deltaMs;
         if (tower.damageFlashTimerMs < 0) tower.damageFlashTimerMs = 0;
@@ -1423,7 +1440,7 @@ export class TowerDefenseEngine {
         ? ATTACK_DEFS[p.attackDefinitionId]
         : undefined;
       const dashVisual = dashDef?.visualEffectConfigId
-        ? CREATURE_TD_CONFIGS[dashDef.visualEffectConfigId]?.default
+        ? getDefinitionVisuals(dashDef.visualEffectConfigId)?.default
             ?.vfxAnimation
         : undefined;
       if (
@@ -1590,8 +1607,9 @@ export class TowerDefenseEngine {
                 !attackDef.adaptiveTargetedAoe &&
                 attackDef.visualEffectConfigId
               ) {
-                const configMap =
-                  CREATURE_TD_CONFIGS[attackDef.visualEffectConfigId];
+                const configMap = getDefinitionVisuals(
+                  attackDef.visualEffectConfigId
+                );
                 const vfxConfig = configMap?.default?.vfxAnimation;
                 const durationMs = vfxConfig?.durationMs ?? 500;
                 this.visualEffects.push({
@@ -2679,7 +2697,12 @@ export class TowerDefenseEngine {
     };
     newEnemies.push(newEnemy);
 
-    if (isShiny && !newEnemy.uncapturable && !this.disableCapture) {
+    if (
+      isShiny &&
+      !newEnemy.uncapturable &&
+      !this.disableCapture &&
+      typeof newEnemy.definitionId === 'number'
+    ) {
       this.events.emit({
         type: 'SHINY_ENEMY_SPAWNED',
         enemyId: newEnemy.id,
@@ -3241,7 +3264,12 @@ export class TowerDefenseEngine {
     if (enemyIndex === -1 || this.enemies[enemyIndex].uncapturable) return null;
 
     const enemy = this.enemies[enemyIndex];
-    if (enemy.kind === 'structure' || enemy.gender === undefined) return null;
+    if (
+      enemy.kind === 'structure' ||
+      enemy.gender === undefined ||
+      typeof enemy.definitionId !== 'number'
+    )
+      return null;
 
     // Remove the enemy from the battlefield
     this.enemies.splice(enemyIndex, 1);
@@ -3254,13 +3282,14 @@ export class TowerDefenseEngine {
 
     const captured: PlayerCreature = {
       id: crypto.randomUUID(),
+      originalOwnerId: this.ownerId,
       speciesId: enemy.definitionId,
       gender: enemy.gender,
       level: capturedLevel,
       xp: 0,
       equippedAttacks: template
         ? getDefaultAttacksForLevel(template, capturedLevel)
-        : ['TACKLE'],
+        : [AttackId.TACKLE],
       isShiny: enemy.isShiny ?? false,
     };
 
@@ -4164,7 +4193,7 @@ export class TowerDefenseEngine {
 
     this.events.emit({
       type: 'STRUCTURE_DESTROYED',
-      structureId: target.definitionId,
+      structureId: target.waveEnemyDefinitionId ?? String(target.definitionId),
       participantTowerIds,
       winsLevel,
     });
@@ -4851,7 +4880,7 @@ export class TowerDefenseEngine {
   public replaceTowerAttack(
     towerId: string,
     replaceIndex: number,
-    newAttackDefId: string
+    newAttackDefId: AttackId
   ) {
     const tower = this.towers.find((t) => t.id === towerId);
     if (!tower) return;
@@ -4873,7 +4902,7 @@ export class TowerDefenseEngine {
     }
   }
 
-  public evolveTower(towerId: string, evolutionDefId: string): boolean {
+  public evolveTower(towerId: string, evolutionDefId: SpeciesId): boolean {
     return this.progression.evolveTower(towerId, evolutionDefId);
   }
 

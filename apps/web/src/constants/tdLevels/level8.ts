@@ -1,3 +1,4 @@
+import { SpeciesId } from '@/types/definitionIds';
 import { TDLevelData } from '@/engine/tower-defense/types';
 
 /**
@@ -35,14 +36,14 @@ export const LEVEL_8: TDLevelData = {
   waveEnemyDefinitions: [
     {
       id: 'practice_runner',
-      creatureId: 'mouse_1',
+      creatureId: SpeciesId.KNOTIA,
       level: 8,
       speedMultiplier: 0.8,
       hpMultiplier: 2,
     },
     {
       id: 'practice_defender',
-      creatureId: 'harlequill',
+      creatureId: SpeciesId.HARLEQUILL,
       level: 10,
       stationaryPosition: { x: 70, y: 48 },
       immuneToDisplacement: true,
@@ -98,7 +99,7 @@ export const LEVEL_8: TDLevelData = {
       recoveryDurationMs: 8000,
     },
     alliedRunner: {
-      creatureId: 'mouse_1',
+      creatureId: SpeciesId.KNOTIA,
       level: 8,
       pathIndex: 1,
       speed: 10,

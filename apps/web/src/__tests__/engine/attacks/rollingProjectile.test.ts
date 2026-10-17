@@ -1,3 +1,5 @@
+import { AttackId, SpeciesId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
@@ -11,7 +13,7 @@ import { configureBowlingPreview } from '@/components/dev/barrelBowlingPreview';
 
 installAttackFixtures();
 
-const move = ATTACK_FIXTURES.BARREL_BOWLING;
+const move = ATTACK_FIXTURES[AttackId.BARREL_BOWLING];
 const engines: TowerDefenseEngine[] = [];
 afterEach(() => {
   engines.splice(0).forEach((engine) => engine.destroy());
@@ -27,15 +29,12 @@ function battle(
   const engine = new TowerDefenseEngine(
     { paths: [path], placementSpots: [], waves: [] },
     [
-      {
+      makePlayerCreature({
         id: 'macask',
-        speciesId: 'macask',
+        speciesId: SpeciesId.MACASK,
         level: 16,
-        xp: 0,
-        gender: 'female' as const,
-        isShiny: false,
-        equippedAttacks: ['BARREL_BOWLING', 'BARREL_BASH'],
-      },
+        equippedAttacks: [AttackId.BARREL_BOWLING, AttackId.BARREL_BASH],
+      }),
     ]
   );
   engines.push(engine);
@@ -57,7 +56,7 @@ function enemy(
 ) {
   const unit = engine.spawnPreviewEnemy({
     id,
-    creatureId: 'mouse_1',
+    creatureId: SpeciesId.KNOTIA,
     level: 16,
     position: { x, y },
   })!;

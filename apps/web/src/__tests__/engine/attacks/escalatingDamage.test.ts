@@ -1,3 +1,5 @@
+import { AttackId, SpeciesId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ProjectileBehavior } from '@/engine/tower-defense/attacks/behaviors';
@@ -9,7 +11,7 @@ import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 installAttackFixtures();
 
 const engines: TowerDefenseEngine[] = [];
-const move = ATTACK_FIXTURES.FIRE_CLAW;
+const move = ATTACK_FIXTURES[AttackId.FIRE_CLAW];
 
 afterEach(() => {
   engines.splice(0).forEach((engine) => engine.destroy());
@@ -18,15 +20,12 @@ afterEach(() => {
 
 function battle() {
   vi.spyOn(Math, 'random').mockReturnValue(0.99);
-  const creature = {
+  const creature = makePlayerCreature({
     id: 'fueguana',
-    speciesId: 'starter_iguana',
+    speciesId: SpeciesId.FUEGUANA,
     level: 16,
-    xp: 0,
-    equippedAttacks: ['FIRE_CLAW'],
-    gender: 'female' as const,
-    isShiny: false,
-  };
+    equippedAttacks: [AttackId.FIRE_CLAW],
+  });
   const engine = new TowerDefenseEngine(
     {
       paths: [
@@ -48,7 +47,7 @@ function battle() {
   tower.equippedAttacksRuntime[0].lastFiredTime = 1e12;
   const target = engine.spawnPreviewEnemy({
     id: 'target',
-    creatureId: 'mouse_1',
+    creatureId: SpeciesId.KNOTIA,
     level: 16,
     position: { x: 45, y: 50 },
   })!;
@@ -64,7 +63,7 @@ describe('Escalating damage and decay', () => {
     const { engine, tower, target } = battle();
     const secondTarget = engine.spawnPreviewEnemy({
       id: 'second_target',
-      creatureId: 'mouse_1',
+      creatureId: SpeciesId.KNOTIA,
       level: 16,
       position: { x: 46, y: 50 },
     })!;

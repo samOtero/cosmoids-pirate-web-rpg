@@ -1,3 +1,4 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -28,24 +29,24 @@ describe('test profile templates', () => {
         template.starterSpeciesId,
       ])
     ).toEqual([
-      [1, 'starter_crab'],
-      [1, 'starter_iguana'],
-      [1, 'starter_monkey'],
-      [2, 'starter_crab'],
-      [2, 'starter_iguana'],
-      [2, 'starter_monkey'],
-      [3, 'starter_crab'],
-      [3, 'starter_iguana'],
-      [3, 'starter_monkey'],
-      [4, 'starter_crab'],
-      [4, 'starter_iguana'],
-      [4, 'starter_monkey'],
+      [1, SpeciesId.PALMIT],
+      [1, SpeciesId.FUEGUANA],
+      [1, SpeciesId.MONKEG],
+      [2, SpeciesId.PALMIT],
+      [2, SpeciesId.FUEGUANA],
+      [2, SpeciesId.MONKEG],
+      [3, SpeciesId.PALMIT],
+      [3, SpeciesId.FUEGUANA],
+      [3, SpeciesId.MONKEG],
+      [4, SpeciesId.PALMIT],
+      [4, SpeciesId.FUEGUANA],
+      [4, SpeciesId.MONKEG],
     ]);
   });
 
   it('builds a Level 3 party with the starter and prior-level catches', () => {
     const profile = createTestProfileFromTemplate(
-      'level-3-starter_monkey',
+      `level-3-${SpeciesId.MONKEG}`,
       12345
     );
 
@@ -58,46 +59,55 @@ describe('test profile templates', () => {
     });
     expect(profile.creatures).toEqual([
       expect.objectContaining({
-        speciesId: 'starter_monkey',
+        speciesId: SpeciesId.MONKEG,
         level: 10,
-        equippedAttacks: ['TACKLE', 'BARREL_BASH'],
+        equippedAttacks: [AttackId.TACKLE, AttackId.BARREL_BASH],
       }),
       expect.objectContaining({
-        speciesId: 'mouse_1',
+        speciesId: SpeciesId.KNOTIA,
         level: 3,
-        equippedAttacks: ['NIBBLE'],
+        equippedAttacks: [AttackId.NIBBLE],
       }),
       expect.objectContaining({
-        speciesId: 'harlequill',
+        speciesId: SpeciesId.HARLEQUILL,
         level: 5,
-        equippedAttacks: ['PECK', 'FUNNY_DANCE'],
+        equippedAttacks: [AttackId.PECK, AttackId.FUNNY_DANCE],
       }),
     ]);
   });
 
   it('adds only catches from levels before the selected level', () => {
-    const level1Profile = createTestProfileFromTemplate('level-1-starter_crab');
-    const level2Profile = createTestProfileFromTemplate('level-2-starter_crab');
+    const level1Profile = createTestProfileFromTemplate(
+      `level-1-${SpeciesId.PALMIT}`
+    );
+    const level2Profile = createTestProfileFromTemplate(
+      `level-2-${SpeciesId.PALMIT}`
+    );
 
     expect(
       level1Profile.creatures.map((creature) => creature.speciesId)
-    ).toEqual(['starter_crab']);
+    ).toEqual([SpeciesId.PALMIT]);
     expect(
       level2Profile.creatures.map((creature) => creature.speciesId)
-    ).toEqual(['starter_crab', 'mouse_1']);
+    ).toEqual([SpeciesId.PALMIT, SpeciesId.KNOTIA]);
   });
 
   it('builds a Level 4 party after the Level 3 milestone', () => {
-    const profile = createTestProfileFromTemplate('level-4-starter_iguana');
+    const profile = createTestProfileFromTemplate(
+      `level-4-${SpeciesId.FUEGUANA}`
+    );
 
     expect(profile).toMatchObject({
       name: 'Test L4 · Fueguana',
       storyProgression: StoryProgression.DEFEAT_BUG_STAGE_2,
       journalUnlockShown: true,
     });
-    expect(
-      profile.creatures.map((creature) => creature.speciesId)
-    ).toEqual(['starter_iguana', 'mouse_1', 'harlequill', 'bug_stage_1']);
+    expect(profile.creatures.map((creature) => creature.speciesId)).toEqual([
+      SpeciesId.FUEGUANA,
+      SpeciesId.KNOTIA,
+      SpeciesId.HARLEQUILL,
+      SpeciesId.SAILKWORM,
+    ]);
   });
 
   it('replaces only profile 3 through the store action', () => {
@@ -105,7 +115,7 @@ describe('test profile templates', () => {
     createProfile(0);
     const firstProfile = useGameStore.getState().profiles[0];
 
-    applyTestProfileTemplate('level-2-starter_iguana');
+    applyTestProfileTemplate(`level-2-${SpeciesId.FUEGUANA}`);
 
     const state = useGameStore.getState();
     expect(state.profiles[0]).toEqual(firstProfile);
@@ -116,14 +126,14 @@ describe('test profile templates', () => {
       gameFlags: [GameFlag.STARTER_FUEGUANA],
       creatures: [
         expect.objectContaining({
-          speciesId: 'starter_iguana',
+          speciesId: SpeciesId.FUEGUANA,
           level: 7,
-          equippedAttacks: ['SCRATCH', 'FIRE_CLAW'],
+          equippedAttacks: [AttackId.SCRATCH, AttackId.FIRE_CLAW],
         }),
         expect.objectContaining({
-          speciesId: 'mouse_1',
+          speciesId: SpeciesId.KNOTIA,
           level: 3,
-          equippedAttacks: ['NIBBLE'],
+          equippedAttacks: [AttackId.NIBBLE],
         }),
       ],
     });
@@ -157,13 +167,15 @@ describe('test profile templates', () => {
     );
     await user.selectOptions(
       screen.getByRole('combobox', { name: /template/i }),
-      'level-3-starter_crab'
+      `level-3-${SpeciesId.PALMIT}`
     );
     await user.click(
       screen.getByRole('button', { name: /replace profile 3/i })
     );
 
-    expect(onApplyTestTemplate).toHaveBeenCalledWith('level-3-starter_crab');
+    expect(onApplyTestTemplate).toHaveBeenCalledWith(
+      `level-3-${SpeciesId.PALMIT}`
+    );
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 

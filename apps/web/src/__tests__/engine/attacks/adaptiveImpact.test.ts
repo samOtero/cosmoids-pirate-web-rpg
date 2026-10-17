@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
@@ -27,15 +29,12 @@ function createBattle() {
       waves: [],
     },
     [
-      {
+      makePlayerCreature({
         id: 'carapenter',
-        speciesId: 'carapenter',
+        speciesId: SpeciesId.CARAPENTER,
         level: 16,
-        xp: 0,
-        equippedAttacks: ['MALLET_SMASH'],
-        gender: 'female' as const,
-        isShiny: false,
-      },
+        equippedAttacks: [AttackId.MALLET_SMASH],
+      }),
     ]
   );
   engine.placeTower('carapenter', 0, 0);
@@ -48,7 +47,7 @@ function createBattle() {
 function addTarget(engine: TowerDefenseEngine, id: string, x: number) {
   const target = engine.spawnPreviewEnemy({
     id,
-    creatureId: 'senticle',
+    creatureId: SpeciesId.SENTICLE,
     level: 16,
     position: { x, y: 0 },
   })!;
@@ -66,7 +65,7 @@ describe('Adaptive area impact', () => {
       AdaptiveTargetedAoeBehavior.execute(
         engine,
         tower,
-        ATTACK_FIXTURES.MALLET_SMASH
+        ATTACK_FIXTURES[AttackId.MALLET_SMASH]
       );
       engine.tick(0, 100);
       expect(engine.projectiles[0].position.x).toBeGreaterThan(0);
@@ -131,7 +130,7 @@ describe('Adaptive area impact', () => {
         AdaptiveTargetedAoeBehavior.execute(
           engine,
           tower,
-          ATTACK_FIXTURES.MALLET_SMASH
+          ATTACK_FIXTURES[AttackId.MALLET_SMASH]
         );
         engine.tick(0, 250);
         const dash = engine.projectiles[0];
@@ -159,7 +158,7 @@ describe('Adaptive area impact', () => {
       AdaptiveTargetedAoeBehavior.execute(
         engine,
         tower,
-        ATTACK_FIXTURES.MALLET_SMASH
+        ATTACK_FIXTURES[AttackId.MALLET_SMASH]
       );
       engine.tick(0, 16);
       expect(engine.projectiles[0].position).toEqual(tower.position);
@@ -175,7 +174,7 @@ describe('Adaptive area impact', () => {
       AdaptiveTargetedAoeBehavior.execute(
         engine,
         tower,
-        ATTACK_FIXTURES.MALLET_SMASH
+        ATTACK_FIXTURES[AttackId.MALLET_SMASH]
       );
       engine.tick(0, 16);
       engine.enemies = [];
@@ -200,7 +199,7 @@ describe('Adaptive area impact', () => {
       AdaptiveTargetedAoeBehavior.execute(
         engine,
         tower,
-        ATTACK_FIXTURES.MALLET_SMASH
+        ATTACK_FIXTURES[AttackId.MALLET_SMASH]
       );
       engine.tick(0, 400);
 
@@ -226,12 +225,12 @@ describe('Adaptive area impact', () => {
       AdaptiveTargetedAoeBehavior.execute(
         singleBattle.engine,
         singleBattle.tower,
-        ATTACK_FIXTURES.MALLET_SMASH
+        ATTACK_FIXTURES[AttackId.MALLET_SMASH]
       );
       AdaptiveTargetedAoeBehavior.execute(
         crowdBattle.engine,
         crowdBattle.tower,
-        ATTACK_FIXTURES.MALLET_SMASH
+        ATTACK_FIXTURES[AttackId.MALLET_SMASH]
       );
       singleBattle.engine.tick(0, 400);
       crowdBattle.engine.tick(0, 400);

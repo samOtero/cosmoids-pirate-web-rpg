@@ -1,3 +1,5 @@
+import { validateDefinitionRegistry } from '@/utils/definitionRegistry';
+import { AttackId } from '@/types/definitionIds';
 import { ElementType } from '@/types/baseGame';
 import { AttackDefinition } from './types';
 
@@ -16,9 +18,9 @@ const ATTACK_RANGES = {
   LONG: 55,
 };
 
-export const ATTACK_DEFS: Record<string, AttackDefinition> = {
-  SUNBATHE: {
-    id: 'SUNBATHE',
+export const ATTACK_DEFS: Record<AttackId, AttackDefinition> = {
+  [AttackId.SUNBATHE]: {
+    id: AttackId.SUNBATHE,
     name: 'Sunbathe',
     description:
       'Fills Warmth to 100% and becomes Sun-Soaked, so the next empowered Water attack does not drain Warmth.',
@@ -29,8 +31,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     rangeIndex: ATTACK_RANGES.NORMAL,
     behaviorType: 'WARMTH_SUPPORT',
   },
-  SHARED_SLUMBER: {
-    id: 'SHARED_SLUMBER',
+  [AttackId.SHARED_SLUMBER]: {
+    id: AttackId.SHARED_SLUMBER,
     name: 'Shared Slumber',
     description:
       'Dormatee sleeps for 6 seconds and puts every eligible enemy in range to sleep for up to 6 seconds. Direct attacks can wake targets after a brief guaranteed rest; awakened targets resist sleep for 8 seconds.',
@@ -42,8 +44,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     behaviorType: 'SHARED_SLUMBER',
     visualEffectConfigId: 'attack_shared_slumber_1',
   },
-  SHIKO_QUAKE: {
-    id: 'SHIKO_QUAKE',
+  [AttackId.SHIKO_QUAKE]: {
+    id: AttackId.SHIKO_QUAKE,
     name: 'Shiko Stomp',
     description:
       'Yokodillo stamps the ground, damaging up to three enemies in range and staggering eligible creatures for 0.35 seconds.',
@@ -56,8 +58,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     effects: [{ type: 'STUN', chance: 1, value: 350 }],
     visualEffectConfigId: 'attack_shiko_quake_1',
   },
-  PALM_SLAM: {
-    id: 'PALM_SLAM',
+  [AttackId.PALM_SLAM]: {
+    id: AttackId.PALM_SLAM,
     name: 'Palm Slam',
     description:
       'Plants its feet, then strikes one nearby enemy with a heavy palm blow that staggers for 0.65 seconds.',
@@ -70,8 +72,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     effects: [{ type: 'STUN', chance: 1, value: 650 }],
     visualEffectConfigId: 'attack_palm_slam_1',
   },
-  RIGGING_NEST: {
-    id: 'RIGGING_NEST',
+  [AttackId.RIGGING_NEST]: {
+    id: AttackId.RIGGING_NEST,
     name: 'Rigging Nest',
     description:
       'Ties a coir nest beside the user for 10 seconds. It releases five tiny threadlings that pursue nearby enemies and bite up to three times each.',
@@ -102,8 +104,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
       },
     },
   },
-  DEEPWATER_GRIP: {
-    id: 'DEEPWATER_GRIP',
+  [AttackId.DEEPWATER_GRIP]: {
+    id: AttackId.DEEPWATER_GRIP,
     name: 'Deepwater Grip',
     description:
       'Holds one enemy for 4 seconds, dealing moderate Water damage once per second. The user cannot attack during the hold. After release, the target resists constriction for 6 seconds. Power is per pulse.',
@@ -119,8 +121,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
       resistanceMs: 6000,
     },
   },
-  BARREL_BOWLING: {
-    id: 'BARREL_BOWLING',
+  [AttackId.BARREL_BOWLING]: {
+    id: AttackId.BARREL_BOWLING,
     name: 'Barrel Bowling',
     type: ElementType.WATER,
     category: 'physical',
@@ -135,8 +137,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
       hitRadius: 4,
     },
   },
-  FUSE_RUSH: {
-    id: 'FUSE_RUSH',
+  [AttackId.FUSE_RUSH]: {
+    id: AttackId.FUSE_RUSH,
     name: 'Hot Streak',
     type: ElementType.FIRE,
     category: 'physical',
@@ -149,8 +151,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     dashTrailType: 'FIRE',
     fuseRushCombo: { hitsToTrigger: 3, damageMultiplier: 2 },
   },
-  SHIPSHAPE: {
-    id: 'SHIPSHAPE',
+  [AttackId.SHIPSHAPE]: {
+    id: AttackId.SHIPSHAPE,
     name: 'Shipshape',
     type: ElementType.GRASS,
     category: 'physical',
@@ -161,8 +163,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     repairSupport: { healFraction: 0.2, defenseMultiplier: 1.25 },
     visualEffectConfigId: 'attack_shipshape_taps',
   },
-  SCRATCH: {
-    id: 'SCRATCH',
+  [AttackId.SCRATCH]: {
+    id: AttackId.SCRATCH,
     name: 'Claw',
     type: ElementType.NORMAL,
     category: 'physical',
@@ -174,8 +176,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     visualEffectConfigId: 'attack_scratch_1',
     isDashAttack: true,
   },
-  FIRE_CLAW: {
-    id: 'FIRE_CLAW',
+  [AttackId.FIRE_CLAW]: {
+    id: AttackId.FIRE_CLAW,
     name: 'Kindle Claw',
     description:
       'Rakes the target with a kindling claw. Successful hits build persistent Heat, increasing Kindle Claw damage by 20% per stack up to three stacks. Heat cools during a lull and is lost when the user moves.',
@@ -196,8 +198,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
       decayIntervalMs: 2000,
     },
   },
-  VINE_WHIP: {
-    id: 'VINE_WHIP',
+  [AttackId.VINE_WHIP]: {
+    id: AttackId.VINE_WHIP,
     name: 'Vine Whip',
     type: ElementType.GRASS,
     category: 'physical',
@@ -207,8 +209,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     behaviorType: 'PROJECTILE',
     projectileSpeed: 1.5,
   },
-  NECTAR_SIPHON: {
-    id: 'NECTAR_SIPHON',
+  [AttackId.NECTAR_SIPHON]: {
+    id: AttackId.NECTAR_SIPHON,
     name: 'Siphon Lash',
     description:
       'Drains half the damage dealt as health. Against a target suffering from any poison, it deals more damage.',
@@ -229,8 +231,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     },
     effects: [{ type: 'DRAIN', chance: 1, value: 0.5 }],
   },
-  MALLET_SMASH: {
-    id: 'MALLET_SMASH',
+  [AttackId.MALLET_SMASH]: {
+    id: AttackId.MALLET_SMASH,
     name: 'Mallet Smash',
     type: ElementType.GRASS,
     category: 'physical',
@@ -250,8 +252,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     dashImpactHoldMs: 520,
     dashStopRange: 16,
   },
-  EMBER: {
-    id: 'EMBER',
+  [AttackId.EMBER]: {
+    id: AttackId.EMBER,
     name: 'Cinder Spit',
     description:
       'Spits a cinder with a chance to burn. Hitting an already-burning enemy scatters sparks to other nearby enemies.',
@@ -280,8 +282,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
       visualEffectConfigId: 'attack_cinder_spit_sparks',
     },
   },
-  WATER_GUN: {
-    id: 'WATER_GUN',
+  [AttackId.WATER_GUN]: {
+    id: AttackId.WATER_GUN,
     name: 'Spurt',
     type: ElementType.WATER,
     category: 'special',
@@ -303,8 +305,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
       highlightColor: 0xbae6fd,
     },
   },
-  WAKE_WHIP: {
-    id: 'WAKE_WHIP',
+  [AttackId.WAKE_WHIP]: {
+    id: AttackId.WAKE_WHIP,
     name: 'Wake Whip',
     description:
       'Waggles its paddle tail while facing the target, launching a narrow wake that pushes the target backward. Warmth strengthens both the hit and the push.',
@@ -326,8 +328,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
       warmPushDistance: 7,
     },
   },
-  SALT_SPIT: {
-    id: 'SALT_SPIT',
+  [AttackId.SALT_SPIT]: {
+    id: AttackId.SALT_SPIT,
     name: 'Salt Spit',
     description:
       'Fires salt crystals that stun briefly and make a carrier drop its objective once. With Warmth, fires at up to three different enemies at full strength.',
@@ -346,8 +348,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     itemPickupLockMs: 2500,
     effects: [{ type: 'STUN', chance: 1, value: 500 }],
   },
-  VENOM_SPRAY: {
-    id: 'VENOM_SPRAY',
+  [AttackId.VENOM_SPRAY]: {
+    id: AttackId.VENOM_SPRAY,
     name: 'Venom Spray',
     description:
       'Deals direct damage with a 50% chance to add a five-second venom stack. Each stack deals 5% of its triggering hit per poison pulse, up to five stacks.',
@@ -382,8 +384,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
       },
     ],
   },
-  BARREL_BASH: {
-    id: 'BARREL_BASH',
+  [AttackId.BARREL_BASH]: {
+    id: AttackId.BARREL_BASH,
     name: 'Barrel Bash',
     description:
       'Smashes one target with its barrel. The impact pushes other nearby enemies backward without damaging them.',
@@ -402,8 +404,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     isDashAttack: true,
     dashTrailType: 'WATER',
   },
-  COIR_SNAP: {
-    id: 'COIR_SNAP',
+  [AttackId.COIR_SNAP]: {
+    id: AttackId.COIR_SNAP,
     name: 'Husk Shot',
     description:
       'Fires a compact shot of coconut husk fiber. Every third successful hit tightens into a coir snare that binds its target for 0.5 seconds.',
@@ -428,8 +430,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
       projectileScales: [0.72, 0.86, 1],
     },
   },
-  COIR_SNARE: {
-    id: 'COIR_SNARE',
+  [AttackId.COIR_SNARE]: {
+    id: AttackId.COIR_SNARE,
     name: 'Coir Snare',
     type: ElementType.GRASS,
     category: 'physical',
@@ -448,8 +450,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     effects: [{ type: 'STUN', chance: 0.25, value: 1000 }],
     visualEffectConfigId: 'attack_coir_snare_1',
   },
-  WIND_GUST: {
-    id: 'WIND_GUST',
+  [AttackId.WIND_GUST]: {
+    id: AttackId.WIND_GUST,
     name: 'Wind Gust',
     type: ElementType.FLYING,
     category: 'special',
@@ -460,8 +462,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     itemPickupLockMs: 2000,
     visualEffectConfigId: 'attack_wind_gust_1',
   },
-  FUNNY_DANCE: {
-    id: 'FUNNY_DANCE',
+  [AttackId.FUNNY_DANCE]: {
+    id: AttackId.FUNNY_DANCE,
     name: 'Funny Dance',
     description:
       'Performs an entertaining dance that startles carrying enemies within range into dropping their objectives.',
@@ -474,8 +476,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     itemPickupLockMs: 2500,
     visualEffectConfigId: 'attack_funny_dance_1',
   },
-  FLYING_COLORS: {
-    id: 'FLYING_COLORS',
+  [AttackId.FLYING_COLORS]: {
+    id: AttackId.FLYING_COLORS,
     name: 'Flying Colors',
     description:
       'Flicks a colorful quill between up to three different enemies. Each follow-up can reach 40 units from the last hit, even without a knockout.',
@@ -493,8 +495,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     flyingColors: { maxTargets: 3, hopRange: 40 },
     visualEffectConfigId: 'attack_flying_colors_1',
   },
-  TOXIC_POLLEN: {
-    id: 'TOXIC_POLLEN',
+  [AttackId.TOXIC_POLLEN]: {
+    id: AttackId.TOXIC_POLLEN,
     name: 'Toxic Pollen',
     description:
       'Blankets every eligible enemy in range with a distinct five-second pollen poison. Its 40-power damage is dealt entirely across five poison pulses.',
@@ -516,8 +518,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     ],
     visualEffectConfigId: 'attack_toxic_pollen_1',
   },
-  SAILCUTTER: {
-    id: 'SAILCUTTER',
+  [AttackId.SAILCUTTER]: {
+    id: AttackId.SAILCUTTER,
     name: 'Sailcutter',
     description:
       'Throws three long-range wind cutters at different enemies. Each hit Wind-Marks its target for 4 seconds, guiding threadlings to it with greater speed and bite damage.',
@@ -541,8 +543,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
       threadlingDamageMultiplier: 1.35,
     },
   },
-  RALLY_HOWL: {
-    id: 'RALLY_HOWL',
+  [AttackId.RALLY_HOWL]: {
+    id: AttackId.RALLY_HOWL,
     name: 'Rally Howl',
     description:
       'Rallies teammates for 15 seconds, increasing their attack speed by 20%.',
@@ -560,8 +562,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     visualEffectConfigId: 'attack_rally_howl_1',
   },
   // Lightning-bolt attack used by Voltusk; distinct from Razcall's Static Yip.
-  SPARK: {
-    id: 'SPARK',
+  [AttackId.SPARK]: {
+    id: AttackId.SPARK,
     name: 'Spark',
     type: ElementType.ELECTRIC,
     category: 'special',
@@ -579,8 +581,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     launchVisualEffectConfigId: 'attack_spark_launch_1',
     visualEffectConfigId: 'attack_spark_1',
   },
-  STATIC_YIP: {
-    id: 'STATIC_YIP',
+  [AttackId.STATIC_YIP]: {
+    id: AttackId.STATIC_YIP,
     name: 'Static Yip',
     type: ElementType.ELECTRIC,
     category: 'special',
@@ -598,8 +600,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     launchVisualEffectConfigId: 'attack_static_yip_launch_1',
     visualEffectConfigId: 'attack_static_yip_1',
   },
-  GRUMBLE: {
-    id: 'GRUMBLE',
+  [AttackId.GRUMBLE]: {
+    id: AttackId.GRUMBLE,
     name: 'Grumble',
     type: ElementType.NORMAL,
     category: 'special',
@@ -617,8 +619,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     launchVisualEffectConfigId: 'attack_grumble_launch_1',
     visualEffectConfigId: 'attack_grumble_1',
   },
-  REVERIE_ORB: {
-    id: 'REVERIE_ORB',
+  [AttackId.REVERIE_ORB]: {
+    id: AttackId.REVERIE_ORB,
     name: 'Reverie Orb',
     description:
       'Conjures a slowly drifting pearl of psychic energy that damages one target.',
@@ -638,8 +640,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     launchVisualEffectConfigId: 'attack_reverie_orb_launch_1',
     visualEffectConfigId: 'attack_reverie_orb_1',
   },
-  BUBBLE_BEAM: {
-    id: 'BUBBLE_BEAM',
+  [AttackId.BUBBLE_BEAM]: {
+    id: AttackId.BUBBLE_BEAM,
     name: 'Bubble Beam',
     type: ElementType.WATER,
     category: 'special',
@@ -649,8 +651,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     behaviorType: 'PROJECTILE',
     projectileSpeed: 1.0,
   },
-  TACKLE: {
-    id: 'TACKLE',
+  [AttackId.TACKLE]: {
+    id: AttackId.TACKLE,
     name: 'Body Rush',
     type: ElementType.NORMAL,
     category: 'physical',
@@ -661,8 +663,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     projectileSpeed: 1,
     isDashAttack: true,
   },
-  QUICK_ATTACK: {
-    id: 'QUICK_ATTACK',
+  [AttackId.QUICK_ATTACK]: {
+    id: AttackId.QUICK_ATTACK,
     name: 'Dart',
     type: ElementType.NORMAL,
     category: 'physical',
@@ -673,8 +675,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     projectileSpeed: 1,
     isDashAttack: true,
   },
-  NIBBLE: {
-    id: 'NIBBLE',
+  [AttackId.NIBBLE]: {
+    id: AttackId.NIBBLE,
     name: 'Nibble',
     type: ElementType.NORMAL,
     category: 'physical',
@@ -686,8 +688,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     visualEffectConfigId: 'attack_nibble_1',
     isDashAttack: true,
   },
-  LOOSE_END: {
-    id: 'LOOSE_END',
+  [AttackId.LOOSE_END]: {
+    id: AttackId.LOOSE_END,
     name: 'Loose End',
     description:
       'Throws a compact rope knot. If the hit defeats its target, the loose line jumps once to the nearest enemy within range for another full-power hit.',
@@ -709,8 +711,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
       followUpRadius: 40,
     },
   },
-  CHOMP: {
-    id: 'CHOMP',
+  [AttackId.CHOMP]: {
+    id: AttackId.CHOMP,
     name: 'Chomp',
     type: ElementType.NORMAL,
     category: 'physical',
@@ -723,8 +725,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     visualEffectConfigId: 'attack_chomp_1',
     isDashAttack: true,
   },
-  PINCH: {
-    id: 'PINCH',
+  [AttackId.PINCH]: {
+    id: AttackId.PINCH,
     name: 'Pinch',
     type: ElementType.NORMAL,
     category: 'physical',
@@ -735,8 +737,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     projectileSpeed: 1,
     isDashAttack: true,
   },
-  STRING_SHOT: {
-    id: 'STRING_SHOT',
+  [AttackId.STRING_SHOT]: {
+    id: AttackId.STRING_SHOT,
     name: 'String Shot',
     type: ElementType.BUG,
     category: 'special',
@@ -755,8 +757,8 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     effects: [{ type: 'SPEED_SLOW', chance: 1, value: 2 / 3 }],
     visualEffectConfigId: 'attack_string_shot_1',
   },
-  PECK: {
-    id: 'PECK',
+  [AttackId.PECK]: {
+    id: AttackId.PECK,
     name: 'Peck',
     type: ElementType.FLYING,
     category: 'physical',
@@ -768,3 +770,5 @@ export const ATTACK_DEFS: Record<string, AttackDefinition> = {
     isDashAttack: true,
   },
 };
+
+validateDefinitionRegistry('Attacks', AttackId, ATTACK_DEFS);

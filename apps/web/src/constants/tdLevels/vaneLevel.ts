@@ -1,5 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
 import { TDLevelData } from '@/engine/tower-defense/types';
-import { FOREST_LEVEL } from './forestLevel';
 
 /**
  * Level 3 returns to the repaired boat battlefield while Captain Vane sends
@@ -113,10 +113,11 @@ export const VANE_LEVEL: TDLevelData = {
     {
       creature: {
         id: 'kip_mopup',
-        speciesId: 'mopup',
+        originalOwnerId: 'guest',
+        speciesId: SpeciesId.MOPUP,
         level: 5,
         xp: 0,
-        equippedAttacks: ['TACKLE'],
+        equippedAttacks: [AttackId.TACKLE],
         activeAttackIndex: 0,
         targetingMode: 'first',
         gender: 'male' as const,
@@ -135,14 +136,14 @@ export const VANE_LEVEL: TDLevelData = {
   waveEnemyDefinitions: [
     {
       id: 'vane_buglet',
-      creatureId: 'bug_stage_1',
+      creatureId: SpeciesId.SAILKWORM,
       level: 5,
       speedMultiplier: 2,
       hpMultiplier: 4,
     },
     {
       id: 'vane_bettle_guard',
-      creatureId: 'bettle',
+      creatureId: SpeciesId.BEETADEL,
       level: 12,
       speedMultiplier: 0.5,
       goalDamage: 10,

@@ -1,3 +1,4 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
 import { TDLevelData } from '@/engine/tower-defense/types';
 
 /**
@@ -340,10 +341,11 @@ export const LEVEL_4: TDLevelData = {
     {
       creature: {
         id: 'kip_mopup',
-        speciesId: 'mopup',
+        originalOwnerId: 'guest',
+        speciesId: SpeciesId.MOPUP,
         level: 8,
         xp: 0,
-        equippedAttacks: ['TACKLE'],
+        equippedAttacks: [AttackId.TACKLE],
         activeAttackIndex: 0,
         targetingMode: 'first',
         gender: 'male' as const,
@@ -406,7 +408,7 @@ export const LEVEL_4: TDLevelData = {
   waveEnemyDefinitions: [
     {
       id: 'ironbell_sonarion',
-      creatureId: 'sonarion',
+      creatureId: SpeciesId.RAZCALL,
       level: 8,
       speedMultiplier: 1.4,
       hpMultiplier: 1.6,
@@ -416,7 +418,7 @@ export const LEVEL_4: TDLevelData = {
     },
     {
       id: 'ironbell_resonarion',
-      creatureId: 'resonarion',
+      creatureId: SpeciesId.RAZOUND,
       level: 16,
       speedMultiplier: 0.4,
       hpMultiplier: 8,

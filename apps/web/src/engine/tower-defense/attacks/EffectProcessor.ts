@@ -1,10 +1,11 @@
+import { getDefinitionVisuals } from '@/utils/definitionVisuals';
 import { TowerDefenseEngine, TD_CREATURE_DEFS } from '../TowerDefenseEngine';
 import { Tower, Enemy } from '../types';
 import { AttackDefinition } from './types';
 import { ElementType } from '@/types/baseGame';
 import { startDamageFlash } from '../damageFlash';
 import { applyPersistentSpeedSlow } from '../speedModifiers';
-import { CREATURE_TD_CONFIGS } from '@/constants/tdConfigs';
+
 import { tryWakeFromDirectDamage } from './sharedSlumber';
 import {
   getFireClawDamageMultiplier,
@@ -287,7 +288,8 @@ export class EffectProcessor {
         position: { ...target.position },
         targetId: target.id,
         durationMs:
-          CREATURE_TD_CONFIGS[configId].default.vfxAnimation!.durationMs!,
+          getDefinitionVisuals(configId)?.default.vfxAnimation?.durationMs ??
+          240,
         elapsedMs: 0,
       });
     }
@@ -698,7 +700,7 @@ export class EffectProcessor {
     if (splash.visualEffectConfigId && hitTargets.length > 0) {
       const configId = splash.visualEffectConfigId;
       const durationMs =
-        CREATURE_TD_CONFIGS[configId]?.default.vfxAnimation?.durationMs ?? 240;
+        getDefinitionVisuals(configId)?.default.vfxAnimation?.durationMs ?? 240;
       for (const enemy of [primaryTarget, ...hitTargets]) {
         engine.visualEffects.push({
           id: `vfx_burning_splash_${enemy.id}_${engine.elapsedTimeMs}_${Math.random()}`,
@@ -716,7 +718,10 @@ export class EffectProcessor {
     target: Enemy,
     attackType: ElementType
   ): number {
-    const defenderMeta = TD_CREATURE_DEFS[target.definitionId];
+    const defenderMeta =
+      typeof target.definitionId === 'number'
+        ? TD_CREATURE_DEFS[target.definitionId]
+        : undefined;
     const defenderTypes = target.elementTypes?.length
       ? target.elementTypes
       : defenderMeta

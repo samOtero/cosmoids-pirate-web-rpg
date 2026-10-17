@@ -1,3 +1,5 @@
+import { SpeciesId, AttackId } from '@/types/definitionIds';
+import { makePlayerCreature } from '@/__tests__/utils/dataBuilders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ATTACK_FIXTURES, installAttackFixtures } from './fixtures';
@@ -33,15 +35,14 @@ function createEngine(withTarget = true, level = 14) {
       placementSpots: [],
       waves: [],
     },
-    ['caster', 'near', 'boundary', 'far', 'dead'].map((id) => ({
-      id,
-      speciesId: 'sonarion',
-      level,
-      xp: 0,
-      equippedAttacks: ['RALLY_HOWL', 'STATIC_YIP'],
-      gender: 'female' as const,
-      isShiny: false,
-    }))
+    ['caster', 'near', 'boundary', 'far', 'dead'].map((id) =>
+      makePlayerCreature({
+        id,
+        speciesId: SpeciesId.RAZCALL,
+        level,
+        equippedAttacks: [AttackId.RALLY_HOWL, AttackId.STATIC_YIP],
+      })
+    )
   );
   engines.push(engine);
   for (const [id, x, y] of [
@@ -57,7 +58,7 @@ function createEngine(withTarget = true, level = 14) {
   if (withTarget)
     engine.spawnPreviewEnemy({
       id: 'target',
-      creatureId: 'mouse_1',
+      creatureId: SpeciesId.KNOTIA,
       level: 14,
       position: { x: 58, y: 50 },
       isInvulnerable: true,
@@ -74,7 +75,11 @@ describe('Support aura and simulation cooldowns', () => {
     engine.events.subscribe((event) => {
       if (event.type === 'ATTACK_DAMAGE_DEALT') damage(event);
     });
-    SupportAuraBehavior.execute(engine, caster, ATTACK_FIXTURES.RALLY_HOWL);
+    SupportAuraBehavior.execute(
+      engine,
+      caster,
+      ATTACK_FIXTURES[AttackId.RALLY_HOWL]
+    );
     for (const recipient of [caster, near, boundary, far])
       expect(getAttackSpeedMultiplier(recipient, 0)).toBe(1.2);
     expect(dead.attackSpeedBuff).toBeUndefined();
@@ -94,7 +99,11 @@ describe('Support aura and simulation cooldowns', () => {
   it('expires exactly after fifteen seconds, with 20% faster cadence rather than 20% less cooldown', () => {
     const engine = createEngine();
     const caster = engine.towers[0];
-    SupportAuraBehavior.execute(engine, caster, ATTACK_FIXTURES.RALLY_HOWL);
+    SupportAuraBehavior.execute(
+      engine,
+      caster,
+      ATTACK_FIXTURES[AttackId.RALLY_HOWL]
+    );
     expect(800 / getAttackSpeedMultiplier(caster, 14999)).toBeCloseTo(666.6667);
     expect(getAttackSpeedMultiplier(caster, 15000)).toBe(1);
   });
@@ -102,9 +111,17 @@ describe('Support aura and simulation cooldowns', () => {
   it('refreshes from another howl without stacking the multiplier or duration', () => {
     const engine = createEngine();
     const [caster, near] = engine.towers;
-    SupportAuraBehavior.execute(engine, caster, ATTACK_FIXTURES.RALLY_HOWL);
+    SupportAuraBehavior.execute(
+      engine,
+      caster,
+      ATTACK_FIXTURES[AttackId.RALLY_HOWL]
+    );
     engine.elapsedTimeMs = 2000;
-    SupportAuraBehavior.execute(engine, near, ATTACK_FIXTURES.RALLY_HOWL);
+    SupportAuraBehavior.execute(
+      engine,
+      near,
+      ATTACK_FIXTURES[AttackId.RALLY_HOWL]
+    );
     expect(caster.attackSpeedBuff).toEqual({
       multiplier: 1.2,
       appliedAtMs: 2000,
@@ -116,7 +133,11 @@ describe('Support aura and simulation cooldowns', () => {
   it('snapshots global recipients: repositioning or losing the caster does not remove the buff', () => {
     const engine = createEngine();
     const [caster, near, , far] = engine.towers;
-    SupportAuraBehavior.execute(engine, caster, ATTACK_FIXTURES.RALLY_HOWL);
+    SupportAuraBehavior.execute(
+      engine,
+      caster,
+      ATTACK_FIXTURES[AttackId.RALLY_HOWL]
+    );
     near.position = { x: 95, y: 95 };
     far.position = { x: 40, y: 50 };
     engine.towers = engine.towers.filter((tower) => tower !== caster);
@@ -134,7 +155,7 @@ describe('Support aura and simulation cooldowns', () => {
     ).toBeUndefined();
     engine.spawnPreviewEnemy({
       id: 'distant-target',
-      creatureId: 'mouse_1',
+      creatureId: SpeciesId.KNOTIA,
       level: 1,
       position: { x: 90, y: 50 },
       isInvulnerable: true,
