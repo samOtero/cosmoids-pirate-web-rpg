@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useState } from 'react';
+import { useId } from 'react';
 import type { AttackId } from '@/types/definitionIds';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import type { PlayerCreature } from '@/types/baseGame';
@@ -13,6 +13,7 @@ import {
 import { attackSeconds } from '@/utils/attackInformation';
 import { AttackDetails } from '@/app/components/attacks/AttackDetails';
 import { AttackDialog } from '@/app/components/attacks/AttackDialog';
+import { ELEMENT_TEXT_COLORS } from '@/app/components/ui/elementTextColors';
 
 export function ActiveAttackMenu({
   name,
@@ -47,9 +48,8 @@ export function ActiveAttackMenu({
   elapsedTimeMs?: number;
   frameTimeMs?: number;
 }) {
-  const [inspectedIndex, setInspectedIndex] = useState(activeAttackIndex);
   const targetingId = useId();
-  const inspected = ATTACK_DEFS[equippedAttacks[inspectedIndex]];
+  const inspected = ATTACK_DEFS[equippedAttacks[activeAttackIndex]];
   const intervalMs =
     inspected && tower && !usesAttackSimulationCooldown(inspected)
       ? getAttackIntervalMs(inspected, tower, elapsedTimeMs)
@@ -58,7 +58,7 @@ export function ActiveAttackMenu({
     inspected && tower
       ? getAttackRemainingMs(
           inspected,
-          tower.equippedAttacksRuntime[inspectedIndex],
+          tower.equippedAttacksRuntime[activeAttackIndex],
           tower,
           elapsedTimeMs,
           frameTimeMs
@@ -103,17 +103,27 @@ export function ActiveAttackMenu({
               <button
                 key={id + '-' + index}
                 type="button"
-                aria-label={'Inspect ' + attack.name}
-                aria-pressed={inspectedIndex === index}
-                onClick={() => setInspectedIndex(index)}
+                aria-label={'Select ' + attack.name}
+                title={attack.name + ' (' + attack.type + ')'}
+                aria-pressed={activeAttackIndex === index}
+                onClick={() => {
+                  if (index !== activeAttackIndex) onSelectAttack(index);
+                }}
                 className={
                   'flex min-h-0 flex-1 items-center justify-between gap-1 rounded border px-2 py-1 text-left text-sm ' +
-                  (inspectedIndex === index
+                  (activeAttackIndex === index
                     ? 'border-cyan-300 bg-cyan-950'
                     : 'border-slate-600 bg-slate-800 hover:border-cyan-500')
                 }
               >
-                <span className="truncate">{attack.name}</span>
+                <span
+                  className={
+                    'min-w-0 truncate font-medium ' +
+                    ELEMENT_TEXT_COLORS[attack.type]
+                  }
+                >
+                  {attack.name}
+                </span>
                 {activeAttackIndex === index && (
                   <span
                     aria-label="Active"
@@ -130,7 +140,7 @@ export function ActiveAttackMenu({
         {inspected && (
           <AttackDetails
             attack={inspected}
-            badge={inspectedIndex === activeAttackIndex ? 'Active' : undefined}
+            badge="Active"
             intervalMs={intervalMs}
             readiness={readiness}
           />
@@ -155,16 +165,6 @@ export function ActiveAttackMenu({
             <option value="lowest-hp-percent">Lowest HP %</option>
             <option value="highest-hp-percent">Highest HP %</option>
           </select>
-          <button
-            type="button"
-            disabled={!inspected || inspectedIndex === activeAttackIndex}
-            onClick={() => onSelectAttack(inspectedIndex)}
-            className="min-h-9 rounded bg-cyan-700 px-2 text-xs font-bold text-white disabled:bg-slate-700 disabled:text-slate-400"
-          >
-            {inspectedIndex === activeAttackIndex
-              ? 'Already Active'
-              : 'Make Active'}
-          </button>
           <button
             type="button"
             onClick={onClose}

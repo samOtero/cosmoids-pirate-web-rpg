@@ -41,7 +41,7 @@ const creature = () =>
   });
 
 describe('attack information decisions', () => {
-  it('separates profile inspection from changing the active move', () => {
+  it('activates a known profile move on selection without saving again on reselection', () => {
     const update = vi.fn();
     render(
       <CreatureDetailsScreen
@@ -51,15 +51,19 @@ describe('attack information decisions', () => {
         onUpdateAttacks={update}
       />
     );
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Inspect Second move' })
-    );
+    fireEvent.click(screen.getByRole('button', { name: 'Select Second move' }));
     expect(
       screen.getByRole('region', { name: 'Second move details' })
     ).toHaveTextContent('Second move controlled description.');
-    expect(update).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole('button', { name: 'Make Active' }));
     expect(update).toHaveBeenCalledWith(creature().equippedAttacks, 1);
+    expect(
+      screen.getByRole('region', { name: 'Second move details' })
+    ).toHaveTextContent('Active');
+    expect(
+      screen.queryByRole('button', { name: 'Make Active' })
+    ).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Select Second move' }));
+    expect(update).toHaveBeenCalledOnce();
   });
   it('requires comparison and confirmation before replacing a known move', () => {
     const update = vi.fn();
@@ -114,7 +118,7 @@ describe('attack information decisions', () => {
     expect(update).not.toHaveBeenCalled();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
-  it('inspects live cooldowns without selecting or consuming a move', () => {
+  it('activates a battle move on selection while preserving its cooldown', () => {
     const support = registerAttack(
       makeAttack({
         ...moves[1],
@@ -133,34 +137,37 @@ describe('attack information decisions', () => {
       { definitionId: support.id, lastFiredTime: 0, readyAtMs: 5000 },
     ];
     const select = vi.fn();
-    render(
-      <ActiveAttackMenu
-        creature={creature()}
-        name="Test creature"
-        spriteUrl=""
-        isActive
-        displayLevel={5}
-        displayXp={0}
-        equippedAttacks={[moves[0].id, support.id]}
-        activeAttackIndex={0}
-        onSelectAttack={select}
-        onClose={vi.fn()}
-        tower={source}
-        elapsedTimeMs={1000}
-        frameTimeMs={2000}
-      />
+    const props = {
+      creature: creature(),
+      name: 'Test creature',
+      spriteUrl: '',
+      isActive: true,
+      displayLevel: 5,
+      displayXp: 0,
+      equippedAttacks: [moves[0].id, support.id],
+      onSelectAttack: select,
+      onClose: vi.fn(),
+      tower: source,
+      elapsedTimeMs: 1000,
+      frameTimeMs: 2000,
+    };
+    const { rerender } = render(
+      <ActiveAttackMenu {...props} activeAttackIndex={0} />
     );
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Inspect Second move' })
-    );
+    fireEvent.click(screen.getByRole('button', { name: 'Select Second move' }));
+    expect(select).toHaveBeenCalledWith(1);
+    rerender(<ActiveAttackMenu {...props} activeAttackIndex={1} />);
     expect(
       screen.getByRole('region', { name: 'Second move details' })
     ).toHaveTextContent('Ready in 4s');
     expect(screen.queryByText('Power')).not.toBeInTheDocument();
-    expect(select).not.toHaveBeenCalled();
     expect(source.equippedAttacksRuntime[1].readyAtMs).toBe(5000);
-    fireEvent.click(screen.getByRole('button', { name: 'Make Active' }));
-    expect(select).toHaveBeenCalledWith(1);
+    expect(
+      screen.queryByRole('button', { name: 'Make Active' })
+    ).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Select Second move' }));
+    fireEvent.click(screen.getByLabelText('More about Second move'));
+    expect(select).toHaveBeenCalledOnce();
   });
   it('makes learning distinct from activation and offers an optional active-move comparison', () => {
     const activate = vi.fn(),

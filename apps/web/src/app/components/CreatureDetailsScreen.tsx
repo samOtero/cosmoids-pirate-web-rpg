@@ -13,6 +13,7 @@ import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { Button } from '@/app/components/ui/Button';
 import Panel from '@/app/components/ui/Panel';
 import { TypeBadge } from '@/app/components/ui/TypeBadge';
+import { ELEMENT_TEXT_COLORS } from '@/app/components/ui/elementTextColors';
 import { GenderBadge } from '@/app/components/ui/GenderBadge';
 
 interface CreatureDetailsScreenProps {
@@ -231,9 +232,13 @@ export default function CreatureDetailsScreen({
                     <button
                       key={moveId}
                       type="button"
-                      aria-label={'Inspect ' + move.name}
+                      aria-label={'Select ' + move.name}
+                      title={move.name + ' (' + move.type + ')'}
                       aria-pressed={inspectedMoveId === moveId}
-                      onClick={() => setInspectedMoveId(moveId)}
+                      onClick={() => {
+                        setInspectedMoveId(moveId);
+                        handleSetActiveAttack(index);
+                      }}
                       className={
                         'flex min-h-9 items-center justify-between gap-1 rounded border px-2 py-1 text-left text-sm ' +
                         (inspectedMoveId === moveId
@@ -241,7 +246,14 @@ export default function CreatureDetailsScreen({
                           : 'border-slate-600 bg-slate-900')
                       }
                     >
-                      <span>{move.name}</span>
+                      <span
+                        className={
+                          'min-w-0 truncate font-medium ' +
+                          ELEMENT_TEXT_COLORS[move.type]
+                        }
+                      >
+                        {move.name}
+                      </span>
                       {index === selectedActiveIdx && (
                         <span
                           aria-label="Active"
@@ -272,16 +284,24 @@ export default function CreatureDetailsScreen({
                         key={moveId}
                         type="button"
                         aria-label={'Inspect forgotten move ' + move.name}
+                        title={move.name + ' (' + move.type + ')'}
                         aria-pressed={inspectedMoveId === moveId}
                         onClick={() => setInspectedMoveId(moveId)}
                         className={
-                          'min-h-9 rounded border px-2 py-1 text-left text-sm ' +
+                          'flex min-h-9 items-center gap-1.5 rounded border px-2 py-1 text-left text-sm ' +
                           (inspectedMoveId === moveId
                             ? 'border-cyan-400 bg-cyan-950'
                             : 'border-slate-600 bg-slate-900')
                         }
                       >
-                        {move.name}
+                        <span
+                          className={
+                            'min-w-0 truncate font-medium ' +
+                            ELEMENT_TEXT_COLORS[move.type]
+                          }
+                        >
+                          {move.name}
+                        </span>
                       </button>
                     );
                   })}
@@ -301,24 +321,7 @@ export default function CreatureDetailsScreen({
                       }
                     />
                   </div>
-                  {currentMoves.includes(inspectedMove.id) ? (
-                    <Button
-                      variant="wood"
-                      disabled={
-                        currentMoves[selectedActiveIdx] === inspectedMove.id
-                      }
-                      onClick={() =>
-                        handleSetActiveAttack(
-                          currentMoves.indexOf(inspectedMove.id)
-                        )
-                      }
-                      className="min-h-9 shrink-0 px-3 py-1 text-xs font-bold"
-                    >
-                      {currentMoves[selectedActiveIdx] === inspectedMove.id
-                        ? 'Already Active'
-                        : 'Make Active'}
-                    </Button>
-                  ) : (
+                  {!currentMoves.includes(inspectedMove.id) && (
                     <Button
                       variant="wood"
                       onClick={() => handleLearnAttack(inspectedMove.id)}

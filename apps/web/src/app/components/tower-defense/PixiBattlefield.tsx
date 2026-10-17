@@ -34,6 +34,14 @@ import {
 } from '@/utils/tdUnitVisuals';
 import { getCaptureUnitVisualState } from '@/utils/captureUnitVisualState';
 import { getTDRangePreviewRadius } from '@/utils/tdAttackRangePreview';
+import {
+  resolveTDDragPointer,
+  type TDDragPointer,
+} from '@/utils/tdDragPointer';
+import {
+  advanceTDDragEdgeScroll,
+  createTDDragEdgeScrollState,
+} from '@/utils/tdDragEdgeScroll';
 import { calculateTDWorldDepth } from '@/utils/tdDepthSorting';
 import { buildTDOffscreenIndicators } from '@/utils/tdOffscreenIndicators';
 import {
@@ -3114,14 +3122,16 @@ export interface PixiBattlefieldRef {
     clientX: number,
     clientY: number,
     type: 'tower' | 'capture',
-    towerCreatureId?: string
+    towerCreatureId?: string,
+    pointerType?: string
   ) => void;
   handleExternalLeave: () => void;
   handleExternalDrop: (
     clientX: number,
     clientY: number,
     towerIdStr: string | null,
-    isCaptureDevice: boolean
+    isCaptureDevice: boolean,
+    pointerType?: string
   ) => void;
 }
 
@@ -3160,6 +3170,16 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
       healingTutorialTowerCreatureId
     );
     const dragPosRef = useRef<{ x: number; y: number } | null>(null);
+    const dragPointerRef = useRef<
+      | (TDDragPointer & {
+          type: 'tower' | 'capture';
+          source: 'external' | 'internal';
+          pointerId?: number;
+        })
+      | null
+    >(null);
+    const viewportSizeRef = useRef({ width: 0, height: 0 });
+    const edgeScrollStateRef = useRef(createTDDragEdgeScrollState());
     const draggingCaptureDeviceRef = useRef<boolean>(false);
     const externalDraggingTowerIdRef = useRef<string | null>(null);
     const bgBoundsRef = useRef<{
@@ -3182,28 +3202,55 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
     ); // Same value changed by the in-game +/- controls.
 
     useImperativeHandle(ref, () => ({
-      handleExternalMove: (clientX, clientY, type, towerCreatureId) => {
+      handleExternalMove: (
+        clientX,
+        clientY,
+        type,
+        towerCreatureId,
+        pointerType = 'mouse'
+      ) => {
         if (isOpeningPanActiveRef.current) return;
+        const pointer = {
+          clientX,
+          clientY,
+          pointerType,
+          type,
+          source: 'external' as const,
+        };
+        dragPointerRef.current = pointer;
         draggingCaptureDeviceRef.current = type === 'capture';
         externalDraggingTowerIdRef.current =
           type === 'tower' ? (towerCreatureId ?? null) : null;
         const bgBounds = bgBoundsRef.current;
         if (bgBounds && bgBounds.width > 0 && containerRef.current) {
           const rect = containerRef.current.getBoundingClientRect();
-          const localX = clientX - rect.left - bgBounds.x;
-          const localY = clientY - rect.top - bgBounds.y;
-          const x = (localX / bgBounds.width) * 100;
-          const y = (localY / bgBounds.height) * 100;
-          dragPosRef.current = { x, y };
+          dragPosRef.current =
+            resolveTDDragPointer(
+              pointer,
+              rect,
+              viewportSizeRef.current,
+              bgBounds
+            )?.world ?? null;
         }
       },
       handleExternalLeave: () => {
+        edgeScrollStateRef.current = createTDDragEdgeScrollState();
+        if (dragPointerRef.current?.source === 'external')
+          dragPointerRef.current = null;
         dragPosRef.current = null;
         draggingCaptureDeviceRef.current = false;
         externalDraggingTowerIdRef.current = null;
       },
-      handleExternalDrop: (clientX, clientY, towerIdStr, isCaptureDevice) => {
+      handleExternalDrop: (
+        clientX,
+        clientY,
+        towerIdStr,
+        isCaptureDevice,
+        pointerType = 'mouse'
+      ) => {
+        edgeScrollStateRef.current = createTDDragEdgeScrollState();
         if (isOpeningPanActiveRef.current) return;
+        dragPointerRef.current = null;
         dragPosRef.current = null;
         draggingCaptureDeviceRef.current = false;
         externalDraggingTowerIdRef.current = null;
@@ -3212,10 +3259,17 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         if (!bgBounds || bgBounds.width === 0 || !containerRef.current) return;
 
         const rect = containerRef.current.getBoundingClientRect();
-        const localX = clientX - rect.left - bgBounds.x;
-        const localY = clientY - rect.top - bgBounds.y;
-        const x = (localX / bgBounds.width) * 100;
-        const y = (localY / bgBounds.height) * 100;
+        const point = resolveTDDragPointer(
+          { clientX, clientY, pointerType },
+          rect,
+          viewportSizeRef.current,
+          bgBounds
+        )?.world;
+        if (!point) {
+          if (towerIdStr) onMapRemoveRef.current(towerIdStr);
+          return;
+        }
+        const { x, y } = point;
 
         if (isCaptureDevice && engine) {
           let targetedEnemyId: string | null = null;
@@ -3305,6 +3359,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
       let isDestroyed = false;
       let isInitialized = false;
+      let removePointerListeners: (() => void) | undefined;
       let bgBounds = { x: 0, y: 0, width: 0, height: 0 };
 
       const initPixi = async () => {
@@ -3396,6 +3451,10 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
         // Handle resize + zoom — called each tick to pick up zoom changes
         const updateBgLayout = () => {
+          viewportSizeRef.current = {
+            width: app.screen.width,
+            height: app.screen.height,
+          };
           if (
             bgSprite.texture.width > 0 &&
             bgSprite.texture.height > 0 &&
@@ -3580,13 +3639,31 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         app.stage.eventMode = 'static';
         app.stage.hitArea = new PIXI.Rectangle(0, 0, 10000, 10000);
 
-        const onDragEnd = (e: PIXI.FederatedPointerEvent) => {
-          if (draggingTowerCreatureId && bgBounds.width > 0) {
-            const x = ((e.global.x - bgBounds.x) / bgBounds.width) * 100;
-            const y = ((e.global.y - bgBounds.y) / bgBounds.height) * 100;
-
-            const closestSpot = engine.getTowerDropSpot({ x, y });
-
+        const resolveDrag = () => {
+          const pointer = dragPointerRef.current;
+          const rect = containerRef.current?.getBoundingClientRect();
+          return pointer && rect
+            ? resolveTDDragPointer(
+                pointer,
+                rect,
+                viewportSizeRef.current,
+                bgBounds
+              )
+            : null;
+        };
+        const updateDraggedPosition = () => {
+          const position = resolveDrag();
+          dragPosRef.current = position?.world ?? null;
+          if (draggingNode && position) {
+            draggingNode.position.set(position.aim.x, position.aim.y);
+          }
+        };
+        const finishInternalDrag = (drop: boolean) => {
+          if (!draggingTowerCreatureId) return;
+          const pointerId = dragPointerRef.current?.pointerId;
+          if (drop) {
+            const point = resolveDrag()?.world;
+            const closestSpot = point ? engine.getTowerDropSpot(point) : null;
             if (closestSpot) {
               onMapDropRef.current(
                 draggingTowerCreatureId,
@@ -3594,23 +3671,73 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 closestSpot.y
               );
             } else {
-              if (onMapRemoveRef.current) {
-                onMapRemoveRef.current(draggingTowerCreatureId);
-              }
-            }
-
-            dragPosRef.current = null;
-            if (draggingNode) draggingNode.cursor = 'grab';
-            draggingNode = null;
-            draggingTowerCreatureId = null;
-            if (onDragStateChangeRef.current) {
-              onDragStateChangeRef.current(false);
+              onMapRemoveRef.current(draggingTowerCreatureId);
             }
           }
+          dragPosRef.current = null;
+          dragPointerRef.current = null;
+          edgeScrollStateRef.current = createTDDragEdgeScrollState();
+          if (draggingNode) draggingNode.cursor = 'grab';
+          draggingNode = null;
+          draggingTowerCreatureId = null;
+          onDragStateChangeRef.current?.(false);
+          if (
+            pointerId !== undefined &&
+            app.canvas.hasPointerCapture(pointerId)
+          )
+            app.canvas.releasePointerCapture(pointerId);
         };
-
-        app.stage.on('pointerup', onDragEnd);
-        app.stage.on('pointerupoutside', onDragEnd);
+        const onPointerMove = (event: PointerEvent) => {
+          const pointer = dragPointerRef.current;
+          if (
+            pointer?.source !== 'internal' ||
+            event.pointerId !== pointer.pointerId
+          )
+            return;
+          pointer.clientX = event.clientX;
+          pointer.clientY = event.clientY;
+          updateDraggedPosition();
+        };
+        const onPointerUp = (event: PointerEvent) => {
+          if (
+            dragPointerRef.current?.source === 'internal' &&
+            event.pointerId === dragPointerRef.current.pointerId
+          ) {
+            onPointerMove(event);
+            finishInternalDrag(true);
+          }
+          isScrollDraggingRef.current = false;
+          scrollDragStartRef.current = null;
+        };
+        const cancelDrag = () => {
+          finishInternalDrag(false);
+          dragPointerRef.current = null;
+          dragPosRef.current = null;
+          edgeScrollStateRef.current = createTDDragEdgeScrollState();
+          isScrollDraggingRef.current = false;
+          scrollDragStartRef.current = null;
+        };
+        const onPointerCancel = (event: PointerEvent) => {
+          const pointer = dragPointerRef.current;
+          if (
+            pointer?.source !== 'internal' ||
+            pointer.pointerId !== event.pointerId
+          )
+            return;
+          cancelDrag();
+        };
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('pointerup', onPointerUp);
+        window.addEventListener('pointercancel', onPointerCancel);
+        window.addEventListener('blur', cancelDrag);
+        app.canvas.addEventListener('lostpointercapture', onPointerCancel);
+        removePointerListeners = () => {
+          window.removeEventListener('pointermove', onPointerMove);
+          window.removeEventListener('pointerup', onPointerUp);
+          window.removeEventListener('pointercancel', onPointerCancel);
+          window.removeEventListener('blur', cancelDrag);
+          app.canvas.removeEventListener('lostpointercapture', onPointerCancel);
+        };
         app.stage.on('pointermove', (e) => {
           // Handle scroll dragging
           if (
@@ -3648,16 +3775,6 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             };
             bgBoundsRef.current = bgBounds;
           }
-
-          if (draggingNode && bgBounds.width > 0) {
-            draggingNode.x = e.global.x;
-            draggingNode.y = e.global.y;
-
-            dragPosRef.current = {
-              x: ((e.global.x - bgBounds.x) / bgBounds.width) * 100,
-              y: ((e.global.y - bgBounds.y) / bgBounds.height) * 100,
-            };
-          }
         });
 
         // Stop scroll dragging on pointer up
@@ -3672,9 +3789,33 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
         // PIXI's internal ticker, synced to monitor refresh rate.
         // This DOES NOT run game logic, it ONLY draws current state.
-        app.ticker.add(() => {
+        app.ticker.add((ticker) => {
           // Re-evaluate bg layout each tick to pick up zoom changes
           updateBgLayout();
+          const edgeScroll = advanceTDDragEdgeScroll({
+            aim:
+              !isOpeningPanActiveRef.current &&
+              dragPointerRef.current?.type === 'tower'
+                ? (resolveDrag()?.aim ?? null)
+                : null,
+            viewport: viewportSizeRef.current,
+            scroll: scrollRef.current,
+            maxScroll: {
+              x: Math.max(0, displayBgWidth - app.screen.width),
+              y: Math.max(0, displayBgHeight - app.screen.height),
+            },
+            deltaMs: ticker.deltaMS,
+            state: edgeScrollStateRef.current,
+          });
+          edgeScrollStateRef.current = edgeScroll.state;
+          if (
+            edgeScroll.scroll.x !== scrollRef.current.x ||
+            edgeScroll.scroll.y !== scrollRef.current.y
+          ) {
+            scrollRef.current = edgeScroll.scroll;
+            updateBgLayout();
+          }
+          if (dragPointerRef.current) updateDraggedPosition();
 
           if (fpsRef.current) {
             fpsRef.current.innerText = `FPS: ${Math.round(app.ticker.FPS)}`;
@@ -4737,19 +4878,38 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               newContainer.eventMode = tower.isFixed ? 'none' : 'static';
               newContainer.cursor = tower.isFixed ? 'default' : 'grab';
               if (!tower.isFixed) {
-                newContainer.on('pointerdown', () => {
-                  draggingNode = newContainer;
-                  draggingTowerCreatureId = tower.creature.id;
-                  newContainer.cursor = 'grabbing';
-                  newContainer.zIndex = DRAGGED_WORLD_DEPTH;
-                  worldLayer.setChildIndex(
-                    newContainer,
-                    worldLayer.children.length - 1
-                  );
-                  if (onDragStateChangeRef.current) {
-                    onDragStateChangeRef.current(true);
+                newContainer.on(
+                  'pointerdown',
+                  (event: PIXI.FederatedPointerEvent) => {
+                    if (
+                      dragPointerRef.current ||
+                      event.button !== 0 ||
+                      isOpeningPanActiveRef.current
+                    )
+                      return;
+                    draggingNode = newContainer;
+                    draggingTowerCreatureId = tower.creature.id;
+                    dragPointerRef.current = {
+                      clientX: event.clientX,
+                      clientY: event.clientY,
+                      pointerType: event.pointerType,
+                      pointerId: event.pointerId,
+                      type: 'tower',
+                      source: 'internal',
+                    };
+                    app.canvas.setPointerCapture(event.pointerId);
+                    updateDraggedPosition();
+                    newContainer.cursor = 'grabbing';
+                    newContainer.zIndex = DRAGGED_WORLD_DEPTH;
+                    worldLayer.setChildIndex(
+                      newContainer,
+                      worldLayer.children.length - 1
+                    );
+                    if (onDragStateChangeRef.current) {
+                      onDragStateChangeRef.current(true);
+                    }
                   }
-                });
+                );
               }
 
               const baseCreature =
@@ -6606,6 +6766,12 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
       return () => {
         isDestroyed = true;
+        removePointerListeners?.();
+        if (dragPointerRef.current?.source === 'internal')
+          onDragStateChangeRef.current?.(false);
+        dragPointerRef.current = null;
+        dragPosRef.current = null;
+        edgeScrollStateRef.current = createTDDragEdgeScrollState();
         isOpeningPanActiveRef.current = false;
         if (isInitialized) {
           app.destroy(true, { children: true });

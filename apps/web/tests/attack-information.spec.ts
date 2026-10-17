@@ -25,7 +25,7 @@ for (const viewport of [
   { width: 1280, height: 800 },
   { width: 844, height: 390 },
 ]) {
-  test(`inspects moves and confirms replacement at ${viewport.width}px`, async ({
+  test(`selects active moves and confirms replacement at ${viewport.width}px`, async ({
     page,
   }, testInfo) => {
     test.setTimeout(90000);
@@ -74,18 +74,18 @@ for (const viewport of [
       .locator('..')
       .click();
     await page
-      .getByRole('button', { name: 'Inspect ' + known[1].name, exact: true })
+      .getByRole('button', { name: 'Select ' + known[1].name, exact: true })
       .click();
     await expect(
       page.getByRole('button', { name: 'Make Active', exact: true })
-    ).toBeVisible();
+    ).toHaveCount(0);
     const activeIndex = () =>
       page.evaluate(
         () =>
           JSON.parse(localStorage.getItem('cosmoids-game-state')!).state
             .profiles[0].creatures[0].activeAttackIndex
       );
-    expect(await activeIndex()).toBe(0);
+    expect(await activeIndex()).toBe(1);
     const profileDetails = page.getByRole('region', {
       name: known[1].name + ' details',
     });
@@ -101,6 +101,7 @@ for (const viewport of [
         exact: true,
       })
       .click();
+    expect(await activeIndex()).toBe(1);
     await page
       .getByRole('button', { name: 'Relearn ' + forgotten.name, exact: true })
       .click();
@@ -132,9 +133,11 @@ for (const viewport of [
       path: testInfo.outputPath('move-replacement-confirmation.png'),
     });
     await replace.click();
-    expect(await activeIndex()).toBe(0);
+    expect(await activeIndex()).toBe(1);
     await expect(
-      page.getByRole('button', { name: 'Already Active', exact: true })
+      page
+        .getByRole('button', { name: 'Select ' + known[1].name, exact: true })
+        .getByLabel('Active', { exact: true })
     ).toBeVisible();
     await page
       .getByRole('button', { name: 'Back to Team', exact: true })
@@ -150,17 +153,25 @@ for (const viewport of [
     const menu = page.getByRole('dialog', { name: 'Moves · ' + species.name });
     await expect(menu).toContainText('Battle paused');
     await menu
-      .getByRole('button', { name: 'Inspect ' + known[1].name, exact: true })
+      .getByRole('button', { name: 'Select ' + known[2].name, exact: true })
       .click();
     await expect(
-      menu.getByRole('region', { name: known[1].name + ' details' })
+      menu.getByRole('region', { name: known[2].name + ' details' })
     ).toBeVisible();
     const trayBounds = (await menu.boundingBox())!;
     expect(trayBounds.height).toBeLessThan(viewport.height * 0.55);
     expect(trayBounds.y).toBeGreaterThan(viewport.height * 0.45);
     await expect(
       menu.getByRole('button', { name: 'Make Active', exact: true })
-    ).toBeInViewport({ ratio: 1 });
+    ).toHaveCount(0);
+    const selectedMove = menu.getByRole('button', {
+      name: 'Select ' + known[2].name,
+      exact: true,
+    });
+    await expect(selectedMove).toHaveAttribute('aria-pressed', 'true');
+    await expect(
+      selectedMove.getByLabel('Active', { exact: true })
+    ).toBeVisible();
     const close = menu.getByRole('button', { name: 'Close', exact: true });
     await expect(close).toBeInViewport({ ratio: 1 });
     await expect(menu.getByRole('region', { name: / details$/ })).toHaveCount(
@@ -169,13 +180,20 @@ for (const viewport of [
     await page.screenshot({
       path: testInfo.outputPath('battle-move-information.png'),
     });
-    await menu.getByLabel('More about ' + known[1].name).click();
+    await menu.getByLabel('More about ' + known[2].name).click();
     expect((await menu.boundingBox())!.height).toBe(trayBounds.height);
     await expect(close).toBeInViewport({ ratio: 1 });
     await menu.getByRole('button', { name: 'Close', exact: true }).click();
     await expect(
       page.getByRole('button', { name: 'Start', exact: true })
     ).toBeVisible();
+    await page
+      .getByRole('button', { name: new RegExp(species.name, 'i') })
+      .click();
+    await expect(
+      menu.getByRole('button', { name: 'Select ' + known[2].name, exact: true })
+    ).toHaveAttribute('aria-pressed', 'true');
+    await menu.getByRole('button', { name: 'Close', exact: true }).click();
     expect(errors).toEqual([]);
   });
 }
