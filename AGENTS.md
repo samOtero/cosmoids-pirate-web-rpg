@@ -96,3 +96,7 @@
 ## Definition identities
 
 - Use permanent numeric `SpeciesId` and `AttackId` constants throughout gameplay and saved references. Follow `docs/development/DEFINITION_IDS.md`; append assignments without renumbering or reusing IDs. Keep instance, owner, encounter, behavior and artwork identities in their respective domains.
+
+## To-do list maintenance
+
+- When completing an item in `TODO.md`, mark it checked and move it to the bottom of the list. Keep unfinished items above completed items.

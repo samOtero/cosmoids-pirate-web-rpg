@@ -1,3 +1,4 @@
+import { usesAttackSimulationCooldown } from './attacks/timing';
 import { getDefinitionVisuals } from '@/utils/definitionVisuals';
 import { SpeciesId, AttackId } from '@/types/definitionIds';
 import {
@@ -1333,13 +1334,7 @@ export class TowerDefenseEngine {
       if (!attackInstance) return;
       if (!attackDef) return;
 
-      const usesSimulationCooldown =
-        attackDef.behaviorType === 'SUPPORT_AURA' ||
-        attackDef.behaviorType === 'WARMTH_SUPPORT' ||
-        attackDef.behaviorType === 'REPAIR_SUPPORT' ||
-        attackDef.behaviorType === 'CONSTRICTION' ||
-        attackDef.behaviorType === 'SHARED_SLUMBER' ||
-        attackDef.behaviorType === 'RIGGING_NEST';
+      const usesSimulationCooldown = usesAttackSimulationCooldown(attackDef);
       if (
         usesSimulationCooldown &&
         (attackInstance.readyAtMs ?? 0) > this.elapsedTimeMs - deltaMs &&

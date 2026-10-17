@@ -138,7 +138,9 @@ describe('tower-defense outro priority', () => {
     act(() => vi.advanceTimersByTime(3000));
     expect(onWin).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Later' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Keep Current Active' })
+    );
     expect(screen.getByText('You Win!')).toBeInTheDocument();
 
     act(() => vi.advanceTimersByTime(2999));
@@ -167,7 +169,9 @@ describe('tower-defense outro priority', () => {
       hasFinishedAllWaves: false,
       enemies: [{}],
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Later' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Keep Current Active' })
+    );
     expect(screen.getByText('You Win!')).toBeInTheDocument();
   });
 
@@ -202,7 +206,9 @@ describe('tower-defense outro priority', () => {
     act(() => vi.advanceTimersByTime(1000));
     act(() => scheduledFrame?.(16));
     act(() => scheduledFrame?.(32));
-    fireEvent.click(screen.getByRole('button', { name: 'Later' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Keep Current Active' })
+    );
     expect(screen.queryByText('You Win!')).not.toBeInTheDocument();
     expect(screen.getByText('Rival flag: 3')).toBeInTheDocument();
     expect(onWin).not.toHaveBeenCalled();
@@ -236,7 +242,9 @@ describe('tower-defense outro priority', () => {
       hasFinishedAllWaves: true,
       enemies: [{}],
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Later' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Keep Current Active' })
+    );
     expect(screen.queryByText('You Win!')).not.toBeInTheDocument();
     expect(onWin).not.toHaveBeenCalled();
     engineHarness.instance!.enemies = [];
@@ -396,7 +404,9 @@ describe('tower-defense outro priority', () => {
     act(() => vi.advanceTimersByTime(3000));
     expect(onLose).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Later' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Keep Current Active' })
+    );
     expect(screen.getByText('Defeat!')).not.toHaveClass(
       'animate-bounce',
       'animate-pulse'

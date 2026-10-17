@@ -15,6 +15,10 @@ import { ActiveAttackMenu } from './ActiveAttackMenu';
 import { TowerButton } from './TowerButton';
 import { ExecuteTDActionEventPayload } from '@/types/baseGame';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import { COSMOID_TEMPLATES } from '@/constants/creatures';
+import { AttackDialog } from '../attacks/AttackDialog';
+import { AttackReplacement } from '../attacks/AttackReplacement';
+import { LearnedAttackDialog } from '../attacks/LearnedAttackDialog';
 import { TDLevelData } from '@/engine/tower-defense/types';
 
 import { createBattleAnalytics } from '@/utils/battleAnalytics';
@@ -204,6 +208,7 @@ export default function TowerDefenseScreen({
 
   const requestRef = useRef<number | null>(null);
   const previousTimeRef = useRef<number | null>(null);
+  const lastEngineFrameTimeRef = useRef(0);
 
   const [hasStarted, setHasStarted] = useState(false);
   const [introState, setIntroState] = useState<
@@ -439,6 +444,7 @@ export default function TowerDefenseScreen({
 
       // 1. Tick the engine simulation
       engineRef.current.tick(time, deltaTime);
+      lastEngineFrameTimeRef.current = time;
 
       // 2. Sync essential UI state (could throttle this for more perf)
       setUiRivalFlagLives(engineRef.current.rivalFlagLives);
@@ -951,6 +957,10 @@ export default function TowerDefenseScreen({
 
               return (
                 <ActiveAttackMenu
+                  key={creature.id}
+                  tower={tower}
+                  elapsedTimeMs={engineRef.current.elapsedTimeMs}
+                  frameTimeMs={lastEngineFrameTimeRef.current}
                   creature={creature}
                   name={name}
                   spriteUrl={spriteUrl}
@@ -1295,166 +1305,85 @@ export default function TowerDefenseScreen({
           }
 
           if (activeModal.type === 'LEARNED_ATTACK') {
-            const newDef = ATTACK_DEFS[activeModal.attackDefId];
+            const attack = ATTACK_DEFS[activeModal.attackDefId];
+            if (!attack) return null;
             const tower = engineRef.current.towers.find(
               (candidate) => candidate.id === activeModal.towerId
             );
-            const creatureVisuals = tower
-              ? resolveSpeciesVisuals(tower.creature.speciesId)
-              : { name: 'Your Cosmoid', spriteUrl: '' };
-            const learnedAttackIndex =
-              tower?.creature.equippedAttacks.findIndex(
-                (attackId) => attackId === activeModal.attackDefId
-              ) ?? -1;
-            const isLearnedAttackActive =
-              tower?.selectedAttackIndex === learnedAttackIndex;
-
-            const makeLearnedAttackActive = () => {
-              if (tower && learnedAttackIndex >= 0) {
-                engineRef.current.setTowerAttack(
-                  tower.creature.id,
-                  learnedAttackIndex
-                );
-                setUiUpdateToggle((prev) => !prev);
-              }
-              closeActiveModal();
-            };
-
+            const learnedIndex =
+              tower?.creature.equippedAttacks.indexOf(attack.id) ?? -1;
+            const current = tower
+              ? ATTACK_DEFS[
+                  tower.creature.equippedAttacks[tower.selectedAttackIndex]
+                ]
+              : undefined;
             return (
-              <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/80 p-2 sm:p-4">
-                <div
-                  role="dialog"
-                  aria-modal="true"
-                  aria-labelledby="learned-attack-title"
-                  className="max-h-[calc(100dvh-1rem)] w-full max-w-xs overflow-y-auto rounded-xl border-2 border-cyan-500 bg-slate-800 p-3 text-center shadow-lg sm:p-5"
-                >
-                  <h3
-                    id="learned-attack-title"
-                    className="text-lg leading-tight font-bold text-cyan-400 sm:text-xl"
-                  >
-                    New Attack Learned!
-                  </h3>
-                  <div className="mt-2 flex items-center justify-center gap-2">
-                    {creatureVisuals.spriteUrl && (
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-cyan-500/40 bg-slate-900 p-1">
-                        <Image
-                          src={creatureVisuals.spriteUrl}
-                          alt={`${creatureVisuals.name} icon`}
-                          width={32}
-                          height={32}
-                          className="h-full w-full object-contain"
-                        />
-                      </div>
-                    )}
-                    <p className="text-left text-sm leading-tight text-slate-200">
-                      <span className="font-bold text-white">
-                        {creatureVisuals.name}
-                      </span>
-                      <br />
-                      learned
-                    </p>
-                  </div>
-                  <div className="my-3 rounded-lg bg-slate-900 p-2.5 sm:p-3">
-                    <span className="text-lg font-bold text-yellow-400 sm:text-xl">
-                      {newDef?.name || activeModal.attackDefId}
-                    </span>
-                    <p className="mt-1 text-xs text-slate-300 sm:text-sm">
-                      Power: {newDef?.power} · Cooldown:{' '}
-                      {(newDef?.cooldownMs ?? 1000) / 1000}s
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      className="min-w-0 flex-1 cursor-pointer rounded-lg bg-slate-600 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-slate-500"
-                      onClick={closeActiveModal}
-                    >
-                      Later
-                    </button>
-                    <button
-                      className="min-w-0 flex-1 cursor-pointer rounded-lg bg-cyan-600 px-3 py-2 text-sm font-bold text-white transition-transform hover:scale-[1.02] hover:bg-cyan-500 active:scale-[0.98] disabled:cursor-default disabled:bg-cyan-800 disabled:text-cyan-200 disabled:hover:scale-100"
-                      onClick={makeLearnedAttackActive}
-                      disabled={!tower || learnedAttackIndex < 0}
-                    >
-                      {isLearnedAttackActive ? 'Already Active' : 'Make Active'}
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <LearnedAttackDialog
+                key={activeModal.towerId + '-' + attack.id}
+                creatureName={
+                  tower
+                    ? resolveSpeciesVisuals(tower.creature.speciesId).name
+                    : 'Your Cosmoid'
+                }
+                attack={attack}
+                current={current}
+                isActive={!!tower && tower.selectedAttackIndex === learnedIndex}
+                canActivate={!!tower && learnedIndex >= 0}
+                onClose={closeActiveModal}
+                onActivate={() => {
+                  if (tower && learnedIndex >= 0) {
+                    engineRef.current.setTowerAttack(
+                      tower.creature.id,
+                      learnedIndex
+                    );
+                    setUiUpdateToggle((previous) => !previous);
+                  }
+                  closeActiveModal();
+                }}
+              />
             );
           }
-
           if (activeModal.type === 'ASK_REPLACE_ATTACK') {
             const tower = engineRef.current.towers.find(
-              (t: any) => t.id === activeModal.towerId
+              (candidate) => candidate.id === activeModal.towerId
             );
-            if (!tower) return null;
-            const newDef = ATTACK_DEFS[activeModal.newAttackDefId];
-
+            const attack = ATTACK_DEFS[activeModal.newAttackDefId];
+            if (!tower || !attack) return null;
+            const learnable =
+              COSMOID_TEMPLATES[tower.creature.speciesId]?.learnableAttacks ??
+              [];
             return (
-              <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/80 p-4">
-                <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg border-2 border-purple-500 bg-slate-800 p-6 shadow-lg">
-                  <h3 className="mb-2 text-2xl font-bold text-purple-400">
-                    Maximum Attacks Reached!
-                  </h3>
-                  <p className="mb-6 text-slate-300">
-                    This creature wants to learn{' '}
-                    <span className="font-bold text-yellow-400">
-                      {newDef?.name}
-                    </span>
-                    , but already knows 4 attacks. Choose an attack to forget,
-                    or cancel.
-                  </p>
-
-                  <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
-                    {/* Current Attacks */}
-                    {tower.creature.equippedAttacks.map(
-                      (atk: AttackId, idx: number) => {
-                        const def = ATTACK_DEFS[atk];
-                        return (
-                          <button
-                            key={idx}
-                            onClick={() => {
-                              engineRef.current.replaceTowerAttack(
-                                tower.id,
-                                idx,
-                                activeModal.newAttackDefId
-                              );
-                              closeActiveModal();
-                            }}
-                            className="group flex cursor-pointer flex-col rounded border border-slate-600 bg-slate-700 p-3 text-left transition-colors hover:border-red-500 hover:bg-red-900/50"
-                          >
-                            <span className="font-bold text-slate-200 group-hover:text-red-400">
-                              Forget {def?.name}
-                            </span>
-                            <span className="mt-1 line-clamp-2 text-xs text-slate-400">
-                              Power: {def?.power}
-                            </span>
-                          </button>
-                        );
-                      }
-                    )}
-                  </div>
-
-                  {/* New Attack Info & Cancel */}
-                  <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-700 pt-4 lg:flex-row">
-                    <div className="flex-1">
-                      <div className="font-bold text-yellow-400">
-                        New: {newDef?.name}
-                      </div>
-                      <div className="text-sm text-slate-300">
-                        Power: {newDef?.power} | Cooldown:{' '}
-                        {(newDef?.cooldownMs || 1000) / 1000}s
-                      </div>
-                    </div>
-                    <button
-                      className="cursor-pointer rounded bg-slate-600 px-6 py-2 font-bold whitespace-nowrap text-white transition-transform hover:scale-[1.02] hover:bg-slate-500 active:scale-[0.98]"
-                      onClick={closeActiveModal}
-                    >
-                      Do Not Learn
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <AttackDialog
+                key={activeModal.towerId + '-' + attack.id}
+                title="Maximum Attacks Reached!"
+                onClose={closeActiveModal}
+              >
+                <AttackReplacement
+                  next={attack}
+                  known={tower.creature.equippedAttacks.map(
+                    (id) => ATTACK_DEFS[id]
+                  )}
+                  activeIndex={tower.selectedAttackIndex}
+                  canRelearn={(id) =>
+                    learnable.some(
+                      (move) =>
+                        move.attackId === id &&
+                        move.level <= tower.creature.level
+                    )
+                  }
+                  onCancel={closeActiveModal}
+                  onReplace={(index) => {
+                    // Keep the battle paused while replacement emits its learned event.
+                    setModalQueue((previous) => previous.slice(1));
+                    engineRef.current.replaceTowerAttack(
+                      tower.id,
+                      index,
+                      attack.id
+                    );
+                    setUiUpdateToggle((previous) => !previous);
+                  }}
+                />
+              </AttackDialog>
             );
           }
 
