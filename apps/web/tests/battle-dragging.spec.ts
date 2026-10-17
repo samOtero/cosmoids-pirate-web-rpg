@@ -207,6 +207,40 @@ for (const input of ['touch', 'mouse'] as const) {
         if (input === 'touch')
           expect(bounds.y + bounds.height).toBeLessThan(pointer.y - 15);
       };
+      const scrollOverBanners = async () => {
+        // Ensure there is room above before checking the top banner.
+        if ((await camera()).y > -30) {
+          await move({
+            x: rect.x + rect.width / 2,
+            y: (rect.y + rect.height + page.viewportSize()!.height) / 2,
+          });
+          await expect
+            .poll(async () => -(await camera()).y)
+            .toBeGreaterThan(30);
+        }
+        for (const banner of ['top', 'bottom'] as const) {
+          const before = await camera();
+          await move({
+            x: rect.x + rect.width / 2,
+            y:
+              banner === 'top'
+                ? rect.y / 2
+                : (rect.y + rect.height + page.viewportSize()!.height) / 2,
+          });
+          await expect
+            .poll(async () => {
+              const after = await camera();
+              return banner === 'top' ? after.y - before.y : before.y - after.y;
+            })
+            .toBeGreaterThan(4);
+        }
+      };
+      const assertCameraStopped = async () => {
+        const stopped = await camera();
+        await page.waitForTimeout(180);
+        expect((await camera()).x).toBeCloseTo(stopped.x);
+        expect((await camera()).y).toBeCloseTo(stopped.y);
+      };
 
       const start = (await roster.boundingBox())!;
       await down({
@@ -271,6 +305,7 @@ for (const input of ['touch', 'mouse'] as const) {
       await page.screenshot({
         path: testInfo.outputPath('edge-scroll-' + input + '.png'),
       });
+      await scrollOverBanners();
       // A stationary aim point maps to fresh world coordinates after the camera pans.
       const target = await visibleSpot();
       await aimAt(target);
@@ -286,10 +321,7 @@ for (const input of ['touch', 'mouse'] as const) {
           );
         })
         .toBe(true);
-      const stopped = await camera();
-      await page.waitForTimeout(180);
-      expect((await camera()).x).toBeCloseTo(stopped.x);
-      expect((await camera()).y).toBeCloseTo(stopped.y);
+      await assertCameraStopped();
 
       // Moving an already placed tower uses the same raised target and supports cancellation.
       const placed = projected(target, await camera());
@@ -308,6 +340,7 @@ for (const input of ['touch', 'mouse'] as const) {
           );
         })
         .toBe(true);
+      await scrollOverBanners();
       const beforeInternalPan = await camera();
       const internalAim = {
         x: rect.width / 2,
@@ -355,11 +388,22 @@ for (const input of ['touch', 'mouse'] as const) {
       });
       await expect(preview).toBeVisible();
       await assertPreview();
+      await scrollOverBanners();
+      // Capture-device drags also pan at an edge inside the map.
+      const beforeCapturePan = await camera();
+      await move({
+        x: rect.x + rect.width / 2,
+        y: rect.y + 3 + lift,
+      });
+      await expect
+        .poll(async () => (await camera()).y - beforeCapturePan.y)
+        .toBeGreaterThan(1);
       await page.screenshot({
         path: testInfo.outputPath('capture-offset-' + input + '.png'),
       });
       await cancel();
       await expect(preview).toHaveCount(0);
+      await assertCameraStopped();
       expect(errors).toEqual([]);
     });
   });

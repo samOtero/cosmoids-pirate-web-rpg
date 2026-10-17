@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { getTDDragAimPoint, resolveTDDragPointer } from '@/utils/tdDragPointer';
+import {
+  getTDDragAimPoint,
+  resolveTDDragPointer,
+  resolveTDDragScrollAim,
+} from '@/utils/tdDragPointer';
 
 describe('battlefield drag aiming', () => {
   const rect = { left: 100, top: 50, width: 800, height: 400 };
@@ -71,6 +75,94 @@ describe('battlefield drag aiming', () => {
     ).toBeNull();
     expect(
       resolveTDDragPointer(pointer, { ...rect, width: 0 }, viewport, map)
+    ).toBeNull();
+  });
+
+  it.each(['mouse', 'touch', 'pen'])(
+    'scrolls over both banners with %s input without accepting off-map drops',
+    (pointerType) => {
+      const surface = { left: 100, top: 0, width: 800, height: 600 };
+      for (const [clientY, expectedY] of [
+        [25, 0],
+        [550, viewport.height],
+      ]) {
+        const pointer = { clientX: 500, clientY, pointerType };
+        expect(
+          resolveTDDragScrollAim(pointer, rect, viewport, surface)
+        ).toEqual({
+          x: viewport.width / 2,
+          y: expectedY,
+        });
+        expect(
+          resolveTDDragPointer(pointer, rect, viewport, map)!.world
+        ).toBeNull();
+      }
+    }
+  );
+
+  it('keeps the raised touch scroll aim usable at the top of the level', () => {
+    const pointer = { clientX: 500, clientY: 5, pointerType: 'touch' };
+    expect(
+      resolveTDDragScrollAim(pointer, rect, viewport, {
+        left: 100,
+        top: 0,
+        width: 800,
+        height: 600,
+      })
+    ).toEqual({ x: 400, y: 0 });
+  });
+
+  it('scrolls down as soon as a touching finger enters the lower banner', () => {
+    const pointer = {
+      clientX: 500,
+      clientY: rect.top + rect.height + 1,
+      pointerType: 'touch',
+    };
+    expect(
+      resolveTDDragScrollAim(pointer, rect, viewport, {
+        left: 100,
+        top: 0,
+        width: 800,
+        height: 600,
+      })
+    ).toEqual({ x: 400, y: viewport.height });
+    // The visible raised drop target still uses its actual position on the map.
+    expect(
+      resolveTDDragPointer(pointer, rect, viewport, map)!.world
+    ).not.toBeNull();
+  });
+
+  it('preserves scaled edge strength inside the map and stops outside the level', () => {
+    const scaledRect = { left: 100, top: 50, width: 400, height: 200 };
+    const surface = { left: 100, top: 0, width: 400, height: 400 };
+    const pointer = { clientX: 495, clientY: 214, pointerType: 'touch' };
+    expect(
+      resolveTDDragScrollAim(pointer, scaledRect, viewport, surface)
+    ).toEqual({
+      x: 790,
+      y: 200,
+    });
+    for (const point of [
+      { clientX: 99, clientY: 100 },
+      { clientX: 501, clientY: 100 },
+      { clientX: 300, clientY: -1 },
+      { clientX: 300, clientY: 401 },
+    ])
+      expect(
+        resolveTDDragScrollAim(
+          { ...pointer, ...point },
+          scaledRect,
+          viewport,
+          surface
+        )
+      ).toBeNull();
+    expect(
+      resolveTDDragScrollAim(
+        pointer,
+        { ...scaledRect, width: 0 },
+        viewport,
+        surface
+      )
     ).toBeNull();
   });
 });

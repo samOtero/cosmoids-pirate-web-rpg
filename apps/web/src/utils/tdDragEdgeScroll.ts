@@ -36,7 +36,7 @@ function travelled(seconds: number): number {
   );
 }
 
-/** Pan only while a tower's aim point stays in a visible viewport edge band. */
+/** Pan while a dragged object's scroll aim stays in a viewport edge band. */
 export function advanceTDDragEdgeScroll({
   aim,
   viewport,

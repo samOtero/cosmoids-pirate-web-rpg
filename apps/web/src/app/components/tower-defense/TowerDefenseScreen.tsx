@@ -176,6 +176,7 @@ export default function TowerDefenseScreen({
   const dragStateRef = useRef<'tower' | 'capture' | false>(false);
   const justDraggedRef = useRef(false);
   const pixiRef = useRef<PixiBattlefieldRef>(null);
+  const dragSurfaceRef = useRef<HTMLDivElement>(null);
   const healingTutorialTriggeredRef = useRef(false);
   const [healingTutorial, setHealingTutorial] =
     useState<HealingTutorialState | null>(null);
@@ -620,6 +621,7 @@ export default function TowerDefenseScreen({
 
   return (
     <div
+      ref={dragSurfaceRef}
       className="fixed inset-0 z-9998 flex touch-none flex-col bg-slate-900"
       onPointerMove={(e) => {
         // Check if a pending drag should become a real drag
@@ -937,6 +939,7 @@ export default function TowerDefenseScreen({
 
       <PixiBattlefield
         ref={pixiRef}
+        dragSurfaceRef={dragSurfaceRef}
         engine={engineRef.current}
         backgroundUrl={levelData.backgroundUrl}
         backgroundScale={levelData.backgroundScale}

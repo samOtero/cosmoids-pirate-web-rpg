@@ -1,6 +1,12 @@
 import { getDefinitionVisuals } from '@/utils/definitionVisuals';
 import { AttackId, SpeciesId } from '@/types/definitionIds';
-import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import {
+  useEffect,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+  type RefObject,
+} from 'react';
 import * as PIXI from 'pixi.js';
 import {
   TowerDefenseEngine,
@@ -36,6 +42,7 @@ import { getCaptureUnitVisualState } from '@/utils/captureUnitVisualState';
 import { getTDRangePreviewRadius } from '@/utils/tdAttackRangePreview';
 import {
   resolveTDDragPointer,
+  resolveTDDragScrollAim,
   type TDDragPointer,
 } from '@/utils/tdDragPointer';
 import {
@@ -3106,6 +3113,7 @@ interface PixiBattlefieldProps {
   onStructureFocused?: (structureId: string) => void;
   onDragStateChange?: (isDragging: boolean) => void;
   getDragState?: () => 'tower' | 'capture' | false;
+  dragSurfaceRef?: RefObject<HTMLDivElement | null>;
   backgroundUrl?: string;
   backgroundScale?: number;
   fitToScreen?: boolean;
@@ -3145,6 +3153,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
       onStructureFocused,
       onDragStateChange,
       getDragState,
+      dragSurfaceRef,
       backgroundUrl,
       backgroundScale = 1,
       fitToScreen = false,
@@ -3792,11 +3801,19 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         app.ticker.add((ticker) => {
           // Re-evaluate bg layout each tick to pick up zoom changes
           updateBgLayout();
+          const pointer = dragPointerRef.current;
+          const rect = pointer
+            ? containerRef.current?.getBoundingClientRect()
+            : null;
           const edgeScroll = advanceTDDragEdgeScroll({
             aim:
-              !isOpeningPanActiveRef.current &&
-              dragPointerRef.current?.type === 'tower'
-                ? (resolveDrag()?.aim ?? null)
+              !isOpeningPanActiveRef.current && pointer && rect
+                ? resolveTDDragScrollAim(
+                    pointer,
+                    rect,
+                    viewportSizeRef.current,
+                    dragSurfaceRef?.current?.getBoundingClientRect() ?? rect
+                  )
                 : null,
             viewport: viewportSizeRef.current,
             scroll: scrollRef.current,
@@ -6784,6 +6801,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
       fitToScreen,
       initialView,
       openingPan,
+      dragSurfaceRef,
     ]);
 
     return (
