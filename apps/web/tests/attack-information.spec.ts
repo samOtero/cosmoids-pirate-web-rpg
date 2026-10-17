@@ -86,6 +86,12 @@ for (const viewport of [
             .profiles[0].creatures[0].activeAttackIndex
       );
     expect(await activeIndex()).toBe(0);
+    const profileDetails = page.getByRole('region', {
+      name: known[1].name + ' details',
+    });
+    expect((await profileDetails.boundingBox())!.height).toBeLessThan(
+      viewport.height * 0.6
+    );
     await page.screenshot({
       path: testInfo.outputPath('profile-move-information.png'),
     });
@@ -111,8 +117,17 @@ for (const viewport of [
       name: 'Replace ' + known[0].name + ' with ' + forgotten.name,
       exact: true,
     });
-    await replace.scrollIntoViewIfNeeded();
     await expect(replace).toBeVisible();
+    await expect(replace).toBeInViewport({ ratio: 1 });
+    await expect(
+      comparison.getByRole('region', { name: / details$/ })
+    ).toHaveCount(1);
+    const comparisonBounds = (await comparison.boundingBox())!;
+    expect(comparisonBounds.height).toBeLessThan(viewport.height * 0.9);
+    expect(comparisonBounds.x).toBeGreaterThanOrEqual(0);
+    expect(comparisonBounds.x + comparisonBounds.width).toBeLessThanOrEqual(
+      viewport.width
+    );
     await page.screenshot({
       path: testInfo.outputPath('move-replacement-confirmation.png'),
     });
@@ -140,12 +155,23 @@ for (const viewport of [
     await expect(
       menu.getByRole('region', { name: known[1].name + ' details' })
     ).toBeVisible();
-    await menu
-      .getByRole('button', { name: 'Make Active', exact: true })
-      .scrollIntoViewIfNeeded();
+    const trayBounds = (await menu.boundingBox())!;
+    expect(trayBounds.height).toBeLessThan(viewport.height * 0.55);
+    expect(trayBounds.y).toBeGreaterThan(viewport.height * 0.45);
+    await expect(
+      menu.getByRole('button', { name: 'Make Active', exact: true })
+    ).toBeInViewport({ ratio: 1 });
+    const close = menu.getByRole('button', { name: 'Close', exact: true });
+    await expect(close).toBeInViewport({ ratio: 1 });
+    await expect(menu.getByRole('region', { name: / details$/ })).toHaveCount(
+      1
+    );
     await page.screenshot({
       path: testInfo.outputPath('battle-move-information.png'),
     });
+    await menu.getByLabel('More about ' + known[1].name).click();
+    expect((await menu.boundingBox())!.height).toBe(trayBounds.height);
+    await expect(close).toBeInViewport({ ratio: 1 });
     await menu.getByRole('button', { name: 'Close', exact: true }).click();
     await expect(
       page.getByRole('button', { name: 'Start', exact: true })

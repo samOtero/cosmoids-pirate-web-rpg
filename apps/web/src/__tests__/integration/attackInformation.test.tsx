@@ -177,11 +177,29 @@ describe('attack information decisions', () => {
       />
     );
     expect(screen.getByRole('dialog')).toHaveTextContent(
-      'It has been added to your known moves.'
+      'Test creature learned New move.'
     );
+    expect(screen.getAllByRole('region', { name: / details$/ })).toHaveLength(
+      1
+    );
+    const more = screen.getByLabelText('More about New move');
+    expect(more.closest('details')).not.toHaveAttribute('open');
+    fireEvent.click(more);
+    expect(more.closest('details')).toHaveAttribute('open');
     fireEvent.click(
-      screen.getByText('Compare with current active move: First move')
+      screen.getByRole('button', {
+        name: 'Compare with current active move: First move',
+      })
     );
+    expect(screen.getAllByRole('region', { name: / details$/ })).toHaveLength(
+      1
+    );
+    expect(
+      screen.getByRole('region', { name: 'First move details' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('More about First move').closest('details')
+    ).not.toHaveAttribute('open');
     expect(activate).not.toHaveBeenCalled();
     fireEvent.click(
       screen.getByRole('button', { name: 'Keep Current Active' })

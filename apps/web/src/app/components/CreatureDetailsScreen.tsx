@@ -140,7 +140,7 @@ export default function CreatureDetailsScreen({
       {/* Main Content Layout (Landscape double column) */}
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto sm:flex-row sm:overflow-hidden lg:gap-6">
         {/* Left Column: Visuals & Stats Panel */}
-        <div className="flex min-h-0 w-full shrink-0 flex-col gap-2 sm:w-[38%]">
+        <div className="flex min-h-0 w-full shrink-0 flex-col gap-2 sm:w-[32%]">
           <Panel
             className={`flex min-h-0 flex-1 flex-col bg-ocean-dark/70 p-3 transition-all duration-300 ${
               creature.isShiny
@@ -219,106 +219,117 @@ export default function CreatureDetailsScreen({
           </Panel>
         </div>
 
-        <div className="flex min-h-80 flex-1 flex-col gap-2 sm:min-h-0">
-          <Panel className="flex min-h-0 flex-1 flex-col overflow-y-auto border-wood/80 bg-ocean-dark/70 p-3">
-            <h3 className="mb-2 text-sm font-bold text-sand">
-              Known moves · select to inspect
-            </h3>
-            <div className="grid shrink-0 grid-cols-2 gap-2">
-              {currentMoves.map((moveId, index) => {
-                const move = ATTACK_DEFS[moveId];
-                if (!move) return null;
-                return (
-                  <button
-                    key={moveId}
-                    type="button"
-                    aria-label={'Inspect ' + move.name}
-                    aria-pressed={inspectedMoveId === moveId}
-                    onClick={() => setInspectedMoveId(moveId)}
-                    className={
-                      'flex min-h-16 flex-col items-start gap-1 rounded-lg border-2 p-2 text-left text-sm ' +
-                      (inspectedMoveId === moveId
-                        ? 'border-cyan-400 bg-cyan-950'
-                        : 'border-slate-600 bg-slate-900')
-                    }
-                  >
-                    <span className="font-bold">{move.name}</span>
-                    <TypeBadge type={move.type} />
-                    {index === selectedActiveIdx && (
-                      <span className="text-xs font-bold text-cyan-200">
-                        Active
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-            {inspectedMove && (
-              <div className="mt-3 space-y-2">
-                <AttackDetails
-                  attack={inspectedMove}
-                  badge={
-                    currentMoves[selectedActiveIdx] === inspectedMove.id
-                      ? 'Active'
-                      : undefined
-                  }
-                />
-                {currentMoves.includes(inspectedMove.id) ? (
-                  <Button
-                    variant="wood"
-                    disabled={
-                      currentMoves[selectedActiveIdx] === inspectedMove.id
-                    }
-                    onClick={() =>
-                      handleSetActiveAttack(
-                        currentMoves.indexOf(inspectedMove.id)
-                      )
-                    }
-                    className="min-h-11 px-4 py-2 text-sm font-bold"
-                  >
-                    {currentMoves[selectedActiveIdx] === inspectedMove.id
-                      ? 'Already Active'
-                      : 'Make Active'}
-                  </Button>
-                ) : (
-                  <Button
-                    variant="wood"
-                    onClick={() => handleLearnAttack(inspectedMove.id)}
-                    className="min-h-11 px-4 py-2 text-sm font-bold"
-                  >
-                    Relearn {inspectedMove.name}
-                  </Button>
-                )}
-              </div>
-            )}
-            <h3 className="mt-4 mb-2 text-sm font-bold text-sand">
-              Relearn Forgotten Attacks
-            </h3>
-            {relearnableAttacks.length === 0 ? (
-              <p className="text-sm text-sand/70">
-                No forgotten moves available to relearn at this level.
-              </p>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {relearnableAttacks.map((moveId) => {
+        <div className="flex min-h-0 flex-1 flex-col">
+          <Panel className="grid min-h-0 flex-1 grid-cols-[minmax(120px,32%)_minmax(0,1fr)] gap-2 border-wood/80 bg-ocean-dark/70 p-2">
+            <div className="min-h-0 overflow-y-auto" aria-label="Move list">
+              <h3 className="mb-1 text-xs font-bold text-sand">Known moves</h3>
+              <div className="flex flex-col gap-1">
+                {currentMoves.map((moveId, index) => {
                   const move = ATTACK_DEFS[moveId];
                   if (!move) return null;
                   return (
                     <button
                       key={moveId}
                       type="button"
-                      aria-label={'Inspect forgotten move ' + move.name}
+                      aria-label={'Inspect ' + move.name}
                       aria-pressed={inspectedMoveId === moveId}
                       onClick={() => setInspectedMoveId(moveId)}
-                      className="flex min-h-11 items-center justify-between gap-2 rounded-lg border border-slate-600 bg-slate-900 p-2 text-left text-sm"
+                      className={
+                        'flex min-h-9 items-center justify-between gap-1 rounded border px-2 py-1 text-left text-sm ' +
+                        (inspectedMoveId === moveId
+                          ? 'border-cyan-400 bg-cyan-950'
+                          : 'border-slate-600 bg-slate-900')
+                      }
                     >
                       <span>{move.name}</span>
-                      <TypeBadge type={move.type} />
+                      {index === selectedActiveIdx && (
+                        <span
+                          aria-label="Active"
+                          title="Active"
+                          className="shrink-0 text-xs text-cyan-200"
+                        >
+                          ●
+                        </span>
+                      )}
                     </button>
                   );
                 })}
               </div>
-            )}
+              <h3 className="mt-3 mb-1 text-xs font-bold text-sand">
+                Forgotten moves
+              </h3>
+              {relearnableAttacks.length === 0 ? (
+                <p className="text-xs text-sand/70">
+                  None available at this level.
+                </p>
+              ) : (
+                <div className="flex flex-col gap-1">
+                  {relearnableAttacks.map((moveId) => {
+                    const move = ATTACK_DEFS[moveId];
+                    if (!move) return null;
+                    return (
+                      <button
+                        key={moveId}
+                        type="button"
+                        aria-label={'Inspect forgotten move ' + move.name}
+                        aria-pressed={inspectedMoveId === moveId}
+                        onClick={() => setInspectedMoveId(moveId)}
+                        className={
+                          'min-h-9 rounded border px-2 py-1 text-left text-sm ' +
+                          (inspectedMoveId === moveId
+                            ? 'border-cyan-400 bg-cyan-950'
+                            : 'border-slate-600 bg-slate-900')
+                        }
+                      >
+                        {move.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+            <div className="flex max-h-full min-h-0 min-w-0 flex-col gap-2 self-start">
+              {inspectedMove && (
+                <>
+                  <div className="grid min-h-0 flex-1">
+                    <AttackDetails
+                      attack={inspectedMove}
+                      badge={
+                        currentMoves[selectedActiveIdx] === inspectedMove.id
+                          ? 'Active'
+                          : undefined
+                      }
+                    />
+                  </div>
+                  {currentMoves.includes(inspectedMove.id) ? (
+                    <Button
+                      variant="wood"
+                      disabled={
+                        currentMoves[selectedActiveIdx] === inspectedMove.id
+                      }
+                      onClick={() =>
+                        handleSetActiveAttack(
+                          currentMoves.indexOf(inspectedMove.id)
+                        )
+                      }
+                      className="min-h-9 shrink-0 px-3 py-1 text-xs font-bold"
+                    >
+                      {currentMoves[selectedActiveIdx] === inspectedMove.id
+                        ? 'Already Active'
+                        : 'Make Active'}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="wood"
+                      onClick={() => handleLearnAttack(inspectedMove.id)}
+                      className="min-h-9 shrink-0 px-3 py-1 text-xs font-bold"
+                    >
+                      Relearn {inspectedMove.name}
+                    </Button>
+                  )}
+                </>
+              )}
+            </div>
           </Panel>
         </div>
       </div>

@@ -1,8 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import type { AttackDefinition } from '@/engine/tower-defense/attacks/types';
 import { AttackDialog } from './AttackDialog';
-import { AttackDetails, AttackComparison } from './AttackDetails';
+import { AttackDetails } from './AttackDetails';
 
 export function LearnedAttackDialog({
   creatureName,
@@ -21,36 +22,62 @@ export function LearnedAttackDialog({
   onActivate: () => void;
   onClose: () => void;
 }) {
+  const [viewingCurrent, setViewingCurrent] = useState(false);
   return (
     <AttackDialog title="New Attack Learned!" onClose={onClose}>
-      <p className="mb-3 text-sm text-slate-200">
-        {creatureName} learned {attack.name}. It has been added to your known
-        moves.
+      <p className="mb-2 text-xs text-slate-200">
+        {creatureName} learned {attack.name}.
       </p>
-      <AttackDetails attack={attack} badge={isActive ? 'Active' : 'Learned'} />
       {current && !isActive && (
-        <details className="mt-3 rounded-lg border border-slate-600 p-3">
-          <summary className="min-h-8 cursor-pointer font-semibold text-cyan-200">
-            Compare with current active move: {current.name}
-          </summary>
-          <div className="mt-3 space-y-3">
-            <AttackDetails attack={current} badge="Current active" />
-            <AttackComparison previous={current} next={attack} />
-          </div>
-        </details>
+        <div className="mb-1 flex gap-1 text-xs" aria-label="Comparison view">
+          <button
+            type="button"
+            aria-pressed={!viewingCurrent}
+            onClick={() => setViewingCurrent(false)}
+            className={
+              'min-h-7 flex-1 rounded border px-2 py-1 ' +
+              (!viewingCurrent
+                ? 'border-cyan-400 bg-cyan-950'
+                : 'border-slate-600')
+            }
+          >
+            New: {attack.name}
+          </button>
+          <button
+            type="button"
+            aria-label={'Compare with current active move: ' + current.name}
+            aria-pressed={viewingCurrent}
+            onClick={() => setViewingCurrent(true)}
+            className={
+              'min-h-7 flex-1 rounded border px-2 py-1 ' +
+              (viewingCurrent
+                ? 'border-cyan-400 bg-cyan-950'
+                : 'border-slate-600')
+            }
+          >
+            Active: {current.name}
+          </button>
+        </div>
       )}
-      <p className="mt-3 text-sm text-slate-300">
+      <div className="grid h-32 min-h-0">
+        <AttackDetails
+          attack={viewingCurrent && current ? current : attack}
+          badge={viewingCurrent || isActive ? 'Active' : 'Learned'}
+          compareWith={!viewingCurrent && !isActive ? current : undefined}
+        />
+      </div>
+      <p className="mt-2 text-xs text-slate-300">
         {isActive
-          ? `${attack.name} is already active.`
+          ? attack.name + ' is already active.'
           : current
-            ? `${current.name} stays active unless you choose Make Active.`
-            : 'You can choose an active move from the move menu.'}
+            ? current.name + ' stays active unless you choose Make Active.'
+            : 'Choose an active move from the move menu.'}
       </p>
-      <div className="mt-4 flex flex-wrap justify-end gap-2">
+      <div className="mt-2 flex justify-end gap-2">
         <button
           type="button"
           onClick={onClose}
-          className="min-h-11 rounded-lg border border-slate-500 bg-slate-800 px-4 py-2 font-bold"
+          className="min-h-9 rounded border border-slate-500 bg-slate-800 px-3 py-1 text-xs font-bold"
         >
           {isActive ? 'Continue' : 'Keep Current Active'}
         </button>
@@ -59,7 +86,7 @@ export function LearnedAttackDialog({
             type="button"
             disabled={!canActivate}
             onClick={onActivate}
-            className="min-h-11 rounded-lg bg-cyan-700 px-4 py-2 font-bold disabled:bg-slate-700 disabled:text-slate-400"
+            className="min-h-9 rounded bg-cyan-700 px-3 py-1 text-xs font-bold disabled:bg-slate-700 disabled:text-slate-400"
           >
             Make Active
           </button>

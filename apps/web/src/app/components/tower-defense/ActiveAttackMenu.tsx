@@ -1,7 +1,6 @@
 'use client';
 
 import { useId, useState } from 'react';
-import Image from 'next/image';
 import type { AttackId } from '@/types/definitionIds';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import type { PlayerCreature } from '@/types/baseGame';
@@ -11,14 +10,12 @@ import {
   getAttackRemainingMs,
   usesAttackSimulationCooldown,
 } from '@/engine/tower-defense/attacks/timing';
-import { attackSeconds, getAttackInformation } from '@/utils/attackInformation';
+import { attackSeconds } from '@/utils/attackInformation';
 import { AttackDetails } from '@/app/components/attacks/AttackDetails';
 import { AttackDialog } from '@/app/components/attacks/AttackDialog';
-import { TypeBadge } from '@/app/components/ui/TypeBadge';
 
 export function ActiveAttackMenu({
   name,
-  spriteUrl,
   displayLevel,
   displayHp,
   displayMaxHp,
@@ -75,98 +72,80 @@ export function ActiveAttackMenu({
       tower.wakeWhip ||
       (tower.sharedSlumberUntilMs ?? 0) > elapsedTimeMs);
   const readiness = !tower
-    ? 'Place this Cosmoid on the battlefield to use its moves.'
+    ? 'Not placed'
     : tower.hp <= 0
-      ? 'This Cosmoid is knocked out.'
+      ? 'Knocked out'
       : busy
-        ? 'Finishing a committed action or sleeping. The selected move waits until it can act.'
+        ? 'Busy · waiting for the current action'
         : remainingMs && remainingMs > 0
           ? 'Ready in ' +
             attackSeconds(Math.ceil(remainingMs / 100) * 100) +
             ((tower.paralysis?.expiresAtMs ?? 0) > elapsedTimeMs &&
             inspected &&
             usesAttackSimulationCooldown(inspected)
-              ? ' · Paralysis may delay recovery.'
+              ? ' · Slowed by paralysis'
               : '')
-          : 'Cooldown ready. Acts automatically when a valid target is available.';
+          : 'Cooldown ready';
   return (
-    <AttackDialog title={'Moves · ' + name} onClose={onClose}>
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-sm">
-        <div className="flex items-center gap-2">
-          {spriteUrl && (
-            <Image
-              src={spriteUrl}
-              alt=""
-              width={40}
-              height={40}
-              className="h-10 w-10 object-contain"
-            />
-          )}
-          <span>
-            Lv {displayLevel}
-            {displayHp !== undefined && displayMaxHp !== undefined
-              ? ' · HP ' + Math.ceil(displayHp) + '/' + displayMaxHp
-              : ''}
-          </span>
+    <AttackDialog title={'Moves · ' + name} layout="tray" onClose={onClose}>
+      <p className="sr-only">
+        Lv {displayLevel}
+        {displayHp !== undefined && displayMaxHp !== undefined
+          ? ' · HP ' + Math.ceil(displayHp) + '/' + displayMaxHp
+          : ''}
+      </p>
+      <div className="grid min-h-0 flex-1 grid-cols-[minmax(110px,22%)_minmax(0,1fr)_126px] gap-2">
+        <div className="flex min-h-0 flex-col gap-1" aria-label="Known moves">
+          {equippedAttacks.map((id, index) => {
+            const attack = ATTACK_DEFS[id];
+            if (!attack) return null;
+            return (
+              <button
+                key={id + '-' + index}
+                type="button"
+                aria-label={'Inspect ' + attack.name}
+                aria-pressed={inspectedIndex === index}
+                onClick={() => setInspectedIndex(index)}
+                className={
+                  'flex min-h-0 flex-1 items-center justify-between gap-1 rounded border px-2 py-1 text-left text-sm ' +
+                  (inspectedIndex === index
+                    ? 'border-cyan-300 bg-cyan-950'
+                    : 'border-slate-600 bg-slate-800 hover:border-cyan-500')
+                }
+              >
+                <span className="truncate">{attack.name}</span>
+                {activeAttackIndex === index && (
+                  <span
+                    aria-label="Active"
+                    title="Active"
+                    className="shrink-0 text-xs text-cyan-200"
+                  >
+                    ●
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
-        <span className="rounded bg-amber-950 px-2 py-1 font-semibold text-amber-200">
-          Battle paused
-        </span>
-      </div>
-      <div
-        className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-4"
-        aria-label="Known moves"
-      >
-        {equippedAttacks.map((id, index) => {
-          const attack = ATTACK_DEFS[id];
-          if (!attack) return null;
-          return (
-            <button
-              key={id + '-' + index}
-              type="button"
-              aria-label={'Inspect ' + attack.name}
-              aria-pressed={inspectedIndex === index}
-              onClick={() => setInspectedIndex(index)}
-              className={
-                'flex min-h-16 flex-col items-start gap-1 rounded-lg border-2 p-2 text-left text-sm ' +
-                (inspectedIndex === index
-                  ? 'border-cyan-300 bg-cyan-950'
-                  : 'border-slate-600 bg-slate-800 hover:border-cyan-500')
-              }
-            >
-              <span className="font-bold">{attack.name}</span>
-              <TypeBadge type={attack.type} />
-              <span className="text-xs text-slate-300">
-                {getAttackInformation(attack).category.split(' · ')[0]}
-              </span>
-              {activeAttackIndex === index && (
-                <span className="text-xs font-bold text-cyan-200">Active</span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-      {inspected && (
-        <AttackDetails
-          attack={inspected}
-          badge={inspectedIndex === activeAttackIndex ? 'Active' : undefined}
-          intervalMs={intervalMs}
-          readiness={readiness}
-        />
-      )}
-      <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
-        <label
-          htmlFor={targetingId}
-          className="text-sm font-bold text-cyan-100"
-        >
-          Targeting
+        {inspected && (
+          <AttackDetails
+            attack={inspected}
+            badge={inspectedIndex === activeAttackIndex ? 'Active' : undefined}
+            intervalMs={intervalMs}
+            readiness={readiness}
+          />
+        )}
+        <div className="flex min-h-0 flex-col gap-1">
+          <label htmlFor={targetingId} className="sr-only">
+            Targeting
+          </label>
           <select
             id={targetingId}
             value={activeTargetingMode}
             onChange={(event) =>
               onSelectTargetingMode?.(event.target.value as TowerTargetingMode)
             }
-            className="ml-2 min-h-11 rounded border border-slate-500 bg-slate-800 px-2 text-sm text-white"
+            className="min-h-8 w-full rounded border border-slate-500 bg-slate-800 px-1 text-xs text-white"
           >
             <option value="first">First</option>
             <option value="last">Last</option>
@@ -176,13 +155,11 @@ export function ActiveAttackMenu({
             <option value="lowest-hp-percent">Lowest HP %</option>
             <option value="highest-hp-percent">Highest HP %</option>
           </select>
-        </label>
-        <div className="flex flex-wrap gap-2">
           <button
             type="button"
             disabled={!inspected || inspectedIndex === activeAttackIndex}
             onClick={() => onSelectAttack(inspectedIndex)}
-            className="min-h-11 rounded-lg bg-cyan-700 px-4 py-2 font-bold text-white disabled:bg-slate-700 disabled:text-slate-400"
+            className="min-h-9 rounded bg-cyan-700 px-2 text-xs font-bold text-white disabled:bg-slate-700 disabled:text-slate-400"
           >
             {inspectedIndex === activeAttackIndex
               ? 'Already Active'
@@ -191,10 +168,13 @@ export function ActiveAttackMenu({
           <button
             type="button"
             onClick={onClose}
-            className="min-h-11 rounded-lg border border-slate-500 bg-slate-800 px-4 py-2 font-bold"
+            className="min-h-8 rounded border border-slate-500 bg-slate-800 px-2 text-xs font-bold"
           >
             Close
           </button>
+          <span className="text-center text-xs text-amber-200">
+            Battle paused
+          </span>
         </div>
       </div>
     </AttackDialog>

@@ -7,10 +7,12 @@ export function AttackDialog({
   title,
   onClose,
   children,
+  layout = 'modal',
 }: {
   title: string;
   onClose: () => void;
   children: ReactNode;
+  layout?: 'modal' | 'tray';
 }) {
   const titleId = useId();
   const panel = useRef<HTMLDivElement>(null);
@@ -23,14 +25,16 @@ export function AttackDialog({
     };
   }, []);
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 p-2 sm:p-4">
+    <div
+      className={`fixed inset-0 z-[9999] flex justify-center ${layout === 'tray' ? 'items-end bg-black/15' : 'items-center bg-black/60 p-2'}`}
+    >
       <div
         ref={panel}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className="max-h-[calc(100dvh-1rem)] w-full max-w-3xl overflow-y-auto overscroll-contain rounded-xl border-2 border-cyan-600 bg-slate-900 p-3 text-slate-100 shadow-xl outline-none sm:p-5"
+        className={`flex w-full flex-col border border-cyan-600 bg-slate-900 text-slate-100 shadow-xl outline-none ${layout === 'tray' ? 'h-[min(210px,48dvh)] rounded-t-lg p-2' : 'max-h-[calc(100dvh-1rem)] max-w-xl overflow-y-auto overscroll-contain rounded-lg p-3'}`}
         onKeyDown={(event) => {
           if (event.key === 'Escape') {
             event.preventDefault();
@@ -68,7 +72,7 @@ export function AttackDialog({
       >
         <h2
           id={titleId}
-          className="mb-3 text-lg font-bold text-cyan-200 sm:text-xl"
+          className="mb-1.5 shrink-0 text-sm font-bold text-cyan-200"
         >
           {title}
         </h2>
