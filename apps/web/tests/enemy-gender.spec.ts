@@ -116,6 +116,7 @@ for (const scenario of [
               height: bounds.height,
               left: bounds.minX,
               hpRight: hp.getBounds().maxX,
+              hpHeight: hp.getBounds().height,
               color: strokes.at(-1)!.data.style.color,
               visible:
                 bounds.minX >= 0 &&
@@ -137,7 +138,7 @@ for (const scenario of [
       expect(badge.color).toBe(
         CREATURE_GENDER_PRESENTATION[scenario.gender].color
       );
-      expect(badge.height).toBeGreaterThanOrEqual(18);
+      expect(badge.height / badge.hpHeight).toBeCloseTo(2);
       expect(badge.left).toBeGreaterThan(badge.hpRight);
       expect(badge.eventMode).toBe('none');
     }
@@ -150,7 +151,9 @@ for (const scenario of [
       await zoomOut.click();
       await expect
         .poll(async () =>
-          (await readBadges()).every((badge) => badge.height >= 18)
+          (await readBadges()).every(
+            (badge) => Math.abs(badge.height / badge.hpHeight - 2) < 0.02
+          )
         )
         .toBe(true);
       await page.screenshot({

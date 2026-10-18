@@ -262,7 +262,12 @@ export function renderHealthBar(
       hpFg.fill({ color: isWeakened ? 0xff0000 : 0x22c55e });
     }
   }
-  return { right: healthBarWidth / 2 + 1, centerY: hpOffsetY + 2 };
+  const bounds = hpBg.getLocalBounds();
+  return {
+    right: bounds.maxX,
+    centerY: bounds.minY + bounds.height / 2,
+    height: bounds.height,
+  };
 }
 
 function drawStar(g: PIXI.Graphics, size: number) {

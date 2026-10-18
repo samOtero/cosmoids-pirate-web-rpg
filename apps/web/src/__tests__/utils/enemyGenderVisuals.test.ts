@@ -3,7 +3,7 @@ import { Container, Graphics } from 'pixi.js';
 import { updateEnemyGenderIndicator } from '@/app/components/tower-defense/enemyGenderVisuals';
 import { CREATURE_GENDER_PRESENTATION } from '@/utils/creatureGenderPresentation';
 
-const healthBar = { right: 37, centerY: -43 };
+const healthBar = { right: 37, centerY: -43, height: 6 };
 
 describe('enemy gender indicators', () => {
   it.each(['male', 'female', 'genderless'] as const)(
@@ -28,7 +28,7 @@ describe('enemy gender indicators', () => {
     }
   );
 
-  it('stays legible at mobile and zoomed-out scales, and follows changes in health-bar layout', () => {
+  it('stays twice the health-bar height with the same proportions at every zoom', () => {
     const container = new Container();
     try {
       for (const scale of [1.5, 1, 0.4, 0.12]) {
@@ -36,6 +36,7 @@ describe('enemy gender indicators', () => {
         const anchor = {
           right: healthBar.right + scale * 8,
           centerY: healthBar.centerY - scale * 12,
+          height: healthBar.height + scale,
         };
         updateEnemyGenderIndicator(
           container,
@@ -44,7 +45,8 @@ describe('enemy gender indicators', () => {
           scale
         );
         const badge = container.getChildByLabel('enemyGenderIndicator')!;
-        expect(badge.getBounds().height).toBeGreaterThanOrEqual(18);
+        expect(badge.getBounds().height).toBeCloseTo(anchor.height * scale * 2);
+        expect(badge.scale.x).toBe(badge.scale.y);
         expect(badge.y).toBe(anchor.centerY);
         expect(badge.getBounds().minX).toBeGreaterThan(anchor.right * scale);
       }

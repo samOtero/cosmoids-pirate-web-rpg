@@ -5,8 +5,7 @@ import { CREATURE_GENDER_PRESENTATION } from '@/utils/creatureGenderPresentation
 
 type GenderIndicator = Container & { displayedGender?: CreatureGender };
 const BADGE_SIZE = 20;
-const MIN_SCREEN_SIZE = 18;
-const SCREEN_GAP = 4;
+const BADGE_BORDER_WIDTH = 2;
 
 function drawGenderSymbol(graphics: Graphics, gender: CreatureGender) {
   graphics.clear();
@@ -30,11 +29,11 @@ function drawGenderSymbol(graphics: Graphics, gender: CreatureGender) {
   }
 }
 
-/** Keep enemy identity beside the HP bar, independent of sprite poses and camera zoom. */
+/** Keep the badge proportional to the visible HP bar as the camera zooms. */
 export function updateEnemyGenderIndicator(
   container: Container,
   enemy: Pick<Enemy, 'gender' | 'kind'>,
-  healthBar: { right: number; centerY: number },
+  healthBar: { right: number; centerY: number; height: number },
   worldScale: number
 ) {
   let indicator = container.getChildByLabel('enemyGenderIndicator') as
@@ -59,7 +58,7 @@ export function updateEnemyGenderIndicator(
     backing.label = 'genderBacking';
     backing.roundRect(-10, -10, BADGE_SIZE, BADGE_SIZE, 5);
     backing.fill({ color: 0x0f172a });
-    backing.stroke({ color: 0x020617, width: 2 });
+    backing.stroke({ color: 0x020617, width: BADGE_BORDER_WIDTH });
     backing.stroke({ color: 0xe2e8f0, alpha: 0.8, width: 0.8 });
     indicator.addChild(backing);
     const symbol = new Graphics();
@@ -74,11 +73,11 @@ export function updateEnemyGenderIndicator(
     );
     indicator.displayedGender = enemy.gender;
   }
-  const scale = Math.max(1, MIN_SCREEN_SIZE / (BADGE_SIZE * worldScale));
+  const scale = (healthBar.height * 2) / (BADGE_SIZE + BADGE_BORDER_WIDTH);
   indicator.visible = true;
   indicator.scale.set(scale);
   indicator.position.set(
-    healthBar.right + SCREEN_GAP / worldScale + (BADGE_SIZE / 2) * scale,
+    healthBar.right + healthBar.height / 2 + (BADGE_SIZE / 2) * scale,
     healthBar.centerY
   );
 }
