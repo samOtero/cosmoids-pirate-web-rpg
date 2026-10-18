@@ -1,6 +1,6 @@
 'use client';
 
-import { useId } from 'react';
+import { useState } from 'react';
 import type { AttackId } from '@/types/definitionIds';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import type { PlayerCreature } from '@/types/baseGame';
@@ -14,6 +14,7 @@ import { attackSeconds } from '@/utils/attackInformation';
 import { AttackDetails } from '@/app/components/attacks/AttackDetails';
 import { AttackDialog } from '@/app/components/attacks/AttackDialog';
 import { ELEMENT_TEXT_COLORS } from '@/app/components/ui/elementTextColors';
+import { TargetPriorityMenu } from './TargetPriorityMenu';
 
 export function ActiveAttackMenu({
   name,
@@ -48,7 +49,7 @@ export function ActiveAttackMenu({
   elapsedTimeMs?: number;
   frameTimeMs?: number;
 }) {
-  const targetingId = useId();
+  const [choosingTarget, setChoosingTarget] = useState(false);
   const inspected = ATTACK_DEFS[equippedAttacks[activeAttackIndex]];
   const intervalMs =
     inspected && tower && !usesAttackSimulationCooldown(inspected)
@@ -87,95 +88,99 @@ export function ActiveAttackMenu({
               : '')
           : 'Cooldown ready';
   return (
-    <AttackDialog title={'Moves · ' + name} layout="tray" onClose={onClose}>
+    <AttackDialog
+      title={'Moves · ' + name}
+      layout="tray"
+      onClose={() => (choosingTarget ? setChoosingTarget(false) : onClose())}
+      headerActions={
+        <>
+          <span className="text-xs text-amber-200">Battle paused</span>
+          {choosingTarget && (
+            <button
+              type="button"
+              onClick={() => setChoosingTarget(false)}
+              className="min-h-11 rounded border border-slate-500 bg-slate-800 px-3 text-xs font-bold focus-visible:outline-2 focus-visible:outline-cyan-300 lg:hidden"
+            >
+              Back to moves
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onClose}
+            className={`min-h-11 rounded border border-slate-500 bg-slate-800 px-3 text-xs font-bold hover:border-cyan-300 focus-visible:outline-2 focus-visible:outline-cyan-300 ${choosingTarget ? 'hidden lg:block' : ''}`}
+          >
+            Close
+          </button>
+        </>
+      }
+    >
       <p className="sr-only">
         Lv {displayLevel}
         {displayHp !== undefined && displayMaxHp !== undefined
           ? ' · HP ' + Math.ceil(displayHp) + '/' + displayMaxHp
           : ''}
       </p>
-      <div className="grid min-h-0 flex-1 grid-cols-[minmax(110px,22%)_minmax(0,1fr)_126px] gap-2">
-        <div className="flex min-h-0 flex-col gap-1" aria-label="Known moves">
-          {equippedAttacks.map((id, index) => {
-            const attack = ATTACK_DEFS[id];
-            if (!attack) return null;
-            return (
-              <button
-                key={id + '-' + index}
-                type="button"
-                aria-label={'Select ' + attack.name}
-                title={attack.name + ' (' + attack.type + ')'}
-                aria-pressed={activeAttackIndex === index}
-                onClick={() => {
-                  if (index !== activeAttackIndex) onSelectAttack(index);
-                }}
-                className={
-                  'flex min-h-0 flex-1 items-center justify-between gap-1 rounded border px-2 py-1 text-left text-sm ' +
-                  (activeAttackIndex === index
-                    ? 'border-cyan-300 bg-cyan-950'
-                    : 'border-slate-600 bg-slate-800 hover:border-cyan-500')
-                }
-              >
-                <span
+      <div className="flex min-h-0 flex-1 flex-col gap-2">
+        <div
+          className={`grid min-h-0 flex-1 grid-cols-[minmax(100px,22%)_minmax(0,1fr)] gap-2 ${choosingTarget ? 'hidden lg:grid' : ''}`}
+        >
+          <div className="flex min-h-0 flex-col gap-1" aria-label="Known moves">
+            {equippedAttacks.map((id, index) => {
+              const attack = ATTACK_DEFS[id];
+              if (!attack) return null;
+              return (
+                <button
+                  key={id + '-' + index}
+                  type="button"
+                  aria-label={'Select ' + attack.name}
+                  title={attack.name + ' (' + attack.type + ')'}
+                  aria-pressed={activeAttackIndex === index}
+                  onClick={() => {
+                    if (index !== activeAttackIndex) onSelectAttack(index);
+                  }}
                   className={
-                    'min-w-0 truncate font-medium ' +
-                    ELEMENT_TEXT_COLORS[attack.type]
+                    'flex min-h-0 flex-1 items-center justify-between gap-1 rounded border px-2 py-1 text-left text-sm ' +
+                    (activeAttackIndex === index
+                      ? 'border-cyan-300 bg-cyan-950'
+                      : 'border-slate-600 bg-slate-800 hover:border-cyan-500')
                   }
                 >
-                  {attack.name}
-                </span>
-                {activeAttackIndex === index && (
                   <span
-                    aria-label="Active"
-                    title="Active"
-                    className="shrink-0 text-xs text-cyan-200"
+                    className={
+                      'min-w-0 truncate font-medium ' +
+                      ELEMENT_TEXT_COLORS[attack.type]
+                    }
                   >
-                    ●
+                    {attack.name}
                   </span>
-                )}
-              </button>
-            );
-          })}
+                  {activeAttackIndex === index && (
+                    <span
+                      aria-label="Active"
+                      title="Active"
+                      className="shrink-0 text-xs text-cyan-200"
+                    >
+                      ●
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          {inspected && (
+            <AttackDetails
+              attack={inspected}
+              badge="Active"
+              intervalMs={intervalMs}
+              readiness={readiness}
+            />
+          )}
         </div>
-        {inspected && (
-          <AttackDetails
-            attack={inspected}
-            badge="Active"
-            intervalMs={intervalMs}
-            readiness={readiness}
-          />
-        )}
-        <div className="flex min-h-0 flex-col gap-1">
-          <label htmlFor={targetingId} className="sr-only">
-            Targeting
-          </label>
-          <select
-            id={targetingId}
-            value={activeTargetingMode}
-            onChange={(event) =>
-              onSelectTargetingMode?.(event.target.value as TowerTargetingMode)
-            }
-            className="min-h-8 w-full rounded border border-slate-500 bg-slate-800 px-1 text-xs text-white"
-          >
-            <option value="first">First</option>
-            <option value="last">Last</option>
-            <option value="closest">Closest</option>
-            <option value="strongest">Strongest</option>
-            <option value="weakest">Weakest</option>
-            <option value="lowest-hp-percent">Lowest HP %</option>
-            <option value="highest-hp-percent">Highest HP %</option>
-          </select>
-          <button
-            type="button"
-            onClick={onClose}
-            className="min-h-8 rounded border border-slate-500 bg-slate-800 px-2 text-xs font-bold"
-          >
-            Close
-          </button>
-          <span className="text-center text-xs text-amber-200">
-            Battle paused
-          </span>
-        </div>
+        <TargetPriorityMenu
+          value={activeTargetingMode}
+          onChange={onSelectTargetingMode}
+          open={choosingTarget}
+          onOpenChange={setChoosingTarget}
+        />
       </div>
     </AttackDialog>
   );

@@ -199,4 +199,66 @@ describe('attack information decisions', () => {
     expect(close).toHaveBeenCalledOnce();
     expect(activate).not.toHaveBeenCalled();
   });
+  it('explains target priority, applies it immediately, and leaves the active move alone', () => {
+    const selectMove = vi.fn();
+    const selectTarget = vi.fn();
+    const close = vi.fn();
+    const props = {
+      creature: creature(),
+      name: 'Test creature',
+      spriteUrl: '',
+      isActive: true,
+      displayLevel: 5,
+      displayXp: 0,
+      equippedAttacks: creature().equippedAttacks!,
+      activeAttackIndex: 1,
+      onSelectAttack: selectMove,
+      onSelectTargetingMode: selectTarget,
+      onClose: close,
+    };
+    const { rerender } = render(<ActiveAttackMenu {...props} />);
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Target priority: First' })
+    );
+    const choices = screen.getByRole('group', {
+      name: 'Target priority options',
+    });
+    expect(
+      within(choices).getByRole('button', { name: 'First' })
+    ).toHaveFocus();
+    expect(
+      within(choices).getByRole('button', { name: 'First' })
+    ).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(
+      within(choices).getByRole('button', {
+        name: 'Most HP',
+      })
+    );
+    expect(selectTarget).toHaveBeenCalledExactlyOnceWith('strongest');
+    expect(selectMove).not.toHaveBeenCalled();
+    expect(close).not.toHaveBeenCalled();
+    rerender(<ActiveAttackMenu {...props} activeTargetingMode="strongest" />);
+    const trigger = screen.getByRole('button', {
+      name: 'Target priority: Most HP',
+    });
+    expect(trigger).toHaveAccessibleDescription(
+      'Highest remaining HP · within range'
+    );
+    expect(trigger).toHaveFocus();
+    expect(
+      screen.getByRole('button', { name: 'Select Second move' })
+    ).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(trigger);
+    fireEvent.click(screen.getByRole('button', { name: 'Most HP' }));
+    expect(selectTarget).toHaveBeenCalledOnce();
+    fireEvent.click(trigger);
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+    expect(
+      screen.queryByRole('group', { name: 'Target priority options' })
+    ).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
+    expect(close).not.toHaveBeenCalled();
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+    expect(close).toHaveBeenCalledOnce();
+  });
 });

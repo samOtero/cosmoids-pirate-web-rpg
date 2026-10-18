@@ -10,6 +10,7 @@ export function AttackDialog({
   layout = 'modal',
   creatureIcon,
   creatureName,
+  headerActions,
 }: {
   title: ReactNode;
   onClose: () => void;
@@ -17,6 +18,7 @@ export function AttackDialog({
   layout?: 'modal' | 'tray' | 'learning';
   creatureIcon?: string;
   creatureName?: string;
+  headerActions?: ReactNode;
 }) {
   const titleId = useId();
   const panel = useRef<HTMLDivElement>(null);
@@ -38,7 +40,7 @@ export function AttackDialog({
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className={`flex w-full flex-col border border-cyan-600 bg-slate-900 text-slate-100 shadow-xl outline-none ${layout === 'tray' ? 'h-[min(210px,48dvh)] rounded-t-lg p-2' : `max-h-[calc(100dvh-1rem)] overscroll-contain rounded-lg p-3 ${layout === 'learning' ? 'max-w-2xl overflow-hidden' : 'max-w-xl overflow-y-auto'}`}`}
+        className={`flex w-full flex-col border border-cyan-600 bg-slate-900 text-slate-100 shadow-xl outline-none ${layout === 'tray' ? 'h-[min(250px,60dvh)] rounded-t-lg p-2' : `max-h-[calc(100dvh-1rem)] overscroll-contain rounded-lg p-3 ${layout === 'learning' ? 'max-w-2xl overflow-hidden' : 'max-w-xl overflow-y-auto'}`}`}
         onKeyDown={(event) => {
           if (event.key === 'Escape') {
             event.preventDefault();
@@ -97,6 +99,11 @@ export function AttackDialog({
               <p className="text-xs text-slate-400">{creatureName}</p>
             )}
           </div>
+          {headerActions && (
+            <div className="ml-auto flex shrink-0 items-center gap-3">
+              {headerActions}
+            </div>
+          )}
         </header>
         {children}
       </div>

@@ -24,6 +24,7 @@ const known = Object.values(ATTACK_DEFS)
 for (const viewport of [
   { width: 1280, height: 800 },
   { width: 844, height: 390 },
+  { width: 667, height: 375 },
 ]) {
   test(`selects active moves and confirms replacement at ${viewport.width}px`, async ({
     page,
@@ -159,8 +160,8 @@ for (const viewport of [
       menu.getByRole('region', { name: known[2].name + ' details' })
     ).toBeVisible();
     const trayBounds = (await menu.boundingBox())!;
-    expect(trayBounds.height).toBeLessThan(viewport.height * 0.55);
-    expect(trayBounds.y).toBeGreaterThan(viewport.height * 0.45);
+    expect(trayBounds.height).toBeLessThanOrEqual(viewport.height * 0.61);
+    expect(trayBounds.y).toBeGreaterThan(viewport.height * 0.39);
     await expect(
       menu.getByRole('button', { name: 'Make Active', exact: true })
     ).toHaveCount(0);
@@ -180,6 +181,60 @@ for (const viewport of [
     await page.screenshot({
       path: testInfo.outputPath('battle-move-information.png'),
     });
+    const priority = menu.getByRole('button', {
+      name: 'Target priority: First',
+    });
+    await expect(priority).toBeInViewport({ ratio: 1 });
+    await expect(priority).toHaveAccessibleDescription(
+      'Furthest along the path · within range'
+    );
+    await priority.click();
+    const choices = menu.getByRole('group', {
+      name: 'Target priority options',
+    });
+    await expect(choices.getByRole('button')).toHaveCount(7);
+    await expect(
+      choices.getByRole('button', { name: 'First', exact: true })
+    ).toBeFocused();
+    await expect(menu.getByRole('region', { name: / details$/ })).toBeVisible({
+      visible: viewport.width >= 1024,
+    });
+    const chooser = menu.getByRole('region', {
+      name: 'Choose target priority',
+    });
+    await expect(chooser).toBeInViewport({ ratio: 1 });
+    await page.screenshot({
+      path: testInfo.outputPath('target-priority-choices.png'),
+    });
+    // Every option remains reachable, including the final health-percentage option.
+    const lastOption = choices.getByRole('button', {
+      name: 'Highest HP %',
+      exact: true,
+    });
+    await expect(lastOption).toBeInViewport({ ratio: 1 });
+    await choices.getByRole('button', { name: 'Most HP', exact: true }).click();
+    const updatedPriority = menu.getByRole('button', {
+      name: 'Target priority: Most HP',
+    });
+    await expect(updatedPriority).toHaveAccessibleDescription(
+      'Highest remaining HP · within range'
+    );
+    await expect(updatedPriority).toBeFocused();
+    await expect(selectedMove).toHaveAttribute('aria-pressed', 'true');
+    await updatedPriority.click();
+    await page.keyboard.press('Escape');
+    await expect(choices).toHaveCount(0);
+    await expect(updatedPriority).toBeFocused();
+    await expect(menu).toBeVisible();
+    await updatedPriority.click();
+    await menu
+      .getByRole('button', {
+        name: viewport.width >= 1024 ? 'Cancel' : 'Back to moves',
+        exact: true,
+      })
+      .click();
+    await expect(choices).toHaveCount(0);
+    await expect(updatedPriority).toBeFocused();
     await menu.getByLabel('More about ' + known[2].name).click();
     expect((await menu.boundingBox())!.height).toBe(trayBounds.height);
     await expect(close).toBeInViewport({ ratio: 1 });
@@ -193,6 +248,9 @@ for (const viewport of [
     await expect(
       menu.getByRole('button', { name: 'Select ' + known[2].name, exact: true })
     ).toHaveAttribute('aria-pressed', 'true');
+    await expect(
+      menu.getByRole('button', { name: 'Target priority: Most HP' })
+    ).toBeVisible();
     await menu.getByRole('button', { name: 'Close', exact: true }).click();
     expect(errors).toEqual([]);
   });
