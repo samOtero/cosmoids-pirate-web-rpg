@@ -1,97 +1,90 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ComponentProps } from 'react';
 import type { AttackDefinition } from '@/engine/tower-defense/attacks/types';
 import { AttackDialog } from './AttackDialog';
-import { AttackDetails } from './AttackDetails';
+import { AttackReplacement } from './AttackReplacement';
+import { LearningMoveDetails } from './LearningMoveDetails';
+import { ELEMENT_TEXT_COLORS } from '../ui/elementTextColors';
 
-export function LearnedAttackDialog({
-  creatureName,
-  attack,
-  current,
-  isActive,
-  canActivate,
-  onActivate,
-  onClose,
-}: {
+type LearningProps = {
   creatureName: string;
+  creatureIcon?: string;
   attack: AttackDefinition;
-  current?: AttackDefinition;
-  isActive: boolean;
-  canActivate: boolean;
-  onActivate: () => void;
   onClose: () => void;
-}) {
-  const [viewingCurrent, setViewingCurrent] = useState(false);
+} & (
+  | {
+      replacement?: undefined;
+      isActive: boolean;
+      canActivate: boolean;
+      onActivate: () => void;
+    }
+  | {
+      replacement: Omit<
+        ComponentProps<typeof AttackReplacement>,
+        'next' | 'onCancel'
+      >;
+    }
+);
+
+export function LearnedAttackDialog(props: LearningProps) {
+  const [choosingReplacement, setChoosingReplacement] = useState(false);
+  const { attack, creatureName, creatureIcon, onClose, replacement } = props;
+  const title = choosingReplacement ? (
+    'Choose a move to replace'
+  ) : (
+    <>
+      {creatureName} {replacement ? 'is trying to learn' : 'learned'}{' '}
+      <span className={ELEMENT_TEXT_COLORS[attack.type]}>{attack.name}</span>!
+    </>
+  );
   return (
-    <AttackDialog title="New Attack Learned!" onClose={onClose}>
-      <p className="mb-2 text-xs text-slate-200">
-        {creatureName} learned {attack.name}.
-      </p>
-      {current && !isActive && (
-        <div className="mb-1 flex gap-1 text-xs" aria-label="Comparison view">
-          <button
-            type="button"
-            aria-pressed={!viewingCurrent}
-            onClick={() => setViewingCurrent(false)}
-            className={
-              'min-h-7 flex-1 rounded border px-2 py-1 ' +
-              (!viewingCurrent
-                ? 'border-cyan-400 bg-cyan-950'
-                : 'border-slate-600')
-            }
-          >
-            New: {attack.name}
-          </button>
-          <button
-            type="button"
-            aria-label={'Compare with current active move: ' + current.name}
-            aria-pressed={viewingCurrent}
-            onClick={() => setViewingCurrent(true)}
-            className={
-              'min-h-7 flex-1 rounded border px-2 py-1 ' +
-              (viewingCurrent
-                ? 'border-cyan-400 bg-cyan-950'
-                : 'border-slate-600')
-            }
-          >
-            Active: {current.name}
-          </button>
+    <AttackDialog
+      key={choosingReplacement ? 'replacement' : 'notification'}
+      title={title}
+      creatureIcon={creatureIcon}
+      creatureName={choosingReplacement ? creatureName : undefined}
+      layout="learning"
+      onClose={onClose}
+    >
+      {choosingReplacement && replacement ? (
+        <AttackReplacement next={attack} {...replacement} onCancel={onClose} />
+      ) : (
+        <div className="flex min-h-0 flex-col gap-3">
+          <div className="min-h-0 overflow-y-auto overscroll-contain">
+            <LearningMoveDetails attack={attack} />
+          </div>
+          <div className="flex shrink-0 justify-end gap-2 border-t border-slate-700 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="min-h-11 rounded border border-slate-500 bg-slate-800 px-3 py-1 text-xs font-bold hover:bg-slate-700"
+            >
+              {replacement ? "Don't Learn" : 'Continue'}
+            </button>
+            {replacement ? (
+              <button
+                type="button"
+                onClick={() => setChoosingReplacement(true)}
+                className="min-h-11 rounded bg-cyan-700 px-3 py-1 text-xs font-bold hover:bg-cyan-600"
+              >
+                Replace a Move
+              </button>
+            ) : (
+              !props.isActive && (
+                <button
+                  type="button"
+                  disabled={!props.canActivate}
+                  onClick={props.onActivate}
+                  className="min-h-11 rounded bg-cyan-700 px-3 py-1 text-xs font-bold hover:bg-cyan-600 disabled:bg-slate-700 disabled:text-slate-400"
+                >
+                  Make Active
+                </button>
+              )
+            )}
+          </div>
         </div>
       )}
-      <div className="grid h-32 min-h-0">
-        <AttackDetails
-          attack={viewingCurrent && current ? current : attack}
-          badge={viewingCurrent || isActive ? 'Active' : 'Learned'}
-          compareWith={!viewingCurrent && !isActive ? current : undefined}
-        />
-      </div>
-      <p className="mt-2 text-xs text-slate-300">
-        {isActive
-          ? attack.name + ' is already active.'
-          : current
-            ? current.name + ' stays active unless you choose Make Active.'
-            : 'Choose an active move from the move menu.'}
-      </p>
-      <div className="mt-2 flex justify-end gap-2">
-        <button
-          type="button"
-          onClick={onClose}
-          className="min-h-9 rounded border border-slate-500 bg-slate-800 px-3 py-1 text-xs font-bold"
-        >
-          {isActive ? 'Continue' : 'Keep Current Active'}
-        </button>
-        {!isActive && (
-          <button
-            type="button"
-            disabled={!canActivate}
-            onClick={onActivate}
-            className="min-h-9 rounded bg-cyan-700 px-3 py-1 text-xs font-bold disabled:bg-slate-700 disabled:text-slate-400"
-          >
-            Make Active
-          </button>
-        )}
-      </div>
     </AttackDialog>
   );
 }

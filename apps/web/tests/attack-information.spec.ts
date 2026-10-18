@@ -122,7 +122,7 @@ for (const viewport of [
     await expect(replace).toBeInViewport({ ratio: 1 });
     await expect(
       comparison.getByRole('region', { name: / details$/ })
-    ).toHaveCount(1);
+    ).toHaveCount(2);
     const comparisonBounds = (await comparison.boundingBox())!;
     expect(comparisonBounds.height).toBeLessThan(viewport.height * 0.9);
     expect(comparisonBounds.x).toBeGreaterThanOrEqual(0);

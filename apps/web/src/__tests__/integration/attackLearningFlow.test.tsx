@@ -93,8 +93,7 @@ describe('learning information in the battle screen', () => {
         attackDefId: moves[4].id,
       });
     });
-    const dialog = screen.getByRole('dialog', { name: 'New Attack Learned!' });
-    expect(dialog).toHaveTextContent('Flow first stays active');
+    const dialog = screen.getByRole('dialog', { name: /learned Flow new!/ });
     expect(tower.selectedAttackIndex).toBe(0);
     expect(
       screen.queryByRole('button', { name: 'Pause' })
@@ -115,9 +114,27 @@ describe('learning information in the battle screen', () => {
         newAttackDefId: moves[4].id,
       })
     );
-    const dialog = screen.getByRole('dialog', {
-      name: 'Maximum Attacks Reached!',
+    const intro = screen.getByRole('dialog', {
+      name: /is trying to learn Flow new!/,
     });
+    expect(
+      within(intro).queryByRole('button', { name: 'Compare with Flow third' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Make Active' })
+    ).not.toBeInTheDocument();
+    fireEvent.click(
+      within(intro).getByRole('button', { name: 'Replace a Move' })
+    );
+    const dialog = screen.getByRole('dialog', {
+      name: 'Choose a move to replace',
+    });
+    expect(
+      within(dialog).getByRole('button', { name: 'Select a move to replace' })
+    ).toBeDisabled();
+    expect(
+      within(dialog).getAllByRole('button', { name: /Compare with/ })
+    ).toHaveLength(4);
     fireEvent.click(
       within(dialog).getByRole('button', { name: 'Compare with Flow third' })
     );
@@ -129,8 +146,10 @@ describe('learning information in the battle screen', () => {
     );
     expect(tower.creature.equippedAttacks[2]).toBe(moves[4].id);
     expect(tower.selectedAttackIndex).toBe(2);
-    const learned = screen.getByRole('dialog', { name: 'New Attack Learned!' });
-    expect(learned).toHaveTextContent('Flow new is already active.');
+    const learned = screen.getByRole('dialog', { name: /learned Flow new!/ });
+    expect(
+      within(learned).queryByRole('button', { name: 'Make Active' })
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Pause' })
     ).not.toBeInTheDocument();
@@ -147,10 +166,65 @@ describe('learning information in the battle screen', () => {
         attackDefId: moves[1].id,
       })
     );
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Keep Current Active' })
-    );
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
     expect(screen.getByRole('button', { name: 'Start' })).toBeInTheDocument();
     expect(tower.selectedAttackIndex).toBe(0);
+  });
+
+  it.each(['intro', 'selection'] as const)(
+    'can cancel from the %s stage without changing moves',
+    (stage) => {
+      const { engine, tower } = startBattle(4, 1);
+      const before = [...tower.creature.equippedAttacks];
+      act(() =>
+        engine.events.emit({
+          type: 'TOWER_ASK_REPLACE_ATTACK',
+          towerId: tower.id,
+          newAttackDefId: moves[4].id,
+        })
+      );
+      if (stage === 'selection') {
+        fireEvent.click(screen.getByRole('button', { name: 'Replace a Move' }));
+        fireEvent.click(
+          screen.getByRole('button', { name: 'Compare with Flow first' })
+        );
+      }
+      fireEvent.click(
+        screen.getByRole('button', {
+          name: stage === 'intro' ? "Don't Learn" : 'Never Mind',
+        })
+      );
+      expect(tower.creature.equippedAttacks).toEqual(before);
+      expect(tower.selectedAttackIndex).toBe(1);
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument();
+    }
+  );
+
+  it('preserves an unselected active slot through replacement and offers activation afterward', () => {
+    const { engine, tower } = startBattle(4, 1);
+    act(() =>
+      engine.events.emit({
+        type: 'TOWER_ASK_REPLACE_ATTACK',
+        towerId: tower.id,
+        newAttackDefId: moves[4].id,
+      })
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Replace a Move' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Compare with Flow first' })
+    );
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Replace Flow first with Flow new' })
+    );
+    expect(tower.creature.equippedAttacks[0]).toBe(moves[4].id);
+    expect(tower.selectedAttackIndex).toBe(1);
+    expect(screen.getByRole('dialog')).toHaveAccessibleName(
+      /learned Flow new!/
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Make Active' }));
+    expect(tower.selectedAttackIndex).toBe(0);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Pause' })).toBeInTheDocument();
   });
 });

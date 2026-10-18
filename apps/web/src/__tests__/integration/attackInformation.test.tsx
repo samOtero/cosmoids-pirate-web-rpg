@@ -169,14 +169,13 @@ describe('attack information decisions', () => {
     fireEvent.click(screen.getByLabelText('More about Second move'));
     expect(select).toHaveBeenCalledOnce();
   });
-  it('makes learning distinct from activation and offers an optional active-move comparison', () => {
+  it('shows learned move information immediately and keeps activation optional', () => {
     const activate = vi.fn(),
       close = vi.fn();
     render(
       <LearnedAttackDialog
         creatureName="Test creature"
-        attack={moves[4]}
-        current={moves[0]}
+        attack={{ ...moves[4], category: 'physical' }}
         isActive={false}
         canActivate
         onActivate={activate}
@@ -184,33 +183,19 @@ describe('attack information decisions', () => {
       />
     );
     expect(screen.getByRole('dialog')).toHaveTextContent(
-      'Test creature learned New move.'
+      'Test creature learned New move!'
     );
     expect(screen.getAllByRole('region', { name: / details$/ })).toHaveLength(
       1
     );
-    const more = screen.getByLabelText('More about New move');
-    expect(more.closest('details')).not.toHaveAttribute('open');
-    fireEvent.click(more);
-    expect(more.closest('details')).toHaveAttribute('open');
-    fireEvent.click(
-      screen.getByRole('button', {
-        name: 'Compare with current active move: First move',
-      })
-    );
-    expect(screen.getAllByRole('region', { name: / details$/ })).toHaveLength(
-      1
-    );
-    expect(
-      screen.getByRole('region', { name: 'First move details' })
-    ).toBeInTheDocument();
-    expect(
-      screen.getByLabelText('More about First move').closest('details')
-    ).not.toHaveAttribute('open');
+    const details = screen.getByRole('region', { name: 'New move details' });
+    expect(details).toHaveTextContent(moves[4].description!);
+    expect(details).toHaveTextContent('Physical');
+    expect(details).toHaveTextContent(moves[4].type);
+    for (const label of ['Power', 'Range', 'Cooldown'])
+      expect(within(details).getByText(label)).toBeVisible();
     expect(activate).not.toHaveBeenCalled();
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Keep Current Active' })
-    );
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
     expect(close).toHaveBeenCalledOnce();
     expect(activate).not.toHaveBeenCalled();
   });

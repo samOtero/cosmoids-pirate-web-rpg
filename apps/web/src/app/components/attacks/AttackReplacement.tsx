@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import type { AttackDefinition } from '@/engine/tower-defense/attacks/types';
 import type { AttackId } from '@/types/definitionIds';
-import { AttackDetails } from './AttackDetails';
+import { ELEMENT_TEXT_COLORS } from '../ui/elementTextColors';
+import { LearningMoveDetails } from './LearningMoveDetails';
 
 export function AttackReplacement({
   next,
@@ -21,90 +22,70 @@ export function AttackReplacement({
   onCancel: () => void;
 }) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [viewingCurrent, setViewingCurrent] = useState(false);
   const selected = selectedIndex === null ? undefined : known[selectedIndex];
   return (
-    <div className="space-y-2">
-      <p className="text-xs text-slate-300">
-        Choose a move to compare, then confirm its replacement.
-      </p>
-      <div className="grid h-40 min-h-0 grid-cols-[minmax(120px,30%)_minmax(0,1fr)] gap-2">
-        <div className="flex min-h-0 flex-col gap-1" aria-label="Known moves">
-          {known.map((attack, index) => (
-            <button
-              key={attack.id + '-' + index}
-              type="button"
-              aria-label={'Compare with ' + attack.name}
-              aria-pressed={selectedIndex === index}
-              onClick={() => {
-                setSelectedIndex(index);
-                setViewingCurrent(true);
-              }}
-              className={
-                'flex min-h-0 flex-1 items-center justify-between gap-1 rounded border px-2 py-1 text-left text-sm ' +
-                (selectedIndex === index
-                  ? 'border-amber-400 bg-amber-950'
-                  : 'border-slate-600 bg-slate-800 hover:border-cyan-400')
-              }
-            >
-              <span>{attack.name}</span>
+    <div className="flex min-h-0 flex-col gap-2">
+      <div className="shrink-0">
+        <LearningMoveDetails attack={next} heading="New:" compact />
+      </div>
+      <div
+        className="grid shrink-0 grid-cols-2 gap-1.5 min-[540px]:grid-cols-4"
+        aria-label="Known moves"
+      >
+        {known.map((attack, index) => (
+          <button
+            key={attack.id + '-' + index}
+            type="button"
+            aria-label={'Compare with ' + attack.name}
+            aria-pressed={selectedIndex === index}
+            onClick={() => setSelectedIndex(index)}
+            className={
+              'min-h-11 min-w-0 rounded border px-2 py-1 text-left text-xs ' +
+              (selectedIndex === index
+                ? 'border-cyan-400 bg-cyan-950'
+                : 'border-slate-600 bg-slate-800 hover:border-cyan-400')
+            }
+          >
+            <span className="flex items-center justify-between gap-1">
+              <span className={'font-bold ' + ELEMENT_TEXT_COLORS[attack.type]}>
+                {attack.name}
+              </span>
+              {selectedIndex === index && (
+                <span aria-label="Selected" className="text-cyan-300">
+                  ✓
+                </span>
+              )}
               {index === activeIndex && (
                 <span
                   aria-label="Active"
                   title="Active"
-                  className="text-xs text-cyan-200"
+                  className="text-cyan-200"
                 >
                   ●
                 </span>
               )}
-            </button>
-          ))}
-        </div>
-        <div className="flex min-h-0 min-w-0 flex-col gap-1">
-          {selected && (
-            <div
-              className="flex shrink-0 gap-1 text-xs"
-              aria-label="Comparison view"
-            >
-              <button
-                type="button"
-                aria-pressed={viewingCurrent}
-                onClick={() => setViewingCurrent(true)}
-                className={
-                  'min-h-7 min-w-0 flex-1 rounded border px-1 py-1 ' +
-                  (viewingCurrent
-                    ? 'border-amber-400 bg-amber-950'
-                    : 'border-slate-600')
-                }
-              >
-                Old: {selected.name}
-              </button>
-              <button
-                type="button"
-                aria-pressed={!viewingCurrent}
-                onClick={() => setViewingCurrent(false)}
-                className={
-                  'min-h-7 min-w-0 flex-1 rounded border px-1 py-1 ' +
-                  (!viewingCurrent
-                    ? 'border-cyan-400 bg-cyan-950'
-                    : 'border-slate-600')
-                }
-              >
-                New: {next.name}
-              </button>
-            </div>
-          )}
-          <div className="grid min-h-0 flex-1">
-            <AttackDetails
-              attack={viewingCurrent && selected ? selected : next}
-              badge={viewingCurrent && selected ? 'To replace' : 'New move'}
-              compareWith={!viewingCurrent ? selected : undefined}
-            />
-          </div>
-        </div>
+            </span>
+            <span className="mt-0.5 block text-[11px] text-slate-300">
+              {attack.type} ·{' '}
+              {attack.category === 'physical' ? 'Physical' : 'Special'}
+            </span>
+          </button>
+        ))}
+      </div>
+      <div
+        aria-live="polite"
+        className="min-h-0 overflow-y-auto overscroll-contain border-t border-slate-700 pt-2"
+      >
+        {selected ? (
+          <LearningMoveDetails attack={selected} heading="Selected:" />
+        ) : (
+          <p className="py-2 text-xs text-slate-400">
+            Select one of your moves to see its description.
+          </p>
+        )}
       </div>
       {selected && selectedIndex !== null && (
-        <p className="text-xs leading-snug text-slate-300">
+        <p className="sr-only">
           {selectedIndex === activeIndex
             ? next.name + ' will become active.'
             : (known[activeIndex]?.name ?? 'Your current move') +
@@ -116,25 +97,37 @@ export function AttackReplacement({
             : selected.name + ' is not currently available to relearn.'}
         </p>
       )}
-      <div className="flex justify-end gap-2">
+      <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-slate-700 pt-2">
+        {selected && (
+          <p className="mr-auto text-xs">
+            <span className={ELEMENT_TEXT_COLORS[selected.type]}>
+              {selected.name}
+            </span>
+            <span className="px-1 text-cyan-300">→</span>
+            <span className={ELEMENT_TEXT_COLORS[next.type]}>{next.name}</span>
+          </p>
+        )}
         <button
           type="button"
           onClick={onCancel}
-          className="min-h-9 shrink-0 rounded border border-slate-500 bg-slate-800 px-3 py-1 text-xs font-bold"
+          className="min-h-11 rounded border border-slate-500 bg-slate-800 px-3 py-1 text-xs font-bold hover:bg-slate-700"
         >
-          Do Not Learn
+          Never Mind
         </button>
         <button
           type="button"
           disabled={!selected || selectedIndex === null}
+          aria-label={
+            selected
+              ? 'Replace ' + selected.name + ' with ' + next.name
+              : 'Select a move to replace'
+          }
           onClick={() => {
-            if (selectedIndex !== null) onReplace(selectedIndex);
+            if (selected && selectedIndex !== null) onReplace(selectedIndex);
           }}
-          className="min-h-9 rounded bg-cyan-700 px-3 py-1 text-xs font-bold text-white disabled:bg-slate-700 disabled:text-slate-400"
+          className="min-h-11 rounded bg-cyan-700 px-3 py-1 text-xs font-bold text-white hover:bg-cyan-600 disabled:bg-slate-700 disabled:text-slate-400"
         >
-          {selected
-            ? 'Replace ' + selected.name + ' with ' + next.name
-            : 'Select a move to replace'}
+          {selected ? 'Replace ' + selected.name : 'Select a Move'}
         </button>
       </div>
     </div>

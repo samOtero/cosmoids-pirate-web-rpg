@@ -339,6 +339,9 @@ export default function CreatureDetailsScreen({
       {replacingMoveId !== null && ATTACK_DEFS[replacingMoveId] && (
         <AttackDialog
           title="Choose an attack to replace"
+          layout="learning"
+          creatureIcon={template.iconImg}
+          creatureName={creature.name}
           onClose={() => setReplacingMoveId(null)}
         >
           <AttackReplacement

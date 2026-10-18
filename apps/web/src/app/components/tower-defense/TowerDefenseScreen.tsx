@@ -16,8 +16,6 @@ import { TowerButton } from './TowerButton';
 import { ExecuteTDActionEventPayload } from '@/types/baseGame';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { COSMOID_TEMPLATES } from '@/constants/creatures';
-import { AttackDialog } from '../attacks/AttackDialog';
-import { AttackReplacement } from '../attacks/AttackReplacement';
 import { LearnedAttackDialog } from '../attacks/LearnedAttackDialog';
 import { TDLevelData } from '@/engine/tower-defense/types';
 
@@ -1398,21 +1396,20 @@ export default function TowerDefenseScreen({
             );
             const learnedIndex =
               tower?.creature.equippedAttacks.indexOf(attack.id) ?? -1;
-            const current = tower
-              ? ATTACK_DEFS[
-                  tower.creature.equippedAttacks[tower.selectedAttackIndex]
-                ]
-              : undefined;
             return (
               <LearnedAttackDialog
-                key={activeModal.towerId + '-' + attack.id}
+                key={'learned-' + activeModal.towerId + '-' + attack.id}
                 creatureName={
                   tower
                     ? resolveSpeciesVisuals(tower.creature.speciesId).name
                     : 'Your Cosmoid'
                 }
+                creatureIcon={
+                  tower
+                    ? COSMOID_TEMPLATES[tower.creature.speciesId]?.iconImg
+                    : undefined
+                }
                 attack={attack}
-                current={current}
                 isActive={!!tower && tower.selectedAttackIndex === learnedIndex}
                 canActivate={!!tower && learnedIndex >= 0}
                 onClose={closeActiveModal}
@@ -1439,26 +1436,28 @@ export default function TowerDefenseScreen({
               COSMOID_TEMPLATES[tower.creature.speciesId]?.learnableAttacks ??
               [];
             return (
-              <AttackDialog
-                key={activeModal.towerId + '-' + attack.id}
-                title="Maximum Attacks Reached!"
+              <LearnedAttackDialog
+                key={'trying-' + activeModal.towerId + '-' + attack.id}
+                creatureName={
+                  resolveSpeciesVisuals(tower.creature.speciesId).name
+                }
+                creatureIcon={
+                  COSMOID_TEMPLATES[tower.creature.speciesId]?.iconImg
+                }
+                attack={attack}
                 onClose={closeActiveModal}
-              >
-                <AttackReplacement
-                  next={attack}
-                  known={tower.creature.equippedAttacks.map(
+                replacement={{
+                  known: tower.creature.equippedAttacks.map(
                     (id) => ATTACK_DEFS[id]
-                  )}
-                  activeIndex={tower.selectedAttackIndex}
-                  canRelearn={(id) =>
+                  ),
+                  activeIndex: tower.selectedAttackIndex,
+                  canRelearn: (id) =>
                     learnable.some(
                       (move) =>
                         move.attackId === id &&
                         move.level <= tower.creature.level
-                    )
-                  }
-                  onCancel={closeActiveModal}
-                  onReplace={(index) => {
+                    ),
+                  onReplace: (index) => {
                     // Keep the battle paused while replacement emits its learned event.
                     setModalQueue((previous) => previous.slice(1));
                     engineRef.current.replaceTowerAttack(
@@ -1467,9 +1466,9 @@ export default function TowerDefenseScreen({
                       attack.id
                     );
                     setUiUpdateToggle((previous) => !previous);
-                  }}
-                />
-              </AttackDialog>
+                  },
+                }}
+              />
             );
           }
 

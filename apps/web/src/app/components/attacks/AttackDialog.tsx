@@ -8,11 +8,15 @@ export function AttackDialog({
   onClose,
   children,
   layout = 'modal',
+  creatureIcon,
+  creatureName,
 }: {
-  title: string;
+  title: ReactNode;
   onClose: () => void;
   children: ReactNode;
-  layout?: 'modal' | 'tray';
+  layout?: 'modal' | 'tray' | 'learning';
+  creatureIcon?: string;
+  creatureName?: string;
 }) {
   const titleId = useId();
   const panel = useRef<HTMLDivElement>(null);
@@ -34,7 +38,7 @@ export function AttackDialog({
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className={`flex w-full flex-col border border-cyan-600 bg-slate-900 text-slate-100 shadow-xl outline-none ${layout === 'tray' ? 'h-[min(210px,48dvh)] rounded-t-lg p-2' : 'max-h-[calc(100dvh-1rem)] max-w-xl overflow-y-auto overscroll-contain rounded-lg p-3'}`}
+        className={`flex w-full flex-col border border-cyan-600 bg-slate-900 text-slate-100 shadow-xl outline-none ${layout === 'tray' ? 'h-[min(210px,48dvh)] rounded-t-lg p-2' : `max-h-[calc(100dvh-1rem)] overscroll-contain rounded-lg p-3 ${layout === 'learning' ? 'max-w-2xl overflow-hidden' : 'max-w-xl overflow-y-auto'}`}`}
         onKeyDown={(event) => {
           if (event.key === 'Escape') {
             event.preventDefault();
@@ -70,12 +74,30 @@ export function AttackDialog({
           }
         }}
       >
-        <h2
-          id={titleId}
-          className="mb-1.5 shrink-0 text-sm font-bold text-cyan-200"
+        <header
+          className={`mb-2 flex shrink-0 items-center gap-2 ${layout === 'learning' ? 'justify-center text-center' : ''}`}
         >
-          {title}
-        </h2>
+          {creatureIcon && (
+            // Existing creature icons are small, local game assets.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={creatureIcon}
+              alt=""
+              className="h-10 w-10 shrink-0 object-contain"
+            />
+          )}
+          <div className="min-w-0">
+            <h2
+              id={titleId}
+              className={`text-sm font-bold ${layout === 'learning' ? 'text-slate-100 sm:text-base' : 'text-cyan-200'}`}
+            >
+              {title}
+            </h2>
+            {creatureName && (
+              <p className="text-xs text-slate-400">{creatureName}</p>
+            )}
+          </div>
+        </header>
         {children}
       </div>
     </div>
