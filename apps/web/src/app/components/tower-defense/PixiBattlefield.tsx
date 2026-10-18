@@ -56,6 +56,7 @@ import {
   resolvePrisonGateVisualLayout,
 } from '@/utils/tdStructureVisuals';
 import { drawRallyHowlRings, updateRallyIndicator } from './rallyHowlVisuals';
+import { updateEnemyGenderIndicator } from './enemyGenderVisuals';
 import { updateWarmthIndicator } from './warmthVisuals';
 import {
   updateDeepwaterBreath,
@@ -261,6 +262,7 @@ export function renderHealthBar(
       hpFg.fill({ color: isWeakened ? 0xff0000 : 0x22c55e });
     }
   }
+  return { right: healthBarWidth / 2 + 1, centerY: hpOffsetY + 2 };
 }
 
 function drawStar(g: PIXI.Graphics, size: number) {
@@ -5560,7 +5562,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               updateFunnyDanceEnemyPose(esprite, enemy, engine.elapsedTimeMs);
             }
 
-            renderHealthBar(
+            const healthBar = renderHealthBar(
               enemy,
               container,
               enemy.tdConfigId ?? enemy.definitionId,
@@ -5571,6 +5573,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                     .healthBarOffsetY
                 : undefined
             );
+            updateEnemyGenderIndicator(container, enemy, healthBar, finalScale);
             updateScouredIndicator(container, enemy, engine.elapsedTimeMs);
             updateDeepwaterCoils(
               container,
