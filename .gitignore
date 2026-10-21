@@ -20,6 +20,7 @@ out/
 # production
 build/
 /apps/api/dist/
+/apps/api/tests/.generated/
 
 # generated image concepts and working renders
 /output/

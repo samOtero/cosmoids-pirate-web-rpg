@@ -9,6 +9,7 @@ import AnalyticsControls from './components/AnalyticsControls';
 import FullscreenControl from './components/FullscreenControl';
 import AuthProvider from './components/auth/AuthProvider';
 import { legacyGameRedirectScript } from '@/lib/legacy-game-redirect';
+import GameChrome from './components/GameChrome';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -57,12 +58,14 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} h-dvh w-screen overflow-hidden bg-[#0d2b45] text-[#f4e4b] antialiased`}
       >
         <AuthProvider>{children}</AuthProvider>
-        <AnimationProvider />
-        <DevTools />
+        <GameChrome>
+          <AnimationProvider />
+          <DevTools />
+          <AnalyticsControls />
+          <FullscreenControl />
+          <RotateDeviceOverlay />
+        </GameChrome>
         <Analytics />
-        <AnalyticsControls />
-        <FullscreenControl />
-        <RotateDeviceOverlay />
       </body>
     </html>
   );

@@ -184,6 +184,13 @@ storage, while preserving existing account origins. The server must derive the
 account ID from its session. Save claims, account-specific local storage keys,
 database synchronization, and online ownership validation are still future work.
 
+The database has explicit game migrations for profiles, individual creatures,
+and account trade boxes. Authenticated profile endpoints now support listing,
+loading, creation, revision-checked saving, and deletion. The game UI, separate
+account caches, and box-transfer integration remain future work. See
+[account save storage and API](GAME_SAVES.md) for the schema, permanent numeric
+gender/location values, request contract, and local verification.
+
 ## Refresh and failures
 
 The provider stays mounted while the player changes game screens. The client

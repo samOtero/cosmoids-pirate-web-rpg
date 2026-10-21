@@ -1,44 +1,58 @@
-import Fastify from "fastify";
-import { readAuthConfig } from "./auth-config.js";
-import { createAuth } from "./auth.js";
-import { registerAuthRoutes } from "./auth-routes.js";
-import { pool } from "./database.js";
+import Fastify from 'fastify';
+import { readAuthConfig } from './auth-config.js';
+import { createAuth } from './auth.js';
+import { registerAuthRoutes } from './auth-routes.js';
+import { pool } from './database.js';
+import { registerProfileRoutes } from './profile-routes.js';
+import { loadGameContent } from './game-content.js';
+import { registerAdminRoutes } from './admin-routes.js';
+import { readAdminAccountIds } from './admin-config.js';
 
 const server = Fastify({
   logger: {
     redact: [
-      "req.headers.cookie",
-      "req.headers.authorization",
+      'req.headers.cookie',
+      'req.headers.authorization',
       "res.headers['set-cookie']",
     ],
   },
   // Nginx connects over loopback; other forwarded-header senders are untrusted.
-  trustProxy: "loopback",
+  trustProxy: 'loopback',
 });
 
 const authConfig = readAuthConfig();
 const auth = createAuth(pool, authConfig);
+const content = await loadGameContent();
 await registerAuthRoutes(server, auth, authConfig);
+await registerProfileRoutes(server, auth, authConfig, pool, content);
+await registerAdminRoutes(
+  server,
+  auth,
+  authConfig,
+  pool,
+  readAdminAccountIds(),
+  content.maxProfiles
+);
 
-pool.on("error", (error) => {
-  server.log.error({ err: error }, "Idle database connection failed");
+pool.on('error', (error) => {
+  server.log.error({ err: error }, 'Idle database connection failed');
 });
 
-server.get("/health", async () => {
+server.get('/health', async () => {
   return { ok: true };
 });
 
-server.get("/health/db", async (_request, reply) => {
+server.get('/health/db', async (_request, reply) => {
   try {
-    await pool.query("SELECT 1");
+    await pool.query('SELECT 1');
     return { ok: true };
   } catch (error) {
-    server.log.error({ err: error }, "Database health check failed");
+    server.log.error({ err: error }, 'Database health check failed');
     return reply.code(503).send({ ok: false });
   }
 });
 
-server.addHook("onClose", async () => {
+server.addHook('onClose', async () => {
   await pool.end();
 });
 
@@ -46,12 +60,12 @@ async function shutdown() {
   try {
     await server.close();
   } catch (error) {
-    server.log.error({ err: error }, "API shutdown failed");
+    server.log.error({ err: error }, 'API shutdown failed');
     process.exitCode = 1;
   }
 }
 
-process.once("SIGINT", shutdown);
-process.once("SIGTERM", shutdown);
+process.once('SIGINT', shutdown);
+process.once('SIGTERM', shutdown);
 
-await server.listen({ host: "127.0.0.1", port: 3001 });
+await server.listen({ host: '127.0.0.1', port: 3001 });

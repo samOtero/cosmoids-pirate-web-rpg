@@ -3,24 +3,31 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node --watch --env-file=.env --import tsx src/server.ts",
-    "build": "tsc",
+    "dev": "node scripts/build-game-content.mjs && node --watch --env-file=.env --import tsx src/server.ts",
+    "build": "node scripts/build-game-content.mjs && tsc",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test tests/*.test.mjs",
+    "test": "node scripts/build-game-content.mjs --tests && node --import tsx --test --test-concurrency=1 tests/*.test.mjs",
     "auth:plan": "node dist/auth-migrate.js",
     "auth:migrate": "node dist/auth-migrate.js --apply",
-    "auth:migrate:local": "node --env-file=.env --import tsx src/auth-migrate.ts --apply"
+    "auth:migrate:local": "node --env-file=.env --import tsx src/auth-migrate.ts --apply",
+    "game:plan": "node dist/game-migrate.js",
+    "game:migrate": "node dist/game-migrate.js --apply",
+    "game:plan:local": "node --env-file=.env --import tsx src/game-migrate.ts",
+    "game:migrate:local": "node --env-file=.env --import tsx src/game-migrate.ts --apply",
+    "test:game-db:local": "node scripts/build-game-content.mjs --tests && node --env-file=.env --import tsx tests/game-schema-local.mjs"
   },
   "dependencies": {
     "@fastify/cors": "^11.3.1",
     "better-auth": "^1.7.7",
     "fastify": "^5.12.5",
+    "node-pg-migrate": "9.0.0",
     "pg": "^8.23.1"
   },
   "devDependencies": {
     "@types/node": "^20.19.25",
     "@types/pg": "^8.23.1",
+    "esbuild": "0.28.2",
     "tsx": "^4.23.15",
     "typescript": "^5.9.3"
   }

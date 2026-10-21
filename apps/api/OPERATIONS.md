@@ -118,16 +118,18 @@ PGPASSWORD=<your-private-database-password>
 BETTER_AUTH_SECRET=<your-existing-private-auth-secret>
 BETTER_AUTH_URL=https://api.cosmoids-td.com
 AUTH_TRUSTED_ORIGINS=https://staging.cosmoids-td.com
+ADMIN_ACCOUNT_IDS=
 ```
 
-| Variable                             | Meaning                                                                                          |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------ |
-| `PGHOST`, `PGPORT`                   | Where Postgres runs                                                                              |
-| `PGDATABASE`, `PGUSER`, `PGPASSWORD` | Database and credentials used by the API                                                         |
-| `BETTER_AUTH_SECRET`                 | Secret used by Better Auth for signing/protecting auth data; minimum 32 characters in our config |
-| `BETTER_AUTH_URL`                    | Public API origin used by Better Auth                                                            |
-| `AUTH_TRUSTED_ORIGINS`               | Comma-separated exact browser origins permitted by CORS and Better Auth                          |
-| `NODE_ENV`                           | Set to `production` in systemd, and explicitly for migration commands                            |
+| Variable                             | Meaning                                                                                                                                    |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `PGHOST`, `PGPORT`                   | Where Postgres runs                                                                                                                        |
+| `PGDATABASE`, `PGUSER`, `PGPASSWORD` | Database and credentials used by the API                                                                                                   |
+| `BETTER_AUTH_SECRET`                 | Secret used by Better Auth for signing/protecting auth data; minimum 32 characters in our config                                           |
+| `BETTER_AUTH_URL`                    | Public API origin used by Better Auth                                                                                                      |
+| `AUTH_TRUSTED_ORIGINS`               | Comma-separated exact browser origins permitted by CORS and Better Auth                                                                    |
+| `NODE_ENV`                           | Set to `production` in systemd, and explicitly for migration commands                                                                      |
+| `ADMIN_ACCOUNT_IDS`                  | Optional comma-separated exact account IDs allowed to inspect `/admin`; empty disables access. Keep server-side and restart after changes. |
 
 The API's own origin is trusted automatically. Additional origins must include
 the scheme and hostname, with no paths, credentials, or wildcards. The example
@@ -410,8 +412,19 @@ skips development Git-hook setup during installation. The filter includes the
 API and its workspace dependencies. `--frozen-lockfile` installs the committed
 dependency resolution without rewriting the lockfile.
 
-The server uses a shallow, filtered sparse checkout including `apps/api`; it
-does not need the game's art. Inspect it with:
+The API build compiles validation data from the canonical game registries. A
+sparse checkout must include `apps/api` and `apps/web/src`. In cone mode, adding
+the source directory also includes its parent config files such as the web
+tsconfig, without downloading `apps/web/public` artwork. Before building an old
+API-only checkout, run:
+
+```bash
+git sparse-checkout add apps/web/src
+```
+
+The build creates `apps/api/dist/authored-game-content.js`; runtime reads that
+compiled module and does not require web source files or artwork. Inspect the
+checkout with:
 
 ```bash
 git sparse-checkout list
@@ -435,6 +448,17 @@ automatically inherit systemd's `EnvironmentFile`. Starting the API never runs
 migrations automatically. An unchanged schema should report that it is up to
 date. The package scripts `auth:plan` and `auth:migrate` run the same built
 script, but still need the environment supplied by their caller.
+
+Account save tables use `node-pg-migrate` through a separate game migration command. After the
+auth tables exist, preview with
+`node --env-file="$HOME/.config/cosmoids/api.env" apps/api/dist/game-migrate.js`
+and explicitly apply with the same command plus `--apply`. Pending schema changes
+and their history entries commit together, and repeated runs are safe. The library
+may create an empty history table before applying; preview rolls that setup back.
+Never edit or rename applied migration files: this library does not check their
+checksums. The command never runs at
+server startup. See [the game save schema guide](../../docs/development/GAME_SAVES.md)
+for constraints, numeric values, tests, and the API work that remains.
 
 After successful installation, build, and any required migration:
 

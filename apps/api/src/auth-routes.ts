@@ -1,8 +1,8 @@
 import cors from '@fastify/cors';
-import { fromNodeHeaders } from 'better-auth/node';
-import type { FastifyInstance, FastifyRequest } from 'fastify';
+import type { FastifyInstance } from 'fastify';
 import type { AuthConfig } from './auth-config.js';
 import type { GameAuth } from './auth.js';
+import { authHeaders } from './auth-request.js';
 
 export async function registerAuthRoutes(
   server: FastifyInstance,
@@ -12,21 +12,9 @@ export async function registerAuthRoutes(
   await server.register(cors, {
     origin: config.trustedOrigins,
     credentials: true,
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type'],
   });
-
-  function authHeaders(request: FastifyRequest) {
-    const headers = fromNodeHeaders(request.headers);
-    // Never trust a client-supplied IP header. Fastify resolves the address
-    // using the socket and only the configured trusted reverse proxy.
-    headers.set('x-cosmoids-client-ip', request.ip);
-    headers.delete('x-forwarded-for');
-    headers.delete('x-forwarded-host');
-    headers.delete('x-forwarded-proto');
-    headers.delete('content-length');
-    return headers;
-  }
 
   server.route({
     method: ['GET', 'POST'],

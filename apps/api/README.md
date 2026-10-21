@@ -13,6 +13,18 @@ connected before opening accounts to players. The browser account UI is describe
 in [the game account guide](../../docs/development/GAME_ACCOUNTS.md). Creature ownership, cloud saves,
 trading, and shiny validation are separate game features.
 
+The account-save database and profile API are documented in
+[the game save guide](../../docs/development/GAME_SAVES.md). It adds versioned
+game migrations using `node-pg-migrate` for profiles, individual creatures, and account trade-box
+metadata, plus authenticated profile listing, loading, creation, revision-checked
+saving, and deletion. Game UI integration and trade-box transfer endpoints are
+the next stage.
+
+The game also exports a view-only `/admin` panel for inspecting cloud accounts,
+profiles and creatures. Its `/api/admin/*` reads require a verified session and
+an exact account ID in the private `ADMIN_ACCOUNT_IDS` setting; access is disabled
+by default. See [admin panel setup](../../docs/development/ADMIN_PANEL.md).
+
 ## How the code fits together
 
 - `src/auth-config.ts` reads the auth secret, public API URL, and allowed website
@@ -73,6 +85,12 @@ the root `pnpm db:up` / `pnpm db:stop` scripts manage that database.
 | `GET /api/auth/get-session`    | Better Auth session endpoint                           |
 | `GET /api/me`                  | Our user endpoint; returns 401 without a valid session |
 
+Authenticated profile endpoints are `GET /api/profiles`, `GET /api/profiles/:id`,
+`POST /api/profiles`, `PUT /api/profiles/:id`, and `DELETE /api/profiles/:id`.
+Save and delete requests require the expected revision; writes require a trusted
+Origin. See the [save API contract](../../docs/development/GAME_SAVES.md#profile-api)
+for snapshots, conflict responses, validation, and cookie handling.
+
 Signup signs the player in automatically. The browser stores a signed session
 cookie and sends it with subsequent requests. Production cookies are Secure,
 HttpOnly, and use Better Auth's default SameSite protection. Use
@@ -118,6 +136,12 @@ For the same suite against actual Postgres, set `AUTH_TEST_DATABASE_URL` to a
 and drops a uniquely named schema per database test; it does not touch existing
 schemas. The test role must be able to create schemas. SQLite checks do not
 replace verifying migrations and queries against Postgres.
+
+Game schema checks require actual PostgreSQL. Run `pnpm test:game-db:local` from
+the root to use the loopback development database in `apps/api/.env`, or set
+`GAME_TEST_DATABASE_URL` explicitly before `pnpm test:api`. These tests also use
+isolated temporary schemas. Preview game migrations with `pnpm game:plan:local`
+and explicitly apply with `pnpm game:migrate:local` after the auth migration.
 
 ## First VPS deployment
 
