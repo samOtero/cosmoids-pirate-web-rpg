@@ -8,19 +8,23 @@ and portrait mobile screens and does not display the game's rotation overlay.
 ## Access
 
 Admin access is disabled by default. Create a normal game account, then obtain its
-exact `user.id` from the authenticated `/api/me` response or from PostgreSQL on the
+exact `user.id` and `user.email` from the authenticated `/api/me` response or from PostgreSQL on the
 VPS. As the database administrator, use a parameterized email lookup of
 `SELECT id FROM "user" WHERE email = $1`; do not select password or session fields.
 
-Add that ID to the private API environment file on the VPS,
+Add that ID/email pair to the private API environment file on the VPS,
 `/home/deploy/.config/cosmoids/api.env`:
 
 ```dotenv
-ADMIN_ACCOUNT_IDS=the-exact-account-id
+ADMIN_ACCOUNTS='[{"id":"the-exact-account-id","email":"you@example.com"}]'
 ```
 
-Multiple IDs can be comma-separated. IDs are exact matches; names, emails and
-wildcards do not grant access. Never put this setting in a `NEXT_PUBLIC_` variable
+The JSON array can contain multiple pairs. Both fields must match the same
+authenticated account exactly, including email casing; copy the values returned
+by `/api/me`. Matching only an ID or email does not grant access. Wildcards and
+duplicate IDs are rejected. Replace any old `ADMIN_ACCOUNT_IDS` setting with this
+paired setting; a nonempty legacy setting causes startup to fail rather than
+granting ID-only access. Never put this setting in a `NEXT_PUBLIC_` variable
 or a tracked environment file. For local development, use the ignored
 `apps/api/.env`. Restart the API after adding or removing an ID. No schema migration
 is required for the allowlist. Signup cannot assign admin access.
@@ -30,10 +34,19 @@ origin must already be in the API's `AUTH_TRUSTED_ORIGINS`. No additional hostna
 or hosting service is required: visit `https://<game-host>/admin` after deployment.
 
 Every admin request checks the real Better Auth session with cookie caching
-disabled, then checks the private allowlist. Missing/expired/revoked sessions get
+disabled, then checks the current account ID and email against one complete
+allowlist entry. Changing an account's email removes its access until the private
+entry is updated and the API restarted. Missing/expired/revoked sessions get
 401; regular accounts get 403. Renewal cookies are forwarded. Admin responses use
 `Cache-Control: no-store` and `X-Robots-Tag: noindex, nofollow`. Client data stays
 in component memory and is removed when access is denied or the session changes.
+
+The pair is an additional account-identity check, not a second authentication
+factor or an environment boundary. This setup still uses the shared VPS database:
+the approved account can inspect its records from any trusted game site, including
+staging or production when both point to this API. A restored/copied database can
+also contain the same ID/email pair. No separate staging environment is required
+for this shared-backend setup.
 
 ## Inspection
 

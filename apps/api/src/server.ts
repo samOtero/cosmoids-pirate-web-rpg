@@ -6,7 +6,7 @@ import { pool } from './database.js';
 import { registerProfileRoutes } from './profile-routes.js';
 import { loadGameContent } from './game-content.js';
 import { registerAdminRoutes } from './admin-routes.js';
-import { readAdminAccountIds } from './admin-config.js';
+import { readAdminAccounts } from './admin-config.js';
 
 const server = Fastify({
   logger: {
@@ -30,7 +30,7 @@ await registerAdminRoutes(
   auth,
   authConfig,
   pool,
-  readAdminAccountIds(),
+  readAdminAccounts(),
   content.maxProfiles
 );
 

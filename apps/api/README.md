@@ -22,7 +22,7 @@ the next stage.
 
 The game also exports a view-only `/admin` panel for inspecting cloud accounts,
 profiles and creatures. Its `/api/admin/*` reads require a verified session and
-an exact account ID in the private `ADMIN_ACCOUNT_IDS` setting; access is disabled
+an exact ID/email pair in the private `ADMIN_ACCOUNTS` setting; access is disabled
 by default. See [admin panel setup](../../docs/development/ADMIN_PANEL.md).
 
 ## How the code fits together

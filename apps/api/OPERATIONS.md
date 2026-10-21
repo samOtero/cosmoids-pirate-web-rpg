@@ -118,18 +118,18 @@ PGPASSWORD=<your-private-database-password>
 BETTER_AUTH_SECRET=<your-existing-private-auth-secret>
 BETTER_AUTH_URL=https://api.cosmoids-td.com
 AUTH_TRUSTED_ORIGINS=https://staging.cosmoids-td.com
-ADMIN_ACCOUNT_IDS=
+ADMIN_ACCOUNTS=[]
 ```
 
-| Variable                             | Meaning                                                                                                                                    |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `PGHOST`, `PGPORT`                   | Where Postgres runs                                                                                                                        |
-| `PGDATABASE`, `PGUSER`, `PGPASSWORD` | Database and credentials used by the API                                                                                                   |
-| `BETTER_AUTH_SECRET`                 | Secret used by Better Auth for signing/protecting auth data; minimum 32 characters in our config                                           |
-| `BETTER_AUTH_URL`                    | Public API origin used by Better Auth                                                                                                      |
-| `AUTH_TRUSTED_ORIGINS`               | Comma-separated exact browser origins permitted by CORS and Better Auth                                                                    |
-| `NODE_ENV`                           | Set to `production` in systemd, and explicitly for migration commands                                                                      |
-| `ADMIN_ACCOUNT_IDS`                  | Optional comma-separated exact account IDs allowed to inspect `/admin`; empty disables access. Keep server-side and restart after changes. |
+| Variable                             | Meaning                                                                                                                                                         |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PGHOST`, `PGPORT`                   | Where Postgres runs                                                                                                                                             |
+| `PGDATABASE`, `PGUSER`, `PGPASSWORD` | Database and credentials used by the API                                                                                                                        |
+| `BETTER_AUTH_SECRET`                 | Secret used by Better Auth for signing/protecting auth data; minimum 32 characters in our config                                                                |
+| `BETTER_AUTH_URL`                    | Public API origin used by Better Auth                                                                                                                           |
+| `AUTH_TRUSTED_ORIGINS`               | Comma-separated exact browser origins permitted by CORS and Better Auth                                                                                         |
+| `NODE_ENV`                           | Set to `production` in systemd, and explicitly for migration commands                                                                                           |
+| `ADMIN_ACCOUNTS`                     | Optional JSON array of exact `{"id":"...","email":"..."}` pairs allowed to inspect `/admin`; empty disables access. Keep server-side and restart after changes. |
 
 The API's own origin is trusted automatically. Additional origins must include
 the scheme and hostname, with no paths, credentials, or wildcards. The example

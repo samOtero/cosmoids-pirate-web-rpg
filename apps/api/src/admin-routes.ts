@@ -35,7 +35,7 @@ export async function registerAdminRoutes(
   auth: GameAuth,
   config: AuthConfig,
   pool: Pool,
-  adminIds: ReadonlySet<string>,
+  adminAccounts: ReadonlyMap<string, string>,
   maxProfiles: number
 ) {
   const repository = new AdminRepository(pool, maxProfiles);
@@ -51,29 +51,23 @@ export async function registerAdminRoutes(
       const cookies = headers.getSetCookie();
       if (cookies.length) reply.header('set-cookie', cookies);
       if (!session)
-        return reply
-          .code(401)
-          .send({
-            code: 'UNAUTHENTICATED',
-            error: 'Log in to access administration.',
-          });
-      if (!adminIds.has(session.user.id))
-        return reply
-          .code(403)
-          .send({
-            code: 'ADMIN_REQUIRED',
-            error: 'This account does not have admin access.',
-          });
+        return reply.code(401).send({
+          code: 'UNAUTHENTICATED',
+          error: 'Log in to access administration.',
+        });
+      if (adminAccounts.get(session.user.id) !== session.user.email)
+        return reply.code(403).send({
+          code: 'ADMIN_REQUIRED',
+          error: 'This account does not have admin access.',
+        });
       if (
         request.headers.origin !== undefined &&
         !config.trustedOrigins.includes(request.headers.origin)
       )
-        return reply
-          .code(403)
-          .send({
-            code: 'UNTRUSTED_ORIGIN',
-            error: 'This website is not allowed to access administration.',
-          });
+        return reply.code(403).send({
+          code: 'UNTRUSTED_ORIGIN',
+          error: 'This website is not allowed to access administration.',
+        });
     });
     routes.setErrorHandler((error, request, reply) => {
       if (error instanceof SaveError)
@@ -84,12 +78,10 @@ export async function registerAdminRoutes(
         { code: (error as { code?: string }).code },
         'Admin inspection failed'
       );
-      return reply
-        .code(503)
-        .send({
-          code: 'ADMIN_UNAVAILABLE',
-          error: 'Administration is temporarily unavailable. Try again.',
-        });
+      return reply.code(503).send({
+        code: 'ADMIN_UNAVAILABLE',
+        error: 'Administration is temporarily unavailable. Try again.',
+      });
     });
     routes.get('/api/admin/session', async () => ({ allowed: true }));
     routes.get<{ Querystring: Record<string, unknown> }>(

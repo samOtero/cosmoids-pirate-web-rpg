@@ -6,7 +6,7 @@ import { makeProfile } from './.generated/data-builders.mjs';
 import { createAuth } from '../src/auth.ts';
 import { registerAuthRoutes } from '../src/auth-routes.ts';
 import { registerAdminRoutes } from '../src/admin-routes.ts';
-import { readAdminAccountIds } from '../src/admin-config.ts';
+import { readAdminAccounts } from '../src/admin-config.ts';
 import { loadGameContent } from '../src/game-content.ts';
 import { ProfileRepository } from '../src/profile-repository.ts';
 import { CreatureLocationCode as Location } from '../src/game-save-values.ts';
@@ -19,20 +19,54 @@ import {
 const content = await loadGameContent();
 const origin = 'https://game.example.com';
 
-test('admin access defaults to nobody and accepts exact private account IDs', () => {
-  assert.equal(readAdminAccountIds({}).size, 0);
+test('admin access defaults to nobody and accepts exact private ID/email pairs', () => {
+  assert.equal(readAdminAccounts({}).size, 0);
+  assert.equal(readAdminAccounts({ ADMIN_ACCOUNTS: '[]' }).size, 0);
   assert.deepEqual(
-    [...readAdminAccountIds({ ADMIN_ACCOUNT_IDS: ' captain-1, captain-2, ' })],
-    ['captain-1', 'captain-2']
+    [
+      ...readAdminAccounts({
+        ADMIN_ACCOUNTS: JSON.stringify([
+          { id: 'captain-1', email: 'one@example.test' },
+          { id: 'captain-2', email: 'two@example.test' },
+        ]),
+      }),
+    ],
+    [
+      ['captain-1', 'one@example.test'],
+      ['captain-2', 'two@example.test'],
+    ]
   );
-  assert.throws(() => readAdminAccountIds({ ADMIN_ACCOUNT_IDS: '*' }));
-  assert.throws(() => readAdminAccountIds({ ADMIN_ACCOUNT_IDS: 'not an id' }));
+  assert.throws(
+    () => readAdminAccounts({ ADMIN_ACCOUNT_IDS: 'captain-1' }),
+    /Replace ADMIN_ACCOUNT_IDS/
+  );
+  for (const value of [
+    'invalid json',
+    '{}',
+    '[null]',
+    '["captain-1"]',
+    JSON.stringify([{ id: 'captain-1' }]),
+    JSON.stringify([{ id: '*', email: 'one@example.test' }]),
+    JSON.stringify([{ id: 'not an id', email: 'one@example.test' }]),
+    JSON.stringify([{ id: 'captain-1', email: '*' }]),
+    JSON.stringify([
+      { id: 'captain-1', email: 'one@example.test', extra: true },
+    ]),
+    JSON.stringify([
+      { id: 'captain-1', email: 'one@example.test' },
+      { id: 'captain-1', email: 'two@example.test' },
+    ]),
+  ])
+    assert.throws(
+      () => readAdminAccounts({ ADMIN_ACCOUNTS: value }),
+      /ADMIN_ACCOUNTS must/
+    );
 });
 
 async function setup(t) {
   const { pool, client } = await fixture(t);
   const auth = createAuth(pool, config);
-  const ids = new Set();
+  const accounts = new Map();
   const server = Fastify({ trustProxy: 'loopback' });
   await registerAuthRoutes(server, auth, config);
   await registerAdminRoutes(
@@ -40,7 +74,7 @@ async function setup(t) {
     auth,
     config,
     pool,
-    ids,
+    accounts,
     content.maxProfiles
   );
   await server.ready();
@@ -67,7 +101,7 @@ async function setup(t) {
   }
   const admin = await login('Administrator');
   const player = await login('Inspectable player');
-  ids.add(admin.user.id);
+  accounts.set(admin.user.id, admin.user.email);
   const call = (url, headers = {}, method = 'GET') =>
     server.inject({
       method,
@@ -111,7 +145,7 @@ async function setup(t) {
     server,
     admin,
     player,
-    ids,
+    accounts,
     call,
     profile,
     party,
@@ -124,7 +158,7 @@ async function setup(t) {
 databaseTest(
   'all admin reads require a live session and explicit admin membership',
   async (t) => {
-    const { call, admin, player, ids, profile, party, server, client } =
+    const { call, admin, player, accounts, profile, party, server, client } =
       await setup(t);
     const paths = [
       '/session',
@@ -143,9 +177,9 @@ databaseTest(
       );
       assert.equal((await call(path)).statusCode, 200);
     }
-    ids.clear();
+    accounts.clear();
     assert.equal((await call('/accounts')).statusCode, 403);
-    ids.add(admin.user.id);
+    accounts.set(admin.user.id, admin.user.email);
     await client.query(
       'UPDATE session SET "expiresAt" = CURRENT_TIMESTAMP - interval \'1 minute\' WHERE "userId" = $1',
       [admin.user.id]
@@ -156,10 +190,62 @@ databaseTest(
       url: '/api/auth/sign-out',
       headers: { cookie: player.cookie, origin },
     });
-    ids.add(player.user.id);
+    accounts.set(player.user.id, player.user.email);
     assert.equal(
       (await call('/accounts', { cookie: player.cookie })).statusCode,
       401
+    );
+  }
+);
+
+databaseTest(
+  'admin permission requires one complete pair and follows the current database email',
+  async (t) => {
+    const { call, admin, player, accounts, profile, party, client } =
+      await setup(t);
+    const paths = [
+      '/session',
+      '/accounts',
+      '/accounts/' + player.user.id,
+      '/profiles/' + profile.id,
+      `/accounts/${player.user.id}/creatures?location=party&profileId=${profile.id}`,
+      '/creatures/' + party,
+    ];
+    // An ID from one entry and email from another must not combine into access.
+    accounts.set(admin.user.id, player.user.email);
+    accounts.set(player.user.id, admin.user.email);
+    for (const path of paths) {
+      assert.equal((await call(path)).statusCode, 403);
+      assert.equal(
+        (await call(path, { cookie: player.cookie })).statusCode,
+        403
+      );
+    }
+    accounts.clear();
+    accounts.set(admin.user.id, admin.user.email.toUpperCase());
+    assert.equal((await call('/session')).statusCode, 403);
+    accounts.set(admin.user.id, admin.user.email);
+    assert.equal((await call('/session')).statusCode, 200);
+
+    const newEmail = randomUUID() + '@example.test';
+    await client.query('UPDATE "user" SET email = $1 WHERE id = $2', [
+      newEmail,
+      admin.user.id,
+    ]);
+    // The existing cookie must not keep the old email authorized.
+    for (const path of paths) assert.equal((await call(path)).statusCode, 403);
+    accounts.set(admin.user.id, newEmail);
+    assert.equal((await call('/session')).statusCode, 200);
+
+    // Reusing the old email under another account ID does not grant access.
+    accounts.set(admin.user.id, admin.user.email);
+    await client.query('UPDATE "user" SET email = $1 WHERE id = $2', [
+      admin.user.email,
+      player.user.id,
+    ]);
+    assert.equal(
+      (await call('/session', { cookie: player.cookie })).statusCode,
+      403
     );
   }
 );
@@ -310,7 +396,7 @@ databaseTest(
           throw new Error('private connection detail');
         },
       },
-      new Set([admin.user.id]),
+      new Map([[admin.user.id, admin.user.email]]),
       content.maxProfiles
     );
     t.after(() => failing.close());
