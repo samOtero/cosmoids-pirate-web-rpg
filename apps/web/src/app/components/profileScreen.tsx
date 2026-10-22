@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import type { CloudProfileSummary } from '@/types/cloudProfile';
 import { Profile } from '@/types/baseGame';
 import { LEVEL_ORDER } from '@/constants/tdLevels';
 import { TestProfileTemplateOption } from '@/constants/testProfileTemplates';
@@ -17,6 +18,12 @@ interface ProfileScreenProps {
   onDelete: (slotId: number) => void;
   onBack: () => void;
   creationPending?: boolean;
+  accountSlots?: (CloudProfileSummary | null)[];
+  loadStatus?: 'idle' | 'loading' | 'ready' | 'error';
+  loadingSlot?: number | null;
+  loadError?: string | null;
+  onRetry?: () => void;
+  onRefresh?: () => void;
   testProfileTemplates?: TestProfileTemplateOption[];
   onApplyTestTemplate?: (templateId: string) => void;
 }
@@ -28,6 +35,12 @@ export default function ProfileScreen({
   onDelete,
   onBack,
   creationPending = false,
+  accountSlots,
+  loadStatus = 'ready',
+  loadingSlot = null,
+  loadError,
+  onRetry,
+  onRefresh,
   testProfileTemplates,
   onApplyTestTemplate,
 }: ProfileScreenProps) {
@@ -37,7 +50,7 @@ export default function ProfileScreen({
     testProfileTemplates?.[0]?.id ?? ''
   );
   const canUseTestTemplates = Boolean(
-    testProfileTemplates?.length && onApplyTestTemplate
+    !accountSlots && testProfileTemplates?.length && onApplyTestTemplate
   );
   const selectedTemplate =
     testProfileTemplates?.find(
@@ -52,6 +65,7 @@ export default function ProfileScreen({
           Select Save File
         </h2>
         <div className="flex items-center gap-2">
+          {accountSlots && onRefresh && <Button variant="secondary" disabled={loadingSlot !== null || loadStatus === 'loading'} onClick={onRefresh}>Refresh saves</Button>}
           {canUseTestTemplates && (
             <Button
               variant="secondary"
@@ -69,92 +83,139 @@ export default function ProfileScreen({
       </div>
 
       {creationPending && <p role="status">Checking your account…</p>}
-      <div className="grid w-full max-w-4xl grid-cols-3 gap-4 lg:gap-6">
-        {[0, 1, 2].map((slotId) => {
-          const profile = profiles[slotId];
+      {accountSlots && (
+        <p className="mb-4 max-w-4xl text-sm text-sand/75">
+          Cloud profiles load fresh when you reopen the game. Changes made now
+          won’t be saved. New cloud saves and deletion aren’t available yet.
+        </p>
+      )}
+      {accountSlots && (loadStatus === 'loading' || loadStatus === 'idle') && (
+        <p role="status">Loading your cloud saves…</p>
+      )}
+      {loadingSlot !== null && (
+        <p role="status" className="mb-3">
+          Loading profile…
+        </p>
+      )}
+      {loadError && (
+        <div role="alert" className="mb-4 max-w-4xl text-center text-red-300">
+          <p>{loadError}</p>
+          {onRetry && (
+            <Button className="mt-3" onClick={onRetry}>
+              Retry
+            </Button>
+          )}
+        </div>
+      )}
+      {(!accountSlots || loadStatus === 'ready') && (
+        <div
+          className="grid w-full max-w-4xl grid-cols-1 gap-4 sm:grid-cols-3 lg:gap-6"
+          aria-busy={loadingSlot !== null}
+        >
+          {[0, 1, 2].map((slotId) => {
+            const profile = profiles[slotId];
+            const card = profile ?? accountSlots?.[slotId];
+            const buddyCreature =
+              profile?.creatures[0] ?? profile?.storageCreatures?.[0];
 
-          if (profile) {
+            if (card) {
+              return (
+                <Panel
+                  key={slotId}
+                  className="group flex h-52 cursor-pointer flex-col justify-between transition-colors hover:border-cyan-500 lg:h-64"
+                >
+                  <button
+                    type="button"
+                    aria-label={`Load ${card.name}`}
+                    disabled={creationPending || loadingSlot !== null}
+                    onClick={() => onSelect(slotId)}
+                    className="flex flex-1 flex-col items-center justify-center space-y-1 disabled:cursor-wait disabled:opacity-60 lg:space-y-2"
+                  >
+                    <div className="mb-1 flex h-12 w-12 items-center justify-center rounded-full bg-blue-900 text-2xl lg:mb-2 lg:h-16 lg:w-16 lg:text-3xl">
+                      {buddyCreature ? (
+                        <img
+                          src={(() => {
+                            const buddy = resolvePlayerCreature(buddyCreature);
+                            return buddy.iconImg || buddy.spriteUrl;
+                          })()}
+                          className="h-8 w-8 object-contain lg:h-12 lg:w-12"
+                          alt="buddy"
+                        />
+                      ) : (
+                        '⛵'
+                      )}
+                    </div>
+                    <h3 className="text-base font-bold text-cyan-300 lg:text-xl">
+                      {card.name}
+                    </h3>
+                    <p className="text-xs text-sand/70">
+                      Level{' '}
+                      {
+                        LEVEL_ORDER.filter(
+                          (level) =>
+                            level.requiredProgression === undefined ||
+                            card.storyProgression >= level.requiredProgression
+                        ).length
+                      }
+                    </p>
+                    <p className="text-xs text-sand/50">
+                      Last Played:{' '}
+                      {new Date(card.lastPlayed).toLocaleDateString()}
+                    </p>
+                  </button>
+                  {accountSlots && (
+                    <p className="mt-2 text-center text-xs text-sand/60">
+                      {profile?.creatures.length ??
+                        accountSlots[slotId]?.partyCount ??
+                        0}{' '}
+                      in team ·{' '}
+                      {profile?.storageCreatures.length ??
+                        accountSlots[slotId]?.storageCount ??
+                        0}{' '}
+                      in storage
+                    </p>
+                  )}
+                  {!accountSlots && (
+                    <div className="mt-2 flex justify-center border-t border-white/10 pt-2 lg:mt-4 lg:pt-4">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (confirm('Delete save?')) onDelete(slotId);
+                        }}
+                        className="text-xs font-bold text-red-400 uppercase hover:text-red-300"
+                      >
+                        Delete Data
+                      </button>
+                    </div>
+                  )}
+                </Panel>
+              );
+            }
+
             return (
               <Panel
                 key={slotId}
-                className="group flex h-52 cursor-pointer flex-col justify-between transition-colors hover:border-cyan-500 lg:h-64"
+                className="flex h-52 cursor-pointer flex-col items-center justify-center transition-colors hover:bg-white/5 lg:h-64"
               >
-                <div
-                  onClick={() => onSelect(slotId)}
-                  className="flex flex-1 flex-col items-center justify-center space-y-1 lg:space-y-2"
+                <button
+                  type="button"
+                  disabled={creationPending || Boolean(accountSlots)}
+                  aria-label={`Create save in slot ${slotId + 1}`}
+                  onClick={() => onCreate(slotId)}
+                  className="space-y-1 text-center disabled:cursor-wait disabled:opacity-50 lg:space-y-4"
                 >
-                  <div className="mb-1 flex h-12 w-12 items-center justify-center rounded-full bg-blue-900 text-2xl lg:mb-2 lg:h-16 lg:w-16 lg:text-3xl">
-                    {profile.creatures[0] || profile.storageCreatures?.[0] ? (
-                      <img
-                        src={(() => {
-                          const buddy = resolvePlayerCreature(
-                            profile.creatures[0] || profile.storageCreatures![0]
-                          );
-                          return buddy.iconImg || buddy.spriteUrl;
-                        })()}
-                        className="h-8 w-8 object-contain lg:h-12 lg:w-12"
-                        alt="buddy"
-                      />
-                    ) : (
-                      '⛵'
-                    )}
-                  </div>
-                  <h3 className="text-base font-bold text-cyan-300 lg:text-xl">
-                    {profile.name}
-                  </h3>
-                  <p className="text-xs text-sand/70">
-                    Level{' '}
-                    {
-                      LEVEL_ORDER.filter(
-                        (level) =>
-                          level.requiredProgression === undefined ||
-                          profile.storyProgression >= level.requiredProgression
-                      ).length
-                    }
-                  </p>
-                  <p className="text-xs text-sand/50">
-                    Last Played:{' '}
-                    {new Date(profile.lastPlayed).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="mt-2 flex justify-center border-t border-white/10 pt-2 lg:mt-4 lg:pt-4">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (confirm('Delete save?')) onDelete(slotId);
-                    }}
-                    className="text-xs font-bold text-red-400 uppercase hover:text-red-300"
-                  >
-                    Delete Data
-                  </button>
-                </div>
+                  <span className="block text-2xl text-wood-light opacity-50 lg:text-4xl">
+                    +
+                  </span>
+                  <span className="block text-sm font-bold tracking-widest text-sand/50 uppercase lg:text-base">
+                    Empty Slot
+                  </span>
+                </button>
               </Panel>
             );
-          }
-
-          return (
-            <Panel
-              key={slotId}
-              className="flex h-52 cursor-pointer flex-col items-center justify-center transition-colors hover:bg-white/5 lg:h-64"
-            >
-              <button
-                type="button"
-                disabled={creationPending}
-                aria-label={`Create save in slot ${slotId + 1}`}
-                onClick={() => onCreate(slotId)}
-                className="space-y-1 text-center disabled:cursor-wait disabled:opacity-50 lg:space-y-4"
-              >
-                <span className="block text-2xl text-wood-light opacity-50 lg:text-4xl">
-                  +
-                </span>
-                <span className="block text-sm font-bold tracking-widest text-sand/50 uppercase lg:text-base">
-                  Empty Slot
-                </span>
-              </button>
-            </Panel>
-          );
-        })}
-      </div>
+          })}
+        </div>
+      )}
 
       {showTestTemplates && canUseTestTemplates && (
         <div

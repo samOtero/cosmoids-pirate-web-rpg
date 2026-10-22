@@ -6,7 +6,13 @@ import AccountLauncher from './auth/AccountLauncher';
 import { trackGameEvent } from '@/utils/analytics';
 import styles from './startScreen.module.css';
 
-export default function StartScreen({ onStart }: { onStart: () => void }) {
+export default function StartScreen({
+  onStart,
+  onGuestStart,
+}: {
+  onStart: () => void;
+  onGuestStart?: () => void;
+}) {
   return (
     <main className={`${styles.screen} animate-fade-in`}>
       <Image
@@ -25,6 +31,7 @@ export default function StartScreen({ onStart }: { onStart: () => void }) {
         </div>
         <div className={styles.launcher}>
           <AccountLauncher
+            onGuestStart={onGuestStart}
             onStart={() => {
               void trackGameEvent('game_started');
               onStart();

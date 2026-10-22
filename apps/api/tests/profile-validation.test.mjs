@@ -10,7 +10,12 @@ import {
 function input(creature, profileVersion) {
   const { id, ownerId, version, creatures, storageCreatures, ...profileData } =
     makeProfile({ creatures: [creature] });
-  return { profileVersion, profileData, creatures, storageCreatures };
+  return {
+    profileVersion,
+    profileData,
+    creatures: creatures.map(({ originalOwnerId, ...c }) => c),
+    storageCreatures,
+  };
 }
 
 test('save validation discovers every registered species and its current legal moves', async () => {

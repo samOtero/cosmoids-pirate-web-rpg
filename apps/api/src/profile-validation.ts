@@ -69,7 +69,6 @@ export function profileId(value: unknown): string {
 
 export interface SaveCreature {
   id: string;
-  originalOwnerId?: string;
   speciesId: number;
   gender: 'male' | 'female' | 'genderless';
   level: number;
@@ -99,14 +98,41 @@ export function validateSnapshot(
   body: Record<string, unknown>,
   content: GameContent
 ): SaveSnapshot {
-  if (body.profileVersion !== content.profileVersion)
+  validateVersion(body.profileVersion, content);
+  const ids = new Set<string>();
+  return {
+    profileVersion: content.profileVersion,
+    profileData: validateProfileData(body.profileData, content),
+    creatures: validateCreatures(
+      body.creatures,
+      content.maxPartySize,
+      content,
+      ids
+    ),
+    storageCreatures: validateCreatures(
+      body.storageCreatures,
+      10000,
+      content,
+      ids
+    ),
+  };
+}
+
+function validateVersion(version: unknown, content: GameContent) {
+  if (version !== content.profileVersion)
     throw new SaveError(
       400,
       'UNSUPPORTED_PROFILE_VERSION',
       'This save format is not supported. Update the game before saving.'
     );
+}
+
+function validateProfileData(
+  raw: unknown,
+  content: GameContent
+): Record<string, unknown> {
   const data = object(
-    body.profileData,
+    raw,
     [
       'name',
       'lastPlayed',
@@ -170,13 +196,20 @@ export function validateSnapshot(
       invalid('Invalid item value.');
     integer(item.count, 0, 2147483647, 'item count');
   }
-  const ids = new Set<string>();
+  return data;
+}
+
+function validateCreatures(
+  raw: unknown,
+  maximum: number,
+  content: GameContent,
+  ids: Set<string>
+): SaveCreature[] {
   const parseCreature = (raw: unknown): SaveCreature => {
     const c = object(
       raw,
       [
         'id',
-        'originalOwnerId',
         'speciesId',
         'gender',
         'level',
@@ -252,10 +285,6 @@ export function validateSnapshot(
       invalid('Unknown targeting mode.');
     return {
       id,
-      originalOwnerId:
-        c.originalOwnerId === undefined
-          ? undefined
-          : string(c.originalOwnerId, 200, 'original owner'),
       speciesId: species.id,
       gender: gender as SaveCreature['gender'],
       level,
@@ -266,14 +295,100 @@ export function validateSnapshot(
       targetingMode: targeting as string,
     };
   };
+  return array(raw, maximum, 'creatures').map(parseCreature);
+}
+
+export interface StorageBox {
+  id: string;
+  name: string;
+  position: number;
+  creatureIds: string[];
+}
+export interface CreatureOrder {
+  party?: string[];
+  /** Only the boxes that changed; new UUIDs create boxes. */
+  storage?: StorageBox[];
+}
+export interface SaveChanges {
+  profileVersion: number;
+  profileData?: Record<string, unknown>;
+  added: SaveCreature[];
+  updated: SaveCreature[];
+  order?: CreatureOrder;
+}
+
+export function validateChanges(
+  body: Record<string, unknown>,
+  content: GameContent
+): SaveChanges {
+  validateVersion(body.profileVersion, content);
+  const changes = object(
+    body.creatureChanges,
+    ['added', 'updated', 'order'],
+    'Creature changes'
+  );
+  const ids = new Set<string>();
+  const added = validateCreatures(
+    changes.added,
+    10000 + content.maxPartySize,
+    content,
+    ids
+  );
+  const updated = validateCreatures(
+    changes.updated,
+    10000 + content.maxPartySize,
+    content,
+    ids
+  );
+  let order: CreatureOrder | undefined;
+  if (changes.order !== undefined) {
+    const raw = object(changes.order, ['party', 'storage'], 'Creature order');
+    const orderedIds = new Set<string>();
+    const parseIds = (value: unknown, max: number) =>
+      array(value, max, 'creature order').map((value) => {
+        const id = string(value, 200, 'creature ID');
+        if (orderedIds.has(id))
+          invalid('Duplicate creature in changed order lists.');
+        orderedIds.add(id);
+        return id;
+      });
+    const boxIds = new Set<string>();
+    order = {
+      ...(raw.party === undefined
+        ? {}
+        : { party: parseIds(raw.party, content.maxPartySize) }),
+      ...(raw.storage === undefined
+        ? {}
+        : {
+            storage: array(raw.storage, 1000, 'storage boxes').map((value) => {
+              const box = object(
+                value,
+                ['id', 'name', 'position', 'creatureIds'],
+                'Storage box'
+              );
+              const id = profileId(box.id);
+              if (boxIds.has(id)) invalid('Duplicate storage box.');
+              boxIds.add(id);
+              return {
+                id,
+                name: string(box.name, 80, 'box name'),
+                position: integer(box.position, 0, 2147483647, 'box position'),
+                creatureIds: parseIds(box.creatureIds, 10000),
+              };
+            }),
+          }),
+    };
+    if (added.some((c) => !orderedIds.has(c.id)))
+      invalid('Every new creature must appear in a changed order list.');
+  } else if (added.length)
+    invalid('New creatures require their party/storage order.');
   return {
     profileVersion: content.profileVersion,
-    profileData: data,
-    creatures: array(body.creatures, content.maxPartySize, 'party').map(
-      parseCreature
-    ),
-    storageCreatures: array(body.storageCreatures, 10000, 'storage').map(
-      parseCreature
-    ),
+    ...(body.profileData === undefined
+      ? {}
+      : { profileData: validateProfileData(body.profileData, content) }),
+    added,
+    updated,
+    order,
   };
 }

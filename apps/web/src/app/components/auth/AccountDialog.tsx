@@ -101,7 +101,7 @@ export default function AccountDialog({
         </button>
       </div>
       <p className={styles.note}>
-        Game saves currently stay on this device. Cloud saving is coming later.
+        Sign in to load your cloud profiles. Offline saves stay on this device.
       </p>
       <form onSubmit={submit} aria-busy={busy}>
         <fieldset

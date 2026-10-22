@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { test } from 'node:test';
+import { readdir } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import { runner } from 'node-pg-migrate';
+const migrationCount = (
+  await readdir(new URL('../src/migrations/', import.meta.url))
+).filter((name) => name.endsWith('.ts')).length;
 import { getMigrations } from 'better-auth/db/migration';
 import { createAuthOptions } from '../src/auth.ts';
 import {
@@ -59,13 +65,29 @@ async function creature(client, owner, save = null, overrides = {}) {
     active: 0,
     ...overrides,
   };
+  let storageBoxId = null;
+  if (values.location === Location.STORAGE && save) {
+    storageBoxId = (
+      await client.query(
+        'SELECT id FROM profile_storage_boxes WHERE profile_id = $1 ORDER BY position LIMIT 1',
+        [save.id]
+      )
+    ).rows[0]?.id;
+    if (!storageBoxId)
+      storageBoxId = (
+        await client.query(
+          "INSERT INTO profile_storage_boxes (profile_id, name, position) VALUES ($1, 'Test box', 0) RETURNING id",
+          [save.id]
+        )
+      ).rows[0].id;
+  }
   return (
     await client.query(
       `
     INSERT INTO player_creatures (
-      id, owner_account_id, original_owner_id, profile_id, location, position,
+      id, owner_account_id, original_owner_id, profile_id, location, position, storage_box_id,
       species_id, gender, level, xp, equipped_attack_ids, active_attack_index
-    ) VALUES ($1, $2, $3, $4, $5, $6, 901, $7, 1, 0, $8, $9)
+    ) VALUES ($1, $2, $3, $4, $5, $6, $10, 901, $7, 1, 0, $8, $9)
     RETURNING *
   `,
       [
@@ -74,10 +96,11 @@ async function creature(client, owner, save = null, overrides = {}) {
         values.originalOwner,
         save?.id ?? null,
         values.location,
-        values.position,
+        values.location === Location.TRADE_BOX ? values.position : null,
         values.gender,
         values.attacks,
         values.active,
+        storageBoxId,
       ]
     )
   ).rows[0];
@@ -85,6 +108,84 @@ async function creature(client, owner, save = null, overrides = {}) {
 
 const rejectsCode = (promise, code) =>
   assert.rejects(promise, (error) => error.code === code);
+
+databaseTest(
+  'storage-box migration preserves legacy ordering, ownership and trade-box positions',
+  async (t) => {
+    const { client } = await fixture(t, { migrate: false });
+    const schema = (await client.query('SELECT current_schema() AS name'))
+      .rows[0].name;
+    await runner({
+      dbClient: client,
+      dir: fileURLToPath(new URL('../src/migrations/', import.meta.url)),
+      migrationsTable: 'game_schema_migrations',
+      migrationsSchema: schema,
+      direction: 'up',
+      count: 1,
+      singleTransaction: true,
+      advisoryLockMode: 'wait',
+      logger: { info() {}, warn() {}, error() {} },
+    });
+    const owner = await account(client);
+    const save = await profile(client, owner);
+    const entries = [
+      ['party-last', Location.PARTY, 4],
+      ['party-first', Location.PARTY, 1],
+      ['storage-last', Location.STORAGE, 8],
+      ['storage-first', Location.STORAGE, 3],
+      ['traded', Location.TRADE_BOX, 9],
+    ];
+    for (const [id, location, position] of entries)
+      await client.query(
+        `INSERT INTO player_creatures
+    (id, owner_account_id, original_owner_id, profile_id, location, position, species_id, gender, level, xp, equipped_attack_ids)
+    VALUES ($1,$2,$2,$3,$4,$5,901,0,1,0,ARRAY[801])`,
+        [
+          id,
+          owner,
+          location === Location.TRADE_BOX ? null : save.id,
+          location,
+          position,
+        ]
+      );
+    assert.equal(
+      (await applyGameMigrations(client)).length,
+      migrationCount - 1
+    );
+    const migrated = (
+      await client.query('SELECT * FROM game_profiles WHERE id = $1', [save.id])
+    ).rows[0];
+    assert.deepEqual(migrated.party_order, ['party-first', 'party-last']);
+    assert.equal(migrated.revision, save.revision);
+    const boxes = (
+      await client.query(
+        'SELECT * FROM profile_storage_boxes WHERE profile_id = $1',
+        [save.id]
+      )
+    ).rows;
+    assert.equal(boxes.length, 1);
+    assert.deepEqual(boxes[0].creature_order, [
+      'storage-first',
+      'storage-last',
+    ]);
+    const rows = (
+      await client.query('SELECT * FROM player_creatures ORDER BY id')
+    ).rows;
+    assert.equal(rows.length, entries.length);
+    for (const row of rows) {
+      assert.equal(row.original_owner_id, owner);
+      assert.equal(
+        row.position,
+        row.location === Location.TRADE_BOX ? 9 : null
+      );
+      assert.equal(
+        row.storage_box_id,
+        row.location === Location.STORAGE ? boxes[0].id : null
+      );
+    }
+    assert.deepEqual(await applyGameMigrations(client), []);
+  }
+);
 
 test('database gender and location assignments remain permanent', () => {
   assert.deepEqual(Gender, { GENDERLESS: 0, MALE: 1, FEMALE: 2 });
@@ -98,7 +199,7 @@ databaseTest(
     const preview = [];
     assert.equal(
       (await planGameMigrations(client, (sql) => preview.push(sql))).length,
-      1
+      migrationCount
     );
     assert.match(preview.join('\n'), /CREATE TABLE game_profiles/);
     assert.equal(
@@ -114,7 +215,7 @@ databaseTest(
         .rows[0].name,
       null
     );
-    assert.equal((await applyGameMigrations(client)).length, 1);
+    assert.equal((await applyGameMigrations(client)).length, migrationCount);
     const owner = await account(client);
     const save = await profile(client, owner);
     const owned = await creature(client, owner, save);
@@ -150,7 +251,7 @@ databaseTest(
     await (
       await getMigrations(createAuthOptions(pool, config))
     ).runMigrations();
-    assert.equal((await applyGameMigrations(client)).length, 1);
+    assert.equal((await applyGameMigrations(client)).length, migrationCount);
   }
 );
 
@@ -175,7 +276,7 @@ databaseTest(
       null
     );
     await client.query('DROP TABLE game_schema_migrations');
-    assert.equal((await applyGameMigrations(client)).length, 1);
+    assert.equal((await applyGameMigrations(client)).length, migrationCount);
   }
 );
 
@@ -189,7 +290,10 @@ databaseTest(
         applyGameMigrations(client),
         applyGameMigrations(second),
       ]);
-      assert.deepEqual(results.map((ids) => ids.length).sort(), [0, 1]);
+      assert.deepEqual(results.map((ids) => ids.length).sort(), [
+        0,
+        migrationCount,
+      ]);
     } finally {
       second.release();
     }
@@ -326,67 +430,112 @@ databaseTest(
 );
 
 databaseTest(
-  'party, storage and trade-box positions are exclusive in their own collections',
+  'party and storage order lives on collections; trade positions remain exclusive',
   async (t) => {
     const { client } = await fixture(t);
     const owner = await account(client);
-    const other = await account(client);
     const save = await profile(client, owner);
-    const second = await profile(client, owner, 1);
-    await box(client, owner);
-    await box(client, other);
-    for (let position = 0; position < 6; position++)
-      await creature(client, owner, save, { position });
-    await rejectsCode(creature(client, owner, save), '23505');
-    await rejectsCode(creature(client, owner, save, { position: 6 }), '23514');
-    await creature(client, owner, second);
-    await creature(client, owner, save, { location: Location.STORAGE });
+    const a = await creature(client, owner, save);
+    const b = await creature(client, owner, save);
+    assert.equal(a.position, null);
+    assert.equal(b.position, null);
+    for (const expression of [
+      'ARRAY[NULL]::text[]',
+      "ARRAY[['a','b']]::text[]",
+      "'[0:1]={a,b}'::text[]",
+    ]) {
+      await rejectsCode(
+        client.query(
+          `UPDATE game_profiles SET party_order = ${expression} WHERE id = $1`,
+          [save.id]
+        ),
+        '23514'
+      );
+    }
+    await client.query(
+      'UPDATE game_profiles SET party_order = $1 WHERE id = $2',
+      [[b.id, a.id], save.id]
+    );
+    assert.deepEqual(
+      (
+        await client.query(
+          'SELECT party_order FROM game_profiles WHERE id = $1',
+          [save.id]
+        )
+      ).rows[0].party_order,
+      [b.id, a.id]
+    );
+    await rejectsCode(
+      client.query('UPDATE game_profiles SET party_order = $1 WHERE id = $2', [
+        Array(7).fill(a.id),
+        save.id,
+      ]),
+      '23514'
+    );
+    await rejectsCode(
+      client.query('UPDATE player_creatures SET position = 0 WHERE id = $1', [
+        a.id,
+      ]),
+      '23514'
+    );
     await creature(client, owner);
-    await creature(client, other);
     await rejectsCode(creature(client, owner), '23505');
     await rejectsCode(creature(client, owner, null, { position: -1 }), '23514');
   }
 );
 
 databaseTest(
-  'position checks can be deferred for a swap but reject final duplicates',
+  'stored creatures require a box in their own profile and box menu positions can swap',
   async (t) => {
     const { client } = await fixture(t);
     const owner = await account(client);
     const save = await profile(client, owner);
-    const first = await creature(client, owner, save);
-    const second = await creature(client, owner, save, { position: 1 });
+    const second = await profile(client, owner, 1);
+    const stored = await creature(client, owner, save, {
+      location: Location.STORAGE,
+    });
+    const foreign = await creature(client, owner, second, {
+      location: Location.STORAGE,
+    });
+    await rejectsCode(
+      client.query(
+        'UPDATE player_creatures SET storage_box_id = $1 WHERE id = $2',
+        [foreign.storage_box_id, stored.id]
+      ),
+      '23503'
+    );
+    await rejectsCode(
+      client.query(
+        'UPDATE player_creatures SET storage_box_id = NULL WHERE id = $1',
+        [stored.id]
+      ),
+      '23514'
+    );
+    await rejectsCode(
+      client.query('DELETE FROM profile_storage_boxes WHERE id = $1', [
+        stored.storage_box_id,
+      ]),
+      '23503'
+    );
+    const otherBox = (
+      await client.query(
+        "INSERT INTO profile_storage_boxes (profile_id, name, position) VALUES ($1, 'Other', 1) RETURNING id",
+        [save.id]
+      )
+    ).rows[0];
     await client.query('BEGIN');
     await client.query(
-      'SET CONSTRAINTS player_creatures_position_unique DEFERRED'
+      'SET CONSTRAINTS profile_storage_boxes_position_unique DEFERRED'
     );
     await client.query(
-      'UPDATE player_creatures SET position = 1 WHERE id = $1',
-      [first.id]
+      'UPDATE profile_storage_boxes SET position = 1 WHERE id = $1',
+      [stored.storage_box_id]
     );
     await client.query(
-      'UPDATE player_creatures SET position = 0 WHERE id = $1',
-      [second.id]
+      'UPDATE profile_storage_boxes SET position = 0 WHERE id = $1',
+      [otherBox.id]
     );
     await client.query('COMMIT');
-    assert.equal(
-      (
-        await client.query(
-          'SELECT position FROM player_creatures WHERE id = $1',
-          [first.id]
-        )
-      ).rows[0].position,
-      1
-    );
-    await client.query('BEGIN');
-    await client.query(
-      'SET CONSTRAINTS player_creatures_position_unique DEFERRED'
-    );
-    await client.query(
-      'UPDATE player_creatures SET position = 0 WHERE id = $1',
-      [first.id]
-    );
-    await rejectsCode(client.query('COMMIT'), '23505');
   }
 );
 
@@ -487,7 +636,7 @@ databaseTest(
     // Controlled SQL checks schema compatibility; save/transfer API is a later step.
     await client.query('BEGIN');
     await client.query(
-      'UPDATE player_creatures SET profile_id = NULL, location = $1 WHERE id = $2',
+      'UPDATE player_creatures SET profile_id = NULL, location = $1, position = 0, storage_box_id = NULL WHERE id = $2',
       [Location.TRADE_BOX, owned.id]
     );
     await client.query(
@@ -501,9 +650,15 @@ databaseTest(
     await client.query('COMMIT');
     await client.query('DELETE FROM game_profiles WHERE id = $1', [source.id]);
     await client.query('BEGIN');
+    const destinationBox = (
+      await client.query(
+        "INSERT INTO profile_storage_boxes (profile_id, name, position) VALUES ($1, 'Destination', 0) RETURNING id",
+        [destination.id]
+      )
+    ).rows[0].id;
     await client.query(
-      'UPDATE player_creatures SET profile_id = $1, location = $2 WHERE id = $3',
-      [destination.id, Location.STORAGE, owned.id]
+      'UPDATE player_creatures SET profile_id = $1, location = $2, position = NULL, storage_box_id = $4 WHERE id = $3',
+      [destination.id, Location.STORAGE, owned.id, destinationBox]
     );
     await client.query(
       'UPDATE game_profiles SET revision = revision + 1 WHERE id = $1',

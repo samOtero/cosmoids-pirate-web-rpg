@@ -8,6 +8,8 @@ import {
   SaveError,
   type SaveCreature,
   type SaveSnapshot,
+  type SaveChanges,
+  type StorageBox,
 } from './profile-validation.js';
 
 const genderCodes = {
@@ -27,6 +29,7 @@ interface ProfileRow {
   profile_version: number;
   revision: number;
   profile_data: Record<string, unknown>;
+  party_order: string[];
   created_at: Date;
   saved_at: Date;
 }
@@ -44,7 +47,8 @@ interface CreatureRow {
   active_attack_index: number;
   targeting_mode: string;
   location: number;
-  position: number;
+  position: number | null;
+  storage_box_id: string | null;
 }
 function wireCreature(row: CreatureRow) {
   return {
@@ -101,11 +105,56 @@ export class ProfileRepository {
     }
   }
 
+  private async storageBoxes(client: PoolClient, profileId: string) {
+    return (
+      await client.query<StorageBox>(
+        'SELECT id, name, position, creature_order AS "creatureIds" FROM profile_storage_boxes WHERE profile_id = $1 ORDER BY position, id',
+        [profileId]
+      )
+    ).rows;
+  }
+
   private async fullProfile(client: PoolClient, row: ProfileRow) {
-    const creatures = await client.query<CreatureRow>(
-      'SELECT * FROM player_creatures WHERE profile_id = $1 AND owner_account_id = $2 ORDER BY location, position',
-      [row.id, row.account_id]
-    );
+    const creatures = (
+      await client.query<CreatureRow>(
+        'SELECT * FROM player_creatures WHERE profile_id = $1 AND owner_account_id = $2',
+        [row.id, row.account_id]
+      )
+    ).rows;
+    const boxes = await this.storageBoxes(client, row.id);
+    const byId = new Map(creatures.map((c) => [c.id, c]));
+    const ordered = [
+      ...row.party_order,
+      ...boxes.flatMap((b) => b.creatureIds),
+    ];
+    if (
+      ordered.length !== byId.size ||
+      new Set(ordered).size !== ordered.length
+    )
+      throw creatureConflict();
+    const read = (ids: string[], location: number, boxId: string | null) =>
+      ids.map((id) => {
+        const creature = byId.get(id);
+        if (
+          !creature ||
+          creature.location !== location ||
+          creature.storage_box_id !== boxId
+        )
+          throw creatureConflict();
+        return wireCreature(creature);
+      });
+    return {
+      ...this.metadata(row),
+      profileData: row.profile_data,
+      creatures: read(row.party_order, Location.PARTY, null),
+      storageCreatures: boxes.flatMap((b) =>
+        read(b.creatureIds, Location.STORAGE, b.id)
+      ),
+      storageBoxes: boxes,
+    };
+  }
+
+  private metadata(row: ProfileRow) {
     return {
       id: row.id,
       slot: row.slot,
@@ -113,13 +162,6 @@ export class ProfileRepository {
       revision: row.revision,
       createdAt: row.created_at.toISOString(),
       savedAt: row.saved_at.toISOString(),
-      profileData: row.profile_data,
-      creatures: creatures.rows
-        .filter((c) => c.location === Location.PARTY)
-        .map(wireCreature),
-      storageCreatures: creatures.rows
-        .filter((c) => c.location === Location.STORAGE)
-        .map(wireCreature),
     };
   }
 
@@ -167,12 +209,33 @@ export class ProfileRepository {
     return this.transaction(async (client) => {
       const row = (
         await client.query<ProfileRow>(
-          `INSERT INTO game_profiles (account_id, slot, profile_version, profile_data)
-        VALUES ($1, $2, $3, $4) RETURNING *`,
-          [accountId, slot, snapshot.profileVersion, snapshot.profileData]
+          `INSERT INTO game_profiles (account_id, slot, profile_version, profile_data, party_order)
+        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+          [
+            accountId,
+            slot,
+            snapshot.profileVersion,
+            snapshot.profileData,
+            snapshot.creatures.map((c) => c.id),
+          ]
         )
       ).rows[0]!;
-      await this.writeCreatures(client, accountId, row.id, snapshot);
+      const box = (
+        await client.query<StorageBox>(
+          `INSERT INTO profile_storage_boxes (profile_id, name, position, creature_order)
+         VALUES ($1, 'Box 1', 0, $2) RETURNING id, name, position, creature_order AS "creatureIds"`,
+          [row.id, snapshot.storageCreatures.map((c) => c.id)]
+        )
+      ).rows[0]!;
+      await this.writeCreatures(client, accountId, row, {
+        profileVersion: snapshot.profileVersion,
+        added: [...snapshot.creatures, ...snapshot.storageCreatures],
+        updated: [],
+        order: {
+          party: snapshot.creatures.map((c) => c.id),
+          storage: [box],
+        },
+      });
       return this.fullProfile(client, row);
     });
   }
@@ -204,19 +267,30 @@ export class ProfileRepository {
     accountId: string,
     id: string,
     revision: number,
-    snapshot: SaveSnapshot
+    changes: SaveChanges
   ) {
     return this.transaction(async (client) => {
-      await this.lock(client, accountId, id, revision);
-      await this.writeCreatures(client, accountId, id, snapshot);
+      const previous = await this.lock(client, accountId, id, revision);
+      const partyOrder = await this.writeCreatures(
+        client,
+        accountId,
+        previous,
+        changes
+      );
       const row = (
         await client.query<ProfileRow>(
-          `UPDATE game_profiles SET profile_data = $1, profile_version = $2,
+          `UPDATE game_profiles SET profile_data = $1, profile_version = $2, party_order = $5,
         revision = revision + 1, saved_at = CURRENT_TIMESTAMP WHERE id = $3 AND account_id = $4 RETURNING *`,
-          [snapshot.profileData, snapshot.profileVersion, id, accountId]
+          [
+            changes.profileData ?? previous.profile_data,
+            changes.profileVersion,
+            id,
+            accountId,
+            partyOrder,
+          ]
         )
       ).rows[0]!;
-      return this.fullProfile(client, row);
+      return this.metadata(row);
     });
   }
 
@@ -253,94 +327,150 @@ export class ProfileRepository {
   private async writeCreatures(
     client: PoolClient,
     accountId: string,
-    id: string,
-    snapshot: SaveSnapshot
+    profile: ProfileRow,
+    changes: SaveChanges
   ) {
-    const incoming = [...snapshot.creatures, ...snapshot.storageCreatures];
-    const current = await client.query<CreatureRow>(
-      `SELECT * FROM player_creatures
-      WHERE profile_id = $1 OR id = ANY($2::text[])`,
-      [id, incoming.map((c) => c.id)]
-    );
+    const id = profile.id;
+    const incoming = [...changes.added, ...changes.updated];
+    const hasOrder =
+      changes.order?.party !== undefined ||
+      changes.order?.storage !== undefined;
+    if (!incoming.length && !hasOrder) return profile.party_order;
+    const current = hasOrder
+      ? await client.query<CreatureRow>(
+          'SELECT * FROM player_creatures WHERE profile_id = $1 OR id = ANY($2::text[])',
+          [id, incoming.map((c) => c.id)]
+        )
+      : await client.query<CreatureRow>(
+          'SELECT * FROM player_creatures WHERE id = ANY($1::text[])',
+          [incoming.map((c) => c.id)]
+        );
     const existing = new Map(current.rows.map((row) => [row.id, row]));
-    const incomingIds = new Set(incoming.map((c) => c.id));
-    if (
-      current.rows.some(
-        (row) => row.profile_id === id && !incomingIds.has(row.id)
-      )
-    )
-      throw creatureConflict();
-    for (const creature of incoming) {
+    for (const creature of changes.added)
+      if (existing.has(creature.id)) throw creatureConflict();
+    for (const creature of changes.updated) {
       const old = existing.get(creature.id);
-      if (old) {
-        if (old.owner_account_id !== accountId || old.profile_id !== id)
-          throw creatureConflict();
-        if (
-          (creature.originalOwnerId !== undefined &&
-            creature.originalOwnerId !== old.original_owner_id) ||
-          creature.gender !== genders[old.gender] ||
-          creature.isShiny !== old.is_shiny ||
-          !this.canEvolve(old.species_id, creature.speciesId, creature.level)
-        ) {
-          throw new SaveError(
-            400,
-            'INVALID_CREATURE_CHANGE',
-            'Creature identity, original ownership, gender and shiny status must be preserved.'
-          );
-        }
-      } else if (
-        creature.originalOwnerId !== undefined &&
-        !['guest', accountId].includes(creature.originalOwnerId)
-      ) {
+      if (!old || old.owner_account_id !== accountId || old.profile_id !== id)
+        throw creatureConflict();
+      if (
+        creature.gender !== genders[old.gender] ||
+        creature.isShiny !== old.is_shiny ||
+        !this.canEvolve(old.species_id, creature.speciesId, creature.level)
+      )
         throw new SaveError(
           400,
-          'INVALID_ORIGINAL_OWNER',
-          'New creatures receive the authenticated account as their original owner.'
+          'INVALID_CREATURE_CHANGE',
+          'Creature identity, gender and shiny status must be preserved.'
         );
+    }
+    const partyOrder = changes.order?.party ?? profile.party_order;
+    const placements = new Map<
+      string,
+      { location: number; boxId: string | null }
+    >();
+    if (hasOrder) {
+      const boxes = await this.storageBoxes(client, id);
+      const byBoxId = new Map(boxes.map((b) => [b.id, b]));
+      for (const box of changes.order?.storage ?? []) byBoxId.set(box.id, box);
+      const merged = [...byBoxId.values()];
+      if (
+        merged.length > 1000 ||
+        new Set(merged.map((b) => b.position)).size !== merged.length ||
+        merged.reduce((n, b) => n + b.creatureIds.length, 0) > 10000
+      )
+        throw creatureConflict();
+      const place = (
+        creatureId: string,
+        location: number,
+        boxId: string | null
+      ) => {
+        if (placements.has(creatureId)) throw creatureConflict();
+        placements.set(creatureId, { location, boxId });
+      };
+      for (const creatureId of partyOrder)
+        place(creatureId, Location.PARTY, null);
+      for (const box of merged)
+        for (const creatureId of box.creatureIds)
+          place(creatureId, Location.STORAGE, box.id);
+      const expected = new Set([
+        ...current.rows
+          .filter(
+            (c) => c.profile_id === id && c.owner_account_id === accountId
+          )
+          .map((c) => c.id),
+        ...changes.added.map((c) => c.id),
+      ]);
+      if (
+        placements.size !== expected.size ||
+        [...placements.keys()].some((id) => !expected.has(id))
+      )
+        throw creatureConflict();
+      if (changes.order?.storage) {
+        await client.query(
+          'SET CONSTRAINTS profile_storage_boxes_position_unique DEFERRED'
+        );
+        for (const box of changes.order.storage) {
+          if (boxes.some((b) => b.id === box.id)) {
+            await client.query(
+              'UPDATE profile_storage_boxes SET name = $1, position = $2, creature_order = $3 WHERE id = $4 AND profile_id = $5',
+              [box.name, box.position, box.creatureIds, box.id, id]
+            );
+          } else {
+            const inserted = await client.query(
+              `INSERT INTO profile_storage_boxes (id, profile_id, name, position, creature_order)
+              VALUES ($1,$2,$3,$4,$5) ON CONFLICT (id) DO NOTHING RETURNING id`,
+              [box.id, id, box.name, box.position, box.creatureIds]
+            );
+            if (inserted.rowCount !== 1) throw creatureConflict();
+          }
+        }
       }
     }
-    await client.query(
-      'SET CONSTRAINTS player_creatures_position_unique DEFERRED'
-    );
-    const write = async (
-      creature: SaveCreature,
-      location: number,
-      position: number
-    ) => {
-      const old = existing.get(creature.id);
-      const fields = [
-        creature.speciesId,
-        genderCodes[creature.gender],
-        creature.level,
-        creature.xp,
-        creature.isShiny,
-        creature.equippedAttacks,
-        creature.activeAttackIndex,
-        creature.targetingMode,
-        location,
-        position,
-      ];
-      if (old) {
-        const updated = await client.query(
-          `UPDATE player_creatures SET species_id = $1, gender = $2, level = $3, xp = $4,
-          is_shiny = $5, equipped_attack_ids = $6, active_attack_index = $7, targeting_mode = $8, location = $9, position = $10,
-          updated_at = CURRENT_TIMESTAMP WHERE id = $11 AND owner_account_id = $12 AND profile_id = $13`,
-          [...fields, creature.id, accountId, id]
-        );
-        if (updated.rowCount !== 1) throw creatureConflict();
-      } else {
-        const inserted = await client.query(
-          `INSERT INTO player_creatures (species_id, gender, level, xp, is_shiny,
-          equipped_attack_ids, active_attack_index, targeting_mode, location, position, id, owner_account_id, profile_id, original_owner_id)
-          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$12) ON CONFLICT (id) DO NOTHING RETURNING id`,
-          [...fields, creature.id, accountId, id]
-        );
-        if (inserted.rowCount !== 1) throw creatureConflict();
-      }
-    };
-    for (const [position, c] of snapshot.creatures.entries())
-      await write(c, Location.PARTY, position);
-    for (const [position, c] of snapshot.storageCreatures.entries())
-      await write(c, Location.STORAGE, position);
+    const fields = (c: SaveCreature) => [
+      c.speciesId,
+      genderCodes[c.gender],
+      c.level,
+      c.xp,
+      c.isShiny,
+      c.equippedAttacks,
+      c.activeAttackIndex,
+      c.targetingMode,
+    ];
+    for (const c of changes.updated) {
+      const updated = await client.query(
+        `UPDATE player_creatures SET species_id = $1, gender = $2, level = $3, xp = $4,
+        is_shiny = $5, equipped_attack_ids = $6, active_attack_index = $7, targeting_mode = $8,
+        updated_at = CURRENT_TIMESTAMP WHERE id = $9 AND owner_account_id = $10 AND profile_id = $11`,
+        [...fields(c), c.id, accountId, id]
+      );
+      if (updated.rowCount !== 1) throw creatureConflict();
+    }
+    for (const c of changes.added) {
+      const placement = placements.get(c.id);
+      if (!placement) throw creatureConflict();
+      const inserted = await client.query(
+        `INSERT INTO player_creatures (species_id, gender, level, xp, is_shiny,
+        equipped_attack_ids, active_attack_index, targeting_mode, location, storage_box_id, id, owner_account_id, profile_id, original_owner_id)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$12) ON CONFLICT (id) DO NOTHING RETURNING id`,
+        [...fields(c), placement.location, placement.boxId, c.id, accountId, id]
+      );
+      if (inserted.rowCount !== 1) throw creatureConflict();
+    }
+    for (const [creatureId, placement] of placements) {
+      const old = existing.get(creatureId);
+      if (
+        !old ||
+        (old.location === placement.location &&
+          old.storage_box_id === placement.boxId)
+      )
+        continue;
+      const moved = await client.query(
+        `UPDATE player_creatures SET location = $1, storage_box_id = $2, updated_at = CURRENT_TIMESTAMP
+        WHERE id = $3 AND owner_account_id = $4 AND profile_id = $5`,
+        [placement.location, placement.boxId, creatureId, accountId, id]
+      );
+      if (moved.rowCount !== 1) throw creatureConflict();
+    }
+    return partyOrder;
   }
 }

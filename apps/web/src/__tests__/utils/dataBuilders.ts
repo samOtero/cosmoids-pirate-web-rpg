@@ -5,6 +5,7 @@ import {
   type Profile,
 } from '@/types/baseGame';
 import { GUEST_OWNER_ID } from '@/utils/creatureOwnership';
+import type { CloudProfile, CloudProfileSummary } from '@/types/cloudProfile';
 
 type CreatureOverrides = Pick<PlayerCreature, 'id' | 'speciesId'> &
   Partial<PlayerCreature>;
@@ -52,5 +53,58 @@ export function makeProfile(overrides: Partial<Profile> = {}): Profile {
     inventory: (overrides.inventory ?? []).map((item) => ({ ...item })),
     gameFlags: [...(overrides.gameFlags ?? [])],
     capturedSpeciesIds: [...(overrides.capturedSpeciesIds ?? [])],
+  };
+}
+
+/** Server response fixture, independent of the production upload serializer. */
+export function makeCloudProfile(options: {
+  id: string;
+  slot: number;
+  boxId: string;
+  revision?: number;
+  profile?: Partial<Profile>;
+}): CloudProfile {
+  const {
+    id: slot,
+    ownerId,
+    version,
+    creatures,
+    storageCreatures,
+    ...profileData
+  } = makeProfile({ ...options.profile, id: options.slot });
+  void ownerId; // Account identity is deliberately absent from the envelope.
+  return {
+    id: options.id,
+    slot,
+    revision: options.revision ?? 1,
+    profileVersion: version!,
+    createdAt: new Date(0).toISOString(),
+    savedAt: new Date(0).toISOString(),
+    profileData,
+    creatures,
+    storageCreatures,
+    storageBoxes: [
+      {
+        id: options.boxId,
+        name: 'Test box',
+        position: 0,
+        creatureIds: storageCreatures.map((c) => c.id),
+      },
+    ],
+  };
+}
+
+export function makeCloudSummary(saved: CloudProfile): CloudProfileSummary {
+  return {
+    id: saved.id,
+    slot: saved.slot,
+    revision: saved.revision,
+    profileVersion: saved.profileVersion,
+    name: saved.profileData.name,
+    lastPlayed: saved.profileData.lastPlayed,
+    storyProgression: saved.profileData.storyProgression,
+    partyCount: saved.creatures.length,
+    storageCount: saved.storageCreatures.length,
+    savedAt: saved.savedAt,
   };
 }

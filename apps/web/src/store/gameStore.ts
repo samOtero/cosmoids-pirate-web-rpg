@@ -43,6 +43,10 @@ import { createTestProfileFromTemplate } from '@/constants/testProfileTemplates'
 import { isTestProfileOverrideEnabled } from '@/utils/testProfileAccess';
 import { generateCreatureGender } from '@/utils/creatureGender';
 import {
+  createProfileSessionSlice,
+  type ProfileSessionSlice,
+} from './profileSession';
+import {
   GUEST_OWNER_ID,
   recordCreatureOwnership,
   type AcquiredCreature,
@@ -80,7 +84,7 @@ export function enforcePartySize(profile: Profile): Profile {
   };
 }
 
-interface GameState {
+interface GameState extends ProfileSessionSlice {
   currentScreen: Screens;
   dialogContext: DialogContext | null;
   dialogContextData: DialogContextData | null;
@@ -130,6 +134,10 @@ export const useGameStore = create<GameState>()(
   devtools(
     persist(
       (set, get) => ({
+        ...createProfileSessionSlice(
+          (state) => set(state, false, 'profileSession'),
+          get
+        ),
         currentScreen: Screens.START,
         dialogContext: null,
         dialogContextData: null,
@@ -398,9 +406,15 @@ export const useGameStore = create<GameState>()(
         setTdLevel: (config: TDLevelConfig | null) =>
           set({ currentTdLevel: config }, false, 'setTdLevel'),
         createProfile: (slotId: number, ownerId = GUEST_OWNER_ID) => {
+          if (get().profileAccountId) return;
           set(
             (state) => {
-              if (slotId < 0 || slotId >= MAX_PROFILES) return state;
+              if (
+                state.profileAccountId ||
+                slotId < 0 ||
+                slotId >= MAX_PROFILES
+              )
+                return state;
               const newProfiles = [...state.profiles];
               newProfiles[slotId] = {
                 id: slotId,
@@ -431,7 +445,12 @@ export const useGameStore = create<GameState>()(
         deleteProfile: (slotId: number) =>
           set(
             (state) => {
-              if (slotId < 0 || slotId >= MAX_PROFILES) return state;
+              if (
+                state.profileAccountId ||
+                slotId < 0 ||
+                slotId >= MAX_PROFILES
+              )
+                return state;
               const newProfiles = [...state.profiles];
               newProfiles[slotId] = null;
               return {
@@ -446,6 +465,7 @@ export const useGameStore = create<GameState>()(
             'deleteProfile'
           ),
         applyTestProfileTemplate: (templateId: string) => {
+          if (get().profileAccountId) return;
           const hostname =
             typeof window === 'undefined'
               ? undefined
@@ -470,6 +490,8 @@ export const useGameStore = create<GameState>()(
           );
         },
         selectProfile: (slotId: number) => {
+          const state = get();
+          if (state.profileAccountId && !state.cloudProfiles[slotId]) return;
           set(
             (state) => {
               if (
@@ -889,12 +911,29 @@ export const useGameStore = create<GameState>()(
       {
         name: 'cosmoids-game-state',
         partialize: (state) => ({
-          profiles: state.profiles,
+          profiles: state.profileAccountId
+            ? state.guestProfiles
+            : state.profiles,
         }),
+        merge: (persisted, state) => {
+          const saved = persisted as
+            | { profiles?: (Profile | null)[] }
+            | undefined;
+          if (!Array.isArray(saved?.profiles)) return state;
+          const profiles = Array.from(
+            { length: MAX_PROFILES },
+            (_, slot) => saved.profiles![slot] ?? null
+          );
+          return state.profileAccountId
+            ? { ...state, guestProfiles: profiles }
+            : { ...state, profiles };
+        },
         onRehydrateStorage: () => (state) => {
           if (!state) return;
           // Reset any profiles that are below the current version
-          const migratedProfiles = state.profiles.map((profile) => {
+          const migratedProfiles = (
+            state.profileAccountId ? state.guestProfiles : state.profiles
+          ).map((profile) => {
             if (!profile) return null;
             if (!profile.version || profile.version < CURRENT_PROFILE_VERSION) {
               console.warn(
@@ -929,7 +968,8 @@ export const useGameStore = create<GameState>()(
             };
             return enforcePartySize(migratedProfile);
           });
-          state.profiles = migratedProfiles;
+          if (state.profileAccountId) state.guestProfiles = migratedProfiles;
+          else state.profiles = migratedProfiles;
         },
       }
     )

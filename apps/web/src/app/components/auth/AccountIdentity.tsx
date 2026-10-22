@@ -5,6 +5,7 @@ import { authClient, getAuthErrorMessage } from '@/lib/auth-client';
 import { Button } from '../ui/Button';
 import { useAccount } from './AuthProvider';
 import styles from './account.module.css';
+import { useGameStore } from '@/store/gameStore';
 
 export default function AccountIdentity({
   onSignedOut,
@@ -28,6 +29,7 @@ export default function AccountIdentity({
         return;
       }
       await refetch();
+      useGameStore.getState().setProfileAccount(null);
       onSignedOut();
     } catch {
       setError('We couldn’t log you out. Check your connection and try again.');
@@ -76,7 +78,7 @@ export default function AccountIdentity({
       </div>
       {hasError && (
         <p role="status" className={styles.error}>
-          We couldn’t check your account. Your local saves are still available.{' '}
+          We couldn’t check your account. Progress in this tab has been kept.{' '}
           <button
             type="button"
             className={styles.textButton}

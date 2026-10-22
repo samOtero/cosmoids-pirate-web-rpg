@@ -5,21 +5,17 @@ import { useGameStore } from '@/store/gameStore';
 import {
   Screens,
   DialogAction,
-  DialogContext,
-  BackgroundImageKey,
-  Creature,
   StoryProgression,
   TDLevelContext,
 } from '@/types/baseGame';
 import { TD_LEVELS } from '@/constants/tdLevels';
-import {
-  resolvePlayerCreature,
-  resolvePlayerCreatures,
-} from '@/utils/resolvePlayerCreature';
+import { resolvePlayerCreatures } from '@/utils/resolvePlayerCreature';
 import { resolveDialog } from '@/utils/dialogResolver';
 import { TEST_PROFILE_TEMPLATE_OPTIONS } from '@/constants/testProfileTemplates';
 import { isTestProfileOverrideEnabled } from '@/utils/testProfileAccess';
 import { useAccount } from '@/app/components/auth/AuthProvider';
+import { useProfileSession } from '@/app/components/auth/useProfileSession';
+import { Button } from '@/app/components/ui/Button';
 
 const StartScreen = lazy(() => import('@/app/components/startScreen'));
 const ProfileScreen = lazy(() => import('@/app/components/profileScreen'));
@@ -48,7 +44,9 @@ const getServerTestProfileOverrideEnabled = () =>
   isTestProfileOverrideEnabled();
 
 export default function Home() {
-  const { session, isPending: isAccountPending } = useAccount();
+  const { isPending: isAccountPending, refetch } = useAccount();
+  const { waitingForIdentity, identityMismatch, needsSession } =
+    useProfileSession();
   const {
     currentScreen,
     setScreen,
@@ -65,12 +63,22 @@ export default function Home() {
     enqueueEvent,
     enqueueAndProcessEvents,
     pushEventToFront,
-    updateCreatures,
     updateCreatureAttacks,
     reorderCreatures,
     currentTdLevel,
     clearQueue,
     markJournalOpened,
+    profileAccountId,
+    cloudSlots,
+    cloudSlotsStatus,
+    cloudSlotsError,
+    cloudProfileError,
+    loadingProfileSlot,
+    failedProfileSlot,
+    loadAccountSlots,
+    loadAccountProfile,
+    cancelProfileRequests,
+    setProfileAccount,
   } = useGameStore();
 
   const testProfileOverrideEnabled = useSyncExternalStore(
@@ -92,11 +100,49 @@ export default function Home() {
     }
   }, [currentScreen, currentProfile, setScreen]);
 
+  if (
+    currentScreen !== Screens.START &&
+    (waitingForIdentity || identityMismatch)
+  ) {
+    return (
+      <div className="flex h-full items-center justify-center p-4">
+        <p role="status">Checking your account…</p>
+      </div>
+    );
+  }
+
+  if (currentScreen === Screens.PROFILES && needsSession) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-4 p-4 text-center">
+        <p role="alert">
+          Log in again to access your cloud profiles. Your current progress is
+          still held in this tab.
+        </p>
+        <Button
+          onClick={() => {
+            void refetch().then(() =>
+              useGameStore.getState().loadAccountSlots()
+            );
+          }}
+        >
+          Check account again
+        </Button>
+        <Button variant="wood" onClick={() => setScreen(Screens.START)}>
+          Back to title
+        </Button>
+      </div>
+    );
+  }
+
   if (currentScreen === Screens.START) {
     return (
       <Suspense fallback={<div>Loading...</div>}>
         <StartScreen
           onStart={() => enqueueAndProcessEvents([{ type: 'GO_TO_PROFILES' }])}
+          onGuestStart={() => {
+            setProfileAccount(null);
+            enqueueAndProcessEvents([{ type: 'GO_TO_PROFILES' }]);
+          }}
         />
       </Suspense>
     );
@@ -107,15 +153,36 @@ export default function Home() {
       <Suspense fallback={<div>Loading...</div>}>
         <ProfileScreen
           profiles={profiles}
-          onSelect={selectProfile}
+          onSelect={
+            profileAccountId
+              ? (slot) => {
+                  void loadAccountProfile(slot);
+                }
+              : selectProfile
+          }
           onCreate={(slotId) => {
             // Do not label a new save as guest while identity is unresolved.
             if (isAccountPending) return;
-            createProfile(slotId, session?.user.id);
+            createProfile(slotId);
           }}
           creationPending={isAccountPending}
+          accountSlots={profileAccountId ? cloudSlots : undefined}
+          loadStatus={cloudSlotsStatus}
+          loadingSlot={loadingProfileSlot}
+          loadError={cloudSlotsError ?? cloudProfileError}
+          onRefresh={() => {
+            void loadAccountSlots();
+          }}
+          onRetry={() => {
+            if (cloudSlotsStatus === 'error') void loadAccountSlots();
+            else if (failedProfileSlot !== null)
+              void loadAccountProfile(failedProfileSlot);
+          }}
           onDelete={deleteProfile}
-          onBack={() => setScreen(Screens.START)}
+          onBack={() => {
+            cancelProfileRequests();
+            setScreen(Screens.START);
+          }}
           testProfileTemplates={
             testProfileOverrideEnabled
               ? TEST_PROFILE_TEMPLATE_OPTIONS

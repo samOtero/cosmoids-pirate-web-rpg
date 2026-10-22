@@ -10,6 +10,7 @@ import {
   object,
   profileId,
   SaveError,
+  validateChanges,
   validateSnapshot,
 } from './profile-validation.js';
 
@@ -39,35 +40,29 @@ export async function registerProfileRoutes(
       const cookies = headers.getSetCookie();
       if (cookies.length) reply.header('set-cookie', cookies);
       if (!session)
-        return reply
-          .code(401)
-          .send({
-            code: 'UNAUTHENTICATED',
-            error: 'Log in before accessing account saves.',
-          });
+        return reply.code(401).send({
+          code: 'UNAUTHENTICATED',
+          error: 'Log in before accessing account saves.',
+        });
       request.authenticatedAccountId = session.user.id;
       const origin = request.headers.origin;
       if (
         (origin !== undefined && !config.trustedOrigins.includes(origin)) ||
         (!['GET', 'HEAD'].includes(request.method) && origin === undefined)
       ) {
-        return reply
-          .code(403)
-          .send({
-            code: 'UNTRUSTED_ORIGIN',
-            error: 'This website is not allowed to change account saves.',
-          });
+        return reply.code(403).send({
+          code: 'UNTRUSTED_ORIGIN',
+          error: 'This website is not allowed to change account saves.',
+        });
       }
     });
     protectedRoutes.setErrorHandler((error, request, reply) => {
       if (error instanceof SaveError)
-        return reply
-          .code(error.status)
-          .send({
-            code: error.code,
-            error: error.message,
-            ...(error.latest === undefined ? {} : { latest: error.latest }),
-          });
+        return reply.code(error.status).send({
+          code: error.code,
+          error: error.message,
+          ...(error.latest === undefined ? {} : { latest: error.latest }),
+        });
       const databaseError = error as {
         code?: string;
         constraint?: string;
@@ -77,35 +72,28 @@ export async function registerProfileRoutes(
         databaseError.code === '23505' &&
         databaseError.constraint === 'game_profiles_account_slot_unique'
       )
-        return reply
-          .code(409)
-          .send({
-            code: 'SLOT_OCCUPIED',
-            error:
-              'This save slot is already occupied. Refresh your save slots.',
-          });
+        return reply.code(409).send({
+          code: 'SLOT_OCCUPIED',
+          error: 'This save slot is already occupied. Refresh your save slots.',
+        });
       if (
         databaseError.statusCode &&
         databaseError.statusCode >= 400 &&
         databaseError.statusCode < 500
       )
-        return reply
-          .code(databaseError.statusCode)
-          .send({
-            code: 'INVALID_REQUEST',
-            error: 'The save request is invalid or too large.',
-          });
+        return reply.code(databaseError.statusCode).send({
+          code: 'INVALID_REQUEST',
+          error: 'The save request is invalid or too large.',
+        });
       request.log.error(
         { code: databaseError.code },
         'Account save request failed'
       );
-      return reply
-        .code(503)
-        .send({
-          code: 'SAVE_UNAVAILABLE',
-          error:
-            'Saving is temporarily unavailable. Keep your progress and try again.',
-        });
+      return reply.code(503).send({
+        code: 'SAVE_UNAVAILABLE',
+        error:
+          'Saving is temporarily unavailable. Keep your progress and try again.',
+      });
     });
     protectedRoutes.get('/api/profiles', async (request) =>
       repository.list(request.authenticatedAccountId!)
@@ -161,8 +149,7 @@ export async function registerProfileRoutes(
             'expectedRevision',
             'profileVersion',
             'profileData',
-            'creatures',
-            'storageCreatures',
+            'creatureChanges',
           ],
           'Save request'
         );
@@ -170,7 +157,7 @@ export async function registerProfileRoutes(
           request.authenticatedAccountId!,
           profileId(request.params.id),
           expectedRevision(body.expectedRevision),
-          validateSnapshot(body, content)
+          validateChanges(body, content)
         );
       }
     );

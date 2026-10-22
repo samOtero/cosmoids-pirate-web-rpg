@@ -12,7 +12,11 @@ const profileColumns = `p.id, p.account_id AS "accountId", p.slot,
   (SELECT count(*)::int FROM player_creatures c WHERE c.profile_id = p.id AND c.location = 0) AS "partyCount",
   (SELECT count(*)::int FROM player_creatures c WHERE c.profile_id = p.id AND c.location = 1) AS "storageCount"`;
 const creatureColumns = `id, owner_account_id AS "accountId", original_owner_id AS "originalOwnerId",
-  profile_id AS "profileId", location, position, species_id AS "speciesId", gender,
+  profile_id AS "profileId", storage_box_id AS "storageBoxId", location,
+  CASE location
+    WHEN 0 THEN (SELECT array_position(p.party_order, player_creatures.id) - 1 FROM game_profiles p WHERE p.id = player_creatures.profile_id)
+    WHEN 1 THEN (SELECT array_position(b.creature_order, player_creatures.id) - 1 FROM profile_storage_boxes b WHERE b.id = player_creatures.storage_box_id)
+    ELSE position END AS position, species_id AS "speciesId", gender,
   level, xp, is_shiny AS "isShiny", equipped_attack_ids AS "equippedAttacks",
   active_attack_index AS "activeAttackIndex", targeting_mode AS "targetingMode",
   created_at AS "createdAt", updated_at AS "updatedAt"`;
@@ -169,7 +173,7 @@ export class AdminRepository {
       ).rows[0].total;
       const rows = (
         await client.query(
-          `SELECT ${creatureColumns} FROM player_creatures ${where} ORDER BY position, id LIMIT $4 OFFSET $5`,
+          `SELECT ${creatureColumns} FROM player_creatures ${where} ORDER BY COALESCE((SELECT b.position FROM profile_storage_boxes b WHERE b.id = player_creatures.storage_box_id), 0), position, id LIMIT $4 OFFSET $5`,
           [...args, limit, offset]
         )
       ).rows;

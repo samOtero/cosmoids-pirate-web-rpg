@@ -85,7 +85,9 @@ describe('Profile Management Integration', () => {
       );
 
       // Click on the profile
-      const profileCard = screen.getByText('Pirate Pete').closest('div')!;
+      const profileCard = screen.getByRole('button', {
+        name: 'Load Pirate Pete',
+      });
       await user.click(profileCard);
 
       expect(mockOnSelect).toHaveBeenCalledWith(0);

@@ -121,19 +121,30 @@ async function setup(t) {
   async function addCreature(location, position, selectedProfile = profile.id) {
     const id = randomUUID();
     await client.query(
-      `INSERT INTO player_creatures (id, owner_account_id, original_owner_id, profile_id, location, position, species_id, gender, level, xp, equipped_attack_ids)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,0,3,17,$8)`,
+      `INSERT INTO player_creatures (id, owner_account_id, original_owner_id, profile_id, location, position, storage_box_id, species_id, gender, level, xp, equipped_attack_ids)
+      VALUES ($1,$2,$3,$4,$5,$6,$9,$7,0,3,17,$8)`,
       [
         id,
         player.user.id,
         admin.user.id,
         selectedProfile,
         location,
-        position,
+        location === Location.TRADE_BOX ? position : null,
         content.species[0].id,
         [content.attackIds[0]],
+        location === Location.STORAGE ? profile.storageBoxes[0].id : null,
       ]
     );
+    if (location === Location.PARTY)
+      await client.query(
+        'UPDATE game_profiles SET party_order = array_append(party_order, $1) WHERE id = $2',
+        [id, selectedProfile]
+      );
+    if (location === Location.STORAGE)
+      await client.query(
+        'UPDATE profile_storage_boxes SET creature_order = array_append(creature_order, $1) WHERE id = $2',
+        [id, profile.storageBoxes[0].id]
+      );
     return id;
   }
   const party = await addCreature(Location.PARTY, 0);

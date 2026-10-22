@@ -176,20 +176,31 @@ Profile version 11 introduces this required metadata. Older profiles reset
 through the existing version checks on selection and hydration; no save
 migration is performed.
 
-Ownership is currently local metadata, not server-enforced access control.
-Logging in does not claim existing guest profiles. When database saves are
-implemented, an explicit claim should save the selected guest profile under the
-authenticated account and replace `"guest"` origins throughout both party and
-storage, while preserving existing account origins. The server must derive the
-account ID from its session. Save claims, account-specific local storage keys,
-database synchronization, and online ownership validation are still future work.
+Offline ownership remains local metadata. Cloud access is enforced by the API,
+which derives the account from its session and assigns/preserves original
+ownership. Login neither claims nor uploads existing local profiles. Explicit
+guest claiming, cloud create/delete controls, manual-save UI and trade-box
+integration remain separate stages. Account local drafts are deferred.
 
 The database has explicit game migrations for profiles, individual creatures,
 and account trade boxes. Authenticated profile endpoints now support listing,
-loading, creation, revision-checked saving, and deletion. The game UI, separate
-account caches, and box-transfer integration remain future work. See
+loading, creation, revision-checked saving, and deletion. The game UI now loads
+cloud slots and selected profiles into memory. Cloud writes and box transfers
+are not connected to the UI yet. See
 [account save storage and API](GAME_SAVES.md) for the schema, permanent numeric
 gender/location values, request contract, and local verification.
+
+The frontend transport (`apps/web/src/lib/profile-client.ts`) now wraps those
+profile endpoints and prepares separate cloud UUID/revision metadata alongside a
+game profile and an in-memory comparison baseline. Manual updates send only
+added/changed creature records; original/current owners are controlled by the
+backend. Account profiles now load into the game store with separate cloud
+metadata, box layout and baseline. The existing local-storage key persists only
+local profiles. Refreshing drops unsaved account progress and loads from the
+database again. Explicit logout/offline play restores local profiles. Switching
+accounts clears prior working copies and aborts/ignores old requests; an expired
+session retains copies while the player logs back in. Loading errors show Retry
+instead of substituting local profiles or empty cloud slots.
 
 ## Refresh and failures
 

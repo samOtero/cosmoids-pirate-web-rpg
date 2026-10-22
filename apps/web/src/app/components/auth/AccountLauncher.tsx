@@ -7,7 +7,13 @@ import AccountDialog, { type AccountAction } from './AccountDialog';
 import AccountIdentity from './AccountIdentity';
 import styles from './account.module.css';
 
-export default function AccountLauncher({ onStart }: { onStart: () => void }) {
+export default function AccountLauncher({
+  onStart,
+  onGuestStart = onStart,
+}: {
+  onStart: () => void;
+  onGuestStart?: () => void;
+}) {
   const { enabled, session, isPending, hasError, refetch } = useAccount();
   const [action, setAction] = useState<AccountAction | null>(null);
 
@@ -39,7 +45,11 @@ export default function AccountLauncher({ onStart }: { onStart: () => void }) {
               </button>
             </div>
           )}
-          <Button variant={enabled ? 'secondary' : 'wood'} onClick={onStart}>
+          <Button
+            variant={enabled ? 'secondary' : 'wood'}
+            disabled={isPending}
+            onClick={onGuestStart}
+          >
             Play offline
           </Button>
         </>
@@ -50,7 +60,11 @@ export default function AccountLauncher({ onStart }: { onStart: () => void }) {
         </p>
       )}
       {enabled && !isPending && (
-        <p className={styles.note}>Saves are stored on this device.</p>
+        <p className={styles.note}>
+          {session
+            ? 'Your cloud profiles are available after you start.'
+            : 'Offline saves are stored on this device.'}
+        </p>
       )}
       {hasError && !(enabled && session) && (
         <p role="status" className={styles.error}>

@@ -1,7 +1,6 @@
-import { ReactElement, ReactNode } from "react";
-import { render, RenderOptions } from "@testing-library/react";
-import { useGameStore } from "@/store/gameStore";
-import { Screens } from "@/types/baseGame";
+import { ReactElement, ReactNode } from 'react';
+import { render, RenderOptions } from '@testing-library/react';
+import { useGameStore } from '@/store/gameStore';
 
 // Create a wrapper that can reset the store between tests
 function TestWrapper({ children }: { children: ReactNode }) {
@@ -11,7 +10,7 @@ function TestWrapper({ children }: { children: ReactNode }) {
 // Custom render function with store reset
 function customRender(
   ui: ReactElement,
-  options?: Omit<RenderOptions, "wrapper">
+  options?: Omit<RenderOptions, 'wrapper'>
 ) {
   return render(ui, { wrapper: TestWrapper, ...options });
 }
@@ -19,15 +18,11 @@ function customRender(
 // Helper to reset the Zustand store
 export function resetStore() {
   const store = useGameStore.getState();
-  useGameStore.setState({
-    currentScreen: "START" as Screens,
-    profiles: [null, null, null],
-    currentProfileId: null,
-    eventQueue: [],
-  });
+  store.cancelProfileRequests();
+  useGameStore.setState(useGameStore.getInitialState(), true);
   localStorage.clear();
 }
 
 // Re-export everything from React Testing Library
-export * from "@testing-library/react";
+export * from '@testing-library/react';
 export { customRender as render };
