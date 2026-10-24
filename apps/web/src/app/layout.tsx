@@ -64,8 +64,8 @@ export default function RootLayout({
           <AnalyticsControls />
           <FullscreenControl />
           <RotateDeviceOverlay />
+          <Analytics />
         </GameChrome>
-        <Analytics />
       </body>
     </html>
   );

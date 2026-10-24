@@ -220,3 +220,13 @@ test('game pages retain their game overlays', () => {
   );
   expect(screen.getByText('Rotate game overlay')).toBeInTheDocument();
 });
+
+test('password recovery supports portrait screens without game overlays', () => {
+  state.pathname = '/reset-password';
+  render(
+    <GameChrome>
+      <div>Rotate game overlay</div>
+    </GameChrome>
+  );
+  expect(screen.queryByText('Rotate game overlay')).not.toBeInTheDocument();
+});

@@ -738,9 +738,10 @@ string.
   redirect and trusted origin. Development saves start fresh at the custom
   domain; no old-save migration is planned.
 
-- Choose/configure an email sender and its DNS verification records.
-- Add email verification and password recovery; currently `emailVerified` is
-  false for newly created accounts.
+- Configure Resend's sending domain, DNS records and server-only credentials;
+  follow [the password recovery setup](../../docs/development/PASSWORD_RECOVERY.md).
+  Password recovery is implemented but delivery stays disabled without those values.
+- Add email verification; currently `emailVerified` is false for newly created accounts.
 - Implement cloud saves, creature ownership, shiny validation, and trading as
   game features separate from authentication.
 - Establish database backups and a tested restore procedure before relying on

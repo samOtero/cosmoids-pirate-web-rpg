@@ -167,6 +167,40 @@
 .fields:disabled {
   opacity: 0.6;
 }
+.recoveryShell {
+  height: 100dvh;
+  overflow: auto;
+  padding: max(1rem, env(safe-area-inset-top)) 1rem
+    max(1rem, env(safe-area-inset-bottom));
+  display: grid;
+  justify-items: center;
+  align-items: safe center;
+  background: radial-gradient(ellipse at top, #173f56, #091923 75%);
+}
+.recoveryCard {
+  width: min(28rem, 100%);
+  padding: 1.5rem;
+  border: 1px solid #67e8f955;
+  border-radius: 1rem;
+  background: #0a1628;
+  color: #f4e4bc;
+  box-shadow: 0 20px 60px #0006;
+}
+.recoveryCard h1 {
+  margin: 0.4rem 0 1rem;
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+.recoveryCard > a {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.75rem;
+}
+.recoveryMessage {
+  margin: 0.75rem 0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
 @media (max-height: 450px) {
   .launcher {
     gap: 0.1rem;

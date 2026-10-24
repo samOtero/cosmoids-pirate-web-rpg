@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { authClient, getAuthErrorMessage } from '@/lib/auth-client';
 import { useAccount } from './AuthProvider';
 import styles from './account.module.css';
+import PasswordRecoveryForm from './PasswordRecoveryForm';
 
 export type AccountAction = 'login' | 'signup';
 
@@ -19,6 +20,8 @@ export default function AccountDialog({
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [recovering, setRecovering] = useState(false);
+  const [recoveryEmail, setRecoveryEmail] = useState('');
   const { refetch } = useAccount();
   const isSignup = action === 'signup';
 
@@ -33,6 +36,10 @@ export default function AccountDialog({
         previousFocus.focus();
     };
   }, []);
+
+  useEffect(() => {
+    dialogRef.current?.querySelector('input')?.focus();
+  }, [recovering]);
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -88,7 +95,11 @@ export default function AccountDialog({
     >
       <div className={styles.dialogHeader}>
         <h2 id="account-dialog-title">
-          {isSignup ? 'Create account' : 'Log in'}
+          {recovering
+            ? 'Reset password'
+            : isSignup
+              ? 'Create account'
+              : 'Log in'}
         </h2>
         <button
           type="button"
@@ -100,53 +111,91 @@ export default function AccountDialog({
           ×
         </button>
       </div>
-      <p className={styles.note}>
-        Sign in to load your cloud profiles. Offline saves stay on this device.
-      </p>
-      <form onSubmit={submit} aria-busy={busy}>
-        <fieldset
-          disabled={busy}
-          className={`${styles.fields} ${isSignup ? styles.signupFields : ''}`}
-        >
-          {isSignup && (
-            <label>
-              Display name
-              <input name="name" type="text" autoComplete="nickname" required />
-            </label>
-          )}
-          <label>
-            Email
-            <input
-              name="email"
-              type="email"
-              autoComplete="email"
-              autoCapitalize="none"
-              spellCheck={false}
-              required
-            />
-          </label>
-          <label>
-            Password
-            <input
-              name="password"
-              type="password"
-              autoComplete={isSignup ? 'new-password' : 'current-password'}
-              minLength={isSignup ? 12 : undefined}
-              maxLength={128}
-              required
-            />
-          </label>
-          {isSignup && <p className={styles.note}>Use 12–128 characters.</p>}
-          {error && (
-            <p role="alert" className={styles.error}>
-              {error}
-            </p>
-          )}
-          <button type="submit" className={styles.primaryButton}>
-            {busy ? 'Please wait…' : isSignup ? 'Create account' : 'Log in'}
-          </button>
-        </fieldset>
-      </form>
+      {recovering ? (
+        <PasswordRecoveryForm
+          initialEmail={recoveryEmail}
+          onBusyChange={setBusy}
+          onBack={() => {
+            setRecovering(false);
+            setError(null);
+          }}
+        />
+      ) : (
+        <>
+          <p className={styles.note}>
+            Sign in to load your cloud profiles. Offline saves stay on this
+            device.
+          </p>
+          <form onSubmit={submit} aria-busy={busy}>
+            <fieldset
+              disabled={busy}
+              className={`${styles.fields} ${isSignup ? styles.signupFields : ''}`}
+            >
+              {isSignup && (
+                <label>
+                  Display name
+                  <input
+                    name="name"
+                    type="text"
+                    autoComplete="nickname"
+                    required
+                  />
+                </label>
+              )}
+              <label>
+                Email
+                <input
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  required
+                />
+              </label>
+              <label>
+                Password
+                <input
+                  name="password"
+                  type="password"
+                  autoComplete={isSignup ? 'new-password' : 'current-password'}
+                  minLength={isSignup ? 12 : undefined}
+                  maxLength={128}
+                  required
+                />
+              </label>
+              {isSignup && (
+                <p className={styles.note}>Use 12–128 characters.</p>
+              )}
+              {error && (
+                <p role="alert" className={styles.error}>
+                  {error}
+                </p>
+              )}
+              <button type="submit" className={styles.primaryButton}>
+                {busy ? 'Please wait…' : isSignup ? 'Create account' : 'Log in'}
+              </button>
+              {!isSignup && (
+                <button
+                  type="button"
+                  className={styles.textButton}
+                  onClick={() => {
+                    const email =
+                      dialogRef.current?.querySelector<HTMLInputElement>(
+                        'input[name="email"]'
+                      )?.value ?? '';
+                    setRecoveryEmail(email);
+                    setError(null);
+                    setRecovering(true);
+                  }}
+                >
+                  Forgot password?
+                </button>
+              )}
+            </fieldset>
+          </form>
+        </>
+      )}
     </dialog>
   );
 }

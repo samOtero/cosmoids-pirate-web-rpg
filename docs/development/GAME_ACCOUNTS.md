@@ -263,11 +263,13 @@ all game JavaScript/CSS requests blocked. It still navigated to the custom
 staging URL and preserved paths, queries and fragments. Custom domains,
 localhost, unrelated previews and the production URL stayed in place.
 
-Before inviting players publicly, configure email verification and password
-recovery, test database backups/restores, and decide how staging will be isolated
-from production accounts. Email/password accounts are currently unverified and
-there is no password recovery UI. Cloud saves, save imports, server-validated
-creature ownership, shiny validation, and trading remain separate future work.
+Before inviting players publicly, configure email verification, test database
+backups/restores, and decide how staging will be isolated from production accounts.
+Email/password accounts are currently unverified. Password recovery now uses Better
+Auth reset tokens and Resend: see [setup and behavior](PASSWORD_RECOVERY.md).
+Real delivery requires a verified sending domain and server-only API key.
+Cloud saves are implemented; guest claiming, shiny validation and trading remain
+separate future work.
 
 References: [Better Auth client](https://better-auth.com/docs/concepts/client),
 [email/password](https://better-auth.com/docs/authentication/email-password),

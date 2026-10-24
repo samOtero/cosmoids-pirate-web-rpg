@@ -1,7 +1,7 @@
 # App To-Do List
 
 - [ ] Add defensive moves for every Cosmoid that can be caught in the game.
-- [ ] Add forgot-password and password-reset functionality.
+- [ ] Configure Resend's sending domain and VPS credentials, then verify password recovery email delivery on the deployed game.
 - [ ] Redesign the capture ball to look more like a coin and less like a Poké Ball.
 - [ ] Fix PostHog logging not working on the new domain.
 - [x] Record and retain the original owner ID for every creature added to a save file, including creatures outside the active party.
@@ -12,3 +12,4 @@
 - [x] Show enemy Cosmoids' genders beside their health bars, using pink female and blue male symbols with contrasting backing and outlines so players can identify them before capture.
 - [x] Make tower target priority easy to find and explain each option, with compact desktop and mobile controls.
 - [x] Save each user's profile and creatures to the database.
+- [x] Add forgot-password and password-reset functionality.

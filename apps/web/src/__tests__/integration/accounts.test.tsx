@@ -141,6 +141,19 @@ describe('account UI with the real Better Auth client', () => {
           serverSession = null;
           return json({ success: true });
         }
+        if (url.pathname.endsWith('/request-password-reset')) {
+          return rejectedLogin
+            ? json(
+                {
+                  code:
+                    rejectedLogin === 429
+                      ? 'TOO_MANY_REQUESTS'
+                      : 'RESET_PASSWORD_DISABLED',
+                },
+                rejectedLogin
+              )
+            : json({ status: true });
+        }
         if (
           url.pathname.endsWith('/sign-in/email') ||
           url.pathname.endsWith('/sign-up/email')
@@ -216,6 +229,69 @@ describe('account UI with the real Better Auth client', () => {
     ).not.toBeInTheDocument();
     expect(onStart).toHaveBeenCalledOnce();
   });
+
+  it('requests a reset from login without signing in or changing guest saves', async () => {
+    localStorage.setItem('cosmoids-game-state', 'existing-guest-save');
+    const onStart = showStart();
+    const dialog = await openForm('Log in');
+    fillForm(dialog);
+    fireEvent.click(
+      within(dialog).getByRole('button', { name: 'Forgot password?' })
+    );
+    expect(screen.getByRole('dialog', { name: 'Reset password' })).toBe(dialog);
+    expect(within(dialog).queryByLabelText('Password')).not.toBeInTheDocument();
+    expect(within(dialog).getByLabelText('Email')).toHaveValue(
+      'captain@example.com'
+    );
+    fireEvent.click(
+      within(dialog).getByRole('button', { name: 'Send reset link' })
+    );
+    expect(await within(dialog).findByRole('status')).toHaveTextContent(
+      /If an account uses that email/
+    );
+    const call = api.fetch.mock.calls.find(([url]) =>
+      String(url).endsWith('/request-password-reset')
+    )!;
+    expect(JSON.parse(call[1].body)).toEqual({
+      email: 'captain@example.com',
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    expect(call[1].credentials).toBe('include');
+    expect(onStart).not.toHaveBeenCalled();
+    expect(localStorage.getItem('cosmoids-game-state')).toBe(
+      'existing-guest-save'
+    );
+    fireEvent.click(
+      within(dialog).getByRole('button', { name: 'Back to log in' })
+    );
+    expect(screen.getByRole('dialog', { name: 'Log in' })).toBe(dialog);
+    expect(within(dialog).getByLabelText('Password')).toHaveValue('');
+  });
+
+  it.each([429, 400])(
+    'handles password-recovery failure %s without a false confirmation',
+    async (status) => {
+      rejectedLogin = status;
+      showStart();
+      const dialog = await openForm('Log in');
+      fillForm(dialog);
+      fireEvent.click(
+        within(dialog).getByRole('button', { name: 'Forgot password?' })
+      );
+      fireEvent.click(
+        within(dialog).getByRole('button', { name: 'Send reset link' })
+      );
+      expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+        status === 429 ? /Too many attempts/ : /recovery isn’t available/
+      );
+      expect(
+        within(dialog).getByRole('button', { name: 'Send reset link' })
+      ).toBeEnabled();
+      expect(
+        within(dialog).queryByText(/If an account uses/)
+      ).not.toBeInTheDocument();
+    }
+  );
 
   it('logs in, returns to the title without logging out, and logs out without deleting local progress', async () => {
     localStorage.setItem('cosmoids-game-state', 'existing-local-save');

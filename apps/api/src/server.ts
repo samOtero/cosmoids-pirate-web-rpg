@@ -7,9 +7,20 @@ import { registerProfileRoutes } from './profile-routes.js';
 import { loadGameContent } from './game-content.js';
 import { registerAdminRoutes } from './admin-routes.js';
 import { readAdminAccounts } from './admin-config.js';
+import { createPasswordResetEmail } from './password-reset-email.js';
+import { loggedRequestURL } from './request-logging.js';
 
 const server = Fastify({
   logger: {
+    serializers: {
+      req(request) {
+        return {
+          method: request.method,
+          url: loggedRequestURL(request.url),
+          remoteAddress: request.ip,
+        };
+      },
+    },
     redact: [
       'req.headers.cookie',
       'req.headers.authorization',
@@ -21,7 +32,10 @@ const server = Fastify({
 });
 
 const authConfig = readAuthConfig();
-const auth = createAuth(pool, authConfig);
+const resetEmail = createPasswordResetEmail(process.env, fetch, () => {
+  server.log.error('Password reset email delivery failed');
+});
+const auth = createAuth(pool, authConfig, resetEmail?.send);
 const content = await loadGameContent();
 await registerAuthRoutes(server, auth, authConfig);
 await registerProfileRoutes(server, auth, authConfig, pool, content);
@@ -53,6 +67,7 @@ server.get('/health/db', async (_request, reply) => {
 });
 
 server.addHook('onClose', async () => {
+  await resetEmail?.drain();
   await pool.end();
 });
 

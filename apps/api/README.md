@@ -7,9 +7,10 @@ For the current VPS file locations, environment settings, Nginx/systemd
 configuration, deployment steps, and troubleshooting commands, see the
 [API operations reference](OPERATIONS.md).
 
-This is the first account-development step. Email addresses are **unverified**.
-Email verification and password recovery still need to be
-connected before opening accounts to players. The browser account UI is described
+Email addresses are **unverified**; email verification remains future work.
+Password recovery uses Better Auth and Resend. Configure the sending domain and
+server-only credentials using [the recovery setup guide](../../docs/development/PASSWORD_RECOVERY.md).
+The browser account UI is described
 in [the game account guide](../../docs/development/GAME_ACCOUNTS.md). Creature ownership, cloud saves,
 trading, and shiny validation are separate game features.
 
@@ -17,8 +18,8 @@ The account-save database and profile API are documented in
 [the game save guide](../../docs/development/GAME_SAVES.md). It adds versioned
 game migrations using `node-pg-migrate` for profiles, individual creatures, and account trade-box
 metadata, plus authenticated profile listing, loading, creation, revision-checked
-saving, and deletion. Game UI integration and trade-box transfer endpoints are
-the next stage.
+saving, and deletion. The game UI supports cloud loading, creation, deletion and
+manual saving. Trade-box transfers and guest claiming remain future work.
 
 The game also exports a view-only `/admin` panel for inspecting cloud accounts,
 profiles and creatures. Its `/api/admin/*` reads require a verified session and

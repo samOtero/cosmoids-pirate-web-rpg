@@ -21,6 +21,10 @@ export function getAuthErrorMessage(error: { status?: number; code?: string }) {
   if (error.status === 429)
     return 'Too many attempts. Wait a minute and try again.';
   switch (error.code) {
+    case 'RESET_PASSWORD_DISABLED':
+      return 'Password recovery isn’t available yet. Please try again later.';
+    case 'INVALID_TOKEN':
+      return 'This reset link has expired or has already been used. Request a new link.';
     case 'INVALID_EMAIL_OR_PASSWORD':
       return 'That email and password combination is incorrect.';
     case 'USER_ALREADY_EXISTS':

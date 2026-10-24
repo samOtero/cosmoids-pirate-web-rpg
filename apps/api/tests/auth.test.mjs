@@ -16,7 +16,7 @@ const config = readAuthConfig({
   AUTH_TRUSTED_ORIGINS: 'https://game.example.com',
 });
 
-async function fixture(t) {
+async function fixture(t, { recovery = true } = {}) {
   // Default tests use SQLite in memory. An explicit test connection enables
   // the same checks on Postgres, isolated in a unique disposable schema.
   let database;
@@ -38,13 +38,18 @@ async function fixture(t) {
     database = new DatabaseSync(':memory:');
     t.after(() => database.close());
   }
-  const auth = createAuth(database, config);
+  const resetEmails = [];
+  const auth = createAuth(
+    database,
+    config,
+    recovery ? (email, url) => resetEmails.push({ email, url }) : undefined
+  );
   await (await getMigrations(auth.options)).runMigrations();
   const server = Fastify({ trustProxy: 'loopback' });
   await registerAuthRoutes(server, auth, config);
   await server.ready();
   t.after(() => server.close());
-  return { server, database, auth };
+  return { server, database, auth, resetEmails };
 }
 
 function cookies(response) {
@@ -253,4 +258,203 @@ test('production auth requires a secret and HTTPS origins', () => {
       AUTH_TRUSTED_ORIGINS: 'https://game.example.com,http://untrusted.example',
     })
   );
+});
+
+const recoveryUser = {
+  name: 'Recover captain',
+  email: 'recovery@example.test',
+  password: 'old-controlled-password-123',
+};
+const redirectTo = 'https://game.example.com/reset-password';
+function resetToken(email) {
+  const url = new URL(email.url);
+  assert.equal(url.origin + url.pathname, redirectTo);
+  assert.equal(url.search, '');
+  return new URLSearchParams(url.hash.slice(1)).get('token');
+}
+
+test('reset requests conceal account existence and only deliver to the registered address', async (t) => {
+  const { server, resetEmails } = await fixture(t);
+  await post(server, 'sign-up/email', recoveryUser);
+  const missing = await post(server, 'request-password-reset', {
+    email: 'missing@example.test',
+    redirectTo,
+  });
+  const existing = await post(server, 'request-password-reset', {
+    email: recoveryUser.email,
+    redirectTo,
+  });
+  assert.equal(missing.statusCode, 200, missing.body);
+  assert.equal(existing.statusCode, 200, existing.body);
+  assert.deepEqual(existing.json(), missing.json());
+  assert.equal(resetEmails.length, 1);
+  assert.equal(resetEmails[0].email, recoveryUser.email);
+  assert.ok(resetToken(resetEmails[0]));
+  assert.equal(existing.headers['cache-control'], 'no-store');
+  assert.equal(existing.headers['referrer-policy'], 'no-referrer');
+  assert.ok(!existing.body.includes(resetToken(resetEmails[0])));
+});
+
+test('reset changes the password, signs out existing sessions and cannot be replayed', async (t) => {
+  const { server, resetEmails } = await fixture(t);
+  const signup = await post(server, 'sign-up/email', recoveryUser);
+  const cookie = cookies(signup);
+  await post(server, 'request-password-reset', {
+    email: recoveryUser.email,
+    redirectTo,
+  });
+  const token = resetToken(resetEmails[0]);
+  const newPassword = 'new-controlled-password-456';
+  const short = await post(server, 'reset-password', {
+    token,
+    newPassword: 'short',
+  });
+  assert.equal(short.statusCode, 400, short.body);
+  const changed = await post(server, 'reset-password', { token, newPassword });
+  assert.equal(changed.statusCode, 200, changed.body);
+  assert.equal(
+    (await server.inject({ url: '/api/me', headers: { cookie } })).statusCode,
+    401
+  );
+  assert.equal(
+    (
+      await post(server, 'sign-in/email', {
+        email: recoveryUser.email,
+        password: recoveryUser.password,
+      })
+    ).statusCode,
+    401
+  );
+  assert.equal(
+    (
+      await post(server, 'sign-in/email', {
+        email: recoveryUser.email,
+        password: newPassword,
+      })
+    ).statusCode,
+    200
+  );
+  const reused = await post(server, 'reset-password', {
+    token,
+    newPassword: 'another-password-789',
+  });
+  assert.equal(reused.statusCode, 400, reused.body);
+  assert.equal(reused.json().code, 'INVALID_TOKEN');
+});
+
+test('expired and forged reset tokens cannot change a password', async (t) => {
+  const { server, auth, resetEmails } = await fixture(t);
+  await post(server, 'sign-up/email', recoveryUser);
+  await post(server, 'request-password-reset', {
+    email: recoveryUser.email,
+    redirectTo,
+  });
+  const token = resetToken(resetEmails[0]);
+  const context = await auth.$context;
+  const verification = await context.internalAdapter.findVerificationValue(
+    `reset-password:${token}`
+  );
+  assert.ok(verification.expiresAt.getTime() <= Date.now() + 30 * 60 * 1000);
+  await context.internalAdapter.updateVerificationByIdentifier(
+    `reset-password:${token}`,
+    { expiresAt: new Date(0) }
+  );
+  for (const value of [token, 'forged-token']) {
+    const result = await post(server, 'reset-password', {
+      token: value,
+      newPassword: 'replacement-password-123',
+    });
+    assert.equal(result.statusCode, 400, result.body);
+    assert.equal(result.json().code, 'INVALID_TOKEN');
+  }
+  assert.equal(
+    (
+      await post(server, 'sign-in/email', {
+        email: recoveryUser.email,
+        password: recoveryUser.password,
+      })
+    ).statusCode,
+    200
+  );
+});
+
+test('recovery rejects foreign origins and unsafe destinations before sending mail', async (t) => {
+  const { server, resetEmails } = await fixture(t);
+  await post(server, 'sign-up/email', recoveryUser);
+  for (const destination of [
+    undefined,
+    'https://evil.example/reset-password',
+    'https://game.example.com/other',
+    `${redirectTo}?next=https://evil.example`,
+  ]) {
+    const response = await post(server, 'request-password-reset', {
+      email: recoveryUser.email,
+      redirectTo: destination,
+    });
+    assert.equal(response.statusCode, 400, response.body);
+  }
+  const untrusted = await post(
+    server,
+    'request-password-reset',
+    { email: recoveryUser.email, redirectTo },
+    { origin: 'https://evil.example' }
+  );
+  assert.equal(untrusted.statusCode, 403, untrusted.body);
+  assert.equal(resetEmails.length, 0);
+});
+
+test('reset email requests and password attempts are rate limited', async (t) => {
+  const { server } = await fixture(t);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    assert.equal(
+      (
+        await post(server, 'request-password-reset', {
+          email: 'missing@example.test',
+          redirectTo,
+        })
+      ).statusCode,
+      200
+    );
+  }
+  assert.equal(
+    (
+      await post(server, 'request-password-reset', {
+        email: 'missing@example.test',
+        redirectTo,
+      })
+    ).statusCode,
+    429
+  );
+  for (let attempt = 0; attempt < 5; attempt++) {
+    assert.equal(
+      (
+        await post(server, 'reset-password', {
+          token: 'forged',
+          newPassword: 'controlled-password-123',
+        })
+      ).statusCode,
+      400
+    );
+  }
+  assert.equal(
+    (
+      await post(server, 'reset-password', {
+        token: 'forged',
+        newPassword: 'controlled-password-123',
+      })
+    ).statusCode,
+    429
+  );
+});
+
+test('unconfigured email delivery disables recovery for every address', async (t) => {
+  const { server } = await fixture(t, { recovery: false });
+  for (const email of [recoveryUser.email, 'missing@example.test']) {
+    const response = await post(server, 'request-password-reset', {
+      email,
+      redirectTo,
+    });
+    assert.equal(response.statusCode, 400, response.body);
+    assert.equal(response.json().code, 'RESET_PASSWORD_DISABLED');
+  }
 });

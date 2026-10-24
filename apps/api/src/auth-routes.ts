@@ -3,6 +3,7 @@ import type { FastifyInstance } from 'fastify';
 import type { AuthConfig } from './auth-config.js';
 import type { GameAuth } from './auth.js';
 import { authHeaders } from './auth-request.js';
+import { passwordResetDestination } from './password-reset-email.js';
 
 export async function registerAuthRoutes(
   server: FastifyInstance,
@@ -21,6 +22,34 @@ export async function registerAuthRoutes(
     url: '/api/auth/*',
     async handler(request, reply) {
       reply.header('Cache-Control', 'no-store');
+      reply.header('Referrer-Policy', 'no-referrer');
+      if (
+        request.method === 'POST' &&
+        [
+          '/api/auth/request-password-reset',
+          '/api/auth/reset-password',
+        ].includes(request.url.split('?')[0])
+      ) {
+        const origin = request.headers.origin;
+        if (origin && !config.trustedOrigins.includes(origin)) {
+          return reply
+            .code(403)
+            .send({ code: 'INVALID_ORIGIN', message: 'Invalid origin' });
+        }
+      }
+      if (
+        request.method === 'POST' &&
+        request.url.split('?')[0] === '/api/auth/request-password-reset'
+      ) {
+        const destination = (request.body as { redirectTo?: unknown } | null)
+          ?.redirectTo;
+        if (!passwordResetDestination(destination, config.trustedOrigins)) {
+          return reply.code(400).send({
+            code: 'INVALID_RESET_DESTINATION',
+            message: 'Invalid reset destination',
+          });
+        }
+      }
       const response = await auth.handler(
         new Request(config.baseURL + request.url, {
           method: request.method,
