@@ -9,6 +9,7 @@ import {
   TDLevelContext,
 } from '@/types/baseGame';
 import { TD_LEVELS } from '@/constants/tdLevels';
+import { isRogueliteEnabled } from '@/constants/featureFlags';
 import { resolvePlayerCreatures } from '@/utils/resolvePlayerCreature';
 import { resolveDialog } from '@/utils/dialogResolver';
 import { TEST_PROFILE_TEMPLATE_OPTIONS } from '@/constants/testProfileTemplates';
@@ -16,6 +17,10 @@ import { isTestProfileOverrideEnabled } from '@/utils/testProfileAccess';
 import { useAccount } from '@/app/components/auth/AuthProvider';
 import { useProfileSession } from '@/app/components/auth/useProfileSession';
 import { Button } from '@/app/components/ui/Button';
+import CloudSaveBar, {
+  useCloudSaveExitWarning,
+} from '@/app/components/CloudSaveBar';
+import CloudSaveConflictDialog from '@/app/components/CloudSaveConflictDialog';
 
 const StartScreen = lazy(() => import('@/app/components/startScreen'));
 const ProfileScreen = lazy(() => import('@/app/components/profileScreen'));
@@ -26,6 +31,9 @@ const LevelSelectScreen = lazy(
 );
 const ModeSelectScreen = lazy(
   () => import('@/app/components/ModeSelectScreen')
+);
+const RogueliteScreen = lazy(
+  () => import('@/app/components/roguelite/RogueliteScreen')
 );
 const TowerDefenseScreen = lazy(
   () => import('@/app/components/tower-defense/TowerDefenseScreen')
@@ -43,7 +51,7 @@ const getClientTestProfileOverrideEnabled = () =>
 const getServerTestProfileOverrideEnabled = () =>
   isTestProfileOverrideEnabled();
 
-export default function Home() {
+function GameScreens() {
   const { isPending: isAccountPending, refetch } = useAccount();
   const { waitingForIdentity, identityMismatch, needsSession } =
     useProfileSession();
@@ -77,6 +85,13 @@ export default function Home() {
     failedProfileSlot,
     loadAccountSlots,
     loadAccountProfile,
+    createAccountProfile,
+    deleteAccountProfile,
+    cloudMutation,
+    cloudMutationError,
+    cloudMutationNeedsRefresh,
+    cloudSaveAttempt,
+    cloudSaveConflict,
     cancelProfileRequests,
     setProfileAccount,
   } = useGameStore();
@@ -152,6 +167,7 @@ export default function Home() {
     return (
       <Suspense fallback={<div>Loading...</div>}>
         <ProfileScreen
+          key={profileAccountId ?? 'guest'}
           profiles={profiles}
           onSelect={
             profileAccountId
@@ -163,13 +179,18 @@ export default function Home() {
           onCreate={(slotId) => {
             // Do not label a new save as guest while identity is unresolved.
             if (isAccountPending) return;
-            createProfile(slotId);
+            if (profileAccountId) void createAccountProfile(slotId);
+            else createProfile(slotId);
           }}
           creationPending={isAccountPending}
           accountSlots={profileAccountId ? cloudSlots : undefined}
           loadStatus={cloudSlotsStatus}
           loadingSlot={loadingProfileSlot}
           loadError={cloudSlotsError ?? cloudProfileError}
+          mutation={cloudMutation}
+          mutationError={cloudMutationError}
+          mutationNeedsRefresh={cloudMutationNeedsRefresh}
+          saveBlocked={Boolean(cloudSaveAttempt || cloudSaveConflict)}
           onRefresh={() => {
             void loadAccountSlots();
           }}
@@ -178,7 +199,11 @@ export default function Home() {
             else if (failedProfileSlot !== null)
               void loadAccountProfile(failedProfileSlot);
           }}
-          onDelete={deleteProfile}
+          onDelete={(slot, confirmed) => {
+            if (profileAccountId) {
+              if (confirmed) void deleteAccountProfile(slot, confirmed);
+            } else deleteProfile(slot);
+          }}
           onBack={() => {
             cancelProfileRequests();
             setScreen(Screens.START);
@@ -371,7 +396,10 @@ export default function Home() {
     );
   }
 
-  if (currentScreen === Screens.MODE_SELECT) {
+  if (
+    currentScreen === Screens.MODE_SELECT ||
+    (currentScreen === Screens.ROGUELITE && !isRogueliteEnabled())
+  ) {
     if (!currentProfile) return null;
 
     return (
@@ -380,6 +408,9 @@ export default function Home() {
           profile={currentProfile}
           onSelectStory={() => setScreen(Screens.LEVEL_SELECT)}
           onSelectChallenge={() => setScreen(Screens.CHALLENGE_SELECT)}
+          onSelectRoguelite={() => {
+            if (isRogueliteEnabled()) setScreen(Screens.ROGUELITE);
+          }}
           onSelectCodex={() => {
             markJournalOpened();
             setScreen(Screens.COSMOID_CODEX);
@@ -399,6 +430,14 @@ export default function Home() {
           profile={currentProfile}
           onBack={() => setScreen(Screens.MODE_SELECT)}
         />
+      </Suspense>
+    );
+  }
+
+  if (currentScreen === Screens.ROGUELITE) {
+    return (
+      <Suspense fallback={<div>Loading roguelite...</div>}>
+        <RogueliteScreen onBack={() => setScreen(Screens.MODE_SELECT)} />
       </Suspense>
     );
   }
@@ -429,4 +468,23 @@ export default function Home() {
   }
 
   return null;
+}
+
+export default function Home() {
+  useCloudSaveExitWarning();
+  const mutation = useGameStore((s) => s.cloudMutation);
+  const conflict = useGameStore((s) => s.cloudSaveConflict);
+  const blocked =
+    mutation?.kind === 'save' ||
+    mutation?.kind === 'check' ||
+    Boolean(conflict);
+  return (
+    <div className="flex h-full min-h-0 flex-col">
+      <CloudSaveBar />
+      <div className="min-h-0 flex-1" inert={blocked}>
+        <GameScreens />
+      </div>
+      <CloudSaveConflictDialog />
+    </div>
+  );
 }

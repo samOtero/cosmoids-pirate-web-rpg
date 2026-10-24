@@ -1,21 +1,26 @@
 'use client';
 
 import { useState } from 'react';
-import type { CloudProfileSummary } from '@/types/cloudProfile';
+import type {
+  CloudProfileReference,
+  CloudProfileSummary,
+} from '@/types/cloudProfile';
+import type { CloudProfileMutation } from '@/store/profileSession';
 import { Profile } from '@/types/baseGame';
 import { LEVEL_ORDER } from '@/constants/tdLevels';
 import { TestProfileTemplateOption } from '@/constants/testProfileTemplates';
 import { resolvePlayerCreature } from '@/utils/resolvePlayerCreature';
-import Panel from '@/app/components/ui/Panel';
+import Panel, { PanelButton } from '@/app/components/ui/Panel';
 import { Button } from '@/app/components/ui/Button';
 import { useAccount } from './auth/AuthProvider';
 import AccountIdentity from './auth/AccountIdentity';
+import DeleteCloudProfileDialog from './DeleteCloudProfileDialog';
 
 interface ProfileScreenProps {
   profiles: (Profile | null)[];
   onSelect: (slotId: number) => void;
   onCreate: (slotId: number) => void;
-  onDelete: (slotId: number) => void;
+  onDelete: (slotId: number, confirmed?: CloudProfileReference) => void;
   onBack: () => void;
   creationPending?: boolean;
   accountSlots?: (CloudProfileSummary | null)[];
@@ -24,6 +29,10 @@ interface ProfileScreenProps {
   loadError?: string | null;
   onRetry?: () => void;
   onRefresh?: () => void;
+  mutation?: CloudProfileMutation | null;
+  mutationError?: string | null;
+  mutationNeedsRefresh?: boolean;
+  saveBlocked?: boolean;
   testProfileTemplates?: TestProfileTemplateOption[];
   onApplyTestTemplate?: (templateId: string) => void;
 }
@@ -41,11 +50,19 @@ export default function ProfileScreen({
   loadError,
   onRetry,
   onRefresh,
+  mutation = null,
+  mutationError,
+  mutationNeedsRefresh = false,
+  saveBlocked = false,
   testProfileTemplates,
   onApplyTestTemplate,
 }: ProfileScreenProps) {
   const { session } = useAccount();
   const [showTestTemplates, setShowTestTemplates] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<CloudProfileSummary | null>(
+    null
+  );
+  const busy = Boolean(mutation) || loadingSlot !== null || saveBlocked;
   const [selectedTemplateId, setSelectedTemplateId] = useState(
     testProfileTemplates?.[0]?.id ?? ''
   );
@@ -59,13 +76,21 @@ export default function ProfileScreen({
   const activeTemplateId = selectedTemplate?.id ?? '';
 
   return (
-    <div className="flex h-full flex-col items-center justify-center overflow-y-auto p-2 lg:p-4">
+    <div className="flex h-full flex-col items-center justify-start overflow-y-auto p-2 lg:justify-center lg:p-4">
       <div className="mb-4 flex w-full max-w-4xl flex-wrap items-center justify-between gap-3 lg:mb-8">
         <h2 className="border-b-2 border-wood pb-2 text-xl font-bold tracking-widest text-sand uppercase lg:text-3xl">
           Select Save File
         </h2>
         <div className="flex items-center gap-2">
-          {accountSlots && onRefresh && <Button variant="secondary" disabled={loadingSlot !== null || loadStatus === 'loading'} onClick={onRefresh}>Refresh saves</Button>}
+          {accountSlots && onRefresh && (
+            <Button
+              variant="secondary"
+              disabled={busy || loadStatus === 'loading'}
+              onClick={onRefresh}
+            >
+              Refresh saves
+            </Button>
+          )}
           {canUseTestTemplates && (
             <Button
               variant="secondary"
@@ -76,7 +101,7 @@ export default function ProfileScreen({
             </Button>
           )}
           {session && <AccountIdentity onSignedOut={onBack} />}
-          <Button variant="wood" onClick={onBack}>
+          <Button variant="wood" disabled={Boolean(mutation)} onClick={onBack}>
             Back
           </Button>
         </div>
@@ -85,8 +110,8 @@ export default function ProfileScreen({
       {creationPending && <p role="status">Checking your account…</p>}
       {accountSlots && (
         <p className="mb-4 max-w-4xl text-sm text-sand/75">
-          Cloud profiles load fresh when you reopen the game. Changes made now
-          won’t be saved. New cloud saves and deletion aren’t available yet.
+          Use Save to keep your cloud progress. New profiles are saved
+          immediately. Unfinished battles aren’t saved.
         </p>
       )}
       {accountSlots && (loadStatus === 'loading' || loadStatus === 'idle') && (
@@ -96,6 +121,18 @@ export default function ProfileScreen({
         <p role="status" className="mb-3">
           Loading profile…
         </p>
+      )}
+      {mutation &&
+        (mutation.kind === 'create' || mutation.kind === 'delete') && (
+          <p role="status" className="mb-3">
+            {mutation.kind === 'create' ? 'Creating' : 'Deleting'} cloud save in
+            slot {mutation.slot + 1}…
+          </p>
+        )}
+      {mutationError && (
+        <div role="alert" className="mb-4 max-w-4xl text-center text-red-300">
+          {mutationError}
+        </div>
       )}
       {loadError && (
         <div role="alert" className="mb-4 max-w-4xl text-center text-red-300">
@@ -110,7 +147,7 @@ export default function ProfileScreen({
       {(!accountSlots || loadStatus === 'ready') && (
         <div
           className="grid w-full max-w-4xl grid-cols-1 gap-4 sm:grid-cols-3 lg:gap-6"
-          aria-busy={loadingSlot !== null}
+          aria-busy={busy}
         >
           {[0, 1, 2].map((slotId) => {
             const profile = profiles[slotId];
@@ -122,12 +159,12 @@ export default function ProfileScreen({
               return (
                 <Panel
                   key={slotId}
-                  className="group flex h-52 cursor-pointer flex-col justify-between transition-colors hover:border-cyan-500 lg:h-64"
+                  className="group flex min-h-52 flex-col justify-between transition-colors hover:border-cyan-500 lg:min-h-64"
                 >
                   <button
                     type="button"
                     aria-label={`Load ${card.name}`}
-                    disabled={creationPending || loadingSlot !== null}
+                    disabled={creationPending || busy}
                     onClick={() => onSelect(slotId)}
                     className="flex flex-1 flex-col items-center justify-center space-y-1 disabled:cursor-wait disabled:opacity-60 lg:space-y-2"
                   >
@@ -175,46 +212,73 @@ export default function ProfileScreen({
                       in storage
                     </p>
                   )}
-                  {!accountSlots && (
-                    <div className="mt-2 flex justify-center border-t border-white/10 pt-2 lg:mt-4 lg:pt-4">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (confirm('Delete save?')) onDelete(slotId);
-                        }}
-                        className="text-xs font-bold text-red-400 uppercase hover:text-red-300"
-                      >
-                        Delete Data
-                      </button>
-                    </div>
-                  )}
+                  <div className="mt-2 flex justify-center border-t border-white/10 pt-2">
+                    <button
+                      type="button"
+                      aria-label={
+                        accountSlots
+                          ? `Delete ${card.name} in slot ${slotId + 1}`
+                          : undefined
+                      }
+                      disabled={
+                        creationPending ||
+                        busy ||
+                        (Boolean(accountSlots) && mutationNeedsRefresh)
+                      }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (accountSlots) {
+                          const target = accountSlots[slotId];
+                          if (target)
+                            setDeleteTarget({ ...target, name: card.name });
+                        } else if (confirm('Delete save?')) onDelete(slotId);
+                      }}
+                      className="min-h-11 px-3 text-xs font-bold text-red-400 uppercase hover:text-red-300 disabled:opacity-50"
+                    >
+                      {accountSlots ? 'Delete Cloud Save' : 'Delete Data'}
+                    </button>
+                  </div>
                 </Panel>
               );
             }
 
             return (
-              <Panel
+              <PanelButton
                 key={slotId}
-                className="flex h-52 cursor-pointer flex-col items-center justify-center transition-colors hover:bg-white/5 lg:h-64"
+                disabled={
+                  creationPending ||
+                  busy ||
+                  (Boolean(accountSlots) && mutationNeedsRefresh)
+                }
+                aria-label={`Create save in slot ${slotId + 1}`}
+                onClick={() => onCreate(slotId)}
+                className="flex h-52 cursor-pointer flex-col items-center justify-center gap-1 text-center transition-colors hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-300 disabled:cursor-wait disabled:opacity-50 lg:h-64 lg:gap-4"
               >
-                <button
-                  type="button"
-                  disabled={creationPending || Boolean(accountSlots)}
-                  aria-label={`Create save in slot ${slotId + 1}`}
-                  onClick={() => onCreate(slotId)}
-                  className="space-y-1 text-center disabled:cursor-wait disabled:opacity-50 lg:space-y-4"
-                >
-                  <span className="block text-2xl text-wood-light opacity-50 lg:text-4xl">
-                    +
-                  </span>
-                  <span className="block text-sm font-bold tracking-widest text-sand/50 uppercase lg:text-base">
-                    Empty Slot
-                  </span>
-                </button>
-              </Panel>
+                <span className="block text-2xl text-wood-light opacity-50 lg:text-4xl">
+                  +
+                </span>
+                <span className="block text-sm font-bold tracking-widest text-sand/50 uppercase lg:text-base">
+                  Empty Slot
+                </span>
+              </PanelButton>
             );
           })}
         </div>
+      )}
+
+      {deleteTarget && (
+        <DeleteCloudProfileDialog
+          name={deleteTarget.name}
+          slot={deleteTarget.slot}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={() => {
+            onDelete(deleteTarget.slot, {
+              id: deleteTarget.id,
+              revision: deleteTarget.revision,
+            });
+            setDeleteTarget(null);
+          }}
+        />
       )}
 
       {showTestTemplates && canUseTestTemplates && (

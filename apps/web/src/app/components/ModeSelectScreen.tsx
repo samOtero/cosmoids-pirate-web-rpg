@@ -2,6 +2,7 @@
 
 import { Profile, StoryProgression } from '@/types/baseGame';
 import { Button } from '@/app/components/ui/Button';
+import { isRogueliteEnabled } from '@/constants/featureFlags';
 
 // Kip introduces the journal after Level 3, so keep it hidden until that
 // story milestone has been reached.
@@ -11,6 +12,7 @@ interface ModeSelectScreenProps {
   profile: Profile;
   onSelectStory: () => void;
   onSelectChallenge: () => void;
+  onSelectRoguelite: () => void;
   onSelectCodex: () => void;
   onBack: () => void;
 }
@@ -19,9 +21,11 @@ export default function ModeSelectScreen({
   profile,
   onSelectStory,
   onSelectChallenge,
+  onSelectRoguelite,
   onSelectCodex,
   onBack,
 }: ModeSelectScreenProps) {
+  const showRoguelite = isRogueliteEnabled();
   const showCodex =
     CODEX_PREVIEW_ENABLED ||
     profile.storyProgression >= StoryProgression.DEFEAT_BUG_STAGE_2;
@@ -64,10 +68,14 @@ export default function ModeSelectScreen({
       </div>
 
       {/* Mode Cards */}
-      <div className="relative z-10 flex flex-1 items-center justify-center px-4 pb-4 lg:px-6 lg:pb-8">
+      <div className="relative z-10 flex min-h-0 flex-1 items-center overflow-y-auto px-4 pb-4 lg:px-6 lg:pb-8">
         <div
-          className={`grid w-full gap-3 lg:gap-6 ${
-            showCodex ? 'max-w-5xl grid-cols-3' : 'max-w-3xl grid-cols-2'
+          className={`mx-auto my-auto grid w-full grid-cols-2 gap-3 lg:gap-6 ${
+            showCodex && showRoguelite
+              ? 'max-w-6xl lg:grid-cols-4'
+              : showCodex || showRoguelite
+                ? 'max-w-5xl sm:grid-cols-3'
+                : 'max-w-3xl'
           }`}
         >
           {/* Story Mode Card */}
@@ -136,6 +144,31 @@ export default function ModeSelectScreen({
             {/* Subtle pulse border */}
             <div className="pointer-events-none absolute inset-0 animate-pulse rounded-2xl border-2 border-amber-400/20" />
           </button>
+
+          {showRoguelite ? (
+            <button
+              id="mode-roguelite"
+              onClick={onSelectRoguelite}
+              className="group relative flex min-h-[160px] cursor-pointer flex-col items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-emerald-400/40 bg-gradient-to-br from-emerald-900/40 to-teal-950/80 p-3 transition-all duration-300 hover:-translate-y-2 hover:border-emerald-300 hover:shadow-2xl hover:shadow-emerald-500/20 active:translate-y-0 lg:min-h-[220px] lg:gap-4 lg:p-7"
+            >
+              <div
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-400/15 text-2xl ring-2 ring-emerald-400/30 lg:h-20 lg:w-20 lg:text-4xl"
+                aria-hidden="true"
+              >
+                ✦
+              </div>
+              <h2 className="text-lg font-bold tracking-wide text-emerald-100 uppercase lg:text-2xl">
+                Roguelite
+              </h2>
+              <p className="max-w-[240px] text-center text-xs leading-relaxed text-sand/60 lg:text-sm">
+                Choose a starter, defend your coins, and draft a new team each
+                run.
+              </p>
+              <div className="text-xs font-semibold tracking-widest text-emerald-300/80 uppercase lg:mt-1">
+                Prototype · Play →
+              </div>
+            </button>
+          ) : null}
 
           {showCodex && (
             <button

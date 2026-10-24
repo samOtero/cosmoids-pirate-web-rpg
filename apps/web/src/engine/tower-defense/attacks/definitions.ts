@@ -1,5 +1,5 @@
 import { validateDefinitionRegistry } from '@/utils/definitionRegistry';
-import { AttackId } from '@/types/definitionIds';
+import { AttackId, STORY_ATTACK_IDS } from '@/types/definitionIds';
 import { ElementType } from '@/types/baseGame';
 import { AttackDefinition } from './types';
 
@@ -771,4 +771,4 @@ export const ATTACK_DEFS: Record<AttackId, AttackDefinition> = {
   },
 };
 
-validateDefinitionRegistry('Attacks', AttackId, ATTACK_DEFS);
+validateDefinitionRegistry('Story attacks', STORY_ATTACK_IDS, ATTACK_DEFS);

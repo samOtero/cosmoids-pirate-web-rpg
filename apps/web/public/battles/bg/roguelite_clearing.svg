@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <radialGradient id="grass"><stop stop-color="#34685b"/><stop offset="1" stop-color="#142e34"/></radialGradient>
+    <pattern id="dots" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M12 18l3-5 2 5m18 22l2-4 2 4" fill="none" stroke="#a5bc80" stroke-opacity=".12" stroke-width="2"/></pattern>
+    <radialGradient id="vault"><stop stop-color="#f3d894" stop-opacity=".32"/><stop offset="1" stop-color="#f3d894" stop-opacity="0"/></radialGradient>
+  </defs>
+  <path fill="url(#grass)" d="M0 0h1280v720H0z"/>
+  <path fill="url(#dots)" d="M0 0h1280v720H0z"/>
+  <g fill="none" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M-20 216h404v144h512V216h404M640 740V360" stroke="#0e292d" stroke-width="65"/>
+    <path d="M-20 216h404v144h512V216h404M640 740V360" stroke="#93866a" stroke-width="49"/>
+    <path d="M-20 216h404v144h512V216h404M640 740V360" stroke="#c3b08a" stroke-opacity=".3" stroke-width="30"/>
+    <path d="M0 216h384v144h512V216h384M640 720V360" stroke="#e7d5a4" stroke-opacity=".18" stroke-width="2" stroke-dasharray="3 18"/>
+  </g>
+  <circle cx="640" cy="360" r="112" fill="url(#vault)"/>
+  <ellipse cx="640" cy="360" rx="62" ry="40" fill="#243f3e" stroke="#d9bd75" stroke-width="3"/>
+  <ellipse cx="640" cy="360" rx="48" ry="28" fill="none" stroke="#d9bd75" stroke-opacity=".3" stroke-width="2"/>
+  <g fill="#193c3c" stroke="#5a7761" stroke-opacity=".5" stroke-width="2">
+    <path d="M34 22l68-18 46 23-8 57-67 12-43-27zM190 37l48-11 28 32-18 40-54-3-22-30zM1092 36l58-22 48 25 5 54-64 15-49-27zM1195 79l43-16 45 12v68l-49 5-30-28z"/>
+    <path d="M32 514l70-24 43 38-9 60-77 14-39-43zM147 619l51-18 50 30-12 53-67 9-36-38zM1090 571l67-19 51 33-13 62-66 12-49-41zM1212 457l51-10 17 15v92l-48-17-28-39z"/>
+  </g>
+  <g fill="#f1e3bb" opacity=".65" font-family="sans-serif" font-size="13" letter-spacing="4" text-anchor="middle">
+    <text x="139" y="177">WEST PATH</text><text x="1141" y="177">EAST PATH</text>
+    <text x="640" y="672">SOUTH PATH</text><text x="640" y="440">COIN STASH</text>
+  </g>
+  <path d="M530 89h220" stroke="#a6ba97" stroke-opacity=".25"/>
+  <text x="640" y="74" fill="#b1c9ad" opacity=".6" font-family="sans-serif" font-size="14" letter-spacing="6" text-anchor="middle">THE CLEARING</text>
+</svg>

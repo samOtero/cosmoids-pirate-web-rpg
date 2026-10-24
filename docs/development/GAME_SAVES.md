@@ -2,8 +2,8 @@
 
 The database, authenticated profile API and frontend transport are implemented.
 The game client loads account slots and selected cloud profiles into memory.
-Cloud creation/deletion controls and manual saving are not connected yet. Existing
-local profiles are not uploaded automatically. Trade-box transfers and their UI are the next
+The client creates/deletes cloud profiles and manually saves progress outside battles.
+Existing local profiles are not uploaded automatically. Trade-box transfers and their UI are the next
 API stage. The existing account/session tables remain owned by Better Auth.
 
 The frontend profile API client is implemented as the first game-integration stage.
@@ -279,17 +279,18 @@ stages. Focused transport and adapter tests are in
 `apps/web/src/store/profileSession.ts` owns runtime-only account state.
 `useProfileSession` follows the confirmed identity from `AuthProvider`. The profile
 screen waits for the initial identity, lists account summaries and loads a selected
-UUID before entering the existing game navigation. Empty cloud slots cannot create
-local saves. Cloud deletion and local test templates are disabled in account mode
-until their dedicated stages. The screen states that progress cannot be saved yet.
+UUID before entering the existing game navigation. Empty cloud slots create cloud
+profiles through the dedicated actions below; local creation and test templates
+cannot modify account slots. Account gameplay uses the manual Save controls below.
 
 Existing game actions continue to operate on `profiles`. Entering account mode
 preserves the local bank in `guestProfiles`, clears the selection and loads cloud
 working copies into the active bank. Each loaded slot has cloud metadata, editable
 boxes and a last-confirmed baseline in `cloudProfiles`. Reopening a loaded slot in
 the same session resumes its working copy without another server load. Refreshing
-summaries does not replace working copies. Login neither claims nor uploads local
-profiles.
+summaries preserves working copies for the same UUID, including unsaved changes.
+A slot that was deleted or replaced with a different UUID clears its previous
+working copy and selection. Login neither claims nor uploads local profiles.
 
 Persistence still uses `cosmoids-game-state`, but serializes only the local bank.
 No account profile, summary, UUID/revision, box draft or baseline is written to
@@ -310,6 +311,78 @@ different account clears them. Errors show Retry, with no local-data fallback.
 Focused tests are `profileSession.test.ts` (persistence, refresh, races/failures)
 and `profileOwnership.test.tsx` (Home/profile-screen flow, identity gating, retries
 and Strict Mode). Cloud fixtures use typed builders independent of serialization.
+
+## Cloud profile creation and deletion (stage 3)
+
+Choosing an empty account slot posts a fresh profile with the same defaults as
+guest creation. The client waits for the server's UUID, revision, storage box and
+full snapshot before adopting the working copy and starting the introduction.
+It never claims a guest save. Creating the initial profile is an immediate cloud
+write; subsequent gameplay uses the manual-save controls below.
+
+Cloud deletion opens a named, slot-specific confirmation that explains permanent
+removal of the profile, its party/storage creatures and unsaved progress. Cancel
+receives initial focus; Escape cancels and focus returns to the invoking control.
+Confirmation captures the UUID and revision shown when the dialog opened. The
+store rejects a changed confirmation target and DELETE sends that expected
+revision. A slot and its loaded metadata are cleared only after a successful
+response. Account trade-box creatures are not part of profile deletion.
+
+Only one create/delete operation runs at a time. Loading, refresh, other writes
+and Back are disabled while it is pending. Account changes abort the request and
+late responses cannot enter or clear another account's slots. Canceling a write
+does not prove the server canceled it, so returning requires reconciliation.
+
+Stale, missing and occupied-slot responses preserve current copies and require a
+slot refresh and a new confirmation. Timeouts, network errors, server failures
+and invalid responses likewise require refresh to inspect the result; writes
+are never replayed automatically. A 401 requests login again. Successful refresh
+clears the write error and re-enables actions. Guest creation/deletion and local
+storage behavior remain unchanged.
+
+Focused coverage is in `profileMutations.test.ts` and `profileOwnership.test.tsx`:
+confirmed adoption/deletion, guest persistence, duplicate submissions, account
+races, session expiry, conflicts, unconfirmed writes and confirmation controls.
+
+## Manual cloud saving (stage 4)
+
+`CloudSaveBar` is a compact, separate row above the selected profile's menus:
+mode selection, levels, challenges, journal, team and profile selection. It is
+hidden on the title, story-dialog and battle screens. The store independently
+rejects saving from those screens. The bar names the profile/slot, reports unsaved
+changes or the confirmed save time, and exposes Save. Guest saving is unchanged.
+`lastPlayed` changes on selection do not count as unsaved gameplay by themselves.
+
+Save captures the working copy and sends the existing changes-only PUT with its
+last confirmed revision. Menu input is blocked while the request runs. Success
+updates cloud metadata, slot summary, storage layout and the saved baseline, not
+the live working copy. Edits made during the request remain unsaved. Creature
+defaults are canonicalized to match the API's active-move and targeting defaults.
+
+An outdated revision displays a blocking notice before any working data is
+replaced. Load latest save acknowledges that unsaved progress will be discarded,
+adopts the supplied latest snapshot and enters normal profile navigation. A
+deleted profile instead returns to the save list; it is never recreated. An
+unsupported response retains the draft and reports an error.
+
+Known validation failures and database-rollback errors preserve the draft and
+baseline and permit an explicit retry. A 401 offers login in place; the same
+account keeps its working copy. No request is replayed automatically. Timeout,
+network or invalid-response failures retain an unconfirmed save attempt and
+offer Check cloud save. That action reads the same UUID: an unchanged revision
+permits retry, a matching next revision confirms the submitted baseline without
+discarding later edits, and a different newer snapshot enters the conflict
+notice. Account changes abort/ignore old requests. Canceled saves remain
+unconfirmed until checked. No account draft or recovery state reaches localStorage.
+
+Tabs with unsaved account profiles or an unconfirmed save attach the browser's
+before-unload warning. This is a warning only, with no background save or local
+draft. Explicit logout/account switching retains its existing discard behavior.
+
+`cloudSaving.test.ts`, `profileOwnership.test.tsx` and `profileClient.test.ts`
+cover confirmed baselines, in-flight edits, request serialization, guest-bank
+isolation, conflict acknowledgement, expiry, unknown outcomes, cancellation,
+account races, screen restrictions and closing a dirty tab.
 
 ## Revisions and box transfers
 

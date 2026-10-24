@@ -163,8 +163,8 @@ function copyCreature(value: CloudCreatureInput): CloudCreatureInput {
     xp: value.xp,
     isShiny: value.isShiny,
     equippedAttacks: [...value.equippedAttacks],
-    activeAttackIndex: value.activeAttackIndex,
-    targetingMode: value.targetingMode,
+    activeAttackIndex: value.activeAttackIndex ?? 0,
+    targetingMode: value.targetingMode ?? 'first',
   };
 }
 function copyProfileData(value: CloudProfileData): CloudProfileData {
@@ -247,7 +247,7 @@ export function createCloudBaseline(
   return { ...snapshot, storageBoxes: boxes };
 }
 
-function prepareBaseline(
+export function createCloudSaveBaseline(
   profile: Profile,
   baseline: CloudProfileBaseline,
   boxes?: CloudStorageBox[]
@@ -349,9 +349,31 @@ export function createCloudChanges(
   storageBoxes?: CloudStorageBox[]
 ): CloudProfileChanges {
   return changesBetween(
-    prepareBaseline(profile, baseline, storageBoxes),
+    createCloudSaveBaseline(profile, baseline, storageBoxes),
     baseline
   );
+}
+
+/** Opening a profile updates lastPlayed; that alone is not unsaved gameplay. */
+export function hasCloudProfileChanges(
+  profile: Profile,
+  baseline: CloudProfileBaseline
+): boolean {
+  try {
+    const changes = createCloudChanges(
+      { ...profile, lastPlayed: baseline.profileData.lastPlayed },
+      baseline
+    );
+    return Boolean(
+      changes.profileData ||
+      changes.creatureChanges.added.length ||
+      changes.creatureChanges.updated.length ||
+      changes.creatureChanges.order
+    );
+  } catch {
+    // Invalid drafts remain visibly unsaved; Save reports the validation error.
+    return true;
+  }
 }
 
 /** The account ID must come from the caller's confirmed session, never user input. */
@@ -502,7 +524,11 @@ export const profileClient = {
     baseline: CloudProfileBaseline,
     options?: ProfileSaveOptions
   ): Promise<CloudProfileSaveResult> => {
-    const snapshot = prepareBaseline(profile, baseline, options?.storageBoxes);
+    const snapshot = createCloudSaveBaseline(
+      profile,
+      baseline,
+      options?.storageBoxes
+    );
     const confirmed = await request(
       'PUT',
       '/' + encodeURIComponent(cloud.id),

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { AttackId } from '@/types/definitionIds';
 import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
+import type { AttackDefinition } from '@/engine/tower-defense/attacks/types';
 import type { PlayerCreature } from '@/types/baseGame';
 import type { Tower, TowerTargetingMode } from '@/engine/tower-defense/types';
 import {
@@ -15,6 +16,8 @@ import { AttackDetails } from '@/app/components/attacks/AttackDetails';
 import { AttackDialog } from '@/app/components/attacks/AttackDialog';
 import { ELEMENT_TEXT_COLORS } from '@/app/components/ui/elementTextColors';
 import { TargetPriorityMenu } from './TargetPriorityMenu';
+
+const getStoryAttack = (id: AttackId) => ATTACK_DEFS[id];
 
 export function ActiveAttackMenu({
   name,
@@ -30,6 +33,7 @@ export function ActiveAttackMenu({
   tower,
   elapsedTimeMs = 0,
   frameTimeMs = 0,
+  getAttackDefinition = getStoryAttack,
 }: {
   creature: PlayerCreature;
   name: string;
@@ -48,9 +52,10 @@ export function ActiveAttackMenu({
   tower?: Tower;
   elapsedTimeMs?: number;
   frameTimeMs?: number;
+  getAttackDefinition?: (id: AttackId) => AttackDefinition | undefined;
 }) {
   const [choosingTarget, setChoosingTarget] = useState(false);
-  const inspected = ATTACK_DEFS[equippedAttacks[activeAttackIndex]];
+  const inspected = getAttackDefinition(equippedAttacks[activeAttackIndex]);
   const intervalMs =
     inspected && tower && !usesAttackSimulationCooldown(inspected)
       ? getAttackIntervalMs(inspected, tower, elapsedTimeMs)
@@ -126,7 +131,7 @@ export function ActiveAttackMenu({
         >
           <div className="flex min-h-0 flex-col gap-1" aria-label="Known moves">
             {equippedAttacks.map((id, index) => {
-              const attack = ATTACK_DEFS[id];
+              const attack = getAttackDefinition(id);
               if (!attack) return null;
               return (
                 <button

@@ -79,4 +79,20 @@ export const AttackId = {
   PINCH: 39,
   STRING_SHOT: 40,
   PECK: 41,
+  ROGUELITE_FIRE_CLAW: 42,
+  ROGUELITE_CINDER_SPIT: 43,
+  ROGUELITE_FIRE_BREATH: 44,
+  ROGUELITE_TAIL_BOMB: 45,
 } as const;
+
+export const ROGUELITE_ATTACK_IDS = {
+  FIRE_CLAW: AttackId.ROGUELITE_FIRE_CLAW,
+  CINDER_SPIT: AttackId.ROGUELITE_CINDER_SPIT,
+  FIRE_BREATH: AttackId.ROGUELITE_FIRE_BREATH,
+  TAIL_BOMB: AttackId.ROGUELITE_TAIL_BOMB,
+} as const;
+
+const rogueliteIds = new Set<number>(Object.values(ROGUELITE_ATTACK_IDS));
+export const STORY_ATTACK_IDS = Object.fromEntries(
+  Object.entries(AttackId).filter(([, id]) => !rogueliteIds.has(id))
+);

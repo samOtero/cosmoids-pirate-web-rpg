@@ -145,9 +145,9 @@ the documented rule and deploy it to production.
 - After successful signup or login, the UI checks `/api/auth/get-session` before
   closing the form. A successful POST alone does not prove the browser retained
   its session cookie. Failed confirmation leaves the form open with guidance.
-- Confirmed login or signup opens the device-local profile selection immediately.
-  An existing session restored on the start screen also opens profile selection
-  automatically. There is no separate Continue step.
+- Confirmed login or signup opens cloud profile selection immediately.
+  An existing session restored on the start screen offers Start to open those
+  profiles. Offline play opens device-local profiles.
 - The profile selection screen shows the account display name and Log out.
   Logout returns to the start screen; guests retain their Back button.
 - Login and logout do not claim or relabel existing profiles. Local saves remain
@@ -179,14 +179,17 @@ migration is performed.
 Offline ownership remains local metadata. Cloud access is enforced by the API,
 which derives the account from its session and assigns/preserves original
 ownership. Login neither claims nor uploads existing local profiles. Explicit
-guest claiming, cloud create/delete controls, manual-save UI and trade-box
+guest claiming and trade-box
 integration remain separate stages. Account local drafts are deferred.
 
 The database has explicit game migrations for profiles, individual creatures,
 and account trade boxes. Authenticated profile endpoints now support listing,
 loading, creation, revision-checked saving, and deletion. The game UI now loads
-cloud slots and selected profiles into memory. Cloud writes and box transfers
-are not connected to the UI yet. See
+cloud slots and selected profiles into memory and supports creating and deleting
+cloud profiles. New profiles are written immediately before their introduction;
+deletion requires a named confirmation and the expected server revision. A manual
+Save bar now writes profile/creature changes from menus outside battles. Box
+transfers remain a separate stage. See
 [account save storage and API](GAME_SAVES.md) for the schema, permanent numeric
 gender/location values, request contract, and local verification.
 
@@ -201,6 +204,21 @@ database again. Explicit logout/offline play restores local profiles. Switching
 accounts clears prior working copies and aborts/ignores old requests; an expired
 session retains copies while the player logs back in. Loading errors show Retry
 instead of substituting local profiles or empty cloud slots.
+
+Creation/deletion errors keep existing data visible. A conflicting or unconfirmed
+write requires Refresh saves before another attempt; deletion then requires a
+fresh confirmation. Switching accounts or logging out prevents late responses
+from changing the next account. Account writes never change the guest bank or
+store cloud data in local storage.
+
+The selected cloud profile's menus display unsaved changes and its confirmed save
+time. Saving sends changed fields/creatures with the last revision. Successful
+requests advance the baseline without overwriting edits made during the request.
+Stale revisions show a notice before loading the latest saved progress and
+discarding this tab's unsaved work. Network/timeout outcomes require Check cloud
+save before another write; known failures preserve the draft for explicit retry.
+Expired saves offer login without clearing the working copy. Unsaved account
+tabs warn before closing/reloading. Unfinished battles remain excluded from saves.
 
 ## Refresh and failures
 

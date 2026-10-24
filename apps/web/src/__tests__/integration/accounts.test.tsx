@@ -300,6 +300,11 @@ describe('account UI with the real Better Auth client', () => {
   it('keeps guest play available when session checking fails', async () => {
     sessionFailure = true;
     const onStart = showStart();
+    // Setup just fetched a healthy session. Explicitly check again instead of
+    // depending on whether the client's short mount-deduplication window elapsed.
+    await act(async () => {
+      await authClient.$store.atoms.session.get().refetch();
+    });
     expect(
       await screen.findByText(/couldn’t check your account/)
     ).toBeInTheDocument();

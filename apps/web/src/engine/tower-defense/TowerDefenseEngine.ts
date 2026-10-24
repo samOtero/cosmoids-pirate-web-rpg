@@ -48,6 +48,7 @@ import {
   FlagDuelShot,
 } from './types';
 import { ATTACK_DEFS } from './attacks/definitions';
+import type { AttackDefinition } from './attacks/types';
 import { startDamageFlash } from './damageFlash';
 import {
   AttackBehaviorRegistry,
@@ -600,6 +601,21 @@ export class TowerDefenseEngine {
   public isSpotOccupied(x: number, y: number): boolean {
     // Check if any tower is at these exact coordinates
     return this.towers.some((t) => t.position.x === x && t.position.y === y);
+  }
+
+  /** Modes may supply independent moves without mutating the story registry. */
+  public getAttackDefinition(id: AttackId): AttackDefinition {
+    return ATTACK_DEFS[id];
+  }
+
+  protected updateCustomTowerAttack(tower: Tower, deltaMs: number): boolean {
+    void tower;
+    void deltaMs;
+    return false;
+  }
+
+  protected updateCustomProjectiles(deltaMs: number): void {
+    void deltaMs;
   }
 
   public destroy() {
@@ -1309,7 +1325,7 @@ export class TowerDefenseEngine {
     newTowers.forEach((tower) => {
       updateFireClawHeat(
         tower,
-        ATTACK_DEFS[AttackId.FIRE_CLAW],
+        this.getAttackDefinition(AttackId.FIRE_CLAW),
         this.elapsedTimeMs
       );
       if (tower.damageFlashTimerMs) {
@@ -1319,7 +1335,7 @@ export class TowerDefenseEngine {
       const attackInstance =
         tower.equippedAttacksRuntime[tower.selectedAttackIndex];
       const attackDef = attackInstance
-        ? ATTACK_DEFS[attackInstance.definitionId]
+        ? this.getAttackDefinition(attackInstance.definitionId)
         : undefined;
       updatePassiveWarmth(tower, attackDef, deltaMs);
       if (
@@ -1333,6 +1349,8 @@ export class TowerDefenseEngine {
         return;
       if (!attackInstance) return;
       if (!attackDef) return;
+
+      if (this.updateCustomTowerAttack(tower, deltaMs)) return;
 
       const usesSimulationCooldown = usesAttackSimulationCooldown(attackDef);
       if (
@@ -1421,7 +1439,7 @@ export class TowerDefenseEngine {
           this,
           p,
           newEnemies,
-          ATTACK_DEFS[p.attackDefinitionId],
+          this.getAttackDefinition(p.attackDefinitionId),
           deltaMs
         );
         return;
@@ -1432,7 +1450,7 @@ export class TowerDefenseEngine {
       }
 
       const dashDef = p.attackDefinitionId
-        ? ATTACK_DEFS[p.attackDefinitionId]
+        ? this.getAttackDefinition(p.attackDefinitionId)
         : undefined;
       const dashVisual = dashDef?.visualEffectConfigId
         ? getDefinitionVisuals(dashDef.visualEffectConfigId)?.default
@@ -1552,7 +1570,7 @@ export class TowerDefenseEngine {
         if (target && p.dealsDamage !== false) {
           const sourceTower = newTowers.find((t) => t.id === p.sourceId);
           if (p.attackDefinitionId && sourceTower) {
-            const attackDef = ATTACK_DEFS[p.attackDefinitionId];
+            const attackDef = this.getAttackDefinition(p.attackDefinitionId);
             if (attackDef) {
               const targetWasAlive = target.hp > 0;
               if (attackDef.adaptiveTargetedAoe) {
@@ -1618,7 +1636,10 @@ export class TowerDefenseEngine {
               }
             } else {
               target.hp -= p.damage; // Fallback
-              startDamageFlash(target, ATTACK_DEFS[p.attackDefinitionId]?.type);
+              startDamageFlash(
+                target,
+                this.getAttackDefinition(p.attackDefinitionId)?.type
+              );
               this.floatingTexts.push({
                 id: `ft_dmg_${time}_${Math.random().toString(36).substring(7)}`,
                 text: Math.ceil(p.damage).toString(),
@@ -1633,7 +1654,7 @@ export class TowerDefenseEngine {
             startDamageFlash(
               target,
               p.attackDefinitionId
-                ? ATTACK_DEFS[p.attackDefinitionId]?.type
+                ? this.getAttackDefinition(p.attackDefinitionId)?.type
                 : undefined
             );
             this.floatingTexts.push({
@@ -1647,7 +1668,7 @@ export class TowerDefenseEngine {
           }
 
           const impactAttackDef = p.attackDefinitionId
-            ? ATTACK_DEFS[p.attackDefinitionId]
+            ? this.getAttackDefinition(p.attackDefinitionId)
             : undefined;
           if (
             target.hp <= 0 &&
@@ -1659,7 +1680,7 @@ export class TowerDefenseEngine {
         }
 
         const impactDef = p.attackDefinitionId
-          ? ATTACK_DEFS[p.attackDefinitionId]
+          ? this.getAttackDefinition(p.attackDefinitionId)
           : undefined;
         if (target && impactDef?.isDashAttack && impactDef.dashImpactHoldMs) {
           p.position = { ...p.target };
@@ -1688,6 +1709,7 @@ export class TowerDefenseEngine {
     this.processScouredEffects(newEnemies);
 
     // Filter dead enemies and collect money
+    this.updateCustomProjectiles(deltaMs);
     const deadEnemies = newEnemies.filter((e) => e.hp <= 0);
     if (deadEnemies.length > 0) {
       this.money += deadEnemies.reduce(

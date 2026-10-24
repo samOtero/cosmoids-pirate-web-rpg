@@ -12,7 +12,6 @@ import {
   TowerDefenseEngine,
   TD_CREATURE_DEFS,
 } from '@/engine/tower-defense/TowerDefenseEngine';
-import { ATTACK_DEFS } from '@/engine/tower-defense/attacks/definitions';
 import { ElementType } from '@/types/baseGame';
 import { TD_BASE_HEIGHT } from '@/constants/game';
 
@@ -3112,7 +3111,19 @@ function updateStructureLabel(
   label.style.fill = isFocused ? 0xfde047 : 0xe2e8f0;
 }
 
+export interface BattlefieldEffectLayout {
+  screenW: number;
+  screenH: number;
+  offsetX: number;
+  offsetY: number;
+  zoom: number;
+}
+
 interface PixiBattlefieldProps {
+  renderAttackPatterns?: (
+    graphics: PIXI.Graphics,
+    layout: BattlefieldEffectLayout
+  ) => void;
   engine: TowerDefenseEngine;
   onMapDrop: (defId: string, x: number, y: number) => void;
   onMapRemove: (defId: string) => void;
@@ -3169,10 +3180,15 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
       onOpeningPanComplete,
       hideUi = false,
       healingTutorialTowerCreatureId,
+      renderAttackPatterns,
     },
     ref
   ) => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const renderAttackPatternsRef = useRef(renderAttackPatterns);
+    useEffect(() => {
+      renderAttackPatternsRef.current = renderAttackPatterns;
+    }, [renderAttackPatterns]);
     const fpsRef = useRef<HTMLDivElement>(null);
     const onMapDropRef = useRef(onMapDrop);
     const onMapRemoveRef = useRef(onMapRemove);
@@ -3408,6 +3424,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         const airFxLayer = new PIXI.Container();
         airFxLayer.label = 'airFxLayer';
         const hudLayer = new PIXI.Container();
+        const extraAttackGraphics = new PIXI.Graphics();
+        extraAttackGraphics.eventMode = 'none';
+        airFxLayer.addChild(extraAttackGraphics);
         hudLayer.label = 'hudLayer';
         app.stage.addChild(
           backgroundLayer,
@@ -3425,13 +3444,15 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
         await PIXI.Assets.load(bgUrl);
         if (isDestroyed) return;
 
-        const flyingColorsVisual =
-          ATTACK_DEFS[AttackId.FLYING_COLORS].projectileVisual;
+        const flyingColorsVisual = engine.getAttackDefinition(
+          AttackId.FLYING_COLORS
+        ).projectileVisual;
         if (flyingColorsVisual?.type === 'FLYING_COLORS') {
           void PIXI.Assets.load(flyingColorsVisual.spriteUrl);
         }
-        const riggingNestVisual =
-          ATTACK_DEFS[AttackId.RIGGING_NEST].riggingNest;
+        const riggingNestVisual = engine.getAttackDefinition(
+          AttackId.RIGGING_NEST
+        ).riggingNest;
         if (riggingNestVisual) {
           for (const url of new Set([
             riggingNestVisual.nestSpriteUrl,
@@ -3853,6 +3874,14 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
           const offsetX = bgBounds.x;
           const offsetY = bgBounds.y;
           const viewportH = app.screen.height; // For sizing UI elements (not affected by bg scale)
+          extraAttackGraphics.clear();
+          renderAttackPatternsRef.current?.(extraAttackGraphics, {
+            screenW,
+            screenH,
+            offsetX,
+            offsetY,
+            zoom: zoomRef.current,
+          });
 
           // Parlet's mosaic currents are painted onto the battlefield itself,
           // keeping them beneath creatures, towers, labels, and projectiles.
@@ -4537,7 +4566,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             );
           }
 
-          const riggingVisual = ATTACK_DEFS[AttackId.RIGGING_NEST].riggingNest;
+          const riggingVisual = engine.getAttackDefinition(
+            AttackId.RIGGING_NEST
+          ).riggingNest;
           if (riggingVisual) {
             const currentNestIds = new Set(
               engine.riggingNests.map((nest) => nest.id)
@@ -4972,7 +5003,8 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 const attackInstance =
                   tower.equippedAttacksRuntime[tower.selectedAttackIndex];
                 const rangeIndex = attackInstance
-                  ? ATTACK_DEFS[attackInstance.definitionId]?.rangeIndex
+                  ? engine.getAttackDefinition(attackInstance.definitionId)
+                      ?.rangeIndex
                   : undefined;
                 rCircle.clear();
                 if (rangeIndex !== undefined && finalScale > 0) {
@@ -5096,7 +5128,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             const isDashing = engine.projectiles.some((p) => {
               if (p.sourceId !== tower.id || !p.attackDefinitionId)
                 return false;
-              const def = ATTACK_DEFS[p.attackDefinitionId];
+              const def = engine.getAttackDefinition(p.attackDefinitionId);
               return def && def.isDashAttack;
             });
 
@@ -5339,7 +5371,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 : 0;
               const attackId = equippedAttacks[selectedAttackIndex];
               const rangeIndex = attackId
-                ? ATTACK_DEFS[attackId]?.rangeIndex
+                ? engine.getAttackDefinition(attackId)?.rangeIndex
                 : undefined;
 
               if (rangeIndex !== undefined && !hoveringLaunch) {
@@ -5773,7 +5805,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               container = new PIXI.Container();
 
               const def = proj.attackDefinitionId
-                ? ATTACK_DEFS[proj.attackDefinitionId]
+                ? engine.getAttackDefinition(proj.attackDefinitionId)
                 : undefined;
 
               if (def?.rollingBarrel) {
@@ -5936,7 +5968,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
 
                 let projColor = 0x22d3ee; // Default cyan
                 if (proj.attackDefinitionId) {
-                  const def = ATTACK_DEFS[proj.attackDefinitionId];
+                  const def = engine.getAttackDefinition(
+                    proj.attackDefinitionId
+                  );
                   if (def) {
                     projColor = TYPE_COLORS[def.type] || projColor;
                   }
@@ -5957,7 +5991,7 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
             container.scale.set(finalScale * (proj.visualScale ?? 1));
 
             const def = proj.attackDefinitionId
-              ? ATTACK_DEFS[proj.attackDefinitionId]
+              ? engine.getAttackDefinition(proj.attackDefinitionId)
               : undefined;
 
             if (
@@ -6263,8 +6297,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                 sparks.label = 'sound_or_electric_attack_vfx';
                 container.addChild(sparks);
               } else if (animConfig?.type === 'COIR_SNARE') {
-                const coirVisual =
-                  ATTACK_DEFS[AttackId.COIR_SNARE].projectileVisual;
+                const coirVisual = engine.getAttackDefinition(
+                  AttackId.COIR_SNARE
+                ).projectileVisual;
                 if (coirVisual?.type === 'COIR_BOLA') {
                   drawCoirSnareImpact(
                     container,
@@ -6275,8 +6310,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
                   );
                 }
               } else if (animConfig?.type === 'STRING_SHOT') {
-                const stringVisual =
-                  ATTACK_DEFS[AttackId.STRING_SHOT].projectileVisual;
+                const stringVisual = engine.getAttackDefinition(
+                  AttackId.STRING_SHOT
+                ).projectileVisual;
                 if (stringVisual?.type === 'STRING_COIL') {
                   drawCoirSnareImpact(
                     container,
@@ -6401,8 +6437,9 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               const pearl = container.getChildByLabel(
                 'reverie_orb_vfx'
               ) as PIXI.Graphics;
-              const palette =
-                ATTACK_DEFS[AttackId.REVERIE_ORB].projectileVisual;
+              const palette = engine.getAttackDefinition(
+                AttackId.REVERIE_ORB
+              ).projectileVisual;
               if (palette?.type === 'REVERIE_ORB') {
                 if (animConfig.type === 'REVERIE_ORB_LAUNCH') {
                   const sourceTower = engine.towers.find(
@@ -6447,14 +6484,13 @@ const PixiBattlefield = forwardRef<PixiBattlefieldRef, PixiBattlefieldProps>(
               const isGrumble =
                 animConfig.type === 'GRUMBLE' ||
                 animConfig.type === 'GRUMBLE_LAUNCH';
-              const palette =
-                ATTACK_DEFS[
-                  isSpark
-                    ? AttackId.SPARK
-                    : isGrumble
-                      ? AttackId.GRUMBLE
-                      : AttackId.STATIC_YIP
-                ].projectileVisual;
+              const palette = engine.getAttackDefinition(
+                isSpark
+                  ? AttackId.SPARK
+                  : isGrumble
+                    ? AttackId.GRUMBLE
+                    : AttackId.STATIC_YIP
+              ).projectileVisual;
               if (
                 palette?.type === 'STATIC_YIP' ||
                 palette?.type === 'SPARK' ||

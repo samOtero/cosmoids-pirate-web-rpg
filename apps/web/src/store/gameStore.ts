@@ -42,6 +42,7 @@ import { TowerDefenseEngine } from '@/engine/tower-defense/TowerDefenseEngine';
 import { createTestProfileFromTemplate } from '@/constants/testProfileTemplates';
 import { isTestProfileOverrideEnabled } from '@/utils/testProfileAccess';
 import { generateCreatureGender } from '@/utils/creatureGender';
+import { createNewProfile } from '@/utils/createProfile';
 import {
   createProfileSessionSlice,
   type ProfileSessionSlice,
@@ -416,21 +417,7 @@ export const useGameStore = create<GameState>()(
               )
                 return state;
               const newProfiles = [...state.profiles];
-              newProfiles[slotId] = {
-                id: slotId,
-                ownerId,
-                name: `Caleb`,
-                lastPlayed: Date.now(),
-                creatures: [],
-                storageCreatures: [],
-                capturedSpeciesIds: [],
-                inventory: [],
-                gameFlags: [],
-                storyProgression: 0,
-                journalUnlockShown: false,
-                journalOpened: false,
-                version: CURRENT_PROFILE_VERSION,
-              };
+              newProfiles[slotId] = createNewProfile(slotId, ownerId);
               return {
                 profiles: newProfiles,
                 currentProfileId: slotId,
